@@ -1,5 +1,7 @@
 #include <complex>
 #include <cstdlib>
+#include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <random>
 #include <vector>
@@ -7,10 +9,23 @@
 #include "vector.hpp"
 #include "matrix.hpp"
 
+#include "SparseMatrix.hpp"
+
 #include <Eigen/Eigenvalues>
 
 int main()
 {
+
+  //===============
+  // MATRIX LOADING
+  //===============
+  
+  std::string path = "/home/cdoucet/Documents/soutien/matherials/codes/existant/chimie_quantique/greedy_quantum_C++/Donnees/Donnees_H2/donnees_in";
+  std::ifstream file(path+"/kinetic_matrix.txt");
+
+  simol::SparseMatrix<double> K(10,10);
+  file >> K;
+  file.close();
 
   //===========================
   // PARALLEL RANDOM GENERATION
