@@ -13,18 +13,20 @@ extern "C"
 
 namespace simol
 {
-  template<class ScalarType>
-  std::ostream & operator<<(std::ostream & output, Vector<ScalarType> const & vector);
+  template<class ScalarType, template<class> class WrappingPolicy>
+  std::ostream & operator<<(std::ostream & output, Vector<ScalarType,WrappingPolicy> const & vector);
 }
 
 namespace simol
 {
 
+  template<class ScalarType> class Dummy {};
+
   //! \brief Vectors and vector operations
-  template<class ScalarType>
+  template<class ScalarType, template<class> class WrappingPolicy>
   class Vector
   {
-    friend std::ostream & operator<< <>(std::ostream & output, Vector<ScalarType> const & vector);
+    friend std::ostream & operator<< <>(std::ostream & output, Vector<ScalarType,WrappingPolicy> const & vector);
     
     public:
       //! \brief Construct a vector of a given size
@@ -51,8 +53,8 @@ namespace simol
 
 namespace simol
 {
-  template<class ScalarType>
-  std::ostream & operator<<(std::ostream & output, Vector<ScalarType> const & vector)
+  template<class ScalarType, template<class> class WrappingPolicy>
+  std::ostream & operator<<(std::ostream & output, Vector<ScalarType,WrappingPolicy> const & vector)
   {
     for (size_t index = 0; index < vector.size(); ++index)
       output << vector.self_[index] << " ";

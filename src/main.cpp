@@ -47,9 +47,9 @@ int main()
   #pragma omp parallel
   {
     size_t numberOfDraws = 10;
-    simol::Vector<double> uniform_sample(numberOfDraws);
-    simol::Vector<double> exponential_sample(numberOfDraws);
-    simol::Vector<double> gaussian_sample(numberOfDraws);
+    simol::Vector<double,simol::Dummy> uniform_sample(numberOfDraws);
+    simol::Vector<double,simol::Dummy> exponential_sample(numberOfDraws);
+    simol::Vector<double,simol::Dummy> gaussian_sample(numberOfDraws);
     for (size_t index = 0; index < numberOfDraws; ++index)
     {
       uniform_sample(index)     = uniform(mersenne);
@@ -70,7 +70,7 @@ int main()
   // BLAS WRAPPING
   //==============
 
-  simol::Vector<double> vec(3,1);
+  simol::Vector<double,simol::Dummy> vec(3,1);
   vec *= 4.323;
   std::cout << vec << std::endl;
 

@@ -4,7 +4,7 @@
 namespace simol
 {
 
-  template<class ScalarType>
+  template<class ScalarType, template<class> class WrappingPolicy>
   class Vector;
 
 }
