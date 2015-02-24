@@ -6,11 +6,10 @@
 #include <random>
 #include <vector>
 
-#include "vector.hpp"
+#include "Vector.hpp"
 #include "matrix.hpp"
 
 #include "SparseMatrix.hpp"
-
 #include <Eigen/Eigenvalues>
 
 int main()
@@ -21,10 +20,20 @@ int main()
   //===============
   
   std::string path = "/home/cdoucet/Documents/soutien/matherials/codes/existant/chimie_quantique/greedy_quantum_C++/Donnees/Donnees_H2/donnees_in";
+  
   std::ifstream file(path+"/kinetic_matrix.txt");
+  simol::SparseMatrix<double,simol::fromEigen> kineticMatrix(10,10);
+  file >> kineticMatrix;
+  file.close();
 
-  simol::SparseMatrix<double> K(10,10);
-  file >> K;
+  file.open(path+"/potential_matrix.txt");
+  simol::SparseMatrix<double,simol::fromEigen> potentialMatrix(10,10);
+  file >> potentialMatrix;
+  file.close();
+
+  file.open(path+"/overlap_matrix.txt");
+  simol::SparseMatrix<double,simol::fromEigen> overlapMatrix(10,10);
+  file >> overlapMatrix;
   file.close();
 
   //===========================
