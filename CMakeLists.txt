@@ -31,6 +31,10 @@ endif(CMAKE_BUILD_TYPE EQUAL "Release")
 include_directories(/usr/local/bibliotheques/eigen/3.2.3/include/eigen3)
 include_directories(/usr/local/bibliotheques/clapack/3.2.1/include)
 include_directories(/usr/local/bibliotheques/cppunit/1.12.1/include)
+include_directories(/usr/local/bibliotheques/yaml-cpp/0.5.1/include)
+include_directories(/usr/local/bibliotheques/boost/1.57.0/include)
+
+
 
 #================
 # LINKER SETTINGS
@@ -39,7 +43,7 @@ include_directories(/usr/local/bibliotheques/cppunit/1.12.1/include)
 #link_directories(/usr/local/bibliotheques/clapack/3.2.1/lib)
 target_link_libraries(simol cblas)
 target_link_libraries(simol /usr/local/bibliotheques/clapack/3.2.1/lib/lapack_LINUX.a)
-
+target_link_libraries(simol /usr/local/bibliotheques/yaml-cpp/0.5.1/lib/libyaml-cpp.a)
 
 #==============
 # TEST SETTINGS
