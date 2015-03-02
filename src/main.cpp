@@ -6,10 +6,10 @@
 #include <random>
 #include <vector>
 
-#include "Vector.hpp"
-#include "matrix.hpp"
+#include "core/Vector.hpp"
+#include "core/matrix.hpp"
 
-#include "SparseMatrix.hpp"
+#include "core/SparseMatrix.hpp"
 #include <Eigen/Eigenvalues>
 
 #include <yaml-cpp/yaml.h>
