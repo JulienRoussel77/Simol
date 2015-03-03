@@ -4,7 +4,7 @@
 
 #include<fstream>
 
-#include "../fromEigen.hpp"
+#include "fromEigen.hpp"
 #include "SparseMatrix_fwd.hpp"
 
 namespace simol
