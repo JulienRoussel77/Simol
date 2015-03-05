@@ -14,10 +14,114 @@
 
 #include <yaml-cpp/yaml.h>
 
-int main(int argc, const char* argv[])
+extern "C"
 {
 
-  
+  /*void dneupd (bool rvec, 
+               char howmny, 
+               bool* select, 
+               double* dr, 
+               double* di, 
+               double** z, 
+               int ldz, 
+               double sigmar, 
+               double sigmai,
+               double* workev,
+               char bmat,
+               n,
+               which,
+               int nev,
+               double tol,
+               resid
+               double* v,
+               int ldv,
+               int iparam[11],
+               int ipntr[14],
+               double* workd,
+               double* workl,
+               int lworkl,
+               int info )*/
+  void dsaupd(int *ido, char *bmat, int *n, char *which,
+                       int *nev, double *tol, double *resid,
+                       int *ncv, double *v, int *ldv,
+                       int *iparam, int *ipntr, double *workd,
+                       double *workl, int *lworkl, int *info);
+}
+
+
+
+
+int main(int argc, const char* argv[])
+{
+/*
+  //=======
+  // ARPACK
+  //=======
+  int ido = 0;
+  char bmat = 'I';
+  int n = 3;
+  char* which = "LM";
+  int nev = 1;
+  double tol = 1e-6;
+  double* resid;
+  int ncv;
+  double* v;
+  int ldv;
+  int* iparam;
+  int* ipntr;
+  double* workd;
+  double* workl;
+  int lworkl;
+  int info;
+*/
+  /*dsapud(ido, bmat, n, which, nev, tol, resid, ncv, v, ldv, iparam, ipntr, workd, workl, lworkl, info);
+
+ // a.1) User defined parameters.
+
+  int     n;          // Dimension of the eigenproblem.
+  int     nev;        // Number of eigenvalues to be computed. 0 < nev < n-1.
+  int     ncv;        // Number of Arnoldi vectors generated at each iteration.
+  int     maxit;      // Maximum number of Arnoldi update iterations allowed.
+  char*   which;      // Specify which of the Ritz values of OP to compute.
+  FLOAT   tol;        // Stopping criterion (relative accuracy of Ritz values).
+  FLOAT   sigmaI;     // Imaginary part of shift (for nonsymmetric problems).
+  TYPE    sigmaR;     // Shift (real part only if problem is nonsymmetric).
+  TYPE    *resid;     // Initial residual vector.
+
+
+ // a.2) Internal variables.
+
+  bool    rvec;       // Indicates if eigenvectors/Schur vectors were
+                      // requested (or only eigenvalues will be determined).
+  bool    newRes;     // Indicates if a new "resid" vector was created.
+  bool    newVal;     // Indicates if a new "EigValR" vector was created.
+  bool    newVec;     // Indicates if a new "EigVec" vector was created.
+  bool    PrepareOK;  // Indicates if internal variables were correctly set.
+  bool    BasisOK;    // Indicates if an Arnoldi basis was found.
+  bool    ValuesOK;   // Indicates if eigenvalues were calculated.
+  bool    VectorsOK;  // Indicates if eigenvectors were determined.
+  bool    SchurOK;    // Indicates if Schur vectors were determined.
+  bool    AutoShift;  // Indicates if implicit shifts will be generated
+                      // internally (or will be supplied by the user).
+  char    bmat;       // Indicates if the problem is a standard ('I') or
+                      // generalized ('G") eigenproblem.
+  char    HowMny;     // Indicates if eigenvectors ('A') or Schur vectors ('P')
+                      // were requested (not referenced if rvec = false).
+  int     ido;        // Original ARPACK reverse communication flag.
+  int     info;       // Original ARPACK error flag.
+  int     mode;       // Indicates the type of the eigenproblem (regular,
+                      // shift and invert, etc).
+  int     lworkl;     // Dimension of array workl.
+  int     lworkv;     // Dimension of array workv.
+  int     lrwork;     // Dimension of array rwork.
+  int     iparam[12]; // Vector that handles original ARPACK parameters.
+  int     ipntr[15];  // Vector that handles original ARPACK pointers.
+  FLOAT   *rwork;     // Original ARPACK internal vector.
+  TYPE    *workl;     // Original ARPACK internal vector.
+  TYPE    *workd;     // Original ARPACK internal vector.
+  TYPE    *workv;     // Original ARPACK internal vector.
+  TYPE    *V;         // Arnoldi basis / Schur vectors.*/
+
 
   //==========
   // YAML

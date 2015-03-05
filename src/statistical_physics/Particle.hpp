@@ -1,0 +1,98 @@
+#ifndef PARTICLE_HPP
+#define PARTICLE_HPP
+
+#include <fstream>
+#include <vector>
+
+#include "Potential.hpp"
+
+//=====================
+// FORWARD DECLARATIONS
+//=====================
+
+template<class ScalarType>
+class Particle;
+
+template<class ScalarType>
+void verlet_scheme(Particle<ScalarType> & particle, Potential<ScalarType> const & potential, double delta_t, size_t numberOfIterations);
+
+//==================
+// CLASS DECLARATION
+//==================
+
+template<class ScalarType>
+class Particle
+{
+
+  //=================
+  // FRIEND FUNCTIONS
+  //=================
+
+  friend void verlet_scheme<>(Particle<ScalarType> & particle, Potential<ScalarType> const & potential, double delta_t, size_t numberOfIterations);
+
+public:
+
+  //=============
+  // CONSTRUCTORS
+  //=============
+
+  Particle(ScalarType const & mass, std::vector<ScalarType> const & positions, std::vector<ScalarType> const & speeds);
+
+  //==========
+  // ACCESSORS
+  //==========
+
+  ScalarType const & position(size_t instantIndex) const;
+  ScalarType const & speed(size_t instantIndex) const;
+  ScalarType const & mass() const;
+
+  std::vector<ScalarType> const & positions() const
+  { return positions_; }
+
+  std::vector<ScalarType> const & speeds() const
+  { return speeds_; }
+
+private:
+
+  //=============
+  // DATA MEMBERS
+  //=============
+
+  ScalarType mass_;
+  std::vector<ScalarType> positions_;
+  std::vector<ScalarType> speeds_;
+};
+
+#include "Particle_impl.hpp"
+
+template<class ScalarType>
+std::ofstream & operator<<(std::ofstream & fileToWrite, std::vector<ScalarType> const & vectorToRead)
+{
+  for (size_t index = 0; index < vectorToRead.size(); ++index)
+    fileToWrite << vectorToRead[index] << " ";
+  
+  return fileToWrite;
+}
+
+template<class ScalarType>
+void verlet_scheme(Particle<ScalarType> & particle, Potential<ScalarType> const & potential, double delta_t, size_t numberOfIterations)
+{
+  for (size_t iteration=0; iteration < numberOfIterations; ++iteration)
+  {
+    ScalarType mass = particle.mass_;
+    ScalarType position = particle.positions_[iteration];
+    ScalarType speed = particle.speeds_[iteration];
+
+    speed = speed - delta_t * potential.derivative(position) / 2;
+    position = position + delta_t * speed / mass;
+    speed = speed - delta_t * potential.derivative(position) / 2;
+
+    particle.positions_[iteration+1] = position;
+    particle.speeds_[iteration+1] = speed;
+  }
+
+}
+
+
+
+#endif

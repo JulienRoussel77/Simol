@@ -1,12 +1,13 @@
 
 cmake_minimum_required (VERSION 2.6)
 
-project (simol)
+project (simol CXX Fortran)
 
 #====================
 # EXECUTABLE SETTINGS
 #====================
-add_executable(simol src/main.cpp)
+add_executable(quantum_chemistry test/functional/quantum_chemistry/main.cpp)
+add_executable(molecular_dynamics test/functional/molecular_dynamics/main.cpp)
 
 #==================
 # COMPILER SETTINGS
@@ -14,6 +15,8 @@ add_executable(simol src/main.cpp)
 
 set(CMAKE_CXX_COMPILER /home/cdoucet/local/gcc/4.8.2/bin/g++)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -fopenmp -std=c++11")
+
+set(CMAKE_FORTRAN_COMPILER /home/cdoucet/local/gcc/4.8.2/bin/gfortran)
 
 
 if (CMAKE_BUILD_TYPE EQUAL "Release")
@@ -34,16 +37,20 @@ include_directories(/usr/local/bibliotheques/cppunit/1.12.1/include)
 include_directories(/usr/local/bibliotheques/yaml-cpp/0.5.1/include)
 include_directories(/usr/local/bibliotheques/boost/1.57.0/include)
 
+include_directories(src/statistical_physics)
+include_directories(src)
 
 
 #================
 # LINKER SETTINGS
 #================
 
-#link_directories(/usr/local/bibliotheques/clapack/3.2.1/lib)
-target_link_libraries(simol cblas)
-target_link_libraries(simol /usr/local/bibliotheques/clapack/3.2.1/lib/lapack_LINUX.a)
-target_link_libraries(simol /usr/local/bibliotheques/yaml-cpp/0.5.1/lib/libyaml-cpp.a)
+target_link_libraries(quantum_chemistry cblas)
+target_link_libraries(quantum_chemistry /usr/local/bibliotheques/clapack/3.2.1/lib/lapack_LINUX.a)
+target_link_libraries(quantum_chemistry /usr/local/bibliotheques/yaml-cpp/0.5.1/lib/libyaml-cpp.a)
+target_link_libraries(quantum_chemistry /usr/local/bibliotheques/arpack/2.1/lib/libarpack_LINUX.a)
+
+target_link_libraries(molecular_dynamics /usr/local/bibliotheques/yaml-cpp/0.5.1/lib/libyaml-cpp.a)
 
 #==============
 # TEST SETTINGS
