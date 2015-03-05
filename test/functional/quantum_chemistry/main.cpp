@@ -17,30 +17,6 @@
 extern "C"
 {
 
-  /*void dneupd (bool rvec, 
-               char howmny, 
-               bool* select, 
-               double* dr, 
-               double* di, 
-               double** z, 
-               int ldz, 
-               double sigmar, 
-               double sigmai,
-               double* workev,
-               char bmat,
-               n,
-               which,
-               int nev,
-               double tol,
-               resid
-               double* v,
-               int ldv,
-               int iparam[11],
-               int ipntr[14],
-               double* workd,
-               double* workl,
-               int lworkl,
-               int info )*/
   void dsaupd(int *ido, char *bmat, int *n, char *which,
                        int *nev, double *tol, double *resid,
                        int *ncv, double *v, int *ldv,
@@ -121,33 +97,6 @@ int main(int argc, const char* argv[])
   TYPE    *workd;     // Original ARPACK internal vector.
   TYPE    *workv;     // Original ARPACK internal vector.
   TYPE    *V;         // Arnoldi basis / Schur vectors.*/
-
-
-  //==========
-  // YAML
-  //==========
-  
-  YAML::Node input = YAML::LoadFile("/home/cdoucet/Documents/soutien/matherials/codes/simol/src/input.yaml");
-  size_t dimension = input["geometry"]["dimension"].as<size_t>();
-  std::cout << "dimension =" << dimension << std::endl;
-  YAML::Node geometry = input["geometry"];
-  std::cout << "dimension =" << geometry["dimension"].as<size_t>() << std::endl;
-  std::cout << "dimension =" << geometry["dimension"] << std::endl;
-
-  
-  YAML::Node node;  // starts out as null
-  node["key"] = "value";  // it now is a map node
-  node["seq"].push_back("first element");  // node["seq"] automatically becomes a sequence
-  node["seq"].push_back("second element");
-
-  node["mirror"] = node["seq"][0];  // this creates an alias
-  node["seq"][0] = "1st element";  // this also changes node["mirror"]
-  node["mirror"] = "element #1";  // and this changes node["seq"][0] - they're really the "same" node
-
-  node["self"] = node;  // you can even create self-aliases
-  node[node["mirror"]] = node["seq"];  // and strange loops :)
-
-  std::cout << YAML::Dump(node) << std::endl;
 
   //===============
   // MATRIX LOADING
