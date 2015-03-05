@@ -29,6 +29,8 @@ extern "C"
 
 int main(int argc, const char* argv[])
 {
+
+
 /*
   //=======
   // ARPACK
@@ -102,19 +104,17 @@ int main(int argc, const char* argv[])
   // MATRIX LOADING
   //===============
   
-  std::string path = "/home/cdoucet/Documents/soutien/matherials/codes/existant/chimie_quantique/greedy_quantum_C++/Donnees/Donnees_H2/donnees_in";
-  
-  std::ifstream file(path+"/kinetic_matrix.txt");
+  std::ifstream file(argv[1]);
   simol::SparseMatrix<double,simol::fromEigen> kineticMatrix(10,10);
   file >> kineticMatrix;
   file.close();
 
-  file.open(path+"/potential_matrix.txt");
+  file.open(argv[2]);
   simol::SparseMatrix<double,simol::fromEigen> potentialMatrix(10,10);
   file >> potentialMatrix;
   file.close();
 
-  file.open(path+"/overlap_matrix.txt");
+  file.open(argv[3]);
   simol::SparseMatrix<double,simol::fromEigen> overlapMatrix(10,10);
   file >> overlapMatrix;
   file.close();
