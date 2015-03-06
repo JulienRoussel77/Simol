@@ -3,18 +3,43 @@ cmake_minimum_required (VERSION 2.6)
 
 project (simol CXX Fortran)
 
+#==============
+# INCLUDE FILES
+#==============
+
+include(CheckCXXCompilerFlag)
+
 #====================
 # EXECUTABLE SETTINGS
 #====================
 add_executable(quantum_chemistry test/functional/quantum_chemistry/main.cpp)
 add_executable(molecular_dynamics test/functional/molecular_dynamics/main.cpp)
 
+#===================
+# USER CONFIGURATION
+#===================
+
+set (config ${CMAKE_CURRENT_SOURCE_DIR}/config.cmake)
+if(EXISTS ${config})
+  include(${config})
+endif(EXISTS ${config})
+
 #==================
 # COMPILER SETTINGS
 #==================
 
-set(CMAKE_CXX_COMPILER /home/cdoucet/local/gcc/4.8.2/bin/g++)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -fopenmp -std=c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -fopenmp")
+
+CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
+if(COMPILER_SUPPORTS_CXX11)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+elseif(COMPILER_SUPPORTS_CXX0X)
+  CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+else()
+        message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
+endif()
+
 
 #set(CMAKE_FORTRAN_COMPILER /home/cdoucet/local/gcc/4.8.2/bin/gfortran)
 #set(CMAKE_FORTRAN_COMPILER /usr/local/bibliotheques/g95/g95-install/0.93/bin/x86_64-unknown-linux-gnu-g95)
