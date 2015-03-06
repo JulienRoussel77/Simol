@@ -16,11 +16,17 @@ include(ExternalProject)
 add_executable(quantum_chemistry test/functional/quantum_chemistry/main.cpp)
 add_executable(molecular_dynamics test/functional/molecular_dynamics/main.cpp)
 
-ExternalProject_Add(yaml-cpp 
+#=============================
+# DOWNLOAD 3RD-PARTY LIBRARIES
+#=============================
+
+ExternalProject_Add(yaml-cpp
                     URL https://yaml-cpp.googlecode.com/files/yaml-cpp-0.5.1.tar.gz
-                    PREFIX ${CMAKE_CURRENT_BINARY_DIR}/yaml-cpp
+                    PREFIX ${CMAKE_CURRENT_BINARY_DIR}/third-party/yaml-cpp
                     CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
 )
+
+add_dependencies(molecular_dynamics yaml-cpp)
 
 #===================
 # USER CONFIGURATION
@@ -64,9 +70,10 @@ endif(CMAKE_BUILD_TYPE EQUAL "Release")
 include_directories(/usr/local/bibliotheques/eigen/3.2.3/include/eigen3)
 include_directories(/usr/local/bibliotheques/clapack/3.2.1/include)
 include_directories(/usr/local/bibliotheques/cppunit/1.12.1/include)
-include_directories(/usr/local/bibliotheques/yaml-cpp/0.5.1/include)
+#include_directories(/usr/local/bibliotheques/yaml-cpp/0.5.1/include)
 include_directories(/usr/local/bibliotheques/boost/1.57.0/include)
 
+include_directories(${CMAKE_CURRENT_BINARY_DIR}/third-party/yaml-cpp/include)
 include_directories(src/statistical_physics)
 include_directories(src)
 
@@ -80,7 +87,8 @@ target_link_libraries(quantum_chemistry /usr/local/bibliotheques/arpack/2.1/lib/
 target_link_libraries(quantum_chemistry /usr/local/bibliotheques/clapack/3.2.1/lib/lapack_LINUX.a)
 target_link_libraries(quantum_chemistry cblas)
 
-target_link_libraries(molecular_dynamics /usr/local/bibliotheques/yaml-cpp/0.5.1/lib/libyaml-cpp.a)
+target_link_libraries(molecular_dynamics ${CMAKE_CURRENT_BINARY_DIR}/third-party/yaml-cpp/lib/libyaml-cpp.a)
+#target_link_libraries(molecular_dynamics /usr/local/bibliotheques/yaml-cpp/0.5.1/lib/libyaml-cpp.a)
 
 #==============
 # TEST SETTINGS
