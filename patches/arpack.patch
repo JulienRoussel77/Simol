@@ -1,0 +1,12 @@
+--- second-orig.f	2015-03-06 10:21:30.230011968 +0100
++++ second.f	2015-03-06 10:40:29.615459769 +0100
+@@ -20,8 +20,7 @@
+       REAL               TARRAY( 2 )
+ *     ..
+ *     .. External Functions ..
+-      REAL               ETIME
+-      EXTERNAL           ETIME
++      EXTERNAL REAL               ETIME
+ *     ..
+ *     .. Executable Statements ..
+ *
