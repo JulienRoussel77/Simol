@@ -17,7 +17,7 @@
 extern "C"
 {
 
-  void dsaupd(int *ido, char *bmat, int *n, char *which,
+  void dsaupd_(int *ido, char *bmat, int *n, char *which,
                        int *nev, double *tol, double *resid,
                        int *ncv, double *v, int *ldv,
                        int *iparam, int *ipntr, double *workd,
@@ -31,7 +31,7 @@ int main(int argc, const char* argv[])
 {
 
 
-/*
+
   //=======
   // ARPACK
   //=======
@@ -43,7 +43,7 @@ int main(int argc, const char* argv[])
   double tol = 1e-6;
   double* resid;
   int ncv;
-  double* v;
+  double* vv;
   int ldv;
   int* iparam;
   int* ipntr;
@@ -51,9 +51,9 @@ int main(int argc, const char* argv[])
   double* workl;
   int lworkl;
   int info;
-*/
-  /*dsapud(ido, bmat, n, which, nev, tol, resid, ncv, v, ldv, iparam, ipntr, workd, workl, lworkl, info);
 
+  dsaupd_(&ido, &bmat, &n, which, &nev, &tol, resid, &ncv, vv, &ldv, iparam, ipntr, workd, workl, &lworkl, &info);
+/*
  // a.1) User defined parameters.
 
   int     n;          // Dimension of the eigenproblem.

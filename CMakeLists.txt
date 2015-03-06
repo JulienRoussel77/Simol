@@ -16,7 +16,8 @@ add_executable(molecular_dynamics test/functional/molecular_dynamics/main.cpp)
 set(CMAKE_CXX_COMPILER /home/cdoucet/local/gcc/4.8.2/bin/g++)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -fopenmp -std=c++11")
 
-set(CMAKE_FORTRAN_COMPILER /home/cdoucet/local/gcc/4.8.2/bin/gfortran)
+#set(CMAKE_FORTRAN_COMPILER /home/cdoucet/local/gcc/4.8.2/bin/gfortran)
+#set(CMAKE_FORTRAN_COMPILER /usr/local/bibliotheques/g95/g95-install/0.93/bin/x86_64-unknown-linux-gnu-g95)
 
 
 if (CMAKE_BUILD_TYPE EQUAL "Release")
@@ -45,10 +46,10 @@ include_directories(src)
 # LINKER SETTINGS
 #================
 
-target_link_libraries(quantum_chemistry cblas)
-target_link_libraries(quantum_chemistry /usr/local/bibliotheques/clapack/3.2.1/lib/lapack_LINUX.a)
 target_link_libraries(quantum_chemistry /usr/local/bibliotheques/yaml-cpp/0.5.1/lib/libyaml-cpp.a)
 target_link_libraries(quantum_chemistry /usr/local/bibliotheques/arpack/2.1/lib/libarpack_LINUX.a)
+target_link_libraries(quantum_chemistry /usr/local/bibliotheques/clapack/3.2.1/lib/lapack_LINUX.a)
+target_link_libraries(quantum_chemistry cblas)
 
 target_link_libraries(molecular_dynamics /usr/local/bibliotheques/yaml-cpp/0.5.1/lib/libyaml-cpp.a)
 
