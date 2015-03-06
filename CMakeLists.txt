@@ -8,12 +8,19 @@ project (simol CXX Fortran)
 #==============
 
 include(CheckCXXCompilerFlag)
+include(ExternalProject)
 
 #====================
 # EXECUTABLE SETTINGS
 #====================
 add_executable(quantum_chemistry test/functional/quantum_chemistry/main.cpp)
 add_executable(molecular_dynamics test/functional/molecular_dynamics/main.cpp)
+
+ExternalProject_Add(yaml-cpp 
+                    URL https://yaml-cpp.googlecode.com/files/yaml-cpp-0.5.1.tar.gz
+                    PREFIX ${CMAKE_CURRENT_BINARY_DIR}/yaml-cpp
+                    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
+)
 
 #===================
 # USER CONFIGURATION
@@ -33,12 +40,9 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -fopenmp")
 CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
 if(COMPILER_SUPPORTS_CXX11)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-elseif(COMPILER_SUPPORTS_CXX0X)
-  CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
-else()
-        message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
-endif()
+else(COMPILER_SUPPORTS_CXX11)
+      #  message(STATUS "The compiler ${CMAKE_CXX_COMPILER} does not support -std=c++11 flag. Please use a different C++ compiler.")
+endif(COMPILER_SUPPORTS_CXX11)
 
 
 #set(CMAKE_FORTRAN_COMPILER /home/cdoucet/local/gcc/4.8.2/bin/gfortran)
