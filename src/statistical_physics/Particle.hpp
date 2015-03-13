@@ -6,6 +6,11 @@
 
 #include "Potential.hpp"
 
+#include "core/Vector.hpp"
+
+using namespace simol;
+
+
 //=====================
 // FORWARD DECLARATIONS
 //=====================
@@ -65,14 +70,6 @@ private:
 
 #include "Particle_impl.hpp"
 
-template<class ScalarType>
-std::ofstream & operator<<(std::ofstream & fileToWrite, std::vector<ScalarType> const & vectorToRead)
-{
-  for (size_t index = 0; index < vectorToRead.size(); ++index)
-    fileToWrite << vectorToRead[index] << " ";
-  
-  return fileToWrite;
-}
 
 template<class ScalarType>
 void verlet_scheme(Particle<ScalarType> & particle, Potential<ScalarType> const & potential, double delta_t, size_t numberOfIterations)

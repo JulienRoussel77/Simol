@@ -42,18 +42,24 @@ int main(int argc, char* argv[])
   double initial_position = physics["Particle"]["Position"].as<double>();
   double potential_parameter = physics["Potential"]["Parameter"].as<double>();
 
+  //==========
+  // LIBRARIES
+  //==========
+  
+  std::string linalg = parameters["Libraries"]["LinearAlgebra"].as<std::string>();
+
   //============
   // COMPUTATION
   //============
   
   std::vector<double> positions(numberOfInstants);
   std::vector<double> speeds(numberOfInstants);
-  
+
   positions[0] = initial_position;
   speeds[0] = initial_speed;
 
   Particle<double> particle(mass, positions, speeds);
-  Potential<double> potential(potential_parameter, 2*M_PI/length);
+  simol::Potential<double> potential(potential_parameter, 2*M_PI/length);
 
   verlet_scheme(particle,potential,timeStep,numberOfInstants);
 
