@@ -7,7 +7,7 @@
 #include <vector>
 
 #include "core/Vector.hpp"
-#include "core/matrix.hpp"
+#include "core/Matrix.hpp"
 
 #include "core/SparseMatrix.hpp"
 #include <Eigen/Eigenvalues>
