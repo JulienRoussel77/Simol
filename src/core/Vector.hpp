@@ -1,68 +1,23 @@
-#ifndef SIMOL_VECTOR_HPP
-#define SIMOL_VECTOR_HPP
+#ifndef VECTOR_HPP
+#define VECTOR_HPP
 
-#include <ostream>
-#include <vector>
-
-extern "C"
-{
-#include <cblas.h>
-}
-
-#include "Vector_fwd.hpp"
-
-namespace simol
-{
-  template<class ScalarType, template<class> class WrappingPolicy>
-  std::ostream & operator<<(std::ostream & output, Vector<ScalarType,WrappingPolicy> const & vector);
-}
+#include "VectorWrapper.hpp"
 
 namespace simol
 {
 
-  template<class ScalarType> class Dummy {};
+  template<class ScalarType, template<class> class WrappedLibrary = eigen>
+  using Vector = typename VectorWrapper<ScalarType,WrappedLibrary>::VectorType;
 
-  //! \brief Vectors and vector operations
-  template<class ScalarType, template<class> class WrappingPolicy>
-  class Vector
+
+}
+  template<class ScalarType>
+  std::ofstream & operator<<(std::ofstream & fileToWrite, std::vector<ScalarType> const & vectorToRead)
   {
-    friend std::ostream & operator<< <>(std::ostream & output, Vector<ScalarType,WrappingPolicy> const & vector);
-    
-    public:
-      //! \brief Construct a vector of a given size
-      Vector(size_t size);
-      
-      //! \brief Construct a vector of a given size and assign it to a given scalar
-      Vector(size_t size, ScalarType scalar);
-    public:
-      //! \brief Access size
-      size_t size() const;
-    public:
-      double & operator()(size_t const index);
-    public:
-      //! \brief Scaling operation
-      void operator*=(double scalar);
-    private:
-      std::vector<ScalarType> self_;
-
-  };
-
-}
-
-#include "Vector_impl.hpp"
-
-namespace simol
-{
-  template<class ScalarType, template<class> class WrappingPolicy>
-  std::ostream & operator<<(std::ostream & output, Vector<ScalarType,WrappingPolicy> const & vector)
-  {
-    for (size_t index = 0; index < vector.size(); ++index)
-      output << vector.self_[index] << " ";
-
-    return output;
+    for (size_t index = 0; index < vectorToRead.size(); ++index)
+      fileToWrite << vectorToRead[index] << " ";
+  
+    return fileToWrite;
   }
-
-}
-
 
 #endif
