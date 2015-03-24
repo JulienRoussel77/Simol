@@ -1,0 +1,8 @@
+============
+INSTALLATION
+============
+
+cd build
+cmake ..
+make
+make install
