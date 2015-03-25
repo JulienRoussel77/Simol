@@ -16,24 +16,27 @@
 int main(int argc, const char* argv[])
 {
 
-  simol::Vector<double> u;
-  simol::Vector<double,simol::eigen> v;
 
   //===============
   // MATRIX LOADING
   //===============
   
-  std::ifstream file(argv[1]);
+  YAML::Node parameters = YAML::LoadFile(argv[1]);
+  YAML::Node data = parameters["Data"];
+
+  std::string path = data["path"].as<std::string>();
+  
+  std::ifstream file(path+data["kinetic"].as<std::string>());
   simol::SparseMatrix<double> kineticMatrix(10,10);
   file >> kineticMatrix;
   file.close();
 
-  file.open(argv[2]);
+  file.open(path+data["potential"].as<std::string>());
   simol::SparseMatrix<double> potentialMatrix(10,10);
   file >> potentialMatrix;
   file.close();
 
-  file.open(argv[3]);
+  file.open(path+data["overlap"].as<std::string>());
   simol::SparseMatrix<double> overlapMatrix(10,10);
   file >> overlapMatrix;
   file.close();
