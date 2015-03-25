@@ -3,18 +3,20 @@
 
 #include "SparseMatrix_fwd.hpp"
 
-
 namespace simol
 {
-
+  template<class ScalarType, template<class> class Library>
+  std::ifstream & operator>>(std::ifstream & fileToRead, SparseMatrix<ScalarType,Library> & matrixToWrite);
 
   template<class ScalarType>
   class SparseMatrix<ScalarType,eigen>
   {
-    
+    friend
+    std::ifstream & operator>> <>(std::ifstream & fileToRead, SparseMatrix<ScalarType,eigen> & matrixToWrite);
+  
     public:
       SparseMatrix(size_t const numberOfRows, size_t const numberOfColumns);
-    public:
+    private:
       typename eigen<ScalarType>::SparseMatrixType wrapped_;
   };
 
