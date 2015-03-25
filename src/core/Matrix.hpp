@@ -5,11 +5,10 @@
 
 namespace simol
 {
-
   template<class ScalarType>
   using DenseMatrix = Eigen::Matrix<ScalarType, Eigen::Dynamic, Eigen::Dynamic>;
 
-  /*template<class ScalarType>
+  template<class ScalarType>
   class DenseMatrix
   {
     public:
@@ -17,7 +16,7 @@ namespace simol
     private:
       Eigen::Matrix<ScalarType, Eigen::Dynamic, Eigen::Dynamic> self_;
 
-  };*/
+  };
 
 }
 

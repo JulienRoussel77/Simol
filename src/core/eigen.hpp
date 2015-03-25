@@ -2,6 +2,8 @@
 #define EIGEN_HPP
 
 #include <Eigen/Core>
+#include <Eigen/Sparse>
+#include <Eigen/Core>
 
 namespace simol
 {
@@ -10,6 +12,7 @@ namespace simol
   struct eigen
   {
     typedef Eigen::Matrix<ScalarType,Eigen::Dynamic,1> VectorType;
+    typedef Eigen::SparseMatrix<ScalarType> SparseMatrixType;
   };
 
 }

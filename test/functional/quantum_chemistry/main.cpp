@@ -7,7 +7,6 @@
 #include <vector>
 
 #include "core/Vector.hpp"
-#include "core/Matrix.hpp"
 
 #include "core/SparseMatrix.hpp"
 #include <Eigen/Eigenvalues>
@@ -25,17 +24,17 @@ int main(int argc, const char* argv[])
   //===============
   
   std::ifstream file(argv[1]);
-  simol::SparseMatrix<double,simol::fromEigen> kineticMatrix(10,10);
+  simol::SparseMatrix<double> kineticMatrix(10,10);
   file >> kineticMatrix;
   file.close();
 
   file.open(argv[2]);
-  simol::SparseMatrix<double,simol::fromEigen> potentialMatrix(10,10);
+  simol::SparseMatrix<double> potentialMatrix(10,10);
   file >> potentialMatrix;
   file.close();
 
   file.open(argv[3]);
-  simol::SparseMatrix<double,simol::fromEigen> overlapMatrix(10,10);
+  simol::SparseMatrix<double> overlapMatrix(10,10);
   file >> overlapMatrix;
   file.close();
 

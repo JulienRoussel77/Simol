@@ -1,48 +1,25 @@
-#ifndef SPARSEMATRIX_HPP
-#define SPRASEMATRIX_HPP
+#ifndef SIMOL_MATRIX_HPP
+#define SIMOL_MATRIX_HPP
 
-
-#include<fstream>
-
-#include "fromEigen.hpp"
 #include "SparseMatrix_fwd.hpp"
 
-namespace simol
-{
-  template<class ScalarType, template<class> class WrappingPolicy>
-  std::ifstream & operator>>(std::ifstream & fileToRead, SparseMatrix<ScalarType,WrappingPolicy> & matrixToWrite);
-}
 
 namespace simol
 {
 
-  template<class ScalarType, template<class> class WrappingPolicy>
-  class SparseMatrix : public WrappingPolicy<ScalarType>
+
+  template<class ScalarType>
+  class SparseMatrix<ScalarType,eigen>
   {
     
-    //=================
-    // FRIEND FUNCTIONS
-    //=================
-
-    friend std::ifstream & operator>> <>(std::ifstream & fileToRead, SparseMatrix<ScalarType,WrappingPolicy> & matrixToWrite);
-
-  public:
-
-    SparseMatrix() = delete;
-    SparseMatrix(size_t numberOfRows, size_t numberOfColumns);
-    SparseMatrix(SparseMatrix const &) = delete;
-    SparseMatrix & operator=(SparseMatrix const &) = delete;
-    ~SparseMatrix() = default;
-
-  private:
-
-    typename WrappingPolicy<ScalarType>::WrappedType wrapped_;
+    public:
+      SparseMatrix(size_t const numberOfRows, size_t const numberOfColumns);
+    public:
+      typename eigen<ScalarType>::SparseMatrixType wrapped_;
   };
 
-  #include "SparseMatrix_impl.hpp"
-
-template<class ScalarType, template<class> class WrappingPolicy>
-std::ifstream & operator>>(std::ifstream & fileToRead, SparseMatrix<ScalarType,WrappingPolicy> & matrixToWrite)
+  template<class ScalarType, template<class> class Library>
+  std::ifstream & operator>>(std::ifstream & fileToRead, SparseMatrix<ScalarType,Library> & matrixToWrite)
   {
     std::vector< Eigen::Triplet<ScalarType,size_t> > nonzeros;
 
@@ -57,6 +34,9 @@ std::ifstream & operator>>(std::ifstream & fileToRead, SparseMatrix<ScalarType,W
     return fileToRead;
   }
 
+
 }
+
+#include "SparseMatrix_impl.hpp"
 
 #endif
