@@ -2,7 +2,7 @@
 #define PARTICLE_IMPL_HPP
 
 template<class ScalarType> inline
-Particle<ScalarType>::Particle(ScalarType const & mass, std::vector<ScalarType> const & positions, std::vector<ScalarType> const & speeds)
+Particle<ScalarType>::Particle(ScalarType const & mass, Vector<ScalarType> const & positions, Vector<ScalarType> const & speeds)
 :mass_(mass), positions_(positions), speeds_(speeds)
 {}
 

@@ -41,7 +41,7 @@ public:
   // CONSTRUCTORS
   //=============
 
-  Particle(ScalarType const & mass, std::vector<ScalarType> const & positions, std::vector<ScalarType> const & speeds);
+  Particle(ScalarType const & mass, Vector<ScalarType> const & positions, Vector<ScalarType> const & speeds);
 
   //==========
   // ACCESSORS
@@ -51,10 +51,10 @@ public:
   ScalarType const & speed(size_t instantIndex) const;
   ScalarType const & mass() const;
 
-  std::vector<ScalarType> const & positions() const
+  Vector<ScalarType> const & positions() const
   { return positions_; }
 
-  std::vector<ScalarType> const & speeds() const
+  Vector<ScalarType> const & speeds() const
   { return speeds_; }
 
 private:
@@ -64,8 +64,8 @@ private:
   //=============
 
   ScalarType mass_;
-  std::vector<ScalarType> positions_;
-  std::vector<ScalarType> speeds_;
+  Vector<ScalarType> positions_;
+  Vector<ScalarType> speeds_;
 };
 
 #include "Particle_impl.hpp"
