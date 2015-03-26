@@ -55,10 +55,10 @@ int main(int argc, char* argv[])
   simol::Vector<double> positions(numberOfInstants);
   simol::Vector<double> speeds(numberOfInstants);
 
-  positions[0] = initial_position;
-  speeds[0] = initial_speed;
+  positions(0) = initial_position;
+  speeds(0) = initial_speed;
 
-  Particle<double> particle(mass, positions, speeds);
+  simol::Particle<double> particle(mass, positions, speeds);
   simol::Potential<double> potential(potential_parameter, 2*M_PI/length);
 
   verlet_scheme(particle,potential,timeStep,numberOfInstants);

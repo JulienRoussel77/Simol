@@ -8,86 +8,89 @@
 
 #include "core/Vector.hpp"
 
-using namespace simol;
-
 
 //=====================
 // FORWARD DECLARATIONS
 //=====================
 
-template<class ScalarType>
-class Particle;
+#include "Particle_fwd.hpp"
 
-template<class ScalarType>
-void verlet_scheme(Particle<ScalarType> & particle, Potential<ScalarType> const & potential, double delta_t, size_t numberOfIterations);
-
-//==================
-// CLASS DECLARATION
-//==================
-
-template<class ScalarType>
-class Particle
+namespace simol
 {
 
-  //=================
-  // FRIEND FUNCTIONS
-  //=================
+  template<class ScalarType>
+  void verlet_scheme(Particle<ScalarType> & particle, Potential<ScalarType> const & potential, double delta_t, size_t numberOfIterations);
 
-  friend void verlet_scheme<>(Particle<ScalarType> & particle, Potential<ScalarType> const & potential, double delta_t, size_t numberOfIterations);
+  //==================
+  // CLASS DECLARATION
+  //==================
 
-public:
+  template<class ScalarType>
+  class Particle
+  {
 
-  //=============
-  // CONSTRUCTORS
-  //=============
+    //=================
+    // FRIEND FUNCTIONS
+    //=================
 
-  Particle(ScalarType const & mass, Vector<ScalarType> const & positions, Vector<ScalarType> const & speeds);
+    friend void verlet_scheme<>(Particle<ScalarType> & particle, Potential<ScalarType> const & potential, double delta_t, size_t numberOfIterations);
 
-  //==========
-  // ACCESSORS
-  //==========
+    public:
 
-  ScalarType const & position(size_t instantIndex) const;
-  ScalarType const & speed(size_t instantIndex) const;
-  ScalarType const & mass() const;
+      //=============
+      // CONSTRUCTORS
+      //=============
 
-  Vector<ScalarType> const & positions() const
-  { return positions_; }
+      Particle(ScalarType const & mass, Vector<ScalarType> const & positions, Vector<ScalarType> const & speeds);
 
-  Vector<ScalarType> const & speeds() const
-  { return speeds_; }
+      //==========
+      // ACCESSORS
+      //==========
 
-private:
+      ScalarType const & position(size_t instantIndex) const;
+      ScalarType const & speed(size_t instantIndex) const;
+      ScalarType const & mass() const;
 
-  //=============
-  // DATA MEMBERS
-  //=============
+      Vector<ScalarType> const & positions() const
+      { return positions_; }
 
-  ScalarType mass_;
-  Vector<ScalarType> positions_;
-  Vector<ScalarType> speeds_;
-};
+      Vector<ScalarType> const & speeds() const
+      { return speeds_; }
+
+    private:
+
+      //=============
+      // DATA MEMBERS
+      //=============
+
+      ScalarType mass_;
+      Vector<ScalarType> positions_;
+      Vector<ScalarType> speeds_;
+  };
+
+}
 
 #include "Particle_impl.hpp"
 
-
-template<class ScalarType>
-void verlet_scheme(Particle<ScalarType> & particle, Potential<ScalarType> const & potential, double delta_t, size_t numberOfIterations)
+namespace simol
 {
-  for (size_t iteration=0; iteration < numberOfIterations; ++iteration)
+  template<class ScalarType>
+  void verlet_scheme(Particle<ScalarType> & particle, Potential<ScalarType> const & potential, double delta_t, size_t numberOfIterations)
   {
-    ScalarType mass = particle.mass_;
-    ScalarType position = particle.positions_[iteration];
-    ScalarType speed = particle.speeds_[iteration];
+    for (size_t iteration=0; iteration < numberOfIterations; ++iteration)
+    {
+      ScalarType mass = particle.mass_;
+      ScalarType position = particle.positions_(iteration);
+      ScalarType speed = particle.speeds_(iteration);
 
-    speed = speed - delta_t * potential.derivative(position) / 2;
-    position = position + delta_t * speed / mass;
-    speed = speed - delta_t * potential.derivative(position) / 2;
+      speed = speed - delta_t * potential.derivative(position) / 2;
+      position = position + delta_t * speed / mass;
+      speed = speed - delta_t * potential.derivative(position) / 2;
 
-    particle.positions_[iteration+1] = position;
-    particle.speeds_[iteration+1] = speed;
+      particle.positions_(iteration+1) = position;
+      particle.speeds_(iteration+1) = speed;
+    }
   }
-
 }
 
 

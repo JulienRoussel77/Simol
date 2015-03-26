@@ -1,23 +1,44 @@
-#ifndef VECTOR_HPP
-#define VECTOR_HPP
+#ifndef VECTORWRAPPER_HPP
+#define VECTORWRAPPER_HPP
 
-#include "VectorWrapper.hpp"
+#include "stl.hpp"
+
+#include "Vector_fwd.hpp"
 
 namespace simol
 {
 
-  template<class ScalarType, template<class> class WrappedLibrary = eigen>
-  using Vector = typename VectorWrapper<ScalarType,WrappedLibrary>::VectorType;
-
-
-}
   template<class ScalarType>
-  std::ofstream & operator<<(std::ofstream & fileToWrite, std::vector<ScalarType> const & vectorToRead)
+  class Vector<ScalarType,stl> : public stl<ScalarType>
+  {};
+
+  template<class ScalarType>
+  class Vector<ScalarType,eigen>
+  {
+    public:
+      Vector(size_t const size);
+      size_t const & size() const
+      { return wrapped_.size(); }
+      ScalarType & operator()(size_t const index);
+      ScalarType const & operator()(size_t const index) const;
+
+    private:
+      typename eigen<ScalarType>::VectorType wrapped_;
+      
+  };
+
+  template<class ScalarType, template<class> class WrappedLibrary>
+  std::ofstream & operator<<(std::ofstream & fileToWrite, Vector<ScalarType,WrappedLibrary> const & vectorToRead)
   {
     for (size_t index = 0; index < vectorToRead.size(); ++index)
-      fileToWrite << vectorToRead[index] << " ";
+      fileToWrite << vectorToRead(index) << " ";
   
     return fileToWrite;
   }
+
+
+}
+
+#include "Vector_impl.hpp"
 
 #endif
