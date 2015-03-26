@@ -8,7 +8,6 @@
 
 #include "core/Vector.hpp"
 
-
 //=====================
 // FORWARD DECLARATIONS
 //=====================
@@ -35,37 +34,33 @@ namespace simol
 
     friend void verlet_scheme<>(Particle<ScalarType> & particle, Potential<ScalarType> const & potential, double delta_t, size_t numberOfIterations);
 
+    //=============
+    // CONSTRUCTORS
+    //=============
+
     public:
 
-      //=============
-      // CONSTRUCTORS
-      //=============
+      Particle(ScalarType const & mass, ScalarType const & position, ScalarType const & speed);
 
-      Particle(ScalarType const & mass, Vector<ScalarType> const & positions, Vector<ScalarType> const & speeds);
+    //==========
+    // ACCESSORS
+    //==========
 
-      //==========
-      // ACCESSORS
-      //==========
+    public:
 
-      ScalarType const & position(size_t instantIndex) const;
-      ScalarType const & speed(size_t instantIndex) const;
       ScalarType const & mass() const;
+      ScalarType const & position() const;
+      ScalarType const & speed() const;
 
-      Vector<ScalarType> const & positions() const
-      { return positions_; }
-
-      Vector<ScalarType> const & speeds() const
-      { return speeds_; }
+    //=============
+    // DATA MEMBERS
+    //=============
 
     private:
 
-      //=============
-      // DATA MEMBERS
-      //=============
-
       ScalarType mass_;
-      Vector<ScalarType> positions_;
-      Vector<ScalarType> speeds_;
+      ScalarType position_;
+      ScalarType speed_;
   };
 
 }
@@ -74,22 +69,12 @@ namespace simol
 
 namespace simol
 {
-  template<class ScalarType>
-  void verlet_scheme(Particle<ScalarType> & particle, Potential<ScalarType> const & potential, double delta_t, size_t numberOfIterations)
+  template<class ScalarType> inline
+  void verlet_scheme(Particle<ScalarType> & particle, Potential<ScalarType> const & potential, double timeStep)
   {
-    for (size_t iteration=0; iteration < numberOfIterations; ++iteration)
-    {
-      ScalarType mass = particle.mass_;
-      ScalarType position = particle.positions_(iteration);
-      ScalarType speed = particle.speeds_(iteration);
-
-      speed = speed - delta_t * potential.derivative(position) / 2;
-      position = position + delta_t * speed / mass;
-      speed = speed - delta_t * potential.derivative(position) / 2;
-
-      particle.positions_(iteration+1) = position;
-      particle.speeds_(iteration+1) = speed;
-    }
+    particle.speed_ -= timeStep * potential.derivative(particle.position_) / 2;
+    particle.position_ += timeStep * particle.speed_ / particle.mass_;
+    particle.speed_ -= timeStep * potential.derivative(particle.position_) / 2;
   }
 }
 

@@ -1,8 +1,7 @@
 
 #include <cstdlib>
 
-#include "Particle.hpp"
-
+#include "ParticleSystem.hpp"
 
 
 #include<yaml-cpp/yaml.h>
@@ -31,6 +30,7 @@ int main(int argc, char* argv[])
   YAML::Node mesh = parameters["Mesh"]["Time"];
   double timeStep = mesh["Step"].as<double>();
   size_t numberOfInstants = mesh["Instants"].as<size_t>();
+  double finalInstant = mesh["Final"].as<double>();
 
   //========
   // PHYSICS
@@ -52,7 +52,11 @@ int main(int argc, char* argv[])
   // COMPUTATION
   //============
 
-  simol::Vector<double> positions(numberOfInstants);
+  size_t numberOfParticles = 1;
+
+  simol::ParticleSystem<double> system(numberOfParticles, mass, initial_position, initial_speed);
+
+  /*simol::Vector<double> positions(numberOfInstants);
   simol::Vector<double> speeds(numberOfInstants);
 
   positions(0) = initial_position;
@@ -67,7 +71,7 @@ int main(int argc, char* argv[])
   positionFile << particle.positions();
 
   std::ofstream speedFile("speeds.txt");
-  speedFile << particle.speeds();
+  speedFile << particle.speeds();*/
   
   return EXIT_SUCCESS;
 }
