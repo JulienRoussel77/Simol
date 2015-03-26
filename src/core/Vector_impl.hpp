@@ -3,11 +3,24 @@
 
 namespace simol
 {
+
+  //=============
+  // CONSTRUCTORS
+  //=============
+
   template<class ScalarType> inline
   Vector<ScalarType,eigen>::Vector(size_t const size)
   :wrapped_(size)
   {}
-      
+  
+  //=====================
+  // ACCESSORS / MUTATORS
+  //=====================
+
+  template<class ScalarType> inline
+  size_t const & Vector<ScalarType,eigen>::size() const
+  { return wrapped_.size(); }
+  
   template<class ScalarType> inline
   ScalarType & Vector<ScalarType,eigen>::operator()(size_t const index)
   { return wrapped_(index); }

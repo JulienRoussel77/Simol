@@ -51,7 +51,7 @@ int main(int argc, char* argv[])
   //============
   // COMPUTATION
   //============
-  
+
   simol::Vector<double> positions(numberOfInstants);
   simol::Vector<double> speeds(numberOfInstants);
 

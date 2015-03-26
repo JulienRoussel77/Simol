@@ -17,8 +17,7 @@ namespace simol
   {
     public:
       Vector(size_t const size);
-      size_t const & size() const
-      { return wrapped_.size(); }
+      size_t const & size() const;
       ScalarType & operator()(size_t const index);
       ScalarType const & operator()(size_t const index) const;
 
