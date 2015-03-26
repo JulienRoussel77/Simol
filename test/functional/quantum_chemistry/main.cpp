@@ -6,9 +6,9 @@
 #include <random>
 #include <vector>
 
-#include "core/Vector.hpp"
+#include "LinearAlgebra/Vector.hpp"
 
-#include "core/SparseMatrix.hpp"
+#include "LinearAlgebra/SparseMatrix.hpp"
 #include <Eigen/Eigenvalues>
 
 #include <yaml-cpp/yaml.h>

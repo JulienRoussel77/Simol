@@ -6,7 +6,7 @@
 
 #include "Potential.hpp"
 
-#include "core/Vector.hpp"
+#include "LinearAlgebra/Vector.hpp"
 
 //=====================
 // FORWARD DECLARATIONS
