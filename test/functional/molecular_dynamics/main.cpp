@@ -29,7 +29,6 @@ int main(int argc, char* argv[])
 
   YAML::Node mesh = parameters["Mesh"]["Time"];
   double timeStep = mesh["Step"].as<double>();
-  size_t numberOfInstants = mesh["Instants"].as<size_t>();
   double finalInstant = mesh["Final"].as<double>();
 
   //========

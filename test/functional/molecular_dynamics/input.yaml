@@ -5,7 +5,6 @@ Geometry:
 Mesh:
   Time:
     Step: 0.05
-    Instants: 100
     Final: 5
 
 Physics:
