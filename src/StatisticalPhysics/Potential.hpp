@@ -1,5 +1,5 @@
-#ifndef POTENTIAL_HPP
-#define POTENTIAL_HPP
+#ifndef SIMOL_POTENTIAL_HPP
+#define SIMOL_POTENTIAL_HPP
 
 namespace simol
 {
