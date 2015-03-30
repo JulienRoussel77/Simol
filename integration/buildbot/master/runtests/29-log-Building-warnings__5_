@@ -1,0 +1,6 @@
+1014:0/home/cdoucet/Documents/soutien/matherials/codes/simol/integration/buildbot/slave/runtests/build/test/functional/molecular_dynamics/main.cpp:24:10: attention : unused variable ‘dimension’ [-Wunused-variable]
+/home/cdoucet/Documents/soutien/matherials/codes/simol/integration/buildbot/slave/runtests/build/test/functional/molecular_dynamics/main.cpp:10:14: attention : unused parameter ‘argc’ [-Wunused-parameter]
+/home/cdoucet/Documents/soutien/matherials/codes/simol/integration/buildbot/slave/runtests/build/test/functional/quantum_chemistry/main.cpp:17:14: attention : unused parameter ‘argc’ [-Wunused-parameter]
+/usr/local/bibliotheques/eigen/3.2.4/include/eigen3/Eigen/src/SparseCore/SparseMatrix.h:952:85: attention : comparaison entre des expressions entières signée et non signée [-Wsign-compare]
+/usr/local/bibliotheques/eigen/3.2.4/include/eigen3/Eigen/src/SparseCore/SparseMatrix.h:952:45: attention : comparaison entre des expressions entières signée et non signée [-Wsign-compare]
+,
