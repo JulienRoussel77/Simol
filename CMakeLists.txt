@@ -103,7 +103,7 @@ include_directories(/usr/local/bibliotheques/boost/1.57.0/include)
 include_directories(/usr/local/bibliotheques/yaml-cpp/0.5.1/include)
 #include_directories(${CMAKE_CURRENT_BINARY_DIR}/third-party/yaml-cpp/include)
 
-include_directories(src/statistical_physics)
+include_directories(src/StatisticalPhysics)
 include_directories(src)
 
 
