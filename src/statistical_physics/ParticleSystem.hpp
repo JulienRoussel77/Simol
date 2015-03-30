@@ -15,6 +15,12 @@ namespace simol
     public:
       ParticleSystem(size_t const numberOfParticles, ScalarType const & mass, ScalarType const & initialPosition, ScalarType const & initialSpeed);
 
+      ParticleType & particle(size_t index) 
+      { return particles_[index]; }
+
+      std::vector<ParticleType> & particles() 
+      { return particles_; }
+
     private:
       ScalarType currentTime_;
       std::vector<ParticleType> particles_;

@@ -3,6 +3,7 @@
 
 #include "ParticleSystem.hpp"
 
+#include <cmath>
 
 #include<yaml-cpp/yaml.h>
 
@@ -52,8 +53,28 @@ int main(int argc, char* argv[])
   //============
 
   size_t numberOfParticles = 1;
+  size_t numberOfInstants = std::floor(finalInstant/timeStep)+2;
 
   simol::ParticleSystem<double> system(numberOfParticles, mass, initial_position, initial_speed);
+  simol::Potential<double> potential(potential_parameter, 2*M_PI/length);
+  
+  std::ofstream positionFile("positions.txt");
+  std::ofstream speedFile("speeds.txt");
+
+  auto particle = system.particle(0);
+  positionFile << particle.position() << " ";
+  speedFile << particle.speed() << " ";
+  for (double instant = 0; instant < finalInstant; instant+=timeStep)
+  {
+    for (auto&& particle : system.particles())
+    {
+      verlet_scheme(particle,potential,timeStep);
+      positionFile << particle.position() << " ";
+      speedFile << particle.speed() << " ";
+    }
+  }
+
+
 
   /*simol::Vector<double> positions(numberOfInstants);
   simol::Vector<double> speeds(numberOfInstants);
@@ -65,12 +86,8 @@ int main(int argc, char* argv[])
   simol::Potential<double> potential(potential_parameter, 2*M_PI/length);
 
   verlet_scheme(particle,potential,timeStep,numberOfInstants);
+*/
 
-  std::ofstream positionFile("positions.txt");
-  positionFile << particle.positions();
-
-  std::ofstream speedFile("speeds.txt");
-  speedFile << particle.speeds();*/
   
   return EXIT_SUCCESS;
 }

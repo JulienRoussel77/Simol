@@ -18,7 +18,7 @@ namespace simol
 {
 
   template<class ScalarType>
-  void verlet_scheme(Particle<ScalarType> & particle, Potential<ScalarType> const & potential, double delta_t, size_t numberOfIterations);
+  void verlet_scheme(Particle<ScalarType> & particle, Potential<ScalarType> const & potential, double delta_t);
 
   //==================
   // CLASS DECLARATION
@@ -32,7 +32,7 @@ namespace simol
     // FRIEND FUNCTIONS
     //=================
 
-    friend void verlet_scheme<>(Particle<ScalarType> & particle, Potential<ScalarType> const & potential, double delta_t, size_t numberOfIterations);
+    friend void verlet_scheme<>(Particle<ScalarType> & particle, Potential<ScalarType> const & potential, double delta_t);
 
     //=============
     // CONSTRUCTORS
