@@ -19,43 +19,71 @@ add_executable(quantum_chemistry test/functional/quantum_chemistry/main.cpp)
 add_executable(molecular_dynamics test/functional/molecular_dynamics/main.cpp)
 add_executable(test_simol test/unit/test_simol.cpp)
 
+#=============
+# USER OPTIONS
+#=============
+
+option(ENABLE_DOWNLOAD "Enables downloading of missing external libraries" False)
+
+
 #=============================
 # DOWNLOAD 3RD-PARTY LIBRARIES
 #=============================
 
-#ExternalProject_Add(yaml-cpp
-#                    URL https://yaml-cpp.googlecode.com/files/yaml-cpp-0.5.1.tar.gz
-#                    PREFIX ${CMAKE_CURRENT_BINARY_DIR}/third-party/yaml-cpp
-#                    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
-#)
+if(ENABLE_DOWNLOAD)
 
-ExternalProject_Add(eigen
-                    URL http://bitbucket.org/eigen/eigen/get/3.2.4.tar.bz2
-                    PREFIX ${CMAKE_CURRENT_BINARY_DIR}/third-party/eigen
-                    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
-)
+  ExternalProject_Add(yaml-cpp
+                      URL https://yaml-cpp.googlecode.com/files/yaml-cpp-0.5.1.tar.gz
+                      PREFIX ${CMAKE_CURRENT_BINARY_DIR}/third-party/yaml-cpp
+                      CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
+  )
 
-#ExternalProject_Add(boost
-#                    URL http://sourceforge.net/projects/boost/files/boost/1.57.0/boost_1_57_0.tar.gz
-#                    PREFIX ${CMAKE_CURRENT_BINARY_DIR}/third-party/boost
-#                    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
-#                    CONFIGURE_COMMAND cd ../boost && ./bootstrap.sh
-#                    BUILD_COMMAND cd ../boost && ./b2 install --prefix=.
-#)
+  ExternalProject_Add(eigen
+                      URL http://bitbucket.org/eigen/eigen/get/3.2.4.tar.bz2
+                      PREFIX ${CMAKE_CURRENT_BINARY_DIR}/third-party/eigen
+                      CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
+  )
 
-#ExternalProject_Add(cppunit
-#                    URL http://sourceforge.net/projects/cppunit/files/cppunit/1.12.1/cppunit-1.12.1.tar.gz
-#                    PREFIX ${CMAKE_CURRENT_BINARY_DIR}/third-party/cppunit
-#                    CONFIGURE_COMMAND cd ../cppunit && LDFLAGS="-ldl" ./configure --prefix=${PREFIX}
-#)
+  #ExternalProject_Add(boost
+  #                    URL http://sourceforge.net/projects/boost/files/boost/1.57.0/boost_1_57_0.tar.gz
+  #                    PREFIX ${CMAKE_CURRENT_BINARY_DIR}/third-party/boost
+  #                    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
+  #                    CONFIGURE_COMMAND cd ../boost && ./bootstrap.sh
+  #                    BUILD_COMMAND cd ../boost && ./b2 install --prefix=.
+  #)
 
-#add_dependencies(molecular_dynamics cppunit)
-add_dependencies(molecular_dynamics eigen)
-#add_dependencies(molecular_dynamics yaml-cpp)
+  #ExternalProject_Add(cppunit
+  #                    URL http://sourceforge.net/projects/cppunit/files/cppunit/1.12.1/cppunit-1.12.1.tar.gz
+  #                    PREFIX ${CMAKE_CURRENT_BINARY_DIR}/third-party/cppunit
+  #                    CONFIGURE_COMMAND cd ../cppunit && LDFLAGS="-ldl" ./configure --prefix=${PREFIX}
+  #)
 
-add_dependencies(quantum_chemistry eigen)
-#add_dependencies(quantum_chemistry yaml-cpp)
+  add_dependencies(yaml-cpp boost)
 
+  #add_dependencies(molecular_dynamics cppunit)
+  add_dependencies(molecular_dynamics eigen)
+  add_dependencies(molecular_dynamics yaml-cpp)
+
+  add_dependencies(quantum_chemistry eigen)
+  add_dependencies(quantum_chemistry yaml-cpp)
+
+  include_directories(${CMAKE_CURRENT_BINARY_DIR}/third-party/eigen/include/eigen3)
+  #include_directories(${CMAKE_CURRENT_BINARY_DIR}/third-party/boost/include)
+  include_directories(${CMAKE_CURRENT_BINARY_DIR}/third-party/yaml-cpp/include)
+
+  target_link_libraries(molecular_dynamics ${CMAKE_CURRENT_BINARY_DIR}/third-party/yaml-cpp/lib/libyaml-cpp.a)
+  target_link_libraries(quantum_chemistry ${CMAKE_CURRENT_BINARY_DIR}/third-party/yaml-cpp/lib/libyaml-cpp.a)
+
+else(ENABLE_DOWNLOAD)
+
+include_directories(/usr/local/bibliotheques/eigen/3.2.4/include/eigen3)
+include_directories(/usr/local/bibliotheques/yaml-cpp/0.5.1/include)
+
+
+target_link_libraries(molecular_dynamics /usr/local/bibliotheques/yaml-cpp/0.5.1/lib/libyaml-cpp.a)
+target_link_libraries(quantum_chemistry /usr/local/bibliotheques/yaml-cpp/0.5.1/lib/libyaml-cpp.a)
+
+endif(ENABLE_DOWNLOAD)
 #===================
 # USER CONFIGURATION
 #===================
@@ -91,34 +119,28 @@ elseif (CMAKE_BUILD_TYPE EQUAL "Profile")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -pg" )
 endif(CMAKE_BUILD_TYPE EQUAL "Release")
 
-#====================
-# INCLUDE DIRECTORIES
-#====================
+#==========
+# DOWNLOADS
+#==========
 
-#include_directories(/usr/local/bibliotheques/eigen/3.2.4/include/eigen3)
-include_directories(${CMAKE_CURRENT_BINARY_DIR}/third-party/eigen/include/eigen3)
+
+#====================
+# LOCAL INSTALLATIONS
+#====================
 
 include_directories(/usr/local/bibliotheques/clapack/3.2.1/include)
 include_directories(/usr/local/bibliotheques/cppunit/1.12.1/include)
 include_directories(/usr/local/bibliotheques/boost/1.57.0/include)
 
-include_directories(/usr/local/bibliotheques/yaml-cpp/0.5.1/include)
-#include_directories(${CMAKE_CURRENT_BINARY_DIR}/third-party/yaml-cpp/include)
-
-include_directories(src/StatisticalPhysics)
-include_directories(src)
-
+target_link_libraries(test_simol /usr/local/bibliotheques/cppunit/1.12.1/lib/libcppunit.so)
+target_link_libraries(quantum_chemistry /usr/local/bibliotheques/arpack/2.1/lib/libarpack_LINUX.a)
 
 #================
 # LINKER SETTINGS
 #================
-target_link_libraries(test_simol /usr/local/bibliotheques/cppunit/1.12.1/lib/libcppunit.so)
 
-target_link_libraries(quantum_chemistry /usr/local/bibliotheques/arpack/2.1/lib/libarpack_LINUX.a)
-
-#target_link_libraries(molecular_dynamics ${CMAKE_CURRENT_BINARY_DIR}/third-party/yaml-cpp/lib/libyaml-cpp.a)
-target_link_libraries(molecular_dynamics /usr/local/bibliotheques/yaml-cpp/0.5.1/lib/libyaml-cpp.a)
-target_link_libraries(quantum_chemistry /usr/local/bibliotheques/yaml-cpp/0.5.1/lib/libyaml-cpp.a)
+include_directories(src/StatisticalPhysics)
+include_directories(src)
 
 #==============
 # TEST SETTINGS
