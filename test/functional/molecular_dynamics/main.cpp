@@ -8,7 +8,7 @@
 #include<yaml-cpp/yaml.h>
 #include <getopt.h>
 
-#include "core/CommandLine.hpp"
+#include "IO/CommandLine.hpp"
 
 int main(int argc, char* argv[])
 {
@@ -64,9 +64,6 @@ int main(int argc, char* argv[])
   simol::ParticleSystem<double> system(numberOfParticles, mass, initial_position, initial_speed);
   simol::Potential<double> potential(potential_parameter, 2*M_PI/length);
   
-  std::ofstream positionFile("positions.txt");
-  std::ofstream speedFile("speeds.txt");
-
   std::ofstream outputFile(outputFilename);
   
   for (double instant = 0; instant < finalInstant; instant+=timeStep)
