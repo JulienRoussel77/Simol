@@ -6,6 +6,9 @@
 #include <cmath>
 
 #include<yaml-cpp/yaml.h>
+#include <getopt.h>
+
+#include "core/CommandLine.hpp"
 
 int main(int argc, char* argv[])
 {
@@ -14,7 +17,10 @@ int main(int argc, char* argv[])
   // COMMAND LINE PARSING
   //=====================
 
-  YAML::Node parameters = YAML::LoadFile(argv[1]);
+  simol::CommandLine cmd(argc,argv);
+
+
+  YAML::Node parameters = YAML::LoadFile(cmd.inputFileName());
 
   //=========
   // GEOMETRY
