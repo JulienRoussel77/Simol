@@ -29,11 +29,11 @@ add_executable(test_simol test/unit/test_simol.cpp)
 #                    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
 #)
 
-#ExternalProject_Add(eigen
-#                    URL http://bitbucket.org/eigen/eigen/get/3.2.4.tar.bz2
-#                    PREFIX ${CMAKE_CURRENT_BINARY_DIR}/third-party/eigen
-#                    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
-#)
+ExternalProject_Add(eigen
+                    URL http://bitbucket.org/eigen/eigen/get/3.2.4.tar.bz2
+                    PREFIX ${CMAKE_CURRENT_BINARY_DIR}/third-party/eigen
+                    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
+)
 
 #ExternalProject_Add(boost
 #                    URL http://sourceforge.net/projects/boost/files/boost/1.57.0/boost_1_57_0.tar.gz
@@ -50,10 +50,10 @@ add_executable(test_simol test/unit/test_simol.cpp)
 #)
 
 #add_dependencies(molecular_dynamics cppunit)
-#add_dependencies(molecular_dynamics eigen)
+add_dependencies(molecular_dynamics eigen)
 #add_dependencies(molecular_dynamics yaml-cpp)
 
-#add_dependencies(quantum_chemistry eigen)
+add_dependencies(quantum_chemistry eigen)
 #add_dependencies(quantum_chemistry yaml-cpp)
 
 #===================
@@ -95,8 +95,8 @@ endif(CMAKE_BUILD_TYPE EQUAL "Release")
 # INCLUDE DIRECTORIES
 #====================
 
-include_directories(/usr/local/bibliotheques/eigen/3.2.4/include/eigen3)
-#include_directories(${CMAKE_CURRENT_BINARY_DIR}/third-party/eigen/include/eigen3)
+#include_directories(/usr/local/bibliotheques/eigen/3.2.4/include/eigen3)
+include_directories(${CMAKE_CURRENT_BINARY_DIR}/third-party/eigen/include/eigen3)
 
 include_directories(/usr/local/bibliotheques/clapack/3.2.1/include)
 include_directories(/usr/local/bibliotheques/cppunit/1.12.1/include)
