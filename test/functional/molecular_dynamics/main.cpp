@@ -61,7 +61,7 @@ int main(int argc, char* argv[])
   std::ofstream positionFile("positions.txt");
   std::ofstream speedFile("speeds.txt");
 
-  auto particle = system.particle(0);
+  simol::Particle<double> particle = system.particle(0);
   positionFile << particle.position() << " ";
   speedFile << particle.speed() << " ";
   for (double instant = 0; instant < finalInstant; instant+=timeStep)
