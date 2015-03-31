@@ -17,4 +17,4 @@ Physics:
     Type: cosine
 
 Output:
-  filename: output.txt
+  Filename: output.txt

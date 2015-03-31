@@ -46,7 +46,7 @@ int main(int argc, char* argv[])
   // LIBRARIES
   //==========
   
-  std::string linalg = parameters["Libraries"]["LinearAlgebra"].as<std::string>();
+  std::string outputFilename = parameters["Output"]["Filename"].as<std::string>();
 
   //============
   // COMPUTATION
@@ -61,16 +61,14 @@ int main(int argc, char* argv[])
   std::ofstream positionFile("positions.txt");
   std::ofstream speedFile("speeds.txt");
 
-  simol::Particle<double> particle = system.particle(0);
-  positionFile << particle.position() << " ";
-  speedFile << particle.speed() << " ";
+  std::ofstream outputFile(outputFilename);
+  
   for (double instant = 0; instant < finalInstant; instant+=timeStep)
   {
     for (auto&& particle : system.particles())
     {
       verlet(particle,potential,timeStep);
-      positionFile << particle.position() << " ";
-      speedFile << particle.speed() << " ";
+      outputFile << instant << " " << particle.position() << " " << particle.speed() << std::endl;
     }
   }
 
