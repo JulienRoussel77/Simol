@@ -7,6 +7,8 @@ project (simol CXX Fortran)
 # INCLUDE FILES
 #==============
 
+set(CMAKE_VERBOSE_MAKEFILE ON)
+
 include(CheckCXXCompilerFlag)
 include(ExternalProject)
 
