@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "Potential.hpp"
-
+#include "ODE/verlet.hpp"
 #include "LinearAlgebra/Vector.hpp"
 
 //=====================
@@ -14,11 +14,9 @@
 
 #include "Particle_fwd.hpp"
 
+
 namespace simol
 {
-
-  template<class ScalarType>
-  void verlet_scheme(Particle<ScalarType> & particle, Potential<ScalarType> const & potential, double delta_t);
 
   //==================
   // CLASS DECLARATION
@@ -32,7 +30,7 @@ namespace simol
     // FRIEND FUNCTIONS
     //=================
 
-    friend void verlet_scheme<>(Particle<ScalarType> & particle, Potential<ScalarType> const & potential, double delta_t);
+    friend void verlet<>(Particle<ScalarType> & particle, Potential<ScalarType> const & potential, double delta_t);
 
     //=============
     // CONSTRUCTORS

@@ -1,3 +1,0 @@
-422:0/home/cdoucet/Documents/soutien/matherials/codes/simol/integration/buildbot/slave/runtests/build/test/functional/molecular_dynamics/main.cpp:24:10: attention : unused variable ‘dimension’ [-Wunused-variable]
-/home/cdoucet/Documents/soutien/matherials/codes/simol/integration/buildbot/slave/runtests/build/test/functional/molecular_dynamics/main.cpp:10:14: attention : unused parameter ‘argc’ [-Wunused-parameter]
-,

@@ -7,7 +7,7 @@
 namespace simol
 {
   template<class ScalarType>
-  void (Particle<ScalarType> & particle, Potential<ScalarType> const & potential, double timeStep);
+  void verlet(Particle<ScalarType> & particle, Potential<ScalarType> const & potential, double timeStep);
 }
 
 #include "verlet_impl.hpp"

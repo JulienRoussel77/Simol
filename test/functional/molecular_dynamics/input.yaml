@@ -16,5 +16,5 @@ Physics:
     Parameter: 1
     Type: cosine
 
-Libraries:
-  LinearAlgebra: eigen
+Output:
+  filename: output.txt

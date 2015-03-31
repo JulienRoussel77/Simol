@@ -68,7 +68,7 @@ int main(int argc, char* argv[])
   {
     for (auto&& particle : system.particles())
     {
-      verlet_scheme(particle,potential,timeStep);
+      verlet(particle,potential,timeStep);
       positionFile << particle.position() << " ";
       speedFile << particle.speed() << " ";
     }
