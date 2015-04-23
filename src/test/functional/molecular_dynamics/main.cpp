@@ -8,7 +8,7 @@
 #include<yaml-cpp/yaml.h>
 #include <getopt.h>
 
-#include "IO/CommandLine.hpp"
+#include "io/CommandLine.hpp"
 
 int main(int argc, char* argv[])
 {

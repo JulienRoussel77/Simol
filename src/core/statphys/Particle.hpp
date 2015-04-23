@@ -5,8 +5,8 @@
 #include <vector>
 
 #include "Potential.hpp"
-#include "ODE/verlet.hpp"
-#include "LinearAlgebra/Vector.hpp"
+#include "ode/verlet.hpp"
+#include "linalg/Vector.hpp"
 
 //=====================
 // FORWARD DECLARATIONS

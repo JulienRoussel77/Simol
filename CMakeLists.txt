@@ -1,7 +1,7 @@
 
 cmake_minimum_required (VERSION 2.6)
 
-project (simol CXX Fortran)
+project (simol CXX)
 
 #==============
 # INCLUDE FILES
@@ -11,20 +11,28 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 
 include(CheckCXXCompilerFlag)
 include(ExternalProject)
+include(ProcessorCount)
 
+ProcessorCount(N)
+if(NOT N EQUAL 0)
+  set(CMAKE_BUILD_FLAGS -j${N})
+  #set(ctest_test_args ${ctest_test_args} PARALLEL_LEVEL ${N})
+endif()
 #====================
 # EXECUTABLE SETTINGS
 #====================
-add_executable(quantum_chemistry test/functional/quantum_chemistry/main.cpp)
-add_executable(molecular_dynamics test/functional/molecular_dynamics/main.cpp)
-add_executable(test_simol test/unit/test_simol.cpp)
+add_executable(quantum_chemistry src/test/functional/quantum_chemistry/main.cpp)
+add_executable(molecular_dynamics src/test/functional/molecular_dynamics/main.cpp)
+add_executable(test_simol src/test/unit/test_simol.cpp)
 
+
+add_subdirectory(src)
 #=============
 # USER OPTIONS
 #=============
 
 option(ENABLE_DOWNLOAD "Enables downloading of missing external libraries" False)
-
+option(EXTERNAL_DIR "Directory where third-party libraries should downloaded" ${CMAKE_CURRENT_BINARY_DIR}/third-party)
 
 #=============================
 # DOWNLOAD 3RD-PARTY LIBRARIES
@@ -32,17 +40,36 @@ option(ENABLE_DOWNLOAD "Enables downloading of missing external libraries" False
 
 if(ENABLE_DOWNLOAD)
 
-  ExternalProject_Add(yaml-cpp
-                      URL https://yaml-cpp.googlecode.com/files/yaml-cpp-0.5.1.tar.gz
-                      PREFIX ${CMAKE_CURRENT_BINARY_DIR}/third-party/yaml-cpp
-                      CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
+  ExternalProject_Add(gcc
+                      URL ftp://ftp.uvsq.fr/pub/gcc/releases/gcc-4.9.2/gcc-4.9.2.tar.gz
+                      PREFIX ${CMAKE_CURRENT_BINARY_DIR}/third-party/gcc
+                      DOWNLOAD_DIR third-party/gcc/download
+                      SOURCE_DIR third-party/gcc/configure
+                      CONFIGURE_COMMAND cd ../configure && ./contrib/download_prerequisites && ./configure --prefix=${PREFIX}/install
+                      #CONFIGURE_COMMAND cd ../gcc && ./contrib/download_prerequisites && ./configure
+                      BINARY_DIR third-party/gcc/build
+                      BUILD_COMMAND cd ../configure && make
+                      INSTALL_DIR third-party/gcc/install
+                      INSTALL_COMMAND cd ../configure && make install
   )
 
-  ExternalProject_Add(eigen
-                      URL http://bitbucket.org/eigen/eigen/get/3.2.4.tar.bz2
-                      PREFIX ${CMAKE_CURRENT_BINARY_DIR}/third-party/eigen
-                      CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
-  )
+#  ExternalProject_Add(yaml-cpp
+#                      URL https://yaml-cpp.googlecode.com/files/yaml-cpp-0.5.1.tar.gz
+#                      PREFIX ${DOWNLOAD_DIR}/yaml-cpp
+#                      CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
+#  )
+
+ExternalProject_Add(eigen
+                    PREFIX ${EXTERNAL_DIR}/eigen
+                    DOWNLOAD_DIR ${EXTERNAL_DIR}/eigen/download
+                    SOURCE_DIR ${EXTERNAL_DIR}/eigen/src
+                    BINARY_DIR ${EXTERNAL_DIR}/eigen/build
+                    STAMP_DIR  ${EXTERNAL_DIR}/eigen/stamp
+                    INSTALL_DIR ${EXTERNAL_DIR}/eigen/install
+                    URL http://bitbucket.org/eigen/eigen/get/3.2.4.tar.gz
+                    URL_MD5 4d0d77e06fef87b4fcd2c9b72cc8dc55
+                    CMAKE_ARGS -D CMAKE_INSTALL_PREFIX=<INSTALL_DIR> 
+                   )
 
   #ExternalProject_Add(boost
   #                    URL http://sourceforge.net/projects/boost/files/boost/1.57.0/boost_1_57_0.tar.gz
@@ -58,14 +85,16 @@ if(ENABLE_DOWNLOAD)
   #                    CONFIGURE_COMMAND cd ../cppunit && LDFLAGS="-ldl" ./configure --prefix=${PREFIX}
   #)
 
-  add_dependencies(yaml-cpp boost)
+  add_dependencies(molecular_dynamics gcc)
+
+#  add_dependencies(yaml-cpp boost)
 
   #add_dependencies(molecular_dynamics cppunit)
-  add_dependencies(molecular_dynamics eigen)
-  add_dependencies(molecular_dynamics yaml-cpp)
+#  add_dependencies(molecular_dynamics eigen)
+#  add_dependencies(molecular_dynamics yaml-cpp)
 
-  add_dependencies(quantum_chemistry eigen)
-  add_dependencies(quantum_chemistry yaml-cpp)
+#  add_dependencies(quantum_chemistry eigen)
+#  add_dependencies(quantum_chemistry yaml-cpp)
 
   include_directories(${CMAKE_CURRENT_BINARY_DIR}/third-party/eigen/include/eigen3)
   #include_directories(${CMAKE_CURRENT_BINARY_DIR}/third-party/boost/include)
@@ -102,9 +131,9 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -fopenmp")
 CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
 if(COMPILER_SUPPORTS_CXX11)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-else(COMPILER_SUPPORTS_CXX11)
-        message(STATUS "The compiler ${CMAKE_CXX_COMPILER} does not support -std=c++11 flag. Please use a different C++ compiler.")
-endif(COMPILER_SUPPORTS_CXX11)
+else()
+  message(STATUS "The compiler ${CMAKE_CXX_COMPILER} does not support -std=c++11 flag. Please use a different C++ compiler.")
+endif()
 
 
 #set(CMAKE_FORTRAN_COMPILER /home/cdoucet/local/gcc/4.8.2/bin/gfortran)
@@ -139,7 +168,8 @@ target_link_libraries(quantum_chemistry /usr/local/bibliotheques/arpack/2.1/lib/
 # LINKER SETTINGS
 #================
 
-include_directories(src/StatisticalPhysics)
+include_directories(src/core)
+include_directories(src/core/statphys)
 include_directories(src)
 
 #==============
