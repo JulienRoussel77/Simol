@@ -19,28 +19,18 @@ int main(int argc, char* argv[])
 
   simol::CommandLine cmd(argc,argv);
 
-
+  //===================
+  // INPUT FILE LOADING
+  //===================
   YAML::Node parameters = YAML::LoadFile(cmd.inputFileName());
 
-  //=========
-  // GEOMETRY
-  //=========
-  
   YAML::Node geometry = parameters["Geometry"];
   size_t dimension = geometry["Dimension"].as<size_t>();
   size_t length = geometry["Length"].as<size_t>();
 
-  //=====
-  // MESH
-  //=====
-
   YAML::Node mesh = parameters["Mesh"]["Time"];
   double timeStep = mesh["Step"].as<double>();
   double finalInstant = mesh["Final"].as<double>();
-
-  //========
-  // PHYSICS
-  //========
 
   YAML::Node physics = parameters["Physics"];
   double mass = physics["Particle"]["Mass"].as<double>();
@@ -48,10 +38,6 @@ int main(int argc, char* argv[])
   double initial_position = physics["Particle"]["Position"].as<double>();
   double potential_parameter = physics["Potential"]["Parameter"].as<double>();
 
-  //==========
-  // LIBRARIES
-  //==========
-  
   std::string outputFilename = parameters["Output"]["Filename"].as<std::string>();
 
   //============
@@ -75,20 +61,5 @@ int main(int argc, char* argv[])
     }
   }
 
-
-
-  /*simol::Vector<double> positions(numberOfInstants);
-  simol::Vector<double> speeds(numberOfInstants);
-
-  positions(0) = initial_position;
-  speeds(0) = initial_speed;
-
-  simol::Particle<double> particle(mass, positions, speeds);
-  simol::Potential<double> potential(potential_parameter, 2*M_PI/length);
-
-  verlet_scheme(particle,potential,timeStep,numberOfInstants);
-*/
-
-  
   return EXIT_SUCCESS;
 }
