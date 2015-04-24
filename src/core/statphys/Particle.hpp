@@ -41,7 +41,7 @@ namespace simol
 
     public:
 
-      Particle(ScalarType const & mass, ScalarType const & position, ScalarType const & speed);
+      Particle(ScalarType const & mass, ScalarType const & position, ScalarType const & momentum);
 
     //==========
     // ACCESSORS
@@ -51,7 +51,7 @@ namespace simol
 
       ScalarType const & mass() const;
       ScalarType const & position() const;
-      ScalarType const & speed() const;
+      ScalarType const & momentum() const;
 
     //=============
     // DATA MEMBERS
@@ -61,7 +61,7 @@ namespace simol
 
       ScalarType mass_;
       ScalarType position_;
-      ScalarType speed_;
+      ScalarType momentum_;
   };
 
 }

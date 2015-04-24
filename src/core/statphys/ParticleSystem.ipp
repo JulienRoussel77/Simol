@@ -32,7 +32,7 @@ namespace simol
       verlet(particle,potential,timeStep);
       outputFile << currentTime_ 
                  << " " << particle.position() 
-                 << " " << particle.speed() 
+                 << " " << particle.momentum() 
                  << std::endl;
     }
       currentTime_ = nextTime;

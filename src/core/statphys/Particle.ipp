@@ -10,8 +10,8 @@ namespace simol
   template<class ScalarType> inline
   Particle<ScalarType>::Particle(ScalarType const & mass, 
                                  ScalarType const & position,
-                                 ScalarType const & speed)
-  :mass_(mass), position_(position), speed_(speed)
+                                 ScalarType const & momentum)
+  :mass_(mass), position_(position), momentum_(momentum)
   {}
 
   //==========
@@ -23,8 +23,8 @@ namespace simol
   { return position_; }
 
   template<class ScalarType> inline
-  ScalarType const & Particle<ScalarType>::speed() const
-  { return speed_; }
+  ScalarType const & Particle<ScalarType>::momentum() const
+  { return momentum_; }
 
   template<class ScalarType> inline
   ScalarType const & Particle<ScalarType>::mass() const
