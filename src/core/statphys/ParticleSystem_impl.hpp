@@ -10,7 +10,7 @@ namespace simol
                                              ScalarType const & initialPosition,
                                              ScalarType const & initialSpeed)
   :currentTime_(0), 
-   particles_(numberOfParticles, Particle<ScalarType>(mass,initialPosition,initialSpeed))
+   configuration_(numberOfParticles, Particle<ScalarType>(mass,initialPosition,initialSpeed))
   {}
 
 }

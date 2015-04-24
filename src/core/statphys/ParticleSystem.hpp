@@ -16,14 +16,14 @@ namespace simol
       ParticleSystem(size_t const numberOfParticles, ScalarType const & mass, ScalarType const & initialPosition, ScalarType const & initialSpeed);
 
       ParticleType & particle(size_t index) 
-      { return particles_[index]; }
+      { return configuration_[index]; }
 
       std::vector<ParticleType> & particles() 
-      { return particles_; }
+      { return configuration_; }
 
     private:
       ScalarType currentTime_;
-      std::vector<ParticleType> particles_;
+      std::vector<ParticleType> configuration_;
   };
 
   // redémarrage : nombres aleatoires, juste pannes, tous les N pas de temps
