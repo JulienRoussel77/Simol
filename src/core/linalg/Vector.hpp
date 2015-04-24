@@ -2,8 +2,13 @@
 #define VECTORWRAPPER_HPP
 
 #include "stl.hpp"
+#include "eigen.hpp"
 
-#include "Vector_fwd.hpp"
+namespace simol
+{
+  template<class ScalarType, template<class> class WrappedLibrary>
+  class Vector;
+}
 
 namespace simol
 {
@@ -38,6 +43,6 @@ namespace simol
 
 }
 
-#include "Vector_impl.hpp"
+#include "Vector.ipp"
 
 #endif

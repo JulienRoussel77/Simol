@@ -19,6 +19,6 @@ namespace simol
 
 }
 
-#include "Potential_impl.hpp"
+#include "Potential.ipp"
 
 #endif

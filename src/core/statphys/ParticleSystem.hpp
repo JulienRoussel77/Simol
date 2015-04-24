@@ -31,6 +31,6 @@ namespace simol
 
 }
 
-#include "ParticleSystem_impl.hpp"
+#include "ParticleSystem.ipp"
 
 #endif

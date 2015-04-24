@@ -12,8 +12,11 @@
 // FORWARD DECLARATIONS
 //=====================
 
-#include "Particle_fwd.hpp"
-
+namespace simol
+{
+  template<class ScalarType>
+  class Particle;
+}
 
 namespace simol
 {
@@ -63,7 +66,7 @@ namespace simol
 
 }
 
-#include "Particle_impl.hpp"
+#include "Particle.ipp"
 
 namespace simol
 {
