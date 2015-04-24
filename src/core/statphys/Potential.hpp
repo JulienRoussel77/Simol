@@ -11,6 +11,7 @@ namespace simol
       Potential(ScalarType parameter, ScalarType pulsatance);
       ScalarType operator()(ScalarType const & position) const;
       ScalarType derivative(ScalarType const & position) const;
+      ScalarType force(ScalarType const & position) const;
 
     private:
       ScalarType parameter_;

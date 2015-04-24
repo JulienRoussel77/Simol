@@ -11,9 +11,9 @@ namespace simol
               Potential<ScalarType> const & potential, 
               double timeStep)
   {
-    particle.speed_ -= timeStep * potential.derivative(particle.position_) / 2;
+    particle.speed_ += timeStep * potential.force(particle.position()) / 2;
     particle.position_ += timeStep * particle.speed_ / particle.mass_;
-    particle.speed_ -= timeStep * potential.derivative(particle.position_) / 2;
+    particle.speed_ += timeStep * potential.force(particle.position()) / 2;
   }
 }
 

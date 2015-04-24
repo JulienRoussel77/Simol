@@ -19,6 +19,9 @@ namespace simol
   ScalarType Potential<ScalarType>::derivative(ScalarType const & position) const
   { return parameter_*energy_*std::sin(energy_*position); }
 
+  template<class ScalarType> inline
+  ScalarType Potential<ScalarType>::force(ScalarType const & position) const
+  { return -derivative(position); }
 }
 
 
