@@ -18,7 +18,7 @@ namespace simol
       ParticleType & particle(size_t index) 
       { return configuration_[index]; }
 
-      std::vector<ParticleType> & particles() 
+      std::vector<ParticleType> & configuration() 
       { return configuration_; }
 
     private:

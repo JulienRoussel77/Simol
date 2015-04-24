@@ -54,7 +54,7 @@ int main(int argc, char* argv[])
   
   for (double instant = 0; instant < finalInstant; instant+=timeStep)
   {
-    for (auto&& particle : system.particles())
+    for (auto&& particle : system.configuration())
     {
       verlet(particle,potential,timeStep);
       outputFile << instant << " " << particle.position() << " " << particle.speed() << std::endl;
