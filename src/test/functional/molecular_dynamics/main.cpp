@@ -52,13 +52,14 @@ int main(int argc, char* argv[])
   
   std::ofstream outputFile(outputFilename);
   
-  for (double instant = 0; instant < finalInstant; instant+=timeStep)
+  for (double instant = timeStep; instant < finalInstant; instant+=timeStep)
   {
-    for (auto&& particle : system.configuration())
+    system.simulate(instant, potential, outputFile);
+   /* for (auto&& particle : system.configuration())
     {
       verlet(particle,potential,timeStep);
       outputFile << instant << " " << particle.position() << " " << particle.speed() << std::endl;
-    }
+    }*/
   }
 
   return EXIT_SUCCESS;

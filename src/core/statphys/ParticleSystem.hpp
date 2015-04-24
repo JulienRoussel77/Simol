@@ -21,6 +21,21 @@ namespace simol
       std::vector<ParticleType> & configuration() 
       { return configuration_; }
 
+      void simulate(ScalarType const nextTime, Potential<ScalarType> const & potential, std::ofstream & outputFile)
+      {
+        ScalarType timeStep = nextTime - currentTime_;
+        for (auto&& particle : configuration_)
+        {
+          verlet(particle,potential,timeStep);
+          outputFile << currentTime_ 
+                     << " " << particle.position() 
+                     << " " << particle.speed() 
+                     << std::endl;
+        }
+        currentTime_ = nextTime;
+
+      }
+
     private:
       ScalarType currentTime_;
       std::vector<ParticleType> configuration_;
