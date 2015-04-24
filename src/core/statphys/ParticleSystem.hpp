@@ -13,30 +13,22 @@ namespace simol
     typedef Particle<ScalarType> ParticleType;
 
     public:
-      ParticleSystem(size_t const numberOfParticles, ScalarType const & mass, ScalarType const & initialPosition, ScalarType const & initialSpeed);
 
-      ParticleType & particle(size_t index) 
-      { return configuration_[index]; }
+      ParticleSystem(size_t const numberOfParticles, 
+                     ScalarType const & mass, 
+                     ScalarType const & initialPosition, 
+                     ScalarType const & initialSpeed);
 
-      std::vector<ParticleType> & configuration() 
-      { return configuration_; }
+      ParticleType & particle(size_t index);
 
-      void simulate(ScalarType const nextTime, Potential<ScalarType> const & potential, std::ofstream & outputFile)
-      {
-        ScalarType timeStep = nextTime - currentTime_;
-        for (auto&& particle : configuration_)
-        {
-          verlet(particle,potential,timeStep);
-          outputFile << currentTime_ 
-                     << " " << particle.position() 
-                     << " " << particle.speed() 
-                     << std::endl;
-        }
-        currentTime_ = nextTime;
+      std::vector<ParticleType> & configuration(); 
 
-      }
+      void simulate(ScalarType const nextTime, 
+                    Potential<ScalarType> const & potential, 
+                    std::ofstream & outputFile);
 
     private:
+      
       ScalarType currentTime_;
       std::vector<ParticleType> configuration_;
   };
