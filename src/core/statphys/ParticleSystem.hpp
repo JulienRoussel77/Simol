@@ -24,13 +24,13 @@ namespace simol
 
       std::vector<ParticleType> & configuration(); 
 
-      void simulate(ScalarType const nextTime, 
+      void simulate(ScalarType const timeStep, 
                     HamiltonDynamics<ScalarType> const & model, 
                     std::ofstream & outputFile);
 
     private:
       
-      ScalarType currentTime_;
+      size_t currentTimeIteration_;
       std::vector<ParticleType> configuration_;
   };
 

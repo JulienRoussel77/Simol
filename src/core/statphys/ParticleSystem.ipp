@@ -9,7 +9,7 @@ namespace simol
                                              ScalarType const & mass,
                                              ScalarType const & initialPosition,
                                              ScalarType const & initialSpeed)
-  :currentTime_(0), 
+  :currentTimeIteration_(0), 
    configuration_(numberOfParticles, Particle<ScalarType>(mass,initialPosition,initialSpeed))
   {}
       
@@ -22,20 +22,19 @@ namespace simol
   { return configuration_; }
 
   template<class ScalarType>
-  void ParticleSystem<ScalarType>::simulate(ScalarType const nextTime, 
+  void ParticleSystem<ScalarType>::simulate(ScalarType const timeStep,
                                             HamiltonDynamics<ScalarType> const & model, 
                                             std::ofstream & outputFile)
   {
-    ScalarType timeStep = nextTime - currentTime_;
     for (auto&& particle : configuration_)
     {
       verlet(particle,model,timeStep);
-      outputFile << currentTime_ 
+      outputFile << currentTimeIteration_ * timeStep 
                  << " " << particle.position() 
                  << " " << particle.momentum() 
                  << std::endl;
     }
-      currentTime_ = nextTime;
+    ++currentTimeIteration_;
 
   }
 

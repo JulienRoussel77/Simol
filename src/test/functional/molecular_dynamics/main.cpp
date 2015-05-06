@@ -58,7 +58,7 @@ int main(int argc, char* argv[])
   for (size_t instantIndex  =1; instantIndex < numberOfInstants; ++instantIndex)
   {
     double instant = instantIndex * timeStep;
-    system.simulate(instant, model, outputFile);
+    system.simulate(timeStep, model, outputFile);
   }
 
   return EXIT_SUCCESS;
