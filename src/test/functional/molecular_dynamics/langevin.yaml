@@ -1,0 +1,24 @@
+Geometry:
+  Dimension: 1
+  Length: 1
+
+Mesh:
+  Time:
+    Step: 0.05
+    Final: 5
+
+Physics:
+  Particle:
+    Mass: 1
+    Position: 0.49
+    Speed: 0
+  Potential:
+    Parameter: 1
+    Type: cosine
+  Model:
+    Name: Langevin
+    Friction: 1
+    Temperature: 100
+
+Output:
+  Filename: output.txt
