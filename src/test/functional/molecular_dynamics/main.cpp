@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
 
   YAML::Node mesh = parameters["Mesh"]["Time"];
   double timeStep = mesh["Step"].as<double>();
-  double finalInstant = mesh["Final"].as<double>();
+  size_t numberOfInstants = mesh["Number"].as<size_t>();
 
   YAML::Node physics = parameters["Physics"];
   double mass = physics["Particle"]["Mass"].as<double>();
@@ -47,7 +47,6 @@ int main(int argc, char* argv[])
   //============
 
   size_t numberOfParticles = 1;
-  size_t numberOfInstants = std::floor(finalInstant/timeStep)+2;
 
   simol::ParticleSystem<double> system(numberOfParticles, mass, initial_position, initial_speed);
   simol::Potential<double> potential(potential_parameter, 2*M_PI/length);
@@ -56,14 +55,10 @@ int main(int argc, char* argv[])
   
   std::ofstream outputFile(outputFilename);
   
-  for (double instant = timeStep; instant < finalInstant; instant+=timeStep)
+  for (size_t instantIndex  =1; instantIndex < numberOfInstants; ++instantIndex)
   {
+    double instant = instantIndex * timeStep;
     system.simulate(instant, model, outputFile);
-   /* for (auto&& particle : system.configuration())
-    {
-      verlet(particle,potential,timeStep);
-      outputFile << instant << " " << particle.position() << " " << particle.speed() << std::endl;
-    }*/
   }
 
   return EXIT_SUCCESS;
