@@ -10,7 +10,7 @@ namespace simol
   class Potential;
   
   template<class ScalarType> 
-  class HamiltonianDynamics;
+  class HamiltonDynamics;
 }
 
 
@@ -18,7 +18,7 @@ namespace simol
 {
   template<class ScalarType>
   void verlet(Particle<ScalarType> & particle, 
-              HamiltonianDynamics<ScalarType> const & model, 
+              HamiltonDynamics<ScalarType> const & model, 
               double timeStep);
 }
 

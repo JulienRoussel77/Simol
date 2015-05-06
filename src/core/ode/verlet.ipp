@@ -8,7 +8,7 @@ namespace simol
 {
   template<class ScalarType> inline
   void verlet(Particle<ScalarType> & particle, 
-              HamiltonianDynamics<ScalarType> const & model, 
+              HamiltonDynamics<ScalarType> const & model, 
               double timeStep)
   {
     particle.momentum_ += timeStep * model.potential().force(particle.position()) / 2;

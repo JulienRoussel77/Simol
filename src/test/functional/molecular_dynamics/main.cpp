@@ -2,7 +2,7 @@
 #include <cstdlib>
 
 #include "ParticleSystem.hpp"
-#include "HamiltonianDynamics.hpp"
+#include "HamiltonDynamics.hpp"
 
 
 #include <cmath>
@@ -52,7 +52,7 @@ int main(int argc, char* argv[])
   simol::ParticleSystem<double> system(numberOfParticles, mass, initial_position, initial_speed);
   simol::Potential<double> potential(potential_parameter, 2*M_PI/length);
 
-  simol::HamiltonianDynamics<double> model(mass, potential);
+  simol::HamiltonDynamics<double> model(mass, potential);
   
   std::ofstream outputFile(outputFilename);
   
