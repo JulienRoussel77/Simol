@@ -23,13 +23,13 @@ namespace simol
 
   template<class ScalarType>
   void ParticleSystem<ScalarType>::simulate(ScalarType const nextTime, 
-                                            Potential<ScalarType> const & potential, 
+                                            HamiltonianDynamics<ScalarType> const & model, 
                                             std::ofstream & outputFile)
   {
     ScalarType timeStep = nextTime - currentTime_;
     for (auto&& particle : configuration_)
     {
-      verlet(particle,potential,timeStep);
+      verlet(particle,model,timeStep);
       outputFile << currentTime_ 
                  << " " << particle.position() 
                  << " " << particle.momentum() 

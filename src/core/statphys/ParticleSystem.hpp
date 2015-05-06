@@ -3,6 +3,7 @@
 
 #include <vector>
 #include "Particle.hpp"
+#include "HamiltonianDynamics.hpp"
 
 namespace simol
 {
@@ -24,7 +25,7 @@ namespace simol
       std::vector<ParticleType> & configuration(); 
 
       void simulate(ScalarType const nextTime, 
-                    Potential<ScalarType> const & potential, 
+                    HamiltonianDynamics<ScalarType> const & model, 
                     std::ofstream & outputFile);
 
     private:

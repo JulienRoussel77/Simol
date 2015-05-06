@@ -58,7 +58,7 @@ int main(int argc, char* argv[])
   
   for (double instant = timeStep; instant < finalInstant; instant+=timeStep)
   {
-    system.simulate(instant, model.potential(), outputFile);
+    system.simulate(instant, model, outputFile);
    /* for (auto&& particle : system.configuration())
     {
       verlet(particle,potential,timeStep);

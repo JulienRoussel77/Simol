@@ -33,7 +33,7 @@ namespace simol
     // FRIEND FUNCTIONS
     //=================
 
-    friend void verlet<>(Particle<ScalarType> & particle, Potential<ScalarType> const & potential, double delta_t);
+    friend void verlet<>(Particle<ScalarType> & particle, HamiltonianDynamics<ScalarType> const & model, double delta_t);
 
     //=============
     // CONSTRUCTORS
