@@ -49,28 +49,7 @@ find_package(Eigen)
 
 if(ENABLE_DOWNLOAD)
 
-#  foreach(LIBRARY IN LISTS LIBRARIES_TO_DOWNLOAD)
-    DownloadThenInstall(${LIBRARIES_TO_DOWNLOAD})
-    message(STATUS "CMakeLists: LIBRARY is ${LIBRARY}")
- #   ExternalProject_Add(${LIBRARY_NAME}
- #                       PREFIX ${${LIBRARY}_PREFIX}
- #                       DOWNLOAD_DIR ${${LIBRARY}_DOWNLOAD_DIR}
- #                       SOURCE_DIR ${${LIBRARY}_SOURCE_DIR}
- #                       BINARY_DIR ${${LIBRARY}_BINARY_DIR}
- #                       TMP_DIR ${${LIBRARY}_TMP_DIR}
- #                       STAMP_DIR  ${${LIBRARY}_STAMP_DIR}
- #                       INSTALL_DIR ${${LIBRARY}_INSTALL_DIR}
- #                       URL ${${LIBRARY}_URL}
- #                       URL_MD5 ${${LIBRARY}_URL_MD5}
- #                       CMAKE_ARGS ${${LIBRARY}_ARGS}
- #                       LOG_DOWNLOAD 1
- #                       LOG_UPDATE 1
- #                       LOG_CONFIGURE 1
- #                       LOG_BUILD 1
- #                       LOG_TEST 1
- #                       LOG_INSTALL 1
- #                      )
-#  endforeach(LIBRARY)
+  DownloadThenInstall(${LIBRARIES_TO_DOWNLOAD})
 
 #  ExternalProject_Add(gcc
 #                      URL ftp://ftp.uvsq.fr/pub/gcc/releases/gcc-4.9.2/gcc-4.9.2.tar.gz
@@ -132,6 +111,8 @@ endif(ENABLE_DOWNLOAD)
 
 #  add_dependencies(quantum_chemistry eigen)
 #  add_dependencies(quantum_chemistry yaml-cpp)
+
+  message(STATUS "EIGEN_INSTALL_DIR is ${EIGEN_INSTALL_DIR}")
 
   include_directories(${EIGEN_INSTALL_DIR}/include/eigen3)
   #include_directories(${CMAKE_CURRENT_BINARY_DIR}/third-party/boost/include)
