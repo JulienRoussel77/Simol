@@ -40,7 +40,7 @@ if(NOT EXISTS EXTERNAL_DIR)
   set(EXTERNAL_DIR ${CMAKE_CURRENT_BINARY_DIR}/third-party)
 endif()
 
-#find_package(BoostHeadersOnly)
+find_package(Boost)
 find_package(CppUnit)
 find_package(Eigen)
 find_package(Yamlcpp)
@@ -67,47 +67,13 @@ if(ENABLE_DOWNLOAD)
 #                      INSTALL_COMMAND cd ../configure && make install
 #  )
 
-#  ExternalProject_Add(yaml-cpp
-#                      PREFIX ${EXTERNAL_DIR}/yaml-cpp
-#                      DOWNLOAD_DIR ${EXTERNAL_DIR}/yaml-cpp/download
-#                      SOURCE_DIR ${EXTERNAL_DIR}/yaml-cpp/src
-#                      BINARY_DIR ${EXTERNAL_DIR}/yaml-cpp/build
-#                      STAMP_DIR  ${EXTERNAL_DIR}/yaml-cpp/stamp
-#                      INSTALL_DIR ${EXTERNAL_DIR}/yaml-cpp/install
-#                      URL https://yaml-cpp.googlecode.com/files/yaml-cpp-0.5.1.tar.gz
-#                      CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
-#  )
-
-
-#  ExternalProject_Add(boost
-#                      PREFIX ${EXTERNAL_DIR}/boost
-#                      DOWNLOAD_DIR ${EXTERNAL_DIR}/boost/download
-#                      SOURCE_DIR ${EXTERNAL_DIR}/boost/src
-#                      BINARY_DIR ${EXTERNAL_DIR}/boost/src
-#                      STAMP_DIR  ${EXTERNAL_DIR}/boost/stamp
-#                      INSTALL_DIR ${EXTERNAL_DIR}/boost/install
-#                      URL http://sourceforge.net/projects/boost/files/boost/1.57.0/boost_1_57_0.tar.gz
-#                      CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
-#                      CONFIGURE_COMMAND ./bootstrap.sh
-#                      BUILD_COMMAND ./b2 install --prefix=<INSTALL_DIR>
-#  )
-
-#  ExternalProject_Add(cppunit
-#                      PREFIX ${EXTERNAL_DIR}/third-party/cppunit
-#                      SOURCE_DIR ${EXTERNAL_DIR}/cppunit/src
-#                      BINARY_DIR ${EXTERNAL_DIR}/cppunit/build
-#                      STAMP_DIR  ${EXTERNAL_DIR}/cppunit/stamp
-#                      INSTALL_DIR ${EXTERNAL_DIR}/cppunit/install
-#                      URL http://sourceforge.net/projects/cppunit/files/cppunit/1.12.1/cppunit-1.12.1.tar.gz
-#                      CONFIGURE_COMMAND cd ../cppunit && LDFLAGS="-ldl" ./configure --prefix=${PREFIX}
-#  )
 
 endif(ENABLE_DOWNLOAD)
 
 #  add_dependencies(molecular_dynamics gcc)
   add_dependencies(molecular_dynamics yamlcpp)
 
-#  add_dependencies(yaml-cpp boost)
+  add_dependencies(yamlcpp boost)
 
   #add_dependencies(molecular_dynamics cppunit)
 
@@ -158,7 +124,7 @@ endif(CMAKE_BUILD_TYPE EQUAL "Release")
 #====================
 
 include_directories(${CPPUNIT_INSTALL_DIR}/include)
-include_directories(/usr/local/bibliotheques/boost/1.57.0/include)
+#include_directories(/usr/local/bibliotheques/boost/1.57.0/include)
 
 target_link_libraries(test_simol ${CPPUNIT_INSTALL_DIR}/lib/libcppunit.so)
 target_link_libraries(quantum_chemistry /usr/local/bibliotheques/arpack/2.1/lib/libarpack_LINUX.a)

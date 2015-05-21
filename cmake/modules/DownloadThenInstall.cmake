@@ -28,6 +28,7 @@ foreach(LIBRARY_NAME IN LISTS LIBRARY_NAMES)
                         CMAKE_ARGS ${${LIBRARY_UPPERNAME}_ARGS}
                         CONFIGURE_COMMAND ${${LIBRARY_UPPERNAME}_CONFIGURE_COMMAND}
                         BUILD_COMMAND ${${LIBRARY_UPPERNAME}_BUILD_COMMAND}
+                        INSTALL_COMMAND ${${LIBRARY_UPPERNAME}_INSTALL_COMMAND}
                #         LOG_DOWNLOAD 1
                         LOG_UPDATE 1
                #         LOG_CONFIGURE 1
