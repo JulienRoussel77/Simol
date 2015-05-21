@@ -40,16 +40,18 @@ if(NOT EXISTS EXTERNAL_DIR)
   set(EXTERNAL_DIR ${CMAKE_CURRENT_BINARY_DIR}/third-party)
 endif()
 
-
+find_package(Boost)
 find_package(Eigen)
-#find_package(Yamlcpp)
+find_package(Yamlcpp)
 #=============================
 # DOWNLOAD 3RD-PARTY LIBRARIES
 #=============================
 
 if(ENABLE_DOWNLOAD)
 
-  DownloadThenInstall(${LIBRARIES_TO_DOWNLOAD})
+  message(STATUS "libraries to download ${LIBRARIES_TO_DOWNLOAD}")
+
+  DownloadThenInstall("${LIBRARIES_TO_DOWNLOAD}")
 
 #  ExternalProject_Add(gcc
 #                      URL ftp://ftp.uvsq.fr/pub/gcc/releases/gcc-4.9.2/gcc-4.9.2.tar.gz
@@ -101,22 +103,20 @@ if(ENABLE_DOWNLOAD)
 
 endif(ENABLE_DOWNLOAD)
 
-  add_dependencies(molecular_dynamics gcc)
+#  add_dependencies(molecular_dynamics gcc)
   add_dependencies(molecular_dynamics yamlcpp)
 
 #  add_dependencies(yaml-cpp boost)
 
   #add_dependencies(molecular_dynamics cppunit)
-#  add_dependencies(molecular_dynamics eigen)
 
-#  add_dependencies(quantum_chemistry eigen)
-#  add_dependencies(quantum_chemistry yaml-cpp)
-
-  message(STATUS "EIGEN_INSTALL_DIR is ${EIGEN_INSTALL_DIR}")
+  add_dependencies(quantum_chemistry eigen)
 
   include_directories(${EIGEN_INSTALL_DIR}/include/eigen3)
-  #include_directories(${CMAKE_CURRENT_BINARY_DIR}/third-party/boost/include)
   include_directories(${YAMLCPP_INSTALL_DIR}/include)
+  include_directories(${BOOST_INSTALL_DIR}/include)
+
+  message(STATUS "YAMLCPP_INSTALL_DIR is ${YAMLCPP_INSTALL_DIR}")
 
   target_link_libraries(molecular_dynamics ${YAMLCPP_INSTALL_DIR}/lib/libyaml-cpp.a)
   target_link_libraries(quantum_chemistry ${YAMLCPP_INSTALL_DIR}/lib/libyaml-cpp.a)
