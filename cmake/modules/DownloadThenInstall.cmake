@@ -26,12 +26,14 @@ foreach(LIBRARY_NAME IN LISTS LIBRARY_NAMES)
                         URL ${${LIBRARY_UPPERNAME}_URL}
                         URL_MD5 ${${LIBRARY_UPPERNAME}_URL_MD5}
                         CMAKE_ARGS ${${LIBRARY_UPPERNAME}_ARGS}
-                        LOG_DOWNLOAD 1
+                        CONFIGURE_COMMAND ${${LIBRARY_UPPERNAME}_CONFIGURE_COMMAND}
+                        BUILD_COMMAND ${${LIBRARY_UPPERNAME}_BUILD_COMMAND}
+               #         LOG_DOWNLOAD 1
                         LOG_UPDATE 1
-                        LOG_CONFIGURE 1
-                        LOG_BUILD 1
+               #         LOG_CONFIGURE 1
+               #         LOG_BUILD 1
                         LOG_TEST 1
-                        LOG_INSTALL 1
+              #          LOG_INSTALL 1
                        )
     set(${LIBRARY_UPPERNAME}_INSTALL_DIR ${${LIBRARY_UPPERNAME}_PREFIX}/install PARENT_SCOPE)
 

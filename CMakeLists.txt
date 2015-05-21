@@ -7,7 +7,7 @@ project (simol CXX)
 # INCLUDE FILES
 #==============
 
-set(CMAKE_VERBOSE_MAKEFILE ON)
+#set(CMAKE_VERBOSE_MAKEFILE ON)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
 
@@ -40,7 +40,8 @@ if(NOT EXISTS EXTERNAL_DIR)
   set(EXTERNAL_DIR ${CMAKE_CURRENT_BINARY_DIR}/third-party)
 endif()
 
-find_package(Boost)
+#find_package(BoostHeadersOnly)
+find_package(CppUnit)
 find_package(Eigen)
 find_package(Yamlcpp)
 #=============================
@@ -156,10 +157,10 @@ endif(CMAKE_BUILD_TYPE EQUAL "Release")
 # LOCAL INSTALLATIONS
 #====================
 
-include_directories(/usr/local/bibliotheques/cppunit/1.12.1/include)
+include_directories(${CPPUNIT_INSTALL_DIR}/include)
 include_directories(/usr/local/bibliotheques/boost/1.57.0/include)
 
-target_link_libraries(test_simol /usr/local/bibliotheques/cppunit/1.12.1/lib/libcppunit.so)
+target_link_libraries(test_simol ${CPPUNIT_INSTALL_DIR}/lib/libcppunit.so)
 target_link_libraries(quantum_chemistry /usr/local/bibliotheques/arpack/2.1/lib/libarpack_LINUX.a)
 
 #================
