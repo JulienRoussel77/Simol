@@ -1,12 +1,22 @@
 \documentclass[12pt]{book}
-
-
+\usepackage{listings}
+\usepackage{xspace}
+\usepackage{url}
+\usepackage{geometry}
 
 \title{Simol developer's guide}
-\author{C\'edric Doucet}
+\author{C\'edric DOUCET}
 \date{\today}
 
+\newcommand{\Git}{\texttt{Git}\xspace} 
+\newcommand{\Simol}{\texttt{Simol}\xspace} 
+\newcommand{\SourceSup}{\texttt{SourceSup}\xspace} 
+\newcommand{\urlSourceSup}{https://sourcesup.renater.fr}
 
+
+\geometry{left=15mm, right=15mm}
+
+\sloppy
 
 \begin{document}
 
@@ -17,19 +27,74 @@
 
 \chapter{Getting started}
 
-\section{Download}
+\section{Obtaining the sources}
 
-To be able to download the development version of Simol, you need to have Git installed on your machine. Git is usually available as a package on Unix systems. For example, to install Git on Ubuntu 12.04, you just have to type
-$$sudo apt-get install git$$
+
+\subsection{Proxy issues}
+
+If you do not use any proxy to connect the internet, you can skip this step. If you try to download and install the development version of \Simol behind a proxy, you have to define the environment variables named \texttt{http\_proxy} and \texttt{https\_proxy}. For example, let us assume that your proxy identifier is \texttt{proxy.enpc.fr} with port 3128. To define \texttt{http\_proxy}, you need to type the following line in your terminal:
+\lstset{language=bash} 
+\begin{lstlisting}
+export http_proxy=http://proxy.enpc.fr:3128
+\end{lstlisting}
+You need to do the same for the \texttt{https\_proxy} variable:
+\lstset{language=bash} 
+\begin{lstlisting}
+export https_proxy=https://proxy.enpc.fr:3128
+\end{lstlisting}
+Note the scope of these variables is limited to the current terminal. If you want these variables to be defined each time you open a new terminal, you need to add the follwing lines at the end of your \url{~/.bashrc} file:
+\lstset{language=bash} 
+\begin{lstlisting}
+export http_proxy=http://proxy.enpc.fr:3128
+export https_proxy=https://proxy.enpc.fr:3128
+\end{lstlisting}
+
+\subsection{Installing \Git}
+
+To be able to download the development version of \Simol, you need to have \Git installed on your machine. \Git is usually available as a package on Unix systems. For example, to install \Git on Ubuntu 12.04, you just have to type
+\lstset{language=bash} 
+\begin{lstlisting}
+sudo apt-get install git
+\end{lstlisting}
+in a terminal. 
+
+\subsection{Creation of an account on \SourceSup}
+
+Sources of \Simol are stored on a software forge called \SourceSup, which you can connect to at \urlSourceSup.  
+
+The sources of \Simol can only be accessed through the SSH protocol. To be able to use this protocol, you need to have a private key and a public key. These keys are usually located at \url{~/.ssh} in your machine. If you have already defined a key called \textit{mykey}, you should see the two files \url{mykey} and \url{mykey.pub} in this directory. The former is private and should never be communicated to anyone else. The latter is public and must be uploaded on \SourceSup. 
+
+If you do not have any SSH pair of keys, you need to create one. To do it, just type
+\lstset{language=bash} 
+\begin{lstlisting}
+ssh keygen -t dsa
+\end{lstlisting}
 in a terminal.
 
-\section{Installation}
 
-Installation of Simol is very simple :
-$$cmake ..$$
-$$make$$
-$$make install$$
+\subsection{Cloning the source repository}
 
+To clone the source repository of \Simol, you need to be located in the directory where you want to store the development version of the software. Then, you have to type
+\lstset{language=bash} 
+\begin{lstlisting}
+git clone git+ssh://git@git.renater.fr:2222/simol.git
+\end{lstlisting}
+in a terminal. This will create a directory \url{simol} and copy the sources of \Simol in it.
+
+\section{Building and Installation}
+
+Sources of \Simol are built in a subdirectory called \url{build}. To reach it, just type
+\lstset{language=bash} 
+\begin{lstlisting}
+cd simol/build
+\end{lstlisting}
+in a terminal. Then, the installation of \Simol is very simple:
+\lstset{language=bash} 
+\begin{lstlisting}
+cmake ..
+make
+make install
+\end{lstlisting}
 
 
 \end{document}
