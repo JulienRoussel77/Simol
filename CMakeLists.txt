@@ -34,7 +34,7 @@ add_executable(test_simol src/test/unit/test_simol.cpp)
 # USER OPTIONS
 #=============
 
-option(ENABLE_DOWNLOAD "Enables downloading of missing external libraries" False)
+option(ENABLE_DOWNLOAD "Enables downloading of missing external libraries" True)
 
 if(NOT EXISTS EXTERNAL_DIR)
   set(EXTERNAL_DIR ${CMAKE_CURRENT_BINARY_DIR}/third-party)

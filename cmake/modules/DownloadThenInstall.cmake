@@ -24,7 +24,6 @@ foreach(LIBRARY_NAME IN LISTS LIBRARY_NAMES)
                         STAMP_DIR ${${LIBRARY_UPPERNAME}_STAMP_DIR}
                         INSTALL_DIR ${${LIBRARY_UPPERNAME}_INSTALL_DIR}
                         URL ${${LIBRARY_UPPERNAME}_URL}
-                        URL_MD5 ${${LIBRARY_UPPERNAME}_URL_MD5}
                         CMAKE_ARGS ${${LIBRARY_UPPERNAME}_ARGS}
                         CONFIGURE_COMMAND ${${LIBRARY_UPPERNAME}_CONFIGURE_COMMAND}
                         BUILD_COMMAND ${${LIBRARY_UPPERNAME}_BUILD_COMMAND}
@@ -37,6 +36,7 @@ foreach(LIBRARY_NAME IN LISTS LIBRARY_NAMES)
               #          LOG_INSTALL 1
                        )
     set(${LIBRARY_UPPERNAME}_INSTALL_DIR ${${LIBRARY_UPPERNAME}_PREFIX}/install PARENT_SCOPE)
+    message(STATUS "${LIBRARY_UPPERNAME}_INSTALL_DIR is ${${LIBRARY_UPPERNAME}_INSTALL_DIR}")
 
 endforeach(LIBRARY_NAME)
 
