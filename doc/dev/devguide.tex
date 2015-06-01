@@ -8,7 +8,10 @@
 \author{C\'edric DOUCET}
 \date{\today}
 
+\newcommand{\CMake}{\texttt{CMake}\xspace} 
+\newcommand{\CMakeLists}{\texttt{CMakeLists}\xspace} 
 \newcommand{\Git}{\texttt{Git}\xspace} 
+\newcommand{\Make}{\texttt{Make}\xspace}
 \newcommand{\Simol}{\texttt{Simol}\xspace} 
 \newcommand{\SourceSup}{\texttt{SourceSup}\xspace} 
 \newcommand{\urlSourceSup}{https://sourcesup.renater.fr}
@@ -79,9 +82,21 @@ To clone the source repository of \Simol, you need to be located in the director
 \begin{lstlisting}
 git clone git+ssh://git@git.renater.fr:2222/simol.git
 \end{lstlisting}
-in a terminal. This will create a directory \url{simol} and copy the sources of \Simol in it.
+in a terminal. This will create a directory \url{simol} and copy the sources of \Simol in it. 
 
-\section{Building and Installation}
+\paragraph{Note:}
+it is possible to change the name of the cloning directory, say \text{foo}, by typing 
+\lstset{language=bash} 
+\begin{lstlisting}
+git clone git+ssh://git@git.renater.fr:2222/simol.git foo
+\end{lstlisting}
+In this documentation, we always assume that the default name \textit{simol} has been keeped.
+
+\section{Installing \Simol}
+
+
+
+\subsection{Configuration}
 
 Sources of \Simol are built in a subdirectory called \url{build}. To reach it, just type
 \lstset{language=bash} 
@@ -95,6 +110,46 @@ cmake ..
 make
 make install
 \end{lstlisting}
+
+\subsection{Build}
+
+
+\section{Running first examples}
+
+\subsection{Molecular dynamics}
+
+\subsection{Quantum chemistry}
+
+
+\chapter{Development environment}
+
+\section{File organization}
+\section{Build system}
+
+\subsection{Why \CMake?}
+
+The build system of \Simol is \CMake, which is very similar to \Make. A typical installation of a software with \CMake consists in running the three following commands from a subdirectory usually called \url{build}: 
+\lstset{language=bash} 
+\begin{lstlisting}
+cmake src && make && make install
+\end{lstlisting}
+If you have already installed a software with \Make, you probably noticed the similarity with the classical combo:
+\lstset{language=bash} 
+\begin{lstlisting}
+src/configure && make && make install
+\end{lstlisting}
+The only difference between \Make and \CMake is the first command, which corresponds to the configuration step. This is one of the reason why \CMake has been chosen to automatize the installation of \Simol. The second reason is that \CMake is a cross-platform build system. Contrary to \Make, which is only available on Unix systems, \CMake can be used on Windows systems too.
+
+\subsection{How does it work?}
+
+\CMake relies on a hierarchy of configuration files named \CMakeLists. The main configuration file must be located at the top directory of the project.
+
+
+
+\section{Coding rules}
+\section{Unit tests}
+\section{Continuous integration}
+\section{Documentation}
 
 
 \end{document}

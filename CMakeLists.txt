@@ -35,6 +35,7 @@ add_executable(test_simol src/test/unit/test_simol.cpp)
 #=============
 
 option(ENABLE_DOWNLOAD "Enables downloading of missing external libraries" True)
+option(INSTALL_GCC "Automatic installation of GCC" False)
 
 if(NOT EXISTS EXTERNAL_DIR)
   set(EXTERNAL_DIR ${CMAKE_CURRENT_BINARY_DIR}/third-party)
@@ -48,24 +49,21 @@ find_package(Yamlcpp)
 # DOWNLOAD 3RD-PARTY LIBRARIES
 #=============================
 
+if(INSTALL_GCC)
+  set(GCC_URL ftp://ftp.uvsq.fr/pub/gcc/releases/gcc-4.9.2/gcc-4.9.2.tar.gz)
+  set(GCC_CONFIGURE_COMMAND cd <BINARY_DIR> && 
+                            <SOURCE_DIR>/contrib/download_prerequisites && 
+                            <SOURCE_DIR>/configure --prefix=<INSTALL_DIR>)
+  DownloadThenInstall(GCC)
+endif(INSTALL_GCC)
+
+
 if(ENABLE_DOWNLOAD)
 
   message(STATUS "libraries to download ${LIBRARIES_TO_DOWNLOAD}")
 
   DownloadThenInstall("${LIBRARIES_TO_DOWNLOAD}")
 
-#  ExternalProject_Add(gcc
-#                      URL ftp://ftp.uvsq.fr/pub/gcc/releases/gcc-4.9.2/gcc-4.9.2.tar.gz
-#                      PREFIX ${CMAKE_CURRENT_BINARY_DIR}/third-party/gcc
-#                      DOWNLOAD_DIR third-party/gcc/download
-#                      SOURCE_DIR third-party/gcc/configure
-#                      CONFIGURE_COMMAND cd ../configure && ./contrib/download_prerequisites && ./configure --prefix=${PREFIX}/install
-                      #CONFIGURE_COMMAND cd ../gcc && ./contrib/download_prerequisites && ./configure
-#                      BINARY_DIR third-party/gcc/build
-#                      BUILD_COMMAND cd ../configure && make
-#                      INSTALL_DIR third-party/gcc/install
-#                      INSTALL_COMMAND cd ../configure && make install
-#  )
 
 
 endif(ENABLE_DOWNLOAD)
