@@ -9,7 +9,7 @@ else()
                           && tar xvzf patch.tar.gz
                           && cp ${CMAKE_SOURCE_DIR}/cmake/arpack/CMakeLists.txt <SOURCE_DIR>)
     set(ARPACK_ARGS -D CMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
-    set(ARPACK_INSTALL_COMMAND cp <BINARY_DIR>/libarpack.a <INSTALL_DIR>)
+    set(ARPACK_INSTALL_COMMAND mkdir -p <INSTALL_DIR>/lib && cp <BINARY_DIR>/libarpack.a <INSTALL_DIR>/lib)
   else(ENABLE_DOWNLOAD)
     message(FATAL_ERROR "Arpack not found. Please provide a value to ARPACK_INSTALL_DIR or set ENABLE_DOWNLOAD to True")
   endif()

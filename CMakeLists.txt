@@ -126,7 +126,7 @@ include_directories(${CPPUNIT_INSTALL_DIR}/include)
 #include_directories(/usr/local/bibliotheques/boost/1.57.0/include)
 
 target_link_libraries(test_simol ${CPPUNIT_INSTALL_DIR}/lib/libcppunit.so)
-target_link_libraries(quantum_chemistry /usr/local/bibliotheques/arpack/2.1/lib/libarpack_LINUX.a)
+target_link_libraries(quantum_chemistry ${ARPACK_INSTALL_DIR}/lib/libarpack.a)
 
 #================
 # LINKER SETTINGS
