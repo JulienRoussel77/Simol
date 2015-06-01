@@ -41,6 +41,7 @@ if(NOT EXISTS EXTERNAL_DIR)
   set(EXTERNAL_DIR ${CMAKE_CURRENT_BINARY_DIR}/third-party)
 endif()
 
+find_package(Arpack)
 find_package(Boost)
 find_package(CppUnit)
 find_package(Eigen)
