@@ -1,7 +1,7 @@
 \documentclass[12pt]{book}
 \usepackage{listings}
 \usepackage{xspace}
-\usepackage{url}
+\usepackage{url,color,hyperref}
 \usepackage{geometry}
 
 \title{Simol developer's guide}
@@ -11,10 +11,47 @@
 \newcommand{\CMake}{\texttt{CMake}\xspace} 
 \newcommand{\CMakeLists}{\texttt{CMakeLists}\xspace} 
 \newcommand{\Git}{\texttt{Git}\xspace} 
+\newcommand{\Linux}{\texttt{Linux}\xspace} 
 \newcommand{\Make}{\texttt{Make}\xspace}
 \newcommand{\Simol}{\texttt{Simol}\xspace} 
 \newcommand{\SourceSup}{\texttt{SourceSup}\xspace} 
-\newcommand{\urlSourceSup}{https://sourcesup.renater.fr}
+
+
+
+\newcommand{\urlGit}{\href{https://git-scm.com}{https://git-scm.com}}
+\newcommand{\urlSourceSup}{\href{https://sourcesup.renater.fr}{https://sourcesup.renater.fr}}
+
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+
+\lstset{ %
+  backgroundcolor=\color{white},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}
+  basicstyle=\footnotesize,        % the size of the fonts that are used for the code
+  breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
+  breaklines=true,                 % sets automatic line breaking
+  captionpos=b,                    % sets the caption-position to bottom
+  commentstyle=\color{mygreen},    % comment style
+  deletekeywords={...},            % if you want to delete keywords from the given language
+  escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
+  extendedchars=true,              % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
+  frame=single,                    % adds a frame around the code
+  keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+  keywordstyle=\color{blue},       % keyword style
+  language=Octave,                 % the language of the code
+  otherkeywords={*,...},            % if you want to add more keywords to the set
+  numbers=left,                    % where to put the line-numbers; possible values are (none, left, right)
+  numbersep=5pt,                   % how far the line-numbers are from the code
+  numberstyle=\tiny\color{mygray}, % the style that is used for the line-numbers
+  rulecolor=\color{black},         % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+  showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+  showstringspaces=false,          % underline spaces within strings only
+  showtabs=false,                  % show tabs within strings adding particular underscores
+  stepnumber=2,                    % the step between two line-numbers. If it's 1, each line will be numbered
+  stringstyle=\color{mymauve},     % string literal style
+  tabsize=2,                       % sets default tabsize to 2 spaces
+  title=\lstname                   % show the filename of files included with \lstinputlisting; also try caption instead of title
+}
 
 
 \geometry{left=15mm, right=15mm}
@@ -30,38 +67,35 @@
 
 \chapter{Getting started}
 
-\section{Obtaining the sources}
 
+\section{Prerequisites}
 
-\subsection{Proxy issues}
+The sources of \Simol are stored on a server of the \SourceSup forge. To be able to get them, you will need to fulfill the following requirements:
+\begin{itemize}
+\item \textit{having a HTTP/HTTPS access to the web} to be able to get the sources and let \Simol download and install all needed external libraries for you; 
+\item \textit{having an account on \SourceSup}, where the sources of \Simol are stored;
+\item \Git must be installed on your machine,
+\item you must have an account on \SourceSup,
+\item you must be able to access the server of \SourceSup with the SSH protocol,
+\item you must be a member of the \Simol development team.
+\end{itemize}
+This section explains how to satisfy these conditions.
 
-If you do not use any proxy to connect the internet, you can skip this step. If you try to download and install the development version of \Simol behind a proxy, you have to define the environment variables named \texttt{http\_proxy} and \texttt{https\_proxy}. For example, let us assume that your proxy identifier is \texttt{proxy.enpc.fr} with port 3128. To define \texttt{http\_proxy}, you need to type the following line in your terminal:
+\subsection{Having an HTTP/HTTPS access to the web}
+
+If you do not use any proxy to connect the internet, you can skip this step. If you try to download and install the development version of \Simol behind a proxy, you have to define the environment variables named \texttt{http\_proxy} and \texttt{https\_proxy}. These variables are required to download external libraries of \Simol. For example, let us assume that your proxy identifier is \texttt{proxy.enpc.fr} with port 3128. To define \texttt{http\_proxy}, you need to type the following line in your terminal:
+
 \lstset{language=bash} 
 \begin{lstlisting}
 export http_proxy=http://proxy.enpc.fr:3128
-\end{lstlisting}
-You need to do the same for the \texttt{https\_proxy} variable:
-\lstset{language=bash} 
-\begin{lstlisting}
 export https_proxy=https://proxy.enpc.fr:3128
 \end{lstlisting}
-Note the scope of these variables is limited to the current terminal. If you want these variables to be defined each time you open a new terminal, you need to add the follwing lines at the end of your \url{~/.bashrc} file:
-\lstset{language=bash} 
-\begin{lstlisting}
-export http_proxy=http://proxy.enpc.fr:3128
-export https_proxy=https://proxy.enpc.fr:3128
-\end{lstlisting}
+Note that the scope of these variables is limited to the current terminal. If you want them to be defined each time you open a new terminal, you need to add theses lines at the end of your \url{~/.bashrc} file.
 
-\subsection{Installing \Git}
+\subsection{Having an SSH access to \SourceSup}
 
-To be able to download the development version of \Simol, you need to have \Git installed on your machine. \Git is usually available as a package on Unix systems. For example, to install \Git on Ubuntu 12.04, you just have to type
-\lstset{language=bash} 
-\begin{lstlisting}
-sudo apt-get install git
-\end{lstlisting}
-in a terminal. 
 
-\subsection{Creation of an account on \SourceSup}
+\subsection{Having an account on \SourceSup}
 
 Sources of \Simol are stored on a software forge called \SourceSup, which you can connect to at \urlSourceSup.  
 
@@ -74,8 +108,40 @@ ssh keygen -t dsa
 \end{lstlisting}
 in a terminal.
 
+\subsection{Being a member of the \Simol team}
 
-\subsection{Cloning the source repository}
+
+
+
+
+
+\subsection{Having \Git installed}
+
+
+\Git is a popular version control system which has been written by Linus Thorvald, the creator of \Linux. The best way to learn more about \Git is to visit its official website: \urlGit. Please refer to the official documentation to find the installation steps for you own machine. In most cases, the easiest way to install it is to use a package manager like \texttt{apt-get}, \texttt{yum}, \texttt{homebrew}, etc. For example, you can install \Git on Ubuntu systems by simply typing
+\lstset{language=bash} 
+\begin{lstlisting}
+sudo apt-get install git
+\end{lstlisting}
+in a terminal. You can check that \Git is installed on your machine with the command
+\lstset{language=bash} 
+\begin{lstlisting}
+git --version
+\end{lstlisting}
+which should return something like this:
+\begin{lstlisting}
+git version 1.7.9.5
+\end{lstlisting}
+
+
+
+
+
+that the default name \textit{simol} has been keeped.
+
+\section{Installation of \Simol}
+
+\subsection{Downloading the sources}
 
 To clone the source repository of \Simol, you need to be located in the directory where you want to store the development version of the software. Then, you have to type
 \lstset{language=bash} 
@@ -85,14 +151,12 @@ git clone git+ssh://git@git.renater.fr:2222/simol.git
 in a terminal. This will create a directory \url{simol} and copy the sources of \Simol in it. 
 
 \paragraph{Note:}
-it is possible to change the name of the cloning directory, say \text{foo}, by typing 
+it is possible to change the name of the cloning directory, say \textit{foo}, by typing 
 \lstset{language=bash} 
 \begin{lstlisting}
 git clone git+ssh://git@git.renater.fr:2222/simol.git foo
 \end{lstlisting}
-In this documentation, we always assume that the default name \textit{simol} has been keeped.
-
-\section{Installing \Simol}
+In this documentation, we always assume 
 
 
 
@@ -111,7 +175,8 @@ make
 make install
 \end{lstlisting}
 
-\subsection{Build}
+\subsection{Building}
+
 
 
 \section{Running first examples}
@@ -150,6 +215,23 @@ The only difference between \Make and \CMake is the first command, which corresp
 \section{Unit tests}
 \section{Continuous integration}
 \section{Documentation}
+
+
+\chapter{FAQ}
+
+\section{Error messages}
+
+
+\subsection{The compiler (...) does not support -std=c++11 flag.}
+
+\Simol relies on some features of the 2011 norm of C++ but your compiler does not seem to support this norm. You need to provide another compiler by passing to the \texttt{cmake} command a correct value of the \texttt{CMAKE\_CXX\_COMPILER} variable. For example, the very first version of \texttt{GCC} which supports the C++11 norm is 4.8.1. If you have installed this version in \url{/usr/local/gcc/4.8.1}, you need to type
+\lstset{language=bash} 
+\begin{lstlisting}
+cmake -D CMAKE_CXX_COMPILER=/usr/local/gcc/4.8.1/bin/g++
+\end{lstlisting}
+during the compilation step.
+
+
 
 
 \end{document}
