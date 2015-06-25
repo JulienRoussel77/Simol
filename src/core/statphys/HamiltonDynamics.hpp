@@ -9,13 +9,12 @@ namespace simol
   class HamiltonDynamics
   {
     public:
-      HamiltonDynamics(ScalarType mass,
-                       Potential<ScalarType> const & potential);
+      HamiltonDynamics(Potential<ScalarType> const & potential);
 
       Potential<ScalarType> const & potential() const;
 
     private:
-      ScalarType mass_;
+      //ScalarType mass_;
       Potential<ScalarType> potential_;
   };
 

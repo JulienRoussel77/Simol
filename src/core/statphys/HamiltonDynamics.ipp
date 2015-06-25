@@ -5,9 +5,8 @@ namespace simol
 {
 
   template<class ScalarType> inline
-  HamiltonDynamics<ScalarType>::HamiltonDynamics(ScalarType mass,
-                                                 Potential<ScalarType> const & potential)
-  :mass_(mass),potential_(potential)
+  HamiltonDynamics<ScalarType>::HamiltonDynamics(Potential<ScalarType> const & potential)
+  : potential_(potential)
   {}
 
   template<class ScalarType> inline

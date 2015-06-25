@@ -37,7 +37,29 @@ namespace simol
     ++currentTimeIteration_;
 
   }
+  
+/*  template<class ScalarType>
+  void ParticleSystem<ScalarType>::simulate(ScalarType const timeStep,
+                                            AtomChain<ScalarType> const & model, 
+                                            std::ofstream & outputFile)
+  {
+    for (auto & particle : configuration_)
+      verlet(particle,model,timeStep);
+    
+    ScalarType alpha_first = std::exp(-gamma * timeStep / particle(0).mass());
+    ScalarType alpha_last = std::exp(-gamma * timeStep / particle(N).mass())
+    
+    for(auto & particle : configuration_)
+    {
+      outputFile << currentTimeIteration_ * timeStep 
+                 << " " << particle.position() 
+                 << " " << particle.momentum() 
+                 << std::endl;
+    }
+    ++currentTimeIteration_;
 
+  }
+*/
 }
 
 #endif

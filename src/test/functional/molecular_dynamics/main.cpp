@@ -51,7 +51,7 @@ int main(int argc, char* argv[])
   simol::ParticleSystem<double> system(numberOfParticles, mass, initial_position, initial_speed);
   simol::Potential<double> potential(potential_parameter, 2*M_PI/length);
 
-  simol::HamiltonDynamics<double> model(mass, potential);
+  simol::HamiltonDynamics<double> model(potential);
   
   std::ofstream outputFile(outputFilename);
   
