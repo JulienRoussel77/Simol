@@ -40,11 +40,6 @@ namespace simol
   // redémarrage : nombres aleatoires, juste pannes, tous les N pas de temps
   //
 
-  template<class ScalarType>
-  ParticleSystem(size_t const & numberOfParticles, ScalarType distance)
-  {}
-
-
 }
 
 

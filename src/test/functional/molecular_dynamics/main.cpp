@@ -3,7 +3,7 @@
 
 #include "ParticleSystem.hpp"
 #include "HamiltonDynamics.hpp"
-
+#include "AtomChain.hpp"
 
 #include <cmath>
 
@@ -60,6 +60,19 @@ int main(int argc, char* argv[])
     double instant = instantIndex * timeStep;
     system.simulate(timeStep, model, outputFile);
   }
+
+  //===========
+  // ATOM CHAIN
+  //===========
+  
+  size_t numberOfAtoms = 3;
+  double leftPosition = 0;
+  double leftMomentum = 0;
+  double leftTemperature = 0;
+  double rightTemperature = 1;
+  simol::AtomChain<double> chain(numberOfAtoms, mass, leftPosition, leftMomentum, leftTemperature, rightTemperature, potential);
+
+
 
   return EXIT_SUCCESS;
 }
