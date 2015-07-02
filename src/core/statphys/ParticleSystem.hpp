@@ -20,6 +20,9 @@ namespace simol
                      ScalarType const & initialPosition, 
                      ScalarType const & initialSpeed);
 
+      ParticleSystem(size_t const & numberOfParticles, 
+                     ScalarType const & distance);
+
       ParticleType & particle(size_t index);
 
       std::vector<ParticleType> & configuration(); 
@@ -37,7 +40,17 @@ namespace simol
   // redémarrage : nombres aleatoires, juste pannes, tous les N pas de temps
   //
 
+  template<class ScalarType>
+  ParticleSystem(size_t const & numberOfParticles, ScalarType distance)
+  {}
+
+
 }
+
+
+
+
+
 
 #include "ParticleSystem.ipp"
 
