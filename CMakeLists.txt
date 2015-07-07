@@ -1,7 +1,7 @@
 
 cmake_minimum_required (VERSION 2.6)
 
-project (simol CXX)
+project (simol C CXX)
 
 #==============
 # INCLUDE FILES
@@ -24,7 +24,7 @@ endif()
 #====================
 # EXECUTABLE SETTINGS
 #====================
-add_executable(quantum_chemistry src/test/functional/quantum_chemistry/main.cpp)
+add_executable(quantum_chemistry src/test/functional/quantum_chemistry/main.cpp src/core/io/MatrixMarketFile.cpp src/core/io/mmio.c)
 add_executable(molecular_dynamics src/test/functional/molecular_dynamics/main.cpp)
 add_executable(test_simol src/test/unit/test_simol.cpp)
 
@@ -133,6 +133,7 @@ target_link_libraries(quantum_chemistry ${ARPACK_INSTALL_DIR}/lib/libarpack.a)
 #================
 
 include_directories(src/core)
+include_directories(src/core/io)
 include_directories(src/core/statphys)
 include_directories(src)
 
