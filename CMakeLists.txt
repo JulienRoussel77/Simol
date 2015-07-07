@@ -24,7 +24,7 @@ endif()
 #====================
 # EXECUTABLE SETTINGS
 #====================
-add_executable(quantum_chemistry src/test/functional/quantum_chemistry/main.cpp src/core/io/MatrixMarketFile.cpp src/core/io/mmio.c)
+add_executable(quantum_chemistry src/test/functional/quantum_chemistry/main.cpp src/core/io/mmio.c)
 add_executable(molecular_dynamics src/test/functional/molecular_dynamics/main.cpp)
 add_executable(test_simol src/test/unit/test_simol.cpp)
 
