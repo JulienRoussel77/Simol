@@ -17,11 +17,11 @@
 int main(int argc, const char* argv[])
 {
 
-  simol::MatrixMarketFile file("/home/cdoucet/Documents/soutien/matherials/codes/simol/data/quantum_chemistry/kinetic_matrix.mtx");
-  std::cout << "numbre de lignes" << file.numberOfRows() << std::endl;
-  std::cout << "numbre de colonnes" << file.numberOfColumns() << std::endl;
-  std::cout << "numbre de valeurs non nulles" << file.numberOfNonzeros() << std::endl;
+  std::string const dataPath = "/home/cdoucet/Documents/soutien/matherials/codes/simol/data/quantum_chemistry/";
 
+  simol::SparseMatrix<double> kineticMatrix(simol::MatrixMarketFile(dataPath+"kinetic_matrix.mtx"));
+  simol::SparseMatrix<double> overlapMatrix(simol::MatrixMarketFile(dataPath+"overlap_matrix.mtx"));
+  simol::SparseMatrix<double> potentialMatrix(simol::MatrixMarketFile(dataPath+"potential_matrix.mtx"));
 
   //===============
   // MATRIX LOADING

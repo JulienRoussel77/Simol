@@ -3,6 +3,7 @@
 
 #include <cstddef>
 #include <cstdio>
+#include <string>
 
 extern "C"
 {
@@ -15,34 +16,39 @@ namespace simol
   class MatrixMarketFile
   {
     public:
-      MatrixMarketFile(char * filename);
+      MatrixMarketFile(std::string const & filename);
       ~MatrixMarketFile();
     public:
+      FILE * content() const;
       std::size_t numberOfRows() const;
       std::size_t numberOfColumns() const;
       std::size_t numberOfNonzeros() const;
     private:
-      FILE * file_;
+      FILE * content_;
       int numberOfRows_;
       int numberOfColumns_;
       int numberOfNonzeros_;
   };
 
   inline
-  MatrixMarketFile::MatrixMarketFile(char * filename)
-  : file_(fopen(filename, "r"))
+  MatrixMarketFile::MatrixMarketFile(std::string const & filename)
+  : content_(fopen(filename.c_str(), "r"))
   {
     MM_typecode matcode;
-    mm_read_banner(file_, &matcode);
-    mm_read_mtx_crd_size(file_, 
+    mm_read_banner(content_, &matcode);
+    mm_read_mtx_crd_size(content_, 
                          &numberOfRows_,
                          &numberOfColumns_,
                          &numberOfNonzeros_);
   }
 
+  inline FILE *
+  MatrixMarketFile::content() const
+  { return content_; }
+
   inline
   MatrixMarketFile::~MatrixMarketFile()
-  { fclose(file_); }
+  { fclose(content_); }
 
   inline std::size_t 
   MatrixMarketFile::numberOfRows() const
@@ -55,6 +61,7 @@ namespace simol
   inline std::size_t 
   MatrixMarketFile::numberOfNonzeros() const
   { return numberOfNonzeros_; }
+
 }
 
 
