@@ -1,8 +1,7 @@
-
-
-
 #include <cppunit/extensions/TestFactoryRegistry.h>
 #include <cppunit/ui/text/TestRunner.h>
+
+#include <iostream>
 
 int main()
 {

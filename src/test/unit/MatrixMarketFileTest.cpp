@@ -2,23 +2,42 @@
 
 #include <cppunit/extensions/HelperMacros.h>
 
-CPPUNIT_TEST_SUITE_REGISTRATION(MatrixMarketFileTest);
 
-
-void MatrixMarketFileTest::setUp()
+namespace simol
 {
-  kinetic_ = new MatrixMarketFile("../../../data/quantum_chemistry/kinetic_matrix.mtx");
+
+  CPPUNIT_TEST_SUITE_REGISTRATION(MatrixMarketFileTest);
+
+
+  void MatrixMarketFileTest::setUp()
+  {
+    kinetic_ = new simol::MatrixMarketFile("../src/test/data/quantum_chemistry/kinetic_matrix.mtx");
+  }
+
+  void MatrixMarketFileTest::tearDown()
+  {
+  //  delete kinetic_;
+  }
+
+  void MatrixMarketFileTest::testNonExistentFilenameThrowsException()
+  {
+    bool exceptionCatched  = false;
+    try
+    {
+      MatrixMarketFile nonexistent("Does not exist");
+    }
+    catch(std::ios_base::failure & error)
+    {
+      exceptionCatched = true;
+    }
+    CPPUNIT_ASSERT(exceptionCatched);
+  }
+
+  void MatrixMarketFileTest::testNumberOfRows()
+  {
+    std::size_t actual_size = kinetic_->numberOfRows();
+    std::size_t expected_size = 10;
+    CPPUNIT_ASSERT_EQUAL(expected_size, actual_size);
+  }
+
 }
-
-void MatrixMarketFileTest::tearDown()
-{
-  delete kinetic_;
-}
-
-void MatrixMarketFileTest::testNumberOfRows()
-{
-  CPPUNIT_ASSERT_EQUAL(10, kinetic_.numberOfRows());
-}
-
-
-
