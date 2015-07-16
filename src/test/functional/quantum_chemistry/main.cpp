@@ -6,8 +6,6 @@
 #include <random>
 #include <vector>
 
-#include "linalg/Vector.hpp"
-
 #include "linalg/SparseMatrix.hpp"
 #include <Eigen/Eigenvalues>
 
@@ -17,7 +15,7 @@
 int main(int argc, const char* argv[])
 {
 
-  std::string const dataPath = "/home/cdoucet/Documents/soutien/matherials/codes/simol/data/quantum_chemistry/";
+  std::string const dataPath = "/home/cdoucet/Documents/soutien/matherials/codes/simol/src/test/data/quantum_chemistry/";
 
   simol::SparseMatrix<double> kineticMatrix(simol::MatrixMarketFile(dataPath+"kinetic_matrix.mtx"));
   simol::SparseMatrix<double> overlapMatrix(simol::MatrixMarketFile(dataPath+"overlap_matrix.mtx"));

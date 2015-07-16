@@ -3,6 +3,8 @@
 
 #include <cstddef>
 #include <cstdio>
+#include <ios>
+#include <iostream>
 #include <string>
 
 extern "C"
@@ -34,12 +36,18 @@ namespace simol
   MatrixMarketFile::MatrixMarketFile(std::string const & filename)
   : content_(fopen(filename.c_str(), "r"))
   {
+    if(!content_)
+      throw std::ios_base::failure("Unable to open the specified matrix market file");
     MM_typecode matcode;
-    mm_read_banner(content_, &matcode);
-    mm_read_mtx_crd_size(content_, 
-                         &numberOfRows_,
-                         &numberOfColumns_,
-                         &numberOfNonzeros_);
+    if (mm_read_banner(content_, &matcode) != 0)
+      throw new std::ios_base::failure("Unable to read the banner");
+    int ret_code = mm_read_mtx_crd_size(content_, 
+                                        &numberOfRows_,
+                                        &numberOfColumns_,
+                                        &numberOfNonzeros_);
+    if( ret_code != 0 )
+      throw new std::ios_base::failure("Unable to read the data");
+      
   }
 
   inline FILE *

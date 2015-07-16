@@ -20,6 +20,7 @@ namespace simol
 
   void SparseMatrixTest::testEigenvaluesOfIdentityAreAllOne()
   {
+    //identity_->eigenvalues(2, "LM", 1e-6);
     CPPUNIT_ASSERT_EQUAL(10, 1);
   }
 

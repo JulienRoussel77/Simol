@@ -13,6 +13,7 @@ namespace simol
   {
     typedef Eigen::Matrix<ScalarType,Eigen::Dynamic,1> VectorType;
     typedef Eigen::SparseMatrix<ScalarType> SparseMatrixType;
+    typedef Eigen::Map<VectorType> VectorMap;
   };
 
 }
