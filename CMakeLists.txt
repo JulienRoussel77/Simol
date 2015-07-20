@@ -1,4 +1,3 @@
-
 cmake_minimum_required (VERSION 2.6)
 
 project (simol C CXX)
@@ -6,8 +5,6 @@ project (simol C CXX)
 #==============
 # INCLUDE FILES
 #==============
-
-#set(CMAKE_VERBOSE_MAKEFILE ON)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
 
@@ -24,12 +21,8 @@ endif()
 #====================
 # EXECUTABLE SETTINGS
 #====================
-add_executable(quantum_chemistry src/test/functional/quantum_chemistry/main.cpp src/core/io/mmio.c)
-add_executable(molecular_dynamics src/test/functional/molecular_dynamics/main.cpp)
 add_executable(test_simol src/test/unit/test_simol.cpp src/test/unit/SparseMatrixTest.cpp src/test/unit/MatrixMarketFileTest.cpp src/core/io/mmio.c)
 
-
-#add_subdirectory(src)
 #=============
 # USER OPTIONS
 #=============
@@ -60,23 +53,13 @@ endif(INSTALL_GCC)
 
 
 if(ENABLE_DOWNLOAD)
-
   message(STATUS "libraries to download ${LIBRARIES_TO_DOWNLOAD}")
-
   DownloadThenInstall("${LIBRARIES_TO_DOWNLOAD}")
-
-
-
 endif(ENABLE_DOWNLOAD)
 
-#  add_dependencies(molecular_dynamics gcc)
-  add_dependencies(molecular_dynamics yamlcpp)
 
-  add_dependencies(yamlcpp boost)
 
-  #add_dependencies(molecular_dynamics cppunit)
 
-  add_dependencies(quantum_chemistry eigen)
 
   include_directories(${EIGEN_INSTALL_DIR}/include/eigen3)
   include_directories(${YAMLCPP_INSTALL_DIR}/include)
@@ -84,8 +67,6 @@ endif(ENABLE_DOWNLOAD)
 
   message(STATUS "YAMLCPP_INSTALL_DIR is ${YAMLCPP_INSTALL_DIR}")
 
-  target_link_libraries(molecular_dynamics ${YAMLCPP_INSTALL_DIR}/lib/libyaml-cpp.a)
-  target_link_libraries(quantum_chemistry ${YAMLCPP_INSTALL_DIR}/lib/libyaml-cpp.a)
 
 
 #===================
@@ -123,10 +104,8 @@ endif(CMAKE_BUILD_TYPE EQUAL "Release")
 #====================
 
 include_directories(${CPPUNIT_INSTALL_DIR}/include)
-#include_directories(/usr/local/bibliotheques/boost/1.57.0/include)
 
 target_link_libraries(test_simol ${CPPUNIT_INSTALL_DIR}/lib/libcppunit.so ${ARPACK_INSTALL_DIR}/lib/libarpack.a)
-target_link_libraries(quantum_chemistry ${ARPACK_INSTALL_DIR}/lib/libarpack.a)
 
 #================
 # LINKER SETTINGS
@@ -137,6 +116,8 @@ include_directories(src/core/linalg)
 include_directories(src/core/io)
 include_directories(src/core/statphys)
 include_directories(src)
+
+add_subdirectory(src)
 
 #==============
 # TEST SETTINGS
