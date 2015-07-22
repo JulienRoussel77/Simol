@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 2.6)
 
-project (simol C CXX)
+project (simol Fortran C CXX)
 
 #==============
 # INCLUDE FILES
@@ -33,6 +33,13 @@ option(INSTALL_GCC "Automatic installation of GCC" False)
 if(NOT EXISTS EXTERNAL_DIR)
   set(EXTERNAL_DIR ${CMAKE_CURRENT_BINARY_DIR}/third-party)
 endif()
+
+find_package(BLAS)
+find_package(LAPACK)
+
+LIST(GET BLAS_LIBRARIES 0 BLAS_LIB)
+LIST(GET LAPACK_LIBRARIES 0 LAPACK_LIB)
+
 
 find_package(Arpack)
 find_package(Boost)
@@ -82,7 +89,7 @@ endif(EXISTS ${config})
 # COMPILER SETTINGS
 #==================
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -fopenmp")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -fopenmp -lgfortran")
 
 CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
 if(COMPILER_SUPPORTS_CXX11)
@@ -105,7 +112,14 @@ endif(CMAKE_BUILD_TYPE EQUAL "Release")
 
 include_directories(${CPPUNIT_INSTALL_DIR}/include)
 
-target_link_libraries(test_simol ${CPPUNIT_INSTALL_DIR}/lib/libcppunit.so ${ARPACK_INSTALL_DIR}/lib/libarpack.a)
+
+MESSAGE(STATUS ${BLAS_LIB})
+target_link_libraries(test_simol ${CPPUNIT_INSTALL_DIR}/lib/libcppunit.so 
+                                 ${LAPACK_LIB}
+                                 ${BLAS_LIB}
+                                 ${ARPACK_INSTALL_DIR}/lib/libarpack.a
+                                 ${ARPACK_INSTALL_DIR}/lib/libarpack_util.a
+                                 )
 
 #================
 # LINKER SETTINGS

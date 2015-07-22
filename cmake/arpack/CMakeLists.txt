@@ -18,6 +18,8 @@ endif()
 # EXECUTABLE SETTINGS
 #====================
 file(GLOB SRC "SRC/*.f")
+file(GLOB UTIL "UTIL/*.f")
 
+add_library(arpack_util ${UTIL})
 add_library(arpack ${SRC})
 
