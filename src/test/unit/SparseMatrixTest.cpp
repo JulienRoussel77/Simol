@@ -2,6 +2,8 @@
 
 #include <cppunit/extensions/HelperMacros.h>
 
+#include "EigenSolver.hpp"
+
 namespace simol
 {
 
@@ -20,8 +22,10 @@ namespace simol
 
   void SparseMatrixTest::testEigenvaluesOfIdentityAreAllOne()
   {
-    //identity_->eigenvalues(2, "LM", 1e-6);
-    CPPUNIT_ASSERT_EQUAL(10, 1);
+    EigenSolver<double> arpack;
+    double * eigenvalues = arpack.solve(*identity_, 2, 1e-6);
+    CPPUNIT_ASSERT_EQUAL(1.0, eigenvalues[0]);
+    CPPUNIT_ASSERT_EQUAL(1.0, eigenvalues[1]);
   }
 
 }

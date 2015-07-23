@@ -22,14 +22,15 @@ namespace simol
   {
     friend std::ifstream & operator>> <>(std::ifstream & fileToRead, 
                                          SparseMatrix<ScalarType,eigen> & matrixToWrite);
-
+    public:
+      std::size_t numberOfRows() const;
+      std::size_t numberOfColumns() const;
+    public:
+      typename eigen<ScalarType>::SparseMatrixType const & wrapped() const
+      { return wrapped_; }
     public:
       SparseMatrix(size_t const numberOfRows, size_t const numberOfColumns);
       SparseMatrix(MatrixMarketFile const & file);
-    public:
-      void eigenvalues(int numberOfEigenvaluesToCompute, 
-                       std::string typeOfEigenvalues,
-                       double tolerance) const;
     private:
       typename eigen<ScalarType>::SparseMatrixType wrapped_;
   };
@@ -57,61 +58,15 @@ namespace simol
     }
     wrapped_.setFromTriplets(nonzeros.begin(),nonzeros.end());
   }
-  
-  template<class ScalarType> inline void
-  SparseMatrix<ScalarType,eigen>::eigenvalues(int numberOfEigenvalues, 
-                                              std::string typeOfEigenvalues,
-                                              double tolerance) const
-  {
-    int ido, ncv, ldv, lworkl, info;
-    double tol, *v;
-    int *iparam, *ipntr;
-    double *workd, *workl;
 
-    ncv = 5;
-    lworkl = ncv*(ncv+8);
-    info = 0;
-    ido = 0;
-    iparam = new int[11];
-    ipntr = new int[11];
-    iparam[0] = 1;
-    iparam[2] = 300;
-    iparam[6] = 1;
-    ldv = 256;
-    int maxn = ldv;
-    int maxncv = 25;
-    v = new double[ldv*maxncv];
-    workl = new double[lworkl];
-    workd = new double[3*maxn];
-    double * residual = new double[maxn];
+  template<class ScalarType> inline std::size_t
+  SparseMatrix<ScalarType,eigen>::numberOfRows() const
+  { return wrapped_.rows(); }
 
-    int sizeOfProblem = wrapped_.size();
-    char typeOfProblem = 'I';
-    dsaupd(ido, typeOfProblem, sizeOfProblem, const_cast<char*>(typeOfEigenvalues.c_str()), numberOfEigenvalues, tolerance, residual, ncv, v, ldv, iparam, ipntr, workd, workl, lworkl, info);
-    while( (ido==1) || (ido==-1) )
-    {
-      typename eigen<ScalarType>::VectorMap x(&workd[ipntr[0]-1], sizeOfProblem);
-      //double *x = &workd[ipntr[0]-1];
-      //double *y = &workd[ipntr[1]-1];
-      auto y = wrapped_ * x;
-      dsaupd(ido, typeOfProblem, sizeOfProblem, const_cast<char*>(typeOfEigenvalues.c_str()), numberOfEigenvalues, tolerance, residual, ncv, v, ldv, iparam, ipntr, workd, workl, lworkl, info);
-    }
+  template<class ScalarType> inline std::size_t
+  SparseMatrix<ScalarType,eigen>::numberOfColumns() const
+  { return wrapped_.cols(); }
 
-    bool rvec = true;
-    char howmny = 'A';
-    bool *select = new bool[ncv];
-    double * eigenvalues = new double[numberOfEigenvalues];
-    double sigma;
-    int ierr;
-
-    dseupd( rvec, howmny, select, eigenvalues, v, ldv, sigma, typeOfProblem, sizeOfProblem, const_cast<char*>(typeOfEigenvalues.c_str()), numberOfEigenvalues, tolerance, residual, ncv, v, ldv, iparam, ipntr, workd, workl, lworkl, ierr );
-
-    std::cout << "eigenvalues: ";
-    for (int i=0;i<numberOfEigenvalues;++i)
-      std::cout << eigenvalues[i] << " ";
-    std::cout << std::endl; 
-  }
-  
   template<class ScalarType, template<class> class Library>
   std::ifstream & operator>>(std::ifstream & fileToRead, SparseMatrix<ScalarType,Library> & matrixToWrite)
   {
@@ -127,6 +82,8 @@ namespace simol
 
     return fileToRead;
   }
+
+
 
 
 }
