@@ -12,7 +12,7 @@ namespace simol
 
   void SparseMatrixTest::setUp()
   {
-    identity_ = new SparseMatrix<double>(MatrixMarketFile("../src/test/data/identity3.mtx"));
+    identity_ = new SparseMatrix<double>(MatrixMarketFile("../src/test/data/identity5.mtx"));
   }
 
   void SparseMatrixTest::tearDown()
