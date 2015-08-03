@@ -1,6 +1,9 @@
 #ifndef SIMOL_EIGENSOLVER_HPP
 #define SIMOL_EIGENSOLVER_HPP
 
+#include "SparseMatrix.hpp"
+
+
 namespace simol
 {
 
@@ -13,8 +16,8 @@ namespace simol
   {
     public:
       double* solve(SparseMatrix<ScalarType, eigen> const & A, 
-                                    int numberOfEigenvalues,
-                                    double tolerance) const;
+                    int numberOfEigenvalues,
+                    double tolerance) const;
   };
 
   template<typename ScalarType, template<typename> class WrappedEigenSolver> double*

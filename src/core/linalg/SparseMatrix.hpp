@@ -53,7 +53,6 @@ namespace simol
         int columnIndex;
         ScalarType nonzero;
         fscanf(file.content(), "%d %d %lg\n", &rowIndex, &columnIndex, &nonzero);
-        std::cout << rowIndex << " " << columnIndex << " " << nonzero << std::endl;
         nonzeros.push_back(Eigen::Triplet<ScalarType,size_t>(rowIndex, columnIndex, nonzero));
     }
     wrapped_.setFromTriplets(nonzeros.begin(),nonzeros.end());
