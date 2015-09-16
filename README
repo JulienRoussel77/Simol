@@ -1,7 +1,7 @@
 
-1. INSTALLATION
+1. INSTALLATION (requires GCC version >= 4.9.2)
 
 cd build
-cmake ..
+cmake -D ENABLE_DOWNLOAD=True -D CMAKE_CXX_COMPILER=path/to/g++ ..
 make
 make install
