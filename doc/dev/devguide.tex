@@ -2,7 +2,7 @@
 \usepackage{listings}
 \usepackage{xspace}
 \usepackage{url,color,hyperref}
-\usepackage{geometry}
+\usepackage{geometry,graphicx}
 
 \title{Simol developer's guide}
 \author{C\'edric DOUCET}
@@ -13,6 +13,7 @@
 \newcommand{\Git}{\texttt{Git}\xspace} 
 \newcommand{\Linux}{\texttt{Linux}\xspace} 
 \newcommand{\Make}{\texttt{Make}\xspace}
+\newcommand{\Netbeans}{\texttt{Netbeans}\xspace} 
 \newcommand{\Simol}{\texttt{Simol}\xspace} 
 \newcommand{\SourceSup}{\texttt{SourceSup}\xspace} 
 
@@ -178,6 +179,30 @@ make install
 \subsection{Building}
 
 
+
+\subsection{Netbeans (8.0.2)}
+
+You may want to use an integrated development environment (IDE) to contribute to \Simol. Many IDEs are available but only a few are able to handle a configuration script from \CMake. \Netbeans is one of them. To link \Netbeans with \Simol, please follow these steps:
+\begin{enumerate}
+\item run \Netbeans
+\item if a project is already open, choose \textit{Close all projects} in \textit{File} menu
+\item in \textit{File} menu, choose \textit{New project} and then choose \textit{C/C++ project with existing sources}
+\item specify the directory containing \Simol sources and choose \textit{Custom} as the configuration mode
+\item choose \textit{Run configure script in subfolder} and modify \textit{Configure arguments} by specifiying your own C/C++/Fortran compilers and enabling automatic downloading of third-party libraries. The result should look like mine:
+\lstset{language=bash} 
+\begin{lstlisting}
+-G "Unix Makefiles" 
+-DCMAKE_BUILD_TYPE=Debug 
+-DCMAKE_C_COMPILER=/usr/local/bibliotheques/gcc/4.9.2/bin/gcc 
+-DCMAKE_CXX_COMPILER=/usr/local/bibliotheques/gcc/4.9.2/bin/g++ 
+-DCMAKE_Fortran_COMPILER=/usr/local/bibliotheques/gcc/4.9.2/bin/gfortran 
+-DENABLE_DOWNLOAD=True 
+-DCMAKE_C_FLAGS_DEBUG="-g3 -gdwarf-2" 
+-DCMAKE_CXX_FLAGS_DEBUG="-g3 -gdwarf-2" 
+-DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+\end{lstlisting}
+\item skip other steps until the end of the creation of the project
+\end{enumerate}
 
 \section{Running first examples}
 
