@@ -1,4 +1,14 @@
 
+0. GCC INSTALLATION
+
+- download gcc archive
+- uncompress it where you want
+- cd into the resulting directory
+- ./contrib/download_prerequisites
+- ./configure --prefix=path/where/you/want/to/install/gcc
+- make -j N (where is the number of procs of your machine)
+- make install
+
 1. INSTALLATION (requires GCC version >= 4.9.2)
 
 cd build
