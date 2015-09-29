@@ -17,7 +17,6 @@ set(SIMOL_C_COMPILER ${CMAKE_C_COMPILER})
 set(SIMOL_CXX_COMPILER ${CMAKE_CXX_COMPILER})
 set(SIMOL_Fortran_COMPILER ${CMAKE_Fortran_COMPILER})
 
-
 ProcessorCount(N)
 if(NOT N EQUAL 0)
   set(CMAKE_BUILD_FLAGS -j${N})
@@ -110,7 +109,6 @@ endif(CMAKE_BUILD_TYPE EQUAL "Release")
 #====================
 
 include_directories(${CPPUNIT_INSTALL_DIR}/include)
-
 
 MESSAGE(STATUS ${BLAS_LIB})
 #target_link_libraries(test_simol ${CPPUNIT_INSTALL_DIR}/lib/libcppunit.so 
