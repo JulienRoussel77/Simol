@@ -69,17 +69,11 @@ if(ENABLE_DOWNLOAD)
   DownloadThenInstall("${LIBRARIES_TO_DOWNLOAD}")
 endif(ENABLE_DOWNLOAD)
 
-
-
-
-
   include_directories(${EIGEN_INSTALL_DIR}/include/eigen3)
   include_directories(${YAMLCPP_INSTALL_DIR}/include)
   include_directories(${BOOST_INSTALL_DIR}/include)
 
   message(STATUS "YAMLCPP_INSTALL_DIR is ${YAMLCPP_INSTALL_DIR}")
-
-
 
 #===================
 # USER CONFIGURATION
