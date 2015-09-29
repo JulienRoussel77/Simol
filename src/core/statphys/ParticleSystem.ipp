@@ -32,6 +32,9 @@ namespace simol
       outputFile << currentTimeIteration_ * timeStep 
                  << " " << particle.position() 
                  << " " << particle.momentum() 
+		 << " " << particle.kineticEnergy()
+		 << " " << particle.potentialEnergy(model.potential())
+		 << " " << particle.energy(model.potential())
                  << std::endl;
     }
     ++currentTimeIteration_;

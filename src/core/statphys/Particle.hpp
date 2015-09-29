@@ -52,6 +52,9 @@ namespace simol
       ScalarType const & mass() const;
       ScalarType const & position() const;
       ScalarType const & momentum() const;
+      ScalarType kineticEnergy() const;
+      ScalarType potentialEnergy(Potential<ScalarType> const & potential) const;
+      ScalarType energy(Potential<ScalarType> const & potential) const;
 
     //=============
     // DATA MEMBERS

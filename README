@@ -2,5 +2,10 @@
 1. INSTALLATION (requires GCC version >= 4.9.2)
 
 cd build
-cmake -D ENABLE_DOWNLOAD=True -D CMAKE_CXX_COMPILER=path/to/g++ ..
+cmake -D ENABLE_DOWNLOAD=True -DCMAKE_C_COMPILER=/home/roussel/5.2.0/bin/gcc -DCMAKE_CXX_COMPILER=/home/roussel/5.2.0/bin/g++ -DCMAKE_Fortran_COMPILER=/home/roussel/5.2.0/bin/gfortran ..
 make
+
+Info pour netbeans :
+-> options de configuration
+
+-G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_COMPILER=/home/roussel/5.2.0/bin/gcc -DCMAKE_CXX_COMPILER=/home/roussel/5.2.0/bin/g++ -D CMAKE_Fortran_COMPILER=/home/roussel/5.2.0/bin/gfortran -DCMAKE_C_FLAGS_DEBUG="-g3 -gdwarf-2" -DCMAKE_CXX_FLAGS_DEBUG="-g3 -gdwarf-2" -D ENABLE_DOWNLOAD=True 

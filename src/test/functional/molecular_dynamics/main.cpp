@@ -1,5 +1,6 @@
 
 #include <cstdlib>
+#include <iostream>
 
 #include "ParticleSystem.hpp"
 #include "HamiltonDynamics.hpp"
@@ -72,7 +73,7 @@ int main(int argc, char* argv[])
   double rightTemperature = 1;
   simol::AtomChain<double> chain(numberOfAtoms, mass, leftPosition, leftMomentum, leftTemperature, rightTemperature, potential);
 
-
+  std::cout << "Fin de la simulation" << std::endl;
 
   return EXIT_SUCCESS;
 }

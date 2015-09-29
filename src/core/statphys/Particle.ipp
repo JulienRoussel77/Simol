@@ -30,5 +30,17 @@ namespace simol
   ScalarType const & Particle<ScalarType>::mass() const
   { return mass_; }
 
+  template<class ScalarType> inline
+  ScalarType Particle<ScalarType>::kineticEnergy() const
+  { return pow(momentum_, 2)/mass_/2; }
+
+  template<class ScalarType> inline
+  ScalarType Particle<ScalarType>::potentialEnergy(Potential<ScalarType> const & potential) const
+  { return potential(position_); }
+      
+  template<class ScalarType> inline
+  ScalarType Particle<ScalarType>::energy(Potential<ScalarType> const & potential) const
+  { return kineticEnergy() + potentialEnergy(potential); }
+
 }
 #endif
