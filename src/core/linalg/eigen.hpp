@@ -1,9 +1,13 @@
 #ifndef EIGEN_HPP
 #define EIGEN_HPP
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+#pragma GCC diagnostic ignored "-Wsign-compare"
 #include <Eigen/Core>
+#include <Eigen/Dense>
 #include <Eigen/Sparse>
-#include <Eigen/Core>
+#pragma GCC diagnostic pop
 
 namespace simol
 {
