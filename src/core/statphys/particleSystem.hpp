@@ -2,34 +2,37 @@
 #define SIMOL_PARTICLESYSTEM_HPP
 
 #include <vector>
-#include "Particle.hpp"
-#include "HamiltonDynamics.hpp"
+#include "particle.hpp"
+#include "dynamics.hpp"
 
 namespace simol
 {
 
-  template<class ScalarType>
   class ParticleSystem
   {
-    typedef Particle<ScalarType> ParticleType;
+    typedef Particle ParticleType;
 
     public:
 
       ParticleSystem(size_t const numberOfParticles, 
-                     ScalarType const & mass, 
-                     ScalarType const & initialPosition, 
-                     ScalarType const & initialSpeed);
+                     double const & mass, 
+                     double const & initialPosition, 
+                     double const & initialSpeed);
 
       ParticleSystem(size_t const & numberOfParticles, 
-                     ScalarType const & distance);
+                     double const & distance);
 
       ParticleType & particle(size_t index);
 
       std::vector<ParticleType> & configuration(); 
 
-      void simulate(ScalarType const timeStep, 
-                    HamiltonDynamics<ScalarType> const & model, 
+      void simulate(double const timeStep, 
+                    Dynamics const* model, 
                     std::ofstream & outputFile);
+      
+      size_t size() const;
+      
+      
 
     private:
       
@@ -47,6 +50,6 @@ namespace simol
 
 
 
-#include "ParticleSystem.ipp"
+#include "particleSystem.ipp"
 
 #endif
