@@ -1,7 +1,9 @@
 add_subdirectory(core)
 
+file(GLOB_RECURSE src src/*.cpp)
+
 add_executable(quantum_chemistry test/functional/quantum_chemistry/main.cpp core/io/mmio.c)
-add_executable(molecular_dynamics test/functional/molecular_dynamics/main.cpp)
+add_executable(molecular_dynamics test/functional/molecular_dynamics/main.cpp ${src})
 
 add_dependencies(quantum_chemistry eigen)
 target_link_libraries(quantum_chemistry ${YAMLCPP_INSTALL_DIR}/lib/libyaml-cpp.a)
