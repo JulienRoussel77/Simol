@@ -87,7 +87,7 @@ endif(EXISTS ${config})
 # COMPILER SETTINGS
 #==================
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -fopenmp -lgfortran -static")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-deprecated -fopenmp -lgfortran -static")
 
 CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
 if(COMPILER_SUPPORTS_CXX11)
