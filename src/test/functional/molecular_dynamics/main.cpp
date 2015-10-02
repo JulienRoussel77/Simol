@@ -4,7 +4,8 @@
 
 #include "particleSystem.hpp"
 #include "dynamics.hpp"
-#include "atomChain.hpp"
+#include "Vector.hpp"
+#include "input.hpp"
 
 #include <cmath>
 
@@ -25,58 +26,48 @@ int main(int argc, char* argv[])
   //===================
   // INPUT FILE LOADING
   //===================
-  
-  std::cout << "Input read in " << cmd.inputFileName() << std::endl;
     
-  YAML::Node input = YAML::LoadFile(cmd.inputFileName());
-
-  YAML::Node geometry = input["Geometry"];
-  size_t dimension = geometry["Dimension"].as<size_t>();
-  size_t length = geometry["Length"].as<size_t>();
-
-  YAML::Node mesh = input["Mesh"]["Time"];
-  double timeStep = mesh["Step"].as<double>();
-  size_t numberOfInstants = mesh["Number"].as<size_t>();
-
-  YAML::Node physics = input["Physics"];
-  double mass = physics["Particle"]["Mass"].as<double>();
-  double initial_speed = physics["Particle"]["Speed"].as<double>();
-  double initial_position = physics["Particle"]["Position"].as<double>();
-  double potential_parameter = physics["Potential"]["Parameter"].as<double>();
-
-  std::string outputFilename = input["Output"]["Filename"].as<std::string>();
+  simol::Input input(cmd);
 
   //============
   // COMPUTATION
   //============
 
-  size_t numberOfParticles = 1;
+  /*size_t numberOfParticles = 1;
+  
+  std::vector<double> masses(numberOfParticles);
+  for (int i=0; i<numberOfParticles; i++)
+    masses[i] = mass;
+  
+  std::vector<dvec> positions(numberOfParticles);
+  for (int i=0; i<numberOfParticles; i++)
+    positions[i] = initial_position;
+  
+  std::vector<dvec> momenta(numberOfParticles);
+  for (int i=0; i<numberOfParticles; i++)
+    momenta[i] = initial_speed;
 
-  simol::ParticleSystem system(numberOfParticles, mass, initial_position, initial_speed);
-  simol::Potential potential(potential_parameter, 2*M_PI/length);
+  simol::ParticleSystem system(numberOfParticles, masses, positions, momenta);*/
+  
+  simol::ParticleSystem system(input);
+  
+  simol::Potential potential(input);
 
   simol::Dynamics* model = simol::createDynamics(input);
   
-  std::ofstream outputFile(outputFilename);
+  std::ofstream outputFile(input.outputFilename());
   
-  std::cout << "Output written in " << outputFilename << std::endl;
+  std::cout << "Output written in " << input.outputFilename() << std::endl;
   
-  for (size_t instantIndex  =1; instantIndex < numberOfInstants; ++instantIndex)
+  for (size_t instantIndex  =1; instantIndex < input.numberOfIterations(); ++instantIndex)
   {
-    double instant = instantIndex * timeStep;
-    system.simulate(timeStep, model, outputFile);
+    double instant = instantIndex * input.timeStep();
+    system.simulate(input.timeStep(), model, outputFile);
   }
 
   //===========
   // ATOM CHAIN
   //===========
-  
-  size_t numberOfAtoms = 3;
-  double leftPosition = 0;
-  double leftMomentum = 0;
-  double leftTemperature = 0;
-  double rightTemperature = 1;
-  simol::AtomChain chain(numberOfAtoms, mass, leftPosition, leftMomentum, leftTemperature, rightTemperature, potential);
 
   std::cout << "Fin de la simulation" << std::endl;
 

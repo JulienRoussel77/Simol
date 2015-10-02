@@ -87,7 +87,7 @@ endif(EXISTS ${config})
 # COMPILER SETTINGS
 #==================
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -fopenmp -lgfortran -static")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -fopenmp -lgfortran -static -Wno-deprecated")
 
 CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
 if(COMPILER_SUPPORTS_CXX11)
@@ -126,6 +126,7 @@ include_directories(src/core)
 include_directories(src/core/linalg)
 include_directories(src/core/io)
 include_directories(src/core/statphys)
+include_directories(src/core/random)
 include_directories(src)
 
 add_subdirectory(src)

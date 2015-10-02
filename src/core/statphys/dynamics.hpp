@@ -1,40 +1,62 @@
-k#ifndef SIMOL_DYNAMICS_HPP
+#ifndef SIMOL_DYNAMICS_HPP
 #define SIMOL_DYNAMICS_HPP
 
 #include "potential.hpp"
-#include<yaml-cpp/yaml.h>
+#include "particle.hpp"
+#include "input.hpp"
+#include "RNG.hpp"
+# include <iostream>
 
 namespace simol
 {
+  class Dynamics;
+  
+  Dynamics* createDynamics(Input  const& input);
+    
   class Dynamics
   {
     public:
-      Dynamics(YAML::Node const& input);
+      Dynamics(Input const&  input);
 
       Potential const & potential() const;
       //friend Dynamics* createDynamics(Potential const& potential);
-      friend Dynamics* createDynamics(YAML::Node const& input);
-
+      friend Dynamics* createDynamics(Input  const& input);
+      virtual void update(Particle& particle,  double const timeStep) = 0;
+      RNG rng_;
     private:
       //ScalarType mass_;
       Potential potential_;
+
   };
   
   class Hamiltonian : public Dynamics
   {
   public:
-    Hamiltonian(YAML::Node const& input);
+    Hamiltonian(Input const&  input);
+    void update(Particle& particle,  double const timeStep);
   };
   
   
-    class Langevin : public Dynamics
+  class Langevin : public Dynamics
   {
   public:
-    Langevin(YAML::Node const& input);
+    Langevin(Input const& input);
+    double const& temperature() const;
+    double const& beta() const;
+    double const& gamma() const;
+    double const& sigma() const;
+    void update(Particle& particle,  double const timeStep);
+  private:
+    double temperature_;
+    double beta_;
+    double gamma_;
+    double sigma_;
   };
+  
+
 
 }
 
-#include "dynamics.cpp"
+//#include "dynamics.cpp"
 
 #endif

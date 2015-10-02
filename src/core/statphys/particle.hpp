@@ -7,6 +7,9 @@
 #include "potential.hpp"
 //#include "ode/verlet.hpp"
 #include "linalg/Vector.hpp"
+#include "RNG.hpp"
+
+
 
 //=====================
 // FORWARD DECLARATIONS
@@ -33,14 +36,16 @@ namespace simol
 
     //friend void verlet(Particle & particle, HamiltonDynamics const & model, double delta_t);
     friend void verlet_scheme(Particle & particle, Potential const & potential, double timeStep);
+    friend void exact_OU_scheme(Particle & particle, double const gamma, double const beta, double const timeStep, RNG& rng);
 
     //=============
     // CONSTRUCTORS
-    //=============Démarrage : /home/roussel/Travail/simol/build/src/molecular_dynamics -i /home/roussel/Travail/simol/src/test/functional/molecular_dynamics/hamiton.yaml
+    //=============
 
 
     public:
-
+      Particle();
+      Particle(double const & mass, dvec const & position, dvec const & momentum);
       Particle(double const & mass, double const & position, double const & momentum);
 
     //==========
@@ -50,8 +55,8 @@ namespace simol
     public:
 
       double const & mass() const;
-      double const & position() const;
-      double const & momentum() const;
+      dvec const & position() const;
+      dvec const & momentum() const;
       double kineticEnergy() const;
       double potentialEnergy(Potential const & potential) const;
       double energy(Potential const & potential) const;
@@ -63,23 +68,19 @@ namespace simol
     private:
 
       double mass_;
-      double position_;
-      double momentum_;
+      dvec position_;
+      dvec momentum_;
   };
 
+  
+  
 }
 
-#include "particle.ipp"
 
-namespace simol
-{
-  void verlet_scheme(Particle & particle, Potential const & potential, double timeStep)
-  {
-    particle.momentum_ -= timeStep * potential.derivative(particle.position_) / 2;
-    particle.position_ += timeStep * particle.momentum_ / particle.mass_;
-    particle.momentum_ -= timeStep * potential.derivative(particle.position_) / 2;
-  }
-}
+
+//#include "particle.ipp"
+
+
 
 
 

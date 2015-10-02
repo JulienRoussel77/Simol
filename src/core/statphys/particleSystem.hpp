@@ -15,19 +15,18 @@ namespace simol
     public:
 
       ParticleSystem(size_t const numberOfParticles, 
-                     double const & mass, 
-                     double const & initialPosition, 
-                     double const & initialSpeed);
+                     std::vector<double> const & masses, 
+                     std::vector<dvec> const & initialPositions, 
+                     std::vector<dvec> const & initialMomenta);
 
-      ParticleSystem(size_t const & numberOfParticles, 
-                     double const & distance);
+      ParticleSystem(Input const& input);
 
       ParticleType & particle(size_t index);
 
       std::vector<ParticleType> & configuration(); 
 
       void simulate(double const timeStep, 
-                    Dynamics const* model, 
+                    Dynamics * model, 
                     std::ofstream & outputFile);
       
       size_t size() const;
@@ -50,6 +49,6 @@ namespace simol
 
 
 
-#include "particleSystem.ipp"
+//#include "particleSystem.ipp"
 
 #endif

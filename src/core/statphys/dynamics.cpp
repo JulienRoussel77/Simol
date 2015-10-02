@@ -7,8 +7,8 @@
 namespace simol
 {
 
-  Dynamics::Dynamics(YAML::Node const& input)
-  : potential_(input["Physics"]["Potential"]["Parameter"].as<double>(), 2*M_PI/input["Geometry"]["Length"].as<size_t>())
+  Dynamics::Dynamics(Input const& input) : 
+    potential_(input.potParameter(), 2*M_PI/input.length()), rng_(1, input.dimension())
   {}
   
   /*Dynamics* createDynamics(Potential const& potential)
@@ -16,15 +16,14 @@ namespace simol
     return new Hamiltonian(potential);
   }*/
   
-  Dynamics* createDynamics(YAML::Node const& input)
+  Dynamics* createDynamics(Input const& input)
   {
-    std::string methodname = input["Physics"]["Model"]["Name"].as<std::string>();
-    if (methodname == "Hamiltonian")
+    if (input.name() == "Hamiltonian")
       return new Hamiltonian(input);
-    else if (methodname == "Langevin")
+    else if (input.name() == "Langevin")
       return new Langevin(input);
     else
-      std::cerr << "Method not valid !" << std::endl;
+      std::cout << "Method not valid !" << std::endl;
     
     return 0;
   }
@@ -34,12 +33,50 @@ namespace simol
 
 
   
-    Hamiltonian::Hamiltonian(YAML::Node const& input):Dynamics(input)
-  {}
+    Hamiltonian::Hamiltonian(Input const& input):Dynamics(input)
+    {}
+  
+    void Hamiltonian::update(Particle& particle,  double const timeStep)
+    {
+      verlet_scheme(particle, potential(), timeStep);
+    }
   
 
-    Langevin::Langevin(YAML::Node const& input):Dynamics(input)
-  {}
+    Langevin::Langevin(Input const& input):
+      Dynamics(input), 
+      temperature_(input.temperature()), 
+      beta_(1/temperature_), 
+      gamma_(input.gamma()), 
+      sigma_(2*gamma_/beta_)
+    {}
+  
+
+  
+    double const& Langevin::temperature() const
+    {
+      return temperature_;
+    }
+      
+    double const& Langevin::beta() const
+    {
+      return beta_;
+    }
+    
+    double const& Langevin::gamma() const
+    {
+      return gamma_;
+    }
+    
+    double const& Langevin::sigma() const
+    {
+      return sigma_;
+    }
+    
+    void Langevin::update(Particle& particle,  double const timeStep)
+    {
+      verlet_scheme(particle, potential(), timeStep);
+      exact_OU_scheme(particle, gamma_, beta_, timeStep, rng_);
+    }
 }
 
 #endif

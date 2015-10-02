@@ -1,16 +1,29 @@
 #ifndef SIMOL_PARTICLESYSTEM_IMPL_HPP
 #define SIMOL_PARTICLESYSTEM_IMPL_HPP
 
+#include "particleSystem.hpp"
+
 namespace simol
 {
 
   ParticleSystem::ParticleSystem(size_t const numberOfParticles, 
-                                             double const & mass,
-                                             double const & initialPosition,
-                                             double const & initialSpeed)
+                                             std::vector<double> const & mass,
+                                             std::vector<dvec> const & initialPosition,
+                                             std::vector<dvec> const & initialSpeed)
   :currentTimeIteration_(0), 
-   configuration_(numberOfParticles, Particle(mass,initialPosition,initialSpeed))
-  {}
+   configuration_(numberOfParticles)
+  {
+    for (int i = 0; i<numberOfParticles; i++)
+      configuration_[i] = Particle(mass[i], initialPosition[i], initialSpeed[i]);
+  }
+  
+  ParticleSystem::ParticleSystem(Input const& input):
+  currentTimeIteration_(0), 
+  configuration_(input.numberOfParticles())
+  {
+    for (int i = 0; i<input.numberOfParticles(); i++)
+      configuration_[i] = Particle(input.mass(), input.initialPosition(i), input.initialSpeed(i));
+  }
       
   Particle & ParticleSystem::particle(size_t index) 
   { return configuration_[index]; }
@@ -19,19 +32,21 @@ namespace simol
   { return configuration_; }
 
   void ParticleSystem::simulate(double const timeStep,
-                                            Dynamics const* model, 
+                                            Dynamics * model, 
                                             std::ofstream & outputFile)
   {
     for (auto&& particle : configuration_)
     {
-      verlet_scheme(particle,model->potential(),timeStep);
-      outputFile << currentTimeIteration_ * timeStep 
+      //verlet_scheme(particle,model->potential(),timeStep);
+      model->update(particle, timeStep);
+      //outputFile << particle.position();
+      /*outputFile << currentTimeIteration_ * timeStep 
                  << " " << particle.position() 
                  << " " << particle.momentum() 
 		 << " " << particle.kineticEnergy()
 		 << " " << particle.potentialEnergy(model->potential())
 		 << " " << particle.energy(model->potential())
-                 << std::endl;
+                 << std::endl;*/
     }
     ++currentTimeIteration_;
 
