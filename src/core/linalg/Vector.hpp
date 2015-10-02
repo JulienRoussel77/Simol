@@ -26,7 +26,7 @@ namespace simol
   {
     public:
       Vector(size_t const size);
-      size_t const & size() const;
+      size_t size() const;
       ScalarType & operator()(size_t const index);
       ScalarType const & operator()(size_t const index) const;
       ScalarType norm() const;
