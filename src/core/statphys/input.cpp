@@ -14,7 +14,7 @@ namespace simol {
 
   double Input::timeStep() const {return data["Mesh"]["Time"]["Step"].as<double>();}
 
-  int Input::numberOfIterations() const {return data["Mesh"]["Time"]["Number"].as<double>();}
+  size_t Input::numberOfIterations() const {return data["Mesh"]["Time"]["Number"].as<double>();}
 
   double Input::potParameter() const {return data["Physics"]["Potential"]["Parameter"].as<double>();}
 
@@ -24,7 +24,7 @@ namespace simol {
 
   double Input::temperature() const {return data["Physics"]["Model"]["Temperature"].as<double>();}
 
-  int Input::numberOfParticles() const {return 1;}
+  size_t Input::numberOfParticles() const {return 1;}
 
   double Input::mass() const {return data["Physics"]["Particle"]["Mass"].as<double>();} 
 	

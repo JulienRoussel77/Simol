@@ -20,7 +20,7 @@ namespace simol{
     double length() const;
     
     double timeStep() const;
-    int numberOfIterations() const;
+    size_t numberOfIterations() const;
     
     double potParameter() const;
 	
@@ -29,7 +29,7 @@ namespace simol{
     double temperature() const;
     
     
-    int numberOfParticles() const;
+    size_t numberOfParticles() const;
     double mass() const;
       
     double initialPosition(int const& i) const;

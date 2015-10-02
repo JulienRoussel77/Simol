@@ -22,9 +22,7 @@ namespace simol
       //friend Dynamics* createDynamics(Potential const& potential);
       friend Dynamics* createDynamics(Input  const& input);
       virtual void update(Particle& particle,  double const timeStep) = 0;
-      RNG rng_;
     private:
-      //ScalarType mass_;
       Potential potential_;
 
   };
@@ -51,6 +49,7 @@ namespace simol
     double beta_;
     double gamma_;
     double sigma_;
+    RNG rng_;
   };
   
 

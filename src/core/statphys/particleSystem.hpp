@@ -4,6 +4,7 @@
 #include <vector>
 #include "particle.hpp"
 #include "dynamics.hpp"
+#include "output.hpp"
 
 namespace simol
 {
@@ -14,20 +15,13 @@ namespace simol
 
     public:
 
-      ParticleSystem(size_t const numberOfParticles, 
-                     std::vector<double> const & masses, 
-                     std::vector<dvec> const & initialPositions, 
-                     std::vector<dvec> const & initialMomenta);
-
       ParticleSystem(Input const& input);
 
       ParticleType & particle(size_t index);
 
       std::vector<ParticleType> & configuration(); 
 
-      void simulate(double const timeStep, 
-                    Dynamics * model, 
-                    std::ofstream & outputFile);
+      void simulate(double const timeStep, Dynamics * model);
       
       size_t size() const;
       
@@ -37,6 +31,7 @@ namespace simol
       
       size_t currentTimeIteration_;
       std::vector<ParticleType> configuration_;
+      Output output;
   };
 
   // redémarrage : nombres aleatoires, juste pannes, tous les N pas de temps

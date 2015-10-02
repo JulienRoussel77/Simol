@@ -60,15 +60,18 @@ namespace simol
 {
   void verlet_scheme(Particle & particle, Potential const & potential, double timeStep)
   {
+    /*std::cout << "verlet" << std::endl;
+    size_t test = particle.momentum_.size();
+        std::cout << "ok" << std::endl;*/
     particle.momentum_ -= timeStep * potential.derivative(particle.position_) / 2;
     particle.position_ += timeStep * particle.momentum_ / particle.mass_;
     particle.momentum_ -= timeStep * potential.derivative(particle.position_) / 2;
   }
   
-  void exact_OU_scheme(Particle & particle, double const gamma, double const beta, double const timeStep, RNG& rng)
+  void exact_OU_scheme(Particle & particle, double const gamma, double const beta, double const timeStep, dvec const& randVec)
   {
     double alpha = exp(- gamma / particle.mass_ * timeStep);    
-    particle.momentum_ = alpha * particle.momentum_ + sqrt((1-pow(alpha, 2))/beta*particle.mass_) * rng.gaussian();
+    particle.momentum_ = alpha * particle.momentum_ + sqrt((1-pow(alpha, 2))/beta*particle.mass_) * randVec;
   }
 }
 #endif

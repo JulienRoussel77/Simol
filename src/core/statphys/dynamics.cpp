@@ -8,7 +8,7 @@ namespace simol
 {
 
   Dynamics::Dynamics(Input const& input) : 
-    potential_(input.potParameter(), 2*M_PI/input.length()), rng_(1, input.dimension())
+    potential_(input.potParameter(), 2*M_PI/input.length())
   {}
   
   /*Dynamics* createDynamics(Potential const& potential)
@@ -47,7 +47,8 @@ namespace simol
       temperature_(input.temperature()), 
       beta_(1/temperature_), 
       gamma_(input.gamma()), 
-      sigma_(2*gamma_/beta_)
+      sigma_(2*gamma_/beta_), 
+      rng_(1, input.dimension())
     {}
   
 
@@ -75,7 +76,7 @@ namespace simol
     void Langevin::update(Particle& particle,  double const timeStep)
     {
       verlet_scheme(particle, potential(), timeStep);
-      exact_OU_scheme(particle, gamma_, beta_, timeStep, rng_);
+      exact_OU_scheme(particle, gamma_, beta_, timeStep, rng_.gaussian());
     }
 }
 

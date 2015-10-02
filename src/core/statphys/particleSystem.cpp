@@ -5,23 +5,13 @@
 
 namespace simol
 {
-
-  ParticleSystem::ParticleSystem(size_t const numberOfParticles, 
-                                             std::vector<double> const & mass,
-                                             std::vector<dvec> const & initialPosition,
-                                             std::vector<dvec> const & initialSpeed)
-  :currentTimeIteration_(0), 
-   configuration_(numberOfParticles)
-  {
-    for (int i = 0; i<numberOfParticles; i++)
-      configuration_[i] = Particle(mass[i], initialPosition[i], initialSpeed[i]);
-  }
   
   ParticleSystem::ParticleSystem(Input const& input):
   currentTimeIteration_(0), 
-  configuration_(input.numberOfParticles())
+  configuration_(input.numberOfParticles()),
+  output(input.outputFilename())
   {
-    for (int i = 0; i<input.numberOfParticles(); i++)
+    for (size_t i = 0; i<input.numberOfParticles(); i++)
       configuration_[i] = Particle(input.mass(), input.initialPosition(i), input.initialSpeed(i));
   }
       
@@ -31,22 +21,15 @@ namespace simol
   std::vector< Particle > & ParticleSystem::configuration() 
   { return configuration_; }
 
-  void ParticleSystem::simulate(double const timeStep,
-                                            Dynamics * model, 
-                                            std::ofstream & outputFile)
+  void ParticleSystem::simulate(double const timeStep, Dynamics * model)
   {
+    //std::cout << "simulate !" << std::endl;
     for (auto&& particle : configuration_)
     {
       //verlet_scheme(particle,model->potential(),timeStep);
+
       model->update(particle, timeStep);
-      //outputFile << particle.position();
-      /*outputFile << currentTimeIteration_ * timeStep 
-                 << " " << particle.position() 
-                 << " " << particle.momentum() 
-		 << " " << particle.kineticEnergy()
-		 << " " << particle.potentialEnergy(model->potential())
-		 << " " << particle.energy(model->potential())
-                 << std::endl;*/
+      output.display(currentTimeIteration_*timeStep, particle);
     }
     ++currentTimeIteration_;
 

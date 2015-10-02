@@ -62,7 +62,7 @@ int main(int argc, char* argv[])
   for (size_t instantIndex  =1; instantIndex < input.numberOfIterations(); ++instantIndex)
   {
     double instant = instantIndex * input.timeStep();
-    system.simulate(input.timeStep(), model, outputFile);
+    system.simulate(input.timeStep(), model);
   }
 
   //===========

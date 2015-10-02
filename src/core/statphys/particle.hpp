@@ -36,7 +36,7 @@ namespace simol
 
     //friend void verlet(Particle & particle, HamiltonDynamics const & model, double delta_t);
     friend void verlet_scheme(Particle & particle, Potential const & potential, double timeStep);
-    friend void exact_OU_scheme(Particle & particle, double const gamma, double const beta, double const timeStep, RNG& rng);
+    friend void exact_OU_scheme(Particle & particle, double const gamma, double const beta, double const timeStep, dvec const& randVec);
 
     //=============
     // CONSTRUCTORS
