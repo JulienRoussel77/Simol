@@ -31,13 +31,8 @@ namespace simol
   //=====================
 
   template<class ScalarType> inline
-  size_t const & Vector<ScalarType,eigen>::size() const
-  { 
-    std::cout << "size !" << std::endl;
-    std::cout << "size = " << wrapped_.size() << std::endl;
-    //return wrapped_.size();
-    return 1;
-  }
+  size_t Vector<ScalarType,eigen>::size() const
+  { return wrapped_.size(); }
   
   template<class ScalarType> inline
   ScalarType & Vector<ScalarType,eigen>::operator()(size_t const index)
