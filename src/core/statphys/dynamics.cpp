@@ -30,26 +30,37 @@ namespace simol
 
   Potential const & Dynamics::potential() const
   { return potential_; }
+  
+  void Dynamics::resetForce(Particle& particle) const
+  {
+    particle.potentialEnergy() = 0;
+    particle.force() = dvec(3, 0);
+  }
+
+  void Dynamics::computeForce(Particle& particle) const
+  {
+    particle.kineticEnergy() = pow(particle.momentum().norm(), 2) / particle.mass() / 2;
+    particle.potentialEnergy() = potential_(particle.position());
+    particle.force() = potential_.force(particle.position());
+  }
+  
+  Hamiltonian::Hamiltonian(Input const& input):Dynamics(input)
+  {}
+
+  void Hamiltonian::update(Particle& particle,  double const timeStep)
+  {
+    verlet_scheme(particle, potential(), timeStep);
+  }
 
 
-  
-    Hamiltonian::Hamiltonian(Input const& input):Dynamics(input)
-    {}
-  
-    void Hamiltonian::update(Particle& particle,  double const timeStep)
-    {
-      verlet_scheme(particle, potential(), timeStep);
-    }
-  
-
-    Langevin::Langevin(Input const& input):
-      Dynamics(input), 
-      temperature_(input.temperature()), 
-      beta_(1/temperature_), 
-      gamma_(input.gamma()), 
-      sigma_(2*gamma_/beta_), 
-      rng_(1, input.dimension())
-    {}
+  Langevin::Langevin(Input const& input):
+    Dynamics(input), 
+    temperature_(input.temperature()), 
+    beta_(1/temperature_), 
+    gamma_(input.gamma()), 
+    sigma_(2*gamma_/beta_), 
+    rng_(1, input.dimension())
+  {}
   
 
   

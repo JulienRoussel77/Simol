@@ -13,6 +13,19 @@ namespace simol
   :wrapped_(size)
   {}
   
+  template<class ScalarType> inline
+  Vector<ScalarType,eigen>::Vector(size_t const size, ScalarType const& lambda):wrapped_(size)
+  {
+   for (size_t i = 0; i<size; i++)
+     wrapped_(i) = lambda;
+  }
+  
+  template<class ScalarType> inline
+  Vector<ScalarType,eigen>::Vector(Vector<ScalarType,eigen> const& u)
+  :wrapped_(u.wrapped_)
+  {
+  }
+  
   //=====================
   // ACCESSORS / MUTATORS
   //=====================
@@ -20,10 +33,10 @@ namespace simol
   template<class ScalarType> inline
   size_t const & Vector<ScalarType,eigen>::size() const
   { 
-    //std::cout << "size !" << std::endl;
-    //std::cout << "size = " << wrapped_.size() << std::endl;
-    return wrapped_.size();
-    
+    std::cout << "size !" << std::endl;
+    std::cout << "size = " << wrapped_.size() << std::endl;
+    //return wrapped_.size();
+    return 1;
   }
   
   template<class ScalarType> inline
@@ -47,59 +60,71 @@ namespace simol
   //======================
   
   template<class ScalarType> inline
-  Vector<ScalarType,eigen>& Vector<ScalarType,eigen>::operator+=(Vector<ScalarType,eigen> const& v)
+  Vector<ScalarType,eigen>& Vector<ScalarType,eigen>::operator+=(Vector<ScalarType,eigen> const& u)
   { 
+    wrapped_ += u.wrapped_;
     return *this;
   }
   
   template<class ScalarType> inline
-  Vector<ScalarType,eigen>& Vector<ScalarType,eigen>::operator-=(Vector<ScalarType,eigen> const& v)
+  Vector<ScalarType,eigen>& Vector<ScalarType,eigen>::operator-=(Vector<ScalarType,eigen> const& u)
   { 
+    wrapped_ -= u.wrapped_;
+    return *this;
+  }
+  
+  template<class ScalarType> inline
+  Vector<ScalarType,eigen>& Vector<ScalarType,eigen>::operator*=(ScalarType const& lambda)
+  { 
+    wrapped_ *= lambda;
+    return *this;
+  }
+  
+  template<class ScalarType> inline
+  Vector<ScalarType,eigen>& Vector<ScalarType,eigen>::operator/=(ScalarType const& lambda)
+  { 
+    wrapped_ /= lambda;
     return *this;
   }
   
   template<class ScalarType> inline
   Vector<ScalarType,eigen> Vector<ScalarType,eigen>::operator*(ScalarType const& lambda) const
   {
-    //return wrapped_ * lambda;
-    return *this;
+    Vector<ScalarType> u(*this);
+    u.wrapped_ *= lambda;
+    return u;
   }
   
   template<class ScalarType> inline
   Vector<ScalarType,eigen> Vector<ScalarType,eigen>::operator/(ScalarType const& lambda) const
   {
-    //return wrapped_ / lambda;
-    return *this;
+    Vector<ScalarType> u(*this);
+    u.wrapped_ /= lambda;
+    return u;
   }
   
   template<class ScalarType> inline
   Vector<ScalarType,eigen> Vector<ScalarType,eigen>::operator-() const
   {
-    //return -wrapped_;
-    return *this;
+    Vector<ScalarType> u(*this);
+    u.wrapped_ *= -1;
+    return u;
   }
   
   template<class ScalarType> inline
-  Vector<ScalarType,eigen> Vector<ScalarType,eigen>::operator+(Vector<ScalarType,eigen> const& v) const
+  Vector<ScalarType,eigen> Vector<ScalarType,eigen>::operator+(Vector<ScalarType,eigen> const& u) const
   {
     //return wrapped_ + v.wrapped_;
-    return *this;
+    //return *this;
+    return Vector<ScalarType,eigen>(*this) += u;
   }
   
   template<class ScalarType> inline
-  Vector<ScalarType,eigen> Vector<ScalarType,eigen>::operator-(Vector<ScalarType,eigen> const& v) const
+  Vector<ScalarType,eigen> Vector<ScalarType,eigen>::operator-(Vector<ScalarType,eigen> const& u) const
   {
     //return wrapped_ - v.wrapped_;
-    return *this;
+    return Vector<ScalarType,eigen>(*this) -= u;
   }
-  
-  /*template<class ScalarType> inline
-  Vector<ScalarType,eigen>& Vector<ScalarType,eigen>::operator=(ScalarType const& lambda)
-  {
-    for (int i=1; 0<size(); i++)
-      wrapped_(i) = lambda;
-    return *this;
-  }*/
   
   
   

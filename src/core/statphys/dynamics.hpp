@@ -22,6 +22,8 @@ namespace simol
       //friend Dynamics* createDynamics(Potential const& potential);
       friend Dynamics* createDynamics(Input  const& input);
       virtual void update(Particle& particle,  double const timeStep) = 0;
+      void resetForce(Particle& particle) const;
+      void computeForce(Particle& particle) const;
     private:
       Potential potential_;
 

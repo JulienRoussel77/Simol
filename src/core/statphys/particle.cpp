@@ -9,25 +9,20 @@ namespace simol
   // CONSTRUCTORS
   //=============
   
-   Particle::Particle() :mass_(0), position_(0), momentum_(0)
+   Particle::Particle() :mass_(0), position_(0), momentum_(0), force_(0)
    {
-    std::cout << "Particle vide créée !" << std::endl;
-      
+    //std::cout << "Particle vide créée !" << std::endl;      
    }
 
-  Particle::Particle(double const & mass, 
-                                 dvec const & position,
-                                 dvec const & momentum)
-  :mass_(mass), position_(position), momentum_(momentum)
+  Particle::Particle(double const & mass, dvec const & position, dvec const & momentum):
+    mass_(mass), position_(position), momentum_(momentum), force_(position.size())
   {}
   
-    Particle::Particle(double const & mass, 
-                                 double const & position,
-                                 double const & momentum)
-  :mass_(mass), position_(1), momentum_(1)
+  Particle::Particle(double const & mass, double const & positionInitial, double const & momentumInitial):
+    mass_(mass), position_(1), momentum_(1), force_(1)
   {
-    position_(0) = position;
-    momentum_(0) = momentum;
+    position_(0) = positionInitial;
+    momentum_(0) = momentumInitial;
   }
 
   //==========
@@ -43,14 +38,26 @@ namespace simol
   double const & Particle::mass() const
   { return mass_; }
 
-  double Particle::kineticEnergy() const
-  { return momentum_.norm()/mass_/2; }
+  double const& Particle::kineticEnergy() const
+  { return kineticEnergy_; }
+  
+  double& Particle::kineticEnergy()
+  { return kineticEnergy_; }
 
-  double Particle::potentialEnergy(Potential const & potential) const
-  { return potential(position_); }
+  double const& Particle::potentialEnergy() const
+  { return potentialEnergy_; }
+  
+  double& Particle::potentialEnergy()
+  { return potentialEnergy_; }
       
-  double Particle::energy(Potential const & potential) const
-  { return kineticEnergy() + potentialEnergy(potential); }
+  double const& Particle::energy() const
+  { return kineticEnergy_ + potentialEnergy_; }
+  
+  dvec const& Particle::force() const
+  { return force_; }
+  
+  dvec& Particle::force()
+  { return force_; }
   
 
 

@@ -26,18 +26,21 @@ namespace simol
   {
     public:
       Vector(size_t const size);
+      Vector(size_t const size, ScalarType const& lambda);
+      Vector(Vector<ScalarType,eigen> const& u);
       size_t const & size() const;
       ScalarType & operator()(size_t const index);
       ScalarType const & operator()(size_t const index) const;
       ScalarType norm() const;
       Vector<ScalarType,eigen>& operator+=(Vector<ScalarType,eigen> const& v);
       Vector<ScalarType,eigen>& operator-=(Vector<ScalarType,eigen> const& v);
+      Vector<ScalarType,eigen>& operator*=(ScalarType const& lambda);
+      Vector<ScalarType,eigen>& operator/=(ScalarType const& lambda);     
       Vector<ScalarType,eigen> operator*(ScalarType const& lambda) const;
       Vector<ScalarType,eigen> operator/(ScalarType const& lambda) const;
       Vector<ScalarType,eigen> operator-() const;
       Vector<ScalarType,eigen> operator+(Vector<ScalarType,eigen> const& v) const;
       Vector<ScalarType,eigen> operator-(Vector<ScalarType,eigen> const& v) const;
-      //Vector<ScalarType,eigen>& operator=(ScalarType const& lambda);	
 
     private:
       typename eigen<ScalarType>::VectorType wrapped_;
@@ -45,22 +48,27 @@ namespace simol
   };
   
 
-  template<class ScalarType, template<class> class WrappedLibrary>
-  std::ofstream & operator<<(std::ofstream & fileToWrite, Vector<ScalarType,WrappedLibrary> const & vectorToRead)
-  {
-    std::cout << "size = " << vectorToRead.size() << std::endl;
-    for (size_t index = 0; index < vectorToRead.size(); ++index)
-      fileToWrite << vectorToRead(index) << " ";
-  
-    return fileToWrite;
-  }
+
   
 
   Vector<double,eigen> operator*(double const& lambda, Vector<double,eigen> const& v);
   
+
+}
+
+template<class ScalarType, template<class> class WrappedLibrary>
+std::ostream & operator<<(std::ostream & fileToWrite, simol::Vector<ScalarType,WrappedLibrary> const & vectorToRead)
+{
+  //std::cout << "size = " << vectorToRead.size() << std::endl;
+  /*for (size_t index = 0; index < vectorToRead.size(); ++index)
+  {
+    std::cout << index << " / " << vectorToRead.size() << std::endl;
+    fileToWrite << vectorToRead(index) << " ";
+  }*/
   
+  fileToWrite << vectorToRead(0) << " ";
 
-
+  return fileToWrite;
 }
 
 #include "Vector.ipp"

@@ -24,15 +24,22 @@ namespace simol
   void ParticleSystem::simulate(double const timeStep, Dynamics * model)
   {
     //std::cout << "simulate !" << std::endl;
+
     for (auto&& particle : configuration_)
-    {
-      //verlet_scheme(particle,model->potential(),timeStep);
-
       model->update(particle, timeStep);
+    computeAllForces(model);
+    for (auto&& particle : configuration_)
       output.display(currentTimeIteration_*timeStep, particle);
-    }
-    ++currentTimeIteration_;
 
+    ++currentTimeIteration_;
+  }
+  
+  void ParticleSystem::computeAllForces(Dynamics const* model)
+  {
+    for (auto&& particle : configuration_)
+      model->resetForce(particle);
+    for (auto&& particle : configuration_)
+      model->computeForce(particle);
   }
   
 /*

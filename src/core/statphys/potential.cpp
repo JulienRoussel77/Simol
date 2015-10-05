@@ -20,7 +20,13 @@ namespace simol
   { return parameter_*(1-std::cos(energy_*position(0))); }
 
   dvec Potential::derivative(dvec const & position) const
-  { return parameter_*energy_*std::sin(energy_*position(0)); }
+  { 
+    std::cout << "deriv !" << std::endl;
+    std::cout << position << std::endl;
+    dvec deriv(1);
+    deriv(0) = parameter_*energy_*std::sin(energy_*position(0));
+    return deriv;
+  }
 
   dvec Potential::force(dvec const & position) const
   { return -derivative(position(0)); }

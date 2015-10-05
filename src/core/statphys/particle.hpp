@@ -57,9 +57,13 @@ namespace simol
       double const & mass() const;
       dvec const & position() const;
       dvec const & momentum() const;
-      double kineticEnergy() const;
-      double potentialEnergy(Potential const & potential) const;
-      double energy(Potential const & potential) const;
+      double const& kineticEnergy() const;
+      double& kineticEnergy();      
+      double const& potentialEnergy() const;
+      double& potentialEnergy();      
+      double const& energy() const;
+      dvec const& force() const;
+      dvec& force();  
 
     //=============
     // DATA MEMBERS
@@ -70,6 +74,9 @@ namespace simol
       double mass_;
       dvec position_;
       dvec momentum_;
+      double potentialEnergy_;
+      double kineticEnergy_;
+      dvec force_;
   };
 
   

@@ -6,5 +6,7 @@ namespace simol {
     {
       return v*lambda;
     }
-  
 }
+
+
+  

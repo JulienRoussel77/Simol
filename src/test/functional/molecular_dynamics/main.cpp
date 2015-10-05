@@ -33,6 +33,7 @@ int main(int argc, char* argv[])
   // COMPUTATION
   //============
 
+
   /*size_t numberOfParticles = 1;
   
   std::vector<double> masses(numberOfParticles);
@@ -55,7 +56,7 @@ int main(int argc, char* argv[])
 
   simol::Dynamics* model = simol::createDynamics(input);
   
-  std::ofstream outputFile(input.outputFilename());
+  system.computeAllForces(model);
   
   std::cout << "Output written in " << input.outputFilename() << std::endl;
   

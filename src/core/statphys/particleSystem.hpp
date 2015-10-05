@@ -22,6 +22,7 @@ namespace simol
       std::vector<ParticleType> & configuration(); 
 
       void simulate(double const timeStep, Dynamics * model);
+      void computeAllForces(Dynamics const* model);
       
       size_t size() const;
       
