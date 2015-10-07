@@ -32,6 +32,8 @@ namespace simol
       ScalarType & operator()(size_t const index);
       ScalarType const & operator()(size_t const index) const;
       ScalarType norm() const;
+      Vector<ScalarType,eigen>& fill(ScalarType const& lambda);
+
       Vector<ScalarType,eigen>& operator+=(Vector<ScalarType,eigen> const& v);
       Vector<ScalarType,eigen>& operator-=(Vector<ScalarType,eigen> const& v);
       Vector<ScalarType,eigen>& operator*=(ScalarType const& lambda);
@@ -41,6 +43,7 @@ namespace simol
       Vector<ScalarType,eigen> operator-() const;
       Vector<ScalarType,eigen> operator+(Vector<ScalarType,eigen> const& v) const;
       Vector<ScalarType,eigen> operator-(Vector<ScalarType,eigen> const& v) const;
+
 
     private:
       typename eigen<ScalarType>::VectorType wrapped_;
@@ -59,15 +62,8 @@ namespace simol
 template<class ScalarType, template<class> class WrappedLibrary>
 std::ostream & operator<<(std::ostream & fileToWrite, simol::Vector<ScalarType,WrappedLibrary> const & vectorToRead)
 {
-  //std::cout << "size = " << vectorToRead.size() << std::endl;
-  /*for (size_t index = 0; index < vectorToRead.size(); ++index)
-  {
-    std::cout << index << " / " << vectorToRead.size() << std::endl;
+  for (size_t index = 0; index < vectorToRead.size(); ++index)
     fileToWrite << vectorToRead(index) << " ";
-  }*/
-  
-  fileToWrite << vectorToRead(0) << " ";
-
   return fileToWrite;
 }
 

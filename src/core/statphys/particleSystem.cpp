@@ -3,38 +3,88 @@
 
 #include "particleSystem.hpp"
 
+using std::cout; 
+using std::endl; 
+
 namespace simol
 {
   
+  ParticleSystem* createSystem(Input  const& input)
+  {
+    if (input.systemName() == "Isolated")
+      return new Isolated(input);
+    else if (input.systemName() == "Chain")
+      return new Chain(input);
+    else
+      std::cout << input.systemName() << " is not a valid system !" << std::endl;
+    
+    return 0;
+  }
+  
   ParticleSystem::ParticleSystem(Input const& input):
   currentTimeIteration_(0), 
-  configuration_(input.numberOfParticles()),
-  output(input.outputFilename())
-  {
-    for (size_t i = 0; i<input.numberOfParticles(); i++)
-      configuration_[i] = Particle(input.mass(), input.initialPosition(i), input.initialSpeed(i));
-  }
-      
+  configuration_(input.numberOfParticles())
+  {}
+  
   Particle & ParticleSystem::particle(size_t index) 
   { return configuration_[index]; }
 
   std::vector< Particle > & ParticleSystem::configuration() 
   { return configuration_; }
+  
+  size_t ParticleSystem::size() const
+  {
+    return configuration_.size();
+  }
+  
+  void ParticleSystem::launch(Dynamics* model, Output& output, double const& timeStep, int const& numberOfIterations)  
+  {
+    cout << "launch !" << endl;
+    computeAllForces(model);
+    for (size_t instantIndex  =1; instantIndex < numberOfIterations; ++instantIndex)
+    {
+      double instant = instantIndex * timeStep;
+      simulate(model, output, timeStep, numberOfIterations);
+      //computeOutput();
+      //writeOutput();
+    }
+    writeOutput(output);
+  }
+  
+  void ParticleSystem::computeOutput()
+  {
+    //positions.push_back(configuration_(0).position()); 
+  }
+  
+  void ParticleSystem::writeOutput(Output& output)
+  {
+    for (auto&& particle : configuration_)
+      output.display(particle);
+  }
+  
+  Isolated::Isolated(Input const& input):
+  ParticleSystem(input)
+  {
+    for (size_t i = 0; i<input.numberOfParticles(); i++) 
+      configuration_[i] = Particle(input.mass(), input.initialPosition(i), input.initialSpeed(i));
+  }
+      
 
-  void ParticleSystem::simulate(double const timeStep, Dynamics * model)
+
+  void Isolated::simulate(Dynamics * model, Output& output, double const& timeStep, int const& numberOfIterations)
   {
     //std::cout << "simulate !" << std::endl;
 
     for (auto&& particle : configuration_)
       model->update(particle, timeStep);
     computeAllForces(model);
-    for (auto&& particle : configuration_)
-      output.display(currentTimeIteration_*timeStep, particle);
+    //for (auto&& particle : configuration_)
+    //  output.display(currentTimeIteration_*timeStep, particle);
 
     ++currentTimeIteration_;
   }
   
-  void ParticleSystem::computeAllForces(Dynamics const* model)
+  void Isolated::computeAllForces(Dynamics const* model)
   {
     for (auto&& particle : configuration_)
       model->resetForce(particle);
@@ -42,33 +92,41 @@ namespace simol
       model->computeForce(particle);
   }
   
-/*
-  void ParticleSystem::simulate(double const timeStep,
-                                            AtomChain const & model, 
-                                            std::ofstream & outputFile)
+  
+  
+    Chain::Chain(Input const& input):
+  ParticleSystem(input)
   {
-    for (auto & particle : configuration_)
-      verlet(particle,model,timeStep);
-    
-    double alpha_first = std::exp(-gamma * timeStep / particle(0).mass());
-    double alpha_last = std::exp(-gamma * timeStep / particle(N).mass())
-    
-    for(auto & particle : configuration_)
-    {
-      outputFile << currentTimeIteration_ * timeStep 
-                 << " " << particle.position() 
-                 << " " << particle.momentum() 
-                 << std::endl;
+    for (size_t i = 0; i<input.numberOfParticles(); i++) {
+      configuration_[i] = Particle(input.mass(), input.initialPosition(i), input.initialSpeed(i));
+      //std::cout << configuration_[i].force() << std::endl;
     }
-    ++currentTimeIteration_;
-
   }
-*/
+      
 
-  size_t ParticleSystem::size() const
+
+  void Chain::simulate(Dynamics* model, Output& output, double const& timeStep, int const& numberOfIterations)
   {
-    return configuration_.size();
+    //std::cout << "simulate !" << std::endl;
+
+    for (auto&& particle : configuration_)
+      model->update(particle, timeStep);
+    computeAllForces(model);
+
+    ++currentTimeIteration_;
   }
+  
+  void Chain::computeAllForces(Dynamics const* model)
+  {
+    //std::cout << "Chain::computeAllForces" << std::endl;
+    for (auto&& particle : configuration_)
+      model->resetForce(particle);
+    //for (auto&& particle : configuration_)
+    //  model->computeForce(particle);
+    for (size_t i=0; i<size()-1; i++)
+      model->interaction(configuration_[i], configuration_[i+1]);
+  }
+
 }
 
 #endif

@@ -17,16 +17,21 @@ namespace simol
   {
     public:
       Dynamics(Input const&  input);
+      virtual ~Dynamics();
 
       Potential const & potential() const;
+      double potential(dvec const& position) const;
+      double potential(double const& position) const;
+      dvec force(dvec const& position) const;
       //friend Dynamics* createDynamics(Potential const& potential);
       friend Dynamics* createDynamics(Input  const& input);
       virtual void update(Particle& particle,  double const timeStep) = 0;
       void resetForce(Particle& particle) const;
       void computeForce(Particle& particle) const;
+      void interaction(Particle& particle1, Particle& particle2) const;
     private:
-      Potential potential_;
-
+      Potential* potential_;
+      //double timeStep;
   };
   
   class Hamiltonian : public Dynamics
@@ -51,6 +56,19 @@ namespace simol
     double beta_;
     double gamma_;
     double sigma_;
+    RNG rng_;
+  };
+  
+  class Overdamped : public Dynamics
+  {
+  public:
+    Overdamped(Input const& input);
+    double const& temperature() const;
+    double const& beta() const;
+    void update(Particle& particle,  double const timeStep);
+  private:
+    double temperature_;
+    double beta_;
     RNG rng_;
   };
   

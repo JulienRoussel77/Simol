@@ -18,6 +18,10 @@
 namespace simol
 {
   class Particle;
+  
+    void verlet_scheme(Particle & particle, Potential const & potential, double timeStep);
+    void exact_OU_scheme(Particle & particle, double const gamma, double const beta, double const timeStep, dvec const& randVec);
+    void maruyama_scheme(Particle & particle, double const beta_, Potential const& potential, double const& timeStep, dvec const& randVec);
 }
 
 namespace simol
@@ -37,6 +41,7 @@ namespace simol
     //friend void verlet(Particle & particle, HamiltonDynamics const & model, double delta_t);
     friend void verlet_scheme(Particle & particle, Potential const & potential, double timeStep);
     friend void exact_OU_scheme(Particle & particle, double const gamma, double const beta, double const timeStep, dvec const& randVec);
+    friend void maruyama_scheme(Particle & particle, double const beta_, Potential const& potential, double const& timeStep, dvec const& randVec);
 
     //=============
     // CONSTRUCTORS
@@ -61,7 +66,7 @@ namespace simol
       double& kineticEnergy();      
       double const& potentialEnergy() const;
       double& potentialEnergy();      
-      double const& energy() const;
+      double energy() const;
       dvec const& force() const;
       dvec& force();  
 

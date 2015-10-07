@@ -3,6 +3,9 @@
 
 #include "particle.hpp"
 
+using std::cout; 
+using std::endl; 
+
 namespace simol
 {
   //=============
@@ -50,7 +53,7 @@ namespace simol
   double& Particle::potentialEnergy()
   { return potentialEnergy_; }
       
-  double const& Particle::energy() const
+  double Particle::energy() const
   { return kineticEnergy_ + potentialEnergy_; }
   
   dvec const& Particle::force() const
@@ -70,15 +73,20 @@ namespace simol
     /*std::cout << "verlet" << std::endl;
     size_t test = particle.momentum_.size();
         std::cout << "ok" << std::endl;*/
-    particle.momentum_ -= timeStep * potential.derivative(particle.position_) / 2;
+    particle.momentum_ -= timeStep * particle.force_ / 2;
     particle.position_ += timeStep * particle.momentum_ / particle.mass_;
-    particle.momentum_ -= timeStep * potential.derivative(particle.position_) / 2;
+    particle.momentum_ -= timeStep * particle.force_ / 2;
   }
   
   void exact_OU_scheme(Particle & particle, double const gamma, double const beta, double const timeStep, dvec const& randVec)
   {
     double alpha = exp(- gamma / particle.mass_ * timeStep);    
     particle.momentum_ = alpha * particle.momentum_ + sqrt((1-pow(alpha, 2))/beta*particle.mass_) * randVec;
+  }
+  
+  void maruyama_scheme(Particle & particle, double const beta_, Potential const& potential, double const& timeStep, dvec const& randVec)
+  {
+    particle.position_ += timeStep * particle.force_ + sqrt(2*timeStep/beta_) * randVec;
   }
 }
 #endif

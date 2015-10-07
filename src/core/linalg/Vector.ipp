@@ -50,9 +50,17 @@ namespace simol
   ScalarType Vector<ScalarType,eigen>::norm() const
   { return wrapped_.norm(); }
   
+  template<class ScalarType> inline
+  Vector<ScalarType,eigen>& Vector<ScalarType,eigen>::fill(ScalarType const& lambda)
+  { 
+    wrapped_.fill(lambda);
+    return *this;
+  }
+  
   //======================
   // Operators
   //======================
+  
   
   template<class ScalarType> inline
   Vector<ScalarType,eigen>& Vector<ScalarType,eigen>::operator+=(Vector<ScalarType,eigen> const& u)

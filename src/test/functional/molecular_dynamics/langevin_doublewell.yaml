@@ -11,16 +11,18 @@ Physics:
   System:
     Name: Isolated
     Mass: 1
-    Position: 0.49
+    Position: 0
     Speed: 0
   Potential:
     Name: DoubleWell
-    Height: .2
+    Amplitude: .2
     InterWell: 10
   Model:
     Name: Langevin
     Gamma: 1
     Temperature: 100
+  Replica:
+    Number: 2
 
 Output:
   Filename: output.txt

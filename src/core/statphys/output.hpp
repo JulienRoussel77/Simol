@@ -14,7 +14,7 @@ namespace simol
     std::ofstream out_;
   public:
     Output(std::string const& outputFilename);
-    void display(double const& time, Particle const& particle);
+    void display(Particle const& particle, double time = 0);
   };
 
 }

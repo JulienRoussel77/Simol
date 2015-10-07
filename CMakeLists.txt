@@ -25,12 +25,12 @@ endif()
 #====================
 # EXECUTABLE SETTINGS
 #====================
-add_executable(test_simol src/test/unit/test_simol.cpp 
-               src/test/unit/EigenSolverTest.cpp 
-               src/test/unit/SparseMatrixTest.cpp 
-               #src/test/unit/MatrixMarketFileTest.cpp 
-               src/core/io/mmio.c
-               src/test/unit/VectorTest.cpp)
+#add_executable(test_simol src/test/unit/test_simol.cpp 
+#               src/test/unit/EigenSolverTest.cpp 
+#               src/test/unit/SparseMatrixTest.cpp 
+#               #src/test/unit/MatrixMarketFileTest.cpp 
+#               src/core/io/mmio.c
+#               src/test/unit/VectorTest.cpp)
 
 #=============
 # USER OPTIONS
@@ -93,7 +93,7 @@ endif(EXISTS ${config})
 #==================
 
 #set(SIMOL_CXX_FLAGS "-static")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SIMOL_CXX_FLAGS} -Wall -Wextra -fopenmp -lgfortran -Wno-deprecated")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SIMOL_CXX_FLAGS} -static -Wall -Wextra -fopenmp -lgfortran -Wno-deprecated")
 
 CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
 if(COMPILER_SUPPORTS_CXX11)
@@ -104,10 +104,10 @@ endif()
 
 if (CMAKE_BUILD_TYPE EQUAL "Release")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2" )
-elseif (CMAKE_BUILD_TYPE EQUAL "Debug")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g" )
 elseif (CMAKE_BUILD_TYPE EQUAL "Profile")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -pg" )
+else ()
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g" )
 endif(CMAKE_BUILD_TYPE EQUAL "Release")
 
 #====================
@@ -117,12 +117,12 @@ endif(CMAKE_BUILD_TYPE EQUAL "Release")
 include_directories(${CPPUNIT_INSTALL_DIR}/include)
 
 MESSAGE(STATUS ${BLAS_LIB})
-target_link_libraries(test_simol ${CPPUNIT_INSTALL_DIR}/lib/libcppunit.so 
-                                 ${LAPACK_LIB}
-                                 ${BLAS_LIB}
-                                 ${ARPACK_INSTALL_DIR}/lib/libarpack.a
-                                 ${ARPACK_INSTALL_DIR}/lib/libarpack_util.a
-                                 )
+#target_link_libraries(test_simol ${CPPUNIT_INSTALL_DIR}/lib/libcppunit.so 
+#                                 ${LAPACK_LIB}
+#                                 ${BLAS_LIB}
+#                                 ${ARPACK_INSTALL_DIR}/lib/libarpack.a
+#                                 ${ARPACK_INSTALL_DIR}/lib/libarpack_util.a
+#                                 )
 
 #================
 # LINKER SETTINGS
@@ -142,6 +142,6 @@ add_subdirectory(src)
 #==============
 enable_testing()
 
-add_test(test_simol ${EXECUTABLE_OUTPUT_PATH}/test_simol)
+#add_test(test_simol ${EXECUTABLE_OUTPUT_PATH}/test_simol)
 
-set_tests_properties(test_simol PROPERTIES PASS_REGULAR_EXPRESSION "OK")
+#set_tests_properties(test_simol PROPERTIES PASS_REGULAR_EXPRESSION "OK")

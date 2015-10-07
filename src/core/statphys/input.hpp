@@ -22,19 +22,33 @@ namespace simol{
     double timeStep() const;
     size_t numberOfIterations() const;
     
-    double potParameter() const;
+    std::string potentialName() const;
+    
+    //Sinus
+    double amplitude() const;
+    
+    //DoubleWell
+    double height() const;
+    double interWell() const;
+    
+    //Harmonic
+    double stiffness() const;
 	
-    std::string name() const;
+    std::string dynamicsName() const;
     double gamma() const;   
     double temperature() const;
     
-    
+    std::string systemName() const;
     size_t numberOfParticles() const;
     double mass() const;
+    
+
       
     double initialPosition(int const& i) const;
     
     double initialSpeed(int const& i) const;
+    
+    int numberOfReplica() const;
     
     std::string outputFilename() const;
 

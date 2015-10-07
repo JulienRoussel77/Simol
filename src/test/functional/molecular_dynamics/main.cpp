@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <iostream>
 
+#include "multiSystem.hpp"
 #include "particleSystem.hpp"
 #include "dynamics.hpp"
 #include "Vector.hpp"
@@ -14,8 +15,12 @@
 
 #include "io/CommandLine.hpp"
 
+using std::cout; 
+using std::endl; 
+
 int main(int argc, char* argv[])
 {
+  
 
   //=====================
   // COMMAND LINE PARSING
@@ -32,43 +37,23 @@ int main(int argc, char* argv[])
   //============
   // COMPUTATION
   //============
-
-
-  /*size_t numberOfParticles = 1;
   
-  std::vector<double> masses(numberOfParticles);
-  for (int i=0; i<numberOfParticles; i++)
-    masses[i] = mass;
+  simol::MultiSystem replica(input);
+  //simol::ParticleSystem* system = simol::createSystem(input);
   
-  std::vector<dvec> positions(numberOfParticles);
-  for (int i=0; i<numberOfParticles; i++)
-    positions[i] = initial_position;
-  
-  std::vector<dvec> momenta(numberOfParticles);
-  for (int i=0; i<numberOfParticles; i++)
-    momenta[i] = initial_speed;
-
-  simol::ParticleSystem system(numberOfParticles, masses, positions, momenta);*/
-  
-  simol::ParticleSystem system(input);
-  
-  simol::Potential potential(input);
+  //simol::Potential potential(input);
 
   simol::Dynamics* model = simol::createDynamics(input);
   
-  system.computeAllForces(model);
+  replica.launch(model, input.timeStep(), input.numberOfIterations());
   
-  std::cout << "Output written in " << input.outputFilename() << std::endl;
-  
-  for (size_t instantIndex  =1; instantIndex < input.numberOfIterations(); ++instantIndex)
-  {
-    double instant = instantIndex * input.timeStep();
-    system.simulate(input.timeStep(), model);
-  }
 
   //===========
   // ATOM CHAIN
   //===========
+  
+  delete model;
+  //delete system;
 
   std::cout << "Fin de la simulation" << std::endl;
 

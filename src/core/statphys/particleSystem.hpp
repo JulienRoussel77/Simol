@@ -6,37 +6,53 @@
 #include "dynamics.hpp"
 #include "output.hpp"
 
+
+
 namespace simol
 {
+  class ParticleSystem;
+  
+  ParticleSystem* createSystem(Input  const& input);
 
   class ParticleSystem
   {
-    typedef Particle ParticleType;
-
+    friend ParticleSystem* createSystem(Input  const& input);
     public:
-
       ParticleSystem(Input const& input);
-
-      ParticleType & particle(size_t index);
-
-      std::vector<ParticleType> & configuration(); 
-
-      void simulate(double const timeStep, Dynamics * model);
-      void computeAllForces(Dynamics const* model);
-      
+      virtual ~ParticleSystem(){};
+      Particle & particle(size_t index);
+      std::vector<Particle> & configuration();       
       size_t size() const;
-      
-      
-
-    private:
+      void launch(Dynamics* model, Output& output, double const& timeStep, int const& numberOfIterations);
+      virtual void simulate(Dynamics* model, Output& output, double const& timeStep, int const& numberOfIterations) = 0;
+      virtual void computeAllForces(Dynamics const* model) = 0;
+      virtual void computeOutput();
+      void writeOutput(Output& output);
+    protected:
       
       size_t currentTimeIteration_;
-      std::vector<ParticleType> configuration_;
-      Output output;
+      std::vector<Particle> configuration_;
+
   };
 
   // redémarrage : nombres aleatoires, juste pannes, tous les N pas de temps
   //
+  
+  class Isolated : public ParticleSystem
+  {
+  public:
+    Isolated(Input const& input);
+    void simulate(Dynamics* model, Output& output, double const& timeStep, int const& numberOfIterations);
+    void computeAllForces(Dynamics const* model);
+  };
+  
+    class Chain : public ParticleSystem
+  {
+  public:
+    Chain(Input const& input);
+    void simulate(Dynamics* model, Output& output, double const& timeStep, int const& numberOfIterations);
+    void computeAllForces(Dynamics const* model);
+  };
 
 }
 
