@@ -7,16 +7,16 @@ namespace simol
 {
   
 
-  Output::Output(std::string const& outputFilename):outputFilename_(outputFilename), outAtoms_(outputFilename), outReplica_("replica.txt")
+  Output::Output(std::string const& outputFoldername):outputFoldername_(outputFoldername), outParticles_(outputFoldername+"particles.txt"), outReplica_(outputFoldername+"replica.txt"),verbose_(1)
   {
-    assert(outAtoms_.is_open());
+    assert(outParticles_.is_open());
     assert(outReplica_.is_open());
-    std::cout << "Output written in " << outputFilename_ << std::endl;
+    std::cout << "Output written in " << outputFoldername_ << std::endl;
   }
 
   void Output::display(Particle const& particle, double time)
   {
-    outAtoms_ << time 
+    outParticles_ << time 
 		  << " " << particle.position() 
 		  << " " << particle.momentum() 
 		  << " " << particle.kineticEnergy()

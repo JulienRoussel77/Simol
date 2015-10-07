@@ -5,24 +5,23 @@ Geometry:
 Mesh:
   Time:
     Step: 0.01
-    Number: 1000000
+    Number: 1000
 
 Physics:
   System:
     Name: Isolated
     Mass: 1
-    Position: 2
+    Position: 0
     Speed: 0
   Potential:
-    Name: DoubleWell
-    Height: 1
-    InterWell: 2
+    Name: Sinusoidal
+    Amplitude: 1
   Model:
-    Name: Langevin
-    Gamma: 1
+    Name: Overdamped
     Temperature: 1
+    Force: 1
   Replica:
-    Number: 1
+    Number: 1000
 
 Output:
   Filename: output.txt

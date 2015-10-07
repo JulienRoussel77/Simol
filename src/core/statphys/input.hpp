@@ -37,6 +37,7 @@ namespace simol{
     std::string dynamicsName() const;
     double gamma() const;   
     double temperature() const;
+    double force() const;
     
     std::string systemName() const;
     size_t numberOfParticles() const;
@@ -50,7 +51,7 @@ namespace simol{
     
     int numberOfReplica() const;
     
-    std::string outputFilename() const;
+    std::string outputFoldername() const;
 
   };
   

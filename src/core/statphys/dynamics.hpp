@@ -23,6 +23,7 @@ namespace simol
       double potential(dvec const& position) const;
       double potential(double const& position) const;
       dvec force(dvec const& position) const;
+      dvec externForce() const;
       //friend Dynamics* createDynamics(Potential const& potential);
       friend Dynamics* createDynamics(Input  const& input);
       virtual void update(Particle& particle,  double const timeStep) = 0;
@@ -32,6 +33,7 @@ namespace simol
     private:
       Potential* potential_;
       //double timeStep;
+      dvec externForce_;
   };
   
   class Hamiltonian : public Dynamics

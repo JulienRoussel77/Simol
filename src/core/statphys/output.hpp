@@ -10,13 +10,14 @@ namespace simol
 
   class Output
   {
-    std::string outputFilename_;
-    std::ofstream outAtoms_;
+    std::string outputFoldername_;
+    std::ofstream outParticles_;
     std::ofstream outReplica_;
   public:
     Output(std::string const& outputFilename);
     void display(Particle const& particle, double time = 0);
     void finalDisplay(Particle const& particle, double time = 0);
+    int verbose_;
   };
 
 }

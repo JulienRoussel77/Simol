@@ -43,9 +43,10 @@ namespace simol
     for (size_t instantIndex  =1; instantIndex < numberOfIterations; ++instantIndex)
     {
       double instant = instantIndex * timeStep;
-      simulate(model, output, timeStep, numberOfIterations);
+      simulate(model, output, timeStep);
       //computeOutput();
-      //writeOutput();
+      writeOutput(output, timeStep*instantIndex);
+      ++currentTimeIteration_;
     }
     writeFinalOutput(output, timeStep*numberOfIterations);
   }
@@ -57,8 +58,9 @@ namespace simol
   
   void ParticleSystem::writeOutput(Output& output, double time)
   {
-    for (auto&& particle : configuration_)
-      output.display(particle, time);
+    if (output.verbose_ > 0)
+      for (auto&& particle : configuration_)
+	output.display(particle, time);
   }
   
   void ParticleSystem::writeFinalOutput(Output& output, double time)
@@ -76,7 +78,7 @@ namespace simol
       
 
 
-  void Isolated::simulate(Dynamics * model, Output& output, double const& timeStep, size_t const& numberOfIterations)
+  void Isolated::simulate(Dynamics * model, Output& output, double const& timeStep)
   {
     //std::cout << "simulate !" << std::endl;
 
@@ -85,12 +87,11 @@ namespace simol
     computeAllForces(model);
     //for (auto&& particle : configuration_)
     //  output.display(currentTimeIteration_*timeStep, particle);
-
-    ++currentTimeIteration_;
   }
   
   void Isolated::computeAllForces(Dynamics const* model)
   {
+    //cout << "Isolated::computeAllForces" << endl;
     for (auto&& particle : configuration_)
       model->resetForce(particle);
     for (auto&& particle : configuration_)
@@ -110,7 +111,7 @@ namespace simol
       
 
 
-  void Chain::simulate(Dynamics* model, Output& output, double const& timeStep, size_t const& numberOfIterations)
+  void Chain::simulate(Dynamics* model, Output& output, double const& timeStep)
   {
     //std::cout << "simulate !" << std::endl;
 

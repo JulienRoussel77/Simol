@@ -73,9 +73,9 @@ namespace simol
     /*std::cout << "verlet" << std::endl;
     size_t test = particle.momentum_.size();
         std::cout << "ok" << std::endl;*/
-    particle.momentum_ -= timeStep * particle.force_ / 2;
+    particle.momentum_ += timeStep * particle.force_ / 2;
     particle.position_ += timeStep * particle.momentum_ / particle.mass_;
-    particle.momentum_ -= timeStep * particle.force_ / 2;
+    particle.momentum_ += timeStep * particle.force_ / 2;
   }
   
   void exact_OU_scheme(Particle & particle, double const gamma, double const beta, double const timeStep, dvec const& randVec)

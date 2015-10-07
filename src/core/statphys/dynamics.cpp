@@ -3,6 +3,8 @@
 
 #include "dynamics.hpp"
 
+using std::cout; 
+using std::endl; 
 
 namespace simol
 {
@@ -21,9 +23,10 @@ namespace simol
     return 0;
   }
   
-  Dynamics::Dynamics(Input const& input)
+  Dynamics::Dynamics(Input const& input):externForce_(input.dimension())
   {
     potential_ = createPotential(input);
+    externForce_(0) = input.force();
   }
   
   Dynamics::~Dynamics()
@@ -46,7 +49,12 @@ namespace simol
   
   dvec Dynamics::force(dvec const& position) const
   {
-   return potential_->force(position); 
+   return potential_->force(position) + externForce(); 
+  }
+  
+  dvec Dynamics::externForce() const
+  {
+   return externForce_; 
   }
   
   void Dynamics::resetForce(Particle& particle) const

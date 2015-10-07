@@ -34,6 +34,7 @@ namespace simol {
   std::string Input::dynamicsName() const {return data["Physics"]["Model"]["Name"].as<std::string>();}
   double Input::gamma() const {return data["Physics"]["Model"]["Gamma"].as<double>();}
   double Input::temperature() const {return data["Physics"]["Model"]["Temperature"].as<double>();}
+  double Input::force() const {return data["Physics"]["Model"]["Force"].as<double>();};
 
   std::string Input::systemName() const {return data["Physics"]["System"]["Name"].as<std::string>();}
   size_t Input::numberOfParticles() const {return 1;}
@@ -43,6 +44,7 @@ namespace simol {
   
   int Input::numberOfReplica() const {return data["Physics"]["Replica"]["Number"].as<int>();}
 
-  std::string Input::outputFilename() const {return data["Output"]["Filename"].as<std::string>();}
+  //std::string Input::outputFilename() const {return data["Output"]["Filename"].as<std::string>();}
+  std::string Input::outputFoldername() const {return "../output/"+dynamicsName()+"/"+systemName()+"/"+potentialName()+"/";}
 
 }
