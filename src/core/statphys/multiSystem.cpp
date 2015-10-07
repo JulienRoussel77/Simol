@@ -25,7 +25,6 @@ namespace simol {
  {
    for (auto&& system : replica)
    {
-     std::cout << "launch replicum" << std::endl;
      system->launch(model, output, timeStep, numberOfIterations);
    }
  }

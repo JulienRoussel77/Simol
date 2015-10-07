@@ -23,11 +23,12 @@ namespace simol
       Particle & particle(size_t index);
       std::vector<Particle> & configuration();       
       size_t size() const;
-      void launch(Dynamics* model, Output& output, double const& timeStep, int const& numberOfIterations);
-      virtual void simulate(Dynamics* model, Output& output, double const& timeStep, int const& numberOfIterations) = 0;
+      void launch(Dynamics* model, Output& output, double const& timeStep, size_t const& numberOfIterations);
+      virtual void simulate(Dynamics* model, Output& output, double const& timeStep, size_t const& numberOfIterations) = 0;
       virtual void computeAllForces(Dynamics const* model) = 0;
       virtual void computeOutput();
-      void writeOutput(Output& output);
+      void writeOutput(Output& output, double time = 0);
+      void writeFinalOutput(Output& output, double time = 0);
     protected:
       
       size_t currentTimeIteration_;
@@ -42,7 +43,7 @@ namespace simol
   {
   public:
     Isolated(Input const& input);
-    void simulate(Dynamics* model, Output& output, double const& timeStep, int const& numberOfIterations);
+    void simulate(Dynamics* model, Output& output, double const& timeStep, size_t const& numberOfIterations);
     void computeAllForces(Dynamics const* model);
   };
   
@@ -50,7 +51,7 @@ namespace simol
   {
   public:
     Chain(Input const& input);
-    void simulate(Dynamics* model, Output& output, double const& timeStep, int const& numberOfIterations);
+    void simulate(Dynamics* model, Output& output, double const& timeStep, size_t const& numberOfIterations);
     void computeAllForces(Dynamics const* model);
   };
 

@@ -39,9 +39,6 @@ int main(int argc, char* argv[])
   //============
   
   simol::MultiSystem replica(input);
-  //simol::ParticleSystem* system = simol::createSystem(input);
-  
-  //simol::Potential potential(input);
 
   simol::Dynamics* model = simol::createDynamics(input);
   
@@ -53,7 +50,6 @@ int main(int argc, char* argv[])
   //===========
   
   delete model;
-  //delete system;
 
   std::cout << "Fin de la simulation" << std::endl;
 
