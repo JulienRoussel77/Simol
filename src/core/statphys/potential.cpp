@@ -13,9 +13,9 @@ namespace simol
 
   Potential::Potential(){}
   
-  Potential::Potential(Input const & input){}
+  Potential::Potential(Input const & input, int const& indexOfReplica){}
   
-  Potential* createPotential(Input const& input)
+  Potential* createPotential(Input const& input, int const& indexOfReplica)
   {
     if (input.potentialName() == "Sinusoidal")
       return new Sinusoidal(input);
@@ -31,7 +31,7 @@ namespace simol
   
 //#### Sinusoidal #####
   
-  Sinusoidal::Sinusoidal(Input const & input):amplitude_(input.amplitude()), pulsation_(2*M_PI/input.length())
+  Sinusoidal::Sinusoidal(Input const & input, int const& indexOfReplica):Potential(input, indexOfReplica), amplitude_(input.amplitude()), pulsation_(2*M_PI/input.length())
   {}
   
   double Sinusoidal::operator()(dvec const & position) const
@@ -49,7 +49,7 @@ namespace simol
   
 //#### DoubleWell #####  
   
-    DoubleWell::DoubleWell(Input const & input):height_(input.height()), interWell_(input.interWell())
+    DoubleWell::DoubleWell(Input const & input, int const& indexOfReplica):Potential(input, indexOfReplica), height_(input.height()), interWell_(input.interWell())
   {}
   
   double DoubleWell::operator()(dvec const & position) const
@@ -67,7 +67,7 @@ namespace simol
   
 //#### Harmonic #####  
   
-  Harmonic::Harmonic(Input const & input):stiffness_(input.stiffness())
+  Harmonic::Harmonic(Input const & input, int const& indexOfReplica):Potential(input, indexOfReplica), stiffness_(input.stiffness())
   {}
   
   

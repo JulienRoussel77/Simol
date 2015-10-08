@@ -25,7 +25,7 @@ namespace simol
   class Vector<ScalarType,eigen>
   {
     public:
-      Vector(size_t const size);
+      Vector(size_t const size=0);
       Vector(size_t const size, ScalarType const& lambda);
       Vector(Vector<ScalarType,eigen> const& u);
       size_t size() const;

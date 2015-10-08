@@ -12,13 +12,13 @@ namespace simol
 {
   class ParticleSystem;
   
-  ParticleSystem* createSystem(Input  const& input);
+  ParticleSystem* createSystem(Input  const& input, int const& indexOfReplica=1);
 
   class ParticleSystem
   {
-    friend ParticleSystem* createSystem(Input  const& input);
+    friend ParticleSystem* createSystem(Input  const& input, int const& indexOfReplica);
     public:
-      ParticleSystem(Input const& input);
+      ParticleSystem(Input const& input, int const& indexOfReplica=1);
       virtual ~ParticleSystem(){};
       Particle & particle(size_t index);
       std::vector<Particle> & configuration();       
@@ -26,11 +26,13 @@ namespace simol
       void launch(Dynamics* model, Output& output, double const& timeStep, size_t const& numberOfIterations);
       virtual void simulate(Dynamics* model, Output& output, double const& timeStep) = 0;
       virtual void computeAllForces(Dynamics const* model) = 0;
-      virtual void computeOutput();
+      virtual void computeOutput(Output& output, Dynamics* model);
       void writeOutput(Output& output, double time = 0);
+      virtual void computeFinalOutput(Output& output, Dynamics* model, size_t const& numberOfIterations);
       void writeFinalOutput(Output& output, double time = 0);
     protected:
-      
+      int dimension_;
+      size_t numberOfParticles_;
       size_t currentTimeIteration_;
       std::vector<Particle> configuration_;
 
@@ -42,7 +44,7 @@ namespace simol
   class Isolated : public ParticleSystem
   {
   public:
-    Isolated(Input const& input);
+    Isolated(Input const& input, int const& indexOfReplica=1);
     void simulate(Dynamics* model, Output& output, double const& timeStep);
     void computeAllForces(Dynamics const* model);
   };
@@ -50,7 +52,7 @@ namespace simol
     class Chain : public ParticleSystem
   {
   public:
-    Chain(Input const& input);
+    Chain(Input const& input, int const& indexOfReplica=1);
     void simulate(Dynamics* model, Output& output, double const& timeStep);
     void computeAllForces(Dynamics const* model);
   };

@@ -34,15 +34,52 @@ namespace simol {
   std::string Input::dynamicsName() const {return data["Physics"]["Model"]["Name"].as<std::string>();}
   double Input::gamma() const {return data["Physics"]["Model"]["Gamma"].as<double>();}
   double Input::temperature() const {return data["Physics"]["Model"]["Temperature"].as<double>();}
-  double Input::force() const {return data["Physics"]["Model"]["Force"].as<double>();};
+  
+
+  
+  bool Input::externalForceVarying() const {
+    if (data["Physics"]["Model"]["ForceMin"] && data["Physics"]["Model"]["ForceMax"] && !data["Physics"]["Model"]["Force"]) return true;
+    else if (!data["Physics"]["Model"]["ForceMin"] && !data["Physics"]["Model"]["ForceMax"] && data["Physics"]["Model"]["Force"]) return false;
+    else {cout << "External force input incoherent !" << endl;exit(1);}
+  }
+  double Input::externalForceMin() const {return data["Physics"]["Model"]["ForceMin"].as<double>();}
+  double Input::externalForceMax() const {return data["Physics"]["Model"]["ForceMax"].as<double>();}
+  
+  double Input::externalForce(int const& indexOfReplica) const {
+    if (!externalForceVarying())
+      if (data["Physics"]["Model"]["Force"])
+	return data["Physics"]["Model"]["Force"].as<double>();
+      else return 0;
+    else
+      return externalForceMin() + indexOfReplica * (externalForceMax() - externalForceMin()) / numberOfReplicas();
+  }
 
   std::string Input::systemName() const {return data["Physics"]["System"]["Name"].as<std::string>();}
   size_t Input::numberOfParticles() const {return 1;}
-  double Input::mass() const {return data["Physics"]["System"]["Mass"].as<double>();} 	
-  double Input::initialPosition(int const& i) const {return data["Physics"]["System"]["Position"].as<double>();}       
-  double Input::initialSpeed(int const& i) const {return data["Physics"]["System"]["Speed"].as<double>();}
   
-  int Input::numberOfReplica() const {return data["Physics"]["Replica"]["Number"].as<int>();}
+  double Input::mass() const {
+    if (data["Physics"]["System"]["Mass"])
+      return data["Physics"]["System"]["Mass"].as<double>();
+    else return 1;
+  } 	
+  
+  double Input::initialPosition(int const& i) const {
+    if (data["Physics"]["System"]["Position"])
+      return data["Physics"]["System"]["Position"].as<double>();
+    else return 0;
+  }   
+  
+    double Input::initialMomentum(int const& i) const {
+    if (data["Physics"]["System"]["Momentum"])
+      return data["Physics"]["System"]["Momentum"].as<double>();
+    else return 0;
+  }  
+  
+  size_t Input::numberOfReplicas() const {
+    if (data["Physics"]["Replica"]["Number"])
+      return data["Physics"]["Replica"]["Number"].as<int>();
+    else return 1;
+  }
 
   //std::string Input::outputFilename() const {return data["Output"]["Filename"].as<std::string>();}
   std::string Input::outputFoldername() const {return "../output/"+dynamicsName()+"/"+systemName()+"/"+potentialName()+"/";}

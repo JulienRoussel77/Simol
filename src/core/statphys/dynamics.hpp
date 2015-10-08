@@ -11,21 +11,24 @@ namespace simol
 {
   class Dynamics;
   
-  Dynamics* createDynamics(Input  const& input);
+  Dynamics* createDynamics(Input  const& input, int const& indexOfReplica=1);
     
   class Dynamics
   {
     public:
-      Dynamics(Input const&  input);
+      Dynamics(Input const&  input, int const& indexOfReplica=1);
       virtual ~Dynamics();
 
       Potential const & potential() const;
       double potential(dvec const& position) const;
       double potential(double const& position) const;
       dvec force(dvec const& position) const;
-      dvec externForce() const;
+      dvec& externalForce() ;
+      const dvec& externalForce() const;
+      double& externalForce(int const& i) ;
+      const double& externalForce(int const& i) const;
       //friend Dynamics* createDynamics(Potential const& potential);
-      friend Dynamics* createDynamics(Input  const& input);
+      friend Dynamics* createDynamics(Input  const& input, int const& indexOfReplica);
       virtual void update(Particle& particle,  double const timeStep) = 0;
       void resetForce(Particle& particle) const;
       void computeForce(Particle& particle) const;
@@ -33,13 +36,13 @@ namespace simol
     private:
       Potential* potential_;
       //double timeStep;
-      dvec externForce_;
+      dvec externalForce_;
   };
   
   class Hamiltonian : public Dynamics
   {
   public:
-    Hamiltonian(Input const&  input);
+    Hamiltonian(Input const&  input, int const& indexOfReplica=1);
     void update(Particle& particle,  double const timeStep);
   };
   
@@ -47,7 +50,7 @@ namespace simol
   class Langevin : public Dynamics
   {
   public:
-    Langevin(Input const& input);
+    Langevin(Input const& input, int const& indexOfReplica=1);
     double const& temperature() const;
     double const& beta() const;
     double const& gamma() const;
@@ -64,7 +67,7 @@ namespace simol
   class Overdamped : public Dynamics
   {
   public:
-    Overdamped(Input const& input);
+    Overdamped(Input const& input, int const& indexOfReplica=1);
     double const& temperature() const;
     double const& beta() const;
     void update(Particle& particle,  double const timeStep);

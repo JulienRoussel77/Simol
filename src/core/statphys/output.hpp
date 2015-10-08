@@ -13,10 +13,19 @@ namespace simol
     std::string outputFoldername_;
     std::ofstream outParticles_;
     std::ofstream outReplica_;
+    
+    dvec sumForces_;
+    std::vector<dvec> responseForces_;
   public:
-    Output(std::string const& outputFilename);
-    void display(Particle const& particle, double time = 0);
-    void finalDisplay(Particle const& particle, double time = 0);
+    Output(Input const& input);
+    void initialize();
+    dvec& sumForces();
+    std::vector<dvec>& responseForces();
+    const dvec& responseForces(int const& i) const;
+    dvec& responseForces(int const& i);
+    void display(Particle const& particle, double time);
+    void finalDisplay(Particle const& particle, double time);
+    void finalDisplayExternalForce(Particle const& particle, dvec const& externalForce, dvec const& responseForce, double time);
     int verbose_;
   };
 

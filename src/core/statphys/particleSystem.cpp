@@ -9,19 +9,21 @@ using std::endl;
 namespace simol
 {
   
-  ParticleSystem* createSystem(Input  const& input)
+  ParticleSystem* createSystem(Input  const& input, int const& indexOfReplica)
   {
     if (input.systemName() == "Isolated")
-      return new Isolated(input);
+      return new Isolated(input, indexOfReplica);
     else if (input.systemName() == "Chain")
-      return new Chain(input);
+      return new Chain(input, indexOfReplica);
     else
       std::cout << input.systemName() << " is not a valid system !" << std::endl;
     
     return 0;
   }
   
-  ParticleSystem::ParticleSystem(Input const& input):
+  ParticleSystem::ParticleSystem(Input const& input, int const& indexOfReplica):
+  dimension_(input.dimension()),
+  numberOfParticles_(input.numberOfParticles()),
   currentTimeIteration_(0), 
   configuration_(input.numberOfParticles())
   {}
@@ -39,21 +41,28 @@ namespace simol
   
   void ParticleSystem::launch(Dynamics* model, Output& output, double const& timeStep, size_t const& numberOfIterations)  
   {
+    output.initialize();
     computeAllForces(model);
     for (size_t instantIndex  =1; instantIndex < numberOfIterations; ++instantIndex)
     {
       double instant = instantIndex * timeStep;
       simulate(model, output, timeStep);
-      //computeOutput();
+      computeOutput(output, model);
       writeOutput(output, timeStep*instantIndex);
       ++currentTimeIteration_;
     }
-    writeFinalOutput(output, timeStep*numberOfIterations);
+    computeFinalOutput(output, model, numberOfIterations);
+    //writeFinalOutput(output, timeStep*numberOfIterations);
   }
   
-  void ParticleSystem::computeOutput()
+  void ParticleSystem::computeOutput(Output& output, Dynamics* model)
   {
+    dvec averageForce(dimension_, 0);
+    for (auto&& particle : configuration_)
+      averageForce += particle.force() - model->externalForce();
     //positions.push_back(configuration_(0).position()); 
+    averageForce /= numberOfParticles_;
+    output.sumForces() += averageForce;
   }
   
   void ParticleSystem::writeOutput(Output& output, double time)
@@ -63,17 +72,22 @@ namespace simol
 	output.display(particle, time);
   }
   
+  void ParticleSystem::computeFinalOutput(Output& output, Dynamics* model, size_t const& numberOfIterations)
+  {
+    output.responseForces().push_back(output.sumForces()/numberOfIterations);
+  }
+  
   void ParticleSystem::writeFinalOutput(Output& output, double time)
   {
     for (auto&& particle : configuration_)
       output.finalDisplay(particle, time);
   }
   
-  Isolated::Isolated(Input const& input):
-  ParticleSystem(input)
+  Isolated::Isolated(Input const& input, int const& indexOfReplica):
+  ParticleSystem(input, indexOfReplica)
   {
     for (size_t i = 0; i<input.numberOfParticles(); i++) 
-      configuration_[i] = Particle(input.mass(), input.initialPosition(i), input.initialSpeed(i));
+      configuration_[i] = Particle(input.mass(), input.initialPosition(i), input.initialMomentum(i));
   }
       
 
@@ -100,11 +114,11 @@ namespace simol
   
   
   
-    Chain::Chain(Input const& input):
-  ParticleSystem(input)
+    Chain::Chain(Input const& input, int const& indexOfReplica):
+  ParticleSystem(input, indexOfReplica)
   {
     for (size_t i = 0; i<input.numberOfParticles(); i++) {
-      configuration_[i] = Particle(input.mass(), input.initialPosition(i), input.initialSpeed(i));
+      configuration_[i] = Particle(input.mass(), input.initialPosition(i), input.initialMomentum(i));
       //std::cout << configuration_[i].force() << std::endl;
     }
   }

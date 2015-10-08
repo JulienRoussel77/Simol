@@ -37,7 +37,10 @@ namespace simol{
     std::string dynamicsName() const;
     double gamma() const;   
     double temperature() const;
-    double force() const;
+    bool externalForceVarying() const;
+    double externalForceMin() const;
+    double externalForceMax() const;
+    double externalForce(int const& indexOfReplica=1) const;
     
     std::string systemName() const;
     size_t numberOfParticles() const;
@@ -47,9 +50,9 @@ namespace simol{
       
     double initialPosition(int const& i) const;
     
-    double initialSpeed(int const& i) const;
+    double initialMomentum(int const& i) const;
     
-    int numberOfReplica() const;
+    size_t numberOfReplicas() const;
     
     std::string outputFoldername() const;
 

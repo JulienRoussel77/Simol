@@ -10,9 +10,6 @@ Mesh:
 Physics:
   System:
     Name: Isolated
-    Mass: 1
-    Position: 0
-    Speed: 0
   Potential:
     Name: Sinusoidal
     Amplitude: 1
@@ -20,9 +17,10 @@ Physics:
     Name: Langevin
     Gamma: 1
     Temperature: 1
-    Force: 0
+    ForceMin: .001
+    ForceMax: 1
   Replica:
-    Number: 10000
+    Number: 10
 
 Output:
   Filename: output.txt

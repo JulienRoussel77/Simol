@@ -6,13 +6,17 @@ namespace simol {
   
  class MultiSystem
  { 
-   size_t size_;
-   std::vector<ParticleSystem*> replica;
+   int dimension_;
+   size_t numberOfReplicas_;
+   std::vector<ParticleSystem*> systemReplicas;
+   std::vector<Dynamics*> dynamicsReplicas;
    Output output;
+   double externalForceMin_, externalForceMax_;
  public:
    MultiSystem(Input const& input);
    virtual ~MultiSystem();
-   void launch(Dynamics* model, double const& timeStep, int const& numberOfIterations);
+   dvec externalForce(int const& indexOfReplica);
+   void launch(double const& timeStep, int const& numberOfIterations);
    int size();
  };
  

@@ -9,24 +9,25 @@ using std::endl;
 namespace simol
 {
 
-    Dynamics* createDynamics(Input const& input)
+    Dynamics* createDynamics(Input const& input, int const& indexOfReplica)
   {
     if (input.dynamicsName() == "Hamiltonian")
-      return new Hamiltonian(input);
+      return new Hamiltonian(input, indexOfReplica);
     else if (input.dynamicsName() == "Langevin")
-      return new Langevin(input);
+      return new Langevin(input, indexOfReplica);
     else if (input.dynamicsName() == "Overdamped")
-      return new Overdamped(input);
+      return new Overdamped(input, indexOfReplica);
     else
       std::cout << input.dynamicsName() << " is not a valid dynamics !" << std::endl;
-    
     return 0;
   }
   
-  Dynamics::Dynamics(Input const& input):externForce_(input.dimension())
+  Dynamics::Dynamics(Input const& input, int const& indexOfReplica):externalForce_(input.dimension())
   {
     potential_ = createPotential(input);
-    externForce_(0) = input.force();
+    
+    externalForce_(0) = input.externalForce(indexOfReplica);
+    cout << "externalForce_(0) = " << externalForce_(0) << endl;
   }
   
   Dynamics::~Dynamics()
@@ -39,22 +40,37 @@ namespace simol
   
   double Dynamics::potential(dvec const& position) const
   {
-   return (*potential_)(position); 
+    return (*potential_)(position); 
   }
   
   double Dynamics::potential(double const& distance) const
   {
-   return (*potential_)(distance); 
+    return (*potential_)(distance); 
   }
   
   dvec Dynamics::force(dvec const& position) const
   {
-   return potential_->force(position) + externForce(); 
+    return potential_->force(position) + externalForce_; 
   }
   
-  dvec Dynamics::externForce() const
+  const dvec& Dynamics::externalForce() const
   {
-   return externForce_; 
+    return externalForce_; 
+  }
+  
+    dvec& Dynamics::externalForce()
+  {
+    return externalForce_; 
+  }
+  
+  const double& Dynamics::externalForce(int const& i) const
+  {
+    return externalForce_(i); 
+  }
+  
+  double& Dynamics::externalForce(int const& i)
+  {
+    return externalForce_(i); 
   }
   
   void Dynamics::resetForce(Particle& particle) const
@@ -82,7 +98,7 @@ namespace simol
     particle1.force() -= force12;
   }
   
-  Hamiltonian::Hamiltonian(Input const& input):Dynamics(input)
+  Hamiltonian::Hamiltonian(Input const& input, int const& indexOfReplica):Dynamics(input, indexOfReplica)
   {
   }
 
@@ -93,8 +109,8 @@ namespace simol
 
   //#### Langevin ####
 
-  Langevin::Langevin(Input const& input):
-    Dynamics(input), 
+  Langevin::Langevin(Input const& input, int const& indexOfReplica):
+    Dynamics(input, indexOfReplica), 
     temperature_(input.temperature()), 
     beta_(1/temperature_), 
     gamma_(input.gamma()), 
@@ -132,8 +148,8 @@ namespace simol
     
   //#### Overdamped ####
 
-  Overdamped::Overdamped(Input const& input):
-    Dynamics(input), 
+  Overdamped::Overdamped(Input const& input, int const& indexOfReplica):
+    Dynamics(input, indexOfReplica), 
     temperature_(input.temperature()), 
     beta_(1/temperature_), 
     rng_(1, input.dimension())

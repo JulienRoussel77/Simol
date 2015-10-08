@@ -6,35 +6,55 @@ using std::endl;
 namespace simol {
   
  MultiSystem::MultiSystem(Input const& input):
-  size_(input.numberOfReplica()), 
-  replica(size_),   
-  output(input.outputFoldername())
+  dimension_(input.dimension()),
+  numberOfReplicas_(input.numberOfReplicas()), 
+  systemReplicas(numberOfReplicas_),  
+  dynamicsReplicas(numberOfReplicas_), 
+  output(input)
  {
-   std::cout << "numberOfReplica : " << size_ << std::endl;
-   for (size_t i=0; i<size_; i++)
-     replica[i] = createSystem(input);
-   
-   if (size_ == 1)
+      if (numberOfReplicas_ == 1)
      output.verbose_ = 1;
    else
      output.verbose_ = 0;
    cout << "verbose = " << output.verbose_ << endl;
+   
+
+   
+   std::cout << "numberOfReplicas : " << numberOfReplicas_ << std::endl;
+   for (size_t i=0; i<numberOfReplicas_; i++)
+   {
+     systemReplicas[i] = createSystem(input, i); 
+     dynamicsReplicas[i] = createDynamics(input, i); 
+   }
  }
  
  MultiSystem::~MultiSystem()
  {
-   for (auto&& system : replica)
+   for (auto&& system : systemReplicas)
      delete system;
+   for (auto&& dynamics : dynamicsReplicas)
+     delete dynamics;
  }
  
- void MultiSystem::launch(Dynamics* model, double const& timeStep, int const& numberOfIterations)
+ dvec MultiSystem::externalForce(int const& indexReplica){
+   dvec extForce(dimension_);
+   extForce(0) = externalForceMin_ + indexReplica * (externalForceMax_ - externalForceMin_) / numberOfReplicas_;
+   return extForce;
+ }
+ 
+ void MultiSystem::launch(double const& timeStep, int const& numberOfIterations)
  {
-   for (size_t i=0; i<size_; i++)
+   for (size_t i=0; i<numberOfReplicas_; i++)
    {
-     if ((10*i) % size_ == 0 && size_ > 1)
-       cout << "---- " << (100 * i) / size_ << " % completed ----" << endl;
-     replica[i]->launch(model, output, timeStep, numberOfIterations);
+     if ((10*i) % numberOfReplicas_ == 0 && numberOfReplicas_ > 1)
+       cout << "---- " << (100 * i) / numberOfReplicas_ << " % completed ----" << endl;
+     //dynamicsReplicas[i]->setExternalForce(externalForce(i));
+     systemReplicas[i]->launch(dynamicsReplicas[i], output, timeStep, numberOfIterations);
    }
+   
+   
+   for (size_t i=0; i<numberOfReplicas_; i++)
+      output.finalDisplayExternalForce(systemReplicas[i]->particle(0), dynamicsReplicas[i]->externalForce(), output.responseForces(i), numberOfIterations*timeStep);
  }
   
 }

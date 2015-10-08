@@ -40,16 +40,12 @@ int main(int argc, char* argv[])
   
   simol::MultiSystem replica(input);
 
-  simol::Dynamics* model = simol::createDynamics(input);
+  //simol::Dynamics* model = simol::createDynamics(input);
   
-  replica.launch(model, input.timeStep(), input.numberOfIterations());
+  replica.launch(input.timeStep(), input.numberOfIterations());
   
 
-  //===========
-  // ATOM CHAIN
-  //===========
   
-  delete model;
 
   std::cout << "Fin de la simulation" << std::endl;
 

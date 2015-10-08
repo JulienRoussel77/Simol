@@ -5,23 +5,21 @@ Geometry:
 Mesh:
   Time:
     Step: 0.01
-    Number: 1000
+    Number: 100000
 
 Physics:
   System:
     Name: Isolated
-    Mass: 1
-    Position: 0
-    Speed: 0
   Potential:
     Name: Sinusoidal
     Amplitude: 1
   Model:
     Name: Overdamped
     Temperature: 1
-    Force: 1
+    ForceMin: .001
+    ForceMax: 1
   Replica:
-    Number: 1000
+    Number: 10
 
 Output:
   Filename: output.txt
