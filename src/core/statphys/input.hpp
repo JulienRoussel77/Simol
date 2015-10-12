@@ -48,12 +48,13 @@ namespace simol{
     
 
       
-    double initialPosition(int const& i) const;
+    double initialPosition(int const& i=0) const;
     
-    double initialMomentum(int const& i) const;
+    double initialMomentum(int const& i=0) const;
     
     size_t numberOfReplicas() const;
     
+    size_t decorrelationNumberOfIterations() const;
     std::string outputFoldername() const;
 
   };

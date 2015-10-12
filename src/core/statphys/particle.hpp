@@ -58,7 +58,7 @@ namespace simol
     //==========
 
     public:
-
+      //Particle& operator= (Particle const& particle);
       double const & mass() const;
       dvec const & position() const;
       dvec const & momentum() const;
@@ -68,7 +68,8 @@ namespace simol
       double& potentialEnergy();      
       double energy() const;
       dvec const& force() const;
-      dvec& force();  
+      dvec& force(); 
+      dvec velocity() const;
 
     //=============
     // DATA MEMBERS

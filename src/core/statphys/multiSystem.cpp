@@ -10,13 +10,14 @@ namespace simol {
   numberOfReplicas_(input.numberOfReplicas()), 
   systemReplicas(numberOfReplicas_),  
   dynamicsReplicas(numberOfReplicas_), 
-  output(input)
+  output(input),
+  rng_(1, input.dimension())
  {
       if (numberOfReplicas_ == 1)
-     output.verbose_ = 1;
+     output.verbose() = 1;
    else
-     output.verbose_ = 0;
-   cout << "verbose = " << output.verbose_ << endl;
+     output.verbose() = 0;
+   cout << "verbose = " << output.verbose() << endl;
    
 
    
@@ -24,7 +25,8 @@ namespace simol {
    for (size_t i=0; i<numberOfReplicas_; i++)
    {
      systemReplicas[i] = createSystem(input, i); 
-     dynamicsReplicas[i] = createDynamics(input, i); 
+     dynamicsReplicas[i] = createDynamics(input, i);
+     dynamicsReplicas[i]->setRNG(&rng_);
    }
  }
  
@@ -42,19 +44,18 @@ namespace simol {
    return extForce;
  }
  
- void MultiSystem::launch(double const& timeStep, int const& numberOfIterations)
+ void MultiSystem::launch()
  {
    for (size_t i=0; i<numberOfReplicas_; i++)
    {
      if ((10*i) % numberOfReplicas_ == 0 && numberOfReplicas_ > 1)
        cout << "---- " << (100 * i) / numberOfReplicas_ << " % completed ----" << endl;
      //dynamicsReplicas[i]->setExternalForce(externalForce(i));
-     systemReplicas[i]->launch(dynamicsReplicas[i], output, timeStep, numberOfIterations);
+     //if (i>0)
+     //  systemReplicas[i]->particle(0) = systemReplicas[i-1]->particle(0);
+     systemReplicas[i]->launch(dynamicsReplicas[i], output);
    }
-   
-   
-   for (size_t i=0; i<numberOfReplicas_; i++)
-      output.finalDisplayExternalForce(systemReplicas[i]->particle(0), dynamicsReplicas[i]->externalForce(), output.responseForces(i), numberOfIterations*timeStep);
+      
  }
   
 }

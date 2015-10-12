@@ -10,16 +10,13 @@ Mesh:
 Physics:
   System:
     Name: Isolated
-    Momentum: .3
+    Momentum: 0
   Potential:
     Name: Sinusoidal
     Amplitude: 1
   Model:
-    Name: Langevin
-    Gamma: 1
+    Name: Overdamped
     Temperature: 1
-  Replica:
-    Number: 1
 
 Output:
   Foldername: GreenKubo

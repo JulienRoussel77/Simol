@@ -57,6 +57,17 @@ namespace simol
     return *this;
   }
   
+  template<class ScalarType> inline
+  ScalarType Vector<ScalarType,eigen>::dot(Vector<ScalarType,eigen> const& v) const
+  {
+   return wrapped_.dot(v.wrapped_); 
+  }
+  
+  /*double dot(Vector<double,eigen> const& u, Vector<double,eigen> const& v)
+  {
+    return u.dot(v);
+  }*/
+  
   //======================
   // Operators
   //======================

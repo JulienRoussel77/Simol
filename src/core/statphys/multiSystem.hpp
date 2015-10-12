@@ -12,11 +12,12 @@ namespace simol {
    std::vector<Dynamics*> dynamicsReplicas;
    Output output;
    double externalForceMin_, externalForceMax_;
+   RNG rng_;
  public:
    MultiSystem(Input const& input);
    virtual ~MultiSystem();
    dvec externalForce(int const& indexOfReplica);
-   void launch(double const& timeStep, int const& numberOfIterations);
+   void launch();
    int size();
  };
  

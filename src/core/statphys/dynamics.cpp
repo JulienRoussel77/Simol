@@ -22,17 +22,42 @@ namespace simol
     return 0;
   }
   
-  Dynamics::Dynamics(Input const& input, int const& indexOfReplica):externalForce_(input.dimension())
+  Dynamics::Dynamics(Input const& input, int const& indexOfReplica):timeStep_(input.timeStep()), numberOfIterations_(input.numberOfIterations()), externalForce_(input.dimension())
   {
     potential_ = createPotential(input);
     
     externalForce_(0) = input.externalForce(indexOfReplica);
-    cout << "externalForce_(0) = " << externalForce_(0) << endl;
+    //cout << "externalForce_(0) = " << externalForce_(0) << endl;
   }
   
   Dynamics::~Dynamics()
   {
     delete potential_;
+  }
+  
+  double& Dynamics::timeStep()
+  {
+    return timeStep_;
+  }
+  
+  const double& Dynamics::timeStep() const
+  {
+    return timeStep_;
+  }
+  
+  size_t& Dynamics::numberOfIterations()
+  {
+    return numberOfIterations_;
+  }
+  
+  const size_t& Dynamics::numberOfIterations() const
+  {
+    return numberOfIterations_;
+  }
+  
+  double Dynamics::finalTime() const
+  {
+    return timeStep_ * numberOfIterations_;
   }
   
   Potential const & Dynamics::potential() const
@@ -102,9 +127,9 @@ namespace simol
   {
   }
 
-  void Hamiltonian::update(Particle& particle,  double const timeStep)
+  void Hamiltonian::update(Particle& particle)
   {
-    verlet_scheme(particle, potential(), timeStep);
+    verlet_scheme(particle, potential(), timeStep());
   }
 
   //#### Langevin ####
@@ -114,8 +139,7 @@ namespace simol
     temperature_(input.temperature()), 
     beta_(1/temperature_), 
     gamma_(input.gamma()), 
-    sigma_(2*gamma_/beta_), 
-    rng_(1, input.dimension())
+    sigma_(2*gamma_/beta_)
   {}
   
 
@@ -140,10 +164,15 @@ namespace simol
       return sigma_;
     }
     
-    void Langevin::update(Particle& particle,  double const timeStep)
+    void Langevin::setRNG(RNG* rng)
     {
-      verlet_scheme(particle, potential(), timeStep);
-      exact_OU_scheme(particle, gamma_, beta_, timeStep, rng_.gaussian());
+      rng_ = rng;
+    };
+    
+    void Langevin::update(Particle& particle)
+    {
+      verlet_scheme(particle, potential(), timeStep());
+      exact_OU_scheme(particle, gamma_, beta_, timeStep(), rng_->gaussian());
     }
     
   //#### Overdamped ####
@@ -151,8 +180,7 @@ namespace simol
   Overdamped::Overdamped(Input const& input, int const& indexOfReplica):
     Dynamics(input, indexOfReplica), 
     temperature_(input.temperature()), 
-    beta_(1/temperature_), 
-    rng_(1, input.dimension())
+    beta_(1/temperature_)
   {}
   
 
@@ -167,9 +195,14 @@ namespace simol
       return beta_;
     }
     
-    void Overdamped::update(Particle& particle,  double const timeStep)
+    void Overdamped::setRNG(RNG* rng)
     {
-      maruyama_scheme(particle, beta_, potential(), timeStep, rng_.gaussian());
+      rng_ = rng;
+    };
+    
+    void Overdamped::update(Particle& particle)
+    {
+      maruyama_scheme(particle, beta_, potential(), timeStep(), rng_->gaussian());
     }
     
 }

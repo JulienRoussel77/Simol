@@ -11,6 +11,8 @@ namespace simol
   class Vector;
   
   typedef Vector<double> dvec;
+  
+  //double dot(Vector<double,eigen> const& u, Vector<double,eigen> const& v);
 }
 
 namespace simol
@@ -24,6 +26,7 @@ namespace simol
   template<class ScalarType>
   class Vector<ScalarType,eigen>
   {
+    //friend double dot(Vector<double,eigen> const& u, Vector<double,eigen> const& v);
     public:
       Vector(size_t const size=0);
       Vector(size_t const size, ScalarType const& lambda);
@@ -33,6 +36,7 @@ namespace simol
       ScalarType const & operator()(size_t const index) const;
       ScalarType norm() const;
       Vector<ScalarType,eigen>& fill(ScalarType const& lambda);
+      ScalarType dot(Vector<ScalarType,eigen> const& v) const;
 
       Vector<ScalarType,eigen>& operator+=(Vector<ScalarType,eigen> const& v);
       Vector<ScalarType,eigen>& operator-=(Vector<ScalarType,eigen> const& v);

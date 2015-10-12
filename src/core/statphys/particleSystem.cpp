@@ -39,48 +39,66 @@ namespace simol
     return configuration_.size();
   }
   
-  void ParticleSystem::launch(Dynamics* model, Output& output, double const& timeStep, size_t const& numberOfIterations)  
+  void ParticleSystem::launch(Dynamics* model, Output& output)  
   {
-    output.initialize();
+    output.initialize(particle(0).momentum());
     computeAllForces(model);
-    for (size_t instantIndex  =1; instantIndex < numberOfIterations; ++instantIndex)
+    for (size_t instantIndex  =0; instantIndex < model->numberOfIterations(); ++instantIndex)
     {
-      double instant = instantIndex * timeStep;
-      simulate(model, output, timeStep);
-      computeOutput(output, model);
-      writeOutput(output, timeStep*instantIndex);
+      double instant = instantIndex * model->timeStep();
+      simulate(model, output);
+      computeOutput(output, model, model->timeStep()*instantIndex);
+      writeOutput(output, model->timeStep()*instantIndex);
       ++currentTimeIteration_;
     }
-    computeFinalOutput(output, model, numberOfIterations);
-    //writeFinalOutput(output, timeStep*numberOfIterations);
+    computeFinalOutput(output, model);
+    writeFinalOutput(output, model);
   }
   
-  void ParticleSystem::computeOutput(Output& output, Dynamics* model)
+  void ParticleSystem::computeOutput(Output& output, Dynamics const* model, double time)
   {
+    //Calcul de la reponse moyenne à un forçage
     dvec averageForce(dimension_, 0);
     for (auto&& particle : configuration_)
       averageForce += particle.force() - model->externalForce();
     //positions.push_back(configuration_(0).position()); 
     averageForce /= numberOfParticles_;
-    output.sumForces() += averageForce;
+    output.responseForces() += averageForce;
+    
+    //Calcul de l'autocorrélation des vitesses
+    if (((int)(time/model->timeStep()) % output.decorrelationNumberOfIterations()) == 0)      
+    {
+      output.timeRef() = time;
+      output.velocityRef() = particle(0).velocity();
+      output.forceRef() = particle(0).force() - model->externalForce();
+    }
+    //output.autocorrelationV.append(/model->timeStep(), output.velocityRef().dot(particle(0).velocity()));
+    output.appendAutocorrelationV(particle(0).velocity(), time);
+    output.appendAutocorrelationF(particle(0).force() - model->externalForce(), time);
+    //cout << time/model->timeStep() << endl;
+    //output.integratedAutocorrelationP() += model->timeStep() * output.refVelocity().dot(particle(0).momentum());
   }
   
   void ParticleSystem::writeOutput(Output& output, double time)
   {
-    if (output.verbose_ > 0)
+    if (output.verbose() > 0)
       for (auto&& particle : configuration_)
+      {
 	output.display(particle, time);
+      }
   }
   
-  void ParticleSystem::computeFinalOutput(Output& output, Dynamics* model, size_t const& numberOfIterations)
+  void ParticleSystem::computeFinalOutput(Output& output, Dynamics const* model)
   {
-    output.responseForces().push_back(output.sumForces()/numberOfIterations);
+    //output.responseForces() /= model->numberOfIterations();  
   }
   
-  void ParticleSystem::writeFinalOutput(Output& output, double time)
+  void ParticleSystem::writeFinalOutput(Output& output, Dynamics const* model)
   {
-    for (auto&& particle : configuration_)
-      output.finalDisplay(particle, time);
+    double time = model->timeStep() * model->numberOfIterations();
+    
+    output.finalDisplay(particle(0), model->externalForce(), model->numberOfIterations()*model->timeStep());
+    output.finalDisplayAutocorrelations();
   }
   
   Isolated::Isolated(Input const& input, int const& indexOfReplica):
@@ -92,12 +110,12 @@ namespace simol
       
 
 
-  void Isolated::simulate(Dynamics * model, Output& output, double const& timeStep)
+  void Isolated::simulate(Dynamics * model, Output& output)
   {
     //std::cout << "simulate !" << std::endl;
 
     for (auto&& particle : configuration_)
-      model->update(particle, timeStep);
+      model->update(particle);
     computeAllForces(model);
     //for (auto&& particle : configuration_)
     //  output.display(currentTimeIteration_*timeStep, particle);
@@ -107,7 +125,9 @@ namespace simol
   {
     //cout << "Isolated::computeAllForces" << endl;
     for (auto&& particle : configuration_)
+    {
       model->resetForce(particle);
+    }
     for (auto&& particle : configuration_)
       model->computeForce(particle);
   }
@@ -125,12 +145,12 @@ namespace simol
       
 
 
-  void Chain::simulate(Dynamics* model, Output& output, double const& timeStep)
+  void Chain::simulate(Dynamics* model, Output& output)
   {
     //std::cout << "simulate !" << std::endl;
 
     for (auto&& particle : configuration_)
-      model->update(particle, timeStep);
+      model->update(particle);
     computeAllForces(model);
 
     ++currentTimeIteration_;

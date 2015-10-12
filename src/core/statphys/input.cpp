@@ -39,7 +39,7 @@ namespace simol {
   
   bool Input::externalForceVarying() const {
     if (data["Physics"]["Model"]["ForceMin"] && data["Physics"]["Model"]["ForceMax"] && !data["Physics"]["Model"]["Force"]) return true;
-    else if (!data["Physics"]["Model"]["ForceMin"] && !data["Physics"]["Model"]["ForceMax"] && data["Physics"]["Model"]["Force"]) return false;
+    else if (!data["Physics"]["Model"]["ForceMin"] && !data["Physics"]["Model"]["ForceMax"]) return false;
     else {cout << "External force input incoherent !" << endl;exit(1);}
   }
   double Input::externalForceMin() const {return data["Physics"]["Model"]["ForceMin"].as<double>();}
@@ -80,8 +80,18 @@ namespace simol {
       return data["Physics"]["Replica"]["Number"].as<int>();
     else return 1;
   }
+  
+  size_t Input::decorrelationNumberOfIterations() const
+  {
+    return data["Output"]["DecorrelationTime"].as<size_t>() / timeStep();
+  }
 
   //std::string Input::outputFilename() const {return data["Output"]["Filename"].as<std::string>();}
-  std::string Input::outputFoldername() const {return "../output/"+dynamicsName()+"/"+systemName()+"/"+potentialName()+"/";}
+  std::string Input::outputFoldername() const {
+    if (data["Output"]["Foldername"])
+      return "../output/"+dynamicsName()+"/"+systemName()+"/"+potentialName()+"/"+data["Output"]["Foldername"].as<std::string>()+"/";
+    else
+      return "../output/"+dynamicsName()+"/"+systemName()+"/"+potentialName()+"/";
+  }
 
 }

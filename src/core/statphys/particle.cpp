@@ -27,6 +27,15 @@ namespace simol
     position_(0) = positionInitial;
     momentum_(0) = momentumInitial;
   }
+  
+  /*Particle& Particle::operator= (Particle const& particle)
+  {
+    //cout << "Particle& Particle::operator= (Particle const& particle)" << endl;
+    mass_ = particle.mass();
+    position_ = particle.position();
+    momentum_ = particle.momentum();
+    force_ = 
+  }*/
 
   //==========
   // ACCESSORS
@@ -62,6 +71,8 @@ namespace simol
   dvec& Particle::force()
   { return force_; }
   
+  dvec Particle::velocity() const
+  {return momentum_ / mass_;}
 
 
 }
@@ -73,6 +84,7 @@ namespace simol
     /*std::cout << "verlet" << std::endl;
     size_t test = particle.momentum_.size();
         std::cout << "ok" << std::endl;*/
+    
     particle.momentum_ += timeStep * particle.force_ / 2;
     particle.position_ += timeStep * particle.momentum_ / particle.mass_;
     particle.momentum_ += timeStep * particle.force_ / 2;
