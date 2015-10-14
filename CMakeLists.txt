@@ -96,6 +96,7 @@ if(SIMOL_GCC_ROOT)
   set(CMAKE_C_COMPILER ${SIMOL_GCC_ROOT}/bin/gcc)
   set(CMAKE_CXX_COMPILER ${SIMOL_GCC_ROOT}/bin/g++)
   set(CMAKE_Fortran_COMPILER ${SIMOL_GCC_ROOT}/bin/gfortran)
+  set(LD_LIBRARY_PATH ${SIMOL_GCC_ROOT}/lib64/libstdc++.so)
 endif(SIMOL_GCC_ROOT)
 
 #set(SIMOL_CXX_FLAGS "-static")
