@@ -92,8 +92,11 @@ endif(EXISTS ${config})
 # COMPILER SETTINGS
 #==================
 
-message(STATUS ${CMAKE_LINKER})
-
+if(SIMOL_GCC_ROOT)
+  set(CMAKE_C_COMPILER ${SIMOL_GCC_ROOT}/bin/gcc)
+  set(CMAKE_CXX_COMPILER ${SIMOL_GCC_ROOT}/bin/g++)
+  set(CMAKE_Fortran_COMPILER ${SIMOL_GCC_ROOT}/bin/gfortran)
+endif(SIMOL_GCC_ROOT)
 
 #set(SIMOL_CXX_FLAGS "-static")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SIMOL_CXX_FLAGS} -Wall -Wextra -fopenmp -lgfortran -Wno-deprecated")
