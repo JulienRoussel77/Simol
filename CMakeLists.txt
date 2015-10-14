@@ -110,10 +110,10 @@ endif()
 
 if (CMAKE_BUILD_TYPE EQUAL "Release")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2" )
-elseif (CMAKE_BUILD_TYPE EQUAL "Debug")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g" )
 elseif (CMAKE_BUILD_TYPE EQUAL "Profile")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -pg" )
+else ()
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g" )
 endif(CMAKE_BUILD_TYPE EQUAL "Release")
 
 #====================
