@@ -15,6 +15,8 @@ namespace simol
       return new Hamiltonian(input, indexOfReplica);
     else if (input.dynamicsName() == "Langevin")
       return new Langevin(input, indexOfReplica);
+    else if (input.dynamicsName() == "BoundaryLangevin")
+      return new BoundaryLangevin(input, indexOfReplica);
     else if (input.dynamicsName() == "Overdamped")
       return new Overdamped(input, indexOfReplica);
     else
@@ -105,8 +107,7 @@ namespace simol
   }
 
   void Dynamics::computeForce(Particle& particle) const
-  {
-    particle.kineticEnergy() = pow(particle.momentum().norm(), 2) / particle.mass() / 2;
+  {    
     particle.potentialEnergy() = potential(particle.position());
     particle.force() = force(particle.position());
   }
@@ -114,96 +115,179 @@ namespace simol
   void Dynamics::interaction(Particle& particle1, Particle& particle2) const
   {
     dvec r12 = particle2.position() - particle1.position();
+    //double d12 = r12.norm();
     double energy12 = potential(r12);
     dvec force12 = force(r12);
     
-    particle1.potentialEnergy() += energy12;
-    particle1.potentialEnergy() += energy12;
+    particle1.potentialEnergy() += energy12 / 2;
+    particle2.potentialEnergy() += energy12 / 2;
     particle1.force() += force12;
-    particle1.force() -= force12;
+    particle2.force() -= force12;
   }
+  
+  void Dynamics::updateBefore(Particle& particle)
+  {
+    particle.momentum() += timeStep_ * particle.force() / 2;
+    particle.position() += timeStep_ * particle.momentum() / particle.mass();
+  }
+  
+  void Dynamics::updateAfter(Particle& particle)
+  {
+    particle.momentum() += timeStep_ * particle.force() / 2;
+    particle.kineticEnergy() = pow(particle.momentum().norm(), 2) / particle.mass() / 2;
+  }
+  
+  
+  
+  //#### Hamiltonian ####
   
   Hamiltonian::Hamiltonian(Input const& input, int const& indexOfReplica):Dynamics(input, indexOfReplica)
   {
   }
+  
+  
+  
+    //#### StochasticDynamics ####
 
-  void Hamiltonian::update(Particle& particle)
-  {
-    verlet_scheme(particle, potential(), timeStep());
-  }
-
-  //#### Langevin ####
-
-  Langevin::Langevin(Input const& input, int const& indexOfReplica):
-    Dynamics(input, indexOfReplica), 
-    temperature_(input.temperature()), 
-    beta_(1/temperature_), 
-    gamma_(input.gamma()), 
-    sigma_(2*gamma_/beta_)
+  StochasticDynamics::StochasticDynamics(Input const& input, int const& indexOfReplica):
+    Dynamics(input, indexOfReplica)
   {}
-  
-
-  
-    double const& Langevin::temperature() const
-    {
-      return temperature_;
-    }
       
-    double const& Langevin::beta() const
-    {
-      return beta_;
-    }
+  void StochasticDynamics::setRNG(RNG* rng)
+  {
+    rng_ = rng;
+  };
+  
     
-    double const& Langevin::gamma() const
-    {
-      return gamma_;
-    }
-    
-    double const& Langevin::sigma() const
-    {
-      return sigma_;
-    }
-    
-    void Langevin::setRNG(RNG* rng)
-    {
-      rng_ = rng;
-    };
-    
-    void Langevin::update(Particle& particle)
-    {
-      verlet_scheme(particle, potential(), timeStep());
-      exact_OU_scheme(particle, gamma_, beta_, timeStep(), rng_->gaussian());
-    }
-    
-  //#### Overdamped ####
+  //#### UniformStochasticDynamics ####
 
-  Overdamped::Overdamped(Input const& input, int const& indexOfReplica):
-    Dynamics(input, indexOfReplica), 
+  UniformStochasticDynamics::UniformStochasticDynamics(Input const& input, int const& indexOfReplica):
+    StochasticDynamics(input, indexOfReplica), 
     temperature_(input.temperature()), 
     beta_(1/temperature_)
   {}
   
-
+  double const& UniformStochasticDynamics::temperature() const
+  {
+    return temperature_;
+  }
+    
+  double const& UniformStochasticDynamics::beta() const
+  {
+    return beta_;
+  }
   
-    double const& Overdamped::temperature() const
-    {
-      return temperature_;
-    }
-      
-    double const& Overdamped::beta() const
-    {
-      return beta_;
-    }
+
+  //#### Langevin ####
+
+  Langevin::Langevin(Input const& input, int const& indexOfReplica):
+    UniformStochasticDynamics(input, indexOfReplica), 
+    gamma_(input.gamma())
+  {} 
+
     
-    void Overdamped::setRNG(RNG* rng)
-    {
-      rng_ = rng;
-    };
+  double const& Langevin::gamma() const
+  {
+    return gamma_;
+  }
+  
+  double Langevin::sigma() const
+  {
+    return sqrt(2*gamma_ / beta_);
+  }
+
+
+  void Langevin::updateAfter(Particle& particle)
+  {
+    particle.momentum() += timeStep_ * particle.force() / 2;
+    double alpha = exp(- gamma_ / particle.mass() * timeStep_);    
+    particle.momentum() = alpha * particle.momentum() + sqrt((1-pow(alpha, 2))/beta_*particle.mass()) * rng_->gaussian();
+
+    particle.kineticEnergy() = pow(particle.momentum().norm(), 2) / particle.mass() / 2;
+  } 
+  
+  
     
-    void Overdamped::update(Particle& particle)
-    {
-      maruyama_scheme(particle, beta_, potential(), timeStep(), rng_->gaussian());
-    }
+  //#### Overdamped ####
+
+  Overdamped::Overdamped(Input const& input, int const& indexOfReplica):
+    UniformStochasticDynamics(input, indexOfReplica)
+  {}
+  
+    
+  void Overdamped::updateBefore(Particle& particle)
+  {
+    particle.position() += timeStep_ * particle.force() + sqrt(2*timeStep_/beta_) * rng_->gaussian();
+  }
+  
+  void Overdamped::updateAfter(Particle& particle){}
+  
+  
+  
+  //#### BoundaryLangevin ####
+
+  BoundaryLangevin::BoundaryLangevin(Input const& input, int const& indexOfReplica):
+    StochasticDynamics(input, indexOfReplica),
+    betaLeft_(input.betaLeft()),
+    betaRight_(input.betaRight()),
+    temperatureLeft_(1/betaLeft_),
+    temperatureRight_(1/betaRight()),
+    gamma_(input.gamma())
+  {} 
+  
+    double const& BoundaryLangevin::betaLeft() const
+  {
+    return betaLeft_;
+  }
+  
+  double const& BoundaryLangevin::betaRight() const
+  {
+    return betaRight_;
+  }
+  
+    double const& BoundaryLangevin::temperatureLeft() const
+  {
+    return temperatureLeft_;
+  }
+  
+  double const& BoundaryLangevin::temperatureRight() const
+  {
+    return temperatureRight_;
+  }
+
+    
+  double const& BoundaryLangevin::gamma() const
+  {
+    return gamma_;
+  }
+  
+  double BoundaryLangevin::sigmaLeft() const
+  {
+    return sqrt(2 * gamma_ / betaLeft_);
+  }
+  
+    double BoundaryLangevin::sigmaRight() const
+  {
+    return sqrt(2 * gamma_ / betaRight_);
+  }
+  
+    void BoundaryLangevin::updateAfterLeft(Particle& particle)
+  {
+    particle.momentum() += timeStep_ * particle.force() / 2;
+    double alpha = exp(- gamma_ / particle.mass() * timeStep_);    
+    particle.momentum() = alpha * particle.momentum() + sqrt((1-pow(alpha, 2))/betaLeft_*particle.mass()) * rng_->gaussian();
+
+    particle.kineticEnergy() = pow(particle.momentum().norm(), 2) / particle.mass() / 2;
+  }
+  
+    void BoundaryLangevin::updateAfterRight(Particle& particle)
+  {
+    particle.momentum() += timeStep_ * particle.force() / 2;
+    double alpha = exp(- gamma_ / particle.mass() * timeStep_);    
+    particle.momentum() = alpha * particle.momentum() + sqrt((1-pow(alpha, 2))/betaRight_*particle.mass()) * rng_->gaussian();
+
+    particle.kineticEnergy() = pow(particle.momentum().norm(), 2) / particle.mass() / 2;
+  }
     
 }
 

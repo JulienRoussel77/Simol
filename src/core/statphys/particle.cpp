@@ -12,13 +12,13 @@ namespace simol
   // CONSTRUCTORS
   //=============
   
-   Particle::Particle() :mass_(0), position_(0), momentum_(0), force_(0)
+   Particle::Particle() :mass_(0), position_(0), momentum_(0), kineticEnergy_(0), force_(0)
    {
     //std::cout << "Particle vide créée !" << std::endl;      
    }
 
   Particle::Particle(double const & mass, dvec const & position, dvec const & momentum):
-    mass_(mass), position_(position), momentum_(momentum), force_(position.size())
+    mass_(mass), position_(position), momentum_(momentum), kineticEnergy_(pow(momentum_.norm(), 2)/2/mass_), force_(position.size()) 
   {}
   
   Particle::Particle(double const & mass, double const & positionInitial, double const & momentumInitial):
@@ -26,6 +26,7 @@ namespace simol
   {
     position_(0) = positionInitial;
     momentum_(0) = momentumInitial;
+    kineticEnergy_ = pow(momentumInitial, 2) / mass_ / 2;
   }
   
   /*Particle& Particle::operator= (Particle const& particle)
@@ -43,8 +44,14 @@ namespace simol
 
   dvec const & Particle::position() const
   { return position_; }
+  
+  dvec & Particle::position()
+  { return position_; }
 
   dvec const & Particle::momentum() const
+  { return momentum_; }
+  
+  dvec & Particle::momentum()
   { return momentum_; }
 
   double const & Particle::mass() const
@@ -79,7 +86,7 @@ namespace simol
 
 namespace simol
 {
-  void verlet_scheme(Particle & particle, Potential const & potential, double timeStep)
+  void verlet_scheme(Particle & particle, double timeStep)
   {
     /*std::cout << "verlet" << std::endl;
     size_t test = particle.momentum_.size();
@@ -96,7 +103,7 @@ namespace simol
     particle.momentum_ = alpha * particle.momentum_ + sqrt((1-pow(alpha, 2))/beta*particle.mass_) * randVec;
   }
   
-  void maruyama_scheme(Particle & particle, double const beta_, Potential const& potential, double const& timeStep, dvec const& randVec)
+  void maruyama_scheme(Particle & particle, double const beta_, double const& timeStep, dvec const& randVec)
   {
     particle.position_ += timeStep * particle.force_ + sqrt(2*timeStep/beta_) * randVec;
   }

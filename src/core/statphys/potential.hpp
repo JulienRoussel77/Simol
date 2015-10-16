@@ -19,9 +19,8 @@ namespace simol
       virtual ~Potential(){};
       Potential(Input const& input, int const& indexOfReplica=1);
       virtual double operator()(dvec const & position) const {std::cout << "This potential is pairwise !" << std::endl; exit(1);};
-      virtual double operator()(double const & position) const {std::cout << "This potential is not pairwise !" << std::endl; exit(1);}
       virtual dvec derivative(dvec const & position) const = 0;
-      virtual dvec force(dvec const & position) const = 0;
+      virtual dvec force(dvec const & position) const;
   };
   
   class Sinusoidal : public Potential{
@@ -29,7 +28,6 @@ namespace simol
       Sinusoidal(Input const& input, int const& indexOfReplica=1);
       double operator()(dvec const & position) const;
       dvec derivative(dvec const & position) const;
-      dvec force(dvec const & position) const;
 
     private:
       double amplitude_;
@@ -41,7 +39,6 @@ namespace simol
       DoubleWell(Input const& input, int const& indexOfReplica=1);
       double operator()(dvec const & position) const;
       dvec derivative(dvec const & position) const;
-      dvec force(dvec const & position) const;
 
     private:
       double height_;
@@ -51,9 +48,8 @@ namespace simol
     class Harmonic : public Potential{
     public:
       Harmonic(Input const& input, int const& indexOfReplica=1);
-      double operator()(double const & position) const;
+      double operator()(dvec const & position) const;
       dvec derivative(dvec const & position) const;
-      dvec force(dvec const & position) const;
 
     private:
       double stiffness_;

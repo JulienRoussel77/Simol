@@ -37,6 +37,9 @@ namespace simol{
     std::string dynamicsName() const;
     double gamma() const;   
     double temperature() const;
+    double beta() const;
+    double betaLeft() const;
+    double betaRight() const;
     bool externalForceVarying() const;
     double externalForceMin() const;
     double externalForceMax() const;
@@ -54,6 +57,7 @@ namespace simol{
     
     size_t numberOfReplicas() const;
     
+    //bool doComputeCorrelations() const;
     size_t decorrelationNumberOfIterations() const;
     std::string outputFoldername() const;
 

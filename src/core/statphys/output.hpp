@@ -24,12 +24,19 @@ namespace simol
   class Output
   {
     std::string outputFoldername_;
+    std::ofstream outObservables_;
     std::ofstream outParticles_;
     std::ofstream outReplica_;
     std::ofstream outCorrelation_;
     
     int verbose_;
     double timeStep_;
+    int dimension_;
+    int numberOfParticles_;
+    
+    double kineticEnergy_;
+    double potentialEnergy_;
+    
     dvec responseForces_;
     
     dvec velocityRef_;
@@ -47,6 +54,13 @@ namespace simol
     const double& timeStep() const;
     int& verbose();
     const int& verbose() const;
+    const double& kineticEnergy() const;
+    double& kineticEnergy();
+    const double& potentialEnergy() const;
+    double& potentialEnergy();
+    double energy() const;
+    double temperature() const;
+    bool doComputeCorrelations() const;
     dvec& responseForces();
     const dvec& responseForces() const;
     double& responseForces(const int& i);
@@ -60,9 +74,9 @@ namespace simol
     const size_t& decorrelationNumberOfIterations() const;
     size_t& decorrelationNumberOfIterations();
     //double& integratedAutocorrelationP();
-    void display(Particle const& particle, double time);
+    void display(vector<Particle> const& configuration, double time);
     void finalDisplayAutocorrelations();
-    void finalDisplay(Particle const& particle, dvec const& externalForce, double time);
+    void finalDisplay(vector<Particle> const& configuration, dvec const& externalForce, double time);
     void appendAutocorrelationV(dvec const& velocity, double time);
     void appendAutocorrelationF(dvec const& force, double time);
   };

@@ -2,6 +2,7 @@
 
 using std::cout; 
 using std::endl; 
+using std::vector;
 
 namespace simol 
 {
@@ -25,11 +26,14 @@ namespace simol
   
   Output::Output(Input const& input):
     outputFoldername_(input.outputFoldername()), 
+    outObservables_(input.outputFoldername()+"observables.txt"), 
     outParticles_(input.outputFoldername()+"particles.txt"), 
     outReplica_(input.outputFoldername()+"replicas.txt"),
     outCorrelation_(input.outputFoldername()+"correlation.txt"),
     verbose_(1),
     timeStep_(input.timeStep()),
+    dimension_(input.dimension()),
+    numberOfParticles_(input.numberOfParticles()),
     responseForces_(input.dimension()),
     velocityRef_(input.dimension()),
     timeRef_(0),
@@ -59,6 +63,42 @@ namespace simol
   const int& Output::verbose() const
   {
     return verbose_;
+  }
+  
+  const double& Output::kineticEnergy() const
+  {
+    return kineticEnergy_;
+  }
+  
+  double& Output::kineticEnergy()
+  {
+    return kineticEnergy_;
+  }
+  
+  const double& Output::potentialEnergy() const
+  {
+    return potentialEnergy_;
+  }
+  
+  double& Output::potentialEnergy()
+  {
+    return potentialEnergy_;
+  }
+  
+  double Output::energy() const
+  {
+    return kineticEnergy_ + potentialEnergy_;
+  }
+  
+  double Output::temperature() const
+  {
+    return 2 * kineticEnergy_ / (dimension_ * numberOfParticles_); 
+  }
+  
+  bool Output::doComputeCorrelations() const
+  {
+    //return doComputeCorrelations_;
+    return decorrelationNumberOfIterations();
   }
   
   const double& Output::timeStep() const
@@ -91,24 +131,37 @@ namespace simol
     return integratedAutocorrelationP_; 
   }*/
 
-  void Output::display(Particle const& particle, double time)
+  void Output::display(vector<Particle> const& configuration, double time)
   {
-    outParticles_ << time 
-		  << " " << particle.position() 
-		  << " " << particle.momentum() 
-		  << " " << particle.kineticEnergy()
-		  << " " << particle.potentialEnergy()
-		  << " " << particle.energy()
-		  << std::endl;
+    for (size_t i = 0; i < configuration.size(); i++)
+      outParticles_ << time 
+		    << " " << i
+		    << " " << configuration[i].position() 
+		    << " " << configuration[i].momentum() 
+		    << " " << configuration[i].kineticEnergy()
+		    << " " << configuration[i].potentialEnergy()
+		    << " " << configuration[i].energy()
+		    << " " << configuration[i].force()		    
+		    << std::endl;
+		    
+    outObservables_ << time
+		    << " " << kineticEnergy()
+		    << " " << potentialEnergy()
+		    << " " << energy()
+		    << " " << temperature()
+		    << std::endl;
+    
   }
   
   
-  void Output::finalDisplay(Particle const& particle, dvec const& externalForce, double time)
+  void Output::finalDisplay(vector<Particle> const& configuration, dvec const& externalForce, double time)
   {
-    outReplica_ << time 
+    for (size_t i = 0; i < configuration.size(); i++)
+      outReplica_ << time 
+		  << " " << i
  		  << " " << externalForce(0)   
-		  << " " << particle.position() 
-		  << " " << particle.momentum() 
+		  << " " << configuration[i].position() 
+		  << " " << configuration[i].momentum() 
 		  << " " << responseForces(0)
 		  << std::endl;
   }

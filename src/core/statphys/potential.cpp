@@ -29,6 +29,9 @@ namespace simol
     return 0;
   }
   
+  dvec Potential::force(dvec const & position) const
+  { return -derivative(position); }
+  
 //#### Sinusoidal #####
   
   Sinusoidal::Sinusoidal(Input const & input, int const& indexOfReplica):Potential(input, indexOfReplica), amplitude_(input.amplitude()), pulsation_(2*M_PI/input.length())
@@ -44,8 +47,6 @@ namespace simol
     return deriv;
   }
 
-  dvec Sinusoidal::force(dvec const & position) const
-  { return -derivative(position); }
   
 //#### DoubleWell #####  
   
@@ -61,9 +62,6 @@ namespace simol
     deriv(0) = 4*height_*position(0)*(position(0)-interWell_/2)*(position(0)+interWell_/2);
     return deriv;
   }
-
-  dvec DoubleWell::force(dvec const & position) const
-  { return -derivative(position); }
   
 //#### Harmonic #####  
   
@@ -71,19 +69,15 @@ namespace simol
   {}
   
   
-  double Harmonic::operator()(double const & distance) const
-  { return pow(distance - 1, 2); }
+  double Harmonic::operator()(dvec const & vecDistance) const
+  { return stiffness_ * pow(vecDistance(0) - 1, 2); }
 
   dvec Harmonic::derivative(dvec const & vecDistance) const
   { 
     dvec deriv(1);
-    deriv(0) = 2 * (vecDistance(0) - 1);
+    deriv(0) = 2 * stiffness_ * (1 - vecDistance(0));
     return deriv;
   }
-
-  dvec Harmonic::force(dvec const & position) const
-  { return -derivative(position); }
-  
 
   
 }

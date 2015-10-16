@@ -35,11 +35,14 @@ namespace simol
       const double& externalForce(int const& i) const;
       //friend Dynamics* createDynamics(Potential const& potential);
       virtual void setRNG(RNG* rng){};
-      virtual void update(Particle& particle) = 0;
       void resetForce(Particle& particle) const;
       void computeForce(Particle& particle) const;
       void interaction(Particle& particle1, Particle& particle2) const;
-    private:
+      virtual void updateBefore(Particle& particle);
+      virtual void updateAfter(Particle& particle);
+      virtual void updateAfterLeft(Particle& particle) {updateAfter(particle);};
+      virtual void updateAfterRight(Particle& particle) {updateAfter(particle);};
+    protected:
       double timeStep_;
       size_t numberOfIterations_;
       Potential* potential_;
@@ -51,40 +54,67 @@ namespace simol
   {
   public:
     Hamiltonian(Input const&  input, int const& indexOfReplica=1);
-    void update(Particle& particle);
   };
   
+  class StochasticDynamics : public Dynamics
+  {
+  public:
+    StochasticDynamics(Input const& input, int const& indexOfReplica=1);
+    virtual void setRNG(RNG* rng);
+  protected:
+    RNG* rng_;
+  };
   
-  class Langevin : public Dynamics
+  class UniformStochasticDynamics : public StochasticDynamics
+  {
+  public:
+    UniformStochasticDynamics(Input const& input, int const& indexOfReplica=1);
+    virtual double const& temperature() const;
+    virtual double const& beta() const;
+  protected:
+    double temperature_;
+    double beta_;
+  };
+  
+  class Langevin : public UniformStochasticDynamics
   {
   public:
     Langevin(Input const& input, int const& indexOfReplica=1);
-    double const& temperature() const;
-    double const& beta() const;
     double const& gamma() const;
-    double const& sigma() const;
-    void setRNG(RNG* rng);
-    void update(Particle& particle);
-  private:
-    double temperature_;
-    double beta_;
+    double sigma() const;
+    virtual void updateAfter(Particle& particle);
+  protected:
     double gamma_;
-    double sigma_;
-    RNG* rng_;
   };
   
-  class Overdamped : public Dynamics
+  class Overdamped : public UniformStochasticDynamics
   {
   public:
     Overdamped(Input const& input, int const& indexOfReplica=1);
-    double const& temperature() const;
-    double const& beta() const;
-    void setRNG(RNG* rng);
-    void update(Particle& particle);
-  private:
-    double temperature_;
-    double beta_;
-    RNG* rng_;
+    virtual void updateBefore(Particle& particle);
+    virtual void updateAfter(Particle& particle);
+  };
+  
+  class BoundaryLangevin : public StochasticDynamics
+  {
+  public:
+    BoundaryLangevin(Input const& input, int const& indexOfReplica=1);
+    const double& betaLeft() const;
+    const double& betaRight() const;
+    const double& temperatureLeft() const;
+    const double& temperatureRight() const;
+    double const& gamma() const;
+    double sigmaLeft() const;
+    double sigmaRight() const;
+    //virtual void updateAfter(Particle& particle);
+    virtual void updateAfterLeft(Particle& particle);
+    virtual void updateAfterRight(Particle& particle);
+  protected:
+    double betaLeft_; 
+    double betaRight_; 
+    double temperatureLeft_;
+    double temperatureRight_;
+    double gamma_;
   };
   
 
