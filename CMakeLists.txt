@@ -13,6 +13,10 @@ include(ExternalProject)
 include(ProcessorCount)
 include(DownloadThenInstall)
 
+set(SIMOL_C_COMPILER ${CMAKE_C_COMPILER})
+set(SIMOL_CXX_COMPILER ${CMAKE_CXX_COMPILER})
+set(SIMOL_Fortran_COMPILER ${CMAKE_Fortran_COMPILER})
+
 ProcessorCount(N)
 if(NOT N EQUAL 0)
   set(CMAKE_BUILD_FLAGS -j${N})
@@ -22,11 +26,19 @@ endif()
 # EXECUTABLE SETTINGS
 #====================
 add_executable(test_simol src/test/unit/test_simol.cpp 
+<<<<<<< HEAD
                           src/test/unit/EigenSolverTest.cpp 
                           src/test/unit/SparseMatrixTest.cpp 
                           src/test/unit/MatrixMarketFileTest.cpp 
                           src/core/io/mmio.c
                           src/test/unit/DenseMatrixTest.cpp)
+=======
+               src/test/unit/EigenSolverTest.cpp 
+               src/test/unit/SparseMatrixTest.cpp 
+               #src/test/unit/MatrixMarketFileTest.cpp 
+               src/core/io/mmio.c
+               src/test/unit/VectorTest.cpp)
+>>>>>>> 97771869aa12f150437e28184e0877013015dc7c
 
 #=============
 # USER OPTIONS
@@ -69,17 +81,11 @@ if(ENABLE_DOWNLOAD)
   DownloadThenInstall("${LIBRARIES_TO_DOWNLOAD}")
 endif(ENABLE_DOWNLOAD)
 
-
-
-
-
   include_directories(${EIGEN_INSTALL_DIR}/include/eigen3)
   include_directories(${YAMLCPP_INSTALL_DIR}/include)
   include_directories(${BOOST_INSTALL_DIR}/include)
 
   message(STATUS "YAMLCPP_INSTALL_DIR is ${YAMLCPP_INSTALL_DIR}")
-
-
 
 #===================
 # USER CONFIGURATION
@@ -94,7 +100,15 @@ endif(EXISTS ${config})
 # COMPILER SETTINGS
 #==================
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -fopenmp -lgfortran")
+if(SIMOL_GCC_ROOT)
+  set(CMAKE_C_COMPILER ${SIMOL_GCC_ROOT}/bin/gcc)
+  set(CMAKE_CXX_COMPILER ${SIMOL_GCC_ROOT}/bin/g++)
+  set(CMAKE_Fortran_COMPILER ${SIMOL_GCC_ROOT}/bin/gfortran)
+  set(LD_LIBRARY_PATH ${SIMOL_GCC_ROOT}/lib64/libstdc++.so)
+endif(SIMOL_GCC_ROOT)
+
+#set(SIMOL_CXX_FLAGS "-static")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SIMOL_CXX_FLAGS} -Wall -Wextra -fopenmp -lgfortran -Wno-deprecated")
 
 CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
 if(COMPILER_SUPPORTS_CXX11)
@@ -105,10 +119,10 @@ endif()
 
 if (CMAKE_BUILD_TYPE EQUAL "Release")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2" )
-elseif (CMAKE_BUILD_TYPE EQUAL "Debug")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g" )
 elseif (CMAKE_BUILD_TYPE EQUAL "Profile")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -pg" )
+else ()
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g" )
 endif(CMAKE_BUILD_TYPE EQUAL "Release")
 
 #====================
@@ -116,7 +130,10 @@ endif(CMAKE_BUILD_TYPE EQUAL "Release")
 #====================
 
 include_directories(${CPPUNIT_INSTALL_DIR}/include)
+include_directories(/home/stoltz/travail/Simol/gcc-4.9.2/installation/include)
 
+
+#set(CMAKE_LINKER /home/stoltz/travail/Simol/gcc-4.9.2/installation/lib64/libstdc++.a)
 
 MESSAGE(STATUS ${BLAS_LIB})
 target_link_libraries(test_simol ${CPPUNIT_INSTALL_DIR}/lib/libcppunit.so 
@@ -134,6 +151,7 @@ include_directories(src/core)
 include_directories(src/core/linalg)
 include_directories(src/core/io)
 include_directories(src/core/statphys)
+include_directories(src/core/random)
 include_directories(src)
 
 add_subdirectory(src)

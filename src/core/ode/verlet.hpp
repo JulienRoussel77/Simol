@@ -1,38 +1,27 @@
 #ifndef SIMOL_VERLET_HPP
 #define SIMOL_VERLET_HPP
 
-#include "Particle.hpp"
-#include "Potential.hpp"
+#include "particle.hpp"
+#include "potential.hpp"
 
-namespace simol
+/*namespace simol
 {
-  template<class ScalarType> class Particle;
-  template<class ScalarType> class Potential;
-  template<class ScalarType> class HamiltonDynamics;
+  //class Particle;
+  class Potential;
+  class HamiltonDynamics;
   
-  template<class ScalarType>
-  void verlet(Particle<ScalarType> & particle, 
-              HamiltonDynamics<ScalarType> const & model, 
+  void verlet(Particle & particle, 
+              HamiltonDynamics const & model, 
               double timeStep)
   {
-    particle.momentum_ += timeStep * model.potential().force(particle.position()) / 2;
+    particle.momentum_ += timeStep * particle.force_ / 2;
     particle.position_ += timeStep * particle.momentum_ / particle.mass_;
-    particle.momentum_ += timeStep * model.potential().force(particle.position()) / 2;
+    particle.momentum_ += timeStep * particle.force_ / 2;
+    std::cout << particle.position_ << " " << particle.momentum_ << " " << particle.force_ << std::endl;
   }
-  
-  /*template<class ScalarType>
-  void verlet(AtomChain<ScalarType> const & model, 
-              double timeStep)
-  {
-    for( size_t index = 1; index < model.numberOfAtoms(); ++index )
-    {
-      model.momentum(index) += timeStep * model.potential().force(model.position(index)) / 2;
-      model.position(index) += timeStep * model.momentum(index) / model.mass(index);
-      model.momentum(index) += timeStep * model.potential().force(model.position(index)) / 2;
-    }
-  }*/
 
-}
+
+}*/
 
 
 

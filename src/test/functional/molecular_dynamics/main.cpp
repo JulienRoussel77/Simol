@@ -1,9 +1,12 @@
 
 #include <cstdlib>
+#include <iostream>
 
-#include "ParticleSystem.hpp"
-#include "HamiltonDynamics.hpp"
-#include "AtomChain.hpp"
+#include "multiSystem.hpp"
+#include "particleSystem.hpp"
+#include "dynamics.hpp"
+#include "Vector.hpp"
+#include "input.hpp"
 
 #include <cmath>
 
@@ -12,8 +15,12 @@
 
 #include "io/CommandLine.hpp"
 
+using std::cout; 
+using std::endl; 
+
 int main(int argc, char* argv[])
 {
+  
 
   //=====================
   // COMMAND LINE PARSING
@@ -24,55 +31,23 @@ int main(int argc, char* argv[])
   //===================
   // INPUT FILE LOADING
   //===================
-  YAML::Node parameters = YAML::LoadFile(cmd.inputFileName());
-
-  YAML::Node geometry = parameters["Geometry"];
-  size_t dimension = geometry["Dimension"].as<size_t>();
-  size_t length = geometry["Length"].as<size_t>();
-
-  YAML::Node mesh = parameters["Mesh"]["Time"];
-  double timeStep = mesh["Step"].as<double>();
-  size_t numberOfInstants = mesh["Number"].as<size_t>();
-
-  YAML::Node physics = parameters["Physics"];
-  double mass = physics["Particle"]["Mass"].as<double>();
-  double initial_speed = physics["Particle"]["Speed"].as<double>();
-  double initial_position = physics["Particle"]["Position"].as<double>();
-  double potential_parameter = physics["Potential"]["Parameter"].as<double>();
-
-  std::string outputFilename = parameters["Output"]["Filename"].as<std::string>();
+    
+  simol::Input input(cmd);
 
   //============
   // COMPUTATION
   //============
-
-  size_t numberOfParticles = 1;
-
-  simol::ParticleSystem<double> system(numberOfParticles, mass, initial_position, initial_speed);
-  simol::Potential<double> potential(potential_parameter, 2*M_PI/length);
-
-  simol::HamiltonDynamics<double> model(potential);
   
-  std::ofstream outputFile(outputFilename);
+  simol::MultiSystem replica(input);
+
+  //simol::Dynamics* model = simol::createDynamics(input);
   
-  for (size_t instantIndex  =1; instantIndex < numberOfInstants; ++instantIndex)
-  {
-    double instant = instantIndex * timeStep;
-    system.simulate(timeStep, model, outputFile);
-  }
-
-  //===========
-  // ATOM CHAIN
-  //===========
+  replica.launch();
   
-  size_t numberOfAtoms = 3;
-  double leftPosition = 0;
-  double leftMomentum = 0;
-  double leftTemperature = 0;
-  double rightTemperature = 1;
-  simol::AtomChain<double> chain(numberOfAtoms, mass, leftPosition, leftMomentum, leftTemperature, rightTemperature, potential);
 
+  
 
+  std::cout << "Fin de la simulation" << std::endl;
 
   return EXIT_SUCCESS;
 }

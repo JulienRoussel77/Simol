@@ -1,0 +1,21 @@
+Geometry:
+  Dimension: 1
+  Length: 1
+
+Mesh:
+  Time:
+    Step: 0.001
+    Number: 1000
+
+Physics:
+  System:
+    Name: Chain
+    Number: 10
+    PositionMin: -5
+    PositionMax: 5
+  Potential:
+    Name: Harmonic
+    Stiffness: 1
+  Model:
+    Name: Overdamped
+    Temperature: 1
