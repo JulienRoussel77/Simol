@@ -21,7 +21,12 @@ endif()
 #====================
 # EXECUTABLE SETTINGS
 #====================
-add_executable(test_simol src/test/unit/test_simol.cpp src/test/unit/EigenSolverTest.cpp src/test/unit/SparseMatrixTest.cpp src/test/unit/MatrixMarketFileTest.cpp src/core/io/mmio.c)
+add_executable(test_simol src/test/unit/test_simol.cpp 
+                          src/test/unit/EigenSolverTest.cpp 
+                          src/test/unit/SparseMatrixTest.cpp 
+                          src/test/unit/MatrixMarketFileTest.cpp 
+                          src/core/io/mmio.c
+                          src/test/unit/DenseMatrixTest.cpp)
 
 #=============
 # USER OPTIONS

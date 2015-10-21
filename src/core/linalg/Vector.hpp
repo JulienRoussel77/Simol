@@ -6,7 +6,8 @@
 
 namespace simol
 {
-  template<class ScalarType, template<class> class WrappedLibrary>
+
+  template<class ScalarType, template<class> class WrappedLibrary = eigen>
   class Vector;
 }
 
@@ -22,11 +23,22 @@ namespace simol
   {
     public:
       Vector(size_t const size);
-      size_t const & size() const;
+      Vector(typename eigen<ScalarType>::VectorType const & wrappedVector)
+      :wrapped_(wrappedVector)
+      {}
+      size_t size() const;
       ScalarType & operator()(size_t const index);
       ScalarType const & operator()(size_t const index) const;
+      
+      ScalarType min() const
+      { return wrapped_.minCoeff(); }
+      
+      ScalarType max() const
+      { return wrapped_.maxCoeff(); }
+      
+      
 
-    private:
+    public:
       typename eigen<ScalarType>::VectorType wrapped_;
       
   };

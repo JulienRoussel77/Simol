@@ -31,7 +31,7 @@ namespace simol
     public:
       SparseMatrix(size_t const numberOfRows, size_t const numberOfColumns);
       SparseMatrix(MatrixMarketFile const & file);
-    private:
+    public:
       typename eigen<ScalarType>::SparseMatrixType wrapped_;
   };
 

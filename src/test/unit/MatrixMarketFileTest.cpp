@@ -11,7 +11,7 @@ namespace simol
 
   void MatrixMarketFileTest::setUp()
   {
-    kinetic_ = new simol::MatrixMarketFile("../src/test/data/quantum_chemistry/kinetic_matrix.mtx");
+    kinetic_ = new simol::MatrixMarketFile("../src/test/data/identity5.mtx");
   }
 
   void MatrixMarketFileTest::tearDown()
@@ -36,7 +36,7 @@ namespace simol
   void MatrixMarketFileTest::testNumberOfRows()
   {
     std::size_t actual_size = kinetic_->numberOfRows();
-    std::size_t expected_size = 10;
+    std::size_t expected_size = 5;
     CPPUNIT_ASSERT_EQUAL(expected_size, actual_size);
   }
 

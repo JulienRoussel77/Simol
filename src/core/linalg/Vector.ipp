@@ -18,7 +18,7 @@ namespace simol
   //=====================
 
   template<class ScalarType> inline
-  size_t const & Vector<ScalarType,eigen>::size() const
+  size_t Vector<ScalarType,eigen>::size() const
   { return wrapped_.size(); }
   
   template<class ScalarType> inline
