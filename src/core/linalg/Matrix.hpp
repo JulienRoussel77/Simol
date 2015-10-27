@@ -37,6 +37,21 @@ namespace simol
               return columnVector;
           }
           
+          
+          DenseMatrix(MatrixMarketFile const & file)
+          : wrapped_(eigen<double>::DenseMatrixType::Zero(file.numberOfRows(), file.numberOfColumns()))
+          {
+            std::vector< Eigen::Triplet<ScalarType, std::size_t> > nonzeros(file.numberOfNonzeros());
+            for(size_t nonzeroIndex = 0; nonzeroIndex < file.numberOfNonzeros(); ++nonzeroIndex)
+            {
+              int rowIndex;
+              int columnIndex;
+              ScalarType nonzero;
+              fscanf(file.content(), "%d %d %lg\n", &rowIndex, &columnIndex, &nonzero);
+              wrapped_(rowIndex, columnIndex) = nonzero;
+            }
+          }
+          
           /*typename eigen<ScalarType>::AdjointReturnType 
           adjoint() const
           { return wrapped_.adjoint(); }*/
