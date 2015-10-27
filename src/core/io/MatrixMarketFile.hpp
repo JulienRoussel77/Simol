@@ -37,7 +37,7 @@ namespace simol
   : content_(fopen(filename.c_str(), "r"))
   {
     if(!content_)
-      throw std::ios_base::failure("Unable to open the specified matrix market file");
+      throw std::ios_base::failure("Unable to open " + filename);
     MM_typecode matcode;
     if (mm_read_banner(content_, &matcode) != 0)
       throw new std::ios_base::failure("Unable to read the banner");
