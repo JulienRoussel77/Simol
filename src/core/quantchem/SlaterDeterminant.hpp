@@ -20,13 +20,13 @@ namespace simol
     DenseMatrix<double>
     Smat(SlaterDeterminant const & Phi, 
          SlaterDeterminant const & Psi, 
-         SparseMatrix<double> const & overlap) // mal nommé : utilisé avec H
+         DenseMatrix<double> const & overlap) // mal nommé : utilisé avec H
     {
         DenseMatrix<double> U = Phi.matrix();
         DenseMatrix<double> V = Psi.matrix();
 
         // recupere la partie non stockee (symetrique)
-        DenseMatrix<double> temp(overlap.numberOfRows(), V.number_of_columns());
+        DenseMatrix<double> temp(overlap.numberOfRows(), V.numberOfColumns());
         temp.wrapped_ = overlap.wrapped_.selfadjointView<Eigen::Upper>() * V.wrapped_;
 
         return DenseMatrix<double>(U.wrapped_.adjoint() * temp.wrapped_);

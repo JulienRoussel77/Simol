@@ -48,10 +48,10 @@ namespace simol
                                   size_t const columnIndex)
           { return wrapped_(rowIndex, columnIndex); }
           
-          size_t number_of_rows() const
+          size_t numberOfRows() const
           { return wrapped_.rows(); }
           
-          size_t number_of_columns() const
+          size_t numberOfColumns() const
           { return wrapped_.cols(); }
           
           double rcond() const
