@@ -24,12 +24,17 @@ namespace simol
           : wrapped_(numberOfRows, numberOfColumns)
           {}
           
+          DenseMatrix(DenseMatrix const & matrix) = default;
+          
           DenseMatrix(typename eigen<ScalarType>::DenseMatrixType const & wrappedMatrix)
           : wrapped_(wrappedMatrix)
           {}
           
-          //Vector<ScalarType> column(size_t const index)
-          //{ return wrapped_.col(index); }
+          Vector<ScalarType> column(size_t const index)
+          { 
+              Vector<ScalarType> columnVector(wrapped_.rows());
+              columnVector.wrapped_.col(index); 
+          }
           
           /*typename eigen<ScalarType>::AdjointReturnType 
           adjoint() const

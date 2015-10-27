@@ -8,6 +8,9 @@ namespace simol
     class SlaterDeterminant
     {
         public:
+            SlaterDeterminant(DenseMatrix<double> const & matrix)
+            : matrix_(matrix)
+            {}
             DenseMatrix<double> const & matrix() const
             { return matrix_; }
         private:
