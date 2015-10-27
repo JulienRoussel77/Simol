@@ -333,402 +333,402 @@ namespace simol
 
     }
    
-double H2_slat(const SlaterDeterminant& Phi, 
-               const SlaterDeterminant& Psi, 
-               const DenseMatrix<double>& O, 
-               const DenseMatrix<double>& E,
-               size_t const numberOfElectrons,
-               size_t const M_disc_,
-               double ratio_ = 1e-12)
-{
-	if (numberOfElectrons==2) 
-        return H2_slat_N2(Phi,Psi,E,numberOfElectrons,M_disc_ );
-
-	else
-	{
-		DenseMatrix<double> S = Smat(Phi, Psi, O);
-
-		DenseMatrix<double> U = Phi.matrix();
-		DenseMatrix<double> V = Psi.matrix();
-
-		Eigen::JacobiSVD<eigen<double>::DenseMatrixType> svd(S.wrapped_);
-
-		Vector<double> D = svd.singularValues();
-		double lmin = D.min();
-		double lmax = D.max();
-
-		double ratio = lmin/lmax;
-
-		//Si le ratio n'est pas trop petit, c'est la formule habituelle
-		if (ratio > ratio_)
-		{
-			DenseMatrix<double> Sinv(S.numberOfRows(), S.numberOfColumns());
-            Sinv.wrapped_ = S.wrapped_.inverse();
-            double scal0 = 0;
-
-		    for (size_t i=0; i < numberOfElectrons; i++)
-		    {
-                Vector<double> Ucol_i(U.numberOfRows());
-                Ucol_i.wrapped_ = U.wrapped_.col(i);
-                
-		    	for (size_t j=0; j < numberOfElectrons; j++)
-		    	{
-                    Vector<double> Ucol_j(U.numberOfRows());
-                    Ucol_j.wrapped_ = U.wrapped_.col(j);
-                    
-		    		for (size_t k = 0; k < numberOfElectrons; k++)
-		    		{
-                        Vector<double> Vcol_k(U.numberOfRows());
-                        Vcol_k.wrapped_ = V.wrapped_.col(k);
-                        
-		    			for (size_t l=0; l < numberOfElectrons; l++)
-		    			{
-                            Vector<double> Vcol_l(U.numberOfRows());
-                            Vcol_l.wrapped_ = V.wrapped_.col(l);
-                            
-		    				 //Ici je prends les notations de Friedrichs
-		    				scal0 += 0.5 * elint(M_disc_, Ucol_i, Vcol_k, Ucol_j, Vcol_l, E)
-                                         * (Sinv(k,i)*Sinv(l,j) - Sinv(k,j)*Sinv(l,i));
-
-		    			}
-		    		}
-		    	}
-		    }
-
-		    return scal0 * (S.wrapped_.determinant());
-		}
-		else
-		{
-			Eigen::JacobiSVD<eigen<double>::DenseMatrixType> svd(S.wrapped_, Eigen::ComputeThinU | Eigen::ComputeThinV);
-
-			DenseMatrix<double> Uvec = svd.matrixU();
-			DenseMatrix<double> Vvec = svd.matrixV();
-
-			Vector<double> D = svd.singularValues();
-			double lmax = D.max();
-
-			D.wrapped_ *= (1.0/lmax);
-
-			//On compte la multiplicité de la valeur propre nulle
-			int mult = 0;
-			for (size_t i= 0; i< numberOfElectrons; i++)
-			{
-			    if (D(i) < ratio_) 
-                    ++mult;
-			}
-
-
-			//cout << "mult = " << mult << endl;
-
-		    //si la multiplicité de 0 est plus grande que 2, la valeur est 0
-			if (mult >2.5) 
-                return 0;
-
-	        else
-	        {
-	        	if ((1.5 > mult) && (mult > 0.5)) //mult = 1
-	        	{
-
-	        		int indmin = getIndMin(D);
-	                Vector<double> xV(Vvec.numberOfRows());
-                    xV.wrapped_ = Vvec.wrapped_.col(indmin);
-	                Vector<double> xU(Uvec.numberOfRows());
-                    xU.wrapped_ = Uvec.wrapped_.col(indmin);
-
-	                Vector<double> orthU(U.numberOfRows());
-                    orthU.wrapped_ = U.wrapped_ * xU.wrapped_;  //Vecteur dans l'orthogonal du sous-espace engendré par V
-	                Vector<double> orthV(V.numberOfRows());
-                    orthV.wrapped_ = V.wrapped_ * xV.wrapped_;  //Vecteur dans l'orthogonal du sous-espace engendré par U
-
-	                Vector<double> temp(O.numberOfColumns());
-                    temp.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>()) * orthU.wrapped_;
-	                orthU.wrapped_ = 1.0 / sqrt( (orthU.wrapped_.adjoint() * temp.wrapped_) ) * orthU.wrapped_;
-	                temp.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>()) * orthV.wrapped_;
-	                orthV.wrapped_ = 1.0 / sqrt( (orthV.wrapped_.adjoint()) *temp.wrapped_) *orthV.wrapped_;
-
-
-	                DenseMatrix<double> PsiU(M_disc_,numberOfElectrons);
-                    PsiU.wrapped_ = eigen<double>::DenseMatrixType::Zero(M_disc_,numberOfElectrons); //Le reste des fonctions: le deux sous-espaces engendrés sont les mêmes, égaux à l'intersection de deux sous-espaces de départ
-	                DenseMatrix<double> PsiV(M_disc_,numberOfElectrons);
-                    PsiV.wrapped_ = eigen<double>::DenseMatrixType::Zero(M_disc_,numberOfElectrons);
-
-	                Vector<double> muU(numberOfElectrons);
-                    muU.wrapped_ = eigen<double>::VectorType::Zero(numberOfElectrons);
-	                Vector<double> muV(numberOfElectrons);
-                    muV.wrapped_ = eigen<double>::VectorType::Zero(numberOfElectrons);
-
-		            for(size_t k=0; k<numberOfElectrons; k++)
-		            {
-		            	temp.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>()) * (U.wrapped_.col(k));
-		            	double PS = orthU.wrapped_.adjoint() * temp.wrapped_;
-		            	PsiU.wrapped_.col(k) = U.wrapped_.col(k) - PS * orthU.wrapped_;
-		            	muU(k) = PS;
-
-		            	temp.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>()) * (V.wrapped_.col(k));
-		            	PS = orthV.wrapped_.adjoint()*temp.wrapped_;
-		                PsiV.wrapped_.col(k) = V.wrapped_.col(k) - PS*orthV.wrapped_;
-		                muV(k) = PS;
-		            }
-
-		            //On crée une base orthonormale de l'intersection des deux
-		            //sous-espaces: par exemple à partir de xU
-		            DenseMatrix<double> xUbas(numberOfElectrons, numberOfElectrons-1);
-                    xUbas.wrapped_ = eigen<double>::DenseMatrixType::Zero(numberOfElectrons, numberOfElectrons-1);
-		            xUbas.wrapped_.block(0,0, numberOfElectrons, indmin) = Uvec.wrapped_.block(0,0, numberOfElectrons, indmin);
-		            xUbas.wrapped_.block(0,indmin, numberOfElectrons, numberOfElectrons-indmin-1) = Uvec.wrapped_.block(0, indmin+1, numberOfElectrons, numberOfElectrons-indmin-1);
-
-		            DenseMatrix<double> coeffs_bas(U.numberOfRows(), xUbas.numberOfColumns());
-                    coeffs_bas.wrapped_ = U.wrapped_ * xUbas.wrapped_;
-		            //Puis on orthonormalise les vecteurs de coeffs_bas
-		            for (size_t i=0; i<(numberOfElectrons-1); i++)
-		            {
-		            	Vector<double> temp2(O.numberOfColumns());
-                        temp2.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>()) * (coeffs_bas.wrapped_.col(i));
-		            	double PS2 = orthU.wrapped_.adjoint()*temp2.wrapped_;
-		            	coeffs_bas.wrapped_.col(i) = coeffs_bas.wrapped_.col(i) - PS2*orthU.wrapped_;
-
-		            	for (size_t j=0; j<i; j++)
-		            	{
-		            		temp2.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>()) * (coeffs_bas.wrapped_.col(j));
-		            		PS2 = ((coeffs_bas.wrapped_.col(i)).adjoint())*temp2.wrapped_;
-		            		coeffs_bas.wrapped_.col(i) = coeffs_bas.wrapped_.col(i) - PS2*coeffs_bas.wrapped_.col(j);
-		            	}
-
-		            	temp2.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>()) * (coeffs_bas.wrapped_.col(i));
-		            	PS2 = ((coeffs_bas.wrapped_.col(i)).adjoint()) * temp2.wrapped_;
-		            	coeffs_bas.wrapped_.col(i) = (1.0/sqrt(PS2)) * coeffs_bas.wrapped_.col(i);
-
-		            }
-
-		            DenseMatrix<double> CU(numberOfElectrons-1,numberOfElectrons);
-                    CU.wrapped_ = eigen<double>::DenseMatrixType::Zero(numberOfElectrons-1,numberOfElectrons);
-		            DenseMatrix<double> CV(numberOfElectrons-1,numberOfElectrons);
-                    CV.wrapped_ = eigen<double>::DenseMatrixType::Zero(numberOfElectrons-1,numberOfElectrons);
-
-		            for (size_t k=0; k< numberOfElectrons; k++)
-		            {
-		            	for (size_t l=0; l< (numberOfElectrons-1); l++)
-		            	{
-		            		Vector<double> temp(O.numberOfRows());
-                            temp.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>()) * (coeffs_bas.wrapped_.col(l));
-		            		double PS = ((PsiU.wrapped_.col(k)).adjoint()) * temp.wrapped_;
-		            		CU(l,k) = PS;
-
-		            		temp.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>()) * (coeffs_bas.wrapped_.col(l));
-		            		PS = ((PsiV.wrapped_.col(k)).adjoint())*temp.wrapped_;
-		            		CV(l,k) = PS;
-		            	}
-		            }
-
-		            //On construit la somme
-		            double sum2 = 0;
-		            for (size_t l=0; l< numberOfElectrons-1; l++)
-		            	sum2 += elint(M_disc_,coeffs_bas.column(l),coeffs_bas.column(l),orthU,orthV,E) 
-                              - elint(M_disc_,coeffs_bas.column(l),orthV,coeffs_bas.column(l),orthU,E);
-
-
-		            //On a alors pour tout k U(:,k) = muU(k)*orthU + PsiU(:,k)
-		            double sum = 0;
-
-		            for (size_t k1= 0; k1 < numberOfElectrons; k1++)
-		            {
-		            	for (size_t k2 = 0; k2 < numberOfElectrons; k2++)
-		            	{
-		            		DenseMatrix<double> aU(numberOfElectrons-1,numberOfElectrons-1);
-                            aU.wrapped_ = eigen<double>::DenseMatrixType::Zero(numberOfElectrons-1,numberOfElectrons-1);
-		            		aU.wrapped_.block(0,0,numberOfElectrons-1,k1) = CU.wrapped_.block(0,0,numberOfElectrons-1,k1);
-		            		aU.wrapped_.block(0,k1,numberOfElectrons-1,numberOfElectrons-1-k1) = CU.wrapped_.block(0,(k1+1),numberOfElectrons-1, numberOfElectrons-1-k1);
-
-		            		DenseMatrix<double> aV(numberOfElectrons-1,numberOfElectrons-1);
-                            aV.wrapped_ = eigen<double>::DenseMatrixType::Zero(numberOfElectrons-1,numberOfElectrons-1);
-		            		aV.wrapped_.block(0,0,numberOfElectrons-1,k2) = CV.wrapped_.block(0,0,numberOfElectrons-1,k2);
-		            		aV.wrapped_.block(0,k2,numberOfElectrons-1, numberOfElectrons-1-k2) = CV.wrapped_.block(0,k2+1,numberOfElectrons-1, numberOfElectrons-1-k2);
-
-		            		sum += muU(k1)*muV(k2)*pow(-1,k1)*pow(-1,k2)*sum2*(aU.wrapped_.determinant())*(aV.wrapped_.determinant());
-		            	}
-
-		            }
-
-		            return sum;
-	        	}
-
-	        	else
-	        	{	//mult = 2
-	        		//La dimension de l'intersection des deux espaces est N-2: il
-	        		//faut récupérer pour U et pour V les deux vecteurs qui sont
-	        		//orthonormaux à l'espace
-
-	        		size_t indmin = getIndMin(D);
-	        		Vector<double> xV1(Vvec.numberOfRows());
-                    xV1.wrapped_ = Vvec.wrapped_.col(indmin);
-	        		Vector<double> xU1(Uvec.numberOfRows());
-                    xU1.wrapped_ = Uvec.wrapped_.col(indmin);
-
-	        		D(indmin) = 1e20;
-
-	        		size_t indmin2 = getIndMin(D);
-	        		Vector<double> xV2 = Vvec.column(indmin2);
-	        		Vector<double> xU2 = Uvec.column(indmin2);
-
-	        		Vector<double> orthU1(U.numberOfRows());
-                    orthU1.wrapped_ = U.wrapped_ * xU1.wrapped_;  //Vecteur dans l'orthogonal du sous-espace engendré par V
-	        		Vector<double> orthU2(U.numberOfRows());
-                    orthU1.wrapped_ = U.wrapped_ * xU2.wrapped_;
-	        		Vector<double> orthV1(V.numberOfRows());
-                    orthV1.wrapped_ = V.wrapped_ * xV1.wrapped_;  //Vecteur dans l'orthogonal du sous-espace engendré par U
-	        		Vector<double> orthV2(V.numberOfRows());
-                    orthV2.wrapped_ = V.wrapped_ * xV2.wrapped_;
-
-	        		Vector<double> temp(O.numberOfRows());
-                    temp.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>()) * orthU1.wrapped_;
-	        		orthU1.wrapped_ = (1.0/sqrt((orthU1.wrapped_.adjoint()) * temp.wrapped_)) * orthU1.wrapped_;
-
-	        		temp.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>()) * orthU2.wrapped_;
-	        		double PS = (orthU1.wrapped_.adjoint()) * temp.wrapped_;
-	        		orthU2.wrapped_ -= PS * orthU1.wrapped_;
-	        		temp.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>()) * orthU2.wrapped_;
-	        		orthU2.wrapped_ = (1.0/sqrt((orthU2.wrapped_.adjoint())*temp.wrapped_))*orthU2.wrapped_;
-
-	        		temp.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>())*orthV1.wrapped_;
-	        	    orthV1.wrapped_ = (1.0/sqrt((orthV1.wrapped_.adjoint())*temp.wrapped_))*orthV1.wrapped_;
-
-	        	    temp.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>())*orthV2.wrapped_;
-	        	    PS = (orthV1.wrapped_.adjoint())*temp.wrapped_;
-	        	    orthV2.wrapped_ -= PS*orthV1.wrapped_;
-	        	    temp.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>())*orthV2.wrapped_;
-	        	    orthV2.wrapped_ = (1.0/sqrt((orthV2.wrapped_.adjoint())*temp.wrapped_))*orthV2.wrapped_;
-
-	        	    DenseMatrix<double> PsiU(M_disc_,numberOfElectrons);
-                    PsiU.wrapped_ = eigen<double>::DenseMatrixType::Zero(M_disc_,numberOfElectrons); //Le reste des fonctions: les deux sous-espaces engendrés sont les mêmes, égaux à l'intersection de deux sous-espaces de départ
-	        	    DenseMatrix<double> PsiV(M_disc_,numberOfElectrons);
-                    PsiV.wrapped_ = eigen<double>::DenseMatrixType::Zero(M_disc_,numberOfElectrons);
-
-	        	    Vector<double> muU1(numberOfElectrons); 
-                    muU1.wrapped_ = eigen<double>::VectorType::Zero(numberOfElectrons);
-	        	    Vector<double> muV1(numberOfElectrons); 
-                    muV1.wrapped_ = eigen<double>::VectorType::Zero(numberOfElectrons);
-	        	    Vector<double> muU2(numberOfElectrons); 
-                    muU2.wrapped_ = eigen<double>::VectorType::Zero(numberOfElectrons);
-	        	    Vector<double> muV2(numberOfElectrons); 
-                    muV2.wrapped_ = eigen<double>::VectorType::Zero(numberOfElectrons);
-
-	        	    for (size_t k=0; k< numberOfElectrons; k++)
-	        	    {
-
-	        	    	Vector<double> temp2(O.numberOfRows());
-                        temp2.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>())*(U.wrapped_.col(k));
-	        	    	muU1(k) = (orthU1.wrapped_.adjoint())*temp2.wrapped_;
-	        	    	muU2(k) = (orthU2.wrapped_.adjoint())*temp2.wrapped_;
-	        	    	temp2.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>())*(V.wrapped_.col(k));
-	        	    	muV1(k) = orthV1.wrapped_.adjoint()*temp2.wrapped_;
-	        	    	muV2(k) = orthV2.wrapped_.adjoint()*temp2.wrapped_;
-
-
-	        	    	PsiU.wrapped_.col(k) = U.wrapped_.col(k) - muU1(k)*orthU1.wrapped_ - muU2(k)*orthU2.wrapped_;
-	        	    	PsiV.wrapped_.col(k) = V.wrapped_.col(k) - muV1(k)*orthV1.wrapped_ - muV2(k)*orthV2.wrapped_;
-	        	    }
-
-	                //On crée une base orthonormale de l'intersection des deux
-	        	    //sous-espaces: par exemple à partir de xU
-	        	    DenseMatrix<double> xUbas(numberOfElectrons, numberOfElectrons-2);
-                    xUbas.wrapped_ = eigen<double>::DenseMatrixType::Zero(numberOfElectrons, numberOfElectrons-2);
-	        	    int ind = 0;
-	        	    for (size_t k=0; k< numberOfElectrons; k++)
-	        	    {
-	        	    	if ( (k!=indmin) && (k!=indmin2))
-	        	    	{
-	        	    		xUbas.wrapped_.col(ind) = Uvec.wrapped_.col(k);
-	        	    		ind = ind+1;
-	        	    	}
-	        	    }
-
-	        	    DenseMatrix<double> coeffs_bas(U.numberOfRows(), xUbas.numberOfColumns());
-                    coeffs_bas.wrapped_ = U.wrapped_ * xUbas.wrapped_;
-
-	        	    //Puis on orthonormalise les vecteurs de coeffs_bas
-	        	    for (size_t i= 0; i < numberOfElectrons-2; i++)
-	        	    {
-	        	    	//On commence par orthonormaliser par rapport à orthU1 et orthU2
-	        	    	Vector<double> temp3(O.numberOfRows());
-                        temp3.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>())*(coeffs_bas.wrapped_.col(i));
-	        	    	double PS3 = (orthU1.wrapped_.adjoint())*temp3.wrapped_;
-	        	    	coeffs_bas.wrapped_.col(i) = coeffs_bas.wrapped_.col(i) - PS3*orthU1.wrapped_;
-	        	    	temp3.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>())*(coeffs_bas.wrapped_.col(i));
-	        	    	PS3 = (orthU2.wrapped_.adjoint())*temp3.wrapped_;
-	        	    	coeffs_bas.wrapped_.col(i) = coeffs_bas.wrapped_.col(i) - PS3*orthU2.wrapped_;
-	        	    	for (size_t j=0; j<i; j++)
-	        	    	{
-	        	    		temp3.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>())*(coeffs_bas.wrapped_.col(i));
-	        	    		PS3 = ((coeffs_bas.wrapped_.col(j)).adjoint())*temp3.wrapped_;
-	        	    		coeffs_bas.wrapped_.col(i) = coeffs_bas.wrapped_.col(i) - PS3*coeffs_bas.wrapped_.col(j);
-	        	    	}
-	        	    	temp3.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>())*(coeffs_bas.wrapped_.col(i));
-	        	    	coeffs_bas.wrapped_.col(i) = 1.0/sqrt((coeffs_bas.wrapped_.col(i).adjoint())*temp3.wrapped_)*coeffs_bas.wrapped_.col(i);
-	        	    }
-
-
-	        	    DenseMatrix<double> CU(numberOfElectrons-2,numberOfElectrons); 
-                    CU.wrapped_ = eigen<double>::DenseMatrixType::Zero(numberOfElectrons-2,numberOfElectrons);
-	        	    DenseMatrix<double> CV(numberOfElectrons-2,numberOfElectrons); 
-                    CV.wrapped_ = eigen<double>::DenseMatrixType::Zero(numberOfElectrons-2,numberOfElectrons);
-
-	        	    for (size_t k=0; k< numberOfElectrons; k++)
-	        	    {
-	        	    	for (size_t l=0; l< numberOfElectrons-2; l++)
-	                    {
-	        	    		Vector<double> temp4(O.numberOfRows());
-                            temp4.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>())*coeffs_bas.wrapped_.col(l);
-	        	    		CU(l,k) = (PsiU.wrapped_.col(k)).adjoint()*temp4.wrapped_;
-	        	    		CV(l,k) = (PsiV.wrapped_.col(k)).adjoint()*temp4.wrapped_;
-	                    }
-	        	    }
-
-	        	    //On construit la somme
-	        	    double sum2 = elint(M_disc_, orthU1,orthV1,orthU2,orthV2,E) - elint(M_disc_, orthU1,orthV2,orthU2,orthV1, E);
-
-	        	    //On a alors pour tout k U(:,k) = muU1(k)*orthU1 + muU2(k)*orthU2 + PsiU(:,k)
-	        	    double sum = 0;
-
-	        	    for (size_t iu = 0; iu < numberOfElectrons-1; iu++)
-	        	    {
-	        	    	for (size_t ju = iu+1 ; ju <numberOfElectrons; ju++)
-	        	    	{
-	        	    		DenseMatrix<double> aU(numberOfElectrons-2,numberOfElectrons-2);
-                            aU.wrapped_ = eigen<double>::DenseMatrixType::Zero(numberOfElectrons-2,numberOfElectrons-2);
-	        	    		aU.wrapped_.block(0,0,numberOfElectrons-2, iu) = CU.wrapped_.block(0,0,numberOfElectrons-2,iu);
-	        	    		aU.wrapped_.block(0,iu,numberOfElectrons-2, ju-iu-1) = CU.wrapped_.block(0,iu+1, numberOfElectrons-2, ju-iu-1);
-	        	    		aU.wrapped_.block(0,ju-1,numberOfElectrons-2, numberOfElectrons-ju-1) = CU.wrapped_.block(0,ju+1,numberOfElectrons-2, numberOfElectrons-ju-1);
-
-
-	        	    		for (size_t iv = 0; iv < numberOfElectrons-1; iv++)
-	                        {
-	        	    			for (size_t jv = iv+1; jv < numberOfElectrons; jv++)
-	        	    			{
-
-	        	    				DenseMatrix<double> aV(numberOfElectrons-2,numberOfElectrons-2);
-                                    aV.wrapped_ = eigen<double>::DenseMatrixType::Zero(numberOfElectrons-2,numberOfElectrons-2);
-	        	    				aV.wrapped_.block(0,0,numberOfElectrons-2,iv) = CV.wrapped_.block(0,0, numberOfElectrons-2, iv);
-	        	    				aV.wrapped_.block(0,iv,numberOfElectrons-2,jv-iv-1) = CV.wrapped_.block(0,iv+1,numberOfElectrons-2,jv-iv-1);
-	        	    				aV.wrapped_.block(0,jv-1,numberOfElectrons-2,numberOfElectrons-jv-1) = CV.wrapped_.block(0,jv+1,numberOfElectrons-2,numberOfElectrons-jv-1);
-
-
-	        	    				sum += pow(-1,iu) * pow(-1,ju+1) *pow(-1,iv) *pow(-1,jv+1) 
-                                         * ((muU1(iu)*muU2(ju) -muU1(ju)*muU2(iu)) * (muV1(iv)*muV2(jv) -muV1(jv)*muV2(iv))) 
-                                         * sum2*(aU.wrapped_.determinant())*(aV.wrapped_.determinant());
-
-	        	    			}
-	                        }
-
-	        	    	}
-	        	    }
-
-	        	    return sum;
-	        	}
-	        }
-		}
-	}
-
-}
+    double H2_slat(const SlaterDeterminant& Phi, 
+                   const SlaterDeterminant& Psi, 
+                   const DenseMatrix<double>& O, 
+                   const DenseMatrix<double>& E,
+                   size_t const numberOfElectrons,
+                   size_t const M_disc_,
+                   double ratio_ = 1e-12)
+    {
+        if (numberOfElectrons==2) 
+            return H2_slat_N2(Phi,Psi,E,numberOfElectrons,M_disc_ );
+
+        else
+        {
+            DenseMatrix<double> S = Smat(Phi, Psi, O);
+
+            DenseMatrix<double> U = Phi.matrix();
+            DenseMatrix<double> V = Psi.matrix();
+
+            Eigen::JacobiSVD<eigen<double>::DenseMatrixType> svd(S.wrapped_);
+
+            Vector<double> D = svd.singularValues();
+            double lmin = D.min();
+            double lmax = D.max();
+
+            double ratio = lmin/lmax;
+
+            //Si le ratio n'est pas trop petit, c'est la formule habituelle
+            if (ratio > ratio_)
+            {
+                DenseMatrix<double> Sinv(S.numberOfRows(), S.numberOfColumns());
+                Sinv.wrapped_ = S.wrapped_.inverse();
+                double scal0 = 0;
+
+                for (size_t i=0; i < numberOfElectrons; i++)
+                {
+                    Vector<double> Ucol_i(U.numberOfRows());
+                    Ucol_i.wrapped_ = U.wrapped_.col(i);
+
+                    for (size_t j=0; j < numberOfElectrons; j++)
+                    {
+                        Vector<double> Ucol_j(U.numberOfRows());
+                        Ucol_j.wrapped_ = U.wrapped_.col(j);
+
+                        for (size_t k = 0; k < numberOfElectrons; k++)
+                        {
+                            Vector<double> Vcol_k(U.numberOfRows());
+                            Vcol_k.wrapped_ = V.wrapped_.col(k);
+
+                            for (size_t l=0; l < numberOfElectrons; l++)
+                            {
+                                Vector<double> Vcol_l(U.numberOfRows());
+                                Vcol_l.wrapped_ = V.wrapped_.col(l);
+
+                                 //Ici je prends les notations de Friedrichs
+                                scal0 += 0.5 * elint(M_disc_, Ucol_i, Vcol_k, Ucol_j, Vcol_l, E)
+                                             * (Sinv(k,i)*Sinv(l,j) - Sinv(k,j)*Sinv(l,i));
+
+                            }
+                        }
+                    }
+                }
+
+                return scal0 * (S.wrapped_.determinant());
+            }
+            else
+            {
+                Eigen::JacobiSVD<eigen<double>::DenseMatrixType> svd(S.wrapped_, Eigen::ComputeThinU | Eigen::ComputeThinV);
+
+                DenseMatrix<double> Uvec = svd.matrixU();
+                DenseMatrix<double> Vvec = svd.matrixV();
+
+                Vector<double> D = svd.singularValues();
+                double lmax = D.max();
+
+                D.wrapped_ *= (1.0/lmax);
+
+                //On compte la multiplicité de la valeur propre nulle
+                int mult = 0;
+                for (size_t i= 0; i< numberOfElectrons; i++)
+                {
+                    if (D(i) < ratio_) 
+                        ++mult;
+                }
+
+
+                //cout << "mult = " << mult << endl;
+
+                //si la multiplicité de 0 est plus grande que 2, la valeur est 0
+                if (mult >2.5) 
+                    return 0;
+
+                else
+                {
+                    if ((1.5 > mult) && (mult > 0.5)) //mult = 1
+                    {
+
+                        int indmin = getIndMin(D);
+                        Vector<double> xV(Vvec.numberOfRows());
+                        xV.wrapped_ = Vvec.wrapped_.col(indmin);
+                        Vector<double> xU(Uvec.numberOfRows());
+                        xU.wrapped_ = Uvec.wrapped_.col(indmin);
+
+                        Vector<double> orthU(U.numberOfRows());
+                        orthU.wrapped_ = U.wrapped_ * xU.wrapped_;  //Vecteur dans l'orthogonal du sous-espace engendré par V
+                        Vector<double> orthV(V.numberOfRows());
+                        orthV.wrapped_ = V.wrapped_ * xV.wrapped_;  //Vecteur dans l'orthogonal du sous-espace engendré par U
+
+                        Vector<double> temp(O.numberOfColumns());
+                        temp.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>()) * orthU.wrapped_;
+                        orthU.wrapped_ = 1.0 / sqrt( (orthU.wrapped_.adjoint() * temp.wrapped_) ) * orthU.wrapped_;
+                        temp.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>()) * orthV.wrapped_;
+                        orthV.wrapped_ = 1.0 / sqrt( (orthV.wrapped_.adjoint()) *temp.wrapped_) *orthV.wrapped_;
+
+
+                        DenseMatrix<double> PsiU(M_disc_,numberOfElectrons);
+                        PsiU.wrapped_ = eigen<double>::DenseMatrixType::Zero(M_disc_,numberOfElectrons); //Le reste des fonctions: le deux sous-espaces engendrés sont les mêmes, égaux à l'intersection de deux sous-espaces de départ
+                        DenseMatrix<double> PsiV(M_disc_,numberOfElectrons);
+                        PsiV.wrapped_ = eigen<double>::DenseMatrixType::Zero(M_disc_,numberOfElectrons);
+
+                        Vector<double> muU(numberOfElectrons);
+                        muU.wrapped_ = eigen<double>::VectorType::Zero(numberOfElectrons);
+                        Vector<double> muV(numberOfElectrons);
+                        muV.wrapped_ = eigen<double>::VectorType::Zero(numberOfElectrons);
+
+                        for(size_t k=0; k<numberOfElectrons; k++)
+                        {
+                            temp.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>()) * (U.wrapped_.col(k));
+                            double PS = orthU.wrapped_.adjoint() * temp.wrapped_;
+                            PsiU.wrapped_.col(k) = U.wrapped_.col(k) - PS * orthU.wrapped_;
+                            muU(k) = PS;
+
+                            temp.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>()) * (V.wrapped_.col(k));
+                            PS = orthV.wrapped_.adjoint()*temp.wrapped_;
+                            PsiV.wrapped_.col(k) = V.wrapped_.col(k) - PS*orthV.wrapped_;
+                            muV(k) = PS;
+                        }
+
+                        //On crée une base orthonormale de l'intersection des deux
+                        //sous-espaces: par exemple à partir de xU
+                        DenseMatrix<double> xUbas(numberOfElectrons, numberOfElectrons-1);
+                        xUbas.wrapped_ = eigen<double>::DenseMatrixType::Zero(numberOfElectrons, numberOfElectrons-1);
+                        xUbas.wrapped_.block(0,0, numberOfElectrons, indmin) = Uvec.wrapped_.block(0,0, numberOfElectrons, indmin);
+                        xUbas.wrapped_.block(0,indmin, numberOfElectrons, numberOfElectrons-indmin-1) = Uvec.wrapped_.block(0, indmin+1, numberOfElectrons, numberOfElectrons-indmin-1);
+
+                        DenseMatrix<double> coeffs_bas(U.numberOfRows(), xUbas.numberOfColumns());
+                        coeffs_bas.wrapped_ = U.wrapped_ * xUbas.wrapped_;
+                        //Puis on orthonormalise les vecteurs de coeffs_bas
+                        for (size_t i=0; i<(numberOfElectrons-1); i++)
+                        {
+                            Vector<double> temp2(O.numberOfColumns());
+                            temp2.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>()) * (coeffs_bas.wrapped_.col(i));
+                            double PS2 = orthU.wrapped_.adjoint()*temp2.wrapped_;
+                            coeffs_bas.wrapped_.col(i) = coeffs_bas.wrapped_.col(i) - PS2*orthU.wrapped_;
+
+                            for (size_t j=0; j<i; j++)
+                            {
+                                temp2.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>()) * (coeffs_bas.wrapped_.col(j));
+                                PS2 = ((coeffs_bas.wrapped_.col(i)).adjoint())*temp2.wrapped_;
+                                coeffs_bas.wrapped_.col(i) = coeffs_bas.wrapped_.col(i) - PS2*coeffs_bas.wrapped_.col(j);
+                            }
+
+                            temp2.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>()) * (coeffs_bas.wrapped_.col(i));
+                            PS2 = ((coeffs_bas.wrapped_.col(i)).adjoint()) * temp2.wrapped_;
+                            coeffs_bas.wrapped_.col(i) = (1.0/sqrt(PS2)) * coeffs_bas.wrapped_.col(i);
+
+                        }
+
+                        DenseMatrix<double> CU(numberOfElectrons-1,numberOfElectrons);
+                        CU.wrapped_ = eigen<double>::DenseMatrixType::Zero(numberOfElectrons-1,numberOfElectrons);
+                        DenseMatrix<double> CV(numberOfElectrons-1,numberOfElectrons);
+                        CV.wrapped_ = eigen<double>::DenseMatrixType::Zero(numberOfElectrons-1,numberOfElectrons);
+
+                        for (size_t k=0; k< numberOfElectrons; k++)
+                        {
+                            for (size_t l=0; l< (numberOfElectrons-1); l++)
+                            {
+                                Vector<double> temp(O.numberOfRows());
+                                temp.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>()) * (coeffs_bas.wrapped_.col(l));
+                                double PS = ((PsiU.wrapped_.col(k)).adjoint()) * temp.wrapped_;
+                                CU(l,k) = PS;
+
+                                temp.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>()) * (coeffs_bas.wrapped_.col(l));
+                                PS = ((PsiV.wrapped_.col(k)).adjoint())*temp.wrapped_;
+                                CV(l,k) = PS;
+                            }
+                        }
+
+                        //On construit la somme
+                        double sum2 = 0;
+                        for (size_t l=0; l< numberOfElectrons-1; l++)
+                            sum2 += elint(M_disc_,coeffs_bas.column(l),coeffs_bas.column(l),orthU,orthV,E) 
+                                  - elint(M_disc_,coeffs_bas.column(l),orthV,coeffs_bas.column(l),orthU,E);
+
+
+                        //On a alors pour tout k U(:,k) = muU(k)*orthU + PsiU(:,k)
+                        double sum = 0;
+
+                        for (size_t k1= 0; k1 < numberOfElectrons; k1++)
+                        {
+                            for (size_t k2 = 0; k2 < numberOfElectrons; k2++)
+                            {
+                                DenseMatrix<double> aU(numberOfElectrons-1,numberOfElectrons-1);
+                                aU.wrapped_ = eigen<double>::DenseMatrixType::Zero(numberOfElectrons-1,numberOfElectrons-1);
+                                aU.wrapped_.block(0,0,numberOfElectrons-1,k1) = CU.wrapped_.block(0,0,numberOfElectrons-1,k1);
+                                aU.wrapped_.block(0,k1,numberOfElectrons-1,numberOfElectrons-1-k1) = CU.wrapped_.block(0,(k1+1),numberOfElectrons-1, numberOfElectrons-1-k1);
+
+                                DenseMatrix<double> aV(numberOfElectrons-1,numberOfElectrons-1);
+                                aV.wrapped_ = eigen<double>::DenseMatrixType::Zero(numberOfElectrons-1,numberOfElectrons-1);
+                                aV.wrapped_.block(0,0,numberOfElectrons-1,k2) = CV.wrapped_.block(0,0,numberOfElectrons-1,k2);
+                                aV.wrapped_.block(0,k2,numberOfElectrons-1, numberOfElectrons-1-k2) = CV.wrapped_.block(0,k2+1,numberOfElectrons-1, numberOfElectrons-1-k2);
+
+                                sum += muU(k1)*muV(k2)*pow(-1,k1)*pow(-1,k2)*sum2*(aU.wrapped_.determinant())*(aV.wrapped_.determinant());
+                            }
+
+                        }
+
+                        return sum;
+                    }
+
+                    else
+                    {	//mult = 2
+                        //La dimension de l'intersection des deux espaces est N-2: il
+                        //faut récupérer pour U et pour V les deux vecteurs qui sont
+                        //orthonormaux à l'espace
+
+                        size_t indmin = getIndMin(D);
+                        Vector<double> xV1(Vvec.numberOfRows());
+                        xV1.wrapped_ = Vvec.wrapped_.col(indmin);
+                        Vector<double> xU1(Uvec.numberOfRows());
+                        xU1.wrapped_ = Uvec.wrapped_.col(indmin);
+
+                        D(indmin) = 1e20;
+
+                        size_t indmin2 = getIndMin(D);
+                        Vector<double> xV2 = Vvec.column(indmin2);
+                        Vector<double> xU2 = Uvec.column(indmin2);
+
+                        Vector<double> orthU1(U.numberOfRows());
+                        orthU1.wrapped_ = U.wrapped_ * xU1.wrapped_;  //Vecteur dans l'orthogonal du sous-espace engendré par V
+                        Vector<double> orthU2(U.numberOfRows());
+                        orthU1.wrapped_ = U.wrapped_ * xU2.wrapped_;
+                        Vector<double> orthV1(V.numberOfRows());
+                        orthV1.wrapped_ = V.wrapped_ * xV1.wrapped_;  //Vecteur dans l'orthogonal du sous-espace engendré par U
+                        Vector<double> orthV2(V.numberOfRows());
+                        orthV2.wrapped_ = V.wrapped_ * xV2.wrapped_;
+
+                        Vector<double> temp(O.numberOfRows());
+                        temp.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>()) * orthU1.wrapped_;
+                        orthU1.wrapped_ = (1.0/sqrt((orthU1.wrapped_.adjoint()) * temp.wrapped_)) * orthU1.wrapped_;
+
+                        temp.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>()) * orthU2.wrapped_;
+                        double PS = (orthU1.wrapped_.adjoint()) * temp.wrapped_;
+                        orthU2.wrapped_ -= PS * orthU1.wrapped_;
+                        temp.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>()) * orthU2.wrapped_;
+                        orthU2.wrapped_ = (1.0/sqrt((orthU2.wrapped_.adjoint())*temp.wrapped_))*orthU2.wrapped_;
+
+                        temp.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>())*orthV1.wrapped_;
+                        orthV1.wrapped_ = (1.0/sqrt((orthV1.wrapped_.adjoint())*temp.wrapped_))*orthV1.wrapped_;
+
+                        temp.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>())*orthV2.wrapped_;
+                        PS = (orthV1.wrapped_.adjoint())*temp.wrapped_;
+                        orthV2.wrapped_ -= PS*orthV1.wrapped_;
+                        temp.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>())*orthV2.wrapped_;
+                        orthV2.wrapped_ = (1.0/sqrt((orthV2.wrapped_.adjoint())*temp.wrapped_))*orthV2.wrapped_;
+
+                        DenseMatrix<double> PsiU(M_disc_,numberOfElectrons);
+                        PsiU.wrapped_ = eigen<double>::DenseMatrixType::Zero(M_disc_,numberOfElectrons); //Le reste des fonctions: les deux sous-espaces engendrés sont les mêmes, égaux à l'intersection de deux sous-espaces de départ
+                        DenseMatrix<double> PsiV(M_disc_,numberOfElectrons);
+                        PsiV.wrapped_ = eigen<double>::DenseMatrixType::Zero(M_disc_,numberOfElectrons);
+
+                        Vector<double> muU1(numberOfElectrons); 
+                        muU1.wrapped_ = eigen<double>::VectorType::Zero(numberOfElectrons);
+                        Vector<double> muV1(numberOfElectrons); 
+                        muV1.wrapped_ = eigen<double>::VectorType::Zero(numberOfElectrons);
+                        Vector<double> muU2(numberOfElectrons); 
+                        muU2.wrapped_ = eigen<double>::VectorType::Zero(numberOfElectrons);
+                        Vector<double> muV2(numberOfElectrons); 
+                        muV2.wrapped_ = eigen<double>::VectorType::Zero(numberOfElectrons);
+
+                        for (size_t k=0; k< numberOfElectrons; k++)
+                        {
+
+                            Vector<double> temp2(O.numberOfRows());
+                            temp2.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>())*(U.wrapped_.col(k));
+                            muU1(k) = (orthU1.wrapped_.adjoint())*temp2.wrapped_;
+                            muU2(k) = (orthU2.wrapped_.adjoint())*temp2.wrapped_;
+                            temp2.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>())*(V.wrapped_.col(k));
+                            muV1(k) = orthV1.wrapped_.adjoint()*temp2.wrapped_;
+                            muV2(k) = orthV2.wrapped_.adjoint()*temp2.wrapped_;
+
+
+                            PsiU.wrapped_.col(k) = U.wrapped_.col(k) - muU1(k)*orthU1.wrapped_ - muU2(k)*orthU2.wrapped_;
+                            PsiV.wrapped_.col(k) = V.wrapped_.col(k) - muV1(k)*orthV1.wrapped_ - muV2(k)*orthV2.wrapped_;
+                        }
+
+                        //On crée une base orthonormale de l'intersection des deux
+                        //sous-espaces: par exemple à partir de xU
+                        DenseMatrix<double> xUbas(numberOfElectrons, numberOfElectrons-2);
+                        xUbas.wrapped_ = eigen<double>::DenseMatrixType::Zero(numberOfElectrons, numberOfElectrons-2);
+                        int ind = 0;
+                        for (size_t k=0; k< numberOfElectrons; k++)
+                        {
+                            if ( (k!=indmin) && (k!=indmin2))
+                            {
+                                xUbas.wrapped_.col(ind) = Uvec.wrapped_.col(k);
+                                ind = ind+1;
+                            }
+                        }
+
+                        DenseMatrix<double> coeffs_bas(U.numberOfRows(), xUbas.numberOfColumns());
+                        coeffs_bas.wrapped_ = U.wrapped_ * xUbas.wrapped_;
+
+                        //Puis on orthonormalise les vecteurs de coeffs_bas
+                        for (size_t i= 0; i < numberOfElectrons-2; i++)
+                        {
+                            //On commence par orthonormaliser par rapport à orthU1 et orthU2
+                            Vector<double> temp3(O.numberOfRows());
+                            temp3.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>())*(coeffs_bas.wrapped_.col(i));
+                            double PS3 = (orthU1.wrapped_.adjoint())*temp3.wrapped_;
+                            coeffs_bas.wrapped_.col(i) = coeffs_bas.wrapped_.col(i) - PS3*orthU1.wrapped_;
+                            temp3.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>())*(coeffs_bas.wrapped_.col(i));
+                            PS3 = (orthU2.wrapped_.adjoint())*temp3.wrapped_;
+                            coeffs_bas.wrapped_.col(i) = coeffs_bas.wrapped_.col(i) - PS3*orthU2.wrapped_;
+                            for (size_t j=0; j<i; j++)
+                            {
+                                temp3.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>())*(coeffs_bas.wrapped_.col(i));
+                                PS3 = ((coeffs_bas.wrapped_.col(j)).adjoint())*temp3.wrapped_;
+                                coeffs_bas.wrapped_.col(i) = coeffs_bas.wrapped_.col(i) - PS3*coeffs_bas.wrapped_.col(j);
+                            }
+                            temp3.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>())*(coeffs_bas.wrapped_.col(i));
+                            coeffs_bas.wrapped_.col(i) = 1.0/sqrt((coeffs_bas.wrapped_.col(i).adjoint())*temp3.wrapped_)*coeffs_bas.wrapped_.col(i);
+                        }
+
+
+                        DenseMatrix<double> CU(numberOfElectrons-2,numberOfElectrons); 
+                        CU.wrapped_ = eigen<double>::DenseMatrixType::Zero(numberOfElectrons-2,numberOfElectrons);
+                        DenseMatrix<double> CV(numberOfElectrons-2,numberOfElectrons); 
+                        CV.wrapped_ = eigen<double>::DenseMatrixType::Zero(numberOfElectrons-2,numberOfElectrons);
+
+                        for (size_t k=0; k< numberOfElectrons; k++)
+                        {
+                            for (size_t l=0; l< numberOfElectrons-2; l++)
+                            {
+                                Vector<double> temp4(O.numberOfRows());
+                                temp4.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>())*coeffs_bas.wrapped_.col(l);
+                                CU(l,k) = (PsiU.wrapped_.col(k)).adjoint()*temp4.wrapped_;
+                                CV(l,k) = (PsiV.wrapped_.col(k)).adjoint()*temp4.wrapped_;
+                            }
+                        }
+
+                        //On construit la somme
+                        double sum2 = elint(M_disc_, orthU1,orthV1,orthU2,orthV2,E) - elint(M_disc_, orthU1,orthV2,orthU2,orthV1, E);
+
+                        //On a alors pour tout k U(:,k) = muU1(k)*orthU1 + muU2(k)*orthU2 + PsiU(:,k)
+                        double sum = 0;
+
+                        for (size_t iu = 0; iu < numberOfElectrons-1; iu++)
+                        {
+                            for (size_t ju = iu+1 ; ju <numberOfElectrons; ju++)
+                            {
+                                DenseMatrix<double> aU(numberOfElectrons-2,numberOfElectrons-2);
+                                aU.wrapped_ = eigen<double>::DenseMatrixType::Zero(numberOfElectrons-2,numberOfElectrons-2);
+                                aU.wrapped_.block(0,0,numberOfElectrons-2, iu) = CU.wrapped_.block(0,0,numberOfElectrons-2,iu);
+                                aU.wrapped_.block(0,iu,numberOfElectrons-2, ju-iu-1) = CU.wrapped_.block(0,iu+1, numberOfElectrons-2, ju-iu-1);
+                                aU.wrapped_.block(0,ju-1,numberOfElectrons-2, numberOfElectrons-ju-1) = CU.wrapped_.block(0,ju+1,numberOfElectrons-2, numberOfElectrons-ju-1);
+
+
+                                for (size_t iv = 0; iv < numberOfElectrons-1; iv++)
+                                {
+                                    for (size_t jv = iv+1; jv < numberOfElectrons; jv++)
+                                    {
+
+                                        DenseMatrix<double> aV(numberOfElectrons-2,numberOfElectrons-2);
+                                        aV.wrapped_ = eigen<double>::DenseMatrixType::Zero(numberOfElectrons-2,numberOfElectrons-2);
+                                        aV.wrapped_.block(0,0,numberOfElectrons-2,iv) = CV.wrapped_.block(0,0, numberOfElectrons-2, iv);
+                                        aV.wrapped_.block(0,iv,numberOfElectrons-2,jv-iv-1) = CV.wrapped_.block(0,iv+1,numberOfElectrons-2,jv-iv-1);
+                                        aV.wrapped_.block(0,jv-1,numberOfElectrons-2,numberOfElectrons-jv-1) = CV.wrapped_.block(0,jv+1,numberOfElectrons-2,numberOfElectrons-jv-1);
+
+
+                                        sum += pow(-1,iu) * pow(-1,ju+1) *pow(-1,iv) *pow(-1,jv+1) 
+                                             * ((muU1(iu)*muU2(ju) -muU1(ju)*muU2(iu)) * (muV1(iv)*muV2(jv) -muV1(jv)*muV2(iv))) 
+                                             * sum2*(aU.wrapped_.determinant())*(aV.wrapped_.determinant());
+
+                                    }
+                                }
+
+                            }
+                        }
+
+                        return sum;
+                    }
+                }
+            }
+        }
+
+    }
 
     
     double 

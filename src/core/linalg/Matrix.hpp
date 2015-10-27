@@ -34,6 +34,7 @@ namespace simol
           { 
               Vector<ScalarType> columnVector(wrapped_.rows());
               columnVector.wrapped_.col(index); 
+              return columnVector;
           }
           
           /*typename eigen<ScalarType>::AdjointReturnType 
