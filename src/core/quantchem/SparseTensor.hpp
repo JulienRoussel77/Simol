@@ -25,6 +25,7 @@ namespace simol
     {
         public:
             SparseTensor(std::string const & filename, size_t const M_disc)
+            : nonzeros_(M_disc * M_disc, M_disc * M_disc)
             {
                 // Attention: le fichier contient les valeurs de \int chi_i(x) chi_j(x) \chi_k(y) \chi_l(y)/|x-y|
                 // uniquement pour les valeurs de i>=j et k>=l
@@ -38,6 +39,8 @@ namespace simol
                 int nbLignes = 0;
                 int test = 0;
 
+                typedef Eigen::Triplet<ScalarType, size_t> NonZero;
+                std::vector<NonZero> nonzeros;
                 while(std::getline(in, ligne))
                 {
                     int i;
@@ -51,15 +54,15 @@ namespace simol
                     double t0 =t;
 
                     // A checker
-                    nonzeros_.push_back(CoefficientType(getInd(M_disc, i,k), getInd(M_disc, j,l),t0));
+                    nonzeros.push_back(NonZero(getInd(M_disc, i,k), getInd(M_disc, j,l),t0));
                     nbLignes++;
                 }
+                nonzeros_.wrapped_.setFromTriplets(nonzeros.begin(), nonzeros.end());
                 in.close(); //On ferme le fichier
             }
             
-        private:
-            typedef Eigen::Triplet<ScalarType, size_t> CoefficientType;
-            std::vector<CoefficientType> nonzeros_;
+        private:      
+            SparseMatrix<ScalarType> nonzeros_;
     };
 }
 
