@@ -25,7 +25,7 @@ namespace simol
     {
         public:
             SparseTensor(std::string const & filename, size_t const M_disc)
-            : basisDimension_(M_disc), nonzeros_(M_disc * M_disc, M_disc * M_disc)
+            : nonzeros_(M_disc * M_disc, M_disc * M_disc)
             {
                 // Attention: le fichier contient les valeurs de \int chi_i(x) chi_j(x) \chi_k(y) \chi_l(y)/|x-y|
                 // uniquement pour les valeurs de i>=j et k>=l
@@ -66,7 +66,6 @@ namespace simol
             { return nonzeros_; }
             
         private:      
-            std::size_t basisDimension_;
             SparseMatrix<ScalarType> nonzeros_;
     };
 }
