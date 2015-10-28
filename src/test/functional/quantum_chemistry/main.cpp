@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "linalg/SparseMatrix.hpp"
+#include "quantchem/SparseTensor.hpp"
 #include <Eigen/Eigenvalues>
 
 #include <yaml-cpp/yaml.h>
@@ -22,12 +23,16 @@ int main()
   simol::MatrixMarketFile kinetic_file(dataPath + "kinetic_matrix.mtx");
   simol::MatrixMarketFile overlap_file(dataPath + "overlap_matrix.mtx");
   simol::MatrixMarketFile potential_file(dataPath + "potential_matrix.mtx");
-  simol::MatrixMarketFile twoelectron_file(dataPath + "twoelectron_matrix.mtx");
+  
+  std::string filename = dataPath + "n.txt";
+  FILE* size_file = fopen(filename.c_str(), "r");
+  size_t M_disc;
+  fscanf(size_file, "%lu", &M_disc);
   
   simol::DenseMatrix<double> kinetic_matrix(kinetic_file);
   simol::DenseMatrix<double> overlap_matrix(overlap_file);
   simol::DenseMatrix<double> potential_matrix(potential_file);
-  simol::SparseMatrix<double> twoelectron_matrix(twoelectron_file);
+  simol::SparseTensor<double> twoelectron_matrix(dataPath + "twoelectron_matrix.txt", M_disc);
   
   /*simol::SparseMatrix<double> kineticMatrix(simol::MatrixMarketFile(dataPath+"kinetic_matrix.mtx"));
   simol::SparseMatrix<double> overlapMatrix(simol::MatrixMarketFile(dataPath+"overlap_matrix.mtx"));
