@@ -18,7 +18,8 @@ namespace simol
               overlap_(MatrixMarketFile(pathToData + "overlap_matrix.mtx")),
               potential_(MatrixMarketFile(pathToData + "potential_matrix.mtx"))
             {
-                SparseTensor<double> twoelectron_matrix(pathToData + "twoelectron_matrix.txt", basisDimension());
+                // Need to define a file format for tensors to be able to use list initializations for tensors
+                twoElectrons_ = SparseTensor<double>(pathToData + "twoelectron_matrix.txt", basisDimension());
             }
             
             std::size_t basisDimension() const
