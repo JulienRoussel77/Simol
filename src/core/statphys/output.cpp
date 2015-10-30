@@ -3,58 +3,58 @@
 using std::cout; 
 using std::endl; 
 using std::vector;
+using std::sin;
+using std::cos;
 
-namespace simol 
-{
+#include <cmath>
+
+namespace simol{
   
-    Statistics::Statistics(int nbIndices):values_(nbIndices, 0), nbValues_(nbIndices, 0){};
-    
-    void Statistics::append(int i, double value)
-    {
-      values_[i] = (nbValues_[i] * values_[i] + value) / (++nbValues_[i]);
-    }
-    
-    double& Statistics::operator()(int i)
-    {
-      return values_[i];
-    }
-    
-    const double& Statistics::operator()(int i) const
-    {
-      return values_[i];
-    }
   
   Output::Output(Input const& input):
     outputFoldername_(input.outputFoldername()), 
     outObservables_(input.outputFoldername()+"observables.txt"), 
     outParticles_(input.outputFoldername()+"particles.txt"), 
-    outReplica_(input.outputFoldername()+"replicas.txt"),
-    outCorrelation_(input.outputFoldername()+"correlation.txt"),
+    outReplica_(input.outputFoldername()+"replicas.txt", std::ofstream::app),
+    outCorrelation_(input.outputFoldername()+"correlations.txt"),
+    outVelocities_(input.outputFoldername()+"velocitiesChain.txt"),
+    outVelocitiesCV_(input.outputFoldername()+"velocities.txt"),
+    outForcesCV_(input.outputFoldername()+"forces.txt"),
+    outLengthsCV_(input.outputFoldername()+"lengths.txt"),
     verbose_(1),
-    timeStep_(input.timeStep()),
+    periodNumberOfIterations_(input.outputPeriodNumberOfIterations()),
+    timeStep_(0),
     dimension_(input.dimension()),
     numberOfParticles_(input.numberOfParticles()),
-    responseForces_(input.dimension()),
-    velocityRef_(input.dimension()),
-    timeRef_(0),
-    decorrelationNumberOfIterations_(input.decorrelationNumberOfIterations()),
-    autocorrelationV(decorrelationNumberOfIterations_),
-    autocorrelationF(decorrelationNumberOfIterations_)
+    decorrelationNumberOfIterations_(0)
   {
+    std::cout << "Output written in " << input.outputFoldername() << std::endl;
     assert(outParticles_.is_open());
     assert(outReplica_.is_open());
-    std::cout << "Output written in " << input.outputFoldername() << std::endl;
-    velocityRef_(0) = input.initialMomentum();
     cout << "decorrelationNumberOfIterations : " << decorrelationNumberOfIterations_ << endl;
+    
+    outObservables_ << "# time kineticEnergy potentialEnergy energy temperature" << endl;
+    outParticles_ << "# time index position momentum kineticEnergy potentialEnergy energy force" << endl;
+    outReplica_ << "# time index externalForce position momentum responseForces" << endl;
+    outVelocities_ << "# time i=0 i=N/4 i=N/2 i=3N/4 i=N-1" << endl;
+    outVelocitiesCV_ << "# time b <b> <b2> D <D> >D2> observable <observable> >observable2> LPhi <LPhi> <LPhi2>" << endl;
+    outForcesCV_ << "# time b <b> <b2> D <D> >D2> observable <observable> >observable2> LPhi <LPhi> <LPhi2>" << endl;
+    outLengthsCV_ << "# time b <b> <b2> D <D> >D2> observable <observable> >observable2> LPhi <LPhi> <LPhi2>" << endl;
   }
   
-  void Output::initialize(dvec const& velocityRef)
+  void Output::reset(Input const& input, Potential& potential, size_t indexOfReplica)
   {
-    responseForces_.fill(0);
-    //integratedAutocorrelationP_ = 0;
-    velocityRef_ = velocityRef;
+    timeStep_ = input.timeStep(indexOfReplica);
+    assert(input.outputPeriodTime(indexOfReplica) == 0 || input.outputPeriodTime(indexOfReplica) >= timeStep());
+    decorrelationNumberOfIterations_ = input.decorrelationNumberOfIterations(indexOfReplica);
+    //autocorrelationVelocity_ = AutocorrelationStats<dvec>(decorrelationNumberOfIterations_, timeStep_);
+    //autocorrelationForce_ = AutocorrelationStats<dvec>(decorrelationNumberOfIterations_, timeStep_);
+    //length_ = AutocorrelationStats<double>(decorrelationNumberOfIterations_, timeStep_);
+    velocityCV_ = createControlVariate(input, potential, indexOfReplica);
+    forceCV_ = createControlVariate(input, potential, indexOfReplica);
+    lengthCV_ = createControlVariate(input, potential, indexOfReplica);
   }
-  
+    
   int& Output::verbose()
   {
     return verbose_;
@@ -63,6 +63,21 @@ namespace simol
   const int& Output::verbose() const
   {
     return verbose_;
+  }
+  
+  double Output::period() const
+  {
+    return periodNumberOfIterations_ * timeStep();
+  }
+  
+  const size_t& Output::periodNumberOfIterations() const
+  {
+    return periodNumberOfIterations_;
+  }
+  
+  bool Output::doOutput(size_t indexOfIteration) const
+  {
+    return (periodNumberOfIterations() > 0 && indexOfIteration % periodNumberOfIterations() == 0);
   }
   
   const double& Output::kineticEnergy() const
@@ -101,40 +116,52 @@ namespace simol
     return decorrelationNumberOfIterations();
   }
   
+  ControlVariate* Output::velocityCV()
+  {
+    return velocityCV_;
+  }
+  
+  ControlVariate* Output::forceCV()
+  {
+    return forceCV_;
+  }
+  
+  ControlVariate* Output::lengthCV()
+  {
+    return lengthCV_;
+  }
+  
+  
+  
   const double& Output::timeStep() const
   {
     return timeStep_;
   }
   
-  dvec& Output::responseForces() 
+  double& Output::timeStep()
   {
-    return responseForces_;
+    return timeStep_;
   }
   
-  const dvec& Output::responseForces() const
+    size_t & Output::decorrelationNumberOfIterations()
   {
-    return responseForces_;
+    return decorrelationNumberOfIterations_;
   }
   
-  const double& Output::responseForces(int const& i) const
+  const size_t& Output::decorrelationNumberOfIterations() const
   {
-    return responseForces_(i);
+    return decorrelationNumberOfIterations_;
   }
   
-  double& Output::responseForces(int const& i)
+  double Output::decorrelationTime() const
   {
-    return responseForces_(i);
+    return decorrelationNumberOfIterations() * timeStep();
   }
-  
-  /*double& Output::integratedAutocorrelationP()
-  {
-    return integratedAutocorrelationP_; 
-  }*/
 
-  void Output::display(vector<Particle> const& configuration, double time)
+  void Output::display(vector<Particle> const& configuration, size_t indexOfIteration)
   {
-    for (size_t i = 0; i < configuration.size(); i++)
-      outParticles_ << time 
+    for (size_t i = 0; i < numberOfParticles_; i++)
+      outParticles_ << indexOfIteration * timeStep() 
 		    << " " << i
 		    << " " << configuration[i].position() 
 		    << " " << configuration[i].momentum() 
@@ -144,85 +171,89 @@ namespace simol
 		    << " " << configuration[i].force()		    
 		    << std::endl;
 		    
-    outObservables_ << time
+    outObservables_ << indexOfIteration * timeStep() 
 		    << " " << kineticEnergy()
 		    << " " << potentialEnergy()
 		    << " " << energy()
 		    << " " << temperature()
 		    << std::endl;
-    
+		
+    if (numberOfParticles_ > 1)
+      outVelocities_ << indexOfIteration * timeStep() 
+		     << " " << configuration[0].momentum()
+		     << " " << configuration[numberOfParticles_/4].momentum()
+		     << " " << configuration[numberOfParticles_/2].momentum()
+		     << " " << configuration[3*numberOfParticles_/4].momentum()
+		     << " " << configuration[numberOfParticles_-1].momentum()
+		     << endl;
+		     
+    displayControlVariate(outVelocitiesCV_, velocityCV(), indexOfIteration * timeStep() );
+    displayControlVariate(outForcesCV_, forceCV(), indexOfIteration * timeStep() );
+    displayControlVariate(outLengthsCV_, lengthCV(), indexOfIteration * timeStep() );
+    //displayVelocity(indexOfIteration);
   }
   
   
-  void Output::finalDisplay(vector<Particle> const& configuration, dvec const& externalForce, double time)
+  void Output::finalDisplay(vector<Particle> const& configuration, dvec const& externalForce, size_t indexOfIteration)
   {
-    for (size_t i = 0; i < configuration.size(); i++)
-      outReplica_ << time 
-		  << " " << i
- 		  << " " << externalForce(0)   
-		  << " " << configuration[i].position() 
-		  << " " << configuration[i].momentum() 
-		  << " " << responseForces(0)
-		  << std::endl;
+    outReplica_ << " " << timeStep()
+		<< " " << timeStep() * indexOfIteration
+		<< " " << externalForce(0)   
+		<< " " << configuration[0].position() 
+		<< " " << configuration[0].momentum() 
+		<< " " << forceCV_->meanObservable()
+		<< " " << forceCV_->stdDeviationObservable()
+		<< std::endl;
   }
   
-    double& Output::timeRef()
-    {
-      return timeRef_;
-    }
-    const double& Output::timeRef() const
-    {
-      return timeRef_;
-    }
+  /*void Output::displayVelocity(size_t indexOfIteration)
+  {
+    outVelocities_ << indexOfIteration * timeStep() 
+		<< " " << autocorrelationVelocity_.lastValue()
+		<< " " << autocorrelationVelocity_.mean()
+		<< " " << autocorrelationVelocity_.standardDeviation()
+		<< std::endl;
     
-    dvec& Output::velocityRef()
-    {
-      return velocityRef_;
-    }
-    const dvec& Output::velocityRef() const
-    {
-      return velocityRef_;
-    }
-    
-    dvec& Output::forceRef()
-    {
-      return forceRef_;
-    }
-    const dvec& Output::forceRef() const
-    {
-      return forceRef_;
-    }
-    
-    size_t & Output::decorrelationNumberOfIterations()
-    {
-      return decorrelationNumberOfIterations_;
-    }
-    const size_t& Output::decorrelationNumberOfIterations() const
-    {
-      return decorrelationNumberOfIterations_;
-    }
+  }*/
+  
+  void Output::displayControlVariate(std::ofstream& out, ControlVariate const* controleVariate, double time) const
+  {
+    out << time
+	<< " " << controleVariate->lastB()
+	<< " " << controleVariate->meanB()
+	<< " " << controleVariate->stdDeviationB() * sqrt(decorrelationTime())
+	<< " " << controleVariate->lastD()
+	<< " " << controleVariate->meanD()
+	<< " " << controleVariate->stdDeviationD() * sqrt(decorrelationTime())
+	<< " " << controleVariate->lastObservable()
+	<< " " << controleVariate->meanObservable()
+	<< " " << controleVariate->stdDeviationObservable() * sqrt(decorrelationTime())
+	<< " " << controleVariate->lastBetterObservable()
+	<< " " << controleVariate->meanBetterObservable()
+	<< " " << controleVariate->stdDeviationBetterObservable() * sqrt(decorrelationTime())
+	<< " " << controleVariate->lastGeneratorOnBasis()
+	<< " " << controleVariate->meanGeneratorOnBasis()
+	<< " " << controleVariate->stdDeviationGeneratorOnBasis() * sqrt(decorrelationTime())
+	<< endl;
+  }
   
   void Output::finalDisplayAutocorrelations()
   {
+    cout << "decorrelationNumberOfIterations : " << decorrelationNumberOfIterations_ << endl;
     double integralV = 0;
     double integralF = 0;
+    double integralQ = 0;
     for (size_t i=0; i < decorrelationNumberOfIterations_; i++)
       outCorrelation_ << i * timeStep() 
-		  << " " << autocorrelationV(i)
-		  << " " << (integralV += autocorrelationV(i)*timeStep())
-		  << " " << autocorrelationF(i)
-		  << " " << (integralF += autocorrelationF(i)*timeStep())
+		  << " " << velocityCV_->autocorrelation(i)
+		  << " " << (integralV += velocityCV_->autocorrelation(i)*timeStep())
+		  << " " << forceCV_->autocorrelation(i)
+		  << " " << (integralF += forceCV_->autocorrelation(i)*timeStep())
+		  << " " << lengthCV_->autocorrelation(i)
+		  << " " << (integralQ += lengthCV_->autocorrelation(i)*timeStep())		  
 		  << std::endl;
+    
   }
-  
-  void Output::appendAutocorrelationV(dvec const& velocity, double time)
-  {
-    autocorrelationV.append((time - timeRef_)/timeStep_, velocityRef_.dot(velocity));
-  }
-  
-  void Output::appendAutocorrelationF(dvec const& force, double time)
-  {
-    autocorrelationF.append((time - timeRef_)/timeStep_, forceRef_.dot(force));
-  }
+ 
   
 }

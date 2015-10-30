@@ -5,7 +5,7 @@ Geometry:
 Mesh:
   Time:
     Step: 0.01
-    Number: 1000
+    Number: 100000
 
 Physics:
   System:
@@ -20,4 +20,4 @@ Physics:
     Name: BoundaryLangevin
     Gamma: 1
     BetaLeft: 1
-    BetaRight: 2
+    BetaRight: 1

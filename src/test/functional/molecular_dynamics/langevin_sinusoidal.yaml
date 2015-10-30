@@ -17,6 +17,6 @@ Physics:
     Name: Langevin
     Gamma: 1
     Temperature: 1
-  Replica:
-    Number: 1000
+  Replicas:
+    Number: 1
 

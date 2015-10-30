@@ -19,8 +19,10 @@ namespace simol{
     int dimension() const;
     double length() const;
     
-    double timeStep() const;
-    size_t numberOfIterations() const;
+    double timeStepMin() const;
+    double timeStepMax() const;
+    double timeStep(size_t indexOfReplica=0) const;
+    size_t numberOfIterations(size_t indexOfReplica=0) const;
     
     std::string potentialName() const;
     
@@ -40,10 +42,10 @@ namespace simol{
     double beta() const;
     double betaLeft() const;
     double betaRight() const;
-    bool externalForceVarying() const;
+    //bool externalForceVarying() const;
     double externalForceMin() const;
     double externalForceMax() const;
-    double externalForce(int const& indexOfReplica=1) const;
+    double externalForce(size_t indexOfReplica=0) const;
     
     std::string systemName() const;
     size_t numberOfParticles() const;
@@ -58,9 +60,13 @@ namespace simol{
     size_t numberOfReplicas() const;
     
     //bool doComputeCorrelations() const;
-    size_t decorrelationNumberOfIterations() const;
+    size_t decorrelationNumberOfIterations(size_t indexOfReplica=0) const;
+    double decorrelationTime(size_t indexOfReplica=0) const;
     std::string outputFoldername() const;
-
+    size_t outputPeriodNumberOfIterations(size_t indexOfReplica=0) const;
+    double outputPeriodTime(size_t indexOfReplica=0) const;
+    
+    std::string controlVariateName() const;
   };
   
 

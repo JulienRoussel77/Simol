@@ -4,22 +4,15 @@
 
 #include <iostream>
 #include "particle.hpp"
+#include "statistics.hpp"
+#include "controlVariate.hpp"
 using std::vector;
 
 namespace simol
 {
   
-  class Statistics
-  {
-    vector<double> values_;
-    vector<int> nbValues_;
-  public:
-    Statistics(int nbIndices);
-    //virtual ~Statistics(){};
-    void append(int i, double value);
-    double& operator()(int i);
-    const double& operator()(int i) const;
-  };
+
+
   
   class Output
   {
@@ -28,32 +21,49 @@ namespace simol
     std::ofstream outParticles_;
     std::ofstream outReplica_;
     std::ofstream outCorrelation_;
+    std::ofstream outVelocities_;
+    std::ofstream outVelocitiesCV_;
+    std::ofstream outForcesCV_;
+    std::ofstream outLengthsCV_;
     
     int verbose_;
+    size_t periodNumberOfIterations_;
     double timeStep_;
     int dimension_;
-    int numberOfParticles_;
+    size_t numberOfParticles_;
     
     double kineticEnergy_;
     double potentialEnergy_;
     
-    dvec responseForces_;
+    //dvec responseForces_;
     
-    dvec velocityRef_;
-    dvec forceRef_;
-    double timeRef_;
+    //dvec velocityRef_;
+    //dvec forceRef_;
+    //int indexOfIterationRef_;
     
     size_t decorrelationNumberOfIterations_;
     //double integratedAutocorrelationP_;
+    
   public:
-    Statistics autocorrelationV;
-    Statistics autocorrelationF;
+    //Statistics autocorrelationV;
+    //Statistics autocorrelationF;
+    
+    ControlVariate* velocityCV_;
+    ControlVariate* forceCV_;
+    ControlVariate* lengthCV_;
 	
     Output(Input const& input);
-    void initialize(dvec const& refVelocity = 0);
+    
+    void reset(Input const& input, Potential& potential, size_t indexOfReplica);
+      
     const double& timeStep() const;
+    double& timeStep();
     int& verbose();
     const int& verbose() const;
+    double period() const;
+    const size_t& periodNumberOfIterations() const;
+    bool doOutput(size_t indexOfIteration) const;
+    
     const double& kineticEnergy() const;
     double& kineticEnergy();
     const double& potentialEnergy() const;
@@ -61,24 +71,27 @@ namespace simol
     double energy() const;
     double temperature() const;
     bool doComputeCorrelations() const;
-    dvec& responseForces();
-    const dvec& responseForces() const;
+    
+    ControlVariate* velocityCV();
+    ControlVariate* forceCV();
+    ControlVariate* lengthCV();
+    
+    /*dvec& responseForces();
+    dvec const& responseForces() const;
     double& responseForces(const int& i);
-    const double& responseForces(const int& i) const;
-    double& timeRef();
-    const double& timeRef() const;
-    dvec& velocityRef();
-    const dvec& velocityRef() const;
-    dvec& forceRef();
-    const dvec& forceRef() const;
+    const double& responseForces(const int& i) const;*/
     const size_t& decorrelationNumberOfIterations() const;
     size_t& decorrelationNumberOfIterations();
+    double decorrelationTime() const;
     //double& integratedAutocorrelationP();
-    void display(vector<Particle> const& configuration, double time);
+    void display(vector<Particle> const& configuration, size_t indexOfIteration);
     void finalDisplayAutocorrelations();
-    void finalDisplay(vector<Particle> const& configuration, dvec const& externalForce, double time);
-    void appendAutocorrelationV(dvec const& velocity, double time);
-    void appendAutocorrelationF(dvec const& force, double time);
+    void finalDisplay(vector<Particle> const& configuration, dvec const& externalForce, size_t indexOfIteration);
+    //void displayVelocity(size_t indexOfIteration);
+    virtual void displayControlVariate(std::ofstream& out, ControlVariate const* controleVariate, double time) const;
+
+    
+    void updateControlVariate(vector<Particle> const& configuration);
   };
 
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "particleSystem.hpp"
+#include "controlVariate.hpp"
 
 namespace simol {
   
@@ -11,13 +12,14 @@ namespace simol {
    std::vector<ParticleSystem*> systemReplicas;
    std::vector<Dynamics*> dynamicsReplicas;
    Output output;
+   std::vector<ControlVariate*> controlVariates_;
    double externalForceMin_, externalForceMax_;
    RNG rng_;
  public:
    MultiSystem(Input const& input);
    virtual ~MultiSystem();
    dvec externalForce(int const& indexOfReplica);
-   void launch();
+   void launch(Input const& input);
    int size();
  };
  

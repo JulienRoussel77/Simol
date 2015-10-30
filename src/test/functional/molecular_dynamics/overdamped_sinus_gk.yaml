@@ -4,15 +4,15 @@ Geometry:
 
 Mesh:
   Time:
-    Step: 0.01
-    Number: 5000000
+    Step: 0.001
+    Number: 1000000000
 
 Physics:
   System:
     Name: Isolated
     Momentum: 0
   Potential:
-    Name: Sinusoidal
+    Name: SumSinusoidal
     Amplitude: 1
   Model:
     Name: Overdamped
@@ -20,4 +20,5 @@ Physics:
 
 Output:
   Foldername: GreenKubo
-  DecorrelationTime: 10
+  DecorrelationTime: 5
+  Period: 10
