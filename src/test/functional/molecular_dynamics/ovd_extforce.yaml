@@ -4,22 +4,23 @@ Geometry:
 
 Mesh:
   Time:
-    Step: 0.01
-    Number: 1000
+    Step: 0.00001
+    Number: 10000000
 
 Physics:
   System:
     Name: Isolated
   Potential:
-    Name: Sinusoidal
+    Name: SumSinusoidal
     Amplitude: 1
   Model:
     Name: Overdamped
     Temperature: 1
-    #ForceMin: .001
-    #ForceMax: 1
-  Replica:
-    Number: 1000
+    Force: [.1,1]
+  Replicas:
+    Number: 3
 
 Output:
-  Filename: output.txt
+  Foldername: ExtForce
+  DecorrelationTime: 4
+  Period: 1

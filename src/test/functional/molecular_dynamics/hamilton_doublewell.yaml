@@ -5,18 +5,21 @@ Geometry:
 Mesh:
   Time:
     Step: 0.01
-    Number: 1000
+    Number: 10000
 
 Physics:
   System:
     Name: Isolated
-    Mass: 1
-    Position: 2
-    Speed: 0
+    Momentum: 1
   Potential:
-    Name: DoubleWell
-    Height: 1
-    InterWell: 2
+    Name: FracSinusoidal
   Model:
     Name: Hamiltonian
+
+Output:
+  DecorrelationTime: 5
+  Period: .01
+
+ControlVariate:
+  Name: SinExp
 

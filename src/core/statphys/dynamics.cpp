@@ -9,7 +9,7 @@ using std::endl;
 namespace simol
 {
 
-    Dynamics* createDynamics(Input const& input, int const& indexOfReplica)
+    Dynamics* createDynamics(Input const& input, size_t indexOfReplica)
   {
     if (input.dynamicsName() == "Hamiltonian")
       return new Hamiltonian(input, indexOfReplica);
@@ -19,17 +19,23 @@ namespace simol
       return new BoundaryLangevin(input, indexOfReplica);
     else if (input.dynamicsName() == "Overdamped")
       return new Overdamped(input, indexOfReplica);
+    else if (input.dynamicsName() == "BoundaryOverdamped")
+      return new BoundaryOverdamped(input, indexOfReplica);
     else
       std::cout << input.dynamicsName() << " is not a valid dynamics !" << std::endl;
     return 0;
   }
   
-  Dynamics::Dynamics(Input const& input, int const& indexOfReplica):timeStep_(input.timeStep()), numberOfIterations_(input.numberOfIterations()), externalForce_(input.dimension())
+  Dynamics::Dynamics(Input const& input, int const& indexOfReplica):
+    timeStep_(input.timeStep(indexOfReplica)), 
+    numberOfIterations_(input.numberOfIterations(indexOfReplica)), 
+    externalForce_(input.dimension())
   {
     potential_ = createPotential(input);
-    
     externalForce_(0) = input.externalForce(indexOfReplica);
-    //cout << "externalForce_(0) = " << externalForce_(0) << endl;
+    cout << "externalForce = " << externalForce_(0) << endl;
+    cout << "timeStep = " << timeStep() << endl;
+    cout << "numberOfIterations_ = " << numberOfIterations_ << endl;
   }
   
   Dynamics::~Dynamics()
@@ -62,7 +68,7 @@ namespace simol
     return timeStep_ * numberOfIterations_;
   }
   
-  Potential const & Dynamics::potential() const
+  Potential& Dynamics::potential()
   { return *potential_; }
   
   double Dynamics::potential(dvec const& position) const
@@ -100,6 +106,11 @@ namespace simol
     return externalForce_(i); 
   }
   
+  
+  
+  
+  
+  
   void Dynamics::resetForce(Particle& particle) const
   {
     particle.potentialEnergy() = 0;
@@ -127,22 +138,39 @@ namespace simol
   
   void Dynamics::updateBefore(Particle& particle)
   {
+    //cout << "Dynamics::updateBefore" <<endl;
     particle.momentum() += timeStep_ * particle.force() / 2;
     particle.position() += timeStep_ * particle.momentum() / particle.mass();
   }
   
   void Dynamics::updateAfter(Particle& particle)
   {
+    //cout << "Dynamics::updateAfter" <<endl;
     particle.momentum() += timeStep_ * particle.force() / 2;
     particle.kineticEnergy() = pow(particle.momentum().norm(), 2) / particle.mass() / 2;
   }
   
+  void Dynamics::updateAllControlVariates(Output& output, vector<Particle> const& configuration, size_t indexOfIteration) const
+  {
+    dvec q = configuration[0].position();
+    dvec p = configuration[0].momentum();
+    //assert(configuration.size() == 1);
+    output.velocityCV()->update(p(0), generatorOn(output.velocityCV(), q, p), q, p, indexOfIteration);
+    output.forceCV()->update(potential_->derivative(q)(0), generatorOn(output.forceCV(), q, p), q, p, indexOfIteration);
+    output.lengthCV()->update(q(0), generatorOn(output.lengthCV(), q, p), q, p, indexOfIteration);
+  }
   
   
   //#### Hamiltonian ####
   
   Hamiltonian::Hamiltonian(Input const& input, int const& indexOfReplica):Dynamics(input, indexOfReplica)
   {
+  }
+  
+  double Hamiltonian::generatorOn(ControlVariate const* controlVariate, dvec const& position, dvec const& momentum) const
+  {
+    return momentum.dot(controlVariate->gradientQ(position, momentum))
+    + force(position).dot(controlVariate->gradientP(position, momentum));   
   }
   
   
@@ -206,6 +234,13 @@ namespace simol
     particle.kineticEnergy() = pow(particle.momentum().norm(), 2) / particle.mass() / 2;
   } 
   
+  double Langevin::generatorOn(ControlVariate const* controlVariate, dvec const& position, dvec const& momentum) const
+  {
+    return momentum.dot(controlVariate->gradientQ(position, momentum))
+    + force(position).dot(controlVariate->gradientP(position, momentum))
+    + gamma_ * (- momentum.dot(controlVariate->gradientP(position, momentum)) 
+		+ controlVariate->laplacienP(position, momentum) / beta_ );    
+  }
   
     
   //#### Overdamped ####
@@ -217,44 +252,63 @@ namespace simol
     
   void Overdamped::updateBefore(Particle& particle)
   {
-    particle.position() += timeStep_ * particle.force() + sqrt(2*timeStep_/beta_) * rng_->gaussian();
+    
   }
   
-  void Overdamped::updateAfter(Particle& particle){}
+  // /!\ a changer dans le cas N != 1
+  void Overdamped::updateAfter(Particle& particle)
+  {
+    //particle.position() += timeStep_ * particle.force() + sqrt(2*timeStep_/beta_) * rng_->gaussian();
   
+    //assert(particle.force()(0) == force(particle.position())(0));
+    dvec randomTerm = sqrt(2*timeStep_/beta_) * rng_->gaussian();
+    dvec qtilde = particle.position() + .5 * timeStep_ * particle.force() + .5 * randomTerm;
+    particle.position() += timeStep_ * force(qtilde) + randomTerm;
+  }
   
-  
-  //#### BoundaryLangevin ####
+  double Overdamped::generatorOn(ControlVariate const* controlVariate, dvec const& position, dvec const& momentum) const
+  {
+    return controlVariate->laplacienQ(position, momentum) / beta_
+    + force(position).dot(controlVariate->gradientQ(position, momentum));    
+  }
 
-  BoundaryLangevin::BoundaryLangevin(Input const& input, int const& indexOfReplica):
+  
+  //#### BoundaryStochasticDynamics ####
+
+  BoundaryStochasticDynamics::BoundaryStochasticDynamics(Input const& input, int const& indexOfReplica):
     StochasticDynamics(input, indexOfReplica),
     betaLeft_(input.betaLeft()),
     betaRight_(input.betaRight()),
     temperatureLeft_(1/betaLeft_),
-    temperatureRight_(1/betaRight()),
-    gamma_(input.gamma())
+    temperatureRight_(1/betaRight())
   {} 
   
-    double const& BoundaryLangevin::betaLeft() const
+    double const& BoundaryStochasticDynamics::betaLeft() const
   {
     return betaLeft_;
   }
   
-  double const& BoundaryLangevin::betaRight() const
+  double const& BoundaryStochasticDynamics::betaRight() const
   {
     return betaRight_;
   }
   
-    double const& BoundaryLangevin::temperatureLeft() const
+    double const& BoundaryStochasticDynamics::temperatureLeft() const
   {
     return temperatureLeft_;
   }
   
-  double const& BoundaryLangevin::temperatureRight() const
+  double const& BoundaryStochasticDynamics::temperatureRight() const
   {
     return temperatureRight_;
   }
 
+  //#### BoundaryLangevin ####
+  
+  BoundaryLangevin::BoundaryLangevin(const Input& input, const int& indexOfReplica):
+    BoundaryStochasticDynamics(input, indexOfReplica),
+    gamma_(input.gamma())
+  {}
     
   double const& BoundaryLangevin::gamma() const
   {
@@ -288,6 +342,26 @@ namespace simol
 
     particle.kineticEnergy() = pow(particle.momentum().norm(), 2) / particle.mass() / 2;
   }
+  
+  //##BoundaryOverdamped ####
+  
+  BoundaryOverdamped::BoundaryOverdamped(const Input& input, const int& indexOfReplica):BoundaryStochasticDynamics(input, indexOfReplica){}
+  
+  /*void BoundaryOverdamped::updateBefore(Particle& particle)
+  {
+  }*/
+  
+  void BoundaryOverdamped::updateAfterLeft(Particle& particle)
+  {
+    particle.position() += timeStep_ * particle.force() + sqrt(2*timeStep_/betaLeft_) * rng_->gaussian();
+  }
+  
+  void BoundaryOverdamped::updateAfterRight(Particle& particle)
+  {
+    particle.position() += timeStep_ * particle.force() + sqrt(2*timeStep_/betaRight_) * rng_->gaussian();
+  }
+
+
     
 }
 

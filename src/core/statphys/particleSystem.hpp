@@ -26,13 +26,12 @@ namespace simol
       void launch(Dynamics* model, Output& output);
       virtual void simulate(Dynamics* model, Output& output);
       virtual void computeAllForces(Dynamics const* model) = 0;
-      virtual void computeOutput(Output& output, Dynamics const* model, double time);
-      void writeOutput(Output& output, double time = 0);
+      virtual void computeOutput(Output& output, Dynamics const* model, size_t indexOfIteration);
+      void writeOutput(Output& output, size_t indexOfIteration = 0);
       virtual void computeFinalOutput(Output& output, Dynamics const* model);
       void writeFinalOutput(Output& output, Dynamics const* model);
     protected:
       int dimension_;
-      size_t currentTimeIteration_;
       std::vector<Particle> configuration_;
 
   };

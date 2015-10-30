@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
 
   //simol::Dynamics* model = simol::createDynamics(input);
   
-  replica.launch();
+  replica.launch(input);
   
 
   

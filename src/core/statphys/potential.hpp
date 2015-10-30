@@ -4,6 +4,7 @@
 #include "Vector.hpp"	
 #include "input.hpp"
 
+
 namespace simol
 {
   class Potential;
@@ -20,6 +21,7 @@ namespace simol
       Potential(Input const& input, int const& indexOfReplica=1);
       virtual double operator()(dvec const & position) const {std::cout << "This potential is pairwise !" << std::endl; exit(1);};
       virtual dvec derivative(dvec const & position) const = 0;
+      virtual double laplacian(dvec const & position) const {std::cout << "Laplacian not implemented !" << std::endl; exit(1);};
       virtual dvec force(dvec const & position) const;
   };
   
@@ -28,6 +30,33 @@ namespace simol
       Sinusoidal(Input const& input, int const& indexOfReplica=1);
       double operator()(dvec const & position) const;
       dvec derivative(dvec const & position) const;
+      double laplacian(dvec const & position) const;
+
+    private:
+      double amplitude_;
+      double pulsation_;
+  };
+  
+    class SumSinusoidal : public Potential{
+    public:
+      SumSinusoidal(Input const& input, int const& indexOfReplica=1);
+      double operator()(dvec const & position) const;
+      dvec derivative(dvec const & position) const;
+      virtual double laplacian(dvec const & position) const;
+
+
+    private:
+      double amplitude_;
+      double pulsation_;
+  };
+  
+  class FracSinusoidal : public Potential{
+    public:
+      FracSinusoidal(Input const& input, int const& indexOfReplica=1);
+      double operator()(dvec const & position) const;
+      dvec derivative(dvec const & position) const;
+      virtual double laplacian(dvec const & position) const;
+
 
     private:
       double amplitude_;
@@ -44,6 +73,19 @@ namespace simol
       double height_;
       double interWell_;
   };
+  
+    class HarmonicWell : public Potential{
+    public:
+      HarmonicWell(Input const& input, int const& indexOfReplica=1);
+      double operator()(dvec const & position) const;
+      dvec derivative(dvec const & position) const;
+
+    private:
+      double stiffness_;
+  };
+
+  
+  
   
     class Harmonic : public Potential{
     public:

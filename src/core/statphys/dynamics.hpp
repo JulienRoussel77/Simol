@@ -4,18 +4,20 @@
 #include "potential.hpp"
 #include "particle.hpp"
 #include "input.hpp"
+#include "output.hpp"
 #include "RNG.hpp"
+#include "controlVariate.hpp"
 # include <iostream>
 
 namespace simol
 {
   class Dynamics;
   
-  Dynamics* createDynamics(Input  const& input, int const& indexOfReplica=1);
+  Dynamics* createDynamics(Input  const& input, size_t indexOfReplica=1);
     
   class Dynamics
   {
-    friend Dynamics* createDynamics(Input  const& input, int const& indexOfReplica);
+    friend Dynamics* createDynamics(Input  const& input, size_t indexOfReplica);
     public:
       Dynamics(Input const&  input, int const& indexOfReplica=1);
       virtual ~Dynamics();
@@ -26,6 +28,7 @@ namespace simol
       size_t& numberOfIterations();
       const size_t& numberOfIterations() const;
       double finalTime() const;
+      Potential& potential();
       double potential(dvec const& position) const;
       double potential(double const& position) const;
       dvec force(dvec const& position) const;
@@ -42,6 +45,8 @@ namespace simol
       virtual void updateAfter(Particle& particle);
       virtual void updateAfterLeft(Particle& particle) {updateAfter(particle);};
       virtual void updateAfterRight(Particle& particle) {updateAfter(particle);};
+      virtual double generatorOn(ControlVariate const* controlVariate, dvec const& position, dvec const& momentum) const{cout << "operator not implemented !"; exit(1); return 0;}
+      virtual void updateAllControlVariates(Output& output, vector<Particle> const& configuration, size_t indexOfIteration) const;
     protected:
       double timeStep_;
       size_t numberOfIterations_;
@@ -54,6 +59,8 @@ namespace simol
   {
   public:
     Hamiltonian(Input const&  input, int const& indexOfReplica=1);
+    virtual double generatorOn(ControlVariate const* controlVariate, dvec const& position, dvec const& momentum) const;
+
   };
   
   class StochasticDynamics : public Dynamics
@@ -83,6 +90,7 @@ namespace simol
     double const& gamma() const;
     double sigma() const;
     virtual void updateAfter(Particle& particle);
+    virtual double generatorOn(ControlVariate const* controlVariate, dvec const& position, dvec const& momentum) const;
   protected:
     double gamma_;
   };
@@ -93,30 +101,56 @@ namespace simol
     Overdamped(Input const& input, int const& indexOfReplica=1);
     virtual void updateBefore(Particle& particle);
     virtual void updateAfter(Particle& particle);
+    virtual double generatorOn(ControlVariate const* controlVariate, dvec const& position, dvec const& momentum) const;
+    //virtual std::function<double (ControlVariate const*, dvec const&, dvec const&)> generator() const;
   };
   
-  class BoundaryLangevin : public StochasticDynamics
+  class BoundaryStochasticDynamics : public StochasticDynamics
   {
   public:
-    BoundaryLangevin(Input const& input, int const& indexOfReplica=1);
-    const double& betaLeft() const;
-    const double& betaRight() const;
-    const double& temperatureLeft() const;
-    const double& temperatureRight() const;
-    double const& gamma() const;
-    double sigmaLeft() const;
-    double sigmaRight() const;
+    BoundaryStochasticDynamics(Input const& input, int const& indexOfReplica=1);
+    virtual const double& betaLeft() const;
+    virtual const double& betaRight() const;
+    virtual const double& temperatureLeft() const;
+    virtual const double& temperatureRight() const;
+    
     //virtual void updateAfter(Particle& particle);
-    virtual void updateAfterLeft(Particle& particle);
-    virtual void updateAfterRight(Particle& particle);
+    virtual void updateAfterLeft(Particle& particle) = 0;
+    virtual void updateAfterRight(Particle& particle) = 0;
   protected:
     double betaLeft_; 
     double betaRight_; 
     double temperatureLeft_;
     double temperatureRight_;
+  };  
+  
+  
+  class BoundaryLangevin : public BoundaryStochasticDynamics
+  {
+  public:
+    BoundaryLangevin(Input const& input, int const& indexOfReplica=1);
+    double const& gamma() const;
+    double sigmaLeft() const;
+    double sigmaRight() const;
+    
+    //virtual void updateAfter(Particle& particle);
+    virtual void updateAfterLeft(Particle& particle);
+    virtual void updateAfterRight(Particle& particle);
+  protected:
     double gamma_;
   };
+    
   
+  class BoundaryOverdamped : public BoundaryStochasticDynamics
+  {
+  public:
+    BoundaryOverdamped(Input const& input, int const& indexOfReplica=1);
+    
+    //virtual void updateAfter(Particle& particle);
+    //virtual void updateBefore(Particle& particle);
+    virtual void updateAfterLeft(Particle& particle);
+    virtual void updateAfterRight(Particle& particle);
+  };
 
 
 }
