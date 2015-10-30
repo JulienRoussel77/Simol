@@ -178,7 +178,7 @@ namespace simol {
   string Input::outputFoldername() const {
     //cout << "../output/"+dynamicsName()+"/"+systemName()+"/"+potentialName()+"/" << endl;
     string foldername = "../output/"+dynamicsName()+"/"+systemName()+"/"+potentialName()+"/";
-    if (data["ControlVariate"]["Name"])
+    if (controlVariateName() != "None")
       foldername += controlVariateName()+"/";
     if (data["Output"]["Foldername"])
       foldername += data["Output"]["Foldername"].as<string>()+"/";

@@ -35,7 +35,11 @@ namespace simol
     externalForce_(0) = input.externalForce(indexOfReplica);
     cout << "externalForce = " << externalForce_(0) << endl;
     cout << "timeStep = " << timeStep() << endl;
-    cout << "numberOfIterations_ = " << numberOfIterations_ << endl;
+    if (numberOfIterations_ < 1e6)
+      cout << "numberOfIterations_ = " << numberOfIterations_ << endl;
+    else
+      cout << "numberOfIterations_ = " << numberOfIterations_/1e6 << "e6" << endl;
+    cout << "finalTime = " << numberOfIterations_ * timeStep() << endl;
   }
   
   Dynamics::~Dynamics()
@@ -154,11 +158,14 @@ namespace simol
   {
     dvec q = configuration[0].position();
     dvec p = configuration[0].momentum();
+    dvec qEnd = configuration[configuration.size()-1].position();
     //assert(configuration.size() == 1);
     output.velocityCV()->update(p(0), generatorOn(output.velocityCV(), q, p), q, p, indexOfIteration);
     output.forceCV()->update(potential_->derivative(q)(0), generatorOn(output.forceCV(), q, p), q, p, indexOfIteration);
-    output.lengthCV()->update(q(0), generatorOn(output.lengthCV(), q, p), q, p, indexOfIteration);
+    output.lengthCV()->update(qEnd(0)- q(0), generatorOn(output.lengthCV(), q, p), q, p, indexOfIteration);
   }
+  
+    
   
   
   //#### Hamiltonian ####
@@ -327,7 +334,7 @@ namespace simol
   
     void BoundaryLangevin::updateAfterLeft(Particle& particle)
   {
-    particle.momentum() += timeStep_ * particle.force() / 2;
+    //particle.momentum() += timeStep_ * particle.force() / 2;
     double alpha = exp(- gamma_ / particle.mass() * timeStep_);    
     particle.momentum() = alpha * particle.momentum() + sqrt((1-pow(alpha, 2))/betaLeft_*particle.mass()) * rng_->gaussian();
 
@@ -336,7 +343,7 @@ namespace simol
   
     void BoundaryLangevin::updateAfterRight(Particle& particle)
   {
-    particle.momentum() += timeStep_ * particle.force() / 2;
+    //particle.momentum() += timeStep_ * particle.force() / 2;
     double alpha = exp(- gamma_ / particle.mass() * timeStep_);    
     particle.momentum() = alpha * particle.momentum() + sqrt((1-pow(alpha, 2))/betaRight_*particle.mass()) * rng_->gaussian();
 
@@ -361,6 +368,12 @@ namespace simol
     particle.position() += timeStep_ * particle.force() + sqrt(2*timeStep_/betaRight_) * rng_->gaussian();
   }
 
+  // /!\ TO DO
+  double BoundaryOverdamped::generatorOn(ControlVariate const* controlVariate, dvec const& position, dvec const& momentum) const
+  {
+    return momentum.dot(controlVariate->gradientQ(position, momentum))
+    + force(position).dot(controlVariate->gradientP(position, momentum));   
+  }
 
     
 }

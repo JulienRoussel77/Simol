@@ -40,6 +40,7 @@ namespace simol
     Potential* potential_;
   public:
     ControlVariate(Input const& input, Potential& potential);
+    virtual bool isNone() const;
     double potential(dvec const& position) const;
     dvec potentialDerivative(dvec const& position) const;
     double potentialLaplacian(dvec const& position) const;
@@ -89,6 +90,18 @@ namespace simol
     virtual double laplacienP(dvec const& position, dvec const& momentum) const;
     virtual dvec gradientP(dvec const& position, dvec const& momentum) const;
   };
+    
+  class CosControlVariate : public ControlVariate
+  {
+  public:
+    CosControlVariate(Input const& input, Potential& potential);
+    double basisFunction(dvec const& position, dvec const& momentum) const;
+    //double generatorOnBasisFunction(dvec const& position, dvec const& momentum) const;
+    virtual double laplacienQ(dvec const& position, dvec const& momentum) const;
+    virtual dvec gradientQ(dvec const& position, dvec const& momentum) const;
+    virtual double laplacienP(dvec const& position, dvec const& momentum) const;
+    virtual dvec gradientP(dvec const& position, dvec const& momentum) const;
+  };
   
   class SinExpControlVariate : public ControlVariate
   {
@@ -102,10 +115,23 @@ namespace simol
     virtual dvec gradientP(dvec const& position, dvec const& momentum) const;
   };
   
+    class CosExpControlVariate : public ControlVariate
+  {
+  public:
+    CosExpControlVariate(Input const& input, Potential& potential);
+    double basisFunction(dvec const& position, dvec const& momentum) const;
+    //double generatorOnBasisFunction(dvec const& position, dvec const& momentum) const;
+    virtual double laplacienQ(dvec const& position, dvec const& momentum) const;
+    virtual dvec gradientQ(dvec const& position, dvec const& momentum) const;
+    virtual double laplacienP(dvec const& position, dvec const& momentum) const;
+    virtual dvec gradientP(dvec const& position, dvec const& momentum) const;
+  };
+  
   class NoControlVariate : public ControlVariate
   {
   public:
     NoControlVariate(Input const& input, Potential& potential);
+    bool isNone() const;
     double basisFunction(dvec const& position, dvec const& momentum) const;
     //double generatorOnBasisFunction(dvec const& position, dvec const& momentum) const;
     virtual double laplacienQ(dvec const& position, dvec const& momentum) const;

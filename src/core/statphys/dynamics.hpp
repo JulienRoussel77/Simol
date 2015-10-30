@@ -150,6 +150,7 @@ namespace simol
     //virtual void updateBefore(Particle& particle);
     virtual void updateAfterLeft(Particle& particle);
     virtual void updateAfterRight(Particle& particle);
+    double generatorOn(ControlVariate const* controlVariate, dvec const& position, dvec const& momentum) const;
   };
 
 

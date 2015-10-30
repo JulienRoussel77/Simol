@@ -4,8 +4,8 @@ Geometry:
 
 Mesh:
   Time:
-    Step: [0.001, 0.01]
-    Number: 100000
+    Step: 0.01
+    Number: 1000000
 
 Physics:
   System:
@@ -20,9 +20,10 @@ Physics:
     Name: BoundaryOverdamped  
     BetaLeft: 1
     BetaRight: 1
-  Replicas:
-    Number: 10
 
 Output:
   DecorrelationTime: 5
   Period: .01
+
+ControlVariate:
+  Name: None

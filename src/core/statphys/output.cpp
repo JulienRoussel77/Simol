@@ -47,9 +47,7 @@ namespace simol{
     timeStep_ = input.timeStep(indexOfReplica);
     assert(input.outputPeriodTime(indexOfReplica) == 0 || input.outputPeriodTime(indexOfReplica) >= timeStep());
     decorrelationNumberOfIterations_ = input.decorrelationNumberOfIterations(indexOfReplica);
-    //autocorrelationVelocity_ = AutocorrelationStats<dvec>(decorrelationNumberOfIterations_, timeStep_);
-    //autocorrelationForce_ = AutocorrelationStats<dvec>(decorrelationNumberOfIterations_, timeStep_);
-    //length_ = AutocorrelationStats<double>(decorrelationNumberOfIterations_, timeStep_);
+    verbose_ = (periodNumberOfIterations() > 0);
     velocityCV_ = createControlVariate(input, potential, indexOfReplica);
     forceCV_ = createControlVariate(input, potential, indexOfReplica);
     lengthCV_ = createControlVariate(input, potential, indexOfReplica);

@@ -15,8 +15,12 @@ namespace simol
       return new NoControlVariate(input, potential);
     if (input.controlVariateName() == "Sinus")
       return new SinusControlVariate(input, potential);
+    if (input.controlVariateName() == "Cosine")
+      return new CosControlVariate(input, potential);
     else if (input.controlVariateName() == "SinExp")
       return new SinExpControlVariate(input, potential);
+    else if (input.controlVariateName() == "CosExp")
+      return new CosExpControlVariate(input, potential);
     else
       std::cout << input.controlVariateName() << " is not a valid control variate !" << std::endl;
     return 0;
@@ -37,7 +41,12 @@ namespace simol
     decorrelationNumberOfIterations_(input.decorrelationNumberOfIterations()),
     potential_(&potential)
   {}
-  
+
+  bool ControlVariate::isNone() const
+  {
+    return false;
+  }
+ 
   double ControlVariate::potential(dvec const& position) const
   {
     return (*potential_)(position);
@@ -201,6 +210,11 @@ namespace simol
   NoControlVariate::NoControlVariate(Input const& input, Potential& potential):
     ControlVariate(input, potential){}
     
+  bool NoControlVariate::isNone() const
+  {
+    return true;
+  }
+    
   double NoControlVariate::basisFunction(dvec const& position, dvec const& momentum) const
   {
     cout << "No basisFunction for NoControlVariate" << endl;
@@ -211,30 +225,22 @@ namespace simol
     //double generatorOnBasisFunction(dvec const& position, dvec const& momentum) const;
   double NoControlVariate::laplacienQ(dvec const& position, dvec const& momentum) const
   {
-    cout << "No laplacienQ for NoControlVariate" << endl;
-    assert(false);
     return 0;
   }
   
   dvec NoControlVariate::gradientQ(dvec const& position, dvec const& momentum) const
   {
-    cout << "No gradientQ for NoControlVariate" << endl;
-    assert(false);
-    return 0;
+    return dvec(position.size());
   }
   
   double NoControlVariate::laplacienP(dvec const& position, dvec const& momentum) const
   {
-    cout << "No laplacienP for NoControlVariate" << endl;
-    assert(false);
     return 0;
   }
     
   dvec NoControlVariate::gradientP(dvec const& position, dvec const& momentum) const
   {
-    cout << "No gradientP for NoControlVariate" << endl;
-    assert(false);
-    return 0;
+    return dvec(position.size());
   }
   
   void NoControlVariate::update(double observable, double generatorOnBasisFunction, dvec const& position, dvec const& momentum, size_t indexOfIteration)
@@ -254,22 +260,23 @@ namespace simol
   
   double SinusControlVariate::basisFunction(dvec const& position, dvec const& momentum) const
   {
-    return cos(2 * M_PI * position(0));;
+    return sin(2 * M_PI * position(0));;
+  }
+   
+  dvec SinusControlVariate::gradientQ(dvec const& position, dvec const& momentum) const
+  {
+    double q = position(0);
+    dvec v(position.size());
+    v(0) = 2 * M_PI * cos(2 * M_PI * position(0));
+    return v;
   }
   
   double SinusControlVariate::laplacienQ(dvec const& position, dvec const& momentum) const
   {
     double q = position(0);
-    return - pow (2 * M_PI, 2) * cos(2 * M_PI * position(0));
+    return - pow (2 * M_PI, 2) * sin(2 * M_PI * position(0));
   }
-  
-  dvec SinusControlVariate::gradientQ(dvec const& position, dvec const& momentum) const
-  {
-    double q = position(0);
-    dvec v(position.size());
-    v(0) = - 2 * M_PI * sin(2 * M_PI * position(0));
-    return v;
-  }
+
   
   double SinusControlVariate::laplacienP(dvec const& position, dvec const& momentum) const
   {
@@ -277,6 +284,42 @@ namespace simol
   }
   
   dvec SinusControlVariate::gradientP(dvec const& position, dvec const& momentum) const
+  {
+    return dvec(position.size());
+  }
+  
+  
+  
+  
+    CosControlVariate::CosControlVariate(Input const& input, Potential& potential):
+    ControlVariate(input, potential)
+  {}
+  
+  double CosControlVariate::basisFunction(dvec const& position, dvec const& momentum) const
+  {
+    return cos(2 * M_PI * position(0));;
+  }
+  
+  double CosControlVariate::laplacienQ(dvec const& position, dvec const& momentum) const
+  {
+    double q = position(0);
+    return - pow (2 * M_PI, 2) * cos(2 * M_PI * position(0));
+  }
+  
+  dvec CosControlVariate::gradientQ(dvec const& position, dvec const& momentum) const
+  {
+    double q = position(0);
+    dvec v(position.size());
+    v(0) = - 2 * M_PI * sin(2 * M_PI * position(0));
+    return v;
+  }
+  
+  double CosControlVariate::laplacienP(dvec const& position, dvec const& momentum) const
+  {
+    return 0;
+  }
+  
+  dvec CosControlVariate::gradientP(dvec const& position, dvec const& momentum) const
   {
     return dvec(position.size());
   }
@@ -295,7 +338,7 @@ namespace simol
   
   double SinExpControlVariate::basisFunction(dvec const& position, dvec const& momentum) const
   {
-    return cos(2 * M_PI * position(0)) * exp(potential(position)/2);
+    return sin(2 * M_PI * position(0)) * exp(potential(position)/2);
   }
   
   dvec SinExpControlVariate::gradientQ(dvec const& position, dvec const& momentum) const
@@ -304,8 +347,8 @@ namespace simol
     dvec v(position.size());
     //v(0) = 2 * M_PI * cos(2 * M_PI * position(0));
     //v(0) = - 2 * M_PI * sin(2 * M_PI * position(0));
-    v(0) = (- 2 * M_PI * sin(2 * M_PI * q)
-	+ potentialDerivative(position)(0)/2 * cos(2 * M_PI * q))
+    v(0) = (2 * M_PI * cos(2 * M_PI * q)
+	+ potentialDerivative(position)(0)/2 * sin(2 * M_PI * q))
 	* exp(potential(position)/2);
     return v;
   }
@@ -314,10 +357,10 @@ namespace simol
   {
     double q = position(0);
     
-    return (-pow(2 * M_PI, 2) * cos(2* M_PI * q)
-      -2 * M_PI * potentialDerivative(position)(0) *  sin(2 * M_PI * q)
-      + potentialLaplacian(position)/2 * cos(2 * M_PI * q)
-      + pow(potentialDerivative(position)(0) / 2, 2) * cos(2 * M_PI * q))
+    return (-pow(2 * M_PI, 2) * sin(2* M_PI * q)
+      +2 * M_PI * potentialDerivative(position)(0) *  cos(2 * M_PI * q)
+      + potentialLaplacian(position)/2 * sin(2 * M_PI * q)
+      + pow(potentialDerivative(position)(0) / 2, 2) * sin(2 * M_PI * q))
       * exp(potential(position)/2);
   }
   
@@ -334,7 +377,47 @@ namespace simol
   
   
   
+  CosExpControlVariate::CosExpControlVariate(Input const& input, Potential& potential):
+    ControlVariate(input, potential)
+  {}
   
+  double CosExpControlVariate::basisFunction(dvec const& position, dvec const& momentum) const
+  {
+    return cos(2 * M_PI * position(0)) * exp(potential(position)/2);
+  }
+  
+  dvec CosExpControlVariate::gradientQ(dvec const& position, dvec const& momentum) const
+  {
+    double q = position(0);
+    dvec v(position.size());
+    //v(0) = 2 * M_PI * cos(2 * M_PI * position(0));
+    //v(0) = - 2 * M_PI * sin(2 * M_PI * position(0));
+    v(0) = (- 2 * M_PI * sin(2 * M_PI * q)
+	+ potentialDerivative(position)(0)/2 * cos(2 * M_PI * q))
+	* exp(potential(position)/2);
+    return v;
+  }
+  
+    double CosExpControlVariate::laplacienQ(dvec const& position, dvec const& momentum) const
+  {
+    double q = position(0);
+    
+    return (-pow(2 * M_PI, 2) * cos(2* M_PI * q)
+      -2 * M_PI * potentialDerivative(position)(0) *  sin(2 * M_PI * q)
+      + potentialLaplacian(position)/2 * cos(2 * M_PI * q)
+      + pow(potentialDerivative(position)(0) / 2, 2) * cos(2 * M_PI * q))
+      * exp(potential(position)/2);
+  }
+  
+  dvec CosExpControlVariate::gradientP(dvec const& position, dvec const& momentum) const
+  {
+    return dvec(position.size());
+  }
+    
+  double CosExpControlVariate::laplacienP(dvec const& position, dvec const& momentum) const
+  {
+    return 0;
+  }
   
   
 }

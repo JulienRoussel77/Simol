@@ -42,6 +42,10 @@ namespace simol
     computeAllForces(model);
     for (size_t indexOfIteration  =0; indexOfIteration < model->numberOfIterations(); ++indexOfIteration)
     {
+      if ((10*indexOfIteration) % model->numberOfIterations() == 0)
+       cout << "---- Run " << (100 * indexOfIteration) / model->numberOfIterations() << " % completed ----" << endl;
+     
+      
       double instant = indexOfIteration * model->timeStep();
       computeOutput(output, model, indexOfIteration);
       writeOutput(output, indexOfIteration);
@@ -148,14 +152,14 @@ namespace simol
   {
     //for (auto&& particle : configuration_)
       //model->updateBefore(particle);
-    for (size_t i=2; i < numberOfParticles() - 1; i++)
+    for (size_t i=1; i < numberOfParticles(); i++)
       model->updateBefore(particle(i));
     
     computeAllForces(model);
     
     assert(numberOfParticles() > 2);
     model->updateAfterLeft(particle(1));
-    for (size_t i=2; i < numberOfParticles() - 1; i++)
+    for (size_t i=1; i < numberOfParticles(); i++)
       model->updateAfter(particle(i));
     model->updateAfterRight(particle(numberOfParticles() - 1));
   }

@@ -61,14 +61,14 @@ namespace simol
       
   };
 
-  template<class ScalarType, template<class> class WrappedLibrary>
+  /*template<class ScalarType, template<class> class WrappedLibrary>
   std::ofstream & operator<<(std::ofstream & fileToWrite, Vector<ScalarType,WrappedLibrary> const & vectorToRead)
   {
     for (size_t index = 0; index < vectorToRead.size(); ++index)
       fileToWrite << vectorToRead(index) << " ";
   
     return fileToWrite;
-  }
+  }*/
 
   Vector<double,eigen> operator*(double const& lambda, Vector<double,eigen> const& v);
   

@@ -52,7 +52,7 @@ namespace simol {
    {
      output.reset(input, dynamicsReplicas[indexOfReplica]->potential(), indexOfReplica);
      if ((10*indexOfReplica) % numberOfReplicas_ == 0 && numberOfReplicas_ > 1)
-       cout << "---- " << (100 * indexOfReplica) / numberOfReplicas_ << " % completed ----" << endl;
+       cout << "-- Simulation " << (100 * indexOfReplica) / numberOfReplicas_ << " % completed ----" << endl;
      //dynamicsReplicas[i]->setExternalForce(externalForce(i));
      //if (i>0)
      //  systemReplicas[i]->particle(0) = systemReplicas[i-1]->particle(0);
