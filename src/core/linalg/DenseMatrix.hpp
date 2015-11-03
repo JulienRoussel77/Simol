@@ -1,5 +1,5 @@
-#ifndef SIMOL_MATRIX_HPP
-#define SIMOL_MATRIX_HPP
+#ifndef SIMOL_DENSEMATRIX_HPP
+#define SIMOL_DENSEMATRIX_HPP
 
 #include <Eigen/Dense>
 
