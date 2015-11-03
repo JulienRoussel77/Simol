@@ -18,3 +18,4 @@ add_dependencies(molecular_dynamics yamlcpp)
 add_dependencies(yamlcpp boost)
 target_link_libraries(molecular_dynamics ${YAMLCPP_INSTALL_DIR}/lib/libyaml-cpp.a)
 
+add_subdirectory(test)

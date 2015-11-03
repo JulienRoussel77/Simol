@@ -20,17 +20,7 @@ set(SIMOL_Fortran_COMPILER ${CMAKE_Fortran_COMPILER})
 ProcessorCount(N)
 if(NOT N EQUAL 0)
   set(CMAKE_BUILD_FLAGS -j${N})
-  #set(ctest_test_args ${ctest_test_args} PARALLEL_LEVEL ${N})
 endif()
-#====================
-# EXECUTABLE SETTINGS
-#====================
-add_executable(test_simol src/test/unit/test_simol.cpp 
-               src/test/unit/EigenSolverTest.cpp 
-               src/test/unit/SparseMatrixTest.cpp 
-               #src/test/unit/MatrixMarketFileTest.cpp 
-               src/core/io/mmio.c
-               src/test/unit/VectorTest.cpp)
 
 #=============
 # USER OPTIONS
@@ -125,18 +115,8 @@ endif(CMAKE_BUILD_TYPE EQUAL "Release")
 #====================
 
 include_directories(${CPPUNIT_INSTALL_DIR}/include)
-include_directories(/home/stoltz/travail/Simol/gcc-4.9.2/installation/include)
-
-
-#set(CMAKE_LINKER /home/stoltz/travail/Simol/gcc-4.9.2/installation/lib64/libstdc++.a)
 
 MESSAGE(STATUS ${BLAS_LIB})
-target_link_libraries(test_simol ${CPPUNIT_INSTALL_DIR}/lib/libcppunit.so 
-                                 ${ARPACK_INSTALL_DIR}/lib/libarpack.a
-                                 ${ARPACK_INSTALL_DIR}/lib/libarpack_util.a
-                                 ${LAPACK_LIB}
-                                 ${BLAS_LIB}
-                                 )
 
 #================
 # LINKER SETTINGS
@@ -151,11 +131,3 @@ include_directories(src)
 
 add_subdirectory(src)
 
-#==============
-# TEST SETTINGS
-#==============
-enable_testing()
-
-add_test(test_simol ${EXECUTABLE_OUTPUT_PATH}/test_simol)
-
-set_tests_properties(test_simol PROPERTIES PASS_REGULAR_EXPRESSION "OK")
