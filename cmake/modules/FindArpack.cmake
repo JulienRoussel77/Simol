@@ -7,6 +7,7 @@ else()
     set(ARPACK_PATCH_COMMAND cd <SOURCE_DIR> 
                           && wget http://www.caam.rice.edu/software/ARPACK/SRC/patch.tar.gz
                           && tar xvzf patch.tar.gz
+                          && patch UTIL/second.f < ${CMAKE_SOURCE_DIR}/patches/arpack.patch
                           && cp ${CMAKE_SOURCE_DIR}/cmake/arpack/CMakeLists.txt <SOURCE_DIR>)
     set(ARPACK_ARGS -D CMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
     set(ARPACK_INSTALL_COMMAND mkdir -p <INSTALL_DIR>/lib && 
