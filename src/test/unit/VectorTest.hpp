@@ -15,16 +15,15 @@ namespace simol
   {
     CPPUNIT_TEST_SUITE(VectorTest);
       CPPUNIT_TEST(test_size);
+      CPPUNIT_TEST(test_sum);
     CPPUNIT_TEST_SUITE_END();
 
     public:
       void test_size();
-
-    private:
-      size_t randomSize;
+      void test_sum();
  
   };
 }
 
 
-#endif 
+#endif
