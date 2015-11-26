@@ -1,0 +1,30 @@
+Geometry:
+  Dimension: 1
+  Length: 1
+
+Mesh:
+  Time:
+    Step: 0.01
+    FinalTime: 10000
+
+Physics:
+  System:
+    Name: Chain
+    Number: 6
+    Position: [0, 0]
+  Potential:
+    Name: Rotor
+    Stiffness: .5
+  Model:
+    Name: BoundaryLangevin
+    Gamma: 1
+    TemperatureLeft: 1
+    TemperatureRight: 1
+
+Output:
+  Foldername: IncomeEq
+  DecorrelationTime: 5
+  Period: 10
+
+ControlVariate:
+  Name: Kinetic

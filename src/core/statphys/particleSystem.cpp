@@ -5,6 +5,8 @@
 
 using std::cout;
 using std::endl;
+using std::min;
+using std::max;
 
 namespace simol
 {
@@ -15,6 +17,8 @@ namespace simol
       return new Isolated(input, indexOfReplica);
     else if (input.systemName() == "Chain")
       return new Chain(input, indexOfReplica);
+    else if (input.systemName() == "TriChain")
+      return new TriChain(input, indexOfReplica);
     else
       std::cout << input.systemName() << " is not a valid system !" << std::endl;
     
@@ -39,6 +43,7 @@ namespace simol
   
   void ParticleSystem::launch(Dynamics* model, Output& output)  
   {
+    model->initializeMomenta(configuration_);
     computeAllForces(model);
     for (size_t indexOfIteration  =0; indexOfIteration < model->numberOfIterations(); ++indexOfIteration)
     {
@@ -68,28 +73,37 @@ namespace simol
   
   void ParticleSystem::computeOutput(Output& output, Dynamics const* model, size_t indexOfIteration)
   {
-      
     //if (output.verbose() > 0 && output.doOutput(indexOfIteration))
     if (output.verbose() > 0)
     {
       output.kineticEnergy() = 0;
       output.potentialEnergy() = 0;
+      output.energyFlow() = 0;
       //Calcul de la température et de l'énergie
-      for (auto&& particle : configuration_)
+      for (size_t i = 0; i < numberOfParticles(); i++)
       {
+	Particle& particle = configuration_[i];
+	//cout << "index = " << min(i+1, numberOfParticles()) << endl;
+	//Particle& nextParticle = configuration_[min(i+1, numberOfParticles()-1)];
 	output.kineticEnergy() += particle.kineticEnergy();
 	output.potentialEnergy() += particle.potentialEnergy();
-      }
+	//cout << i << " : " << particle.kineticEnergy() << " + " << particle.potentialEnergy() << endl;
+	//cout << "momentum : " << particle.momentum() << endl;
+	//if (i != numberOfParticles() - 1)
+	  //output.energyFlow() += - particle.energyGrad(0) * particle.momentum(0) / (numberOfParticles() - 1);
+      }   
+      //cout << output.kineticEnergy() + output.potentialEnergy() << endl;
+      double inFlux = model->temperatureLeft() - 2*particle(0).kineticEnergy();
+      double outFlux = 2*particle(numberOfParticles()-1).kineticEnergy()- model->temperatureRight();
       
-      //Calcul de l'autocorrélation des vitesses
-      /*if (output.doComputeCorrelations())
-      {
-	//output.appendAutocorrelationVelocity(particle(0).position(), indexOfIteration);
-	output.appendAutocorrelationVelocity(particle(0).velocity(), indexOfIteration);
-	output.appendAutocorrelationForce(particle(0).force() - model->externalForce(), indexOfIteration);
-	
-      }*/
-     
+      //output.energyFlow() = model->temperatureLeft() - 2*particle(0).kineticEnergy();
+      //output.energyFlow() = 2*particle(numberOfParticles()-1).kineticEnergy() - model->temperatureRight();
+      output.energyFlow() = (pow(model->temperatureRight(), 2) * inFlux + pow(model->temperatureLeft(), 2) * outFlux) / (pow(model->temperatureRight(), 2) + pow(model->temperatureLeft(), 2));
+      //int midNumber = (numberOfParticles()-1) / 2;
+      //output.energyFlow() = - particle(0).energyGrad(0) * particle(0).momentum(0);
+      
+      //output.energyFlow() = model->temperatureLeft() - 2*particle(0).kineticEnergy();
+
     }
     model->updateAllControlVariates(output, configuration_, indexOfIteration);
       
@@ -97,7 +111,7 @@ namespace simol
   
   void ParticleSystem::writeOutput(Output& output, size_t indexOfIteration)
   {
-    if (output.verbose() > 0 && output.doOutput(indexOfIteration))
+    if (output.verbose() > 0 && output.doOutput(indexOfIteration) && indexOfIteration >= 100)
       output.display(configuration_, indexOfIteration);
   }
   
@@ -122,9 +136,6 @@ namespace simol
       configuration_[i] = Particle(input.mass(), input.initialPosition(i), input.initialMomentum(i));
   }
       
-
-
-
   
   void Isolated::computeAllForces(Dynamics const* model)
   {
@@ -139,28 +150,39 @@ namespace simol
   
   
   
-    Chain::Chain(Input const& input, int const& indexOfReplica):
-  ParticleSystem(input, indexOfReplica)
+  
+  
+  
+  Chain::Chain(Input const& input, int const& indexOfReplica):
+  ParticleSystem(input, indexOfReplica),
+  ancorParticle_(input.dimension())
   {
-    for (size_t i = 0; i<input.numberOfParticles(); i++) {
+    assert(configuration_.size() > 1);
+    ancorParticle_.position(0) = 2 * input.initialPosition(0) - input.initialPosition(1);
+    for (size_t i = 0; i<input.numberOfParticles(); i++) 
+    {
       configuration_[i] = Particle(input.mass(), input.initialPosition(i), input.initialMomentum(i));
       //std::cout << configuration_[i].force() << std::endl;
     }
+        configuration_[0].position(0) -= .1;
+
   }
   
     void Chain::simulate(Dynamics * model, Output& output)
   {
     //for (auto&& particle : configuration_)
       //model->updateBefore(particle);
-    for (size_t i=1; i < numberOfParticles(); i++)
+    for (size_t i=0; i < numberOfParticles(); i++)
       model->updateBefore(particle(i));
     
     computeAllForces(model);
     
-    assert(numberOfParticles() > 2);
-    model->updateAfterLeft(particle(1));
-    for (size_t i=1; i < numberOfParticles(); i++)
+    assert(numberOfParticles() > 1);
+    
+    for (size_t i=0; i < numberOfParticles(); i++)
       model->updateAfter(particle(i));
+    
+    model->updateAfterLeft(particle(0));
     model->updateAfterRight(particle(numberOfParticles() - 1));
   }
   
@@ -171,8 +193,61 @@ namespace simol
       model->resetForce(particle);
     //for (auto&& particle : configuration_)
     //  model->computeForce(particle);
+    model->interaction(ancorParticle_, configuration_[0]);
     for (size_t i = 0; i < numberOfParticles() - 1; i++)
       model->interaction(configuration_[i], configuration_[i+1]);
+  }
+  
+  
+  
+  
+  
+  
+  TriChain::TriChain(Input const& input, int const& indexOfReplica):
+  ParticleSystem(input, indexOfReplica),
+  ancorParticle1_(input.dimension()),
+  ancorParticle2_(input.dimension())
+  {
+    assert(configuration_.size() > 1);
+    ancorParticle1_.position(0) = 3 * input.initialPosition(0) - 2*input.initialPosition(1);
+    ancorParticle2_.position(0) = 2 * input.initialPosition(0) - input.initialPosition(1);
+    for (size_t i = 0; i<input.numberOfParticles(); i++) 
+    {
+      configuration_[i] = Particle(input.mass(), input.initialPosition(i), input.initialMomentum(i));
+      //std::cout << configuration_[i].force() << std::endl;
+    }
+    configuration_[0].position(0) -= .1;
+  }
+  
+    void TriChain::simulate(Dynamics * model, Output& output)
+  {
+    //for (auto&& particle : configuration_)
+      //model->updateBefore(particle);
+    for (size_t i=0; i < numberOfParticles(); i++)
+      model->updateBefore(particle(i));
+    
+    computeAllForces(model);
+    
+    assert(numberOfParticles() > 1);
+    
+    for (size_t i=0; i < numberOfParticles(); i++)
+      model->updateAfter(particle(i));
+    
+    model->updateAfterLeft(particle(0));
+    model->updateAfterRight(particle(numberOfParticles() - 1));
+  }
+  
+  void TriChain::computeAllForces(Dynamics const* model)
+  {
+    //std::cout << "TriChain::computeAllForces" << std::endl;
+    for (auto&& particle : configuration_)
+      model->resetForce(particle);
+    //for (auto&& particle : configuration_)
+    //  model->computeForce(particle);
+    model->triInteraction(ancorParticle1_, ancorParticle2_, configuration_[0]);
+    model->triInteraction(ancorParticle2_, configuration_[0], configuration_[1]);
+    for (size_t i = 0; i < numberOfParticles() - 2; i++)
+      model->triInteraction(configuration_[i], configuration_[i+1], configuration_[i+2]);
   }
 
 }

@@ -5,23 +5,22 @@ Geometry:
 Mesh:
   Time:
     Step: 0.01
-    Number: 10000
+    FinalTime: 1000
 
 Physics:
   System:
     Name: Isolated
-    Momentum: 1
   Potential:
     Name: DoubleWell
     Height: 1
     InterWell: 2
   Model:
-    Name: Hamiltonian
+    Name: Overdamped
+    Temperature: 1
 
 Output:
-  DecorrelationTime: 5
-  Period: .01
+  DecorrelationTime: 0.2
+  Period: 0.01
 
 ControlVariate:
   Name: None
-

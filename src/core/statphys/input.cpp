@@ -12,6 +12,14 @@ namespace simol {
   Input::Input(CommandLine cmd):data(YAML::LoadFile(cmd.inputFileName()))
   {
     std::cout << "Input read in " << cmd.inputFileName() << std::endl;
+    
+    if (data["Physics"]["System"]["Position"])
+      if (data["Physics"]["System"]["Position"].size() == 2)
+      {
+	positionMin_ = data["Physics"]["System"]["Position"][0].as<double>();
+	positionMax_ = data["Physics"]["System"]["Position"][1].as<double>();
+      }
+          
   }
 
   int Input::dimension() const {return data["Geometry"]["Dimension"].as<int>();}
@@ -56,51 +64,99 @@ namespace simol {
   string Input::potentialName() const {return data["Physics"]["Potential"]["Name"].as<string>();}
 
   //Sinusoidal
-  double Input::amplitude() const {return data["Physics"]["Potential"]["Amplitude"].as<double>();}
+  double Input::amplitude() const 
+  {
+    if (data["Physics"]["Potential"]["Amplitude"])
+      return data["Physics"]["Potential"]["Amplitude"].as<double>();
+    else
+      return 1;
+  }
   
   //DoubleWell
   double Input::height() const {return data["Physics"]["Potential"]["Height"].as<double>();}
   double Input::interWell() const {return data["Physics"]["Potential"]["InterWell"].as<double>();}
   
   //Harmonic
-  double Input::stiffness() const {
+  double Input::potentialStiffness() const {
     if (data["Physics"]["Potential"]["Stiffness"])
       return data["Physics"]["Potential"]["Stiffness"].as<double>();
     else
-      return .5;
+      return 1;
   }
+  
+  //Quadratic
+  double Input::potentialAlpha() const {
+    if (data["Physics"]["Potential"]["Alpha"])
+      return data["Physics"]["Potential"]["Alpha"].as<double>();
+    else
+      return 1;
+  }
+  
+  double Input::potentialBeta() const {
+    if (data["Physics"]["Potential"]["Beta"])
+      return data["Physics"]["Potential"]["Beta"].as<double>();
+    else
+      return 1;
+  }
+  
 
   string Input::dynamicsName() const {return data["Physics"]["Model"]["Name"].as<string>();}
   double Input::gamma() const {return data["Physics"]["Model"]["Gamma"].as<double>();}
   
-  double Input::temperature() const 
+  double Input::temperature(size_t indexOfReplica) const 
   {
     if (data["Physics"]["Model"]["Temperature"])
       return data["Physics"]["Model"]["Temperature"].as<double>();
     else if (data["Physics"]["Model"]["Beta"])
       return 1 / data["Physics"]["Model"]["Beta"].as<double>();
+    else if (data["Physics"]["Model"]["TemperatureLeft"] && data["Physics"]["Model"]["TemperatureRight"])
+      return (temperatureLeft() + temperatureRight()) / 2;
+    else if (data["Physics"]["Model"]["BetaLeft"] && data["Physics"]["Model"]["BetaRight"])
+      return .5/betaLeft() + .5/betaRight();
     else 
       {cout << "Temperature not precised !" << endl;exit(1);}
   }
   
-  double Input::beta() const 
+  double Input::temperatureLeft(size_t indexOfReplica) const 
+  {
+    return data["Physics"]["Model"]["TemperatureLeft"].as<double>();
+  }
+  
+    double Input::temperatureRight(size_t indexOfReplica) const 
+  {
+    return data["Physics"]["Model"]["TemperatureRight"].as<double>();
+  }
+  
+  double Input::beta(size_t indexOfReplica) const 
   {
     if (data["Physics"]["Model"]["Beta"])
       return data["Physics"]["Model"]["Beta"].as<double>();
     else if (data["Physics"]["Model"]["Temperature"])
       return 1 / data["Physics"]["Model"]["Temperature"].as<double>();
-    else 
+    else if (data["Physics"]["Model"]["BetaLeft"] && data["Physics"]["Model"]["BetaRight"])
+      return 2. / (1/betaLeft() + 1/betaRight());
+    else if (data["Physics"]["Model"]["TemperatureLeft"] && data["Physics"]["Model"]["TemperatureRight"])
+      return 2/(temperatureLeft() + temperatureRight());
+    else
       {cout << "Beta not precised !" << endl;exit(1);}
   }
   
-  double Input::betaLeft() const 
+  double Input::betaLeft(size_t indexOfReplica) const 
   {
-    return data["Physics"]["Model"]["BetaLeft"].as<double>();
+    if (data["Physics"]["Model"]["BetaLeft"])
+      return data["Physics"]["Model"]["BetaLeft"].as<double>();
+    else if (data["Physics"]["Model"]["TemperatureLeft"])
+      return 1 / data["Physics"]["Model"]["TemperatureLeft"].as<double>();
+    else assert(false);
   }
   
-    double Input::betaRight() const 
+  double Input::betaRight(size_t indexOfReplica) const 
   {
-    return data["Physics"]["Model"]["BetaRight"].as<double>();
+    if (data["Physics"]["Model"]["BetaRight"])
+      return data["Physics"]["Model"]["BetaRight"].as<double>();
+    else if (data["Physics"]["Model"]["TemperatureRight"])
+      return 1 / data["Physics"]["Model"]["TemperatureRight"].as<double>();
+    else assert(false);
   }
   
   /*bool Input::externalForceVarying() const {
@@ -137,9 +193,10 @@ namespace simol {
   
   double Input::initialPosition(int const& i) const {
     if (data["Physics"]["System"]["Position"])
-      return data["Physics"]["System"]["Position"].as<double>();
-    else if (data["Physics"]["System"]["PositionMin"] && data["Physics"]["System"]["PositionMax"])
-      return data["Physics"]["System"]["PositionMin"].as<double>() + (i + .5)/numberOfParticles() * (data["Physics"]["System"]["PositionMax"].as<double>() - data["Physics"]["System"]["PositionMin"].as<double>());
+      if (data["Physics"]["System"]["Position"].size() == 1)
+	return data["Physics"]["System"]["Position"].as<double>();
+      else
+	return positionMin_ + (i + .5)/numberOfParticles() * (positionMax_ - positionMin_);
     else return 0;
   }   
   

@@ -9,30 +9,28 @@ using std::endl;
 namespace simol
 {
 
-    Dynamics* createDynamics(Input const& input, size_t indexOfReplica)
+    Dynamics* createDynamics(Input const& input, size_t iOfReplica)
   {
     if (input.dynamicsName() == "Hamiltonian")
-      return new Hamiltonian(input, indexOfReplica);
+      return new Hamiltonian(input, iOfReplica);
     else if (input.dynamicsName() == "Langevin")
-      return new Langevin(input, indexOfReplica);
+      return new Langevin(input, iOfReplica);
     else if (input.dynamicsName() == "BoundaryLangevin")
-      return new BoundaryLangevin(input, indexOfReplica);
+      return new BoundaryLangevin(input, iOfReplica);
     else if (input.dynamicsName() == "Overdamped")
-      return new Overdamped(input, indexOfReplica);
-    else if (input.dynamicsName() == "BoundaryOverdamped")
-      return new BoundaryOverdamped(input, indexOfReplica);
+      return new Overdamped(input, iOfReplica);
     else
       std::cout << input.dynamicsName() << " is not a valid dynamics !" << std::endl;
     return 0;
   }
   
-  Dynamics::Dynamics(Input const& input, int const& indexOfReplica):
-    timeStep_(input.timeStep(indexOfReplica)), 
-    numberOfIterations_(input.numberOfIterations(indexOfReplica)), 
+  Dynamics::Dynamics(Input const& input, int const& iOfReplica):
+    timeStep_(input.timeStep(iOfReplica)), 
+    numberOfIterations_(input.numberOfIterations(iOfReplica)), 
     externalForce_(input.dimension())
   {
     potential_ = createPotential(input);
-    externalForce_(0) = input.externalForce(indexOfReplica);
+    externalForce_(0) = input.externalForce(iOfReplica);
     cout << "externalForce = " << externalForce_(0) << endl;
     cout << "timeStep = " << timeStep() << endl;
     if (numberOfIterations_ < 1e6)
@@ -113,7 +111,8 @@ namespace simol
   
   
   
-  
+  void Dynamics::initializeMomenta(vector<Particle>& configuration)
+  {}
   
   void Dynamics::resetForce(Particle& particle) const
   {
@@ -132,12 +131,28 @@ namespace simol
     dvec r12 = particle2.position() - particle1.position();
     //double d12 = r12.norm();
     double energy12 = potential(r12);
-    dvec force12 = force(r12);
+    dvec force12 = force(r12);    // = - v'(q_2 - q_1)
     
-    particle1.potentialEnergy() += energy12 / 2;
-    particle2.potentialEnergy() += energy12 / 2;
-    particle1.force() += force12;
-    particle2.force() -= force12;
+    //particle1.potentialEnergy() += energy12 / 2;
+    particle2.potentialEnergy() = energy12;
+    particle1.force() -= force12;
+    particle2.force() += force12;
+    particle1.energyGrad() = -force12;    // v'(q_2 - q_1)
+  }
+  
+    void Dynamics::triInteraction(Particle& particle1, Particle& particle2, Particle& particle3) const
+  {
+    dvec delta = particle3.position() - 2*particle2.position() + particle1.position();
+    //double d12 = r12.norm();
+    double energy123 = potential(delta);
+    dvec force123 = force(delta);    // = - v'(q_2 - q_1)
+    
+    //particle1.potentialEnergy() += energy12 / 2;
+    particle3.potentialEnergy() = energy123;
+    particle1.force() += force123;
+    particle2.force() -= 2*force123;
+    particle3.force() += force123;
+    particle3.energyGrad() = -force123;    // - v'(q_2 - q_1)
   }
   
   void Dynamics::updateBefore(Particle& particle)
@@ -160,9 +175,15 @@ namespace simol
     dvec p = configuration[0].momentum();
     dvec qEnd = configuration[configuration.size()-1].position();
     //assert(configuration.size() == 1);
-    output.velocityCV()->update(p(0), generatorOn(output.velocityCV(), q, p), q, p, indexOfIteration);
-    output.forceCV()->update(potential_->derivative(q)(0), generatorOn(output.forceCV(), q, p), q, p, indexOfIteration);
-    output.lengthCV()->update(qEnd(0)- q(0), generatorOn(output.lengthCV(), q, p), q, p, indexOfIteration);
+    VectorXd generatorOnBasis;
+    /*generatorOnBasis = generatorOn(output.velocityCV(), configuration);
+    output.velocityCV()->update(p(0), generatorOnBasis, configuration, indexOfIteration);
+    generatorOnBasis = generatorOn(output.forceCV(), configuration);
+    output.forceCV()->update(potential_->derivative(q)(0), generatorOnBasis, configuration, indexOfIteration);
+    generatorOnBasis = generatorOn(output.lengthCV(), configuration);
+    output.lengthCV()->update(qEnd(0), generatorOnBasis, configuration, indexOfIteration);*/
+    generatorOnBasis = generatorOn(output.flowCV(), configuration);
+    output.flowCV()->update(output.energyFlow(), generatorOnBasis, configuration, indexOfIteration);
   }
   
     
@@ -170,37 +191,52 @@ namespace simol
   
   //#### Hamiltonian ####
   
-  Hamiltonian::Hamiltonian(Input const& input, int const& indexOfReplica):Dynamics(input, indexOfReplica)
+  Hamiltonian::Hamiltonian(Input const& input, int const& iOfReplica):Dynamics(input, iOfReplica)
   {
   }
   
-  double Hamiltonian::generatorOn(ControlVariate const* controlVariate, dvec const& position, dvec const& momentum) const
+  MatrixXd Hamiltonian::generatorOn(ControlVariate const* controlVariate, vector<Particle> const& configuration) const
   {
-    return momentum.dot(controlVariate->gradientQ(position, momentum))
-    + force(position).dot(controlVariate->gradientP(position, momentum));   
+    VectorXd result = VectorXd::Zero(controlVariate->nbOfFunctions());
+    for (size_t iOfFunction=0; iOfFunction < controlVariate->nbOfFunctions(); iOfFunction++)
+      for (size_t iOfParticle=0; iOfParticle < configuration.size(); iOfParticle++)
+	result(iOfFunction) += configuration[iOfParticle].momentum().dot(controlVariate->gradientQ(configuration, iOfParticle, iOfFunction))
+	      + force(configuration[iOfParticle].position()).dot(controlVariate->gradientP(configuration, iOfParticle, iOfFunction)); 
+    //return momentum.dot(controlVariate->gradientQ(configuration, i))
+    //+ force(position).dot(controlVariate->gradientP(configuration));   
+    return result;      
   }
   
   
   
     //#### StochasticDynamics ####
 
-  StochasticDynamics::StochasticDynamics(Input const& input, int const& indexOfReplica):
-    Dynamics(input, indexOfReplica)
+  StochasticDynamics::StochasticDynamics(Input const& input, int const& iOfReplica):
+    Dynamics(input, iOfReplica)
   {}
       
   void StochasticDynamics::setRNG(RNG* rng)
   {
     rng_ = rng;
-  };
+  }
+ 
   
     
   //#### UniformStochasticDynamics ####
 
-  UniformStochasticDynamics::UniformStochasticDynamics(Input const& input, int const& indexOfReplica):
-    StochasticDynamics(input, indexOfReplica), 
-    temperature_(input.temperature()), 
-    beta_(1/temperature_)
+  UniformStochasticDynamics::UniformStochasticDynamics(Input const& input, int const& iOfReplica):
+    StochasticDynamics(input, iOfReplica), 
+    beta_(input.beta(iOfReplica)),
+    temperature_(1/beta_)
   {}
+  
+
+  
+  void UniformStochasticDynamics::initializeMomenta(vector<Particle>& configuration)
+  {
+    for (auto&& particle : configuration)
+      particle.momentum() = sqrt(beta() / particle.mass()) * rng_->gaussian();
+  }
   
   double const& UniformStochasticDynamics::temperature() const
   {
@@ -212,11 +248,20 @@ namespace simol
     return beta_;
   }
   
+  double const& UniformStochasticDynamics::temperatureLeft() const
+  {
+    return temperature_;
+  }
+  
+  double const& UniformStochasticDynamics::temperatureRight() const
+  {
+    return temperature_;
+  }
 
   //#### Langevin ####
 
-  Langevin::Langevin(Input const& input, int const& indexOfReplica):
-    UniformStochasticDynamics(input, indexOfReplica), 
+  Langevin::Langevin(Input const& input, int const& iOfReplica):
+    UniformStochasticDynamics(input, iOfReplica), 
     gamma_(input.gamma())
   {} 
 
@@ -241,19 +286,26 @@ namespace simol
     particle.kineticEnergy() = pow(particle.momentum().norm(), 2) / particle.mass() / 2;
   } 
   
-  double Langevin::generatorOn(ControlVariate const* controlVariate, dvec const& position, dvec const& momentum) const
+  MatrixXd Langevin::generatorOn(ControlVariate const* controlVariate, vector<Particle> const& configuration) const
   {
-    return momentum.dot(controlVariate->gradientQ(position, momentum))
-    + force(position).dot(controlVariate->gradientP(position, momentum))
-    + gamma_ * (- momentum.dot(controlVariate->gradientP(position, momentum)) 
-		+ controlVariate->laplacienP(position, momentum) / beta_ );    
+    VectorXd result = VectorXd::Zero(controlVariate->nbOfFunctions());
+    for (size_t iOfFunction=0; iOfFunction < controlVariate->nbOfFunctions(); iOfFunction++)
+      for (size_t iOfParticle=0; iOfParticle < configuration.size(); iOfParticle++)
+	result(iOfFunction) += dot(configuration[iOfParticle].momentum(), controlVariate->gradientQ(configuration, iOfParticle, iOfFunction))
+	      + dot(configuration[iOfParticle].force(), controlVariate->gradientP(configuration, iOfParticle, iOfFunction))
+	      + gamma_ * (- dot(configuration[iOfParticle].momentum(), controlVariate->gradientP(configuration, iOfParticle, iOfFunction))
+			+ controlVariate->laplacienP(configuration, iOfParticle, iOfFunction) / beta_ );
+    return result;
+    //return configuration[0].position(0);
   }
+  
+    
   
     
   //#### Overdamped ####
 
-  Overdamped::Overdamped(Input const& input, int const& indexOfReplica):
-    UniformStochasticDynamics(input, indexOfReplica)
+  Overdamped::Overdamped(Input const& input, int const& iOfReplica):
+    UniformStochasticDynamics(input, iOfReplica)
   {}
   
     
@@ -265,30 +317,39 @@ namespace simol
   // /!\ a changer dans le cas N != 1
   void Overdamped::updateAfter(Particle& particle)
   {
-    //particle.position() += timeStep_ * particle.force() + sqrt(2*timeStep_/beta_) * rng_->gaussian();
+    particle.position() += timeStep_ * particle.force() + sqrt(2*timeStep_/beta_) * rng_->gaussian();
   
     //assert(particle.force()(0) == force(particle.position())(0));
-    dvec randomTerm = sqrt(2*timeStep_/beta_) * rng_->gaussian();
+    /*dvec randomTerm = sqrt(2*timeStep_/beta_) * rng_->gaussian();
     dvec qtilde = particle.position() + .5 * timeStep_ * particle.force() + .5 * randomTerm;
-    particle.position() += timeStep_ * force(qtilde) + randomTerm;
+    particle.position() += timeStep_ * force(qtilde) + randomTerm;*/
   }
   
-  double Overdamped::generatorOn(ControlVariate const* controlVariate, dvec const& position, dvec const& momentum) const
+  MatrixXd Overdamped::generatorOn(ControlVariate const* controlVariate, vector<Particle> const& configuration) const
   {
-    return controlVariate->laplacienQ(position, momentum) / beta_
-    + force(position).dot(controlVariate->gradientQ(position, momentum));    
+    VectorXd result = VectorXd::Zero(controlVariate->nbOfFunctions());
+      for (size_t iOfFunction=0; iOfFunction < controlVariate->nbOfFunctions(); iOfFunction++)
+	for (size_t iOfParticle=0; iOfParticle < configuration.size(); iOfParticle++)
+	  result(iOfFunction) += controlVariate->laplacienQ(configuration, iOfParticle, iOfFunction) / beta_
+	      + dot(force(configuration[iOfParticle].position()), controlVariate->gradientQ(configuration, iOfParticle, iOfFunction));
+    return result;
+    
+    //double q = configuration[0].position(0);
+    //return - pow (2 * M_PI, 2) * sin(2 * M_PI * q) / beta_ + force(configuration[0].position())(0) * 2 * M_PI * cos(2 * M_PI * q);
   }
 
   
   //#### BoundaryStochasticDynamics ####
 
-  BoundaryStochasticDynamics::BoundaryStochasticDynamics(Input const& input, int const& indexOfReplica):
-    StochasticDynamics(input, indexOfReplica),
+  BoundaryStochasticDynamics::BoundaryStochasticDynamics(Input const& input, int const& iOfReplica):
+    StochasticDynamics(input, iOfReplica),
     betaLeft_(input.betaLeft()),
     betaRight_(input.betaRight()),
     temperatureLeft_(1/betaLeft_),
     temperatureRight_(1/betaRight())
-  {} 
+  {
+    cout << "deltaTemperature = " << deltaTemperature() << endl;    
+  } 
   
     double const& BoundaryStochasticDynamics::betaLeft() const
   {
@@ -309,11 +370,27 @@ namespace simol
   {
     return temperatureRight_;
   }
+  
+  double BoundaryStochasticDynamics::deltaTemperature() const
+  {
+    return (temperatureLeft_ - temperatureRight_)/2;
+  }
+  
+    void BoundaryStochasticDynamics::initializeMomenta(vector<Particle>& configuration)
+  {
+    for (size_t iOfParticle = 0; iOfParticle < configuration.size(); iOfParticle++)
+    {
+      Particle& particle = configuration[iOfParticle];
+      double tempi_ = temperatureLeft_ + (iOfParticle + .5) * (temperatureRight_ - temperatureLeft_) / configuration.size();
+      particle.momentum() = sqrt(tempi_ / particle.mass()) * rng_->gaussian();
+    }
+  }
+  
 
   //#### BoundaryLangevin ####
   
-  BoundaryLangevin::BoundaryLangevin(const Input& input, const int& indexOfReplica):
-    BoundaryStochasticDynamics(input, indexOfReplica),
+  BoundaryLangevin::BoundaryLangevin(const Input& input, const int& iOfReplica):
+    BoundaryStochasticDynamics(input, iOfReplica),
     gamma_(input.gamma())
   {}
     
@@ -350,32 +427,25 @@ namespace simol
     particle.kineticEnergy() = pow(particle.momentum().norm(), 2) / particle.mass() / 2;
   }
   
-  //##BoundaryOverdamped ####
-  
-  BoundaryOverdamped::BoundaryOverdamped(const Input& input, const int& indexOfReplica):BoundaryStochasticDynamics(input, indexOfReplica){}
-  
-  /*void BoundaryOverdamped::updateBefore(Particle& particle)
+  MatrixXd BoundaryLangevin::generatorOn(ControlVariate const* controlVariate, vector<Particle> const& configuration) const
   {
-  }*/
-  
-  void BoundaryOverdamped::updateAfterLeft(Particle& particle)
-  {
-    particle.position() += timeStep_ * particle.force() + sqrt(2*timeStep_/betaLeft_) * rng_->gaussian();
+    size_t numberOfParticles = configuration.size();
+    VectorXd result = VectorXd::Zero(controlVariate->nbOfFunctions());
+    for (size_t iOfFunction=0; iOfFunction < controlVariate->nbOfFunctions(); iOfFunction++)
+    {
+      for (size_t iOfParticle=0; iOfParticle < configuration.size(); iOfParticle++)
+      result(iOfFunction) += dot(configuration[iOfParticle].momentum(), controlVariate->gradientQ(configuration, iOfParticle, iOfFunction))
+	      + dot(configuration[iOfParticle].force(), controlVariate->gradientP(configuration, iOfParticle, iOfFunction));
+	      //if(false)	      
+      result(iOfFunction) += gamma_ * (- dot(configuration[0].momentum(), controlVariate->gradientP(configuration, 0, iOfFunction))
+			+ controlVariate->laplacienP(configuration, 0, iOfFunction) / betaLeft_
+			- dot(configuration[numberOfParticles-1].momentum(), controlVariate->gradientP(configuration, numberOfParticles-1, iOfFunction))
+			+ controlVariate->laplacienP(configuration, numberOfParticles-1, iOfFunction) / betaRight_);
+    }
+    return result;   
   }
   
-  void BoundaryOverdamped::updateAfterRight(Particle& particle)
-  {
-    particle.position() += timeStep_ * particle.force() + sqrt(2*timeStep_/betaRight_) * rng_->gaussian();
-  }
-
-  // /!\ TO DO
-  double BoundaryOverdamped::generatorOn(ControlVariate const* controlVariate, dvec const& position, dvec const& momentum) const
-  {
-    return momentum.dot(controlVariate->gradientQ(position, momentum))
-    + force(position).dot(controlVariate->gradientP(position, momentum));   
-  }
-
-    
+ 
 }
 
 #endif

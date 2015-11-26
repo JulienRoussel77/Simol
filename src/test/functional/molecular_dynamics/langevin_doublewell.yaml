@@ -5,7 +5,7 @@ Geometry:
 Mesh:
   Time:
     Step: 0.01
-    Number: 1000000
+    Number: 10000
 
 Physics:
   System:
@@ -25,4 +25,7 @@ Physics:
     Number: 1
 
 Output:
-  Filename: output.txt
+  DecorrelationTime: 5
+
+ControlVariate:
+  Name: Local

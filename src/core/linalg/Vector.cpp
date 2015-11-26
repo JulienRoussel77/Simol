@@ -6,6 +6,11 @@ namespace simol {
     {
       return v*lambda;
     }
+    
+    double dot(Vector<double,eigen> const& u, Vector<double,eigen> const& v)
+    {
+      return u.wrapped_.dot(v.wrapped_);
+    }
 }
 
 

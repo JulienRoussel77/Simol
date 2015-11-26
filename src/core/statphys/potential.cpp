@@ -29,6 +29,10 @@ namespace simol
       return new HarmonicWell(input);
     else if (input.potentialName() == "Harmonic")
       return new Harmonic(input);
+    else if (input.potentialName() == "Rotor")
+      return new Rotor(input);
+    else if (input.potentialName() == "Quadratic")
+      return new Quadratic(input);
     else
       std::cout << input.potentialName() << " is not a valid potential !" << std::endl;
     
@@ -141,38 +145,87 @@ namespace simol
   
   //#### HarmonicWell #####  
   
-  HarmonicWell::HarmonicWell(Input const & input, int const& indexOfReplica):Potential(input, indexOfReplica), stiffness_(input.stiffness())
+  HarmonicWell::HarmonicWell(Input const & input, int const& indexOfReplica):
+    Potential(input, indexOfReplica), 
+    stiffness_(input.potentialStiffness())
   {}
   
   
   double HarmonicWell::operator()(dvec const & position) const
-  { return stiffness_ * pow(position(0), 2); }
+  { return stiffness_ / 2 * pow(position(0), 2); }
 
   dvec HarmonicWell::derivative(dvec const & position) const
   { 
     dvec deriv(1);
-    deriv(0) = 2 * stiffness_ * position(0);
+    deriv(0) = stiffness_ * position(0);
     return deriv;
   }
 
   
 //#### Harmonic #####  
   
-  Harmonic::Harmonic(Input const & input, int const& indexOfReplica):Potential(input, indexOfReplica), stiffness_(input.stiffness())
+  Harmonic::Harmonic(Input const & input, int const& indexOfReplica):
+    Potential(input, indexOfReplica), 
+    stiffness_(input.potentialStiffness())
   {}
   
   
   double Harmonic::operator()(dvec const & vecDistance) const
-  { return stiffness_ * pow(vecDistance(0) - 1, 2); }
+  { return stiffness_ / 2* pow(vecDistance(0) - 1, 2); }
 
   dvec Harmonic::derivative(dvec const & vecDistance) const
   { 
     dvec deriv(1);
-    deriv(0) = 2 * stiffness_ * (1 - vecDistance(0));
+    deriv(0) = stiffness_ * (vecDistance(0) - 1);
+    return deriv;
+  }
+  
+  //#### Rotor #####  
+  
+  Rotor::Rotor(Input const & input, int const& indexOfReplica):
+    Potential(input, indexOfReplica)
+  {}
+  
+  
+  double Rotor::operator()(dvec const & vecDistance) const
+  { 
+    //return pow(vecDistance(0) - 1, 2);
+    return 1 - cos(vecDistance(0));
+  }
+
+  dvec Rotor::derivative(dvec const & vecDistance) const
+  { 
+    dvec deriv(1);
+    deriv(0) = sin(vecDistance(0));
+    //deriv(0) = 2 * (1 - vecDistance(0));
     return deriv;
   }
 
+  double Rotor::laplacian(dvec const & vecDistance) const
+  { 
+    return cos(vecDistance(0));
+  }
   
+    
+//#### Quadratic #####  
+  
+  Quadratic::Quadratic(Input const & input, int const& indexOfReplica):
+    Potential(input, indexOfReplica), 
+    stiffness_(input.potentialStiffness()),
+    alpha_(input.potentialAlpha()),
+    beta_(input.potentialBeta())
+  {}
+  
+  
+  double Quadratic::operator()(dvec const & vecDistance) const
+  { return stiffness_/2 * pow(vecDistance(0), 2) + alpha_/3 * pow(vecDistance(0), 3) + beta_/4 * pow(vecDistance(0), 4); }
+
+  dvec Quadratic::derivative(dvec const & vecDistance) const
+  { 
+    dvec deriv(1);
+    deriv(0) = stiffness_ * vecDistance(0) + alpha_ * pow(vecDistance(0), 2) + beta_ * pow(vecDistance(0), 3);
+    return deriv;
+  }
 }
 
 

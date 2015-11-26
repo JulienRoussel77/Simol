@@ -22,9 +22,13 @@ namespace simol
     std::ofstream outReplica_;
     std::ofstream outCorrelation_;
     std::ofstream outVelocities_;
+    std::ofstream outBeam_;
     std::ofstream outVelocitiesCV_;
     std::ofstream outForcesCV_;
     std::ofstream outLengthsCV_;
+    std::ofstream outFlowCV_;
+    
+    std::ofstream outFlowPT_;
     
     int verbose_;
     size_t periodNumberOfIterations_;
@@ -34,6 +38,7 @@ namespace simol
     
     double kineticEnergy_;
     double potentialEnergy_;
+    double energyFlow_;
     
     //dvec responseForces_;
     
@@ -51,6 +56,7 @@ namespace simol
     ControlVariate* velocityCV_;
     ControlVariate* forceCV_;
     ControlVariate* lengthCV_;
+    ControlVariate* flowCV_;
 	
     Output(Input const& input);
     
@@ -70,11 +76,15 @@ namespace simol
     double& potentialEnergy();
     double energy() const;
     double temperature() const;
+    const double& energyFlow() const;
+    double& energyFlow();
+    
     bool doComputeCorrelations() const;
     
     ControlVariate* velocityCV();
     ControlVariate* forceCV();
     ControlVariate* lengthCV();
+    ControlVariate* flowCV();
     
     /*dvec& responseForces();
     dvec const& responseForces() const;
@@ -88,7 +98,6 @@ namespace simol
     void finalDisplayAutocorrelations();
     void finalDisplay(vector<Particle> const& configuration, dvec const& externalForce, size_t indexOfIteration);
     //void displayVelocity(size_t indexOfIteration);
-    virtual void displayControlVariate(std::ofstream& out, ControlVariate const* controleVariate, double time) const;
 
     
     void updateControlVariate(vector<Particle> const& configuration);

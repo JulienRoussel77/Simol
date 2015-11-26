@@ -71,6 +71,7 @@ namespace simol
   }*/
 
   Vector<double,eigen> operator*(double const& lambda, Vector<double,eigen> const& v);
+  double dot(Vector<double,eigen> const& u, Vector<double,eigen> const& v);
   
 
 }

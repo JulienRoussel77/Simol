@@ -14,6 +14,7 @@ namespace simol{
   
   class Input{
     YAML::Node data;
+    double positionMin_, positionMax_;
   public:
     Input(CommandLine cmd);
     int dimension() const;
@@ -34,14 +35,18 @@ namespace simol{
     double interWell() const;
     
     //Harmonic
-    double stiffness() const;
+    double potentialStiffness() const;
+    double potentialAlpha() const;
+    double potentialBeta() const;
 	
     std::string dynamicsName() const;
     double gamma() const;   
-    double temperature() const;
-    double beta() const;
-    double betaLeft() const;
-    double betaRight() const;
+    double temperature(size_t indexOfReplica=0) const;
+    double temperatureLeft(size_t indexOfReplica=0) const;
+    double temperatureRight(size_t indexOfReplica=0) const;
+    double beta(size_t indexOfReplica=0) const;
+    double betaLeft(size_t indexOfReplica=0) const;
+    double betaRight(size_t indexOfReplica=0) const;
     //bool externalForceVarying() const;
     double externalForceMin() const;
     double externalForceMax() const;

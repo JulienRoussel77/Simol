@@ -12,13 +12,13 @@ namespace simol
 {
   class ParticleSystem;
   
-  ParticleSystem* createSystem(Input  const& input, int const& indexOfReplica=1);
+  ParticleSystem* createSystem(Input  const& input, int const& iOfReplica=0);
 
   class ParticleSystem
   {
     friend ParticleSystem* createSystem(Input  const& input, int const& indexOfReplica);
     public:
-      ParticleSystem(Input const& input, int const& indexOfReplica=1);
+      ParticleSystem(Input const& input, int const& iOfReplica=0);
       virtual ~ParticleSystem(){};
       Particle & particle(size_t index);
       std::vector<Particle> & configuration();       
@@ -42,14 +42,25 @@ namespace simol
   class Isolated : public ParticleSystem
   {
   public:
-    Isolated(Input const& input, int const& indexOfReplica=1);
+    Isolated(Input const& input, int const& iOfReplica=0);
     void computeAllForces(Dynamics const* model);
   };
   
-    class Chain : public ParticleSystem
+  class Chain : public ParticleSystem
   {
+    Particle ancorParticle_;
   public:
-    Chain(Input const& input, int const& indexOfReplica=1);
+    Chain(Input const& input, int const& iOfReplica=0);
+    void computeAllForces(Dynamics const* model);
+    void simulate(Dynamics * model, Output& output);
+  };
+  
+  class TriChain : public ParticleSystem
+  {
+    Particle ancorParticle1_;
+    Particle ancorParticle2_;
+  public:
+    TriChain(Input const& input, int const& iOfReplica=0);
     void computeAllForces(Dynamics const* model);
     void simulate(Dynamics * model, Output& output);
   };

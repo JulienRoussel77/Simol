@@ -87,7 +87,7 @@ namespace simol
   
   
   
-    class Harmonic : public Potential{
+  class Harmonic : public Potential{
     public:
       Harmonic(Input const& input, int const& indexOfReplica=1);
       double operator()(dvec const & position) const;
@@ -96,7 +96,28 @@ namespace simol
     private:
       double stiffness_;
   };
+  
+  class Rotor : public Potential{
+    public:
+      Rotor(Input const& input, int const& indexOfReplica=1);
+      double operator()(dvec const & position) const;
+      dvec derivative(dvec const & position) const;
+      double laplacian(dvec const & position) const;
 
+    private:
+      double stiffness_;
+  };
+
+  
+    class Quadratic : public Potential{
+    public:
+      Quadratic(Input const& input, int const& indexOfReplica=1);
+      double operator()(dvec const & position) const;
+      dvec derivative(dvec const & position) const;
+
+    private:
+      double stiffness_, alpha_, beta_;
+  };
 }
 
 //#include "potential.ipp"

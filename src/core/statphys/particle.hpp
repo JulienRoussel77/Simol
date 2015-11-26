@@ -50,6 +50,7 @@ namespace simol
 
     public:
       Particle();
+      Particle(int dimension);
       Particle(double const & mass, dvec const & position, dvec const & momentum);
       Particle(double const & mass, double const & position, double const & momentum);
 
@@ -59,11 +60,16 @@ namespace simol
 
     public:
       //Particle& operator= (Particle const& particle);
+      int dimension() const;
       double const & mass() const;
       dvec const & position() const;
-      dvec & position();     
+      dvec & position();
+      double const& position(int i) const;
+      double& position(int i);
       dvec const & momentum() const;
       dvec & momentum();
+      double const& momentum(int i) const;
+      double& momentum(int i);
       double const& kineticEnergy() const;
       double& kineticEnergy();      
       double const& potentialEnergy() const;
@@ -71,6 +77,12 @@ namespace simol
       double energy() const;
       dvec const& force() const;
       dvec& force(); 
+      double const& force(int i) const;
+      double& force(int i); 
+      dvec const& energyGrad() const;
+      dvec& energyGrad();  
+      double const& energyGrad(int i) const;
+      double& energyGrad(int i);  
       dvec velocity() const;
 
     //=============
@@ -85,6 +97,7 @@ namespace simol
       double potentialEnergy_;
       double kineticEnergy_;
       dvec force_;
+      dvec energyGrad_;
   };
 
   

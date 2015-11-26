@@ -12,7 +12,12 @@ namespace simol
   // CONSTRUCTORS
   //=============
   
-   Particle::Particle() :mass_(0), position_(0), momentum_(0), kineticEnergy_(0), force_(0)
+   Particle::Particle() :mass_(0), position_(0), momentum_(0), kineticEnergy_(0), force_(0), energyGrad_(0)
+   {
+    //std::cout << "Particle vide créée !" << std::endl;      
+   }
+   
+   Particle::Particle(int dimension) :mass_(0), position_(dimension), momentum_(dimension), kineticEnergy_(0), force_(dimension), energyGrad_(dimension)
    {
     //std::cout << "Particle vide créée !" << std::endl;      
    }
@@ -22,7 +27,7 @@ namespace simol
   {}
   
   Particle::Particle(double const & mass, double const & positionInitial, double const & momentumInitial):
-    mass_(mass), position_(1), momentum_(1), force_(1)
+    mass_(mass), position_(1), momentum_(1), force_(1), energyGrad_(1)
   {
     position_(0) = positionInitial;
     momentum_(0) = momentumInitial;
@@ -41,18 +46,35 @@ namespace simol
   //==========
   // ACCESSORS
   //==========
+  
+  int Particle::dimension() const
+  {
+    return position_.size();
+  }
 
   dvec const & Particle::position() const
   { return position_; }
   
   dvec & Particle::position()
   { return position_; }
+  
+  double const & Particle::position(int i) const
+  { return position_(i); }
+  
+  double & Particle::position(int i)
+  { return position_(i); }
 
   dvec const & Particle::momentum() const
   { return momentum_; }
   
   dvec & Particle::momentum()
   { return momentum_; }
+  
+  double const & Particle::momentum(int i) const
+  { return momentum_(i); }
+  
+  double & Particle::momentum(int i)
+  { return momentum_(i); }
 
   double const & Particle::mass() const
   { return mass_; }
@@ -77,6 +99,18 @@ namespace simol
   
   dvec& Particle::force()
   { return force_; }
+  
+  dvec const& Particle::energyGrad() const
+  { return energyGrad_; }
+  
+  dvec& Particle::energyGrad()
+  { return energyGrad_; }
+  
+  double const& Particle::energyGrad(int i) const
+  { return energyGrad_(i); }
+  
+  double& Particle::energyGrad(int i)
+  { return energyGrad_(i); }
   
   dvec Particle::velocity() const
   {return momentum_ / mass_;}
