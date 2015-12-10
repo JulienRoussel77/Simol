@@ -1,5 +1,12 @@
 cmake_minimum_required (VERSION 2.6)
 
+if(SIMOL_GCC_ROOT)
+  set(CMAKE_C_COMPILER ${SIMOL_GCC_ROOT}/bin/gcc)
+  set(CMAKE_CXX_COMPILER ${SIMOL_GCC_ROOT}/bin/g++)
+  set(CMAKE_Fortran_COMPILER ${SIMOL_GCC_ROOT}/bin/gfortran)
+  link_directories(${SIMOL_GCC_ROOT}/lib64)
+endif(SIMOL_GCC_ROOT)
+
 project (simol Fortran C CXX)
 
 #==============
@@ -130,4 +137,3 @@ include_directories(src/core/random)
 include_directories(src)
 
 add_subdirectory(src)
-
