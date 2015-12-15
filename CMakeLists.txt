@@ -46,7 +46,7 @@ find_package(LAPACK)
 LIST(GET BLAS_LIBRARIES 0 BLAS_LIB)
 LIST(GET LAPACK_LIBRARIES 0 LAPACK_LIB)
 
-
+find_package(Armadillo)
 find_package(Arpack)
 find_package(Boost)
 find_package(CppUnit)
@@ -73,6 +73,7 @@ endif(ENABLE_DOWNLOAD)
   include_directories(${EIGEN_INSTALL_DIR}/include/eigen3)
   include_directories(${YAMLCPP_INSTALL_DIR}/include)
   include_directories(${BOOST_INSTALL_DIR}/include)
+  include_directories(${ARMADILLO_INSTALL_DIR}/include)
 
   message(STATUS "YAMLCPP_INSTALL_DIR is ${YAMLCPP_INSTALL_DIR}")
 

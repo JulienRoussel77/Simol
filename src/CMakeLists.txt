@@ -14,8 +14,11 @@ target_link_libraries(quantum_chemistry ${YAMLCPP_INSTALL_DIR}/lib/libyaml-cpp.a
 target_link_libraries(quantum_chemistry ${ARPACK_INSTALL_DIR}/lib/libarpack.a)
 
 
+add_dependencies(molecular_dynamics armadillo)
 add_dependencies(molecular_dynamics yamlcpp)
 add_dependencies(yamlcpp boost)
+
+target_link_libraries(molecular_dynamics ${ARMADILLO_INSTALL_DIR}/lib/libarmadillo.so)
 target_link_libraries(molecular_dynamics ${YAMLCPP_INSTALL_DIR}/lib/libyaml-cpp.a)
 
 #add_subdirectory(test)
