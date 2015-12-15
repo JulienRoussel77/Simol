@@ -93,7 +93,7 @@ namespace simol
     return externalForce_; 
   }
   
-    dvec& Dynamics::externalForce()
+  dvec& Dynamics::externalForce()
   {
     return externalForce_; 
   }
@@ -111,7 +111,7 @@ namespace simol
   
   
   
-  void Dynamics::initializeMomenta(vector<Particle>& configuration)
+  void Dynamics::initializeMomenta(vector<Particle>& /*configuration*/)
   {}
   
   void Dynamics::resetForce(Particle& particle) const
@@ -145,14 +145,14 @@ namespace simol
     dvec delta = particle3.position() - 2*particle2.position() + particle1.position();
     //double d12 = r12.norm();
     double energy123 = potential(delta);
-    dvec force123 = force(delta);    // = - v'(q_2 - q_1)
+    dvec force123 = force(delta);    // = - v'(r_2)
     
     //particle1.potentialEnergy() += energy12 / 2;
-    particle3.potentialEnergy() = energy123;
+    particle2.potentialEnergy() = energy123;
     particle1.force() += force123;
     particle2.force() -= 2*force123;
     particle3.force() += force123;
-    particle3.energyGrad() = -force123;    // - v'(q_2 - q_1)
+    particle3.energyGrad() = -force123;    // - v'(r_2)
   }
   
   void Dynamics::updateBefore(Particle& particle)
@@ -176,14 +176,16 @@ namespace simol
     dvec qEnd = configuration[configuration.size()-1].position();
     //assert(configuration.size() == 1);
     VectorXd generatorOnBasis;
-    /*generatorOnBasis = generatorOn(output.velocityCV(), configuration);
+    generatorOnBasis = generatorOn(output.velocityCV(), configuration);
     output.velocityCV()->update(p(0), generatorOnBasis, configuration, indexOfIteration);
     generatorOnBasis = generatorOn(output.forceCV(), configuration);
     output.forceCV()->update(potential_->derivative(q)(0), generatorOnBasis, configuration, indexOfIteration);
     generatorOnBasis = generatorOn(output.lengthCV(), configuration);
-    output.lengthCV()->update(qEnd(0), generatorOnBasis, configuration, indexOfIteration);*/
-    generatorOnBasis = generatorOn(output.flowCV(), configuration);
-    output.flowCV()->update(output.energyFlow(), generatorOnBasis, configuration, indexOfIteration);
+    output.lengthCV()->update(qEnd(0), generatorOnBasis, configuration, indexOfIteration);
+    generatorOnBasis = generatorOn(output.midFlowCV(), configuration);
+    output.midFlowCV()->update(output.energyMidFlow(), generatorOnBasis, configuration, indexOfIteration);
+		generatorOnBasis = generatorOn(output.sumFlowCV(), configuration);
+    output.sumFlowCV()->update(output.energySumFlow(), generatorOnBasis, configuration, indexOfIteration);
   }
   
     
@@ -200,7 +202,7 @@ namespace simol
     VectorXd result = VectorXd::Zero(controlVariate->nbOfFunctions());
     for (size_t iOfFunction=0; iOfFunction < controlVariate->nbOfFunctions(); iOfFunction++)
       for (size_t iOfParticle=0; iOfParticle < configuration.size(); iOfParticle++)
-	result(iOfFunction) += configuration[iOfParticle].momentum().dot(controlVariate->gradientQ(configuration, iOfParticle, iOfFunction))
+				result(iOfFunction) += configuration[iOfParticle].momentum().dot(controlVariate->gradientQ(configuration, iOfParticle, iOfFunction))
 	      + force(configuration[iOfParticle].position()).dot(controlVariate->gradientP(configuration, iOfParticle, iOfFunction)); 
     //return momentum.dot(controlVariate->gradientQ(configuration, i))
     //+ force(position).dot(controlVariate->gradientP(configuration));   
@@ -309,7 +311,7 @@ namespace simol
   {}
   
     
-  void Overdamped::updateBefore(Particle& particle)
+  void Overdamped::updateBefore(Particle& /*particle*/)
   {
     
   }
@@ -391,7 +393,8 @@ namespace simol
   
   BoundaryLangevin::BoundaryLangevin(const Input& input, const int& iOfReplica):
     BoundaryStochasticDynamics(input, iOfReplica),
-    gamma_(input.gamma())
+    gamma_(input.gamma()),
+    tauBending_(input.tauBending())
   {}
     
   double const& BoundaryLangevin::gamma() const
@@ -404,9 +407,14 @@ namespace simol
     return sqrt(2 * gamma_ / betaLeft_);
   }
   
-    double BoundaryLangevin::sigmaRight() const
+  double BoundaryLangevin::sigmaRight() const
   {
     return sqrt(2 * gamma_ / betaRight_);
+  }
+  
+  double const& BoundaryLangevin::tauBending() const
+  {
+    return tauBending_;
   }
   
     void BoundaryLangevin::updateAfterLeft(Particle& particle)
@@ -425,6 +433,12 @@ namespace simol
     particle.momentum() = alpha * particle.momentum() + sqrt((1-pow(alpha, 2))/betaRight_*particle.mass()) * rng_->gaussian();
 
     particle.kineticEnergy() = pow(particle.momentum().norm(), 2) / particle.mass() / 2;
+  }
+  
+  void BoundaryLangevin::bending(Particle& particle1, Particle& particle2) const
+  {
+    particle1.force(0) -= tauBending();
+    particle2.force(0) += tauBending(); 
   }
   
   MatrixXd BoundaryLangevin::generatorOn(ControlVariate const* controlVariate, vector<Particle> const& configuration) const

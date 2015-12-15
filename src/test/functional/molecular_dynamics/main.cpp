@@ -7,6 +7,7 @@
 #include "dynamics.hpp"
 #include "Vector.hpp"
 #include "input.hpp"
+#include "galerkin.hpp"
 
 #include <cmath>
 
@@ -32,6 +33,7 @@ int main(int argc, char* argv[])
   // INPUT FILE LOADING
   //===================
     
+  cout << "Input read in " << cmd.inputFileName() << "...";
   simol::Input input(cmd);
 
   //============
@@ -39,11 +41,10 @@ int main(int argc, char* argv[])
   //============
   
   simol::MultiSystem replica(input);
-
-  //simol::Dynamics* model = simol::createDynamics(input);
+	replica.launch(input);
   
-  replica.launch(input);
-  
+	//simol::Galerkin galerkinSolver(input);
+	//galerkinSolver.solve();
 
   
 

@@ -36,21 +36,23 @@ namespace simol
       const dvec& externalForce() const;
       double& externalForce(int const& i) ;
       const double& externalForce(int const& i) const;
+			virtual double const& gamma() const {assert(false);}
       virtual const double& temperatureLeft() const {assert(false);}
       virtual const double& temperatureRight() const {assert(false);}
       //friend Dynamics* createDynamics(Potential const& potential);
       
       virtual void initializeMomenta(vector<Particle>& configuration);
-      virtual void setRNG(RNG* rng){};
+      virtual void setRNG(RNG* /*rng*/){};
       void resetForce(Particle& particle) const;
       void computeForce(Particle& particle) const;
       void interaction(Particle& particle1, Particle& particle2) const;
       void triInteraction(Particle& particle1, Particle& particle2, Particle& particle3) const;
       virtual void updateBefore(Particle& particle);
       virtual void updateAfter(Particle& particle);
-      virtual void updateAfterLeft(Particle& particle) {};
-      virtual void updateAfterRight(Particle& particle) {};
-      virtual MatrixXd generatorOn(ControlVariate const* controlVariate, vector<Particle> const& configuration) const{cout << "operator not implemented !"; assert(false); return MatrixXd();}
+      virtual void updateAfterLeft(Particle& /*particle*/) {};
+      virtual void updateAfterRight(Particle& /*particle*/) {};
+      virtual void bending(Particle& /*particle1*/, Particle& /*particle2*/) const {};
+      virtual MatrixXd generatorOn(ControlVariate const* /*controlVariate*/, vector<Particle> const& /*configuration*/) const{cout << "operator not implemented !"; assert(false); return MatrixXd();}
       virtual void updateAllControlVariates(Output& output, vector<Particle> const& configuration, size_t indexOfIteration) const;
     protected:
       double timeStep_;
@@ -144,12 +146,16 @@ namespace simol
     double sigmaLeft() const;
     double sigmaRight() const;
     
+    double const& tauBending() const;
+    
     //virtual void updateAfter(Particle& particle);
     virtual void updateAfterLeft(Particle& particle);
     virtual void updateAfterRight(Particle& particle);
+    virtual void bending(Particle& particle1, Particle& particle2) const;
     MatrixXd generatorOn(ControlVariate const* controlVariate, vector<Particle> const& configuration) const;
   protected:
     double gamma_;
+    double tauBending_;
   };
 
 

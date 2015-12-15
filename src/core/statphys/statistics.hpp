@@ -1,13 +1,7 @@
 #pragma once
 
+#include "tools.hpp"
 #include "input.hpp"
-#include <iostream>
-#include <vector>
-using std::vector;
-using std::cout; 
-using std::endl;
-using Eigen::Matrix;
-using Eigen::Dynamic;
 
 namespace simol
 {
@@ -52,6 +46,7 @@ namespace simol
     //T valueRef_;
     //T lastValue_;
   public:
+		AutocorrelationStats();
     AutocorrelationStats(size_t decorrelationNumberOfIterations, double decorrelationTime, size_t nbOfObservables = 1);
     //const double& timeStep() const;
     void append(T const& newValue, size_t iOfIteration, size_t iOfObservable = 0);
@@ -131,6 +126,19 @@ namespace simol
   
   
   
+  template <class T>
+  AutocorrelationStats<T>::AutocorrelationStats():
+    decorrelationNumberOfIterations_(0),
+    decorrelationTime_(0),
+    nbOfObservables_(0),
+    //timeStep_(timeStep),
+    statisticsValues_(0),
+    statisticsRefValues_(0),
+    statisticsMeanCorrelation_(0),
+    //statisticsMeanCorrelationTemp_(),
+    statisticsCorrelation_(0, 0),
+    indexRef_(0)
+  {}
   
   template <class T>
   AutocorrelationStats<T>::AutocorrelationStats(size_t decorrelationNumberOfIterations, double decorrelationTime, size_t nbOfObservables):
@@ -153,7 +161,7 @@ namespace simol
   }
   
   template <class T>
-  void AutocorrelationStats<T>::append(T const& newValue, size_t iOfIteration, size_t iOfObservable, T const& newRefValue)
+  void AutocorrelationStats<T>::append(T const& /*newValue*/, size_t /*iOfIteration*/, size_t /*iOfObservable*/, T const& /*newRefValue*/)
   {
     cout << "AutocorrelationStats<T>::append(T newValue, size_t iOfIteration) not implemented !" << endl;
   
@@ -197,7 +205,7 @@ namespace simol
   }
   
   template <class T>
-  double AutocorrelationStats<T>::integratedAutocorrelationUnbiased(size_t iOfObservable) const
+  double AutocorrelationStats<T>::integratedAutocorrelationUnbiased(size_t /*iOfObservable*/) const
   {
     cout << "AutocorrelationStats<T>::integratedAutocorrelationUnbiased() not implemented !" << endl;
     exit(1);

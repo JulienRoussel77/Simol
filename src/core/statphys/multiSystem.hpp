@@ -1,5 +1,6 @@
 #pragma once
 
+#include "tools.hpp"
 #include "particleSystem.hpp"
 #include "controlVariate.hpp"
 

@@ -9,18 +9,31 @@ using std::min;
 namespace simol {
   
 
-  Input::Input(CommandLine cmd):data(YAML::LoadFile(cmd.inputFileName()))
+  Input::Input(CommandLine cmd):
+		data(YAML::LoadFile(cmd.inputFileName())),
+		inputPath_(cmd.inputFileName()),
+		inputFlux_(inputPath())
   {
-    std::cout << "Input read in " << cmd.inputFileName() << std::endl;
+    //std::cout << "Input read in " << cmd.inputFileName() << std::endl;
     
     if (data["Physics"]["System"]["Position"])
       if (data["Physics"]["System"]["Position"].size() == 2)
       {
-	positionMin_ = data["Physics"]["System"]["Position"][0].as<double>();
-	positionMax_ = data["Physics"]["System"]["Position"][1].as<double>();
+				positionMin_ = data["Physics"]["System"]["Position"][0].as<double>();
+				positionMax_ = data["Physics"]["System"]["Position"][1].as<double>();
       }
           
   }
+  
+  const std::string& Input::inputPath() const
+  {
+		return inputPath_;
+	}
+	
+	const std::ifstream& Input::inputFlux() const
+	{
+		return inputFlux_;
+	}
 
   int Input::dimension() const {return data["Geometry"]["Dimension"].as<int>();}
 
@@ -176,6 +189,14 @@ namespace simol {
 	return data["Physics"]["Model"]["Force"].as<double>();
     else return 0;   
   }
+  
+  double Input::tauBending() const
+  {
+    if (data["Physics"]["Model"]["Tau"])
+      return data["Physics"]["Model"]["Tau"].as<double>();
+    else
+      return 0;
+  }
 
   string Input::systemName() const {return data["Physics"]["System"]["Name"].as<string>();}
   
@@ -263,5 +284,27 @@ namespace simol {
     else 
       return "None";
   }
+  
+  //####Galerkin####
+ 
+  	size_t Input::numberOfFourier() const
+  	{
+			if(data["Galerkin"])
+				if(data["Galerkin"]["Basis"])
+					if(data["Galerkin"]["Basis"]["Fourier"])
+						return data["Galerkin"]["Basis"]["Fourier"].as<size_t>();
+
+			return 0;
+		}
+		
+		size_t Input::numberOfHermite() const
+		{
+			if(data["Galerkin"])
+				if(data["Galerkin"]["Basis"])
+					if(data["Galerkin"]["Basis"]["Hermite"])
+						return data["Galerkin"]["Basis"]["Hermite"].as<size_t>();
+
+			return 0;
+		}
 
 }

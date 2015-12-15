@@ -2,11 +2,10 @@
 #define SIMOL_OUTPUT_HPP
 
 
-#include <iostream>
+#include "tools.hpp"
 #include "particle.hpp"
 #include "statistics.hpp"
 #include "controlVariate.hpp"
-using std::vector;
 
 namespace simol
 {
@@ -26,9 +25,11 @@ namespace simol
     std::ofstream outVelocitiesCV_;
     std::ofstream outForcesCV_;
     std::ofstream outLengthsCV_;
-    std::ofstream outFlowCV_;
-    
-    std::ofstream outFlowPT_;
+    std::ofstream outMidFlowCV_;    
+    std::ofstream outMidFlowPT_;
+		std::ofstream outSumFlowCV_;    
+    std::ofstream outSumFlowPT_;
+		std::ofstream outProfile_;
     
     int verbose_;
     size_t periodNumberOfIterations_;
@@ -38,7 +39,8 @@ namespace simol
     
     double kineticEnergy_;
     double potentialEnergy_;
-    double energyFlow_;
+    double energyMidFlow_;
+		double energySumFlow_;
     
     //dvec responseForces_;
     
@@ -56,7 +58,12 @@ namespace simol
     ControlVariate* velocityCV_;
     ControlVariate* forceCV_;
     ControlVariate* lengthCV_;
-    ControlVariate* flowCV_;
+    ControlVariate* midFlowCV_;
+		ControlVariate* sumFlowCV_;
+		
+		AutocorrelationStats<double> temperatureProfile_;
+		AutocorrelationStats<double> bendingProfile_;
+		AutocorrelationStats<double> flowProfile_;
 	
     Output(Input const& input);
     
@@ -76,15 +83,18 @@ namespace simol
     double& potentialEnergy();
     double energy() const;
     double temperature() const;
-    const double& energyFlow() const;
-    double& energyFlow();
+    const double& energyMidFlow() const;
+    double& energyMidFlow();
+		const double& energySumFlow() const;
+    double& energySumFlow();
     
     bool doComputeCorrelations() const;
     
     ControlVariate* velocityCV();
     ControlVariate* forceCV();
     ControlVariate* lengthCV();
-    ControlVariate* flowCV();
+    ControlVariate* midFlowCV();
+		ControlVariate* sumFlowCV();
     
     /*dvec& responseForces();
     dvec const& responseForces() const;
@@ -101,7 +111,10 @@ namespace simol
 
     
     void updateControlVariate(vector<Particle> const& configuration);
-  };
+		void appendTemperatureProfile(double value, size_t iOfIteration, size_t iOfParticle);
+		void appendBendingProfile(double value, size_t iOfIteration, size_t iOfParticle);
+		void appendFlowProfile(double value, size_t iOfIteration, size_t iOfParticle);
+	};
 
 }
 #endif

@@ -5,12 +5,12 @@ Geometry:
 Mesh:
   Time:
     Step: 0.01
-    FinalTime: 10000
+    FinalTime: 1000000
 
 Physics:
   System:
-    Name: Chain
-    Number: 6
+    Name: BiChain
+    Number: 100
     Position: [0, 0]
   Potential:
     Name: Rotor
@@ -18,8 +18,8 @@ Physics:
   Model:
     Name: BoundaryLangevin
     Gamma: 1
-    TemperatureLeft: 1
-    TemperatureRight: 1
+    TemperatureLeft: 1.2
+    TemperatureRight: 0.8
 
 Output:
   Foldername: IncomeEq
@@ -27,4 +27,4 @@ Output:
   Period: 10
 
 ControlVariate:
-  Name: Kinetic
+  Name: None

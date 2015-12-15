@@ -1,6 +1,8 @@
 #ifndef SIMOL_DENSEMATRIX_HPP
 #define SIMOL_DENSEMATRIX_HPP
 
+#include "MatrixMarketFile.hpp"
+
 #include <Eigen/Dense>
 
 #include "eigen.hpp"

@@ -1,6 +1,7 @@
 #ifndef SIMOL_POTENTIAL_HPP
 #define SIMOL_POTENTIAL_HPP
 
+#include "tools.hpp"
 #include "Vector.hpp"	
 #include "input.hpp"
 
@@ -19,9 +20,9 @@ namespace simol
       Potential();
       virtual ~Potential(){};
       Potential(Input const& input, int const& indexOfReplica=1);
-      virtual double operator()(dvec const & position) const {std::cout << "This potential is pairwise !" << std::endl; exit(1);};
+      virtual double operator()(dvec const & /*position*/) const {std::cout << "This potential is pairwise !" << std::endl; exit(1);};
       virtual dvec derivative(dvec const & position) const = 0;
-      virtual double laplacian(dvec const & position) const {std::cout << "Laplacian not implemented !" << std::endl; exit(1);};
+      virtual double laplacian(dvec const & /*position*/) const {std::cout << "Laplacian not implemented !" << std::endl; exit(1);};
       virtual dvec force(dvec const & position) const;
   };
   

@@ -1,0 +1,26 @@
+Geometry:
+  Dimension: 1
+  Length: 1
+
+Mesh:
+  Time:
+    Step: 0.01
+    Number: 100000
+
+Physics:
+  System:
+    Name: Isolated
+  Potential:
+    Name: Sinusoidal
+    Amplitude: 1
+  Model:
+    Name: Langevin
+    Gamma: 1
+    Temperature: 1
+  Replicas:
+    Number: 1
+
+Galerkin:
+  Basis:
+    Fourier: 5
+    Hermite: 2

@@ -1,6 +1,7 @@
 #ifndef PARTICLE_HPP
 #define PARTICLE_HPP
 
+#include "tools.hpp"
 #include <fstream>
 #include <vector>
 
@@ -77,8 +78,8 @@ namespace simol
       double energy() const;
       dvec const& force() const;
       dvec& force(); 
-      double const& force(int i) const;
-      double& force(int i); 
+      double const& force(size_t i) const;
+      double& force(size_t i); 
       dvec const& energyGrad() const;
       dvec& energyGrad();  
       double const& energyGrad(int i) const;

@@ -22,42 +22,54 @@ namespace simol{
     outVelocitiesCV_(input.outputFoldername()+"velocities.txt"),
     outForcesCV_(input.outputFoldername()+"forces.txt"),
     outLengthsCV_(input.outputFoldername()+"lengths.txt"),
-    outFlowCV_(input.outputFoldername()+"flow.txt"),
-    outFlowPT_(input.outputFoldername()+"flowPost.txt"),
+    outMidFlowCV_(input.outputFoldername()+"midFlow.txt"),
+    outMidFlowPT_(input.outputFoldername()+"midFlowPost.txt"),
+    outSumFlowCV_(input.outputFoldername()+"sumFlow.txt"),
+    outSumFlowPT_(input.outputFoldername()+"sumFlowPost.txt"),
+    outProfile_(input.outputFoldername()+"profile.txt"),
     verbose_(1),
     periodNumberOfIterations_(input.outputPeriodNumberOfIterations()),
     timeStep_(0),
     dimension_(input.dimension()),
     numberOfParticles_(input.numberOfParticles()),
-    decorrelationNumberOfIterations_(0)
+    decorrelationNumberOfIterations_(0)    
   {
     std::cout << "Output written in " << input.outputFoldername() << std::endl;
     assert(outParticles_.is_open());
     assert(outReplica_.is_open());
     
-    
     outObservables_ << "# time kineticEnergy potentialEnergy energy temperature" << endl;
     outParticles_ << "# time index position momentum kineticEnergy potentialEnergy energy force" << endl;
-    outReplica_ << "# time index externalForce position momentum responseForces" << endl;
+    outReplica_ << "# time dt externalForce position momentum <responseForces> <responseForces2>" << endl;
     outVelocities_ << "# time i=0 i=N/4 i=N/2 i=3N/4 i=N-1" << endl;
     outVelocitiesCV_ << "# time b <b> <b2> D <D> >D2> observable <observable> >observable2> LPhi <LPhi> <LPhi2>" << endl;
     outForcesCV_ << "# time b <b> <b2> D <D> >D2> observable <observable> >observable2> LPhi <LPhi> <LPhi2>" << endl;
     outLengthsCV_ << "# time b <b> <b2> D <D> >D2> observable <observable> >observable2> LPhi <LPhi> <LPhi2>" << endl;
-    outFlowCV_ << "# time b <b> <b2> D <D> >D2> observable <observable> >observable2> LPhi <LPhi> <LPhi2>" << endl; 
-  }
+    outMidFlowCV_ << "# time b <b> <b2> D <D> >D2> observable <observable> >observable2> LPhi <LPhi> <LPhi2>" << endl; 
+		outSumFlowCV_ << "# time b <b> <b2> D <D> >D2> observable <observable> >observable2> LPhi <LPhi> <LPhi2>" << endl; 
+		
+		std::ofstream outInput(input.outputFoldername()+"inputFile.txt");
+		std::ifstream inInput(input.inputPath());
+		outInput << input.inputFlux().rdbuf();
+	}
   
-  void Output::reset(Input const& input, Potential& potential, size_t indexOfReplica)
+  void Output::reset(Input const& input, Potential& potential, size_t iOfReplica)
   {
-    timeStep_ = input.timeStep(indexOfReplica);
-    assert(input.outputPeriodTime(indexOfReplica) == 0 || input.outputPeriodTime(indexOfReplica) >= timeStep());
-    decorrelationNumberOfIterations_ = input.decorrelationNumberOfIterations(indexOfReplica);
+		cout << "nbOfParticles : " << numberOfParticles_ << endl;
+    timeStep_ = input.timeStep(iOfReplica);
+    assert(input.outputPeriodTime(iOfReplica) == 0 || input.outputPeriodTime(iOfReplica) >= timeStep());
+    decorrelationNumberOfIterations_ = input.decorrelationNumberOfIterations(iOfReplica);
     cout << "decorrelationNumberOfIterations : " << decorrelationNumberOfIterations_ << endl;
     verbose_ = (periodNumberOfIterations() > 0);
-    velocityCV_ = createControlVariate(input, potential, indexOfReplica);
-    forceCV_ = createControlVariate(input, potential, indexOfReplica);
-    lengthCV_ = createControlVariate(input, potential, indexOfReplica);
-    flowCV_ = createControlVariate(input, potential, indexOfReplica);
-  }
+    velocityCV_ = createControlVariate(input, potential, iOfReplica);
+    forceCV_ = createControlVariate(input, potential, iOfReplica);
+    lengthCV_ = createControlVariate(input, potential, iOfReplica);
+    midFlowCV_ = createControlVariate(input, potential, iOfReplica);
+		sumFlowCV_ = createControlVariate(input, potential, iOfReplica);
+		temperatureProfile_ = AutocorrelationStats<double>(decorrelationNumberOfIterations(), decorrelationTime(), numberOfParticles_);
+		bendingProfile_ = AutocorrelationStats<double>(decorrelationNumberOfIterations(), decorrelationTime(), numberOfParticles_);
+  	flowProfile_ = AutocorrelationStats<double>(decorrelationNumberOfIterations(), decorrelationTime(), numberOfParticles_);
+	}
     
   int& Output::verbose()
   {
@@ -104,14 +116,24 @@ namespace simol{
     return potentialEnergy_;
   }
   
-  const double& Output::energyFlow() const
+  const double& Output::energyMidFlow() const
   {
-    return energyFlow_;
+    return energyMidFlow_;
   }
   
-  double& Output::energyFlow()
+  double& Output::energyMidFlow()
   {
-    return energyFlow_;
+    return energyMidFlow_;
+  }
+  
+  const double& Output::energySumFlow() const
+  {
+    return energySumFlow_;
+  }
+  
+  double& Output::energySumFlow()
+  {
+    return energySumFlow_;
   }
   
   double Output::energy() const
@@ -145,11 +167,15 @@ namespace simol{
     return lengthCV_;
   }
   
-  ControlVariate* Output::flowCV()
+  ControlVariate* Output::midFlowCV()
   {
-    return flowCV_;
+    return midFlowCV_;
   }
   
+  ControlVariate* Output::sumFlowCV()
+  {
+    return sumFlowCV_;
+  }
   
   
   const double& Output::timeStep() const
@@ -218,7 +244,8 @@ namespace simol{
     velocityCV_->display(outVelocitiesCV_, indexOfIteration * timeStep());
     forceCV_->display(outForcesCV_, indexOfIteration * timeStep() );
     lengthCV_->display(outLengthsCV_, indexOfIteration * timeStep() );
-    flowCV_->display(outFlowCV_, indexOfIteration * timeStep() );
+    midFlowCV_->display(outMidFlowCV_, indexOfIteration * timeStep() );
+		sumFlowCV_->display(outSumFlowCV_, indexOfIteration * timeStep() );
   }
   
   
@@ -226,29 +253,48 @@ namespace simol{
   {
     cout<< "replica : " << timeStep() * indexOfIteration
 		<< " " << timeStep()
-		<< " " << externalForce(0)   
+		<< " " << externalForce(0)
 		<< " " << configuration[0].position() 
 		<< " " << configuration[0].momentum() 
 		<< " " << forceCV_->meanObservable()
 		<< " " << forceCV_->stdDeviationObservable()
-		<< " " << forceCV_->meanBetterObservable()
-		<< " " << forceCV_->stdDeviationBetterObservable()
+		//<< " " << forceCV_->meanBetterObservable()
+		//<< " " << forceCV_->stdDeviationBetterObservable()
+		<< " " << midFlowCV_->meanObservable()
+		<< " " << midFlowCV_->stdDeviationObservable()
+		<< " " << sumFlowCV_->meanObservable()
+		<< " " << sumFlowCV_->stdDeviationObservable()
 		<< std::endl;
 		
     assert(outReplica_.is_open());
     
-    outReplica_ << " " << timeStep() * indexOfIteration
+    outReplica_ << timeStep() * indexOfIteration
 		<< " " << timeStep()
 		<< " " << externalForce(0)   
 		<< " " << configuration[0].position() 
 		<< " " << configuration[0].momentum() 
 		<< " " << forceCV_->meanObservable()
 		<< " " << forceCV_->stdDeviationObservable()
-		<< " " << forceCV_->meanBetterObservable()
-		<< " " << forceCV_->stdDeviationBetterObservable()
+		//<< " " << forceCV_->meanBetterObservable()
+		//<< " " << forceCV_->stdDeviationBetterObservable()
+		<< " " << midFlowCV_->meanObservable()
+		<< " " << midFlowCV_->stdDeviationObservable()
+		<< " " << sumFlowCV_->meanObservable()
+		<< " " << sumFlowCV_->stdDeviationObservable()
 		<< std::endl;
 		
-    flowCV_->postTreat(outFlowPT_, timeStep());
+		for (size_t iOfParticle = 0; iOfParticle < numberOfParticles_; iOfParticle++)
+			outProfile_ << iOfParticle << " " 
+									<< temperatureProfile_.mean(iOfParticle) << " "
+									<< temperatureProfile_.standardDeviation(iOfParticle) / sqrt(timeStep() * indexOfIteration) << " "
+									<< bendingProfile_.mean(iOfParticle) << " "
+									<< bendingProfile_.standardDeviation(iOfParticle) / sqrt(timeStep() * indexOfIteration)
+									<< flowProfile_.mean(iOfParticle) << " "
+									<< flowProfile_.standardDeviation(iOfParticle) / sqrt(timeStep() * indexOfIteration)
+									<< endl;
+									
+    midFlowCV_->postTreat(outMidFlowPT_, timeStep());
+		sumFlowCV_->postTreat(outSumFlowPT_, timeStep());
   }
   
 
@@ -260,8 +306,10 @@ namespace simol{
     double integralV = 0;
     double integralF = 0;
     double integralQ = 0;
-    double flowQ = 0;
-    VectorXd integralFlowB2(flowCV_->nbOfFunctions());
+    double midFlowQ = 0;
+		double sumFlowQ = 0;
+    //VectorXd integralMidFlowB2(midFlowCV_->nbOfFunctions());
+		size_t midNumber = numberOfParticles_/2;
     for (size_t i=0; i < decorrelationNumberOfIterations_; i++)
     {
       outCorrelation_ << i * timeStep() 
@@ -271,14 +319,34 @@ namespace simol{
 		  << " " << (integralF += forceCV_->autocorrelation(i)*timeStep())
 		  << " " << lengthCV_->autocorrelation(i) - pow(lengthCV_->meanObservable(), 2)
 		  << " " << (integralQ += lengthCV_->autocorrelation(i)*timeStep())
-		  << " " << flowCV_->autocorrelation(i) - pow(flowCV_->meanObservable(), 2)
-		  << " " << (flowQ += flowCV_->autocorrelation(i)*timeStep());
-      for (size_t iOfFunction = 0; iOfFunction < flowCV_->nbOfFunctions(); iOfFunction++)
-	outCorrelation_  << " " << flowCV_->autocorrelationB2(i, iOfFunction) - pow(flowCV_->correlationB2(iOfFunction), 2)
-		  << " " << (integralFlowB2(iOfFunction) += flowCV_->autocorrelationB2(i, iOfFunction)*timeStep());	
-      outCorrelation_ << std::endl;
+		  << " " << midFlowCV_->autocorrelation(i) - pow(midFlowCV_->meanObservable(), 2)
+		  << " " << (midFlowQ += midFlowCV_->autocorrelation(i)*timeStep())
+			<< " " << sumFlowCV_->autocorrelation(i) - pow(sumFlowCV_->meanObservable(), 2)
+		  << " " << (sumFlowQ += sumFlowCV_->autocorrelation(i)*timeStep());
+      //for (size_t iOfFunction = 0; iOfFunction < flowCV_->nbOfFunctions(); iOfFunction++)
+		//		outCorrelation_  << " " << flowCV_->autocorrelationB2(i, iOfFunction) - pow(flowCV_->correlationB2(iOfFunction), 2)
+		//			<< " " << (integralFlowB2(iOfFunction) += flowCV_->autocorrelationB2(i, iOfFunction)*timeStep());
+			outCorrelation_ << " " << bendingProfile_(i, midNumber) - pow(bendingProfile_.mean(midNumber), 2)
+      << std::endl;
     }
   }
  
+ 	void Output::appendTemperatureProfile(double value, size_t iOfIteration, size_t iOfParticle)
+	{
+		temperatureProfile_.append(value, iOfIteration, iOfParticle);
+		/*cout << value << " " << iOfParticle << endl;
+		cout << temperatureProfile_.lastValue(iOfParticle) << endl;
+		cout << temperatureProfile_.mean(iOfParticle) << endl << endl;*/
+	}
+	
+	void Output::appendBendingProfile(double value, size_t iOfIteration, size_t iOfParticle)
+	{
+		bendingProfile_.append(value, iOfIteration, iOfParticle);
+	}
+	
+	void Output::appendFlowProfile(double value, size_t iOfIteration, size_t iOfParticle)
+	{
+		flowProfile_.append(value, iOfIteration, iOfParticle);
+	}
   
 }

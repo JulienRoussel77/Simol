@@ -3,11 +3,7 @@
 #include "statistics.hpp"
 #include "potential.hpp"
 #include "particle.hpp"
-#include <iostream>
-#include <fstream>
-//#include 
-using Eigen::MatrixXd;
-using Eigen::VectorXd;
+
  
 namespace simol
 {
@@ -115,7 +111,7 @@ namespace simol
     virtual double laplacienP(vector<Particle> const& configuration, size_t indexOfParticle = 0, size_t iOfFunction = 0) const;
     virtual dvec gradientP(vector<Particle> const& configuration, size_t indexOfParticle = 0, size_t iOfFunction = 0) const;
     void update(double observable, VectorXd& generatorOnBasisFunction, vector<Particle> const& configuration, size_t indexOfIteration);
-    virtual void postTreat(std::ofstream& out, double timeStep){};
+    virtual void postTreat(std::ofstream& out, double timeStep);
   };
   
   

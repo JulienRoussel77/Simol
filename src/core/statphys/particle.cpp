@@ -100,6 +100,12 @@ namespace simol
   dvec& Particle::force()
   { return force_; }
   
+  double const& Particle::force(size_t i) const
+  { return force_(i); }
+  
+  double& Particle::force(size_t i)
+  { return force_(i); }
+  
   dvec const& Particle::energyGrad() const
   { return energyGrad_; }
   

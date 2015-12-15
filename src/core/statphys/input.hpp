@@ -9,14 +9,19 @@
 
 #include <string>
 #include <iostream>
+#include <fstream>
 
 namespace simol{
   
   class Input{
     YAML::Node data;
+		std::string inputPath_;
+		std::ifstream inputFlux_;
     double positionMin_, positionMax_;
   public:
     Input(CommandLine cmd);
+		const std::string& inputPath() const;
+		const std::ifstream& inputFlux() const;
     int dimension() const;
     double length() const;
     
@@ -51,6 +56,7 @@ namespace simol{
     double externalForceMin() const;
     double externalForceMax() const;
     double externalForce(size_t indexOfReplica=0) const;
+    double tauBending() const;
     
     std::string systemName() const;
     size_t numberOfParticles() const;
@@ -72,6 +78,10 @@ namespace simol{
     double outputPeriodTime(size_t indexOfReplica=0) const;
     
     std::string controlVariateName() const;
+		
+		//Galerkin
+		size_t numberOfFourier() const;
+		size_t numberOfHermite() const;
   };
   
 

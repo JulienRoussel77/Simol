@@ -13,7 +13,7 @@ namespace simol
 
   Potential::Potential(){}
   
-  Potential::Potential(Input const & input, int const& indexOfReplica){}
+  Potential::Potential(Input const & /*input*/, int const& /*indexOfReplica*/){}
   
   Potential* createPotential(Input const& input, int const& indexOfReplica)
   {

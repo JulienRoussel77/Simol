@@ -1,6 +1,7 @@
 #ifndef SIMOL_PARTICLESYSTEM_HPP
 #define SIMOL_PARTICLESYSTEM_HPP
 
+#include "tools.hpp"
 #include <vector>
 #include "particle.hpp"
 #include "dynamics.hpp"
@@ -18,20 +19,23 @@ namespace simol
   {
     friend ParticleSystem* createSystem(Input  const& input, int const& indexOfReplica);
     public:
-      ParticleSystem(Input const& input, int const& iOfReplica=0);
+      ParticleSystem(Input const& input, int const& /*iOfReplica=0*/);
       virtual ~ParticleSystem(){};
-      Particle & particle(size_t index);
+      Particle & getParticle(size_t index);
+			const size_t& dimension() const;
       std::vector<Particle> & configuration();       
       size_t numberOfParticles() const;
       void launch(Dynamics* model, Output& output);
-      virtual void simulate(Dynamics* model, Output& output);
+      virtual void simulate(Dynamics* model);
       virtual void computeAllForces(Dynamics const* model) = 0;
       virtual void computeOutput(Output& output, Dynamics const* model, size_t indexOfIteration);
+			virtual void computeProfile(Output& /*output*/, Dynamics const* /*model*/, size_t /*iOfIteration*/){};
       void writeOutput(Output& output, size_t indexOfIteration = 0);
       virtual void computeFinalOutput(Output& output, Dynamics const* model);
       void writeFinalOutput(Output& output, Dynamics const* model);
+			
     protected:
-      int dimension_;
+      size_t dimension_;
       std::vector<Particle> configuration_;
 
   };
@@ -46,13 +50,14 @@ namespace simol
     void computeAllForces(Dynamics const* model);
   };
   
-  class Chain : public ParticleSystem
+  class BiChain : public ParticleSystem
   {
     Particle ancorParticle_;
   public:
-    Chain(Input const& input, int const& iOfReplica=0);
+    BiChain(Input const& input, int const& iOfReplica=0);
     void computeAllForces(Dynamics const* model);
-    void simulate(Dynamics * model, Output& output);
+    void simulate(Dynamics * model);
+		virtual void computeProfile(Output& output, Dynamics const* model, size_t iOfIteration);
   };
   
   class TriChain : public ParticleSystem
@@ -62,7 +67,8 @@ namespace simol
   public:
     TriChain(Input const& input, int const& iOfReplica=0);
     void computeAllForces(Dynamics const* model);
-    void simulate(Dynamics * model, Output& output);
+    void simulate(Dynamics * model);
+		virtual void computeProfile(Output& output, Dynamics const* model, size_t iOfIteration);
   };
 
 }

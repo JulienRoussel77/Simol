@@ -23,7 +23,7 @@ namespace simol{
   }
   
   template <>
-  void AutocorrelationStats<dvec>::append(dvec const& newValue, size_t iOfIteration, size_t iOfObservable, dvec const& newRefValue)
+  void AutocorrelationStats<dvec>::append(dvec const& newValue, size_t iOfIteration, size_t iOfObservable, dvec const& /*newRefValue*/)
   {
     if (iOfIteration % decorrelationNumberOfIterations_ == 0)
     {
