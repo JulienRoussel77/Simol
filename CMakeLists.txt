@@ -64,7 +64,7 @@ if(ENABLE_DOWNLOAD)
   simol_install_package(Armadillo)
   simol_install_package(Arpack)
   simol_install_package(Boost)
-  simol_install_package(CppUnit)
+  #simol_install_package(CppUnit)
   simol_install_package(Eigen)
   simol_install_package(Yamlcpp)
 endif(ENABLE_DOWNLOAD)
@@ -121,7 +121,7 @@ endif(CMAKE_BUILD_TYPE EQUAL "Release")
 # LOCAL INSTALLATIONS
 #====================
 
-include_directories(${CPPUNIT_INSTALL_DIR}/include)
+#include_directories(${CPPUNIT_INSTALL_DIR}/include)
 
 MESSAGE(STATUS ${BLAS_LIB})
 

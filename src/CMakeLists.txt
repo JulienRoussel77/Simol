@@ -1,6 +1,6 @@
 add_subdirectory(core)
 
-file(GLOB_RECURSE statphys "core/statphys/*.cpp")
+file(GLOB_RECURSE statphys "modules/statphys/*.cpp")
 file(GLOB_RECURSE random "core/random/*.cpp")
 file(GLOB_RECURSE io "core/io/*.cpp")
 file(GLOB_RECURSE linalg "core/linalg/*.cpp")
