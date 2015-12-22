@@ -44,4 +44,4 @@ foreach(LIBRARY_NAME IN LISTS LIBRARY_NAMES)
 endforeach(LIBRARY_NAME)
 
 
-endfunction(DownloadThenInstall)
+endfunction(simol_install_package)
