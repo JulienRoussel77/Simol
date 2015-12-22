@@ -1,8 +1,10 @@
-function(DownloadThenInstall LIBRARY_NAMES)
+function(simol_install_package LIBRARY_NAMES)
 
 foreach(LIBRARY_NAME IN LISTS LIBRARY_NAMES)
 
     message(STATUS "LIBRARY_NAME is ${LIBRARY_NAME}")
+
+    include(Install${LIBRARY_NAME})
 
     string(TOLOWER ${LIBRARY_NAME} LIBRARY_LOWERNAME)
     string(TOUPPER ${LIBRARY_NAME} LIBRARY_UPPERNAME)

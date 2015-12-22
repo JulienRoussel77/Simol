@@ -18,7 +18,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/mod
 include(CheckCXXCompilerFlag)
 include(ExternalProject)
 include(ProcessorCount)
-include(DownloadThenInstall)
+include(SimolInstallPackage)
 
 set(SIMOL_C_COMPILER ${CMAKE_C_COMPILER})
 set(SIMOL_CXX_COMPILER ${CMAKE_CXX_COMPILER})
@@ -46,12 +46,6 @@ find_package(LAPACK)
 LIST(GET BLAS_LIBRARIES 0 BLAS_LIB)
 LIST(GET LAPACK_LIBRARIES 0 LAPACK_LIB)
 
-find_package(Armadillo)
-find_package(Arpack)
-find_package(Boost)
-find_package(CppUnit)
-find_package(Eigen)
-find_package(Yamlcpp)
 #=============================
 # DOWNLOAD 3RD-PARTY LIBRARIES
 #=============================
@@ -61,13 +55,18 @@ if(INSTALL_GCC)
   set(GCC_CONFIGURE_COMMAND cd <BINARY_DIR> && 
                             <SOURCE_DIR>/contrib/download_prerequisites && 
                             <SOURCE_DIR>/configure --prefix=<INSTALL_DIR>)
-  DownloadThenInstall(GCC)
+#  DownloadThenInstall(GCC)
 endif(INSTALL_GCC)
 
 
 if(ENABLE_DOWNLOAD)
   message(STATUS "libraries to download ${LIBRARIES_TO_DOWNLOAD}")
-  DownloadThenInstall("${LIBRARIES_TO_DOWNLOAD}")
+  simol_install_package(Armadillo)
+  simol_install_package(Arpack)
+  simol_install_package(Boost)
+  simol_install_package(CppUnit)
+  simol_install_package(Eigen)
+  simol_install_package(Yamlcpp)
 endif(ENABLE_DOWNLOAD)
 
   include_directories(${EIGEN_INSTALL_DIR}/include/eigen3)
