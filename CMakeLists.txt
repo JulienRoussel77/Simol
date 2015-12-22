@@ -99,7 +99,6 @@ endif(SIMOL_GCC_ROOT)
 
 message(STATUS ${CMAKE_CXX_COMPILER})
 
-#set(SIMOL_CXX_FLAGS "-static")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SIMOL_CXX_FLAGS} -Wall -Wextra -fopenmp -lgfortran -Wno-deprecated")
 
 CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
