@@ -1,7 +1,7 @@
 add_executable(test_simol unit/test_simol.cpp 
                           unit/EigenSolverTest.cpp 
                           unit/SparseMatrixTest.cpp 
-                          ../core/io/mmio.c
+                          ../src/core/io/mmio.c
                           unit/VectorTest.cpp)
 
 target_link_libraries(test_simol ${CPPUNIT_INSTALL_DIR}/lib/libcppunit.so 
