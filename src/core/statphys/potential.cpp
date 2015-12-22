@@ -15,7 +15,7 @@ namespace simol
   
   Potential::Potential(Input const & /*input*/, int const& /*indexOfReplica*/){}
   
-  Potential* createPotential(Input const& input, int const& indexOfReplica)
+  Potential* createPotential(Input const& input, int const& /*indexOfReplica*/)
   {
     if (input.potentialName() == "Sinusoidal")
       return new Sinusoidal(input);
@@ -48,7 +48,9 @@ namespace simol
   {}
   
   double Sinusoidal::operator()(dvec const & position) const
-  { return amplitude_* (1-std::cos(pulsation_*position(0))); }
+  { 
+		return amplitude_* (1-std::cos(pulsation_*position(0))); 
+	}
 
   dvec Sinusoidal::derivative(dvec const & position) const
   { 

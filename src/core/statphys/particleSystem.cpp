@@ -22,7 +22,8 @@ namespace simol
   
   ParticleSystem::ParticleSystem(Input const& input, int const& /*indexOfReplica*/):
   dimension_(input.dimension()),
-  configuration_(input.numberOfParticles())
+  configuration_(input.numberOfParticles()),
+  settingsPath_(input.settingsPath())
   {}
   
   Particle & ParticleSystem::getParticle(size_t index) 
@@ -43,7 +44,14 @@ namespace simol
   
   void ParticleSystem::launch(Dynamics* model, Output& output)  
   {
-    model->initializeMomenta(configuration_);
+		cout << "Estimated time : " << 3 * numberOfParticles()/1024. * model->numberOfIterations() / 1e6 << " hours" << endl;
+		//if (settingsPath_ == "")
+		//	model->initializeMomenta(configuration_);
+		//else
+		//	model->startFrom(settingsPath_);
+		
+		initializeSystem(model);
+		
     computeAllForces(model);
     for (size_t iOfIteration  =0; iOfIteration < model->numberOfIterations(); ++iOfIteration)
     {
@@ -110,7 +118,7 @@ namespace simol
   {
     //double time = model->timeStep() * model->numberOfIterations();
     
-    output.finalDisplay(configuration_, model->externalForce(), model->numberOfIterations());
+    output.finalDisplay(configuration_, model->externalForce());
     if (output.doComputeCorrelations() &&  output.verbose() > 0)
       output.finalDisplayAutocorrelations();
   }
@@ -219,15 +227,32 @@ namespace simol
   ancorParticle2_(input.dimension())
   {
     assert(configuration_.size() > 1);
-    ancorParticle1_.position(0) = 3 * input.initialPosition(0) - 2*input.initialPosition(1);
-    ancorParticle2_.position(0) = 2 * input.initialPosition(0) - input.initialPosition(1);
+    ancorParticle1_.position(0) = 0;//3 * input.initialPosition(0) - 2*input.initialPosition(1);
+    ancorParticle2_.position(0) = 0;//2 * input.initialPosition(0) - input.initialPosition(1);
     for (size_t i = 0; i<input.numberOfParticles(); i++) 
     {
       configuration_[i] = Particle(input.mass(), input.initialPosition(i), input.initialMomentum(i));
       //std::cout << configuration_[i].force() << std::endl;
     }
-    configuration_[0].position(0) -= .1;
+    //configuration_[0].position(0) -= .1;
   }
+  
+  void TriChain::initializeSystem(Dynamics* model)
+	{
+		//cout << "TriChain::initializeSystem(Dynamics* model)" << endl;
+		double localBending = model->computeMeanPotLaw(1/model->temperatureLeft());
+		getParticle(0).position(0) = localBending;
+		double alpha = 1 / (double) numberOfParticles();
+		double localBeta = 1/((1-alpha) * model->temperatureLeft() + alpha * model->temperatureRight());
+		getParticle(0).position(0) = 2 * getParticle(0).position(0) + model->computeMeanPotLaw(localBeta);
+		for (size_t iOfParticle = 2; iOfParticle < numberOfParticles(); iOfParticle++)
+		{
+			double alpha = iOfParticle / (double) numberOfParticles();
+			localBeta = 1/((1-alpha) * model->temperatureLeft() + alpha * model->temperatureRight());
+			getParticle(iOfParticle).position(0) = -getParticle(iOfParticle-2).position(0) + 2 * getParticle(iOfParticle-1).position(0) + model->computeMeanPotLaw(localBeta);
+			getParticle(iOfParticle).momentum() = model->drawMomentum(localBeta, getParticle(iOfParticle).mass());
+		}
+	}
   
     void TriChain::simulate(Dynamics * model)
   {
@@ -300,6 +325,16 @@ namespace simol
 		output.energySumFlow() /= numberOfParticles()-2;
 		//cout << output.energySumFlow() << endl;
 	}
+	
+	void TriChain::writeFinalOutput(Output& output, Dynamics const* model)
+  {
+    //double time = model->timeStep() * model->numberOfIterations();
+    
+    output.finalDisplay(configuration_, model->externalForce());
+    if (output.doComputeCorrelations() &&  output.verbose() > 0)
+      output.finalDisplayAutocorrelations();
+		output.displayFinalFlow(model->temperature(), model->deltaTemperature(), model->tauBending());
+  }
   
 }
 

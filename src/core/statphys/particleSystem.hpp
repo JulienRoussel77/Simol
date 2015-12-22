@@ -25,6 +25,7 @@ namespace simol
 			const size_t& dimension() const;
       std::vector<Particle> & configuration();       
       size_t numberOfParticles() const;
+			virtual void initializeSystem(Dynamics* /*model*/){};
       void launch(Dynamics* model, Output& output);
       virtual void simulate(Dynamics* model);
       virtual void computeAllForces(Dynamics const* model) = 0;
@@ -37,7 +38,7 @@ namespace simol
     protected:
       size_t dimension_;
       std::vector<Particle> configuration_;
-
+			string settingsPath_;
   };
 
   // redémarrage : nombres aleatoires, juste pannes, tous les N pas de temps
@@ -66,10 +67,12 @@ namespace simol
     Particle ancorParticle2_;
   public:
     TriChain(Input const& input, int const& iOfReplica=0);
+		virtual void initializeSystem(Dynamics* model);
     void computeAllForces(Dynamics const* model);
     void simulate(Dynamics * model);
 		virtual void computeProfile(Output& output, Dynamics const* model, size_t iOfIteration);
-  };
+		void writeFinalOutput(Output& output, Dynamics const* model);
+	};
 
 }
 

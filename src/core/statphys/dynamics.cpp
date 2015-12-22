@@ -188,7 +188,24 @@ namespace simol
     output.sumFlowCV()->update(output.energySumFlow(), generatorOnBasis, configuration, indexOfIteration);
   }
   
-    
+  double Dynamics::computeMeanPotLaw(double localBeta) const
+	{
+		//cout << "Dynamics::computeMeanPotLaw" << endl;
+		double repFunc = 0;
+		double qInteg = 0;
+		size_t nbIntegrationNodes = 1000;
+		double step = 8. / nbIntegrationNodes;
+		dvec deltaQ(1);
+		for (size_t iOfNode = 0; iOfNode < nbIntegrationNodes; iOfNode++)
+		{
+			deltaQ(0) = - 4 + iOfNode * step;
+			//cout << q << " " << localBeta << " " << potential(q) << endl;
+			repFunc += exp(-localBeta * potential(deltaQ));
+			qInteg += deltaQ(0) * exp(-localBeta * potential(deltaQ));			
+		}
+		//cout << "beta = " << localBeta << " -> " << qInteg / repFunc << endl;
+		return qInteg / repFunc;
+	}
   
   
   //#### Hamiltonian ####
@@ -221,6 +238,11 @@ namespace simol
   {
     rng_ = rng;
   }
+  
+  dvec StochasticDynamics::drawMomentum(double localBeta, double mass)
+	{
+		return sqrt(1 / (localBeta * mass)) * rng_->gaussian();
+	}
  
   
     
@@ -232,15 +254,14 @@ namespace simol
     temperature_(1/beta_)
   {}
   
-
   
   void UniformStochasticDynamics::initializeMomenta(vector<Particle>& configuration)
   {
     for (auto&& particle : configuration)
-      particle.momentum() = sqrt(beta() / particle.mass()) * rng_->gaussian();
+      particle.momentum() = sqrt(1 / (beta() * particle.mass())) * rng_->gaussian();
   }
   
-  double const& UniformStochasticDynamics::temperature() const
+  double UniformStochasticDynamics::temperature() const
   {
     return temperature_;
   }
@@ -363,7 +384,12 @@ namespace simol
     return betaRight_;
   }
   
-    double const& BoundaryStochasticDynamics::temperatureLeft() const
+  double BoundaryStochasticDynamics::temperature() const
+  {
+    return (temperatureLeft_ + temperatureRight_) / 2;
+  }
+  
+  double const& BoundaryStochasticDynamics::temperatureLeft() const
   {
     return temperatureLeft_;
   }
@@ -378,7 +404,7 @@ namespace simol
     return (temperatureLeft_ - temperatureRight_)/2;
   }
   
-    void BoundaryStochasticDynamics::initializeMomenta(vector<Particle>& configuration)
+  void BoundaryStochasticDynamics::initializeMomenta(vector<Particle>& configuration)
   {
     for (size_t iOfParticle = 0; iOfParticle < configuration.size(); iOfParticle++)
     {
@@ -387,6 +413,16 @@ namespace simol
       particle.momentum() = sqrt(tempi_ / particle.mass()) * rng_->gaussian();
     }
   }
+  
+  /*void BoundaryStochasticDynamics::startFrom(string settingsPath)
+  {
+    for (size_t iOfParticle = 0; iOfParticle < configuration.size(); iOfParticle++)
+    {
+      Particle& particle = configuration[iOfParticle];
+      double tempi_ = temperatureLeft_ + (iOfParticle + .5) * (temperatureRight_ - temperatureLeft_) / configuration.size();
+      particle.momentum() = sqrt(tempi_ / particle.mass()) * rng_->gaussian();
+    }
+  }*/
   
 
   //#### BoundaryLangevin ####

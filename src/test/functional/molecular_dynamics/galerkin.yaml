@@ -22,5 +22,5 @@ Physics:
 
 Galerkin:
   Basis:
-    Fourier: 5
-    Hermite: 2
+    Fourier: 25
+    Hermite: 20

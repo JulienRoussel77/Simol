@@ -9,23 +9,30 @@
 
 namespace simol
 {
-	SpMat tensor(SpMat A, SpMat B);
+	SMat tensor(SMat A, SMat B);
 	
 	class Galerkin
 	{
 		//DenseMatrix<double> A;
-		size_t numberOfFourier_, numberOfHermite_;
-		int maxOfFourier_;
-		SpMat Q_, P_;
-		SpMat Lthm0_, Lthm_, Lham_;
-		SpMat Leq_;
+		size_t numberOfFourier_, numberOfHermite_, maxOfFourier_;
+		size_t sizeOfBasis_;
+		SMat Q_, P_;
+		SMat tQ_, tP_;
+		SMat Lthm0_, Lthm_, Lham_;
+		SMat Leq_;
 		double beta_;
+		double amplitude_;
+		size_t nbIntegrationNodes_;
+		vector<double> fourierCoeffsExp_;
 	public:
 		Galerkin(Input const& input);
-		size_t iPosi(int iOfFourier, size_t iOfHermite) const;
-		size_t iSign(int iOfFourier, size_t iOfHermite) const;
-		size_t iPosiF(int iOfFourier) const;
-		size_t iSignF(int iOfFourier) const;
-		void solve();
+		double potential(double q);
+		size_t iTens(size_t iOfFourier2, size_t iOfHermite) const;
+		DMat shapeSaddle(DMat& A);
+		DMat unshapeSaddle(DMat& Asad);
+		DVec shapeSaddle(DVec& X);
+		DVec unshapeSaddle(DVec& Xsad);
+		void computeFourierCoeffsExp();
+		void compute();
 	};
 }

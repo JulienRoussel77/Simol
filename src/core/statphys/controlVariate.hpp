@@ -19,6 +19,7 @@ namespace simol
     double decorrelationTime_;
     size_t nbOfFunctions_;
     size_t nbOfFunctionPairs_;
+		size_t periodNumberOfIterations_;
     
     AutocorrelationStats<double> statsObservable_;
     AutocorrelationStats<double> statsBetterObservable_;
@@ -48,6 +49,7 @@ namespace simol
     double decorrelationTime() const;
     virtual size_t nbOfFunctions() const;
     virtual size_t nbOfFunctionPairs() const;
+		bool doOutput(size_t indexOfIteration) const;
     
     virtual VectorXd lastB1() const;
     virtual VectorXd meanB1() const;

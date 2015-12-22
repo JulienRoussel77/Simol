@@ -19,6 +19,7 @@ namespace simol
     std::ofstream outObservables_;
     std::ofstream outParticles_;
     std::ofstream outReplica_;
+		std::ofstream outFinalFlow_;
     std::ofstream outCorrelation_;
     std::ofstream outVelocities_;
     std::ofstream outBeam_;
@@ -36,6 +37,7 @@ namespace simol
     double timeStep_;
     int dimension_;
     size_t numberOfParticles_;
+		size_t numberOfIterations_;
     
     double kineticEnergy_;
     double potentialEnergy_;
@@ -76,6 +78,9 @@ namespace simol
     double period() const;
     const size_t& periodNumberOfIterations() const;
     bool doOutput(size_t indexOfIteration) const;
+		const size_t& numberOfParticles() const;
+		const size_t& numberOfIterations() const;
+		double finalTime() const;
     
     const double& kineticEnergy() const;
     double& kineticEnergy();
@@ -106,8 +111,8 @@ namespace simol
     //double& integratedAutocorrelationP();
     void display(vector<Particle> const& configuration, size_t indexOfIteration);
     void finalDisplayAutocorrelations();
-    void finalDisplay(vector<Particle> const& configuration, dvec const& externalForce, size_t indexOfIteration);
-    //void displayVelocity(size_t indexOfIteration);
+    void finalDisplay(vector<Particle> const& configuration, dvec const& externalForce);
+    void displayFinalFlow(double temperature, double delta_temperature, double tau);
 
     
     void updateControlVariate(vector<Particle> const& configuration);

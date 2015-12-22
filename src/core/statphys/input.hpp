@@ -10,14 +10,19 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include "tools.hpp"
 
 namespace simol{
   
   class Input{
     YAML::Node data;
-		std::string inputPath_;
-		std::ifstream inputFlux_;
+		string inputPath_;
+		ifstream inputFlux_;
     double positionMin_, positionMax_;
+		ifstream inputSettings_;
+		int settingsSize_;
+		vector<double> settingsPositions_, initialPositions_;
+		vector<double> settingsMomenta_, initialMomenta_;
   public:
     Input(CommandLine cmd);
 		const std::string& inputPath() const;
@@ -67,6 +72,8 @@ namespace simol{
     double initialPosition(int const& i=0) const;
     
     double initialMomentum(int const& i=0) const;
+		string settingsPath() const;
+		int settingsSize() const;
     
     size_t numberOfReplicas() const;
     
@@ -74,6 +81,7 @@ namespace simol{
     size_t decorrelationNumberOfIterations(size_t indexOfReplica=0) const;
     double decorrelationTime(size_t indexOfReplica=0) const;
     std::string outputFoldername() const;
+		std::string finalOutputFoldername() const;
     size_t outputPeriodNumberOfIterations(size_t indexOfReplica=0) const;
     double outputPeriodTime(size_t indexOfReplica=0) const;
     
@@ -82,6 +90,9 @@ namespace simol{
 		//Galerkin
 		size_t numberOfFourier() const;
 		size_t numberOfHermite() const;
+		
+		
+		double readItem(ifstream& in);
   };
   
 

@@ -13,8 +13,12 @@ namespace simol {
 		data(YAML::LoadFile(cmd.inputFileName())),
 		inputPath_(cmd.inputFileName()),
 		inputFlux_(inputPath())
+		//inputSettings_(settingsPath()),
+		//settingsSize_(settingsSize())
   {
-    //std::cout << "Input read in " << cmd.inputFileName() << std::endl;
+		/*cout << "SettingsPath = " << settingsPath() << endl;
+		assert(inputSettings_.is_open());
+		cout << "SettingsSize = " << settingsSize_ << endl;*/
     
     if (data["Physics"]["System"]["Position"])
       if (data["Physics"]["System"]["Position"].size() == 2)
@@ -22,7 +26,47 @@ namespace simol {
 				positionMin_ = data["Physics"]["System"]["Position"][0].as<double>();
 				positionMax_ = data["Physics"]["System"]["Position"][1].as<double>();
       }
-          
+      
+    
+    /*if (settingsPath() != "" && settingsSize_ != -1)
+		{
+			settingsPositions_ = vector<double>(settingsSize_);
+			settingsMomenta_ = vector<double>(settingsSize_);
+			for (size_t iOfParticle=0; (int)iOfParticle < settingsSize_; iOfParticle++)
+			{
+				readItem(inputSettings_);
+				assert( (int) readItem(inputSettings_) == (int) iOfParticle);
+				settingsPositions_[iOfParticle] = readItem(inputSettings_);
+				settingsMomenta_[iOfParticle] = readItem(inputSettings_);
+				for (int i=0; i<4; i++)
+					readItem(inputSettings_);
+				cout << iOfParticle << " " << settingsPositions_[iOfParticle] << " " << settingsMomenta_[iOfParticle] << endl;
+			}
+			
+			//Estimating the tauBending
+			//double estimTau = 2 * (settingsPositions_[settingsSize()-1] - 2*settingsPositions_[(settingsSize()-1)/2] + settingsPositions_[(settingsSize()-1)/2]
+			double estimTau = settingsPositions_[settingsSize()-1] / pow(settingsSize()-1, 4);
+			cout << "Estimated bending = " << estimTau << endl;
+			
+			cout << "file read" << endl;
+			
+			initialPositions_ = vector<double>(numberOfParticles());
+			initialMomenta_ = vector<double>(numberOfParticles());
+			double ratio = settingsSize_ / (double) numberOfParticles();
+			for (size_t iOfParticle=0; iOfParticle < numberOfParticles(); iOfParticle++)
+			{
+				double fracIndex = ratio * iOfParticle;
+				int iInf = (int) (fracIndex);
+				int iSup = ceil  (fracIndex);
+				double alpha = fracIndex - iInf;
+				assert(0 <= alpha && alpha <= 1);
+				initialPositions_[iOfParticle] = pow(ratio, -4) * 
+						((1-alpha) * settingsPositions_[iInf] + alpha * settingsPositions_[iSup]);
+				initialMomenta_[iOfParticle]   = (1-alpha) * settingsMomenta_[iInf]   + alpha * settingsMomenta_[iSup];
+			
+				cout << iOfParticle << " " << alpha << " " << settingsPositions_[iInf] << " " << settingsPositions_[iSup] << " " << initialPositions_[iOfParticle] << endl;
+			}
+		}*/
   }
   
   const std::string& Input::inputPath() const
@@ -116,7 +160,7 @@ namespace simol {
   string Input::dynamicsName() const {return data["Physics"]["Model"]["Name"].as<string>();}
   double Input::gamma() const {return data["Physics"]["Model"]["Gamma"].as<double>();}
   
-  double Input::temperature(size_t indexOfReplica) const 
+  double Input::temperature(size_t /*indexOfReplica*/) const 
   {
     if (data["Physics"]["Model"]["Temperature"])
       return data["Physics"]["Model"]["Temperature"].as<double>();
@@ -130,17 +174,17 @@ namespace simol {
       {cout << "Temperature not precised !" << endl;exit(1);}
   }
   
-  double Input::temperatureLeft(size_t indexOfReplica) const 
+  double Input::temperatureLeft(size_t /*indexOfReplica*/) const 
   {
     return data["Physics"]["Model"]["TemperatureLeft"].as<double>();
   }
   
-    double Input::temperatureRight(size_t indexOfReplica) const 
+    double Input::temperatureRight(size_t /*indexOfReplica*/) const 
   {
     return data["Physics"]["Model"]["TemperatureRight"].as<double>();
   }
   
-  double Input::beta(size_t indexOfReplica) const 
+  double Input::beta(size_t /*indexOfReplica*/) const 
   {
     if (data["Physics"]["Model"]["Beta"])
       return data["Physics"]["Model"]["Beta"].as<double>();
@@ -154,7 +198,7 @@ namespace simol {
       {cout << "Beta not precised !" << endl;exit(1);}
   }
   
-  double Input::betaLeft(size_t indexOfReplica) const 
+  double Input::betaLeft(size_t /*indexOfReplica*/) const 
   {
     if (data["Physics"]["Model"]["BetaLeft"])
       return data["Physics"]["Model"]["BetaLeft"].as<double>();
@@ -163,7 +207,7 @@ namespace simol {
     else assert(false);
   }
   
-  double Input::betaRight(size_t indexOfReplica) const 
+  double Input::betaRight(size_t /*indexOfReplica*/) const 
   {
     if (data["Physics"]["Model"]["BetaRight"])
       return data["Physics"]["Model"]["BetaRight"].as<double>();
@@ -214,19 +258,48 @@ namespace simol {
   
   double Input::initialPosition(int const& i) const {
     if (data["Physics"]["System"]["Position"])
+		{
       if (data["Physics"]["System"]["Position"].size() == 1)
-	return data["Physics"]["System"]["Position"].as<double>();
+				return data["Physics"]["System"]["Position"].as<double>();
       else
-	return positionMin_ + (i + .5)/numberOfParticles() * (positionMax_ - positionMin_);
-    else return 0;
+				return positionMin_ + (i + .5)/numberOfParticles() * (positionMax_ - positionMin_);
+		}
+		/*else if (settingsSize_ != -1)
+		{
+			cout << "using settings for q : " << i << "->" << initialPositions_[i] << endl;
+			return initialPositions_[i];
+		}*/
+			
+		else return 0;
   }   
   
-    double Input::initialMomentum(int const& i) const {
+  double Input::initialMomentum(int const& /*i*/) const 
+  {
     if (data["Physics"]["System"]["Momentum"])
       return data["Physics"]["System"]["Momentum"].as<double>();
+		/*else if (settingsSize_ != -1)
+		{
+			cout << "using settings for p : " << i << "->" << initialMomenta_[i] << endl;
+			return initialMomenta_[i];
+		}*/
     else return 0;
     //else return (i < numberOfParticles()/2)?.2:-.2;
   }  
+  
+  string Input::settingsPath() const
+  {
+		if (data["Physics"]["System"]["SettingsPath"])
+			return finalOutputFoldername()+data["Physics"]["System"]["SettingsPath"].as<string>();
+		else return "";
+	}
+	
+	int Input::settingsSize() const
+  {
+		if (data["Physics"]["System"]["SettingsSize"])
+			return data["Physics"]["System"]["SettingsSize"].as<int>();
+		else return -1;
+	}
+	
   
   size_t Input::numberOfReplicas() const {
     if (data["Physics"]["Replicas"]["Number"])
@@ -245,7 +318,7 @@ namespace simol {
     else return 0;
   }
   
-  double Input::decorrelationTime(size_t indexOfReplica) const
+  double Input::decorrelationTime(size_t /*indexOfReplica*/) const
   {
     if (data["Output"]["DecorrelationTime"])
       return data["Output"]["DecorrelationTime"].as<double>();
@@ -263,6 +336,14 @@ namespace simol {
     return foldername;
   }
   
+  string Input::finalOutputFoldername() const {
+    //cout << "../output/"+dynamicsName()+"/"+systemName()+"/"+potentialName()+"/" << endl;
+    string finalFoldername = "../output/"+dynamicsName()+"/"+systemName()+"/"+potentialName()+"/";
+    if (controlVariateName() != "None")
+      finalFoldername += controlVariateName()+"/";
+    return finalFoldername;
+  }
+  
   size_t Input::outputPeriodNumberOfIterations(size_t indexOfReplica) const {
     if (data["Output"]["Period"])
       return data["Output"]["Period"].as<double>() / timeStep(indexOfReplica);
@@ -270,7 +351,7 @@ namespace simol {
       return 1;
   }
   
-  double Input::outputPeriodTime(size_t indexOfReplica) const {
+  double Input::outputPeriodTime(size_t /*indexOfReplica*/) const {
     if (data["Output"]["Period"])
       return data["Output"]["Period"].as<double>();
     else
@@ -305,6 +386,15 @@ namespace simol {
 						return data["Galerkin"]["Basis"]["Hermite"].as<size_t>();
 
 			return 0;
+		}
+		
+		
+		
+		double Input::readItem(ifstream& in)
+		{
+			double item;
+			in >> item;
+			return item;
 		}
 
 }

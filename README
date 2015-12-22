@@ -12,7 +12,11 @@
 1. INSTALLATION (requires GCC version >= 4.9.2)
 
 cd build
-cmake -D ENABLE_DOWNLOAD=True -DCMAKE_C_COMPILER=/home/roussel/5.2.0/bin/gcc -DCMAKE_CXX_COMPILER=/home/roussel/5.2.0/bin/g++ -DCMAKE_Fortran_COMPILER=/home/roussel/5.2.0/bin/gfortran ..
+#cmake -D ENABLE_DOWNLOAD=True -DCMAKE_C_COMPILER=/home/roussel/5.2.0/bin/gcc -DCMAKE_CXX_COMPILER=/home/roussel/5.2.0/bin/g++ -DCMAKE_Fortran_COMPILER=/home/roussel/5.2.0/bin/gfortran ..
+
+export GCC_ROOT=/libre/common/softwares/gcc/4.9.2
+cmake -D ENABLE_DOWNLOAD=True -D SIMOL_GCC_ROOT=$GCC_ROOT ..
+
 make
 
 Info pour netbeans :

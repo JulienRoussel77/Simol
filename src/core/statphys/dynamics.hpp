@@ -24,7 +24,7 @@ namespace simol
 
       Potential const & potential() const;
       double& timeStep();
-      const double& timeStep() const;
+      double const& timeStep() const;
       size_t& numberOfIterations();
       const size_t& numberOfIterations() const;
       double finalTime() const;
@@ -34,14 +34,18 @@ namespace simol
       dvec force(dvec const& position) const;
       dvec& externalForce() ;
       const dvec& externalForce() const;
-      double& externalForce(int const& i) ;
-      const double& externalForce(int const& i) const;
+      double& externalForce(int const& i);
+      double const& externalForce(int const& i) const;
 			virtual double const& gamma() const {assert(false);}
-      virtual const double& temperatureLeft() const {assert(false);}
-      virtual const double& temperatureRight() const {assert(false);}
+			virtual double temperature() const {assert(false);}
+      virtual double const& temperatureLeft() const {assert(false);}
+      virtual double const& temperatureRight() const {assert(false);}
+      virtual double deltaTemperature() const {assert(false);}
+      virtual double const& tauBending() const {assert(false);}
       //friend Dynamics* createDynamics(Potential const& potential);
       
       virtual void initializeMomenta(vector<Particle>& configuration);
+			virtual dvec drawMomentum(double /*localBeta*/, double /*mass*/){assert(false);return 0;};
       virtual void setRNG(RNG* /*rng*/){};
       void resetForce(Particle& particle) const;
       void computeForce(Particle& particle) const;
@@ -54,7 +58,8 @@ namespace simol
       virtual void bending(Particle& /*particle1*/, Particle& /*particle2*/) const {};
       virtual MatrixXd generatorOn(ControlVariate const* /*controlVariate*/, vector<Particle> const& /*configuration*/) const{cout << "operator not implemented !"; assert(false); return MatrixXd();}
       virtual void updateAllControlVariates(Output& output, vector<Particle> const& configuration, size_t indexOfIteration) const;
-    protected:
+			virtual double computeMeanPotLaw(double betaLocal) const;
+	protected:
       double timeStep_;
       size_t numberOfIterations_;
       Potential* potential_;
@@ -75,6 +80,7 @@ namespace simol
   public:
     StochasticDynamics(Input const& input, int const& indexOfReplica=1);
     virtual void setRNG(RNG* rng);
+		virtual dvec drawMomentum(double localBeta, double mass);
   protected:
     RNG* rng_;
   };
@@ -87,10 +93,10 @@ namespace simol
   public:
     UniformStochasticDynamics(Input const& input, int const& indexOfReplica=1);
     void initializeMomenta(vector<Particle>& configuration);
-    virtual double const& temperature() const;
+    virtual double  temperature() const;
     virtual double const& beta() const;
-    virtual const double& temperatureLeft() const;
-    virtual const double& temperatureRight() const;
+    virtual double const& temperatureLeft() const;
+    virtual double const& temperatureRight() const;
   };
   
   class Langevin : public UniformStochasticDynamics
@@ -119,10 +125,11 @@ namespace simol
   {
   public:
     BoundaryStochasticDynamics(Input const& input, int const& indexOfReplica=1);
-    virtual const double& betaLeft() const;
-    virtual const double& betaRight() const;
-    virtual const double& temperatureLeft() const;
-    virtual const double& temperatureRight() const;
+    virtual double const& betaLeft() const;
+    virtual double const& betaRight() const;
+		virtual double temperature() const;
+    virtual double const& temperatureLeft() const;
+    virtual double const& temperatureRight() const;
     double deltaTemperature() const;
     
     //virtual void updateAfter(Particle& particle);
