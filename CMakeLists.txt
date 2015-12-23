@@ -74,31 +74,6 @@ endif(ENABLE_DOWNLOAD)
   include_directories(${BOOST_INSTALL_DIR}/include)
   include_directories(${ARMADILLO_INSTALL_DIR}/include)
 
-  message(STATUS "YAMLCPP_INSTALL_DIR is ${YAMLCPP_INSTALL_DIR}")
-
-#===================
-# USER CONFIGURATION
-#===================
-
-set (config ${CMAKE_CURRENT_SOURCE_DIR}/config.cmake)
-if(EXISTS ${config})
-  include(${config})
-endif(EXISTS ${config})
-
-#==================
-# COMPILER SETTINGS
-#==================
-
-if(SIMOL_GCC_ROOT)
-  set(CMAKE_C_COMPILER ${SIMOL_GCC_ROOT}/bin/gcc)
-  set(CMAKE_CXX_COMPILER ${SIMOL_GCC_ROOT}/bin/g++)
-  set(CMAKE_Fortran_COMPILER ${SIMOL_GCC_ROOT}/bin/gfortran)
-  set(LD_LIBRARY_PATH ${SIMOL_GCC_ROOT}/lib64/libstdc++.so)
-  message(STATUS ok!)
-endif(SIMOL_GCC_ROOT)
-
-message(STATUS ${CMAKE_CXX_COMPILER})
-
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SIMOL_CXX_FLAGS} -Wall -Wextra -fopenmp -lgfortran -Wno-deprecated")
 
 CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
@@ -115,14 +90,6 @@ elseif (CMAKE_BUILD_TYPE EQUAL "Profile")
 else ()
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g" )
 endif(CMAKE_BUILD_TYPE EQUAL "Release")
-
-#====================
-# LOCAL INSTALLATIONS
-#====================
-
-#include_directories(${CPPUNIT_INSTALL_DIR}/include)
-
-MESSAGE(STATUS ${BLAS_LIB})
 
 #================
 # LINKER SETTINGS
