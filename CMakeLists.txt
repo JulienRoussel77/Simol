@@ -1,4 +1,21 @@
-cmake_minimum_required (VERSION 2.6)
+########################
+# \file CMakeLists.txt
+# \author Cedric Doucet
+########################
+
+########################################################################
+# Minimum version is 2.8 because it the default version for Ubuntu 12.04
+# However, older versions may be used (not tested)
+########################################################################
+
+cmake_minimum_required (VERSION 2.8)
+
+################################################################
+# The SIMOL_GCC_ROOT has been defined for two main reasons:
+#   1. it prevents users from providing paths for each compiler
+#   2. it aims at solving linking problems with GCC 5 and higher
+# But for the moment, the problem with GCC 5 still remains.
+################################################################
 
 if(SIMOL_GCC_ROOT)
   set(CMAKE_C_COMPILER ${SIMOL_GCC_ROOT}/bin/gcc)
@@ -6,6 +23,12 @@ if(SIMOL_GCC_ROOT)
   set(CMAKE_Fortran_COMPILER ${SIMOL_GCC_ROOT}/bin/gfortran)
   link_directories(${SIMOL_GCC_ROOT}/lib64)
 endif(SIMOL_GCC_ROOT)
+
+################################################
+# Project definition:
+#   1. its name is simol
+#   2. it involves both fortran, c and c++ files
+################################################
 
 project (simol Fortran C CXX)
 
