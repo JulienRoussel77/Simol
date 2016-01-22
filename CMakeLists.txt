@@ -43,10 +43,6 @@ include(ExternalProject)
 include(ProcessorCount)
 include(SimolInstallPackage)
 
-set(SIMOL_C_COMPILER ${CMAKE_C_COMPILER})
-set(SIMOL_CXX_COMPILER ${CMAKE_CXX_COMPILER})
-set(SIMOL_Fortran_COMPILER ${CMAKE_Fortran_COMPILER})
-
 ProcessorCount(N)
 if(NOT N EQUAL 0)
   set(CMAKE_BUILD_FLAGS -j${N})
