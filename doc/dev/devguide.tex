@@ -211,6 +211,63 @@ You may want to use an integrated development environment (IDE) to contribute to
 \subsection{Quantum chemistry}
 
 
+\chapter{Installation}
+
+
+\section{Compilers}
+
+\subsection{GCC 4.9.3}
+
+The GNU Compilation Collection (GCC) is the preferred set of compilers for Simol. If needed, we recommend to install the 4.9.3 version of this collection. There are two reasons for this:
+\begin{itemize}
+\item this version supports C++11 features,
+\item strings are not defined the same starting from version 5 and it causes many compilation problems which we have not solved yet.
+\end{itemize}
+However, any version number between 4.8.1 and 4.9.3 fulfills these conditions. For example, if the number version returned by the command line
+\lstset{language=bash} 
+\begin{lstlisting}
+g++ --version
+\end{lstlisting}
+is at least 4.8.1, you do not need to install any other version of GCC and you can skip this step. Especially, even if the version number is 5.1.0 or higher, it would be possible to compile and link simol files without any problems (not tested). The sequel is only useful if you need to install GCC 4.9.3 manually. 
+
+The installation of GCC 4.9.3 is quite simple. We describe here how it may be installed from sources. Alternative approaches are possible, especially those based on a package manager. However, package managers differ significatively from an operating system to another, as well as cross-plateform tools. That is the reason why we do not plan to give any support for them here. Please refer to the documentation of your favorite tool if you do not want to install GCC from sources, but from a package manager. To install GCC 4.9.3 from sources, please download the source from a mirror site on the official website 
+\begin{center}
+	\url{https://gcc.gnu.org/gcc-4.9}
+\end{center}
+For example, you can download and exract the sources thanks to the following command lines:
+\lstset{language=bash} 
+\begin{lstlisting}
+	wget ftp://ftp.uvsq.fr/pub/gcc/releases/gcc-4.9.3/gcc-4.9.3.tar.gz
+	tar xf gcc-4.9.3.tar.gz
+\end{lstlisting}
+It will create a directory named gcc-4.9.3. Then, change to this directory and download prerequisites:
+\begin{lstlisting}
+	cd gcc-4.9.3
+	./contrib/download_prerequisites
+\end{lstlisting}
+It will take some time to achieve the downloading process. Once it is done, source must be built outside of the source directory. Let $GCC\_ROOT$ be the directory where you want to install GCC 4.9.3. For example, you can define it like this:
+\begin{lstlisting}
+	export GCC_ROOT=/home/yourlogin/gcc/4.9.3
+\end{lstlisting}
+where \textit{youlogin} stands for your own login. The installation process is defined by these steps:
+\begin{lstlisting}
+	cd ..
+	mkdir build-gcc-4.9.3
+	cd gcc-4.9.3
+	../gcc-4.9.3/configure --prefix=$GCC_ROOT --enable-languages=c,c++,fortran
+	make -j 4
+	make install
+\end{lstlisting}
+
+
+
+
+\subsection{Other compilers}
+
+We do not provide any support for other compilers for the moment.
+
+
+
 \chapter{Development environment}
 
 \section{File organization}
@@ -233,6 +290,11 @@ The only difference between \Make and \CMake is the first command, which corresp
 \subsection{How does it work?}
 
 \CMake relies on a hierarchy of configuration files named \CMakeLists. The main configuration file must be located at the top directory of the project.
+
+
+
+
+
 
 
 \section{Version control wit \Git}
