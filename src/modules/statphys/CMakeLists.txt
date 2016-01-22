@@ -6,7 +6,8 @@ add_dependencies(simol-statphys simol-core)
 
 message(STATUS ${CMAKE_BINARY_DIR})
 
-target_link_libraries(simol-statphys ${CMAKE_BINARY_DIR}/src/core/simol-core.so)
+#target_link_libraries(simol-statphys ${CMAKE_BINARY_DIR}/src/core/simol-core.so)
+target_link_libraries(simol-statphys simol-core)
 
 #add_dependencies(molecular_dynamics armadillo)
 #add_dependencies(molecular_dynamics yamlcpp)
