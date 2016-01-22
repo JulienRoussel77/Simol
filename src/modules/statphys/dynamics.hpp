@@ -5,7 +5,7 @@
 #include "particle.hpp"
 #include "input.hpp"
 #include "output.hpp"
-#include "RNG.hpp"
+#include "random/RNG.hpp"
 #include "controlVariate.hpp"
 # include <iostream>
 

@@ -2,7 +2,7 @@
 #define SIMOL_POTENTIAL_HPP
 
 #include "tools.hpp"
-#include "Vector.hpp"	
+#include "linalg/Vector.hpp"	
 #include "input.hpp"
 
 

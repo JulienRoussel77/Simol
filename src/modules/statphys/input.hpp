@@ -3,7 +3,7 @@
 
 #include<yaml-cpp/yaml.h>
 #include <getopt.h>
-#include "Vector.hpp"
+#include "linalg/Vector.hpp"
 
 #include "io/CommandLine.hpp"
 

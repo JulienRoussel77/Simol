@@ -1,3 +1,8 @@
+include_directories(linalg)
+include_directories(io)
+include_directories(statphys)
+include_directories(random)
+
 file(GLOB_RECURSE random "random/*.cpp")
 file(GLOB_RECURSE io "io/*.cpp")
 file(GLOB_RECURSE linalg "linalg/*.cpp")

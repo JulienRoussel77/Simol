@@ -8,7 +8,7 @@
 #include "potential.hpp"
 //#include "ode/verlet.hpp"
 #include "linalg/Vector.hpp"
-#include "RNG.hpp"
+#include "random/RNG.hpp"
 
 
 
