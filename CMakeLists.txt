@@ -114,11 +114,5 @@ endif(CMAKE_BUILD_TYPE EQUAL "Release")
 # LINKER SETTINGS
 #================
 
-include_directories(src/core)
-include_directories(src/core/linalg)
-include_directories(src/core/io)
-include_directories(src/core/statphys)
-include_directories(src/core/random)
-include_directories(src)
 
 add_subdirectory(src)
