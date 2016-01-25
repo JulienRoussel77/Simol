@@ -1,4 +1,3 @@
-include_directories(statphys)
 include_directories(.)
 
 
