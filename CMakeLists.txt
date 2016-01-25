@@ -122,6 +122,7 @@ endif(CMAKE_BUILD_TYPE EQUAL "Release")
 # LINKER SETTINGS
 #================
 
+include_directories(src)
 
 add_subdirectory(src)
 add_subdirectory(test)

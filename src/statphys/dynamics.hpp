@@ -5,16 +5,16 @@
 #include "particle.hpp"
 #include "input.hpp"
 #include "output.hpp"
-#include "random/RNG.hpp"
+#include "core/random/RNG.hpp"
 #include "controlVariate.hpp"
 # include <iostream>
 
 namespace simol
 {
   class Dynamics;
-  
+
   Dynamics* createDynamics(Input  const& input, size_t indexOfReplica=1);
-    
+
   class Dynamics
   {
     friend Dynamics* createDynamics(Input  const& input, size_t indexOfReplica);
@@ -43,7 +43,7 @@ namespace simol
       virtual double deltaTemperature() const {assert(false);}
       virtual double const& tauBending() const {assert(false);}
       //friend Dynamics* createDynamics(Potential const& potential);
-      
+
       virtual void initializeMomenta(vector<Particle>& configuration);
 			virtual dvec drawMomentum(double /*localBeta*/, double /*mass*/){assert(false);return 0;};
       virtual void setRNG(RNG* /*rng*/){};
@@ -66,7 +66,7 @@ namespace simol
       //double timeStep;
       dvec externalForce_;
   };
-  
+
   class Hamiltonian : public Dynamics
   {
   public:
@@ -74,7 +74,7 @@ namespace simol
     virtual MatrixXd generatorOn(ControlVariate const* controlVariate, vector<Particle> const& configuration) const;
 
   };
-  
+
   class StochasticDynamics : public Dynamics
   {
   public:
@@ -84,7 +84,7 @@ namespace simol
   protected:
     RNG* rng_;
   };
-  
+
   class UniformStochasticDynamics : public StochasticDynamics
   {
   protected:
@@ -98,7 +98,7 @@ namespace simol
     virtual double const& temperatureLeft() const;
     virtual double const& temperatureRight() const;
   };
-  
+
   class Langevin : public UniformStochasticDynamics
   {
   public:
@@ -110,7 +110,7 @@ namespace simol
   protected:
     double gamma_;
   };
-  
+
   class Overdamped : public UniformStochasticDynamics
   {
   public:
@@ -120,7 +120,7 @@ namespace simol
     virtual MatrixXd generatorOn(ControlVariate const* controlVariate, vector<Particle> const& configuration) const;
     //virtual std::function<double (ControlVariate const*, dvec const&, dvec const&)> generator() const;
   };
-  
+
   class BoundaryStochasticDynamics : public StochasticDynamics
   {
   public:
@@ -131,20 +131,20 @@ namespace simol
     virtual double const& temperatureLeft() const;
     virtual double const& temperatureRight() const;
     double deltaTemperature() const;
-    
+
     //virtual void updateAfter(Particle& particle);
     virtual void updateAfterLeft(Particle& particle) = 0;
     virtual void updateAfterRight(Particle& particle) = 0;
-    
+
     void initializeMomenta(vector<Particle>& configuration);
   protected:
-    double betaLeft_; 
-    double betaRight_; 
+    double betaLeft_;
+    double betaRight_;
     double temperatureLeft_;
     double temperatureRight_;
-  };  
-  
-  
+  };
+
+
   class BoundaryLangevin : public BoundaryStochasticDynamics
   {
   public:
@@ -152,9 +152,9 @@ namespace simol
     double const& gamma() const;
     double sigmaLeft() const;
     double sigmaRight() const;
-    
+
     double const& tauBending() const;
-    
+
     //virtual void updateAfter(Particle& particle);
     virtual void updateAfterLeft(Particle& particle);
     virtual void updateAfterRight(Particle& particle);

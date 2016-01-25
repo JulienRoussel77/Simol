@@ -2,20 +2,20 @@
 #define SIMOL_POTENTIAL_HPP
 
 #include "tools.hpp"
-#include "linalg/Vector.hpp"	
+#include "core/linalg/Vector.hpp"
 #include "input.hpp"
 
 
 namespace simol
 {
   class Potential;
-  
+
   Potential* createPotential(Input const& input, int const& indexOfReplica=1);
 
   class Potential
   {
     friend Potential* createPotential(Input const& input, int const& indexOfReplica);
-    
+
     public:
       Potential();
       virtual ~Potential(){};
@@ -25,7 +25,7 @@ namespace simol
       virtual double laplacian(dvec const & /*position*/) const {std::cout << "Laplacian not implemented !" << std::endl; exit(1);};
       virtual dvec force(dvec const & position) const;
   };
-  
+
   class Sinusoidal : public Potential{
     public:
       Sinusoidal(Input const& input, int const& indexOfReplica=1);
@@ -37,7 +37,7 @@ namespace simol
       double amplitude_;
       double pulsation_;
   };
-  
+
     class SumSinusoidal : public Potential{
     public:
       SumSinusoidal(Input const& input, int const& indexOfReplica=1);
@@ -50,7 +50,7 @@ namespace simol
       double amplitude_;
       double pulsation_;
   };
-  
+
   class FracSinusoidal : public Potential{
     public:
       FracSinusoidal(Input const& input, int const& indexOfReplica=1);
@@ -63,7 +63,7 @@ namespace simol
       double amplitude_;
       double pulsation_;
   };
-  
+
   class DoubleWell : public Potential{
     public:
       DoubleWell(Input const& input, int const& indexOfReplica=1);
@@ -74,7 +74,7 @@ namespace simol
       double height_;
       double interWell_;
   };
-  
+
     class HarmonicWell : public Potential{
     public:
       HarmonicWell(Input const& input, int const& indexOfReplica=1);
@@ -85,9 +85,9 @@ namespace simol
       double stiffness_;
   };
 
-  
-  
-  
+
+
+
   class Harmonic : public Potential{
     public:
       Harmonic(Input const& input, int const& indexOfReplica=1);
@@ -97,7 +97,7 @@ namespace simol
     private:
       double stiffness_;
   };
-  
+
   class Rotor : public Potential{
     public:
       Rotor(Input const& input, int const& indexOfReplica=1);
@@ -109,7 +109,7 @@ namespace simol
       double stiffness_;
   };
 
-  
+
     class Quadratic : public Potential{
     public:
       Quadratic(Input const& input, int const& indexOfReplica=1);

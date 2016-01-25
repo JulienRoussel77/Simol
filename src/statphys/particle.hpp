@@ -7,8 +7,8 @@
 
 #include "potential.hpp"
 //#include "ode/verlet.hpp"
-#include "linalg/Vector.hpp"
-#include "random/RNG.hpp"
+#include "core/linalg/Vector.hpp"
+#include "core/random/RNG.hpp"
 
 
 
@@ -19,7 +19,7 @@
 namespace simol
 {
   class Particle;
-  
+
     void verlet_scheme(Particle & particle, double timeStep);
     void exact_OU_scheme(Particle & particle, double const gamma, double const beta, double const timeStep, dvec const& randVec);
     void maruyama_scheme(Particle & particle, double const beta_, double const& timeStep, dvec const& randVec);
@@ -72,18 +72,18 @@ namespace simol
       double const& momentum(int i) const;
       double& momentum(int i);
       double const& kineticEnergy() const;
-      double& kineticEnergy();      
+      double& kineticEnergy();
       double const& potentialEnergy() const;
-      double& potentialEnergy();      
+      double& potentialEnergy();
       double energy() const;
       dvec const& force() const;
-      dvec& force(); 
+      dvec& force();
       double const& force(size_t i) const;
-      double& force(size_t i); 
+      double& force(size_t i);
       dvec const& energyGrad() const;
-      dvec& energyGrad();  
+      dvec& energyGrad();
       double const& energyGrad(int i) const;
-      double& energyGrad(int i);  
+      double& energyGrad(int i);
       dvec velocity() const;
 
     //=============
@@ -101,8 +101,8 @@ namespace simol
       dvec energyGrad_;
   };
 
-  
-  
+
+
 }
 
 
