@@ -32,17 +32,25 @@ endif(SIMOL_GCC_ROOT)
 
 project (simol Fortran C CXX)
 
-#==============
-# INCLUDE FILES
-#==============
+#==================================
+# Path to CMake modules
+#  - recipes for external libraries
+#  - simol functions
+#==================================
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
 
 include(CheckCXXCompilerFlag)
 include(ExternalProject)
-include(ProcessorCount)
 include(SimolInstallPackage)
 
+
+#===========================
+# Automatic setting of make
+# to perform parallel builds
+#===========================
+
+include(ProcessorCount)
 ProcessorCount(N)
 if(NOT N EQUAL 0)
   set(CMAKE_BUILD_FLAGS -j${N})
@@ -55,7 +63,7 @@ endif()
 option(ENABLE_DOWNLOAD "Enables downloading of missing external libraries" True)
 option(INSTALL_GCC "Automatic installation of GCC" False)
 
-if(NOT EXISTS EXTERNAL_DIR)
+if(NOT EXTERNAL_DIR)
   set(EXTERNAL_DIR ${CMAKE_CURRENT_BINARY_DIR}/third-party)
 endif()
 
