@@ -124,3 +124,4 @@ endif(CMAKE_BUILD_TYPE EQUAL "Release")
 
 
 add_subdirectory(src)
+add_subdirectory(test)
