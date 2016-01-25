@@ -3,7 +3,7 @@
 include_directories(core)
 
 add_subdirectory(core)
+add_subdirectory(quantchem)
 add_subdirectory(statphys)
-add_subdirectory(modules)
 
 
