@@ -16,5 +16,5 @@ enable_testing()
 
 #set_tests_properties(test_simol PROPERTIES PASS_REGULAR_EXPRESSION "OK")
 
-add_subdirectory(functional)
-
+#add_subdirectory(functional)
+ADD_SUBDIRECTORY(unit)
