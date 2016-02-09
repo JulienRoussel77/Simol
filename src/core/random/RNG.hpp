@@ -2,7 +2,7 @@
 #define SIMOL_GAUSSIAN_HPP
 
 #include <random>
-#include "linalg/Vector.hpp"
+#include "core/linalg/Vector.hpp"
 
 
 namespace simol

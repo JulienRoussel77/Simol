@@ -2,7 +2,8 @@
 SIMOL_INSTALL_PACKAGE(GTest)
 
 FIND_PACKAGE(Threads)
-ADD_EXECUTABLE(simol_test_unit core/linalg/VectorTest.cpp)
+ADD_EXECUTABLE(simol_test_unit ${CMAKE_SOURCE_DIR}/test/unit/core/linalg/VectorTest.cpp 
+                               ${CMAKE_SOURCE_DIR}/test/unit/core/linalg/DenseMatrixTest.cpp)
 
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/src/core/linalg)
 INCLUDE_DIRECTORIES(${EXTERNAL_DIR}/gtest/install/include)
