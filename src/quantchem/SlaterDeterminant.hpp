@@ -8,18 +8,23 @@ namespace simol
     class SlaterDeterminant
     {
         public:
-            SlaterDeterminant(DenseMatrix<double> const & matrix)
-            : matrix_(matrix)
-            {}
-            DenseMatrix<double> const & matrix() const
-            { return matrix_; }
+            SlaterDeterminant(DenseMatrix<double> const & matrix);
+            DenseMatrix<double> const & matrix() const;
         private:
             DenseMatrix<double>  matrix_;
     };
-    
+
+    SlaterDeterminant::SlaterDeterminant(DenseMatrix<double> const & matrix)
+    : matrix_(matrix)
+    {}
+
+    DenseMatrix<double> const &
+    SlaterDeterminant::matrix() const
+    { return matrix_; }
+
     DenseMatrix<double>
-    Smat(SlaterDeterminant const & Phi, 
-         SlaterDeterminant const & Psi, 
+    Smat(SlaterDeterminant const & Phi,
+         SlaterDeterminant const & Psi,
          DenseMatrix<double> const & overlap) // mal nommé : utilisé avec H
     {
         DenseMatrix<double> U = Phi.matrix();
@@ -32,11 +37,11 @@ namespace simol
         return DenseMatrix<double>(U.wrapped_.adjoint() * temp.wrapped_);
     }
 
-    
- 
+
+
 
 }
 
 
-#endif	
+#endif
 
