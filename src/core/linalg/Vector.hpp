@@ -40,6 +40,7 @@ namespace simol
       ScalarType min() const;
       size_t min_index() const;
       Vector<ScalarType, eigen> sort() const;
+      std::vector<size_t> smallest_indices(size_t const number_of_indices);
 
       ScalarType max() const
       { return wrapped_.maxCoeff(); }
@@ -149,6 +150,27 @@ namespace simol
       wrapped_.minCoeff(&index);
       return index;
   }
+
+  template<class ScalarType>
+  inline
+  std::vector<size_t>
+  Vector<ScalarType, eigen>::smallest_indices(size_t const number_of_indices)
+  {
+    std::vector<size_t> indices(size());
+    for(size_t index=0; index<size(); ++index)
+        indices[index] = index;
+
+    std::sort(indices.begin(),
+              indices.end(),
+              [&](size_t const & left_index,
+                  size_t const & right_index)
+              { return (wrapped_[left_index] < wrapped_[right_index]); }
+             );
+
+    return std::vector<size_t>(indices.begin(), indices.begin() + number_of_indices);
+
+  }
+
 
   template<class ScalarType>
   inline

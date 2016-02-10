@@ -44,7 +44,31 @@ namespace simol
 
       // penser à utiliser google mock a la place
       for(size_t index=0; index<size; ++index)
-          EXPECT_EQ( actual(index), expected(index));
+          EXPECT_EQ( expected(index), actual(index) );
+
+  }
+
+  TEST(VectorTest, smallest_indices_are_correct)
+  {
+      size_t size = 5;
+      size_t number_of_indices = 3;
+      Vector<double> vec(size);
+      vec(0) = 4;
+      vec(1) = 1;
+      vec(2) = 2;
+      vec(3) = 0;
+      vec(4) = 3;
+
+      std::vector<size_t> actual = vec.smallest_indices(number_of_indices);
+
+      std::vector<size_t> expected(number_of_indices);
+      expected[0] = 3;
+      expected[1] = 1;
+      expected[2] = 2;
+
+      // penser à utiliser google mock a la place
+      for(size_t index=0; index<number_of_indices; ++index)
+          EXPECT_EQ( expected[index], actual[index] );
 
   }
 
