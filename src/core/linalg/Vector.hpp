@@ -9,10 +9,9 @@ namespace simol
 {
   template<class ScalarType=double, template<class> class WrappedLibrary=eigen>
   class Vector;
-  
+
   typedef Vector<double> dvec;
-  
-  //double dot(Vector<double,eigen> const& u, Vector<double,eigen> const& v);
+
 }
 
 namespace simol
@@ -21,7 +20,7 @@ namespace simol
   template<class ScalarType>
   class Vector<ScalarType,stl> : public stl<ScalarType>
   {};
-  
+
 
   template<class ScalarType>
   class Vector<ScalarType,eigen>
@@ -42,13 +41,13 @@ namespace simol
       ScalarType dot(Vector<ScalarType,eigen> const& v) const;
       ScalarType min() const
       { return wrapped_.minCoeff(); }
-      
+
       ScalarType max() const
       { return wrapped_.maxCoeff(); }
       Vector<ScalarType,eigen>& operator+=(Vector<ScalarType,eigen> const& v);
       Vector<ScalarType,eigen>& operator-=(Vector<ScalarType,eigen> const& v);
       Vector<ScalarType,eigen>& operator*=(ScalarType const& lambda);
-      Vector<ScalarType,eigen>& operator/=(ScalarType const& lambda);     
+      Vector<ScalarType,eigen>& operator/=(ScalarType const& lambda);
       Vector<ScalarType,eigen> operator*(ScalarType const& lambda) const;
       Vector<ScalarType,eigen> operator/(ScalarType const& lambda) const;
       Vector<ScalarType,eigen> operator-() const;
@@ -58,7 +57,7 @@ namespace simol
 
     public:
       typename eigen<ScalarType>::VectorType wrapped_;
-      
+
   };
 
   /*template<class ScalarType, template<class> class WrappedLibrary>
@@ -66,13 +65,157 @@ namespace simol
   {
     for (size_t index = 0; index < vectorToRead.size(); ++index)
       fileToWrite << vectorToRead(index) << " ";
-  
+
     return fileToWrite;
   }*/
 
   Vector<double,eigen> operator*(double const& lambda, Vector<double,eigen> const& v);
   double dot(Vector<double,eigen> const& u, Vector<double,eigen> const& v);
-  
+
+  //=============
+  // CONSTRUCTORS
+  //=============
+
+  template<class ScalarType> inline
+  Vector<ScalarType,eigen>::Vector(size_t const size)
+  :wrapped_(size)
+  {}
+
+  template<class ScalarType> inline
+  Vector<ScalarType,eigen>::Vector(size_t const size, ScalarType const& lambda):wrapped_(size)
+  {
+   for (size_t i = 0; i<size; i++)
+     wrapped_(i) = lambda;
+  }
+
+  template<class ScalarType> inline
+  Vector<ScalarType,eigen>::Vector(Vector<ScalarType,eigen> const& u)
+  :wrapped_(u.wrapped_)
+  {}
+
+  //=====================
+  // ACCESSORS / MUTATORS
+  //=====================
+
+  template<class ScalarType>
+  inline
+  size_t
+  Vector<ScalarType,eigen>::size() const
+  { return wrapped_.size(); }
+
+  template<class ScalarType>
+  inline
+  ScalarType &
+  Vector<ScalarType,eigen>::operator()(size_t const index)
+  { return wrapped_(index); }
+
+  template<class ScalarType>
+  inline
+  ScalarType const &
+  Vector<ScalarType,eigen>::operator()(size_t const index) const
+  { return wrapped_(index); }
+
+  //======================
+  // Utils
+  //======================
+
+  template<class ScalarType>
+  inline
+  ScalarType
+  Vector<ScalarType,eigen>::norm() const
+  { return wrapped_.norm(); }
+
+  template<class ScalarType>
+  inline
+  Vector<ScalarType,eigen> &
+  Vector<ScalarType,eigen>::fill(ScalarType const& lambda)
+  {
+    wrapped_.fill(lambda);
+    return *this;
+  }
+
+  template<class ScalarType> inline
+  ScalarType Vector<ScalarType,eigen>::dot(Vector<ScalarType,eigen> const& v) const
+  {
+   return wrapped_.dot(v.wrapped_);
+  }
+
+  /*double dot(Vector<double,eigen> const& u, Vector<double,eigen> const& v)
+  {
+    return u.dot(v);
+  }*/
+
+  //======================
+  // Operators
+  //======================
+
+
+  template<class ScalarType> inline
+  Vector<ScalarType,eigen>& Vector<ScalarType,eigen>::operator+=(Vector<ScalarType,eigen> const& u)
+  {
+    wrapped_ += u.wrapped_;
+    return *this;
+  }
+
+  template<class ScalarType> inline
+  Vector<ScalarType,eigen>& Vector<ScalarType,eigen>::operator-=(Vector<ScalarType,eigen> const& u)
+  {
+    wrapped_ -= u.wrapped_;
+    return *this;
+  }
+
+  template<class ScalarType> inline
+  Vector<ScalarType,eigen>& Vector<ScalarType,eigen>::operator*=(ScalarType const& lambda)
+  {
+    wrapped_ *= lambda;
+    return *this;
+  }
+
+  template<class ScalarType> inline
+  Vector<ScalarType,eigen>& Vector<ScalarType,eigen>::operator/=(ScalarType const& lambda)
+  {
+    wrapped_ /= lambda;
+    return *this;
+  }
+
+  template<class ScalarType> inline
+  Vector<ScalarType,eigen> Vector<ScalarType,eigen>::operator*(ScalarType const& lambda) const
+  {
+    Vector<ScalarType> u(*this);
+    u.wrapped_ *= lambda;
+    return u;
+  }
+
+  template<class ScalarType> inline
+  Vector<ScalarType,eigen> Vector<ScalarType,eigen>::operator/(ScalarType const& lambda) const
+  {
+    Vector<ScalarType> u(*this);
+    u.wrapped_ /= lambda;
+    return u;
+  }
+
+  template<class ScalarType> inline
+  Vector<ScalarType,eigen> Vector<ScalarType,eigen>::operator-() const
+  {
+    Vector<ScalarType> u(*this);
+    u.wrapped_ *= -1;
+    return u;
+  }
+
+  template<class ScalarType> inline
+  Vector<ScalarType,eigen> Vector<ScalarType,eigen>::operator+(Vector<ScalarType,eigen> const& u) const
+  {
+    //return wrapped_ + v.wrapped_;
+    //return *this;
+    return Vector<ScalarType,eigen>(*this) += u;
+  }
+
+  template<class ScalarType> inline
+  Vector<ScalarType,eigen> Vector<ScalarType,eigen>::operator-(Vector<ScalarType,eigen> const& u) const
+  {
+    //return wrapped_ - v.wrapped_;
+    return Vector<ScalarType,eigen>(*this) -= u;
+  }
 
 }
 
@@ -84,6 +227,5 @@ std::ostream & operator<<(std::ostream & fileToWrite, simol::Vector<ScalarType,W
   return fileToWrite;
 }
 
-#include "Vector.ipp"
 
 #endif
