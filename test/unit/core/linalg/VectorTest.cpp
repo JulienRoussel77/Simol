@@ -26,5 +26,27 @@ namespace simol
 
   }
 
+  TEST(VectorTest, sort_is_correct)
+  {
+      size_t size = 5;
+      Vector<double> vec(size);
+      vec(0) = 4;
+      vec(1) = 1;
+      vec(2) = 2;
+      vec(3) = 0;
+      vec(4) = 3;
+
+      Vector<double> actual = vec.sort();
+
+      Vector<double> expected(size);
+      for(size_t index=0; index<size; ++index)
+          expected(index) = index;
+
+      // penser à utiliser google mock a la place
+      for(size_t index=0; index<size; ++index)
+          EXPECT_EQ( actual(index), expected(index));
+
+  }
+
 }
 

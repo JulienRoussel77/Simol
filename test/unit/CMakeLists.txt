@@ -13,3 +13,8 @@ TARGET_LINK_LIBRARIES(simol_test_unit ${EXTERNAL_DIR}/gtest/install/lib/libgtest
 TARGET_LINK_LIBRARIES(simol_test_unit ${EXTERNAL_DIR}/gtest/install/lib/libgtest.a)
 TARGET_LINK_LIBRARIES(simol_test_unit ${CMAKE_THREAD_LIBS_INIT})
 
+ENABLE_TESTING()
+
+ADD_TEST(test_simol simol_test_unit " ")
+
+add_custom_target(unit COMMAND simol_test_unit)

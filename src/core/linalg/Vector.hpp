@@ -39,6 +39,7 @@ namespace simol
       ScalarType dot(Vector<ScalarType,eigen> const& v) const;
       ScalarType min() const;
       size_t min_index() const;
+      Vector<ScalarType, eigen> sort() const;
 
       ScalarType max() const
       { return wrapped_.maxCoeff(); }
@@ -128,6 +129,16 @@ namespace simol
   ScalarType
   Vector<ScalarType, eigen>::min() const
   { return wrapped_.minCoeff(); }
+
+  template<class ScalarType>
+  inline
+  Vector<ScalarType, eigen>
+  Vector<ScalarType, eigen>::sort() const
+  {
+      Vector<ScalarType, eigen> to_be_sorted = *this;
+      std::sort( to_be_sorted.wrapped_.data(), to_be_sorted.wrapped_.data() + size() );
+      return to_be_sorted;
+  }
 
   template<class ScalarType>
   inline
