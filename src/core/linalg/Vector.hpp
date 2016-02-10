@@ -30,17 +30,15 @@ namespace simol
       Vector(size_t const size=0);
       Vector(size_t const size, ScalarType const& lambda);
       Vector(Vector<ScalarType,eigen> const& u);
-      Vector(typename eigen<ScalarType>::VectorType const & wrappedVector)
-      :wrapped_(wrappedVector)
-      {}
+      Vector(typename eigen<ScalarType>::VectorType const & wrappedVector);
       size_t size() const;
       ScalarType & operator()(size_t const index);
       ScalarType const & operator()(size_t const index) const;
       ScalarType norm() const;
       Vector<ScalarType,eigen>& fill(ScalarType const& lambda);
       ScalarType dot(Vector<ScalarType,eigen> const& v) const;
-      ScalarType min() const
-      { return wrapped_.minCoeff(); }
+      ScalarType min() const;
+      size_t min_index() const;
 
       ScalarType max() const
       { return wrapped_.maxCoeff(); }
@@ -75,6 +73,12 @@ namespace simol
   //=============
   // CONSTRUCTORS
   //=============
+
+  template<class ScalarType>
+  inline
+  Vector<ScalarType, eigen>::Vector(typename eigen<ScalarType>::VectorType const & wrappedVector)
+  :wrapped_(wrappedVector)
+  {}
 
   template<class ScalarType> inline
   Vector<ScalarType,eigen>::Vector(size_t const size)
@@ -118,6 +122,22 @@ namespace simol
   //======================
   // Utils
   //======================
+
+  template<class ScalarType>
+  inline
+  ScalarType
+  Vector<ScalarType, eigen>::min() const
+  { return wrapped_.minCoeff(); }
+
+  template<class ScalarType>
+  inline
+  size_t
+  Vector<ScalarType, eigen>::min_index() const
+  {
+      size_t index;
+      wrapped_.minCoeff(&index);
+      return index;
+  }
 
   template<class ScalarType>
   inline

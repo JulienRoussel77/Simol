@@ -9,8 +9,8 @@
 
 namespace simol
 {
-    
-    size_t getIndMin(Vector<double> const & W)
+
+ /*   size_t getIndMin(Vector<double> const & W)
     {
         size_t ind = 0;
         double minw = W(0);
@@ -27,8 +27,8 @@ namespace simol
         }
         return ind;
     }
-
-    std::vector<size_t> 
+*/
+    std::vector<size_t>
     getIndMin(Vector<double> const & W0, size_t const N)
     {
         std::vector<size_t> vec(N);
@@ -58,13 +58,13 @@ namespace simol
         }
         return vec;
     }
-    
-    
-  
-    
+
+
+
+
        DenseMatrix<double>
     FockMat(std::size_t const M_disc,
-            DenseMatrix<double> const & Phi, 
+            DenseMatrix<double> const & Phi,
             DenseMatrix<double> const & E)
     {
 
@@ -90,14 +90,14 @@ namespace simol
         return G0;
 
     }
-    
-       
-    double 
+
+
+    double
     elint(std::size_t const M_disc,
-          Vector<double> const & psi1, 
-          Vector<double> const & psi2, 
+          Vector<double> const & psi1,
+          Vector<double> const & psi2,
           Vector<double> const & psi3,
-          Vector<double> const & psi4, 
+          Vector<double> const & psi4,
           DenseMatrix<double> const & E)
     {
 
@@ -119,12 +119,12 @@ namespace simol
         temp.wrapped_ = E.wrapped_.selfadjointView<Eigen::Upper>() * U12v.wrapped_;
         return U34v.wrapped_.adjoint() * temp.wrapped_;
     }
-    
-    
+
+
     double
-    H1_slat(SlaterDeterminant const & Phi, 
-            SlaterDeterminant const & Psi, 
-            DenseMatrix<double> const & O, 
+    H1_slat(SlaterDeterminant const & Phi,
+            SlaterDeterminant const & Psi,
+            DenseMatrix<double> const & O,
             DenseMatrix<double> const & H,
             size_t const M_disc_,
             size_t const numberOfElectrons,
@@ -159,12 +159,12 @@ namespace simol
             int mult = 0;
             for (size_t i= 0; i< D.size(); i++)
             {
-                if (D(i) < ratio_) 
+                if (D(i) < ratio_)
                     mult = mult+1;
             }
 
             //si la multiplicité de 0 est plus grande que 1, la valeur est 0
-            if (mult >1.5) 
+            if (mult >1.5)
                 return 0;
             //Sinon, on utilise une formule patriculière
             else
@@ -295,9 +295,9 @@ namespace simol
 
         }
     }
-    
-    double H2_slat_N2(const SlaterDeterminant& Phi, 
-                      const SlaterDeterminant& Psi, 
+
+    double H2_slat_N2(const SlaterDeterminant& Phi,
+                      const SlaterDeterminant& Psi,
                       const DenseMatrix<double>& E,
                       size_t const numberOfElectrons,
                       size_t const M_disc)
@@ -308,33 +308,33 @@ namespace simol
         DenseMatrix<double> V = Psi.matrix();
 
         // On calcule directement
-        
+
         Vector<double> Vcol0(V.numberOfRows());
         Vector<double> Vcol1(V.numberOfRows());
         Vector<double> Ucol0(V.numberOfRows());
         Vector<double> Ucol1(V.numberOfRows());
-        
+
         Ucol0.wrapped_ = U.wrapped_.col(0);
         Ucol1.wrapped_ = U.wrapped_.col(1);
         Vcol0.wrapped_ = V.wrapped_.col(0);
         Vcol1.wrapped_ = V.wrapped_.col(1);
 
-        return 0.5 * ( elint(M_disc, Ucol0, Vcol0, Ucol1, Vcol1, E) 
+        return 0.5 * ( elint(M_disc, Ucol0, Vcol0, Ucol1, Vcol1, E)
                      - elint(M_disc, Ucol1, Vcol0, Ucol0, Vcol1, E)
-                     - elint(M_disc, Ucol0, Vcol1, Ucol1, Vcol0, E) 
+                     - elint(M_disc, Ucol0, Vcol1, Ucol1, Vcol0, E)
                      + elint(M_disc, Ucol1, Vcol1, Ucol0, Vcol0, E) );
 
     }
-   
-    double H2_slat(const SlaterDeterminant& Phi, 
-                   const SlaterDeterminant& Psi, 
-                   const DenseMatrix<double>& O, 
+
+    double H2_slat(const SlaterDeterminant& Phi,
+                   const SlaterDeterminant& Psi,
+                   const DenseMatrix<double>& O,
                    const DenseMatrix<double>& E,
                    size_t const numberOfElectrons,
                    size_t const M_disc_,
                    double ratio_ = 1e-12)
     {
-        if (numberOfElectrons==2) 
+        if (numberOfElectrons==2)
             return H2_slat_N2(Phi,Psi,E,numberOfElectrons,M_disc_ );
 
         else
@@ -406,7 +406,7 @@ namespace simol
                 int mult = 0;
                 for (size_t i= 0; i< numberOfElectrons; i++)
                 {
-                    if (D(i) < ratio_) 
+                    if (D(i) < ratio_)
                         ++mult;
                 }
 
@@ -414,7 +414,7 @@ namespace simol
                 //cout << "mult = " << mult << endl;
 
                 //si la multiplicité de 0 est plus grande que 2, la valeur est 0
-                if (mult >2.5) 
+                if (mult >2.5)
                     return 0;
 
                 else
@@ -516,7 +516,7 @@ namespace simol
                         //On construit la somme
                         double sum2 = 0;
                         for (size_t l=0; l< numberOfElectrons-1; l++)
-                            sum2 += elint(M_disc_,coeffs_bas.column(l),coeffs_bas.column(l),orthU,orthV,E) 
+                            sum2 += elint(M_disc_,coeffs_bas.column(l),coeffs_bas.column(l),orthU,orthV,E)
                                   - elint(M_disc_,coeffs_bas.column(l),orthV,coeffs_bas.column(l),orthU,E);
 
 
@@ -596,13 +596,13 @@ namespace simol
                         DenseMatrix<double> PsiV(M_disc_,numberOfElectrons);
                         PsiV.wrapped_ = eigen<double>::DenseMatrixType::Zero(M_disc_,numberOfElectrons);
 
-                        Vector<double> muU1(numberOfElectrons); 
+                        Vector<double> muU1(numberOfElectrons);
                         muU1.wrapped_ = eigen<double>::VectorType::Zero(numberOfElectrons);
-                        Vector<double> muV1(numberOfElectrons); 
+                        Vector<double> muV1(numberOfElectrons);
                         muV1.wrapped_ = eigen<double>::VectorType::Zero(numberOfElectrons);
-                        Vector<double> muU2(numberOfElectrons); 
+                        Vector<double> muU2(numberOfElectrons);
                         muU2.wrapped_ = eigen<double>::VectorType::Zero(numberOfElectrons);
-                        Vector<double> muV2(numberOfElectrons); 
+                        Vector<double> muV2(numberOfElectrons);
                         muV2.wrapped_ = eigen<double>::VectorType::Zero(numberOfElectrons);
 
                         for (size_t k=0; k< numberOfElectrons; k++)
@@ -660,9 +660,9 @@ namespace simol
                         }
 
 
-                        DenseMatrix<double> CU(numberOfElectrons-2,numberOfElectrons); 
+                        DenseMatrix<double> CU(numberOfElectrons-2,numberOfElectrons);
                         CU.wrapped_ = eigen<double>::DenseMatrixType::Zero(numberOfElectrons-2,numberOfElectrons);
-                        DenseMatrix<double> CV(numberOfElectrons-2,numberOfElectrons); 
+                        DenseMatrix<double> CV(numberOfElectrons-2,numberOfElectrons);
                         CV.wrapped_ = eigen<double>::DenseMatrixType::Zero(numberOfElectrons-2,numberOfElectrons);
 
                         for (size_t k=0; k< numberOfElectrons; k++)
@@ -705,8 +705,8 @@ namespace simol
                                         aV.wrapped_.block(0,jv-1,numberOfElectrons-2,numberOfElectrons-jv-1) = CV.wrapped_.block(0,jv+1,numberOfElectrons-2,numberOfElectrons-jv-1);
 
 
-                                        sum += pow(-1,iu) * pow(-1,ju+1) *pow(-1,iv) *pow(-1,jv+1) 
-                                             * ((muU1(iu)*muU2(ju) -muU1(ju)*muU2(iu)) * (muV1(iv)*muV2(jv) -muV1(jv)*muV2(iv))) 
+                                        sum += pow(-1,iu) * pow(-1,ju+1) *pow(-1,iv) *pow(-1,jv+1)
+                                             * ((muU1(iu)*muU2(ju) -muU1(ju)*muU2(iu)) * (muV1(iv)*muV2(jv) -muV1(jv)*muV2(iv)))
                                              * sum2*(aU.wrapped_.determinant())*(aV.wrapped_.determinant());
 
                                     }
@@ -723,15 +723,15 @@ namespace simol
 
     }
 
-    
-    double 
+
+    double
     over_slat(SlaterDeterminant const & Phi, SlaterDeterminant const & Psi, DenseMatrix<double> const & O)
     {
         DenseMatrix<double> S = Smat(Phi, Psi, O);
         return S.wrapped_.determinant();
     }
-    
-     
+
+
 
 
     SlaterDeterminant
@@ -749,7 +749,7 @@ namespace simol
         DenseMatrix<double> Phi0 = initial_solution.matrix();
         DenseMatrix<double> F0(K.numberOfRows(), K.numberOfColumns());
         F0.wrapped_ = K.wrapped_ + Nu.wrapped_;
-        
+
         //Roothan parce que c'est le plus simple: ToDo coder ODA
         for( std::size_t iteration = 0; iteration < numberOfIterations; ++iteration )
         {
@@ -778,7 +778,7 @@ namespace simol
             {
                 lambda += D(Itab[i]);
                 for (std::size_t j = 0; j< numberOfElectrons; ++j)
-                    lambda += 0.5 * ( elint(M_disc, Phi0.column(i), Phi0.column(i), Phi0.column(j), Phi0.column(j), E) 
+                    lambda += 0.5 * ( elint(M_disc, Phi0.column(i), Phi0.column(i), Phi0.column(j), Phi0.column(j), E)
                                     - elint(M_disc, Phi0.column(i), Phi0.column(j), Phi0.column(j), Phi0.column(i), E) );
             }
 
@@ -799,5 +799,5 @@ namespace simol
 }
 
 
-#endif	
+#endif
 
