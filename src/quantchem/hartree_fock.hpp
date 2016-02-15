@@ -10,57 +10,6 @@
 namespace simol
 {
 
- /*   size_t getIndMin(Vector<double> const & W)
-    {
-        size_t ind = 0;
-        double minw = W(0);
-
-        size_t w = W.size();
-
-        for (size_t i = 1; i< w; i++)
-        {
-            if (W(i)<minw)
-            {
-                ind = i;
-                minw = W(i);
-            }
-        }
-        return ind;
-    }
-*/
-    std::vector<size_t>
-    getIndMin(Vector<double> const & W0, size_t const N)
-    {
-        std::vector<size_t> vec(N);
-
-        Vector<double> W = W0;
-        size_t num = 0;
-        while (num < N)
-        {
-            size_t ind = 0;
-            double minw = W(0);
-
-            size_t w = W.size();
-
-            for (size_t i = 1; i< w; i++)
-            {
-                if (W(i)<minw)
-                {
-                    ind = i;
-                    minw = W(i);
-                }
-            }
-            vec[num] = ind;
-            W(ind) = 1e32;
-
-            num = num +1;
-
-        }
-        return vec;
-    }
-
-
-
 
        DenseMatrix<double>
     FockMat(std::size_t const M_disc,
