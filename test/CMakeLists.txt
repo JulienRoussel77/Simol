@@ -13,12 +13,11 @@ FIND_PACKAGE(Threads)
 #                                 ${LAPACK_LIB}
 #                                 ${BLAS_LIB}
 #                                 )
-enable_testing()
+ENABLE_TESTING()
 
 #add_test(test_simol ${EXECUTABLE_OUTPUT_PATH}/test_simol)
 
 #set_tests_properties(test_simol PROPERTIES PASS_REGULAR_EXPRESSION "OK")
 
-#add_subdirectory(functional)
 ADD_SUBDIRECTORY(unit)
 ADD_SUBDIRECTORY(functional)

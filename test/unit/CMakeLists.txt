@@ -14,4 +14,4 @@ ENABLE_TESTING()
 
 ADD_TEST(test_simol simol_test_unit " ")
 
-add_custom_target(unit COMMAND simol_test_unit)
+ADD_CUSTOM_TARGET(unit COMMAND simol_test_unit)
