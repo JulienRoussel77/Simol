@@ -9,16 +9,15 @@
 
 #include <Eigen/SparseCore>
 
+#include "core/linalg/SparseMatrix.hpp"
+
 namespace simol
 {
     std::size_t
     getInd(std::size_t const M_disc,
            std::size_t const rowIndex,
-           std::size_t const columnIndex)
-    {
-        assert(rowIndex < M_disc && columnIndex < M_disc);
-        return rowIndex * M_disc + columnIndex;
-    }
+           std::size_t const columnIndex);
+
 
     template<typename ScalarType = double>
     class SparseTensor
@@ -76,7 +75,7 @@ namespace simol
 
     template<typename ScalarType>
     SparseMatrix<ScalarType> const &
-    SparTensor<ScalarType>::nonzeros() const
+    SparseTensor<ScalarType>::nonzeros() const
     { return nonzeros_; }
 }
 

@@ -1,3 +1,6 @@
+SIMOL_INSTALL_PACKAGE(GTest)
+
+FIND_PACKAGE(Threads)
 #add_executable(test_simol unit/test_simol.cpp 
 #                          unit/EigenSolverTest.cpp 
 #                          unit/SparseMatrixTest.cpp 
@@ -18,3 +21,4 @@ enable_testing()
 
 #add_subdirectory(functional)
 ADD_SUBDIRECTORY(unit)
+ADD_SUBDIRECTORY(functional)

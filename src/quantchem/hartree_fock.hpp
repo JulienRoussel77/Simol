@@ -3,15 +3,15 @@
 #define	SIMOL_HARTREE_FOCK_HPP
 
 #include "SlaterDeterminant.hpp"
-
+#include "SparseTensor.hpp"
 #include <vector>
-#include "../linalg/Vector.hpp"
+#include "core/linalg/Vector.hpp"
 
 namespace simol
 {
 
 
-       DenseMatrix<double>
+    DenseMatrix<double>
     FockMat(std::size_t const M_disc,
             DenseMatrix<double> const & Phi,
             DenseMatrix<double> const & E)
@@ -118,7 +118,7 @@ namespace simol
             //Sinon, on utilise une formule patriculière
             else
             {
-                int indmin = getIndMin(D);
+                int indmin = D.index_of_minimum();
 
                 Vector<double> xV(Vvec.numberOfRows());
                 xV.wrapped_ = Vvec.wrapped_.col(indmin);
@@ -371,7 +371,7 @@ namespace simol
                     if ((1.5 > mult) && (mult > 0.5)) //mult = 1
                     {
 
-                        int indmin = getIndMin(D);
+                        int indmin = D.index_of_minimum();
                         Vector<double> xV(Vvec.numberOfRows());
                         xV.wrapped_ = Vvec.wrapped_.col(indmin);
                         Vector<double> xU(Uvec.numberOfRows());
@@ -500,7 +500,7 @@ namespace simol
                         //faut récupérer pour U et pour V les deux vecteurs qui sont
                         //orthonormaux à l'espace
 
-                        size_t indmin = getIndMin(D);
+                        size_t indmin = D.index_of_minimum();
                         Vector<double> xV1(Vvec.numberOfRows());
                         xV1.wrapped_ = Vvec.wrapped_.col(indmin);
                         Vector<double> xU1(Uvec.numberOfRows());
@@ -508,7 +508,7 @@ namespace simol
 
                         D(indmin) = 1e20;
 
-                        size_t indmin2 = getIndMin(D);
+                        size_t indmin2 = D.index_of_minimum();
                         Vector<double> xV2 = Vvec.column(indmin2);
                         Vector<double> xU2 = Uvec.column(indmin2);
 
@@ -713,7 +713,7 @@ namespace simol
             Vector<double> D = es.eigenvalues();
             DenseMatrix<double> V = es.eigenvectors();
 
-            std::vector<size_t> Itab = getIndMin(D, numberOfElectrons);
+            std::vector<size_t> Itab = D.indices_of_smallest(numberOfElectrons);
 
             DenseMatrix<double> Phinew(M_disc, numberOfElectrons);
             Phinew.wrapped_ = eigen<double>::DenseMatrixType::Zero(M_disc, numberOfElectrons);

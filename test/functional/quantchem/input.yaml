@@ -1,0 +1,5 @@
+Data:
+  path: ../../../data/quantum_chemistry
+  overlap: overlap_matrix.txt
+  kinetic: kinetic_matrix.txt
+  potential: potential_matrix.txt

@@ -12,7 +12,7 @@ namespace simol
     EXPECT_EQ(expected_size, actual_size);
   }
 
-  TEST(VectorTest, min_index_is_correct)
+  TEST(VectorTest, index_of_minimum_is_correct)
   {
       Vector<double> vec(3);
       vec(0) = 0;
@@ -20,7 +20,7 @@ namespace simol
       vec(2) = 6;
 
       size_t expected = 1;
-      size_t actual = vec.min_index();
+      size_t actual = vec.index_of_minimum();
 
       EXPECT_EQ(expected, actual);
 
@@ -48,7 +48,7 @@ namespace simol
 
   }
 
-  TEST(VectorTest, smallest_indices_are_correct)
+  TEST(VectorTest, indices_of_smallest_are_correct)
   {
       size_t size = 5;
       size_t number_of_indices = 3;
@@ -59,7 +59,7 @@ namespace simol
       vec(3) = 0;
       vec(4) = 3;
 
-      std::vector<size_t> actual = vec.smallest_indices(number_of_indices);
+      std::vector<size_t> actual = vec.indices_of_smallest(number_of_indices);
 
       std::vector<size_t> expected(number_of_indices);
       expected[0] = 3;

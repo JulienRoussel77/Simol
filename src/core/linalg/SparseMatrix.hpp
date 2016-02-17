@@ -1,7 +1,7 @@
 #ifndef SIMOL_SPARSEMATRIX_HPP
 #define SIMOL_SPARSEMATRIX_HPP
 
-#include "MatrixMarketFile.hpp"
+#include "core/io/MatrixMarketFile.hpp"
 
 #include "eigen.hpp"
 
@@ -14,13 +14,13 @@ namespace simol
   class SparseMatrix;
 
   template<class ScalarType, template<class> class Library>
-  std::ifstream & operator>>(std::ifstream & fileToRead, 
+  std::ifstream & operator>>(std::ifstream & fileToRead,
                              SparseMatrix<ScalarType, Library> & matrixToWrite);
 
   template<class ScalarType>
   class SparseMatrix<ScalarType,eigen>
   {
-    friend std::ifstream & operator>> <>(std::ifstream & fileToRead, 
+    friend std::ifstream & operator>> <>(std::ifstream & fileToRead,
                                          SparseMatrix<ScalarType,eigen> & matrixToWrite);
     public:
       std::size_t numberOfRows() const;

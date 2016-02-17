@@ -1,2 +1,1 @@
-
-add_subdirectory(statphys)
+ADD_SUBDIRECTORY(quantchem)

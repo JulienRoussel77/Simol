@@ -38,9 +38,9 @@ namespace simol
       Vector<ScalarType,eigen>& fill(ScalarType const& lambda);
       ScalarType dot(Vector<ScalarType,eigen> const& v) const;
       ScalarType min() const;
-      size_t min_index() const;
+      size_t index_of_minimum() const;
       Vector<ScalarType, eigen> sort() const;
-      std::vector<size_t> smallest_indices(size_t const number_of_indices);
+      std::vector<size_t> indices_of_smallest(size_t const number_of_indices);
 
       ScalarType max() const
       { return wrapped_.maxCoeff(); }
@@ -144,7 +144,7 @@ namespace simol
   template<class ScalarType>
   inline
   size_t
-  Vector<ScalarType, eigen>::min_index() const
+  Vector<ScalarType, eigen>::index_of_minimum() const
   {
       size_t index;
       wrapped_.minCoeff(&index);
@@ -154,7 +154,7 @@ namespace simol
   template<class ScalarType>
   inline
   std::vector<size_t>
-  Vector<ScalarType, eigen>::smallest_indices(size_t const number_of_indices)
+  Vector<ScalarType, eigen>::indices_of_smallest(size_t const number_of_indices)
   {
     std::vector<size_t> indices(size());
     for(size_t index=0; index<size(); ++index)
