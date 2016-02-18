@@ -30,7 +30,14 @@ namespace simol
             SparseMatrix<ScalarType> const &
             nonzeros() const;
 
-        private:
+            ScalarType const operator()(std::size_t const rowIndex,
+                                          std::size_t const columnIndex) const
+            { return nonzeros_(rowIndex, columnIndex); }
+
+            std::size_t numberOfRows() const
+            { return nonzeros_.numberOfRows(); }
+
+        public:
             SparseMatrix<ScalarType> nonzeros_;
     };
 

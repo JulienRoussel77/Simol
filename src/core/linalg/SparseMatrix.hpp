@@ -25,6 +25,10 @@ namespace simol
     public:
       std::size_t numberOfRows() const;
       std::size_t numberOfColumns() const;
+      ScalarType const operator()(std::size_t const rowIndex,
+                                    std::size_t const columnIndex) const
+     { return wrapped_.coeff(rowIndex, columnIndex); }
+
     public:
       typename eigen<ScalarType>::SparseMatrixType const & wrapped() const
       { return wrapped_; }

@@ -14,7 +14,7 @@ namespace simol
     DenseMatrix<double>
     FockMat(std::size_t const M_disc,
             DenseMatrix<double> const & Phi,
-            DenseMatrix<double> const & E)
+            SparseTensor<double> const & E)
     {
 
         //A améliorer pour faire que la matrice de Fock soit une matrice sparse symmétrique
@@ -47,7 +47,7 @@ namespace simol
           Vector<double> const & psi2,
           Vector<double> const & psi3,
           Vector<double> const & psi4,
-          DenseMatrix<double> const & E)
+          SparseTensor<double> const & E)
     {
 
         Vector<double> U12v(M_disc*M_disc);
@@ -65,7 +65,7 @@ namespace simol
         }
 
         Vector<double> temp(E.numberOfRows());
-        temp.wrapped_ = E.wrapped_.selfadjointView<Eigen::Upper>() * U12v.wrapped_;
+        temp.wrapped_ = E.nonzeros_.wrapped_.selfadjointView<Eigen::Upper>() * U12v.wrapped_;
         return U34v.wrapped_.adjoint() * temp.wrapped_;
     }
 
@@ -247,7 +247,7 @@ namespace simol
 
     double H2_slat_N2(const SlaterDeterminant& Phi,
                       const SlaterDeterminant& Psi,
-                      const DenseMatrix<double>& E,
+                      const SparseTensor<double>& E,
                       size_t const numberOfElectrons,
                       size_t const M_disc)
     {
@@ -278,7 +278,7 @@ namespace simol
     double H2_slat(const SlaterDeterminant& Phi,
                    const SlaterDeterminant& Psi,
                    const DenseMatrix<double>& O,
-                   const DenseMatrix<double>& E,
+                   const SparseTensor<double>& E,
                    size_t const numberOfElectrons,
                    size_t const M_disc_,
                    double ratio_ = 1e-12)
@@ -686,7 +686,7 @@ namespace simol
     SlaterDeterminant
     hartree_fock(std::size_t const M_disc,
                  std::size_t const numberOfElectrons,
-                 DenseMatrix<double> const & E,
+                 SparseTensor<double> const & E,
                  DenseMatrix<double> const & K,
                  DenseMatrix<double> const & O,
                  DenseMatrix<double> const & Nu,
