@@ -41,6 +41,8 @@ namespace simol
       size_t index_of_minimum() const;
       Vector<ScalarType, eigen> sort() const;
       std::vector<size_t> indices_of_smallest(size_t const number_of_indices);
+      static Vector Zero(std::size_t length)
+      { return WrappedType(WrappedType::Zero(length)); }
 
       ScalarType max() const
       { return wrapped_.maxCoeff(); }
@@ -56,6 +58,7 @@ namespace simol
 
 
     public:
+      typedef typename eigen<ScalarType>::VectorType WrappedType;
       typename eigen<ScalarType>::VectorType wrapped_;
 
   };

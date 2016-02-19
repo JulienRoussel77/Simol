@@ -49,10 +49,8 @@ namespace simol
                       SparseTensor<double> const & E)
     {
 
-        Vector<double> U12v(M_disc*M_disc);
-        U12v.wrapped_ = eigen<double>::VectorType::Zero(M_disc*M_disc);
-        Vector<double> U34v(M_disc*M_disc);
-        U34v.wrapped_ = eigen<double>::VectorType::Zero(M_disc*M_disc);
+        Vector<double> U12v = Vector<double>::Zero(M_disc*M_disc);
+        Vector<double> U34v = Vector<double>::Zero(M_disc*M_disc);
 
         for (size_t i=0; i< M_disc; i++)
         {
@@ -141,10 +139,8 @@ namespace simol
                 DenseMatrix<double> PsiU = DenseMatrix<double>::Zero(M_disc_,numberOfElectrons); //Le reste des fonctions: le deux sous-espaces engendrés sont les mêmes, égaux à l'intersection de deux sous-espaces de départ
                 DenseMatrix<double> PsiV = DenseMatrix<double>::Zero(M_disc_ , numberOfElectrons);
 
-                Vector<double> muU(numberOfElectrons);
-                muU.wrapped_ = eigen<double>::VectorType::Zero(numberOfElectrons);
-                Vector<double> muV(numberOfElectrons);
-                muV.wrapped_ = eigen<double>::VectorType::Zero(numberOfElectrons);
+                Vector<double> muU = Vector<double>::Zero(numberOfElectrons);
+                Vector<double> muV = Vector<double>::Zero(numberOfElectrons);
 
                 for(size_t k=0; k<numberOfElectrons; k++)
                 {
@@ -384,10 +380,8 @@ namespace simol
                         DenseMatrix<double> PsiU = DenseMatrix<double>::Zero(M_disc_,numberOfElectrons); //Le reste des fonctions: le deux sous-espaces engendrés sont les mêmes, égaux à l'intersection de deux sous-espaces de départ
                         DenseMatrix<double> PsiV = DenseMatrix<double>::Zero(M_disc_,numberOfElectrons);
 
-                        Vector<double> muU(numberOfElectrons);
-                        muU.wrapped_ = eigen<double>::VectorType::Zero(numberOfElectrons);
-                        Vector<double> muV(numberOfElectrons);
-                        muV.wrapped_ = eigen<double>::VectorType::Zero(numberOfElectrons);
+                        Vector<double> muU = Vector<double>::Zero(numberOfElectrons);
+                        Vector<double> muV = Vector<double>::Zero(numberOfElectrons);
 
                         for(size_t k=0; k<numberOfElectrons; k++)
                         {
@@ -528,14 +522,10 @@ namespace simol
                         DenseMatrix<double> PsiU = DenseMatrix<double>::Zero(M_disc_,numberOfElectrons); //Le reste des fonctions: les deux sous-espaces engendrés sont les mêmes, égaux à l'intersection de deux sous-espaces de départ
                         DenseMatrix<double> PsiV = DenseMatrix<double>::Zero(M_disc_,numberOfElectrons);
 
-                        Vector<double> muU1(numberOfElectrons);
-                        muU1.wrapped_ = eigen<double>::VectorType::Zero(numberOfElectrons);
-                        Vector<double> muV1(numberOfElectrons);
-                        muV1.wrapped_ = eigen<double>::VectorType::Zero(numberOfElectrons);
-                        Vector<double> muU2(numberOfElectrons);
-                        muU2.wrapped_ = eigen<double>::VectorType::Zero(numberOfElectrons);
-                        Vector<double> muV2(numberOfElectrons);
-                        muV2.wrapped_ = eigen<double>::VectorType::Zero(numberOfElectrons);
+                        Vector<double> muU1 = Vector<double>::Zero(numberOfElectrons);
+                        Vector<double> muV1 = Vector<double>::Zero(numberOfElectrons);
+                        Vector<double> muU2 = Vector<double>::Zero(numberOfElectrons);
+                        Vector<double> muV2 = Vector<double>::Zero(numberOfElectrons);
 
                         for (size_t k=0; k< numberOfElectrons; k++)
                         {
