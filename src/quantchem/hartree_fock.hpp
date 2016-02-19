@@ -18,8 +18,7 @@ namespace simol
     {
 
         //A améliorer pour faire que la matrice de Fock soit une matrice sparse symmétrique
-        DenseMatrix<double> G0(M_disc, M_disc);
-        G0.wrapped_ = eigen<double>::DenseMatrixType::Zero(M_disc, M_disc);
+        DenseMatrix<double> G0 = DenseMatrix<double>::Zero(M_disc, M_disc);
         DenseMatrix<double> D(Phi.numberOfRows(), Phi.numberOfRows());
         D.wrapped_ = Phi.wrapped_ * Phi.wrapped_.adjoint();
 
@@ -139,10 +138,8 @@ namespace simol
                 double n2orthV = orthV.wrapped_.adjoint() * temp.wrapped_;
                 orthV.wrapped_ = (1.0/sqrt(n2orthV)) * orthV.wrapped_;
 
-                DenseMatrix<double> PsiU(M_disc_, numberOfElectrons);
-                PsiU.wrapped_ = eigen<double>::DenseMatrixType::Zero(M_disc_,numberOfElectrons); //Le reste des fonctions: le deux sous-espaces engendrés sont les mêmes, égaux à l'intersection de deux sous-espaces de départ
-                DenseMatrix<double> PsiV(M_disc_, numberOfElectrons);
-                PsiV.wrapped_ = eigen<double>::DenseMatrixType::Zero(M_disc_ , numberOfElectrons);
+                DenseMatrix<double> PsiU = DenseMatrix<double>::Zero(M_disc_,numberOfElectrons); //Le reste des fonctions: le deux sous-espaces engendrés sont les mêmes, égaux à l'intersection de deux sous-espaces de départ
+                DenseMatrix<double> PsiV = DenseMatrix<double>::Zero(M_disc_ , numberOfElectrons);
 
                 Vector<double> muU(numberOfElectrons);
                 muU.wrapped_ = eigen<double>::VectorType::Zero(numberOfElectrons);
@@ -164,8 +161,7 @@ namespace simol
 
                     //On crée une base orthonormale de l'intersection des deux
                 //sous-espaces: par exemple à partir de xU
-                DenseMatrix<double> xUbas(numberOfElectrons, numberOfElectrons-1);
-                xUbas.wrapped_ = eigen<double>::DenseMatrixType::Zero(numberOfElectrons, numberOfElectrons-1);
+                DenseMatrix<double> xUbas = DenseMatrix<double>::Zero(numberOfElectrons, numberOfElectrons-1);
                 xUbas.wrapped_.block(0,0, numberOfElectrons, indmin) = Uvec.wrapped_.block(0,0, numberOfElectrons, indmin);
                 xUbas.wrapped_.block(0,indmin, numberOfElectrons, numberOfElectrons-indmin-1) = Uvec.wrapped_.block(0, indmin+1, numberOfElectrons, numberOfElectrons-indmin-1);
 
@@ -192,10 +188,8 @@ namespace simol
 
                 }
 
-                DenseMatrix<double> CU(numberOfElectrons-1,numberOfElectrons);
-                CU.wrapped_ = eigen<double>::DenseMatrixType::Zero(numberOfElectrons-1,numberOfElectrons);
-                DenseMatrix<double> CV(numberOfElectrons-1,numberOfElectrons);
-                CV.wrapped_ = eigen<double>::DenseMatrixType::Zero(numberOfElectrons-1,numberOfElectrons);
+                DenseMatrix<double> CU = DenseMatrix<double>::Zero(numberOfElectrons-1,numberOfElectrons);
+                DenseMatrix<double> CV = DenseMatrix<double>::Zero(numberOfElectrons-1,numberOfElectrons);
 
                 for (size_t k=0; k< numberOfElectrons; k++)
                 {
@@ -224,13 +218,11 @@ namespace simol
                 {
                     for (size_t k2 =0; k2 < numberOfElectrons; k2++)
                     {
-                        DenseMatrix<double> aU(numberOfElectrons-1, numberOfElectrons-1);
-                        aU.wrapped_ = eigen<double>::DenseMatrixType::Zero(numberOfElectrons-1, numberOfElectrons-1);
+                        DenseMatrix<double> aU = DenseMatrix<double>::Zero(numberOfElectrons-1, numberOfElectrons-1);
                         aU.wrapped_.block(0,0, numberOfElectrons-1, k1) = CU.wrapped_.block(0,0, numberOfElectrons-1, k1);
                         aU.wrapped_.block(0,k1, numberOfElectrons-1, numberOfElectrons-1-k1) = CU.wrapped_.block(0,k1+1, numberOfElectrons-1, numberOfElectrons -1 -k1);
 
-                        DenseMatrix<double> aV(numberOfElectrons-1, numberOfElectrons-1);
-                        aV.wrapped_ = eigen<double>::DenseMatrixType::Zero(numberOfElectrons-1, numberOfElectrons-1);
+                        DenseMatrix<double> aV = DenseMatrix<double>::Zero(numberOfElectrons-1, numberOfElectrons-1);
                         aV.wrapped_.block(0,0, numberOfElectrons-1,k2) = CV.wrapped_.block(0,0, numberOfElectrons-1, k2);
                         aV.wrapped_.block(0,k2, numberOfElectrons-1, numberOfElectrons-1-k2) = CV.wrapped_.block(0,k2+1, numberOfElectrons-1, numberOfElectrons-1 -k2);
 
@@ -389,10 +381,8 @@ namespace simol
                         orthV.wrapped_ = 1.0 / sqrt( (orthV.wrapped_.adjoint()) *temp.wrapped_) *orthV.wrapped_;
 
 
-                        DenseMatrix<double> PsiU(M_disc_,numberOfElectrons);
-                        PsiU.wrapped_ = eigen<double>::DenseMatrixType::Zero(M_disc_,numberOfElectrons); //Le reste des fonctions: le deux sous-espaces engendrés sont les mêmes, égaux à l'intersection de deux sous-espaces de départ
-                        DenseMatrix<double> PsiV(M_disc_,numberOfElectrons);
-                        PsiV.wrapped_ = eigen<double>::DenseMatrixType::Zero(M_disc_,numberOfElectrons);
+                        DenseMatrix<double> PsiU = DenseMatrix<double>::Zero(M_disc_,numberOfElectrons); //Le reste des fonctions: le deux sous-espaces engendrés sont les mêmes, égaux à l'intersection de deux sous-espaces de départ
+                        DenseMatrix<double> PsiV = DenseMatrix<double>::Zero(M_disc_,numberOfElectrons);
 
                         Vector<double> muU(numberOfElectrons);
                         muU.wrapped_ = eigen<double>::VectorType::Zero(numberOfElectrons);
@@ -414,8 +404,7 @@ namespace simol
 
                         //On crée une base orthonormale de l'intersection des deux
                         //sous-espaces: par exemple à partir de xU
-                        DenseMatrix<double> xUbas(numberOfElectrons, numberOfElectrons-1);
-                        xUbas.wrapped_ = eigen<double>::DenseMatrixType::Zero(numberOfElectrons, numberOfElectrons-1);
+                        DenseMatrix<double> xUbas = DenseMatrix<double>::Zero(numberOfElectrons, numberOfElectrons-1);
                         xUbas.wrapped_.block(0,0, numberOfElectrons, indmin) = Uvec.wrapped_.block(0,0, numberOfElectrons, indmin);
                         xUbas.wrapped_.block(0,indmin, numberOfElectrons, numberOfElectrons-indmin-1) = Uvec.wrapped_.block(0, indmin+1, numberOfElectrons, numberOfElectrons-indmin-1);
 
@@ -442,10 +431,8 @@ namespace simol
 
                         }
 
-                        DenseMatrix<double> CU(numberOfElectrons-1,numberOfElectrons);
-                        CU.wrapped_ = eigen<double>::DenseMatrixType::Zero(numberOfElectrons-1,numberOfElectrons);
-                        DenseMatrix<double> CV(numberOfElectrons-1,numberOfElectrons);
-                        CV.wrapped_ = eigen<double>::DenseMatrixType::Zero(numberOfElectrons-1,numberOfElectrons);
+                        DenseMatrix<double> CU = DenseMatrix<double>::Zero(numberOfElectrons-1,numberOfElectrons);
+                        DenseMatrix<double> CV = DenseMatrix<double>::Zero(numberOfElectrons-1,numberOfElectrons);
 
                         for (size_t k=0; k< numberOfElectrons; k++)
                         {
@@ -476,13 +463,11 @@ namespace simol
                         {
                             for (size_t k2 = 0; k2 < numberOfElectrons; k2++)
                             {
-                                DenseMatrix<double> aU(numberOfElectrons-1,numberOfElectrons-1);
-                                aU.wrapped_ = eigen<double>::DenseMatrixType::Zero(numberOfElectrons-1,numberOfElectrons-1);
+                                DenseMatrix<double> aU = DenseMatrix<double>::Zero(numberOfElectrons-1,numberOfElectrons-1);
                                 aU.wrapped_.block(0,0,numberOfElectrons-1,k1) = CU.wrapped_.block(0,0,numberOfElectrons-1,k1);
                                 aU.wrapped_.block(0,k1,numberOfElectrons-1,numberOfElectrons-1-k1) = CU.wrapped_.block(0,(k1+1),numberOfElectrons-1, numberOfElectrons-1-k1);
 
-                                DenseMatrix<double> aV(numberOfElectrons-1,numberOfElectrons-1);
-                                aV.wrapped_ = eigen<double>::DenseMatrixType::Zero(numberOfElectrons-1,numberOfElectrons-1);
+                                DenseMatrix<double> aV = DenseMatrix<double>::Zero(numberOfElectrons-1,numberOfElectrons-1);
                                 aV.wrapped_.block(0,0,numberOfElectrons-1,k2) = CV.wrapped_.block(0,0,numberOfElectrons-1,k2);
                                 aV.wrapped_.block(0,k2,numberOfElectrons-1, numberOfElectrons-1-k2) = CV.wrapped_.block(0,k2+1,numberOfElectrons-1, numberOfElectrons-1-k2);
 
@@ -540,10 +525,8 @@ namespace simol
                         temp.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>())*orthV2.wrapped_;
                         orthV2.wrapped_ = (1.0/sqrt((orthV2.wrapped_.adjoint())*temp.wrapped_))*orthV2.wrapped_;
 
-                        DenseMatrix<double> PsiU(M_disc_,numberOfElectrons);
-                        PsiU.wrapped_ = eigen<double>::DenseMatrixType::Zero(M_disc_,numberOfElectrons); //Le reste des fonctions: les deux sous-espaces engendrés sont les mêmes, égaux à l'intersection de deux sous-espaces de départ
-                        DenseMatrix<double> PsiV(M_disc_,numberOfElectrons);
-                        PsiV.wrapped_ = eigen<double>::DenseMatrixType::Zero(M_disc_,numberOfElectrons);
+                        DenseMatrix<double> PsiU = DenseMatrix<double>::Zero(M_disc_,numberOfElectrons); //Le reste des fonctions: les deux sous-espaces engendrés sont les mêmes, égaux à l'intersection de deux sous-espaces de départ
+                        DenseMatrix<double> PsiV = DenseMatrix<double>::Zero(M_disc_,numberOfElectrons);
 
                         Vector<double> muU1(numberOfElectrons);
                         muU1.wrapped_ = eigen<double>::VectorType::Zero(numberOfElectrons);
@@ -572,8 +555,7 @@ namespace simol
 
                         //On crée une base orthonormale de l'intersection des deux
                         //sous-espaces: par exemple à partir de xU
-                        DenseMatrix<double> xUbas(numberOfElectrons, numberOfElectrons-2);
-                        xUbas.wrapped_ = eigen<double>::DenseMatrixType::Zero(numberOfElectrons, numberOfElectrons-2);
+                        DenseMatrix<double> xUbas = DenseMatrix<double>::Zero(numberOfElectrons, numberOfElectrons-2);
                         int ind = 0;
                         for (size_t k=0; k< numberOfElectrons; k++)
                         {
@@ -609,10 +591,8 @@ namespace simol
                         }
 
 
-                        DenseMatrix<double> CU(numberOfElectrons-2,numberOfElectrons);
-                        CU.wrapped_ = eigen<double>::DenseMatrixType::Zero(numberOfElectrons-2,numberOfElectrons);
-                        DenseMatrix<double> CV(numberOfElectrons-2,numberOfElectrons);
-                        CV.wrapped_ = eigen<double>::DenseMatrixType::Zero(numberOfElectrons-2,numberOfElectrons);
+                        DenseMatrix<double> CU = DenseMatrix<double>::Zero(numberOfElectrons-2,numberOfElectrons);
+                        DenseMatrix<double> CV = DenseMatrix<double>::Zero(numberOfElectrons-2,numberOfElectrons);
 
                         for (size_t k=0; k< numberOfElectrons; k++)
                         {
@@ -635,8 +615,7 @@ namespace simol
                         {
                             for (size_t ju = iu+1 ; ju <numberOfElectrons; ju++)
                             {
-                                DenseMatrix<double> aU(numberOfElectrons-2,numberOfElectrons-2);
-                                aU.wrapped_ = eigen<double>::DenseMatrixType::Zero(numberOfElectrons-2,numberOfElectrons-2);
+                                DenseMatrix<double> aU = DenseMatrix<double>::Zero(numberOfElectrons-2,numberOfElectrons-2);
                                 aU.wrapped_.block(0,0,numberOfElectrons-2, iu) = CU.wrapped_.block(0,0,numberOfElectrons-2,iu);
                                 aU.wrapped_.block(0,iu,numberOfElectrons-2, ju-iu-1) = CU.wrapped_.block(0,iu+1, numberOfElectrons-2, ju-iu-1);
                                 aU.wrapped_.block(0,ju-1,numberOfElectrons-2, numberOfElectrons-ju-1) = CU.wrapped_.block(0,ju+1,numberOfElectrons-2, numberOfElectrons-ju-1);
@@ -647,8 +626,7 @@ namespace simol
                                     for (size_t jv = iv+1; jv < numberOfElectrons; jv++)
                                     {
 
-                                        DenseMatrix<double> aV(numberOfElectrons-2,numberOfElectrons-2);
-                                        aV.wrapped_ = eigen<double>::DenseMatrixType::Zero(numberOfElectrons-2,numberOfElectrons-2);
+                                        DenseMatrix<double> aV = DenseMatrix<double>::Zero(numberOfElectrons-2,numberOfElectrons-2);
                                         aV.wrapped_.block(0,0,numberOfElectrons-2,iv) = CV.wrapped_.block(0,0, numberOfElectrons-2, iv);
                                         aV.wrapped_.block(0,iv,numberOfElectrons-2,jv-iv-1) = CV.wrapped_.block(0,iv+1,numberOfElectrons-2,jv-iv-1);
                                         aV.wrapped_.block(0,jv-1,numberOfElectrons-2,numberOfElectrons-jv-1) = CV.wrapped_.block(0,jv+1,numberOfElectrons-2,numberOfElectrons-jv-1);
@@ -728,10 +706,8 @@ namespace simol
             std::vector<size_t> Itab = D.indices_of_smallest(numberOfElectrons);
             std::cout << "        smallest" << std::endl;
 
-            DenseMatrix<double> Phinew(M_disc, numberOfElectrons);
+            DenseMatrix<double> Phinew = DenseMatrix<double>::Zero(M_disc, numberOfElectrons);
             std::cout << "        Phinew" << std::endl;
-            Phinew.wrapped_ = eigen<double>::DenseMatrixType::Zero(M_disc, numberOfElectrons);
-            std::cout << "        Phinew.wrapped_" << std::endl;
             for (size_t i=0; i< numberOfElectrons; i++)
                 Phinew.wrapped_.col(i) = V.wrapped_.col(Itab[i]);
             Phi0 = Phinew;

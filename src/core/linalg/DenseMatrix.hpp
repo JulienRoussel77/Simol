@@ -49,7 +49,14 @@ namespace simol
           double
           rcond() const;
 
+          static
+          DenseMatrix
+          Zero(std::size_t numberOfRows,
+                    size_t numberOfColumns)
+          { return DenseMatrix(WrappedType::Zero(numberOfRows, numberOfColumns)); }
+
       public:
+          typedef typename eigen<ScalarType>::DenseMatrixType WrappedType;
           typename eigen<ScalarType>::DenseMatrixType wrapped_;
   };
 

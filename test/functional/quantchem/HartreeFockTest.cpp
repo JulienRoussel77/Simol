@@ -26,8 +26,8 @@ namespace simol
    matrix.wrapped_ = eigen<double>::DenseMatrixType::Zero(M_disc, M_disc);
    SlaterDeterminant initial_solution(matrix);
 
-   std::size_t numberOfElectrons = 10;
-   std::size_t numberOfIterations = 1;
+   std::size_t numberOfElectrons = 2;
+   std::size_t numberOfIterations = 20;
 
    SlaterDeterminant solution = hartree_fock(M_disc, numberOfElectrons,
                                              twoelectron_matrix,
