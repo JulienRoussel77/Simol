@@ -55,6 +55,11 @@ namespace simol
                     size_t numberOfColumns)
           { return DenseMatrix(WrappedType::Zero(numberOfRows, numberOfColumns)); }
 
+          // TODO: write a non-pessimized version
+          // with CwiseBinaryOp from Eigen
+          DenseMatrix operator+(DenseMatrix const & other) const
+          { return WrappedType(this->wrapped_ + other.wrapped_); }
+
       public:
           typedef typename eigen<ScalarType>::DenseMatrixType WrappedType;
           typename eigen<ScalarType>::DenseMatrixType wrapped_;

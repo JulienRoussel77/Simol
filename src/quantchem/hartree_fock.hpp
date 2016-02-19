@@ -665,39 +665,22 @@ namespace simol
 
         std::cout << "start" << std::endl;
         DenseMatrix<double> Phi0 = initial_solution.matrix();
-        std::cout << "    Phi0" << std::endl;
-        DenseMatrix<double> F0(K.numberOfRows(), K.numberOfColumns());
-        std::cout << "    F0" << std::endl;
-        F0.wrapped_ = K.wrapped_ + Nu.wrapped_;
-        std::cout << "    F0.wrapped_" << std::endl;
+        DenseMatrix<double> F0 = K + Nu;
 
         std::cout << "    Main loop_" << std::endl;
         //Roothan parce que c'est le plus simple: ToDo coder ODA
         for( std::size_t iteration = 0; iteration < numberOfIterations; ++iteration )
         {
-            DenseMatrix<double> F(F0.numberOfRows(), F0.numberOfColumns());
-            std::cout << "        F" << std::endl;
-            DenseMatrix<double> Fock(F0.numberOfRows(), F0.numberOfColumns());
-            std::cout << "        Fock" << std::endl;
-            Fock = FockMat(M_disc, Phi0, E);
-            std::cout << "        FockMat" << std::endl;
-            F.wrapped_ = F0.wrapped_ + Fock.wrapped_;
-            std::cout << "        F.wrapped_" << std::endl;
-
+            DenseMatrix<double> F = F0 + FockMat(M_disc, Phi0, E);
 
             Eigen::GeneralizedSelfAdjointEigenSolver<eigen<double>::DenseMatrixType> es(F.wrapped_, O.wrapped_, Eigen::ComputeEigenvectors|Eigen::Ax_lBx);
-            std::cout << "        eigensolver" << std::endl;
 
             Vector<double> D = es.eigenvalues();
-            std::cout << "        eigenvalues" << std::endl;
             DenseMatrix<double> V = es.eigenvectors();
-            std::cout << "        eigenvectors" << std::endl;
 
             std::vector<size_t> Itab = D.indices_of_smallest(numberOfElectrons);
-            std::cout << "        smallest" << std::endl;
 
             DenseMatrix<double> Phinew = DenseMatrix<double>::Zero(M_disc, numberOfElectrons);
-            std::cout << "        Phinew" << std::endl;
             for (size_t i=0; i< numberOfElectrons; i++)
                 Phinew.wrapped_.col(i) = V.wrapped_.col(Itab[i]);
             Phi0 = Phinew;
