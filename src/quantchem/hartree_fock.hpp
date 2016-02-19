@@ -42,12 +42,12 @@ namespace simol
 
 
     double
-    elint(std::size_t const M_disc,
-          Vector<double> const & psi1,
-          Vector<double> const & psi2,
-          Vector<double> const & psi3,
-          Vector<double> const & psi4,
-          SparseTensor<double> const & E)
+    electric_integral(std::size_t const M_disc,
+                      Vector<double> const & psi1,
+                      Vector<double> const & psi2,
+                      Vector<double> const & psi3,
+                      Vector<double> const & psi4,
+                      SparseTensor<double> const & E)
     {
 
         Vector<double> U12v(M_disc*M_disc);
@@ -268,10 +268,10 @@ namespace simol
         Vcol0.wrapped_ = V.wrapped_.col(0);
         Vcol1.wrapped_ = V.wrapped_.col(1);
 
-        return 0.5 * ( elint(M_disc, Ucol0, Vcol0, Ucol1, Vcol1, E)
-                     - elint(M_disc, Ucol1, Vcol0, Ucol0, Vcol1, E)
-                     - elint(M_disc, Ucol0, Vcol1, Ucol1, Vcol0, E)
-                     + elint(M_disc, Ucol1, Vcol1, Ucol0, Vcol0, E) );
+        return 0.5 * ( electric_integral(M_disc, Ucol0, Vcol0, Ucol1, Vcol1, E)
+                     - electric_integral(M_disc, Ucol1, Vcol0, Ucol0, Vcol1, E)
+                     - electric_integral(M_disc, Ucol0, Vcol1, Ucol1, Vcol0, E)
+                     + electric_integral(M_disc, Ucol1, Vcol1, Ucol0, Vcol0, E) );
 
     }
 
@@ -329,7 +329,7 @@ namespace simol
                                 Vcol_l.wrapped_ = V.wrapped_.col(l);
 
                                  //Ici je prends les notations de Friedrichs
-                                scal0 += 0.5 * elint(M_disc_, Ucol_i, Vcol_k, Ucol_j, Vcol_l, E)
+                                scal0 += 0.5 * electric_integral(M_disc_, Ucol_i, Vcol_k, Ucol_j, Vcol_l, E)
                                              * (Sinv(k,i)*Sinv(l,j) - Sinv(k,j)*Sinv(l,i));
 
                             }
@@ -465,8 +465,8 @@ namespace simol
                         //On construit la somme
                         double sum2 = 0;
                         for (size_t l=0; l< numberOfElectrons-1; l++)
-                            sum2 += elint(M_disc_,coeffs_bas.column(l),coeffs_bas.column(l),orthU,orthV,E)
-                                  - elint(M_disc_,coeffs_bas.column(l),orthV,coeffs_bas.column(l),orthU,E);
+                            sum2 += electric_integral(M_disc_,coeffs_bas.column(l),coeffs_bas.column(l),orthU,orthV,E)
+                                  - electric_integral(M_disc_,coeffs_bas.column(l),orthV,coeffs_bas.column(l),orthU,E);
 
 
                         //On a alors pour tout k U(:,k) = muU(k)*orthU + PsiU(:,k)
@@ -626,7 +626,7 @@ namespace simol
                         }
 
                         //On construit la somme
-                        double sum2 = elint(M_disc_, orthU1,orthV1,orthU2,orthV2,E) - elint(M_disc_, orthU1,orthV2,orthU2,orthV1, E);
+                        double sum2 = electric_integral(M_disc_, orthU1,orthV1,orthU2,orthV2,E) - electric_integral(M_disc_, orthU1,orthV2,orthU2,orthV1, E);
 
                         //On a alors pour tout k U(:,k) = muU1(k)*orthU1 + muU2(k)*orthU2 + PsiU(:,k)
                         double sum = 0;
@@ -745,8 +745,8 @@ namespace simol
                 lambda += D(Itab[i]);
                 std::cout << "            lambda update" << std::endl;
                 for (std::size_t j = 0; j< numberOfElectrons; ++j)
-                    lambda += 0.5 * ( elint(M_disc, Phi0.column(i), Phi0.column(i), Phi0.column(j), Phi0.column(j), E)
-                                    - elint(M_disc, Phi0.column(i), Phi0.column(j), Phi0.column(j), Phi0.column(i), E) );
+                    lambda += 0.5 * ( electric_integral(M_disc, Phi0.column(i), Phi0.column(i), Phi0.column(j), Phi0.column(j), E)
+                                    - electric_integral(M_disc, Phi0.column(i), Phi0.column(j), Phi0.column(j), Phi0.column(i), E) );
                     std::cout << "                lambda inner update" << std::endl;
             }
             std::cout << "        finish lambda" << std::endl;
