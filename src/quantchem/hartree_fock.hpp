@@ -695,47 +695,67 @@ namespace simol
     {
         //A améliorer: pour l'instant j'utilise des matrices pleines car il n'y a pas de solveur eigenvalue pour les matrices sparses
 
+        std::cout << "start" << std::endl;
         DenseMatrix<double> Phi0 = initial_solution.matrix();
+        std::cout << "    Phi0" << std::endl;
         DenseMatrix<double> F0(K.numberOfRows(), K.numberOfColumns());
+        std::cout << "    F0" << std::endl;
         F0.wrapped_ = K.wrapped_ + Nu.wrapped_;
+        std::cout << "    F0.wrapped_" << std::endl;
 
+        std::cout << "    Main loop_" << std::endl;
         //Roothan parce que c'est le plus simple: ToDo coder ODA
         for( std::size_t iteration = 0; iteration < numberOfIterations; ++iteration )
         {
             DenseMatrix<double> F(F0.numberOfRows(), F0.numberOfColumns());
+            std::cout << "        F" << std::endl;
             DenseMatrix<double> Fock(F0.numberOfRows(), F0.numberOfColumns());
+            std::cout << "        Fock" << std::endl;
             Fock = FockMat(M_disc, Phi0, E);
+            std::cout << "        FockMat" << std::endl;
             F.wrapped_ = F0.wrapped_ + Fock.wrapped_;
+            std::cout << "        F.wrapped_" << std::endl;
 
 
             Eigen::GeneralizedSelfAdjointEigenSolver<eigen<double>::DenseMatrixType> es(F.wrapped_, O.wrapped_, Eigen::ComputeEigenvectors|Eigen::Ax_lBx);
+            std::cout << "        eigensolver" << std::endl;
 
             Vector<double> D = es.eigenvalues();
+            std::cout << "        eigenvalues" << std::endl;
             DenseMatrix<double> V = es.eigenvectors();
+            std::cout << "        eigenvectors" << std::endl;
 
             std::vector<size_t> Itab = D.indices_of_smallest(numberOfElectrons);
+            std::cout << "        smallest" << std::endl;
 
             DenseMatrix<double> Phinew(M_disc, numberOfElectrons);
+            std::cout << "        Phinew" << std::endl;
             Phinew.wrapped_ = eigen<double>::DenseMatrixType::Zero(M_disc, numberOfElectrons);
+            std::cout << "        Phinew.wrapped_" << std::endl;
             for (size_t i=0; i< numberOfElectrons; i++)
                 Phinew.wrapped_.col(i) = V.wrapped_.col(Itab[i]);
             Phi0 = Phinew;
+            std::cout << "        Phi0" << std::endl;
 
 
+            std::cout << "        start lambda" << std::endl;
             double lambda = 0;
             for (std::size_t i = 0; i < numberOfElectrons; ++i)
             {
                 lambda += D(Itab[i]);
+                std::cout << "            lambda update" << std::endl;
                 for (std::size_t j = 0; j< numberOfElectrons; ++j)
                     lambda += 0.5 * ( elint(M_disc, Phi0.column(i), Phi0.column(i), Phi0.column(j), Phi0.column(j), E)
                                     - elint(M_disc, Phi0.column(i), Phi0.column(j), Phi0.column(j), Phi0.column(i), E) );
+                    std::cout << "                lambda inner update" << std::endl;
             }
+            std::cout << "        finish lambda" << std::endl;
 
-            SlaterDeterminant sol(Phi0);
-            DenseMatrix<double> sum(K.numberOfRows(), K.numberOfColumns());
-            sum.wrapped_ = K.wrapped_ + Nu.wrapped_;
-            double lambda2 = H1_slat(Phi0, Phi0, O, sum, numberOfElectrons, M_disc) + H2_slat(Phi0, Phi0, O, E, numberOfElectrons, M_disc);
-            lambda2 /= over_slat(Phi0, Phi0, O);
+//            SlaterDeterminant sol(Phi0);
+            //DenseMatrix<double> sum(K.numberOfRows(), K.numberOfColumns());
+            //sum.wrapped_ = K.wrapped_ + Nu.wrapped_;
+            //double lambda2 = H1_slat(Phi0, Phi0, O, sum, numberOfElectrons, M_disc) + H2_slat(Phi0, Phi0, O, E, numberOfElectrons, M_disc);
+            //lambda2 /= over_slat(Phi0, Phi0, O);
 
 
         }
