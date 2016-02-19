@@ -744,10 +744,13 @@ namespace simol
             {
                 lambda += D(Itab[i]);
                 std::cout << "            lambda update" << std::endl;
+                Vector<double> column_i = Phi0.column(i);
+                std::cout << "            column i" << std::endl;
                 for (std::size_t j = 0; j< numberOfElectrons; ++j)
                 {
-                    lambda += 0.5 * ( electric_integral(M_disc, Phi0.column(i), Phi0.column(i), Phi0.column(j), Phi0.column(j), E)
-                                    - electric_integral(M_disc, Phi0.column(i), Phi0.column(j), Phi0.column(j), Phi0.column(i), E) );
+                    Vector<double> column_j = Phi0.column(j);
+                    lambda += 0.5 * ( electric_integral(M_disc, column_i, column_i, column_j, column_j, E)
+                                    - electric_integral(M_disc, column_i, column_j, column_j, column_i, E) );
                     std::cout << "                lambda inner update" << std::endl;
                 }
             }
