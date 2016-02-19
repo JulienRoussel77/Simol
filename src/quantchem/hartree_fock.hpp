@@ -745,9 +745,11 @@ namespace simol
                 lambda += D(Itab[i]);
                 std::cout << "            lambda update" << std::endl;
                 for (std::size_t j = 0; j< numberOfElectrons; ++j)
+                {
                     lambda += 0.5 * ( electric_integral(M_disc, Phi0.column(i), Phi0.column(i), Phi0.column(j), Phi0.column(j), E)
                                     - electric_integral(M_disc, Phi0.column(i), Phi0.column(j), Phi0.column(j), Phi0.column(i), E) );
                     std::cout << "                lambda inner update" << std::endl;
+                }
             }
             std::cout << "        finish lambda" << std::endl;
 
