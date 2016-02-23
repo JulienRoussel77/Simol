@@ -665,7 +665,21 @@ namespace simol
 
         std::cout << "start" << std::endl;
         DenseMatrix<double> Phi0 = initial_solution.matrix();
+
+        Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols, ", ", ", ", "", "", " << ", ";");
+        std::cout << "Phi0:" << std::endl;
+        std::cout << Phi0.wrapped_.format(CommaInitFmt) << std::endl;
+
+        std::cout << "K:" << std::endl;
+        std::cout << K.wrapped_.format(CommaInitFmt) << std::endl;
+        std::cout << "Nu:" << std::endl;
+        std::cout << K.wrapped_.format(CommaInitFmt) << std::endl;
+
+
+
         DenseMatrix<double> F0 = K + Nu;
+        std::cout << "F0:" << std::endl;
+        std::cout << F0.wrapped_.format(CommaInitFmt) << std::endl;
 
         std::cout << "    Main loop_" << std::endl;
         //Roothan parce que c'est le plus simple: ToDo coder ODA

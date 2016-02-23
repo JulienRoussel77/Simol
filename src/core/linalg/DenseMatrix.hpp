@@ -9,6 +9,8 @@
 
 #include "Vector.hpp"
 
+#include <ostream>
+
 namespace simol
 {
 
@@ -18,6 +20,7 @@ namespace simol
   template<class ScalarType>
   class DenseMatrix<ScalarType,eigen>
   {
+
       public:
 
           DenseMatrix(DenseMatrix const & matrix) = default;
@@ -128,6 +131,12 @@ namespace simol
 
     return lmin/lmax;
   }
+
+  template<class ScalarType>
+  std::ostream &
+  operator<<(std::ostream & output,
+             DenseMatrix<ScalarType, eigen> const & matrixToPrint)
+  { return output << matrixToPrint.wrapped_; }
 
 }
 
