@@ -73,6 +73,9 @@ namespace simol
           ScalarType trace() const
           { return wrapped_.trace(); }
 
+          ScalarType determinant() const
+          { return wrapped_.determinant(); }
+
       public:
           typedef typename eigen<ScalarType>::DenseMatrixType WrappedType;
           typename eigen<ScalarType>::DenseMatrixType wrapped_;

@@ -248,7 +248,6 @@ namespace simol
     double H2_slat_N2(const SlaterDeterminant& Phi,
                       const SlaterDeterminant& Psi,
                       const SparseTensor<double>& E,
-                      size_t const numberOfElectrons,
                       size_t const M_disc)
     {
         assert(numberOfElectrons==2);
@@ -284,7 +283,7 @@ namespace simol
                    double ratio_ = 1e-12)
     {
         if (numberOfElectrons==2)
-            return H2_slat_N2(Phi,Psi,E,numberOfElectrons,M_disc_ );
+            return H2_slat_N2(Phi,Psi,E,M_disc_ );
 
         else
         {
@@ -636,7 +635,7 @@ namespace simol
 
                                         sum += pow(-1,iu) * pow(-1,ju+1) *pow(-1,iv) *pow(-1,jv+1)
                                              * ((muU1(iu)*muU2(ju) -muU1(ju)*muU2(iu)) * (muV1(iv)*muV2(jv) -muV1(jv)*muV2(iv)))
-                                             * sum2*(aU.wrapped_.determinant())*(aV.wrapped_.determinant());
+                                             * sum2*aU.determinant()*aV.determinant();
 
                                     }
                                 }
@@ -655,10 +654,7 @@ namespace simol
 
     double
     over_slat(SlaterDeterminant const & Phi, SlaterDeterminant const & Psi, DenseMatrix<double> const & O)
-    {
-        DenseMatrix<double> S = Smat(Phi, Psi, O);
-        return S.wrapped_.determinant();
-    }
+    { return Smat(Phi, Psi, O).determinant(); }
 
     SlaterDeterminant
     hartree_fock(DiscreteHamiltonian H,
@@ -703,7 +699,6 @@ namespace simol
             for (size_t i=0; i< numberOfElectrons; i++)
                 Phi0.wrapped_.col(i) = V.wrapped_.col(Itab[i]);
 
-            SlaterDeterminant sol(Phi0);
             double lambda2 = H1_slat(Phi0, Phi0, O, F0, numberOfElectrons, H.basisDimension()) + H2_slat(Phi0, Phi0, O, H.two_electrons(), numberOfElectrons, H.basisDimension());
             lambda2 /= over_slat(Phi0, Phi0, O);
 
