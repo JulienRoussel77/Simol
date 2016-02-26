@@ -41,7 +41,7 @@ namespace simol
 
    std::size_t numberOfIterations = 20;
 
-   SchrodingerHamiltonian H(dataPath, M_disc);
+   DiscreteHamiltonian H(dataPath, M_disc);
 
    SlaterDeterminant solution = hartree_fock(H,
                                              numberOfElectrons,

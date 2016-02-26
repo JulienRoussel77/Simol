@@ -6,7 +6,7 @@
 #include "SparseTensor.hpp"
 #include <vector>
 #include "core/linalg/Vector.hpp"
-#include "SchrodingerHamiltonian.hpp"
+#include "DiscreteHamiltonian.hpp"
 namespace simol
 {
 
@@ -661,7 +661,7 @@ namespace simol
     }
 
     SlaterDeterminant
-    hartree_fock(SchrodingerHamiltonian H,
+    hartree_fock(DiscreteHamiltonian H,
                  std::size_t const numberOfElectrons,
                  SlaterDeterminant const & initial_solution,
                  std::size_t const numberOfIterations)

@@ -1,19 +1,12 @@
-/*
- * File:   SchrodingerHamiltonian.hpp
- * Author: cdoucet
- *
- * Created on 28 octobre 2015, 14:19
- */
-
-#ifndef SIMOL_SCHRODINGERHAMILTONIAN_HPP
-#define	SIMOL_SCHRODINGERHAMILTONIAN_HPP
+#ifndef SIMOL_DISCRETEHAMILTONIAN_HPP
+#define	SIMOL_DISCRETEHAMILTONIAN_HPP
 
 namespace simol
 {
-    class SchrodingerHamiltonian
+    class DiscreteHamiltonian
     {
         public:
-           SchrodingerHamiltonian(std::string pathToData, std::size_t basisDimension)
+           DiscreteHamiltonian(std::string pathToData, std::size_t basisDimension)
            : kinetic_(pathToData + "kinetic_matrix.txt", basisDimension),
              overlap_(pathToData + "overlap_matrix.txt", basisDimension),
              potential_(pathToData + "potential_matrix.txt", basisDimension),
@@ -48,5 +41,5 @@ namespace simol
     };
 }
 
-#endif	/* SIMOL_SCHRODINGERHAMILTONIAN_HPP */
+#endif	/* SIMOL_DISCRETEHAMILTONIAN_HPP */
 
