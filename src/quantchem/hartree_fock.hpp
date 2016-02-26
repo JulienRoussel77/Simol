@@ -690,8 +690,8 @@ namespace simol
         {
             DenseMatrix<double> F = F0 + FockMat(H.basisDimension(), Phi0, H.two_electrons());
 
-            DenseMatrix<double> densmat = eigen<double>::DenseMatrixType( Phi0.wrapped_ * ( Phi0.adjoint().wrapped_ ) );
-	        DenseMatrix<double> prod = eigen<double>::DenseMatrixType(F.wrapped_ * densmat.wrapped_);
+            DenseMatrix<double> densmat = Phi0 * Phi0.adjoint();
+	        DenseMatrix<double> prod = F * densmat;
 	        double lambda = prod.trace();
             std::cout << "lambda = " << lambda << std::endl;
 

@@ -63,10 +63,12 @@ namespace simol
           DenseMatrix operator+(DenseMatrix const & other) const
           { return WrappedType(this->wrapped_ + other.wrapped_); }
 
+          // TODO: write a non-pessimized version (return type may different in eigen)
           DenseMatrix adjoint() const
-          {
-              return DenseMatrix(wrapped_.adjoint());
-          }
+          { return DenseMatrix(wrapped_.adjoint()); }
+
+          DenseMatrix operator*(DenseMatrix const & matrix) const
+          { return DenseMatrix( WrappedType(wrapped_ * matrix.wrapped_) ); }
 
           ScalarType trace() const
           { return wrapped_.trace(); }
