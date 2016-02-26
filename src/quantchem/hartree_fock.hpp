@@ -6,7 +6,7 @@
 #include "SparseTensor.hpp"
 #include <vector>
 #include "core/linalg/Vector.hpp"
-
+#include "SchrodingerHamiltonian.hpp"
 namespace simol
 {
 
@@ -661,12 +661,8 @@ namespace simol
     }
 
     SlaterDeterminant
-    hartree_fock(std::size_t const M_disc,
+    hartree_fock(SchrodingerHamiltonian H,
                  std::size_t const numberOfElectrons,
-                 SparseTensor<double> const & E,
-                 SparseMatrix<double> const & sparseK,
-                 SparseMatrix<double> const & sparseO,
-                 SparseMatrix<double> const & sparseNu,
                  SlaterDeterminant const & initial_solution,
                  std::size_t const numberOfIterations)
     {
@@ -676,23 +672,23 @@ namespace simol
 
         Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols, ", ", ", ", "", "", " << ", ";");
 
-        Eigen::MatrixXd I = Eigen::MatrixXd::Identity(sparseK.numberOfRows(), sparseK.numberOfColumns());
+        Eigen::MatrixXd I = Eigen::MatrixXd::Identity(H.basisDimension(), H.basisDimension());
 
-        DenseMatrix<double> K(sparseK.numberOfRows(), sparseK.numberOfColumns());
-        K.wrapped_ = sparseK.wrapped_.selfadjointView<Eigen::Upper>() * I;
+        DenseMatrix<double> K(H.basisDimension(), H.basisDimension());
+        K.wrapped_ = H.kinetic().wrapped_.selfadjointView<Eigen::Upper>() * I;
 
-        DenseMatrix<double> O(sparseK.numberOfRows(), sparseK.numberOfColumns());
-        O.wrapped_ = sparseO.wrapped_.selfadjointView<Eigen::Upper>() * I;
+        DenseMatrix<double> O(H.basisDimension(), H.basisDimension());
+        O.wrapped_ = H.overlap().wrapped_.selfadjointView<Eigen::Upper>() * I;
 
-        DenseMatrix<double> Nu(sparseK.numberOfRows(), sparseK.numberOfColumns());
-        Nu.wrapped_ = sparseNu.wrapped_.selfadjointView<Eigen::Upper>() * I;
+        DenseMatrix<double> Nu(H.basisDimension(), H.basisDimension());
+        Nu.wrapped_ = H.potential().wrapped_.selfadjointView<Eigen::Upper>() * I;
 
         DenseMatrix<double> F0 = K + Nu;
 
         //Roothan parce que c'est le plus simple: ToDo coder ODA
         for( std::size_t iteration = 0; iteration < numberOfIterations; ++iteration )
         {
-            DenseMatrix<double> F = F0 + FockMat(M_disc, Phi0, E);
+            DenseMatrix<double> F = F0 + FockMat(H.basisDimension(), Phi0, H.two_electrons());
 
             DenseMatrix<double> densmat = eigen<double>::DenseMatrixType( Phi0.wrapped_ * ( Phi0.adjoint().wrapped_ ) );
 	        DenseMatrix<double> prod = eigen<double>::DenseMatrixType(F.wrapped_ * densmat.wrapped_);
@@ -706,7 +702,7 @@ namespace simol
 
             std::vector<size_t> Itab = D.indices_of_smallest(numberOfElectrons);
 
-            DenseMatrix<double> Phinew = DenseMatrix<double>::Zero(M_disc, numberOfElectrons);
+            DenseMatrix<double> Phinew = DenseMatrix<double>::Zero(H.basisDimension(), numberOfElectrons);
             for (size_t i=0; i< numberOfElectrons; i++)
                 Phinew.wrapped_.col(i) = V.wrapped_.col(Itab[i]);
             Phi0 = Phinew;
@@ -714,7 +710,7 @@ namespace simol
             SlaterDeterminant sol(Phi0);
             DenseMatrix<double> sum(K.numberOfRows(), K.numberOfColumns());
             sum.wrapped_ = K.wrapped_ + Nu.wrapped_;
-            double lambda2 = H1_slat(Phi0, Phi0, O, sum, numberOfElectrons, M_disc) + H2_slat(Phi0, Phi0, O, E, numberOfElectrons, M_disc);
+            double lambda2 = H1_slat(Phi0, Phi0, O, sum, numberOfElectrons, H.basisDimension()) + H2_slat(Phi0, Phi0, O, H.two_electrons(), numberOfElectrons, H.basisDimension());
             lambda2 /= over_slat(Phi0, Phi0, O);
 
             std::cout << "lambda2 = " << lambda2 << std::endl;

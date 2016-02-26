@@ -41,11 +41,10 @@ namespace simol
 
    std::size_t numberOfIterations = 20;
 
-   SlaterDeterminant solution = hartree_fock(M_disc, numberOfElectrons,
-                                             twoelectron_matrix,
-                                             kinetic_matrix,
-                                             overlap_matrix,
-                                             potential_matrix,
+   SchrodingerHamiltonian H(dataPath, M_disc);
+
+   SlaterDeterminant solution = hartree_fock(H,
+                                             numberOfElectrons,
                                              initial_solution,
                                              numberOfIterations);
 

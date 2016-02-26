@@ -73,6 +73,34 @@ namespace simol
 	    in.close(); //On ferme le fichier
         wrapped_.setFromTriplets(tripletList.begin(), tripletList.end());
       }
+      SparseMatrix(std::string const & filename, std::size_t const size)
+      : wrapped_(size, size)
+      {
+     	FILE* fichier = fopen(filename.c_str(),"r" ); //ON ouvre le fichier en lecture seule
+        typedef Eigen::Triplet<double,std::size_t> T;
+	    std::vector<T> tripletList;
+        std::ifstream in(filename.c_str()); //Ouverture en mode lecture de "bdd.txt"
+	    std::string ligne; //Création d'une chaine de caractere
+	    int nbLignes = 0;
+	    int test = 0;
+
+	    while(std::getline(in, ligne))
+	    {
+		    int i;
+		    int j;
+		    long double t;
+		    test = 0;
+		    test = fscanf(fichier, "%d %d %Lf", &i , &j, &t);
+		    assert(test>0);
+		    double t0 =t;
+		    tripletList.push_back(T(i,j,t0));
+
+		    //On lit chaque ligne du fichier que l'on stoke dans "ligne"
+	           nbLignes++;
+	    }
+	    in.close(); //On ferme le fichier
+        wrapped_.setFromTriplets(tripletList.begin(), tripletList.end());
+      }
     public:
       typename eigen<ScalarType>::SparseMatrixType wrapped_;
   };
