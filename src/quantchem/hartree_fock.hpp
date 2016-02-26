@@ -708,9 +708,7 @@ namespace simol
             Phi0 = Phinew;
 
             SlaterDeterminant sol(Phi0);
-            DenseMatrix<double> sum(K.numberOfRows(), K.numberOfColumns());
-            sum.wrapped_ = K.wrapped_ + Nu.wrapped_;
-            double lambda2 = H1_slat(Phi0, Phi0, O, sum, numberOfElectrons, H.basisDimension()) + H2_slat(Phi0, Phi0, O, H.two_electrons(), numberOfElectrons, H.basisDimension());
+            double lambda2 = H1_slat(Phi0, Phi0, O, F0, numberOfElectrons, H.basisDimension()) + H2_slat(Phi0, Phi0, O, H.two_electrons(), numberOfElectrons, H.basisDimension());
             lambda2 /= over_slat(Phi0, Phi0, O);
 
             std::cout << "lambda2 = " << lambda2 << std::endl;
