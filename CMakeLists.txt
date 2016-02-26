@@ -110,8 +110,10 @@ else()
   message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} does not support -std=c++11 flag. Please use a different C++ compiler.")
 endif()
 
+SET(CMAKE_BUILD_TYPE "Release")
+
 if (CMAKE_BUILD_TYPE EQUAL "Release")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2" )
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3" )
 elseif (CMAKE_BUILD_TYPE EQUAL "Profile")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -pg" )
 else ()

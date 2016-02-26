@@ -63,6 +63,14 @@ namespace simol
           DenseMatrix operator+(DenseMatrix const & other) const
           { return WrappedType(this->wrapped_ + other.wrapped_); }
 
+          DenseMatrix adjoint() const
+          {
+              return DenseMatrix(wrapped_.adjoint());
+          }
+
+          ScalarType trace() const
+          { return wrapped_.trace(); }
+
       public:
           typedef typename eigen<ScalarType>::DenseMatrixType WrappedType;
           typename eigen<ScalarType>::DenseMatrixType wrapped_;

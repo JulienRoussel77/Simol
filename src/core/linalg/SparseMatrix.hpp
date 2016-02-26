@@ -2,7 +2,7 @@
 #define SIMOL_SPARSEMATRIX_HPP
 
 #include "core/io/MatrixMarketFile.hpp"
-
+#include "quantchem/SparseTensor.hpp"
 #include "eigen.hpp"
 
 #include "dsaupd.hpp"
@@ -10,6 +10,16 @@
 
 namespace simol
 {
+    std::size_t
+    getInd(std::size_t const M_disc,
+           std::size_t const rowIndex,
+           std::size_t const columnIndex)
+    {
+        assert(rowIndex < M_disc && columnIndex < M_disc);
+        return rowIndex * M_disc + columnIndex;
+    }
+
+
   template<class ScalarType, template<class> class WrappedLibrary = eigen>
   class SparseMatrix;
 
@@ -35,6 +45,34 @@ namespace simol
     public:
       SparseMatrix(size_t const numberOfRows, size_t const numberOfColumns);
       SparseMatrix(MatrixMarketFile const & file);
+      SparseMatrix(const char * filename, std::size_t const size)
+      : wrapped_(size, size)
+      {
+     	FILE* fichier = fopen(filename,"r" ); //ON ouvre le fichier en lecture seule
+        typedef Eigen::Triplet<double,std::size_t> T;
+	    std::vector<T> tripletList;
+        std::ifstream in(filename); //Ouverture en mode lecture de "bdd.txt"
+	    std::string ligne; //Création d'une chaine de caractere
+	    int nbLignes = 0;
+	    int test = 0;
+
+	    while(std::getline(in, ligne))
+	    {
+		    int i;
+		    int j;
+		    long double t;
+		    test = 0;
+		    test = fscanf(fichier, "%d %d %Lf", &i , &j, &t);
+		    assert(test>0);
+		    double t0 =t;
+		    tripletList.push_back(T(i,j,t0));
+
+		    //On lit chaque ligne du fichier que l'on stoke dans "ligne"
+	           nbLignes++;
+	    }
+	    in.close(); //On ferme le fichier
+        wrapped_.setFromTriplets(tripletList.begin(), tripletList.end());
+      }
     public:
       typename eigen<ScalarType>::SparseMatrixType wrapped_;
   };

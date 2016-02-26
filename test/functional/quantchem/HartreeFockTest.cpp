@@ -11,11 +11,8 @@ namespace simol
     MatrixMarketFile overlap_file(dataPath + "overlap_matrix.mtx");
     MatrixMarketFile potential_file(dataPath + "potential_matrix.mtx");
 
-    DenseMatrix<double> kinetic_matrix(kinetic_file);
-    std::cout << "K apres lecture:" << std::endl;
-    std::cout << kinetic_matrix << std::endl;
-    DenseMatrix<double> overlap_matrix(overlap_file);
-    DenseMatrix<double> potential_matrix(potential_file);
+    //DenseMatrix<double> overlap_matrix(overlap_file);
+    //DenseMatrix<double> potential_matrix(potential_file);
 
     std::string filename = dataPath + "n.txt";
     FILE* size_file = fopen(filename.c_str(), "r");
@@ -23,6 +20,15 @@ namespace simol
     fscanf(size_file, "%lu", &M_disc);
 
     std::cout << "M_disc = " << M_disc << std::endl;
+
+    std::string kinetic_txt = dataPath + "kinetic_matrix.txt";
+    SparseMatrix<double> kinetic_matrix(kinetic_txt.c_str(), M_disc);
+
+    std::string overlap_txt = dataPath + "overlap_matrix.txt";
+    SparseMatrix<double> overlap_matrix(overlap_txt.c_str(), M_disc);
+
+    std::string potential_txt = dataPath + "potential_matrix.txt";
+    SparseMatrix<double> potential_matrix(potential_txt.c_str(), M_disc);
 
     SparseTensor<double> twoelectron_matrix(dataPath + "twoelectron_matrix.txt", M_disc);
    std::size_t numberOfElectrons = 2;

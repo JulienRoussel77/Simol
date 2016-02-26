@@ -10,36 +10,6 @@
 namespace simol
 {
 
-
-    DenseMatrix<double>
-    FockMat(std::size_t const M_disc,
-            DenseMatrix<double> const & Phi,
-            SparseTensor<double> const & E)
-    {
-
-        //A améliorer pour faire que la matrice de Fock soit une matrice sparse symmétrique
-        DenseMatrix<double> G0 = DenseMatrix<double>::Zero(M_disc, M_disc);
-        DenseMatrix<double> D(Phi.numberOfRows(), Phi.numberOfRows());
-        D.wrapped_ = Phi.wrapped_ * Phi.wrapped_.adjoint();
-
-        for (size_t k=0; k< M_disc; k++)
-        {
-            for (size_t l=k; l< M_disc; l++)
-            {
-                for (size_t k1=0; k1 < M_disc; k1++)
-                {
-                    for (size_t k2=0; k2 < M_disc; k2++)
-                        G0(k,l) += D(k1,k2)*(E(getInd(M_disc,k,l),getInd(M_disc,k1,k2)) - E(getInd(M_disc,k,k2),getInd(M_disc,k1,l)));
-                }
-                G0(l,k) = G0(k,l);
-            }
-        }
-
-        return G0;
-
-    }
-
-
     double
     electric_integral(std::size_t const M_disc,
                       Vector<double> const & psi1,
@@ -65,6 +35,49 @@ namespace simol
         temp.wrapped_ = E.nonzeros_.wrapped_.selfadjointView<Eigen::Upper>() * U12v.wrapped_;
         return U34v.wrapped_.adjoint() * temp.wrapped_;
     }
+
+
+    DenseMatrix<double>
+    FockMat(std::size_t const M_disc,
+            DenseMatrix<double> const & Phi,
+            SparseTensor<double> const & E)
+    {
+
+        //A améliorer pour faire que la matrice de Fock soit une matrice sparse symmétrique
+        DenseMatrix<double> G0 = DenseMatrix<double>::Zero(M_disc, M_disc);
+        DenseMatrix<double> D(Phi.numberOfRows(), Phi.numberOfRows());
+        D.wrapped_ = Phi.wrapped_ * Phi.wrapped_.adjoint();
+
+        for (size_t k=0; k< M_disc; k++)
+        {
+            Vector<double> Phik = Vector<double>::Zero(M_disc);
+            Phik(k) = 1;
+            for (size_t l=k; l< M_disc; l++)
+            {
+                Vector<double> Phil = Vector<double>::Zero(M_disc);
+                Phil(l) = 1;
+                for (size_t k1=0; k1 < M_disc; k1++)
+                {
+                    Vector<double> Phik1 = Vector<double>::Zero(M_disc);
+                    Phik1(k1) = 1;
+                    for (size_t k2=0; k2 < M_disc; k2++)
+                    {
+                        Vector<double> Phik2 = Vector<double>::Zero(M_disc);
+                        Phik2(k2) = 1;
+                        //G0(k,l) += D(k1,k2)*(E(getInd(M_disc,k,l),getInd(M_disc,k1,k2)) - E(getInd(M_disc,k,k2),getInd(M_disc,k1,l)));
+                        G0(k,l) += D(k1,k2) * ( electric_integral(M_disc, Phik, Phil, Phik1, Phik2, E) - electric_integral(M_disc, Phik, Phik2, Phik1, Phil, E) );
+
+                    }
+                }
+                G0(l,k) = G0(k,l);
+            }
+        }
+
+        G0.wrapped_ = 0.5 * G0.wrapped_;
+        return G0;
+
+    }
+
 
 
     double
@@ -655,9 +668,9 @@ namespace simol
     hartree_fock(std::size_t const M_disc,
                  std::size_t const numberOfElectrons,
                  SparseTensor<double> const & E,
-                 DenseMatrix<double> const & K,
-                 DenseMatrix<double> const & O,
-                 DenseMatrix<double> const & Nu,
+                 SparseMatrix<double> const & sparseK,
+                 SparseMatrix<double> const & sparseO,
+                 SparseMatrix<double> const & sparseNu,
                  SlaterDeterminant const & initial_solution,
                  std::size_t const numberOfIterations)
     {
@@ -667,47 +680,68 @@ namespace simol
         DenseMatrix<double> Phi0 = initial_solution.matrix();
 
         Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols, ", ", ", ", "", "", " << ", ";");
-        std::cout << "Phi0:" << std::endl;
-        std::cout << Phi0.wrapped_.format(CommaInitFmt) << std::endl;
 
-        std::cout << "K:" << std::endl;
-        std::cout << K.wrapped_.format(CommaInitFmt) << std::endl;
-        std::cout << "Nu:" << std::endl;
-        std::cout << K.wrapped_.format(CommaInitFmt) << std::endl;
+        Eigen::MatrixXd I = Eigen::MatrixXd::Identity(sparseK.numberOfRows(), sparseK.numberOfColumns());
 
+        DenseMatrix<double> K(sparseK.numberOfRows(), sparseK.numberOfColumns());
+        K.wrapped_ = sparseK.wrapped_.selfadjointView<Eigen::Upper>() * I;
 
+        DenseMatrix<double> O(sparseK.numberOfRows(), sparseK.numberOfColumns());
+        O.wrapped_ = sparseO.wrapped_.selfadjointView<Eigen::Upper>() * I;
+
+        DenseMatrix<double> Nu(sparseK.numberOfRows(), sparseK.numberOfColumns());
+        Nu.wrapped_ = sparseNu.wrapped_.selfadjointView<Eigen::Upper>() * I;
 
         DenseMatrix<double> F0 = K + Nu;
-        std::cout << "F0:" << std::endl;
-        std::cout << F0.wrapped_.format(CommaInitFmt) << std::endl;
 
         std::cout << "    Main loop_" << std::endl;
         //Roothan parce que c'est le plus simple: ToDo coder ODA
-        for( std::size_t iteration = 0; iteration < numberOfIterations; ++iteration )
+        for( std::size_t iteration = 0; iteration < 2; ++iteration )
         {
             DenseMatrix<double> F = F0 + FockMat(M_disc, Phi0, E);
+
+            std::cout << "F:" << std::endl;
+            std::cout << F.wrapped_.format(CommaInitFmt) << std::endl;
+
+            DenseMatrix<double> densmat = eigen<double>::DenseMatrixType( Phi0.wrapped_ * ( Phi0.adjoint().wrapped_ ) );
+                std::cout << "densmat:" << std::endl;
+                std::cout << densmat.wrapped_.format(CommaInitFmt) << std::endl;
+	        DenseMatrix<double> prod = eigen<double>::DenseMatrixType(F.wrapped_ * densmat.wrapped_);
+                std::cout << "prod:" << std::endl;
+                std::cout << prod.wrapped_.format(CommaInitFmt) << std::endl;
+	        double lambda = prod.trace();
+            std::cout << "lambda = " << lambda << std::endl;
 
             Eigen::GeneralizedSelfAdjointEigenSolver<eigen<double>::DenseMatrixType> es(F.wrapped_, O.wrapped_, Eigen::ComputeEigenvectors|Eigen::Ax_lBx);
 
             Vector<double> D = es.eigenvalues();
+                std::cout << "D:" << std::endl;
+                std::cout << D.wrapped_.format(CommaInitFmt) << std::endl;
             DenseMatrix<double> V = es.eigenvectors();
+                std::cout << "V:" << std::endl;
+                std::cout << V.wrapped_.format(CommaInitFmt) << std::endl;
 
             std::vector<size_t> Itab = D.indices_of_smallest(numberOfElectrons);
 
             DenseMatrix<double> Phinew = DenseMatrix<double>::Zero(M_disc, numberOfElectrons);
             for (size_t i=0; i< numberOfElectrons; i++)
                 Phinew.wrapped_.col(i) = V.wrapped_.col(Itab[i]);
+                std::cout << "Phinew:" << std::endl;
+                std::cout << Phinew.wrapped_.format(CommaInitFmt) << std::endl;
             Phi0 = Phinew;
-            std::cout << "        Phi0" << std::endl;
 
 
-            std::cout << "        start lambda" << std::endl;
+            /*std::cout << "        start lambda" << std::endl;
             double lambda = 0;
             for (std::size_t i = 0; i < numberOfElectrons; ++i)
             {
                 lambda += D(Itab[i]);
+                std::cout << "lambda = " << lambda << std::endl;
                 std::cout << "            lambda update" << std::endl;
                 Vector<double> column_i = Phi0.column(i);
+                std::cout << "column_i:" << std::endl;
+                std::cout << column_i.wrapped_.format(CommaInitFmt) << std::endl;
+
                 std::cout << "            column i" << std::endl;
                 for (std::size_t j = 0; j< numberOfElectrons; ++j)
                 {
@@ -717,7 +751,7 @@ namespace simol
                     std::cout << "                lambda inner update" << std::endl;
                 }
             }
-            std::cout << "        finish lambda" << std::endl;
+            std::cout << "        finish lambda" << std::endl;*/
 
 //            SlaterDeterminant sol(Phi0);
             //DenseMatrix<double> sum(K.numberOfRows(), K.numberOfColumns());
