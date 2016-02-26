@@ -64,7 +64,6 @@ namespace simol
                     {
                         Vector<double> Phik2 = Vector<double>::Zero(M_disc);
                         Phik2(k2) = 1;
-                        //G0(k,l) += D(k1,k2)*(E(getInd(M_disc,k,l),getInd(M_disc,k1,k2)) - E(getInd(M_disc,k,k2),getInd(M_disc,k1,l)));
                         G0(k,l) += D(k1,k2) * ( electric_integral(M_disc, Phik, Phil, Phik1, Phik2, E) - electric_integral(M_disc, Phik, Phik2, Phik1, Phil, E) );
 
                     }
@@ -730,35 +729,13 @@ namespace simol
                 std::cout << Phinew.wrapped_.format(CommaInitFmt) << std::endl;
             Phi0 = Phinew;
 
+            SlaterDeterminant sol(Phi0);
+            DenseMatrix<double> sum(K.numberOfRows(), K.numberOfColumns());
+            sum.wrapped_ = K.wrapped_ + Nu.wrapped_;
+            double lambda2 = H1_slat(Phi0, Phi0, O, sum, numberOfElectrons, M_disc) + H2_slat(Phi0, Phi0, O, E, numberOfElectrons, M_disc);
+            lambda2 /= over_slat(Phi0, Phi0, O);
 
-            /*std::cout << "        start lambda" << std::endl;
-            double lambda = 0;
-            for (std::size_t i = 0; i < numberOfElectrons; ++i)
-            {
-                lambda += D(Itab[i]);
-                std::cout << "lambda = " << lambda << std::endl;
-                std::cout << "            lambda update" << std::endl;
-                Vector<double> column_i = Phi0.column(i);
-                std::cout << "column_i:" << std::endl;
-                std::cout << column_i.wrapped_.format(CommaInitFmt) << std::endl;
-
-                std::cout << "            column i" << std::endl;
-                for (std::size_t j = 0; j< numberOfElectrons; ++j)
-                {
-                    Vector<double> column_j = Phi0.column(j);
-                    lambda += 0.5 * ( electric_integral(M_disc, column_i, column_i, column_j, column_j, E)
-                                    - electric_integral(M_disc, column_i, column_j, column_j, column_i, E) );
-                    std::cout << "                lambda inner update" << std::endl;
-                }
-            }
-            std::cout << "        finish lambda" << std::endl;*/
-
-//            SlaterDeterminant sol(Phi0);
-            //DenseMatrix<double> sum(K.numberOfRows(), K.numberOfColumns());
-            //sum.wrapped_ = K.wrapped_ + Nu.wrapped_;
-            //double lambda2 = H1_slat(Phi0, Phi0, O, sum, numberOfElectrons, M_disc) + H2_slat(Phi0, Phi0, O, E, numberOfElectrons, M_disc);
-            //lambda2 /= over_slat(Phi0, Phi0, O);
-
+            std::cout << "lambda2 = " << lambda2 << std::endl;
 
         }
 
