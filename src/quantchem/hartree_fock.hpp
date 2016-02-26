@@ -660,9 +660,6 @@ namespace simol
         return S.wrapped_.determinant();
     }
 
-
-
-
     SlaterDeterminant
     hartree_fock(std::size_t const M_disc,
                  std::size_t const numberOfElectrons,
@@ -675,7 +672,6 @@ namespace simol
     {
         //A améliorer: pour l'instant j'utilise des matrices pleines car il n'y a pas de solveur eigenvalue pour les matrices sparses
 
-        std::cout << "start" << std::endl;
         DenseMatrix<double> Phi0 = initial_solution.matrix();
 
         Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols, ", ", ", ", "", "", " << ", ";");
@@ -693,40 +689,26 @@ namespace simol
 
         DenseMatrix<double> F0 = K + Nu;
 
-        std::cout << "    Main loop_" << std::endl;
         //Roothan parce que c'est le plus simple: ToDo coder ODA
-        for( std::size_t iteration = 0; iteration < 2; ++iteration )
+        for( std::size_t iteration = 0; iteration < numberOfIterations; ++iteration )
         {
             DenseMatrix<double> F = F0 + FockMat(M_disc, Phi0, E);
 
-            std::cout << "F:" << std::endl;
-            std::cout << F.wrapped_.format(CommaInitFmt) << std::endl;
-
             DenseMatrix<double> densmat = eigen<double>::DenseMatrixType( Phi0.wrapped_ * ( Phi0.adjoint().wrapped_ ) );
-                std::cout << "densmat:" << std::endl;
-                std::cout << densmat.wrapped_.format(CommaInitFmt) << std::endl;
 	        DenseMatrix<double> prod = eigen<double>::DenseMatrixType(F.wrapped_ * densmat.wrapped_);
-                std::cout << "prod:" << std::endl;
-                std::cout << prod.wrapped_.format(CommaInitFmt) << std::endl;
 	        double lambda = prod.trace();
             std::cout << "lambda = " << lambda << std::endl;
 
             Eigen::GeneralizedSelfAdjointEigenSolver<eigen<double>::DenseMatrixType> es(F.wrapped_, O.wrapped_, Eigen::ComputeEigenvectors|Eigen::Ax_lBx);
 
             Vector<double> D = es.eigenvalues();
-                std::cout << "D:" << std::endl;
-                std::cout << D.wrapped_.format(CommaInitFmt) << std::endl;
             DenseMatrix<double> V = es.eigenvectors();
-                std::cout << "V:" << std::endl;
-                std::cout << V.wrapped_.format(CommaInitFmt) << std::endl;
 
             std::vector<size_t> Itab = D.indices_of_smallest(numberOfElectrons);
 
             DenseMatrix<double> Phinew = DenseMatrix<double>::Zero(M_disc, numberOfElectrons);
             for (size_t i=0; i< numberOfElectrons; i++)
                 Phinew.wrapped_.col(i) = V.wrapped_.col(Itab[i]);
-                std::cout << "Phinew:" << std::endl;
-                std::cout << Phinew.wrapped_.format(CommaInitFmt) << std::endl;
             Phi0 = Phinew;
 
             SlaterDeterminant sol(Phi0);

@@ -14,6 +14,8 @@ namespace simol
     //DenseMatrix<double> overlap_matrix(overlap_file);
     //DenseMatrix<double> potential_matrix(potential_file);
 
+    std::cout.precision(20);
+
     std::string filename = dataPath + "n.txt";
     FILE* size_file = fopen(filename.c_str(), "r");
     size_t M_disc;
