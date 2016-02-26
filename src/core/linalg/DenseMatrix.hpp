@@ -76,6 +76,9 @@ namespace simol
           ScalarType determinant() const
           { return wrapped_.determinant(); }
 
+          Vector<ScalarType> operator*(Vector<ScalarType> const & vector)
+          { return Vector<ScalarType>(wrapped_ * vector.wrapped_); }
+
       public:
           typedef typename eigen<ScalarType>::DenseMatrixType WrappedType;
           typename eigen<ScalarType>::DenseMatrixType wrapped_;

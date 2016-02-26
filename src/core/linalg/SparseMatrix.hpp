@@ -54,14 +54,13 @@ namespace simol
         std::ifstream in(filename); //Ouverture en mode lecture de "bdd.txt"
 	    std::string ligne; //Création d'une chaine de caractere
 	    int nbLignes = 0;
-	    int test = 0;
 
 	    while(std::getline(in, ligne))
 	    {
 		    int i;
 		    int j;
 		    long double t;
-		    test = 0;
+		    int test = 0;
 		    test = fscanf(fichier, "%d %d %Lf", &i , &j, &t);
 		    assert(test>0);
 		    double t0 =t;
@@ -82,14 +81,13 @@ namespace simol
         std::ifstream in(filename.c_str()); //Ouverture en mode lecture de "bdd.txt"
 	    std::string ligne; //Création d'une chaine de caractere
 	    int nbLignes = 0;
-	    int test = 0;
 
 	    while(std::getline(in, ligne))
 	    {
 		    int i;
 		    int j;
 		    long double t;
-		    test = 0;
+		    int test = 0;
 		    test = fscanf(fichier, "%d %d %Lf", &i , &j, &t);
 		    assert(test>0);
 		    double t0 =t;

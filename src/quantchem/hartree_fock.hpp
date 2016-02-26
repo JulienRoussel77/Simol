@@ -45,8 +45,7 @@ namespace simol
 
         //A améliorer pour faire que la matrice de Fock soit une matrice sparse symmétrique
         DenseMatrix<double> G0 = DenseMatrix<double>::Zero(M_disc, M_disc);
-        DenseMatrix<double> D(Phi.numberOfRows(), Phi.numberOfRows());
-        D.wrapped_ = Phi.wrapped_ * Phi.wrapped_.adjoint();
+        DenseMatrix<double> D = Phi * Phi.adjoint();
 
         for (size_t k=0; k< M_disc; k++)
         {
@@ -99,7 +98,7 @@ namespace simol
         {
             DenseMatrix<double> temp(S.numberOfRows(), A.numberOfColumns());
             temp.wrapped_ = S.wrapped_.inverse() * A.wrapped_;
-            return (S.wrapped_.determinant())*(temp.wrapped_.trace());
+            return S.determinant() * temp.trace();
         }
         else
         {
@@ -129,15 +128,11 @@ namespace simol
             {
                 int indmin = D.index_of_minimum();
 
-                Vector<double> xV(Vvec.numberOfRows());
-                xV.wrapped_ = Vvec.wrapped_.col(indmin);
-                Vector<double> xU(Uvec.numberOfRows());
-                xU.wrapped_ = Uvec.wrapped_.col(indmin);
+                Vector<double> xV = Vvec.column(indmin);
+                Vector<double> xU = Uvec.column(indmin);
 
-                Vector<double> orthU(U.numberOfRows());
-                orthU.wrapped_ = U.wrapped_ * xU.wrapped_;  //Vecteur dans l'orthogonal du sous-espace engendré par V
-                Vector<double> orthV(V.numberOfRows());
-                orthV.wrapped_ = V.wrapped_ * xV.wrapped_;  //Vecteur dans l'orthogonal du sous-espace engendré par U
+                Vector<double> orthU = U * xU;  //Vecteur dans l'orthogonal du sous-espace engendré par V
+                Vector<double> orthV = V * xV;  //Vecteur dans l'orthogonal du sous-espace engendré par U
 
                 Vector<double> temp(O.numberOfRows());
                 temp.wrapped_ = O.wrapped_.selfadjointView<Eigen::Upper>() * orthU.wrapped_;
@@ -173,8 +168,7 @@ namespace simol
                 xUbas.wrapped_.block(0,0, numberOfElectrons, indmin) = Uvec.wrapped_.block(0,0, numberOfElectrons, indmin);
                 xUbas.wrapped_.block(0,indmin, numberOfElectrons, numberOfElectrons-indmin-1) = Uvec.wrapped_.block(0, indmin+1, numberOfElectrons, numberOfElectrons-indmin-1);
 
-                DenseMatrix<double> coeffs_bas(U.numberOfRows(), xUbas.numberOfColumns());
-                coeffs_bas.wrapped_ = U.wrapped_*xUbas.wrapped_;
+                DenseMatrix<double> coeffs_bas = U * xUbas;
                 //Puis on orthonormalise les vecteurs de coeffs_bas
                 for (size_t i=0; i<(numberOfElectrons-1); i++)
                 {
@@ -580,7 +574,7 @@ namespace simol
                             coeffs_bas.wrapped_.col(i) = coeffs_bas.wrapped_.col(i) - PS3*orthU1.wrapped_;
                             temp3.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>())*(coeffs_bas.wrapped_.col(i));
                             PS3 = (orthU2.wrapped_.adjoint())*temp3.wrapped_;
-                            coeffs_bas.wrapped_.col(i) = coeffs_bas.wrapped_.col(i) - PS3*orthU2.wrapped_;
+                            coeffs_bas.column(i) = coeffs_bas.column(i) - PS3 * orthU2;
                             for (size_t j=0; j<i; j++)
                             {
                                 temp3.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>())*(coeffs_bas.wrapped_.col(i));
