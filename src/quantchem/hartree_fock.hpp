@@ -670,8 +670,6 @@ namespace simol
 
         DenseMatrix<double> Phi0 = initial_solution.matrix();
 
-        Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols, ", ", ", ", "", "", " << ", ";");
-
         Eigen::MatrixXd I = Eigen::MatrixXd::Identity(H.basisDimension(), H.basisDimension());
 
         DenseMatrix<double> K(H.basisDimension(), H.basisDimension());
@@ -702,10 +700,8 @@ namespace simol
 
             std::vector<size_t> Itab = D.indices_of_smallest(numberOfElectrons);
 
-            DenseMatrix<double> Phinew = DenseMatrix<double>::Zero(H.basisDimension(), numberOfElectrons);
             for (size_t i=0; i< numberOfElectrons; i++)
-                Phinew.wrapped_.col(i) = V.wrapped_.col(Itab[i]);
-            Phi0 = Phinew;
+                Phi0.wrapped_.col(i) = V.wrapped_.col(Itab[i]);
 
             SlaterDeterminant sol(Phi0);
             double lambda2 = H1_slat(Phi0, Phi0, O, F0, numberOfElectrons, H.basisDimension()) + H2_slat(Phi0, Phi0, O, H.two_electrons(), numberOfElectrons, H.basisDimension());
