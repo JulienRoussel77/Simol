@@ -303,23 +303,19 @@ namespace simol
 
                 for (size_t i=0; i < numberOfElectrons; i++)
                 {
-                    Vector<double> Ucol_i(U.numberOfRows());
-                    Ucol_i.wrapped_ = U.wrapped_.col(i);
+                    Vector<double> Ucol_i = U.column(i);
 
                     for (size_t j=0; j < numberOfElectrons; j++)
                     {
-                        Vector<double> Ucol_j(U.numberOfRows());
-                        Ucol_j.wrapped_ = U.wrapped_.col(j);
+                        Vector<double> Ucol_j = U.column(j);
 
                         for (size_t k = 0; k < numberOfElectrons; k++)
                         {
-                            Vector<double> Vcol_k(U.numberOfRows());
-                            Vcol_k.wrapped_ = V.wrapped_.col(k);
+                            Vector<double> Vcol_k = V.column(k);
 
                             for (size_t l=0; l < numberOfElectrons; l++)
                             {
-                                Vector<double> Vcol_l(U.numberOfRows());
-                                Vcol_l.wrapped_ = V.wrapped_.col(l);
+                                Vector<double> Vcol_l = V.column(l);
 
                                  //Ici je prends les notations de Friedrichs
                                 scal0 += 0.5 * electric_integral(M_disc_, Ucol_i, Vcol_k, Ucol_j, Vcol_l, E)
@@ -352,9 +348,6 @@ namespace simol
                         ++mult;
                 }
 
-
-                //cout << "mult = " << mult << endl;
-
                 //si la multiplicité de 0 est plus grande que 2, la valeur est 0
                 if (mult >2.5)
                     return 0;
@@ -365,21 +358,17 @@ namespace simol
                     {
 
                         int indmin = D.index_of_minimum();
-                        Vector<double> xV(Vvec.numberOfRows());
-                        xV.wrapped_ = Vvec.wrapped_.col(indmin);
-                        Vector<double> xU(Uvec.numberOfRows());
-                        xU.wrapped_ = Uvec.wrapped_.col(indmin);
+                        Vector<double> xV = Vvec.column(indmin);
+                        Vector<double> xU = Uvec.column(indmin);
 
-                        Vector<double> orthU(U.numberOfRows());
-                        orthU.wrapped_ = U.wrapped_ * xU.wrapped_;  //Vecteur dans l'orthogonal du sous-espace engendré par V
-                        Vector<double> orthV(V.numberOfRows());
-                        orthV.wrapped_ = V.wrapped_ * xV.wrapped_;  //Vecteur dans l'orthogonal du sous-espace engendré par U
+                        Vector<double> orthU = U * xU;  //Vecteur dans l'orthogonal du sous-espace engendré par V
+                        Vector<double> orthV = V * xV;  //Vecteur dans l'orthogonal du sous-espace engendré par U
 
                         Vector<double> temp(O.numberOfColumns());
                         temp.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>()) * orthU.wrapped_;
-                        orthU.wrapped_ = 1.0 / sqrt( (orthU.wrapped_.adjoint() * temp.wrapped_) ) * orthU.wrapped_;
+                        orthU.wrapped_ = 1.0 / sqrt( (orthU, temp) ) * orthU.wrapped_;
                         temp.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>()) * orthV.wrapped_;
-                        orthV.wrapped_ = 1.0 / sqrt( (orthV.wrapped_.adjoint()) *temp.wrapped_) *orthV.wrapped_;
+                        orthV.wrapped_ = 1.0 / sqrt( (orthV, temp) ) * orthV.wrapped_;
 
 
                         DenseMatrix<double> PsiU = DenseMatrix<double>::Zero(M_disc_,numberOfElectrons); //Le reste des fonctions: le deux sous-espaces engendrés sont les mêmes, égaux à l'intersection de deux sous-espaces de départ
@@ -391,13 +380,13 @@ namespace simol
                         for(size_t k=0; k<numberOfElectrons; k++)
                         {
                             temp.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>()) * (U.wrapped_.col(k));
-                            double PS = orthU.wrapped_.adjoint() * temp.wrapped_;
-                            PsiU.wrapped_.col(k) = U.wrapped_.col(k) - PS * orthU.wrapped_;
+                            double PS = (orthU, temp);
+                            PsiU.column(k) = U.column(k) - PS * orthU;
                             muU(k) = PS;
 
                             temp.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>()) * (V.wrapped_.col(k));
-                            PS = orthV.wrapped_.adjoint()*temp.wrapped_;
-                            PsiV.wrapped_.col(k) = V.wrapped_.col(k) - PS*orthV.wrapped_;
+                            PS = (orthV, temp);
+                            PsiV.column(k) = V.column(k) - PS * orthV;
                             muV(k) = PS;
                         }
 
@@ -407,26 +396,25 @@ namespace simol
                         xUbas.wrapped_.block(0,0, numberOfElectrons, indmin) = Uvec.wrapped_.block(0,0, numberOfElectrons, indmin);
                         xUbas.wrapped_.block(0,indmin, numberOfElectrons, numberOfElectrons-indmin-1) = Uvec.wrapped_.block(0, indmin+1, numberOfElectrons, numberOfElectrons-indmin-1);
 
-                        DenseMatrix<double> coeffs_bas(U.numberOfRows(), xUbas.numberOfColumns());
-                        coeffs_bas.wrapped_ = U.wrapped_ * xUbas.wrapped_;
+                        DenseMatrix<double> coeffs_bas = U * xUbas;
                         //Puis on orthonormalise les vecteurs de coeffs_bas
                         for (size_t i=0; i<(numberOfElectrons-1); i++)
                         {
                             Vector<double> temp2(O.numberOfColumns());
                             temp2.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>()) * (coeffs_bas.wrapped_.col(i));
-                            double PS2 = orthU.wrapped_.adjoint()*temp2.wrapped_;
-                            coeffs_bas.wrapped_.col(i) = coeffs_bas.wrapped_.col(i) - PS2*orthU.wrapped_;
+                            double PS2 = (orthU, temp2);
+                            coeffs_bas.column(i) = coeffs_bas.column(i) - PS2 * orthU;
 
                             for (size_t j=0; j<i; j++)
                             {
                                 temp2.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>()) * (coeffs_bas.wrapped_.col(j));
-                                PS2 = ((coeffs_bas.wrapped_.col(i)).adjoint())*temp2.wrapped_;
-                                coeffs_bas.wrapped_.col(i) = coeffs_bas.wrapped_.col(i) - PS2*coeffs_bas.wrapped_.col(j);
+                                PS2 = (coeffs_bas.column(i), temp2);
+                                coeffs_bas.column(i) = coeffs_bas.column(i) - PS2 * coeffs_bas.column(j);
                             }
 
                             temp2.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>()) * (coeffs_bas.wrapped_.col(i));
-                            PS2 = ((coeffs_bas.wrapped_.col(i)).adjoint()) * temp2.wrapped_;
-                            coeffs_bas.wrapped_.col(i) = (1.0/sqrt(PS2)) * coeffs_bas.wrapped_.col(i);
+                            PS2 = (coeffs_bas.column(i), temp2);
+                            coeffs_bas.column(i) = (1.0/sqrt(PS2)) * coeffs_bas.column(i);
 
                         }
 
@@ -439,11 +427,11 @@ namespace simol
                             {
                                 Vector<double> temp(O.numberOfRows());
                                 temp.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>()) * (coeffs_bas.wrapped_.col(l));
-                                double PS = ((PsiU.wrapped_.col(k)).adjoint()) * temp.wrapped_;
+                                double PS = (PsiU.column(k), temp);
                                 CU(l,k) = PS;
 
                                 temp.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>()) * (coeffs_bas.wrapped_.col(l));
-                                PS = ((PsiV.wrapped_.col(k)).adjoint())*temp.wrapped_;
+                                PS = (PsiV.column(k), temp);
                                 CV(l,k) = PS;
                             }
                         }
@@ -470,7 +458,7 @@ namespace simol
                                 aV.wrapped_.block(0,0,numberOfElectrons-1,k2) = CV.wrapped_.block(0,0,numberOfElectrons-1,k2);
                                 aV.wrapped_.block(0,k2,numberOfElectrons-1, numberOfElectrons-1-k2) = CV.wrapped_.block(0,k2+1,numberOfElectrons-1, numberOfElectrons-1-k2);
 
-                                sum += muU(k1)*muV(k2)*pow(-1,k1)*pow(-1,k2)*sum2*(aU.wrapped_.determinant())*(aV.wrapped_.determinant());
+                                sum += muU(k1)*muV(k2)*pow(-1,k1)*pow(-1,k2)*sum2*(aU.determinant())*(aV.determinant());
                             }
 
                         }
@@ -485,10 +473,8 @@ namespace simol
                         //orthonormaux à l'espace
 
                         size_t indmin = D.index_of_minimum();
-                        Vector<double> xV1(Vvec.numberOfRows());
-                        xV1.wrapped_ = Vvec.wrapped_.col(indmin);
-                        Vector<double> xU1(Uvec.numberOfRows());
-                        xU1.wrapped_ = Uvec.wrapped_.col(indmin);
+                        Vector<double> xV1 = Vvec.column(indmin);
+                        Vector<double> xU1 = Uvec.column(indmin);
 
                         D(indmin) = 1e20;
 
@@ -496,33 +482,29 @@ namespace simol
                         Vector<double> xV2 = Vvec.column(indmin2);
                         Vector<double> xU2 = Uvec.column(indmin2);
 
-                        Vector<double> orthU1(U.numberOfRows());
-                        orthU1.wrapped_ = U.wrapped_ * xU1.wrapped_;  //Vecteur dans l'orthogonal du sous-espace engendré par V
-                        Vector<double> orthU2(U.numberOfRows());
-                        orthU1.wrapped_ = U.wrapped_ * xU2.wrapped_;
-                        Vector<double> orthV1(V.numberOfRows());
-                        orthV1.wrapped_ = V.wrapped_ * xV1.wrapped_;  //Vecteur dans l'orthogonal du sous-espace engendré par U
-                        Vector<double> orthV2(V.numberOfRows());
-                        orthV2.wrapped_ = V.wrapped_ * xV2.wrapped_;
+                        Vector<double> orthU1 = U * xU1;  //Vecteur dans l'orthogonal du sous-espace engendré par V
+                        Vector<double> orthU2 = U * xU2;
+                        Vector<double> orthV1 = V * xV1;
+                        Vector<double> orthV2 = V * xV2;
 
                         Vector<double> temp(O.numberOfRows());
                         temp.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>()) * orthU1.wrapped_;
-                        orthU1.wrapped_ = (1.0/sqrt((orthU1.wrapped_.adjoint()) * temp.wrapped_)) * orthU1.wrapped_;
+                        orthU1 = ( 1.0 / sqrt( (orthU1, temp) ) ) * orthU1;
 
                         temp.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>()) * orthU2.wrapped_;
-                        double PS = (orthU1.wrapped_.adjoint()) * temp.wrapped_;
-                        orthU2.wrapped_ -= PS * orthU1.wrapped_;
+                        double PS = (orthU1, temp);
+                        orthU2 -= PS * orthU1;
                         temp.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>()) * orthU2.wrapped_;
-                        orthU2.wrapped_ = (1.0/sqrt((orthU2.wrapped_.adjoint())*temp.wrapped_))*orthU2.wrapped_;
+                        orthU2 = ( 1.0 / sqrt( (orthU2, temp) ) ) * orthU2;
 
                         temp.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>())*orthV1.wrapped_;
-                        orthV1.wrapped_ = (1.0/sqrt((orthV1.wrapped_.adjoint())*temp.wrapped_))*orthV1.wrapped_;
+                        orthV1 = ( 1.0 / sqrt( (orthV1, temp) ) ) * orthV1;
 
                         temp.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>())*orthV2.wrapped_;
-                        PS = (orthV1.wrapped_.adjoint())*temp.wrapped_;
-                        orthV2.wrapped_ -= PS*orthV1.wrapped_;
+                        PS = (orthV1, temp);
+                        orthV2 -= PS * orthV1;
                         temp.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>())*orthV2.wrapped_;
-                        orthV2.wrapped_ = (1.0/sqrt((orthV2.wrapped_.adjoint())*temp.wrapped_))*orthV2.wrapped_;
+                        orthV2 = ( 1.0 / sqrt( (orthV2, temp) ) ) * orthV2;
 
                         DenseMatrix<double> PsiU = DenseMatrix<double>::Zero(M_disc_,numberOfElectrons); //Le reste des fonctions: les deux sous-espaces engendrés sont les mêmes, égaux à l'intersection de deux sous-espaces de départ
                         DenseMatrix<double> PsiV = DenseMatrix<double>::Zero(M_disc_,numberOfElectrons);
@@ -537,15 +519,15 @@ namespace simol
 
                             Vector<double> temp2(O.numberOfRows());
                             temp2.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>())*(U.wrapped_.col(k));
-                            muU1(k) = (orthU1.wrapped_.adjoint())*temp2.wrapped_;
-                            muU2(k) = (orthU2.wrapped_.adjoint())*temp2.wrapped_;
+                            muU1(k) = (orthU1, temp2);
+                            muU2(k) = (orthU2, temp2);
                             temp2.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>())*(V.wrapped_.col(k));
-                            muV1(k) = orthV1.wrapped_.adjoint()*temp2.wrapped_;
-                            muV2(k) = orthV2.wrapped_.adjoint()*temp2.wrapped_;
+                            muV1(k) = (orthV1, temp2);
+                            muV2(k) = (orthV2, temp2);
 
 
-                            PsiU.wrapped_.col(k) = U.wrapped_.col(k) - muU1(k)*orthU1.wrapped_ - muU2(k)*orthU2.wrapped_;
-                            PsiV.wrapped_.col(k) = V.wrapped_.col(k) - muV1(k)*orthV1.wrapped_ - muV2(k)*orthV2.wrapped_;
+                            PsiU.column(k) = U.column(k) - muU1(k) * orthU1 - muU2(k) * orthU2;
+                            PsiV.column(k) = V.column(k) - muV1(k) * orthV1 - muV2(k) * orthV2;
                         }
 
                         //On crée une base orthonormale de l'intersection des deux
@@ -556,13 +538,12 @@ namespace simol
                         {
                             if ( (k!=indmin) && (k!=indmin2))
                             {
-                                xUbas.wrapped_.col(ind) = Uvec.wrapped_.col(k);
-                                ind = ind+1;
+                                xUbas.column(ind) = Uvec.column(k);
+                                ++ind;
                             }
                         }
 
-                        DenseMatrix<double> coeffs_bas(U.numberOfRows(), xUbas.numberOfColumns());
-                        coeffs_bas.wrapped_ = U.wrapped_ * xUbas.wrapped_;
+                        DenseMatrix<double> coeffs_bas = U * xUbas;
 
                         //Puis on orthonormalise les vecteurs de coeffs_bas
                         for (size_t i= 0; i < numberOfElectrons-2; i++)
@@ -570,16 +551,16 @@ namespace simol
                             //On commence par orthonormaliser par rapport à orthU1 et orthU2
                             Vector<double> temp3(O.numberOfRows());
                             temp3.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>())*(coeffs_bas.wrapped_.col(i));
-                            double PS3 = (orthU1.wrapped_.adjoint())*temp3.wrapped_;
-                            coeffs_bas.wrapped_.col(i) = coeffs_bas.wrapped_.col(i) - PS3*orthU1.wrapped_;
+                            double PS3 = (orthU1, temp3);
+                            coeffs_bas.column(i) = coeffs_bas.column(i) - PS3 * orthU1;
                             temp3.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>())*(coeffs_bas.wrapped_.col(i));
-                            PS3 = (orthU2.wrapped_.adjoint())*temp3.wrapped_;
+                            PS3 = (orthU2, temp3);
                             coeffs_bas.column(i) = coeffs_bas.column(i) - PS3 * orthU2;
                             for (size_t j=0; j<i; j++)
                             {
                                 temp3.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>())*(coeffs_bas.wrapped_.col(i));
-                                PS3 = ((coeffs_bas.wrapped_.col(j)).adjoint())*temp3.wrapped_;
-                                coeffs_bas.wrapped_.col(i) = coeffs_bas.wrapped_.col(i) - PS3*coeffs_bas.wrapped_.col(j);
+                                PS3 = (coeffs_bas.column(j), temp3);
+                                coeffs_bas.column(i) = coeffs_bas.column(i) - PS3 * coeffs_bas.column(j);
                             }
                             temp3.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>())*(coeffs_bas.wrapped_.col(i));
                             coeffs_bas.wrapped_.col(i) = 1.0/sqrt((coeffs_bas.wrapped_.col(i).adjoint())*temp3.wrapped_)*coeffs_bas.wrapped_.col(i);
@@ -595,13 +576,14 @@ namespace simol
                             {
                                 Vector<double> temp4(O.numberOfRows());
                                 temp4.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>())*coeffs_bas.wrapped_.col(l);
-                                CU(l,k) = (PsiU.wrapped_.col(k)).adjoint()*temp4.wrapped_;
-                                CV(l,k) = (PsiV.wrapped_.col(k)).adjoint()*temp4.wrapped_;
+                                CU(l,k) = (PsiU.column(k), temp4);
+                                CV(l,k) = (PsiV.column(k), temp4);
                             }
                         }
 
                         //On construit la somme
-                        double sum2 = electric_integral(M_disc_, orthU1,orthV1,orthU2,orthV2,E) - electric_integral(M_disc_, orthU1,orthV2,orthU2,orthV1, E);
+                        double sum2 = electric_integral(M_disc_, orthU1,orthV1,orthU2,orthV2,E)
+                                    - electric_integral(M_disc_, orthU1,orthV2,orthU2,orthV1, E);
 
                         //On a alors pour tout k U(:,k) = muU1(k)*orthU1 + muU2(k)*orthU2 + PsiU(:,k)
                         double sum = 0;
