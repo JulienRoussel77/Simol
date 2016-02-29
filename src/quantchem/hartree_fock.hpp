@@ -33,7 +33,7 @@ namespace simol
 
         Vector<double> temp(E.numberOfRows());
         temp.wrapped_ = E.nonzeros_.wrapped_.selfadjointView<Eigen::Upper>() * U12v.wrapped_;
-        return U34v.wrapped_.adjoint() * temp.wrapped_;
+        return (U34v, temp);
     }
 
 
@@ -96,8 +96,7 @@ namespace simol
         //Si le ratio n'est pas trop petit, c'est la formule habituelle
         if (S.rcond() > ratio_)
         {
-            DenseMatrix<double> temp(S.numberOfRows(), A.numberOfColumns());
-            temp.wrapped_ = S.wrapped_.inverse() * A.wrapped_;
+            DenseMatrix<double> temp = S.inverse() * A;
             return S.determinant() * temp.trace();
         }
         else
@@ -110,14 +109,14 @@ namespace simol
             Vector<double> D = svd.singularValues();
             double lmax = D.max();
 
-            D.wrapped_ = (1.0/lmax) * D.wrapped_;
+            D = (1.0/lmax) * D;
 
             //On compte la multiplicité de la valeur propre nulle
             int mult = 0;
             for (size_t i= 0; i< D.size(); i++)
             {
                 if (D(i) < ratio_)
-                    mult = mult+1;
+                    ++mult;
             }
 
             //si la multiplicité de 0 est plus grande que 1, la valeur est 0
@@ -136,12 +135,12 @@ namespace simol
 
                 Vector<double> temp(O.numberOfRows());
                 temp.wrapped_ = O.wrapped_.selfadjointView<Eigen::Upper>() * orthU.wrapped_;
-                double n2orthU = orthU.wrapped_.adjoint() * temp.wrapped_;
-                orthU.wrapped_ = (1.0/sqrt(n2orthU))* orthU.wrapped_;
+                double n2orthU = (orthU, temp);
+                orthU = ( 1.0 / sqrt(n2orthU) ) * orthU;
 
                 temp.wrapped_ = O.wrapped_.selfadjointView<Eigen::Upper>() * orthV.wrapped_;
-                double n2orthV = orthV.wrapped_.adjoint() * temp.wrapped_;
-                orthV.wrapped_ = (1.0/sqrt(n2orthV)) * orthV.wrapped_;
+                double n2orthV = (orthV, temp);
+                orthV = ( 1.0 / sqrt(n2orthV) ) * orthV;
 
                 DenseMatrix<double> PsiU = DenseMatrix<double>::Zero(M_disc_,numberOfElectrons); //Le reste des fonctions: le deux sous-espaces engendrés sont les mêmes, égaux à l'intersection de deux sous-espaces de départ
                 DenseMatrix<double> PsiV = DenseMatrix<double>::Zero(M_disc_ , numberOfElectrons);
@@ -152,13 +151,13 @@ namespace simol
                 for(size_t k=0; k<numberOfElectrons; k++)
                 {
                     temp.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>()) * (U.wrapped_.col(k));
-                    double PS = orthU.wrapped_.adjoint()*temp.wrapped_;
-                    PsiU.wrapped_.col(k) = U.wrapped_.col(k) - PS*orthU.wrapped_;
+                    double PS = (orthU, temp);
+                    PsiU.column(k) = U.column(k) - PS * orthU;
                     muU(k) = PS;
 
                     temp.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>()) * (V.wrapped_.col(k));
-                    PS = orthV.wrapped_.adjoint()*temp.wrapped_;
-                    PsiV.wrapped_.col(k) = V.wrapped_.col(k) - PS*orthV.wrapped_;
+                    PS = (orthV, temp);
+                    PsiV.column(k) = V.column(k) - PS * orthV;
                     muV(k) = PS;
                 }
 
@@ -174,14 +173,14 @@ namespace simol
                 {
                     Vector<double> temp2(O.numberOfRows());
                     temp2.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>()) * (coeffs_bas.wrapped_.col(i));
-                    double PS2 = orthU.wrapped_.adjoint()*temp2.wrapped_;
-                    coeffs_bas.wrapped_.col(i) = coeffs_bas.wrapped_.col(i) - PS2*orthU.wrapped_;
+                    double PS2 = (orthU, temp2);
+                    coeffs_bas.column(i) = coeffs_bas.column(i) - PS2 * orthU;
 
                     for (size_t j=0; j<i; j++)
                     {
                         temp2.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>()) * (coeffs_bas.wrapped_.col(j));
-                        PS2 = ((coeffs_bas.wrapped_.col(i)).adjoint())*temp2.wrapped_;
-                        coeffs_bas.wrapped_.col(i) = coeffs_bas.wrapped_.col(i) - PS2*coeffs_bas.wrapped_.col(j);
+                        PS2 = (coeffs_bas.column(i), temp2);
+                        coeffs_bas.column(i) = coeffs_bas.column(i) - PS2 * coeffs_bas.column(j);
                     }
 
                     temp2.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>()) * (coeffs_bas.wrapped_.col(i));
@@ -298,7 +297,7 @@ namespace simol
             if (ratio > ratio_)
             {
                 DenseMatrix<double> Sinv(S.numberOfRows(), S.numberOfColumns());
-                Sinv.wrapped_ = S.wrapped_.inverse();
+                Sinv = S.inverse();
                 double scal0 = 0;
 
                 for (size_t i=0; i < numberOfElectrons; i++)
@@ -563,9 +562,8 @@ namespace simol
                                 coeffs_bas.column(i) = coeffs_bas.column(i) - PS3 * coeffs_bas.column(j);
                             }
                             temp3.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>())*(coeffs_bas.wrapped_.col(i));
-                            coeffs_bas.wrapped_.col(i) = 1.0/sqrt((coeffs_bas.wrapped_.col(i).adjoint())*temp3.wrapped_)*coeffs_bas.wrapped_.col(i);
+                            coeffs_bas.column(i) = ( 1.0 / sqrt( (coeffs_bas.column(i), temp3) ) ) * coeffs_bas.column(i);
                         }
-
 
                         DenseMatrix<double> CU = DenseMatrix<double>::Zero(numberOfElectrons-2,numberOfElectrons);
                         DenseMatrix<double> CV = DenseMatrix<double>::Zero(numberOfElectrons-2,numberOfElectrons);
@@ -582,8 +580,7 @@ namespace simol
                         }
 
                         //On construit la somme
-                        double sum2 = electric_integral(M_disc_, orthU1,orthV1,orthU2,orthV2,E)
-                                    - electric_integral(M_disc_, orthU1,orthV2,orthU2,orthV1, E);
+                        double sum2 = electric_integral(M_disc_, orthU1,orthV1,orthU2,orthV2,E) - electric_integral(M_disc_, orthU1,orthV2,orthU2,orthV1, E);
 
                         //On a alors pour tout k U(:,k) = muU1(k)*orthU1 + muU2(k)*orthU2 + PsiU(:,k)
                         double sum = 0;

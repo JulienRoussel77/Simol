@@ -1,8 +1,9 @@
 #ifndef SIMOL_SPARSEMATRIX_HPP
 #define SIMOL_SPARSEMATRIX_HPP
 
+#include "core/linalg/Vector.hpp"
 #include "core/io/MatrixMarketFile.hpp"
-#include "quantchem/SparseTensor.hpp"
+//#include "quantchem/SparseTensor.hpp"
 #include "eigen.hpp"
 
 #include "dsaupd.hpp"
@@ -150,8 +151,15 @@ namespace simol
     return fileToRead;
   }
 
-
-
+/*  template<class ScalarType>
+  Vector<ScalarType, eigen> operator*(SparseMatrix<ScalarType, eigen> const & matrix,
+                                      Vector<ScalarType, eigen> const & vector)
+  {
+      Vector<ScalarType, eigen> prod(matrix.numberOfRows());
+      prod.wrapped_ = matrix.wrapped_.selfadjointView<Eigen::Upper>() * vector.wrapped_;
+      return prod;
+  }
+*/
 
 }
 

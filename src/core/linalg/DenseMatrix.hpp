@@ -76,6 +76,9 @@ namespace simol
           ScalarType determinant() const
           { return wrapped_.determinant(); }
 
+          DenseMatrix inverse() const
+          { return DenseMatrix(WrappedType(wrapped_.inverse())); }
+
           Vector<ScalarType> operator*(Vector<ScalarType> const & vector)
           { return Vector<ScalarType>(wrapped_ * vector.wrapped_); }
 
