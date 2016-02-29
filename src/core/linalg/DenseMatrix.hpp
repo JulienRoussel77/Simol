@@ -100,11 +100,7 @@ namespace simol
 
   template<class ScalarType> Vector<ScalarType>
   DenseMatrix<ScalarType, eigen>::column(size_t const index)
-  {
-      Vector<ScalarType> columnVector(wrapped_.rows());
-      columnVector.wrapped_.col(index);
-      return columnVector;
-  }
+  { return Vector<ScalarType>(wrapped_.col(index)); }
 
   template<class ScalarType>
   DenseMatrix<ScalarType, eigen>::DenseMatrix(MatrixMarketFile const & file)

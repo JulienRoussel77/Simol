@@ -250,15 +250,10 @@ namespace simol
 
         // On calcule directement
 
-        Vector<double> Vcol0(V.numberOfRows());
-        Vector<double> Vcol1(V.numberOfRows());
-        Vector<double> Ucol0(V.numberOfRows());
-        Vector<double> Ucol1(V.numberOfRows());
-
-        Ucol0.wrapped_ = U.wrapped_.col(0);
-        Ucol1.wrapped_ = U.wrapped_.col(1);
-        Vcol0.wrapped_ = V.wrapped_.col(0);
-        Vcol1.wrapped_ = V.wrapped_.col(1);
+        Vector<double> Vcol0 = V.column(0);
+        Vector<double> Vcol1 = V.column(1);
+        Vector<double> Ucol0 = U.column(0);
+        Vector<double> Ucol1 = U.column(1);
 
         return 0.5 * ( electric_integral(M_disc, Ucol0, Vcol0, Ucol1, Vcol1, E)
                      - electric_integral(M_disc, Ucol1, Vcol0, Ucol0, Vcol1, E)
