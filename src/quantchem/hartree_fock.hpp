@@ -325,7 +325,7 @@ namespace simol
                     }
                 }
 
-                return scal0 * (S.wrapped_.determinant());
+                return scal0 * (S.determinant());
             }
             else
             {
@@ -337,7 +337,7 @@ namespace simol
                 Vector<double> D = svd.singularValues();
                 double lmax = D.max();
 
-                D.wrapped_ *= (1.0/lmax);
+                D *= (1.0/lmax);
 
                 //On compte la multiplicité de la valeur propre nulle
                 int mult = 0;
@@ -365,9 +365,9 @@ namespace simol
 
                         Vector<double> temp(O.numberOfColumns());
                         temp.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>()) * orthU.wrapped_;
-                        orthU.wrapped_ = 1.0 / sqrt( (orthU, temp) ) * orthU.wrapped_;
+                        orthU = 1.0 / sqrt( (orthU, temp) ) * orthU;
                         temp.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>()) * orthV.wrapped_;
-                        orthV.wrapped_ = 1.0 / sqrt( (orthV, temp) ) * orthV.wrapped_;
+                        orthV = 1.0 / sqrt( (orthV, temp) ) * orthV;
 
 
                         DenseMatrix<double> PsiU = DenseMatrix<double>::Zero(M_disc_,numberOfElectrons); //Le reste des fonctions: le deux sous-espaces engendrés sont les mêmes, égaux à l'intersection de deux sous-espaces de départ
