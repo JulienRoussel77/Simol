@@ -9,7 +9,7 @@
 #include <Eigen/Sparse>
 #include <Eigen/Core>
 #include <Eigen/SVD>
-#pragma GCC diagnostic pop 
+#pragma GCC diagnostic pop
 
 
 namespace simol
@@ -24,6 +24,7 @@ namespace simol
     typedef Eigen::Map<VectorType> VectorMap;
     typedef Eigen::JacobiSVD<DenseMatrixType> SVDType;
     typedef typename DenseMatrixType::AdjointReturnType AdjointReturnType;
+    typedef typename DenseMatrixType::ColXpr DenseMatrixColumn;
   };
 
 }

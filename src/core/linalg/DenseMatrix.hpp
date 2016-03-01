@@ -31,7 +31,15 @@ namespace simol
           DenseMatrix(typename eigen<ScalarType>::DenseMatrixType const & wrappedMatrix);
 
           Vector<ScalarType>
-          column(size_t const index);
+          column(size_t const index) const;
+
+          DenseMatrix permute_columns(std::vector<std::size_t> const & permutation) const
+          {
+              DenseMatrix permuted(numberOfRows(), permutation.size());
+              for (size_t i = 0; i < permutation.size(); ++i)
+                permuted.wrapped_.col(i) = wrapped_.col(permutation[i]);
+              return permuted;
+          }
 
           DenseMatrix(MatrixMarketFile const & file);
 
@@ -82,6 +90,12 @@ namespace simol
           Vector<ScalarType> operator*(Vector<ScalarType> const & vector)
           { return Vector<ScalarType>(wrapped_ * vector.wrapped_); }
 
+          DenseMatrix & operator*=(ScalarType const scalar)
+          {
+              wrapped_ *= scalar;
+              return *this;
+          }
+
       public:
           typedef typename eigen<ScalarType>::DenseMatrixType WrappedType;
           typename eigen<ScalarType>::DenseMatrixType wrapped_;
@@ -99,7 +113,7 @@ namespace simol
   {}
 
   template<class ScalarType> Vector<ScalarType>
-  DenseMatrix<ScalarType, eigen>::column(size_t const index)
+  DenseMatrix<ScalarType, eigen>::column(size_t const index) const
   { return Vector<ScalarType>(wrapped_.col(index)); }
 
   template<class ScalarType>
