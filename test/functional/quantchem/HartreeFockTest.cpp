@@ -39,7 +39,7 @@ namespace simol
    matrix.wrapped_ = eigen<double>::DenseMatrixType::Zero(M_disc, numberOfElectrons);
    SlaterDeterminant initial_solution(matrix);
 
-   std::size_t numberOfIterations = 20;
+   std::size_t numberOfIterations = 1;
 
    DiscreteHamiltonian H(dataPath, M_disc);
 

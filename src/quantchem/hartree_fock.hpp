@@ -243,7 +243,8 @@ namespace simol
                       const SparseTensor<double>& E,
                       size_t const M_disc)
     {
-        assert(numberOfElectrons==2);
+        assert(Phi.number_of_electrons()==2);
+        assert(Psi.number_of_electrons()==2);
 
         DenseMatrix<double> U = Phi.matrix();
         DenseMatrix<double> V = Psi.matrix();
@@ -634,16 +635,14 @@ namespace simol
 
         DenseMatrix<double> Phi0 = initial_solution.matrix();
 
-        Eigen::MatrixXd I = Eigen::MatrixXd::Identity(H.basisDimension(), H.basisDimension());
-
         DenseMatrix<double> K(H.basisDimension(), H.basisDimension());
-        K.wrapped_ = H.kinetic().wrapped_.selfadjointView<Eigen::Upper>() * I;
+        K.wrapped_ = DenseMatrix<double>::WrappedType(H.kinetic().wrapped_);
 
         DenseMatrix<double> O(H.basisDimension(), H.basisDimension());
-        O.wrapped_ = H.overlap().wrapped_.selfadjointView<Eigen::Upper>() * I;
+        O.wrapped_ = DenseMatrix<double>::WrappedType(H.overlap().wrapped_);
 
         DenseMatrix<double> Nu(H.basisDimension(), H.basisDimension());
-        Nu.wrapped_ = H.potential().wrapped_.selfadjointView<Eigen::Upper>() * I;
+        Nu.wrapped_ = DenseMatrix<double>::WrappedType(H.potential().wrapped_);
 
         DenseMatrix<double> F0 = K + Nu;
 
@@ -663,9 +662,6 @@ namespace simol
             DenseMatrix<double> V = es.eigenvectors();
 
             std::vector<size_t> Itab = D.indices_of_smallest(numberOfElectrons);
-
-            /*for (size_t i=0; i< numberOfElectrons; i++)
-                Phi0.wrapped_.col(i) = V.wrapped_.col(Itab[i]);*/
 
             Phi0 = V.permute_columns(Itab);
 

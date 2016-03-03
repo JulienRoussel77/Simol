@@ -10,6 +10,7 @@ namespace simol
         public:
             SlaterDeterminant(DenseMatrix<double> const & matrix);
             DenseMatrix<double> const & matrix() const;
+            std::size_t number_of_electrons() const;
         private:
             DenseMatrix<double>  matrix_;
     };
@@ -17,6 +18,9 @@ namespace simol
     SlaterDeterminant::SlaterDeterminant(DenseMatrix<double> const & matrix)
     : matrix_(matrix)
     {}
+
+    std::size_t SlaterDeterminant::number_of_electrons() const
+    { return matrix_.numberOfColumns(); }
 
     DenseMatrix<double> const &
     SlaterDeterminant::matrix() const
