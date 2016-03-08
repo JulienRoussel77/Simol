@@ -36,6 +36,16 @@ namespace simol
         return (U34v, temp);
     }
 
+    double
+    electric_integral(std::size_t const M_disc,
+                      size_t const index1,
+                      size_t const index2,
+                      size_t const index3,
+                      size_t const index4,
+                      SparseTensor<double> const & E)
+    {
+        return E(getInd(M_disc, index2, index4), getInd(M_disc, index1, index3));
+    }
 
     DenseMatrix<double>
     FockMat(std::size_t const M_disc,
@@ -49,29 +59,18 @@ namespace simol
 
         for (size_t k=0; k< M_disc; k++)
         {
-            Vector<double> Phik = Vector<double>::Zero(M_disc);
-            Phik(k) = 1;
             for (size_t l=k; l< M_disc; l++)
             {
-                Vector<double> Phil = Vector<double>::Zero(M_disc);
-                Phil(l) = 1;
                 for (size_t k1=0; k1 < M_disc; k1++)
                 {
-                    Vector<double> Phik1 = Vector<double>::Zero(M_disc);
-                    Phik1(k1) = 1;
                     for (size_t k2=0; k2 < M_disc; k2++)
-                    {
-                        Vector<double> Phik2 = Vector<double>::Zero(M_disc);
-                        Phik2(k2) = 1;
-                        G0(k,l) += D(k1,k2) * ( electric_integral(M_disc, Phik, Phil, Phik1, Phik2, E) - electric_integral(M_disc, Phik, Phik2, Phik1, Phil, E) );
-
-                    }
+                        G0(k,l) += D(k1,k2) * ( electric_integral(M_disc, k, l, k1, k2, E) - electric_integral(M_disc, k, k2, k1, l, E) );
                 }
+                G0(k,l) *= 0.5;
                 G0(l,k) = G0(k,l);
             }
         }
 
-        G0.wrapped_ = 0.5 * G0.wrapped_;
         return G0;
 
     }
@@ -637,8 +636,10 @@ namespace simol
 
         Eigen::MatrixXd I = Eigen::MatrixXd::Identity(H.basisDimension(), H.basisDimension());
 
-        DenseMatrix<double> K(H.basisDimension(), H.basisDimension());
-        K.wrapped_ = H.kinetic().wrapped_.selfadjointView<Eigen::Upper>() * I;
+        //DenseMatrix<double> K(H.basisDimension(), H.basisDimension());
+        //K.wrapped_ = H.kinetic().wrapped_.selfadjointView<Eigen::Upper>() * I;
+
+        DenseMatrix<double> K = H.kinetic();
 
         DenseMatrix<double> O(H.basisDimension(), H.basisDimension());
         O.wrapped_ = H.overlap().wrapped_.selfadjointView<Eigen::Upper>() * I;

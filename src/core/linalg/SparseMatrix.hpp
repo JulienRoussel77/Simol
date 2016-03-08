@@ -9,6 +9,9 @@
 #include "dsaupd.hpp"
 #include "dseupd.hpp"
 
+#include <fstream>
+#include <string>
+
 namespace simol
 {
     std::size_t

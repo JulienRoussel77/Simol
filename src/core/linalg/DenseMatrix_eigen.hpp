@@ -1,9 +1,11 @@
 #ifndef SIMOL_DENSEMATRIX_EIGEN_HPP
 #define SIMOL_DENSEMATRIX_EIGEN_HPP
 
+#include <Eigen/Core>
 #include <Eigen/Dense>
 
 #include "eigen.hpp"
+#include "SparseMatrix.hpp"
 
 namespace simol
 {
@@ -14,6 +16,18 @@ namespace simol
       public:
 
           DenseMatrix(DenseMatrix const & matrix) = default;
+
+          DenseMatrix(SparseMatrix<ScalarType, eigen> const & matrix)
+          //: wrapped_(matrix.numberOfRows(), matrix.numberOfColumns())
+          : wrapped_(matrix.wrapped_.template triangularView<Eigen::Upper>())
+          {
+            /*for (int k=0; k<matrix.wrapped_.outerSize(); ++k)
+            {
+                for (typename eigen<ScalarType>::SparseMatrixType::InnerIterator it(matrix.wrapped_,k); it; ++it)
+                    wrapped_(it.row(),it.col()) = wrapped_(it.col(),it.row()) = it.value();
+            }*/
+            wrapped_ += matrix.wrapped_.transpose().template triangularView<Eigen::StrictlyLower>();
+          }
 
           DenseMatrix(std::size_t numberOfRows,
                       std::size_t numberOfColumns);
