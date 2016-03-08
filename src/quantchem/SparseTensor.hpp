@@ -84,6 +84,12 @@ namespace simol
     SparseMatrix<ScalarType> const &
     SparseTensor<ScalarType>::nonzeros() const
     { return nonzeros_; }
+
+    template<typename ScalarType>
+    Vector<ScalarType> operator*(SparseTensor<ScalarType> const & tensor,
+                                 Vector<ScalarType> const & vector)
+    { return tensor.nonzeros_ * vector; }
+
 }
 
 

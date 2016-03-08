@@ -91,8 +91,6 @@ namespace simol
           DenseMatrix inverse() const
           { return DenseMatrix(WrappedType(wrapped_.inverse())); }
 
-          Vector<ScalarType> operator*(Vector<ScalarType> const & vector)
-          { return Vector<ScalarType>(wrapped_ * vector.wrapped_); }
 
           DenseMatrix & operator*=(ScalarType const scalar)
           {
@@ -170,6 +168,11 @@ namespace simol
   operator<<(std::ostream & output,
              DenseMatrix<ScalarType, eigen> const & matrixToPrint)
   { return output << matrixToPrint.wrapped_; }
+
+  template<typename ScalarType>
+  Vector<ScalarType> operator*(DenseMatrix<ScalarType, eigen> const & matrix,
+                               Vector<ScalarType> const & vector)
+  { return Vector<ScalarType>(matrix.wrapped_ * vector.wrapped_); }
 
 }
 

@@ -154,15 +154,15 @@ namespace simol
     return fileToRead;
   }
 
-/*  template<class ScalarType>
+  template<class ScalarType>
   Vector<ScalarType, eigen> operator*(SparseMatrix<ScalarType, eigen> const & matrix,
                                       Vector<ScalarType, eigen> const & vector)
   {
       Vector<ScalarType, eigen> prod(matrix.numberOfRows());
-      prod.wrapped_ = matrix.wrapped_.selfadjointView<Eigen::Upper>() * vector.wrapped_;
+      prod.wrapped_ = matrix.wrapped_.template selfadjointView<Eigen::Upper>() * vector.wrapped_;
       return prod;
   }
-*/
+
 
 }
 

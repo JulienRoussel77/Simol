@@ -31,8 +31,7 @@ namespace simol
             }
         }
 
-        Vector<double> temp(E.numberOfRows());
-        temp.wrapped_ = E.nonzeros_.wrapped_.selfadjointView<Eigen::Upper>() * U12v.wrapped_;
+        Vector<double> temp = E * U12v;
         return (U34v, temp);
     }
 
@@ -132,12 +131,11 @@ namespace simol
                 Vector<double> orthU = U * xU;  //Vecteur dans l'orthogonal du sous-espace engendré par V
                 Vector<double> orthV = V * xV;  //Vecteur dans l'orthogonal du sous-espace engendré par U
 
-                Vector<double> temp(O.numberOfRows());
-                temp.wrapped_ = O.wrapped_.selfadjointView<Eigen::Upper>() * orthU.wrapped_;
+                Vector<double> temp = O * orthU;
                 double n2orthU = (orthU, temp);
                 orthU = ( 1.0 / sqrt(n2orthU) ) * orthU;
 
-                temp.wrapped_ = O.wrapped_.selfadjointView<Eigen::Upper>() * orthV.wrapped_;
+                temp = O * orthV;
                 double n2orthV = (orthV, temp);
                 orthV = ( 1.0 / sqrt(n2orthV) ) * orthV;
 
@@ -206,8 +204,7 @@ namespace simol
                     }
                 }
 
-                Vector<double> temp3(H.numberOfRows());
-                temp3.wrapped_ = (H.wrapped_.selfadjointView<Eigen::Upper>()) *orthV.wrapped_;
+                Vector<double> temp3 = H * orthV;
                 double sum2 = (orthU.wrapped_.adjoint())*temp3.wrapped_;
 
                 //On a alors pour tout k U(:,k) = muU(k)*orthU + PsiU(:,k)
@@ -358,10 +355,9 @@ namespace simol
                         Vector<double> orthU = U * xU;  //Vecteur dans l'orthogonal du sous-espace engendré par V
                         Vector<double> orthV = V * xV;  //Vecteur dans l'orthogonal du sous-espace engendré par U
 
-                        Vector<double> temp(O.numberOfColumns());
-                        temp.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>()) * orthU.wrapped_;
+                        Vector<double> temp = O * orthU;
                         orthU = 1.0 / sqrt( (orthU, temp) ) * orthU;
-                        temp.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>()) * orthV.wrapped_;
+                        temp = O * orthV;
                         orthV = 1.0 / sqrt( (orthV, temp) ) * orthV;
 
 
@@ -481,23 +477,22 @@ namespace simol
                         Vector<double> orthV1 = V * xV1;
                         Vector<double> orthV2 = V * xV2;
 
-                        Vector<double> temp(O.numberOfRows());
-                        temp.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>()) * orthU1.wrapped_;
+                        Vector<double> temp = O * orthU1;
                         orthU1 = ( 1.0 / sqrt( (orthU1, temp) ) ) * orthU1;
 
-                        temp.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>()) * orthU2.wrapped_;
+                        temp = O * orthU2;
                         double PS = (orthU1, temp);
                         orthU2 -= PS * orthU1;
-                        temp.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>()) * orthU2.wrapped_;
+                        temp = O * orthU2;
                         orthU2 = ( 1.0 / sqrt( (orthU2, temp) ) ) * orthU2;
 
-                        temp.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>())*orthV1.wrapped_;
+                        temp = O * orthV1;
                         orthV1 = ( 1.0 / sqrt( (orthV1, temp) ) ) * orthV1;
 
-                        temp.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>())*orthV2.wrapped_;
+                        temp = O * orthV2;
                         PS = (orthV1, temp);
                         orthV2 -= PS * orthV1;
-                        temp.wrapped_ = (O.wrapped_.selfadjointView<Eigen::Upper>())*orthV2.wrapped_;
+                        temp = O * orthV2;
                         orthV2 = ( 1.0 / sqrt( (orthV2, temp) ) ) * orthV2;
 
                         DenseMatrix<double> PsiU = DenseMatrix<double>::Zero(M_disc_,numberOfElectrons); //Le reste des fonctions: les deux sous-espaces engendrés sont les mêmes, égaux à l'intersection de deux sous-espaces de départ
@@ -636,16 +631,9 @@ namespace simol
 
         Eigen::MatrixXd I = Eigen::MatrixXd::Identity(H.basisDimension(), H.basisDimension());
 
-        //DenseMatrix<double> K(H.basisDimension(), H.basisDimension());
-        //K.wrapped_ = H.kinetic().wrapped_.selfadjointView<Eigen::Upper>() * I;
-
         DenseMatrix<double> K = H.kinetic();
-
-        DenseMatrix<double> O(H.basisDimension(), H.basisDimension());
-        O.wrapped_ = H.overlap().wrapped_.selfadjointView<Eigen::Upper>() * I;
-
-        DenseMatrix<double> Nu(H.basisDimension(), H.basisDimension());
-        Nu.wrapped_ = H.potential().wrapped_.selfadjointView<Eigen::Upper>() * I;
+        DenseMatrix<double> O = H.overlap();
+        DenseMatrix<double> Nu = H.potential();
 
         DenseMatrix<double> F0 = K + Nu;
 
