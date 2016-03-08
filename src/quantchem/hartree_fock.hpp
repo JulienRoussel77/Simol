@@ -7,6 +7,7 @@
 #include <vector>
 #include "core/linalg/Vector.hpp"
 #include "DiscreteHamiltonian.hpp"
+#include "core/linalg/EigenDecomposition.hpp"
 namespace simol
 {
 
@@ -645,7 +646,7 @@ namespace simol
 	        double lambda = prod.trace();
             std::cout << "lambda = " << lambda << std::endl;
 
-            Eigen::GeneralizedSelfAdjointEigenSolver<eigen<double>::DenseMatrixType> es(F.wrapped_, O.wrapped_, Eigen::ComputeEigenvectors|Eigen::Ax_lBx);
+            EigenDecomposition<double> es(F, O);
 
             Vector<double> D = es.eigenvalues();
             DenseMatrix<double> V = es.eigenvectors();
