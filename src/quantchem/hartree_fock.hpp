@@ -629,8 +629,6 @@ namespace simol
 
         DenseMatrix<double> Phi0 = initial_solution.matrix();
 
-        Eigen::MatrixXd I = Eigen::MatrixXd::Identity(H.basisDimension(), H.basisDimension());
-
         DenseMatrix<double> K = H.kinetic();
         DenseMatrix<double> O = H.overlap();
         DenseMatrix<double> Nu = H.potential();
@@ -654,9 +652,6 @@ namespace simol
 
             std::vector<size_t> Itab = D.indices_of_smallest(numberOfElectrons);
 
-            /*for (size_t i=0; i< numberOfElectrons; i++)
-                Phi0.wrapped_.col(i) = V.wrapped_.col(Itab[i]);*/
-
             Phi0 = V.permute_columns(Itab);
 
             double lambda2 = H1_slat(Phi0, Phi0, O, F0, numberOfElectrons, H.basisDimension()) + H2_slat(Phi0, Phi0, O, H.two_electrons(), numberOfElectrons, H.basisDimension());
@@ -666,9 +661,7 @@ namespace simol
 
         }
 
-        SlaterDeterminant sol(Phi0);
-
-        return sol;
+        return SlaterDeterminant(Phi0);
     }
 
 }
