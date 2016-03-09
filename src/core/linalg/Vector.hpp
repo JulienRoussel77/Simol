@@ -1,5 +1,5 @@
-#ifndef VECTORWRAPPER_HPP
-#define VECTORWRAPPER_HPP
+#ifndef SIMOL_VECTOR_HPP
+#define SIMOL_VECTOR_HPP
 
 #include "eigen.hpp"
 
