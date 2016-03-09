@@ -17,9 +17,9 @@ namespace simol
     RNG(size_t const seed, int dimension):dimension_(dimension), seed_(seed), generator_(seed), distribution_(0,1){}
 
     //Vector<double> gaussian(double const & mean, double const & standardDeviation)
-    dvec gaussian()
+    Vector<double> gaussian()
     {
-      dvec g(dimension_);
+      Vector<double> g(dimension_);
       for (int i=0; i<dimension_; i++)
 	g(i) = distribution_(generator_);
       return g;

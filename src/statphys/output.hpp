@@ -44,18 +44,9 @@ namespace simol
     double energyMidFlow_;
 		double energySumFlow_;
     
-    //dvec responseForces_;
-    
-    //dvec velocityRef_;
-    //dvec forceRef_;
-    //int indexOfIterationRef_;
-    
     size_t decorrelationNumberOfIterations_;
-    //double integratedAutocorrelationP_;
     
   public:
-    //Statistics autocorrelationV;
-    //Statistics autocorrelationF;
     
     ControlVariate* velocityCV_;
     ControlVariate* forceCV_;
@@ -101,17 +92,13 @@ namespace simol
     ControlVariate* midFlowCV();
 		ControlVariate* sumFlowCV();
     
-    /*dvec& responseForces();
-    dvec const& responseForces() const;
-    double& responseForces(const int& i);
-    const double& responseForces(const int& i) const;*/
     const size_t& decorrelationNumberOfIterations() const;
     size_t& decorrelationNumberOfIterations();
     double decorrelationTime() const;
     //double& integratedAutocorrelationP();
     void display(vector<Particle> const& configuration, size_t indexOfIteration);
     void finalDisplayAutocorrelations();
-    void finalDisplay(vector<Particle> const& configuration, dvec const& externalForce);
+    void finalDisplay(vector<Particle> const& configuration, Vector<double> const& externalForce);
     void displayFinalFlow(double temperature, double delta_temperature, double tau);
 
     

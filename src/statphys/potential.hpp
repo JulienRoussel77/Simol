@@ -20,18 +20,18 @@ namespace simol
       Potential();
       virtual ~Potential(){};
       Potential(Input const& input, int const& indexOfReplica=1);
-      virtual double operator()(dvec const & /*position*/) const {std::cout << "This potential is pairwise !" << std::endl; exit(1);};
-      virtual dvec derivative(dvec const & position) const = 0;
-      virtual double laplacian(dvec const & /*position*/) const {std::cout << "Laplacian not implemented !" << std::endl; exit(1);};
-      virtual dvec force(dvec const & position) const;
+      virtual double operator()(Vector<double> const & /*position*/) const {std::cout << "This potential is pairwise !" << std::endl; exit(1);};
+      virtual Vector<double> derivative(Vector<double> const & position) const = 0;
+      virtual double laplacian(Vector<double> const & /*position*/) const {std::cout << "Laplacian not implemented !" << std::endl; exit(1);};
+      virtual Vector<double> force(Vector<double> const & position) const;
   };
 
   class Sinusoidal : public Potential{
     public:
       Sinusoidal(Input const& input, int const& indexOfReplica=1);
-      double operator()(dvec const & position) const;
-      dvec derivative(dvec const & position) const;
-      double laplacian(dvec const & position) const;
+      double operator()(Vector<double> const & position) const;
+      Vector<double> derivative(Vector<double> const & position) const;
+      double laplacian(Vector<double> const & position) const;
 
     private:
       double amplitude_;
@@ -41,9 +41,9 @@ namespace simol
     class SumSinusoidal : public Potential{
     public:
       SumSinusoidal(Input const& input, int const& indexOfReplica=1);
-      double operator()(dvec const & position) const;
-      dvec derivative(dvec const & position) const;
-      virtual double laplacian(dvec const & position) const;
+      double operator()(Vector<double> const & position) const;
+      Vector<double> derivative(Vector<double> const & position) const;
+      virtual double laplacian(Vector<double> const & position) const;
 
 
     private:
@@ -54,9 +54,9 @@ namespace simol
   class FracSinusoidal : public Potential{
     public:
       FracSinusoidal(Input const& input, int const& indexOfReplica=1);
-      double operator()(dvec const & position) const;
-      dvec derivative(dvec const & position) const;
-      virtual double laplacian(dvec const & position) const;
+      double operator()(Vector<double> const & position) const;
+      Vector<double> derivative(Vector<double> const & position) const;
+      virtual double laplacian(Vector<double> const & position) const;
 
 
     private:
@@ -67,8 +67,8 @@ namespace simol
   class DoubleWell : public Potential{
     public:
       DoubleWell(Input const& input, int const& indexOfReplica=1);
-      double operator()(dvec const & position) const;
-      dvec derivative(dvec const & position) const;
+      double operator()(Vector<double> const & position) const;
+      Vector<double> derivative(Vector<double> const & position) const;
 
     private:
       double height_;
@@ -78,8 +78,8 @@ namespace simol
     class HarmonicWell : public Potential{
     public:
       HarmonicWell(Input const& input, int const& indexOfReplica=1);
-      double operator()(dvec const & position) const;
-      dvec derivative(dvec const & position) const;
+      double operator()(Vector<double> const & position) const;
+      Vector<double> derivative(Vector<double> const & position) const;
 
     private:
       double stiffness_;
@@ -91,8 +91,8 @@ namespace simol
   class Harmonic : public Potential{
     public:
       Harmonic(Input const& input, int const& indexOfReplica=1);
-      double operator()(dvec const & position) const;
-      dvec derivative(dvec const & position) const;
+      double operator()(Vector<double> const & position) const;
+      Vector<double> derivative(Vector<double> const & position) const;
 
     private:
       double stiffness_;
@@ -101,9 +101,9 @@ namespace simol
   class Rotor : public Potential{
     public:
       Rotor(Input const& input, int const& indexOfReplica=1);
-      double operator()(dvec const & position) const;
-      dvec derivative(dvec const & position) const;
-      double laplacian(dvec const & position) const;
+      double operator()(Vector<double> const & position) const;
+      Vector<double> derivative(Vector<double> const & position) const;
+      double laplacian(Vector<double> const & position) const;
 
     private:
       double stiffness_;
@@ -113,8 +113,8 @@ namespace simol
     class Quadratic : public Potential{
     public:
       Quadratic(Input const& input, int const& indexOfReplica=1);
-      double operator()(dvec const & position) const;
-      dvec derivative(dvec const & position) const;
+      double operator()(Vector<double> const & position) const;
+      Vector<double> derivative(Vector<double> const & position) const;
 
     private:
       double stiffness_, alpha_, beta_;

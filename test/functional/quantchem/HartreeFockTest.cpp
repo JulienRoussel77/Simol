@@ -6,7 +6,7 @@ namespace simol
 
   TEST(HartreeFockTest, LiH)
   {
-    std::string const dataPath = "/local/cdoucet/simol/test/functional/quantchem/LiH/";
+    std::string const dataPath = "/home/cdoucet/simol/test/functional/quantchem/LiH/";
     MatrixMarketFile kinetic_file(dataPath + "kinetic_matrix.mtx");
     MatrixMarketFile overlap_file(dataPath + "overlap_matrix.mtx");
     MatrixMarketFile potential_file(dataPath + "potential_matrix.mtx");

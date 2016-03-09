@@ -21,8 +21,8 @@ namespace simol
   class Particle;
 
     void verlet_scheme(Particle & particle, double timeStep);
-    void exact_OU_scheme(Particle & particle, double const gamma, double const beta, double const timeStep, dvec const& randVec);
-    void maruyama_scheme(Particle & particle, double const beta_, double const& timeStep, dvec const& randVec);
+    void exact_OU_scheme(Particle & particle, double const gamma, double const beta, double const timeStep, Vector<double> const& randVec);
+    void maruyama_scheme(Particle & particle, double const beta_, double const& timeStep, Vector<double> const& randVec);
 }
 
 namespace simol
@@ -41,8 +41,8 @@ namespace simol
 
     //friend void verlet(Particle & particle, HamiltonDynamics const & model, double delta_t);
     friend void verlet_scheme(Particle & particle, double timeStep);
-    friend void exact_OU_scheme(Particle & particle, double const gamma, double const beta, double const timeStep, dvec const& randVec);
-    friend void maruyama_scheme(Particle & particle, double const beta_, double const& timeStep, dvec const& randVec);
+    friend void exact_OU_scheme(Particle & particle, double const gamma, double const beta, double const timeStep, Vector<double> const& randVec);
+    friend void maruyama_scheme(Particle & particle, double const beta_, double const& timeStep, Vector<double> const& randVec);
 
     //=============
     // CONSTRUCTORS
@@ -52,7 +52,7 @@ namespace simol
     public:
       Particle();
       Particle(int dimension);
-      Particle(double const & mass, dvec const & position, dvec const & momentum);
+      Particle(double const & mass, Vector<double> const & position, Vector<double> const & momentum);
       Particle(double const & mass, double const & position, double const & momentum);
 
     //==========
@@ -63,12 +63,12 @@ namespace simol
       //Particle& operator= (Particle const& particle);
       int dimension() const;
       double const & mass() const;
-      dvec const & position() const;
-      dvec & position();
+      Vector<double> const & position() const;
+      Vector<double> & position();
       double const& position(int i) const;
       double& position(int i);
-      dvec const & momentum() const;
-      dvec & momentum();
+      Vector<double> const & momentum() const;
+      Vector<double> & momentum();
       double const& momentum(int i) const;
       double& momentum(int i);
       double const& kineticEnergy() const;
@@ -76,15 +76,15 @@ namespace simol
       double const& potentialEnergy() const;
       double& potentialEnergy();
       double energy() const;
-      dvec const& force() const;
-      dvec& force();
+      Vector<double> const& force() const;
+      Vector<double>& force();
       double const& force(size_t i) const;
       double& force(size_t i);
-      dvec const& energyGrad() const;
-      dvec& energyGrad();
+      Vector<double> const& energyGrad() const;
+      Vector<double>& energyGrad();
       double const& energyGrad(int i) const;
       double& energyGrad(int i);
-      dvec velocity() const;
+      Vector<double> velocity() const;
 
     //=============
     // DATA MEMBERS
@@ -93,12 +93,12 @@ namespace simol
     private:
 
       double mass_;
-      dvec position_;
-      dvec momentum_;
+      Vector<double> position_;
+      Vector<double> momentum_;
       double potentialEnergy_;
       double kineticEnergy_;
-      dvec force_;
-      dvec energyGrad_;
+      Vector<double> force_;
+      Vector<double> energyGrad_;
   };
 
 

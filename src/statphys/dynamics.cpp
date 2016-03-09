@@ -73,7 +73,7 @@ namespace simol
   Potential& Dynamics::potential()
   { return *potential_; }
   
-  double Dynamics::potential(dvec const& position) const
+  double Dynamics::potential(Vector<double> const& position) const
   {
     return (*potential_)(position); 
   }
@@ -83,17 +83,17 @@ namespace simol
     return (*potential_)(distance); 
   }
   
-  dvec Dynamics::force(dvec const& position) const
+  Vector<double> Dynamics::force(Vector<double> const& position) const
   {
     return potential_->force(position) + externalForce_; 
   }
   
-  const dvec& Dynamics::externalForce() const
+  const Vector<double>& Dynamics::externalForce() const
   {
     return externalForce_; 
   }
   
-  dvec& Dynamics::externalForce()
+  Vector<double>& Dynamics::externalForce()
   {
     return externalForce_; 
   }
@@ -128,10 +128,10 @@ namespace simol
   
   void Dynamics::interaction(Particle& particle1, Particle& particle2) const
   {
-    dvec r12 = particle2.position() - particle1.position();
+    Vector<double> r12 = particle2.position() - particle1.position();
     //double d12 = r12.norm();
     double energy12 = potential(r12);
-    dvec force12 = force(r12);    // = - v'(q_2 - q_1)
+    Vector<double> force12 = force(r12);    // = - v'(q_2 - q_1)
     
     //particle1.potentialEnergy() += energy12 / 2;
     particle2.potentialEnergy() = energy12;
@@ -142,10 +142,10 @@ namespace simol
   
     void Dynamics::triInteraction(Particle& particle1, Particle& particle2, Particle& particle3) const
   {
-    dvec delta = particle3.position() - 2*particle2.position() + particle1.position();
+    Vector<double> delta = particle3.position() - 2*particle2.position() + particle1.position();
     //double d12 = r12.norm();
     double energy123 = potential(delta);
-    dvec force123 = force(delta);    // = - v'(r_2)
+    Vector<double> force123 = force(delta);    // = - v'(r_2)
     
     //particle1.potentialEnergy() += energy12 / 2;
     particle2.potentialEnergy() = energy123;
@@ -171,9 +171,9 @@ namespace simol
   
   void Dynamics::updateAllControlVariates(Output& output, vector<Particle> const& configuration, size_t indexOfIteration) const
   {
-    dvec q = configuration[0].position();
-    dvec p = configuration[0].momentum();
-    dvec qEnd = configuration[configuration.size()-1].position();
+    Vector<double> q = configuration[0].position();
+    Vector<double> p = configuration[0].momentum();
+    Vector<double> qEnd = configuration[configuration.size()-1].position();
     //assert(configuration.size() == 1);
     VectorXd generatorOnBasis;
     generatorOnBasis = generatorOn(output.velocityCV(), configuration);
@@ -195,7 +195,7 @@ namespace simol
 		double qInteg = 0;
 		size_t nbIntegrationNodes = 1000;
 		double step = 8. / nbIntegrationNodes;
-		dvec deltaQ(1);
+		Vector<double> deltaQ(1);
 		for (size_t iOfNode = 0; iOfNode < nbIntegrationNodes; iOfNode++)
 		{
 			deltaQ(0) = - 4 + iOfNode * step;
@@ -239,7 +239,7 @@ namespace simol
     rng_ = rng;
   }
   
-  dvec StochasticDynamics::drawMomentum(double localBeta, double mass)
+  Vector<double> StochasticDynamics::drawMomentum(double localBeta, double mass)
 	{
 		return sqrt(1 / (localBeta * mass)) * rng_->gaussian();
 	}
@@ -341,11 +341,6 @@ namespace simol
   void Overdamped::updateAfter(Particle& particle)
   {
     particle.position() += timeStep_ * particle.force() + sqrt(2*timeStep_/beta_) * rng_->gaussian();
-  
-    //assert(particle.force()(0) == force(particle.position())(0));
-    /*dvec randomTerm = sqrt(2*timeStep_/beta_) * rng_->gaussian();
-    dvec qtilde = particle.position() + .5 * timeStep_ * particle.force() + .5 * randomTerm;
-    particle.position() += timeStep_ * force(qtilde) + randomTerm;*/
   }
   
   MatrixXd Overdamped::generatorOn(ControlVariate const* controlVariate, vector<Particle> const& configuration) const

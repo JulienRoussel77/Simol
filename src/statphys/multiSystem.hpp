@@ -19,7 +19,7 @@ namespace simol {
  public:
    MultiSystem(Input const& input);
    virtual ~MultiSystem();
-   dvec externalForce(int const& indexOfReplica);
+   Vector<double> externalForce(int const& indexOfReplica);
    void launch(Input const& input);
    int size();
  };

@@ -29,11 +29,11 @@ namespace simol
       const size_t& numberOfIterations() const;
       double finalTime() const;
       Potential& potential();
-      double potential(dvec const& position) const;
+      double potential(Vector<double> const& position) const;
       double potential(double const& position) const;
-      dvec force(dvec const& position) const;
-      dvec& externalForce() ;
-      const dvec& externalForce() const;
+      Vector<double> force(Vector<double> const& position) const;
+      Vector<double>& externalForce() ;
+      const Vector<double>& externalForce() const;
       double& externalForce(int const& i);
       double const& externalForce(int const& i) const;
 			virtual double const& gamma() const {assert(false);}
@@ -45,7 +45,7 @@ namespace simol
       //friend Dynamics* createDynamics(Potential const& potential);
 
       virtual void initializeMomenta(vector<Particle>& configuration);
-			virtual dvec drawMomentum(double /*localBeta*/, double /*mass*/){assert(false);return 0;};
+			virtual Vector<double> drawMomentum(double /*localBeta*/, double /*mass*/){assert(false);return 0;};
       virtual void setRNG(RNG* /*rng*/){};
       void resetForce(Particle& particle) const;
       void computeForce(Particle& particle) const;
@@ -64,7 +64,7 @@ namespace simol
       size_t numberOfIterations_;
       Potential* potential_;
       //double timeStep;
-      dvec externalForce_;
+      Vector<double> externalForce_;
   };
 
   class Hamiltonian : public Dynamics
@@ -80,7 +80,7 @@ namespace simol
   public:
     StochasticDynamics(Input const& input, int const& indexOfReplica=1);
     virtual void setRNG(RNG* rng);
-		virtual dvec drawMomentum(double localBeta, double mass);
+		virtual Vector<double> drawMomentum(double localBeta, double mass);
   protected:
     RNG* rng_;
   };
@@ -118,7 +118,6 @@ namespace simol
     virtual void updateBefore(Particle& particle);
     virtual void updateAfter(Particle& particle);
     virtual MatrixXd generatorOn(ControlVariate const* controlVariate, vector<Particle> const& configuration) const;
-    //virtual std::function<double (ControlVariate const*, dvec const&, dvec const&)> generator() const;
   };
 
   class BoundaryStochasticDynamics : public StochasticDynamics
