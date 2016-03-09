@@ -1,8 +1,6 @@
 #ifndef SIMOL_VECTOR_EIGEN_HPP
 #define SIMOL_VECTOR_EIGEN_HPP
 
-
-
 namespace simol
 {
 
@@ -10,8 +8,8 @@ namespace simol
   class Vector<ScalarType,eigen>
   {
     public:
-      Vector(size_t const size=0);
-      Vector(size_t const size, ScalarType const& lambda);
+      explicit Vector(size_t const size=0);
+      explicit Vector(size_t const size, ScalarType const& lambda);
       Vector(Vector<ScalarType,eigen> const& u);
       Vector(typename eigen<ScalarType>::VectorType const & wrappedVector);
       size_t size() const;

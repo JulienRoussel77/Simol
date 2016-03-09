@@ -78,11 +78,11 @@ namespace simol
     return (*potential_)(position); 
   }
   
-  double Dynamics::potential(double const& distance) const
+/*  double Dynamics::potential(double const& distance) const
   {
     return (*potential_)(distance); 
   }
-  
+  */
   Vector<double> Dynamics::force(Vector<double> const& position) const
   {
     return potential_->force(position) + externalForce_; 

@@ -45,7 +45,7 @@ namespace simol
       //friend Dynamics* createDynamics(Potential const& potential);
 
       virtual void initializeMomenta(vector<Particle>& configuration);
-			virtual Vector<double> drawMomentum(double /*localBeta*/, double /*mass*/){assert(false);return 0;};
+			virtual Vector<double> drawMomentum(double /*localBeta*/, double /*mass*/){assert(false);return Vector<double>();};
       virtual void setRNG(RNG* /*rng*/){};
       void resetForce(Particle& particle) const;
       void computeForce(Particle& particle) const;

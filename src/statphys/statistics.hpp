@@ -89,7 +89,7 @@ namespace simol
   T Statistics<T>::mean(size_t i, size_t j) const
   {
     if (nbValues_(i,j) == 0)
-      return 0;
+      return T(0);
     else
       return sumValues_(i,j) / nbValues_(i,j);
   }
