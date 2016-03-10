@@ -1,13 +1,15 @@
-#pragma once
+
+#ifndef SIMOL_MULTISYSTEM_HPP
+#define SIMOL_MULTISYSTEM_HPP
 
 #include "tools.hpp"
 #include "particleSystem.hpp"
 #include "controlVariate.hpp"
 
 namespace simol {
-  
+
  class MultiSystem
- { 
+ {
    int dimension_;
    size_t numberOfReplicas_;
    std::vector<ParticleSystem*> systemReplicas;
@@ -23,5 +25,7 @@ namespace simol {
    void launch(Input const& input);
    int size();
  };
- 
+
 }
+
+#endif

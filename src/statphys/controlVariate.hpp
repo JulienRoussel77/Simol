@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SIMOL_CONTROLVARIATE_HPP
+#define SIMOL_CONTROLVARIATE_HPP
 
 #include "statistics.hpp"
 #include "potential.hpp"
@@ -243,3 +244,5 @@ namespace simol
   };
 
 }
+
+#endif

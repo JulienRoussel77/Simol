@@ -4,17 +4,65 @@
 \chapter{Coding rules}
 
 
-\section{Keyword \textit{using}}
+\section{Preprocessor directives}
+
+
+\subsection{Avoid using \texttt{pragma once}}
+
+The directive named \texttt{pragma once} does not belong to C++ standard. Prefer using include guards in header files instead. For example, the following \texttt{foo.hpp} file is correct
+\begin{cppcode}
+	#ifndef SIMOL_FOO_HPP
+	#define SIMOL_FOO_HPP
+	
+	class Foo;
+	
+	#endif
+\end{cppcode}
+but the version below is not officially supported:
+\begin{cppcode}
+	#pragma once
+	
+	class Foo;
+
+\end{cppcode}
+
+
+
+\section{Namespaces}
 
 
 \subsection{Avoid using \textit{using namespace}}
 
-Do not use the instruction \textit{using namespace} because it cancels the effects of namespaces and may create name conflicts.
+Do not use the instruction \textit{using namespace} because it cancels the effects of namespaces and may create name conflicts. For example, such a conflict may appear in the code below if a type named \texttt{string} is defined in \texttt{string.hpp}.
 
+\begin{cppcode}
+	#include "string.hpp"
+	using namespace std;
+	int main()
+	{
+		string hello = "hello"; // std::string or string from string.hpp?
+		string world = "world"; // std::string or string from string.hpp?
+		cout << hello << endl;
+		cout << world << endl;
+	}
+\end{cppcode}
 
-\subsection{Avoid using \textit{using namespace::function}} 
+Thus, please prefer avoiding using the \texttt{using namespace foo} instruction. Use \texttt{foo::bar} when you want to use \texttt{bar} function defined in \texttt{foo} namespace. According to this rule, the correct version of the code below is
+\begin{cppcode}
+	#include "string.hpp"
+	int main()
+	{
+		std::string hello = "hello"; // ok, std::string
+		string world = "world"; // ok, string from string.hpp
+		std::cout << hello << std::endl;
+		std::cout << world << std::endl;
+	}
+\end{cppcode}
+
+\subsection{Avoid using \textit{using foo::function}} 
 
 For the same reason as above, do not use the instruction \textit{using namespace::function}.
+
 
 
 

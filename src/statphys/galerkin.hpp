@@ -1,6 +1,5 @@
-#pragma once
-//#include "SparseMatrix.hpp"
-//#include <Eigen/Dense>
+#ifndef SIMOL_GALERKIN_HPP
+#define SIMOL_GALERKIN_HPP
 
 #include "tools.hpp"
 #include "input.hpp"
@@ -36,3 +35,5 @@ namespace simol
 		void compute();
 	};
 }
+
+#endif

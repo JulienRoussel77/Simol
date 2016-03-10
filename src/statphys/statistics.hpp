@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SIMOL_STATISTICS_HPP
+#define SIMOL_STATISTICS_HPP
 
 #include "tools.hpp"
 #include "input.hpp"
@@ -226,3 +227,5 @@ namespace simol
 
 
 }
+
+#endif

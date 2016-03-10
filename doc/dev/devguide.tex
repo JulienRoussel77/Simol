@@ -4,6 +4,28 @@
 \usepackage{url,color,hyperref}
 \usepackage{geometry,graphicx}
 
+\usepackage{eso-pic}
+%\usepackage{\modelPath monster2e}
+\usepackage{tikz}
+\usepackage{layout}
+\usepackage{xcolor}
+\usepackage{amsmath,amssymb}
+\usepackage{fancybox}
+\usepackage{graphicx}
+\usepackage[absolute,showboxes,overlay]{textpos}
+\usepackage{listings}
+\TPshowboxesfalse
+\textblockorigin{0mm}{0mm}
+
+\usepackage{minted}
+\newminted{cpp}
+{
+	tabsize=2
+}
+
+
+
+
 \title{Simol developer's guide}
 \author{C\'edric DOUCET}
 \date{\today}
@@ -63,7 +85,6 @@
 
 \maketitle
 \tableofcontents
-
 
 
 \input{chapters/installation}
