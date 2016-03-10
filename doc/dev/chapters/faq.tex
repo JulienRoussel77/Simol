@@ -1,0 +1,32 @@
+\chapter{FAQ}
+
+\section{Error messages}
+
+
+\subsection{The compiler (...) does not support -std=c++11 flag.}
+
+\Simol relies on some features of the 2011 norm of C++ but your compiler does not seem to support this norm. You need to provide another compiler by passing to the \texttt{cmake} command a correct value of the \texttt{CMAKE\_CXX\_COMPILER} variable. For example, the very first version of \texttt{GCC} which supports the C++11 norm is 4.8.1. If you have installed this version in \url{/usr/local/gcc/4.8.1}, you need to type
+\lstset{language=bash} 
+\begin{lstlisting}
+cmake -D CMAKE_CXX_COMPILER=/usr/local/gcc/4.8.1/bin/g++
+\end{lstlisting}
+during the compilation step.
+
+\subsection{Cloning into 'simol'... Permission denied (publickey)}
+
+This message means that something goes wrong when you try to connect \SourceSup with you SSH key. You should verify that your key is effectively activated with the command
+\lstset{language=bash} 
+\begin{lstlisting}
+ssh-add -l
+\end{lstlisting}
+If you obtain something like this:
+\lstset{language=bash} 
+\begin{lstlisting}
+The agent has no identities
+\end{lstlisting}
+then your key is not activated. To activate it, you have to type add your key:
+\lstset{language=bash} 
+\begin{lstlisting}
+ssh-add mykey
+\end{lstlisting}
+where \textit{mykey} is the full name of your key (including its path).

@@ -1,0 +1,64 @@
+\chapter{Development environment}
+
+\section{File organization}
+\section{Build system}
+
+\subsection{Why \CMake?}
+
+The build system of \Simol is \CMake, which is very similar to \Make. A typical installation of a software with \CMake consists in running the three following commands from a subdirectory usually called \url{build}: 
+\lstset{language=bash} 
+\begin{lstlisting}
+cmake src && make && make install
+\end{lstlisting}
+If you have already installed a software with \Make, you probably noticed the similarity with the classical combo:
+\lstset{language=bash} 
+\begin{lstlisting}
+src/configure && make && make install
+\end{lstlisting}
+The only difference between \Make and \CMake is the first command, which corresponds to the configuration step. This is one of the reason why \CMake has been chosen to automatize the installation of \Simol. The second reason is that \CMake is a cross-platform build system. Contrary to \Make, which is only available on Unix systems, \CMake can be used on Windows systems too.
+
+\subsection{How does it work?}
+
+\CMake relies on a hierarchy of configuration files named \CMakeLists. The main configuration file must be located at the top directory of the project.
+
+
+
+
+
+
+
+\section{Version control wit \Git}
+
+
+\subsection{Main commands}
+
+
+\subsubsection{Clone}
+
+\subsubsection{Add}
+
+\subsubsection{Commit}
+
+
+\subsubsection{Push}
+
+
+\subsubsection{Status}
+
+
+\subsubsection{Pull}
+
+
+\subsection{Good practices}
+
+
+\subsubsection{Atomic commits}
+
+\subsubsection{Writing good commit messages}
+
+
+
+\section{Coding rules}
+\section{Unit tests}
+\section{Continuous integration}
+\section{Documentation}
