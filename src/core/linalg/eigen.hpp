@@ -25,6 +25,8 @@ namespace simol
     typedef Eigen::JacobiSVD<DenseMatrixType> SVDType;
     typedef typename DenseMatrixType::AdjointReturnType AdjointReturnType;
     typedef typename DenseMatrixType::ColXpr DenseMatrixColumn;
+    typedef Eigen::Block<DenseMatrixType> DenseBlock;
+    typedef Eigen::Block<DenseMatrixType const> DenseBlock_const;
   };
 
 }

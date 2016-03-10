@@ -162,8 +162,8 @@ namespace simol
                     //On crée une base orthonormale de l'intersection des deux
                 //sous-espaces: par exemple à partir de xU
                 DenseMatrix<double> xUbas = DenseMatrix<double>::Zero(numberOfElectrons, numberOfElectrons-1);
-                xUbas.wrapped_.block(0,0, numberOfElectrons, indmin) = Uvec.wrapped_.block(0,0, numberOfElectrons, indmin);
-                xUbas.wrapped_.block(0,indmin, numberOfElectrons, numberOfElectrons-indmin-1) = Uvec.wrapped_.block(0, indmin+1, numberOfElectrons, numberOfElectrons-indmin-1);
+                xUbas.block(0,0, numberOfElectrons, indmin) = Uvec.block(0,0, numberOfElectrons, indmin);
+                xUbas.block(0,indmin, numberOfElectrons, numberOfElectrons-indmin-1) = Uvec.block(0, indmin+1, numberOfElectrons, numberOfElectrons-indmin-1);
 
                 DenseMatrix<double> coeffs_bas = U * xUbas;
                 //Puis on orthonormalise les vecteurs de coeffs_bas
@@ -214,12 +214,12 @@ namespace simol
                     for (size_t k2 =0; k2 < numberOfElectrons; k2++)
                     {
                         DenseMatrix<double> aU = DenseMatrix<double>::Zero(numberOfElectrons-1, numberOfElectrons-1);
-                        aU.wrapped_.block(0,0, numberOfElectrons-1, k1) = CU.wrapped_.block(0,0, numberOfElectrons-1, k1);
-                        aU.wrapped_.block(0,k1, numberOfElectrons-1, numberOfElectrons-1-k1) = CU.wrapped_.block(0,k1+1, numberOfElectrons-1, numberOfElectrons -1 -k1);
+                        aU.block(0,0, numberOfElectrons-1, k1) = CU.block(0,0, numberOfElectrons-1, k1);
+                        aU.block(0,k1, numberOfElectrons-1, numberOfElectrons-1-k1) = CU.block(0,k1+1, numberOfElectrons-1, numberOfElectrons -1 -k1);
 
                         DenseMatrix<double> aV = DenseMatrix<double>::Zero(numberOfElectrons-1, numberOfElectrons-1);
-                        aV.wrapped_.block(0,0, numberOfElectrons-1,k2) = CV.wrapped_.block(0,0, numberOfElectrons-1, k2);
-                        aV.wrapped_.block(0,k2, numberOfElectrons-1, numberOfElectrons-1-k2) = CV.wrapped_.block(0,k2+1, numberOfElectrons-1, numberOfElectrons-1 -k2);
+                        aV.block(0,0, numberOfElectrons-1,k2) = CV.block(0,0, numberOfElectrons-1, k2);
+                        aV.block(0,k2, numberOfElectrons-1, numberOfElectrons-1-k2) = CV.block(0,k2+1, numberOfElectrons-1, numberOfElectrons-1 -k2);
 
                          sum = sum + muU(k1)*muV(k2)*(pow(-1, k1))*(pow(-1, k2))*sum2*(aU.determinant())*(aV.determinant());
                     }
@@ -381,8 +381,8 @@ namespace simol
                         //On crée une base orthonormale de l'intersection des deux
                         //sous-espaces: par exemple à partir de xU
                         DenseMatrix<double> xUbas = DenseMatrix<double>::Zero(numberOfElectrons, numberOfElectrons-1);
-                        xUbas.wrapped_.block(0,0, numberOfElectrons, indmin) = Uvec.wrapped_.block(0,0, numberOfElectrons, indmin);
-                        xUbas.wrapped_.block(0,indmin, numberOfElectrons, numberOfElectrons-indmin-1) = Uvec.wrapped_.block(0, indmin+1, numberOfElectrons, numberOfElectrons-indmin-1);
+                        xUbas.block(0,0, numberOfElectrons, indmin) = Uvec.block(0,0, numberOfElectrons, indmin);
+                        xUbas.block(0,indmin, numberOfElectrons, numberOfElectrons-indmin-1) = Uvec.block(0, indmin+1, numberOfElectrons, numberOfElectrons-indmin-1);
 
                         DenseMatrix<double> coeffs_bas = U * xUbas;
                         //Puis on orthonormalise les vecteurs de coeffs_bas
@@ -437,12 +437,12 @@ namespace simol
                             for (size_t k2 = 0; k2 < numberOfElectrons; k2++)
                             {
                                 DenseMatrix<double> aU = DenseMatrix<double>::Zero(numberOfElectrons-1,numberOfElectrons-1);
-                                aU.wrapped_.block(0,0,numberOfElectrons-1,k1) = CU.wrapped_.block(0,0,numberOfElectrons-1,k1);
-                                aU.wrapped_.block(0,k1,numberOfElectrons-1,numberOfElectrons-1-k1) = CU.wrapped_.block(0,(k1+1),numberOfElectrons-1, numberOfElectrons-1-k1);
+                                aU.block(0,0,numberOfElectrons-1,k1) = CU.block(0,0,numberOfElectrons-1,k1);
+                                aU.block(0,k1,numberOfElectrons-1,numberOfElectrons-1-k1) = CU.block(0,(k1+1),numberOfElectrons-1, numberOfElectrons-1-k1);
 
                                 DenseMatrix<double> aV = DenseMatrix<double>::Zero(numberOfElectrons-1,numberOfElectrons-1);
-                                aV.wrapped_.block(0,0,numberOfElectrons-1,k2) = CV.wrapped_.block(0,0,numberOfElectrons-1,k2);
-                                aV.wrapped_.block(0,k2,numberOfElectrons-1, numberOfElectrons-1-k2) = CV.wrapped_.block(0,k2+1,numberOfElectrons-1, numberOfElectrons-1-k2);
+                                aV.block(0,0,numberOfElectrons-1,k2) = CV.block(0,0,numberOfElectrons-1,k2);
+                                aV.block(0,k2,numberOfElectrons-1, numberOfElectrons-1-k2) = CV.block(0,k2+1,numberOfElectrons-1, numberOfElectrons-1-k2);
 
                                 sum += muU(k1)*muV(k2)*pow(-1,k1)*pow(-1,k2)*sum2*(aU.determinant())*(aV.determinant());
                             }
@@ -574,9 +574,9 @@ namespace simol
                             for (size_t ju = iu+1 ; ju <numberOfElectrons; ju++)
                             {
                                 DenseMatrix<double> aU = DenseMatrix<double>::Zero(numberOfElectrons-2,numberOfElectrons-2);
-                                aU.wrapped_.block(0,0,numberOfElectrons-2, iu) = CU.wrapped_.block(0,0,numberOfElectrons-2,iu);
-                                aU.wrapped_.block(0,iu,numberOfElectrons-2, ju-iu-1) = CU.wrapped_.block(0,iu+1, numberOfElectrons-2, ju-iu-1);
-                                aU.wrapped_.block(0,ju-1,numberOfElectrons-2, numberOfElectrons-ju-1) = CU.wrapped_.block(0,ju+1,numberOfElectrons-2, numberOfElectrons-ju-1);
+                                aU.block(0,0,numberOfElectrons-2, iu) = CU.block(0,0,numberOfElectrons-2,iu);
+                                aU.block(0,iu,numberOfElectrons-2, ju-iu-1) = CU.block(0,iu+1, numberOfElectrons-2, ju-iu-1);
+                                aU.block(0,ju-1,numberOfElectrons-2, numberOfElectrons-ju-1) = CU.block(0,ju+1,numberOfElectrons-2, numberOfElectrons-ju-1);
 
 
                                 for (size_t iv = 0; iv < numberOfElectrons-1; iv++)
@@ -585,9 +585,9 @@ namespace simol
                                     {
 
                                         DenseMatrix<double> aV = DenseMatrix<double>::Zero(numberOfElectrons-2,numberOfElectrons-2);
-                                        aV.wrapped_.block(0,0,numberOfElectrons-2,iv) = CV.wrapped_.block(0,0, numberOfElectrons-2, iv);
-                                        aV.wrapped_.block(0,iv,numberOfElectrons-2,jv-iv-1) = CV.wrapped_.block(0,iv+1,numberOfElectrons-2,jv-iv-1);
-                                        aV.wrapped_.block(0,jv-1,numberOfElectrons-2,numberOfElectrons-jv-1) = CV.wrapped_.block(0,jv+1,numberOfElectrons-2,numberOfElectrons-jv-1);
+                                        aV.block(0,0,numberOfElectrons-2,iv) = CV.block(0,0, numberOfElectrons-2, iv);
+                                        aV.block(0,iv,numberOfElectrons-2,jv-iv-1) = CV.block(0,iv+1,numberOfElectrons-2,jv-iv-1);
+                                        aV.block(0,jv-1,numberOfElectrons-2,numberOfElectrons-jv-1) = CV.block(0,jv+1,numberOfElectrons-2,numberOfElectrons-jv-1);
 
 
                                         sum += pow(-1,iu) * pow(-1,ju+1) *pow(-1,iv) *pow(-1,jv+1)

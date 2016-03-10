@@ -29,6 +29,12 @@ namespace simol
           Vector<ScalarType>
           column(size_t const index) const;
 
+          typename eigen<ScalarType>::DenseBlock block(size_t startRow, size_t startCol, size_t blockRows, size_t blockCols)
+          { return wrapped_.block(startRow, startCol, blockRows, blockCols); }
+
+          typename eigen<ScalarType>::DenseBlock_const block(size_t startRow, size_t startCol, size_t blockRows, size_t blockCols) const
+          { return wrapped_.block(startRow, startCol, blockRows, blockCols); }
+
           DenseMatrix permute_columns(std::vector<std::size_t> const & permutation) const
           {
               DenseMatrix permuted(numberOfRows(), permutation.size());
