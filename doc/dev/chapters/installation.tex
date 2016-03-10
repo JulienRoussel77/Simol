@@ -18,11 +18,11 @@ This section explains how to satisfy these conditions.
 
 If you do not use any proxy to connect the internet, you can skip this step. If you try to download and install the development version of \Simol behind a proxy, you have to define the environment variables named \texttt{http\_proxy} and \texttt{https\_proxy}. These variables are required to download external libraries of \Simol. For example, let us assume that your proxy identifier is \texttt{proxy.enpc.fr} with port 3128. To define \texttt{http\_proxy}, you need to type the following line in your terminal:
 
-\lstset{language=bash} 
-\begin{lstlisting}
-export http_proxy=http://proxy.enpc.fr:3128
-export https_proxy=https://proxy.enpc.fr:3128
-\end{lstlisting}
+\begin{minted}{bash}
+    export http_proxy=http://proxy.enpc.fr:3128
+    export https_proxy=https://proxy.enpc.fr:3128
+\end{minted}
+
 Note that the scope of these variables is limited to the current terminal. If you want them to be defined each time you open a new terminal, you need to add theses lines at the end of your \url{~/.bashrc} file.
 
 \subsection{Having an SSH access to \SourceSup}
@@ -35,10 +35,9 @@ Sources of \Simol are stored on a software forge called \SourceSup, which you ca
 The sources of \Simol can only be accessed through the SSH protocol. To be able to use this protocol, you need to have a private key and a public key. These keys are usually located at \url{~/.ssh} in your machine. If you have already defined a key called \textit{mykey}, you should see the two files \url{mykey} and \url{mykey.pub} in this directory. The former is private and should never be communicated to anyone else. The latter is public and must be uploaded on \SourceSup. 
 
 If you do not have any SSH pair of keys, you need to create one. To do it, just type
-\lstset{language=bash} 
-\begin{lstlisting}
+\begin{minted}{bash}
 ssh keygen -t dsa
-\end{lstlisting}
+\end{minted}
 in a terminal.
 
 \subsection{Being a member of the \Simol team}
@@ -52,19 +51,17 @@ in a terminal.
 
 
 \Git is a popular version control system which has been written by Linus Thorvald, the creator of \Linux. The best way to learn more about \Git is to visit its official website: \urlGit. Please refer to the official documentation to find the installation steps for you own machine. In most cases, the easiest way to install it is to use a package manager like \texttt{apt-get}, \texttt{yum}, \texttt{homebrew}, etc. For example, you can install \Git on Ubuntu systems by simply typing
-\lstset{language=bash} 
-\begin{lstlisting}
+\begin{minted}{bash}
 sudo apt-get install git
-\end{lstlisting}
+\end{minted}
 in a terminal. You can check that \Git is installed on your machine with the command
-\lstset{language=bash} 
-\begin{lstlisting}
+\begin{minted}{bash}
 git --version
-\end{lstlisting}
+\end{minted}
 which should return something like this:
-\begin{lstlisting}
+\begin{minted}{bash}
 git version 1.7.9.5
-\end{lstlisting}
+\end{minted}
 
 
 \section{Installation of \Simol}
@@ -72,18 +69,16 @@ git version 1.7.9.5
 \subsection{Downloading the sources}
 
 To clone the source repository of \Simol, you need to be located in the directory where you want to store the development version of the software. Then, you have to type
-\lstset{language=bash} 
-\begin{lstlisting}
+\begin{minted}{bash}
 git clone git+ssh://git@git.renater.fr:2222/simol.git
-\end{lstlisting}
+\end{minted}
 in a terminal. This will create a directory \url{simol} and copy the sources of \Simol in it. 
 
 \paragraph{Note:}
 it is possible to change the name of the cloning directory, say \textit{foo}, by typing 
-\lstset{language=bash} 
-\begin{lstlisting}
+\begin{minted}{bash}
 git clone git+ssh://git@git.renater.fr:2222/simol.git foo
-\end{lstlisting}
+\end{minted}
 
 
 
@@ -91,25 +86,24 @@ git clone git+ssh://git@git.renater.fr:2222/simol.git foo
 \subsection{Configuration}
 
 Sources of \Simol have to be built in a subdirectory called \url{build}. To reach it, just type
-\lstset{language=bash} 
-\begin{lstlisting}
+\begin{minted}{bash}
 cd simol/build
-\end{lstlisting}
+\end{minted}
 in a terminal. The configuration step lays on a configuration file. We provide an example of such a configuration file which should be copied in the root directory of \Simol :
-\begin{lstlisting}
+\begin{minted}{bash}
 cp ../cmake/config.cmake ..
-\end{lstlisting}
+\end{minted}
 Please edit the copied file according to your environment. Especially, don't forget to set the variable \texttt{GCC\_ROOT} to the root of your own installation of \texttt{gcc}. Once you have edited the configuration file, all is ready to perform the configuration of \Simol by typing:
-\begin{lstlisting}
+\begin{minted}{bash}
 cmake -C ../config.cmake ..
-\end{lstlisting}
+\end{minted}
 
 \subsection{Building}
 
 The building step of \Simol is very simple: just type
-\begin{lstlisting}
+\begin{minted}{bash}
 make
-\end{lstlisting}
+\end{minted}
 Note that it is not necessary to add the "-j" flag to parallelize the building step. It is done automatically. 
 
 
@@ -122,8 +116,7 @@ You may want to use an integrated development environment (IDE) to contribute to
 \item in \textit{File} menu, choose \textit{New project} and then choose \textit{C/C++ project with existing sources}
 \item specify the directory containing \Simol sources and choose \textit{Custom} as the configuration mode
 \item choose \textit{Run configure script in subfolder} and modify \textit{Configure arguments} by specifiying your own C/C++/Fortran compilers and enabling automatic downloading of third-party libraries. The result should look like mine:
-\lstset{language=bash} 
-\begin{lstlisting}
+\begin{minted}{bash}
 -G "Unix Makefiles" 
 -DCMAKE_BUILD_TYPE=Debug 
 -DCMAKE_C_COMPILER=/usr/local/bibliotheques/gcc/4.9.2/bin/gcc 
@@ -133,7 +126,7 @@ You may want to use an integrated development environment (IDE) to contribute to
 -DCMAKE_C_FLAGS_DEBUG="-g3 -gdwarf-2" 
 -DCMAKE_CXX_FLAGS_DEBUG="-g3 -gdwarf-2" 
 -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-\end{lstlisting}
+\end{minted}
 \item skip other steps until the end of the creation of the project
 \end{enumerate}
 
@@ -149,10 +142,9 @@ The GNU Compilation Collection (GCC) is the preferred set of compilers for Simol
 \item strings are not defined the same starting from version 5 and it causes many compilation problems which we have not solved yet.
 \end{itemize}
 However, any version number between 4.8.1 and 4.9.3 fulfills these conditions. For example, if the number version returned by the command line
-\lstset{language=bash} 
-\begin{lstlisting}
+\begin{minted}{bash}
 g++ --version
-\end{lstlisting}
+\end{minted}
 is at least 4.8.1, you do not need to install any other version of GCC and you can skip this step. Especially, even if the version number is 5.1.0 or higher, it would be possible to compile and link simol files without any problems (not tested). The sequel is only useful if you need to install GCC 4.9.3 manually. 
 
 The installation of GCC 4.9.3 is quite simple. We describe here how it may be installed from sources. Alternative approaches are possible, especially those based on a package manager. However, package managers differ significatively from an operating system to another, as well as cross-plateform tools. That is the reason why we do not plan to give any support for them here. Please refer to the documentation of your favorite tool if you do not want to install GCC from sources, but from a package manager. To install GCC 4.9.3 from sources, please download the source from a mirror site on the official website 
@@ -160,29 +152,28 @@ The installation of GCC 4.9.3 is quite simple. We describe here how it may be in
 	\url{https://gcc.gnu.org/gcc-4.9}
 \end{center}
 For example, you can download and exract the sources thanks to the following command lines:
-\lstset{language=bash} 
-\begin{lstlisting}
+\begin{minted}{bash}
 	wget ftp://ftp.uvsq.fr/pub/gcc/releases/gcc-4.9.3/gcc-4.9.3.tar.gz
 	tar xf gcc-4.9.3.tar.gz
-\end{lstlisting}
+\end{minted}
 It will create a directory named gcc-4.9.3. Then, change to this directory and download prerequisites:
-\begin{lstlisting}
+\begin{minted}{bash}
 	cd gcc-4.9.3
 	./contrib/download_prerequisites
-\end{lstlisting}
+\end{minted}
 It will take some time to achieve the downloading process. Once it is done, source must be built outside of the source directory. Let $GCC\_ROOT$ be the directory where you want to install GCC 4.9.3. For example, you can define it like this:
-\begin{lstlisting}
+\begin{minted}{bash}
 	export GCC_ROOT=/home/yourlogin/gcc/4.9.3
-\end{lstlisting}
+\end{minted}
 where \textit{youlogin} stands for your own login. The installation process is defined by these steps:
-\begin{lstlisting}
+\begin{minted}{bash}
 	cd ..
 	mkdir build-gcc-4.9.3
 	cd gcc-4.9.3
 	../gcc-4.9.3/configure --prefix=$GCC_ROOT --enable-languages=c,c++,fortran
 	make -j 4
 	make install
-\end{lstlisting}
+\end{minted}
 
 
 
