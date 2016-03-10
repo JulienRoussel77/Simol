@@ -9,10 +9,10 @@
 
 namespace simol
 {
-  
 
 
-  
+
+
   class Output
   {
     std::string outputFoldername_;
@@ -26,42 +26,42 @@ namespace simol
     std::ofstream outVelocitiesCV_;
     std::ofstream outForcesCV_;
     std::ofstream outLengthsCV_;
-    std::ofstream outMidFlowCV_;    
+    std::ofstream outMidFlowCV_;
     std::ofstream outMidFlowPT_;
-		std::ofstream outSumFlowCV_;    
+		std::ofstream outSumFlowCV_;
     std::ofstream outSumFlowPT_;
 		std::ofstream outProfile_;
-    
+
     int verbose_;
     size_t periodNumberOfIterations_;
     double timeStep_;
     int dimension_;
     size_t numberOfParticles_;
 		size_t numberOfIterations_;
-    
+
     double kineticEnergy_;
     double potentialEnergy_;
     double energyMidFlow_;
 		double energySumFlow_;
-    
+
     size_t decorrelationNumberOfIterations_;
-    
+
   public:
-    
+
     ControlVariate* velocityCV_;
     ControlVariate* forceCV_;
     ControlVariate* lengthCV_;
     ControlVariate* midFlowCV_;
 		ControlVariate* sumFlowCV_;
-		
+
 		AutocorrelationStats<double> temperatureProfile_;
 		AutocorrelationStats<double> bendingProfile_;
 		AutocorrelationStats<double> flowProfile_;
-	
+
     Output(Input const& input);
-    
+
     void reset(Input const& input, Potential& potential, size_t indexOfReplica);
-      
+
     const double& timeStep() const;
     double& timeStep();
     int& verbose();
@@ -72,7 +72,7 @@ namespace simol
 		const size_t& numberOfParticles() const;
 		const size_t& numberOfIterations() const;
 		double finalTime() const;
-    
+
     const double& kineticEnergy() const;
     double& kineticEnergy();
     const double& potentialEnergy() const;
@@ -83,26 +83,26 @@ namespace simol
     double& energyMidFlow();
 		const double& energySumFlow() const;
     double& energySumFlow();
-    
+
     bool doComputeCorrelations() const;
-    
+
     ControlVariate* velocityCV();
     ControlVariate* forceCV();
     ControlVariate* lengthCV();
     ControlVariate* midFlowCV();
 		ControlVariate* sumFlowCV();
-    
+
     const size_t& decorrelationNumberOfIterations() const;
     size_t& decorrelationNumberOfIterations();
     double decorrelationTime() const;
     //double& integratedAutocorrelationP();
-    void display(vector<Particle> const& configuration, size_t indexOfIteration);
+    void display(std::vector<Particle> const& configuration, size_t indexOfIteration);
     void finalDisplayAutocorrelations();
-    void finalDisplay(vector<Particle> const& configuration, Vector<double> const& externalForce);
+    void finalDisplay(std::vector<Particle> const& configuration, Vector<double> const& externalForce);
     void displayFinalFlow(double temperature, double delta_temperature, double tau);
 
-    
-    void updateControlVariate(vector<Particle> const& configuration);
+
+    void updateControlVariate(std::vector<Particle> const& configuration);
 		void appendTemperatureProfile(double value, size_t iOfIteration, size_t iOfParticle);
 		void appendBendingProfile(double value, size_t iOfIteration, size_t iOfParticle);
 		void appendFlowProfile(double value, size_t iOfIteration, size_t iOfParticle);

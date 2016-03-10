@@ -6,17 +6,6 @@
 #include <fstream>
 #include <vector>
 
-using std::ofstream;
-using std::cout;
-using std::endl;
-using std::min;
-using std::max;
-using std::string;
-using std::vector;
-using std::ifstream;
-
-using std::vector;
-
 #include <Eigen/Sparse>
 typedef std::complex<double> cplx;
 

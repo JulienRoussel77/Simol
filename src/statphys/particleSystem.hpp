@@ -12,7 +12,7 @@
 namespace simol
 {
   class ParticleSystem;
-  
+
   ParticleSystem* createSystem(Input  const& input, int const& iOfReplica=0);
 
   class ParticleSystem
@@ -23,7 +23,7 @@ namespace simol
       virtual ~ParticleSystem(){};
       Particle & getParticle(size_t index);
 			const size_t& dimension() const;
-      std::vector<Particle> & configuration();       
+      std::vector<Particle> & configuration();
       size_t numberOfParticles() const;
 			virtual void initializeSystem(Dynamics* /*model*/){};
       void launch(Dynamics* model, Output& output);
@@ -34,23 +34,23 @@ namespace simol
       void writeOutput(Output& output, size_t indexOfIteration = 0);
       virtual void computeFinalOutput(Output& output, Dynamics const* model);
       void writeFinalOutput(Output& output, Dynamics const* model);
-			
+
     protected:
       size_t dimension_;
       std::vector<Particle> configuration_;
-			string settingsPath_;
+      std::string settingsPath_;
   };
 
   // redémarrage : nombres aleatoires, juste pannes, tous les N pas de temps
   //
-  
+
   class Isolated : public ParticleSystem
   {
   public:
     Isolated(Input const& input, int const& iOfReplica=0);
     void computeAllForces(Dynamics const* model);
   };
-  
+
   class BiChain : public ParticleSystem
   {
     Particle ancorParticle_;
@@ -60,7 +60,7 @@ namespace simol
     void simulate(Dynamics * model);
 		virtual void computeProfile(Output& output, Dynamics const* model, size_t iOfIteration);
   };
-  
+
   class TriChain : public ParticleSystem
   {
     Particle ancorParticle1_;

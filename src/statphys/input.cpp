@@ -1,13 +1,7 @@
 #include "input.hpp"
 
-using std::cout; 
-using std::endl; 
-using std::string;
-using std::max;
-using std::min;
-
 namespace simol {
-  
+
 
   Input::Input(CommandLine cmd):
 		data(YAML::LoadFile(cmd.inputFileName())),
@@ -16,18 +10,18 @@ namespace simol {
 		//inputSettings_(settingsPath()),
 		//settingsSize_(settingsSize())
   {
-		/*cout << "SettingsPath = " << settingsPath() << endl;
+		/*std::cout << "SettingsPath = " << settingsPath() << std::endl;
 		assert(inputSettings_.is_open());
-		cout << "SettingsSize = " << settingsSize_ << endl;*/
-    
+        std::cout << "SettingsSize = " << settingsSize_ << std::endl;*/
+
     if (data["Physics"]["System"]["Position"])
       if (data["Physics"]["System"]["Position"].size() == 2)
       {
 				positionMin_ = data["Physics"]["System"]["Position"][0].as<double>();
 				positionMax_ = data["Physics"]["System"]["Position"][1].as<double>();
       }
-      
-    
+
+
     /*if (settingsPath() != "" && settingsSize_ != -1)
 		{
 			settingsPositions_ = vector<double>(settingsSize_);
@@ -40,16 +34,16 @@ namespace simol {
 				settingsMomenta_[iOfParticle] = readItem(inputSettings_);
 				for (int i=0; i<4; i++)
 					readItem(inputSettings_);
-				cout << iOfParticle << " " << settingsPositions_[iOfParticle] << " " << settingsMomenta_[iOfParticle] << endl;
+                    std::cout << iOfParticle << " " << settingsPositions_[iOfParticle] << " " << settingsMomenta_[iOfParticle] << std::endl;
 			}
-			
+
 			//Estimating the tauBending
 			//double estimTau = 2 * (settingsPositions_[settingsSize()-1] - 2*settingsPositions_[(settingsSize()-1)/2] + settingsPositions_[(settingsSize()-1)/2]
 			double estimTau = settingsPositions_[settingsSize()-1] / pow(settingsSize()-1, 4);
-			cout << "Estimated bending = " << estimTau << endl;
-			
-			cout << "file read" << endl;
-			
+            std::cout << "Estimated bending = " << estimTau << std::endl;
+
+            std::cout << "file read" << std::endl;
+
 			initialPositions_ = vector<double>(numberOfParticles());
 			initialMomenta_ = vector<double>(numberOfParticles());
 			double ratio = settingsSize_ / (double) numberOfParticles();
@@ -60,20 +54,20 @@ namespace simol {
 				int iSup = ceil  (fracIndex);
 				double alpha = fracIndex - iInf;
 				assert(0 <= alpha && alpha <= 1);
-				initialPositions_[iOfParticle] = pow(ratio, -4) * 
+				initialPositions_[iOfParticle] = pow(ratio, -4) *
 						((1-alpha) * settingsPositions_[iInf] + alpha * settingsPositions_[iSup]);
 				initialMomenta_[iOfParticle]   = (1-alpha) * settingsMomenta_[iInf]   + alpha * settingsMomenta_[iSup];
-			
-				cout << iOfParticle << " " << alpha << " " << settingsPositions_[iInf] << " " << settingsPositions_[iSup] << " " << initialPositions_[iOfParticle] << endl;
+
+                std::cout << iOfParticle << " " << alpha << " " << settingsPositions_[iInf] << " " << settingsPositions_[iSup] << " " << initialPositions_[iOfParticle] << std::endl;
 			}
 		}*/
   }
-  
+
   const std::string& Input::inputPath() const
   {
 		return inputPath_;
 	}
-	
+
 	const std::ifstream& Input::inputFlux() const
 	{
 		return inputFlux_;
@@ -82,57 +76,57 @@ namespace simol {
   int Input::dimension() const {return data["Geometry"]["Dimension"].as<int>();}
 
   double Input::length() const {return data["Geometry"]["Length"].as<double>();}
-  
-  double Input::timeStepMin() const 
+
+  double Input::timeStepMin() const
   {
     if (data["Mesh"]["Time"]["Step"].size() == 2)
       return data["Mesh"]["Time"]["Step"][0].as<double>();
     else
-      return data["Mesh"]["Time"]["Step"].as<double>(); 
+      return data["Mesh"]["Time"]["Step"].as<double>();
   }
-  
-    double Input::timeStepMax() const 
+
+    double Input::timeStepMax() const
   {
     if (data["Mesh"]["Time"]["Step"].size() == 2)
       return data["Mesh"]["Time"]["Step"][1].as<double>();
     else
-      return data["Mesh"]["Time"]["Step"].as<double>(); 
+      return data["Mesh"]["Time"]["Step"].as<double>();
   }
 
-  double Input::timeStep(size_t indexOfReplica) const 
+  double Input::timeStep(size_t indexOfReplica) const
   {
     //return timeStepMin() + indexOfReplica * (timeStepMax() - timeStepMin()) / numberOfReplicas();
-  
-    return timeStepMin() * pow(timeStepMax() / timeStepMin(), indexOfReplica / max(1., numberOfReplicas()-1.));
+
+    return timeStepMin() * pow(timeStepMax() / timeStepMin(), indexOfReplica / std::max(1., numberOfReplicas()-1.));
   }
 
   //double Input::timeStep() const {return data["Mesh"]["Time"]["Step"].as<double>();}
 
-  size_t Input::numberOfIterations(size_t indexOfReplica) const 
+  size_t Input::numberOfIterations(size_t indexOfReplica) const
   {
     if (data["Mesh"]["Time"]["Number"])
       return data["Mesh"]["Time"]["Number"].as<double>();
     else if (data["Mesh"]["Time"]["FinalTime"])
       return data["Mesh"]["Time"]["FinalTime"].as<double>() / timeStep(indexOfReplica);
     else
-    {cout << "Number of Iterations not specified !" << endl;exit(1);}
+    {std::cout << "Number of Iterations not specified !" << std::endl;exit(1);}
   }
-  
-  string Input::potentialName() const {return data["Physics"]["Potential"]["Name"].as<string>();}
+
+  std::string Input::potentialName() const {return data["Physics"]["Potential"]["Name"].as<std::string>();}
 
   //Sinusoidal
-  double Input::amplitude() const 
+  double Input::amplitude() const
   {
     if (data["Physics"]["Potential"]["Amplitude"])
       return data["Physics"]["Potential"]["Amplitude"].as<double>();
     else
       return 1;
   }
-  
+
   //DoubleWell
   double Input::height() const {return data["Physics"]["Potential"]["Height"].as<double>();}
   double Input::interWell() const {return data["Physics"]["Potential"]["InterWell"].as<double>();}
-  
+
   //Harmonic
   double Input::potentialStiffness() const {
     if (data["Physics"]["Potential"]["Stiffness"])
@@ -140,7 +134,7 @@ namespace simol {
     else
       return 1;
   }
-  
+
   //Quadratic
   double Input::potentialAlpha() const {
     if (data["Physics"]["Potential"]["Alpha"])
@@ -148,19 +142,19 @@ namespace simol {
     else
       return 1;
   }
-  
+
   double Input::potentialBeta() const {
     if (data["Physics"]["Potential"]["Beta"])
       return data["Physics"]["Potential"]["Beta"].as<double>();
     else
       return 1;
   }
-  
 
-  string Input::dynamicsName() const {return data["Physics"]["Model"]["Name"].as<string>();}
+
+  std::string Input::dynamicsName() const {return data["Physics"]["Model"]["Name"].as<std::string>();}
   double Input::gamma() const {return data["Physics"]["Model"]["Gamma"].as<double>();}
-  
-  double Input::temperature(size_t /*indexOfReplica*/) const 
+
+  double Input::temperature(size_t /*indexOfReplica*/) const
   {
     if (data["Physics"]["Model"]["Temperature"])
       return data["Physics"]["Model"]["Temperature"].as<double>();
@@ -170,21 +164,21 @@ namespace simol {
       return (temperatureLeft() + temperatureRight()) / 2;
     else if (data["Physics"]["Model"]["BetaLeft"] && data["Physics"]["Model"]["BetaRight"])
       return .5/betaLeft() + .5/betaRight();
-    else 
-      {cout << "Temperature not precised !" << endl;exit(1);}
+    else
+      {std::cout << "Temperature not precised !" << std::endl;exit(1);}
   }
-  
-  double Input::temperatureLeft(size_t /*indexOfReplica*/) const 
+
+  double Input::temperatureLeft(size_t /*indexOfReplica*/) const
   {
     return data["Physics"]["Model"]["TemperatureLeft"].as<double>();
   }
-  
-    double Input::temperatureRight(size_t /*indexOfReplica*/) const 
+
+    double Input::temperatureRight(size_t /*indexOfReplica*/) const
   {
     return data["Physics"]["Model"]["TemperatureRight"].as<double>();
   }
-  
-  double Input::beta(size_t /*indexOfReplica*/) const 
+
+  double Input::beta(size_t /*indexOfReplica*/) const
   {
     if (data["Physics"]["Model"]["Beta"])
       return data["Physics"]["Model"]["Beta"].as<double>();
@@ -195,10 +189,10 @@ namespace simol {
     else if (data["Physics"]["Model"]["TemperatureLeft"] && data["Physics"]["Model"]["TemperatureRight"])
       return 2/(temperatureLeft() + temperatureRight());
     else
-      {cout << "Beta not precised !" << endl;exit(1);}
+      {std::cout << "Beta not precised !" << std::endl;exit(1);}
   }
-  
-  double Input::betaLeft(size_t /*indexOfReplica*/) const 
+
+  double Input::betaLeft(size_t /*indexOfReplica*/) const
   {
     if (data["Physics"]["Model"]["BetaLeft"])
       return data["Physics"]["Model"]["BetaLeft"].as<double>();
@@ -206,8 +200,8 @@ namespace simol {
       return 1 / data["Physics"]["Model"]["TemperatureLeft"].as<double>();
     else assert(false);
   }
-  
-  double Input::betaRight(size_t /*indexOfReplica*/) const 
+
+  double Input::betaRight(size_t /*indexOfReplica*/) const
   {
     if (data["Physics"]["Model"]["BetaRight"])
       return data["Physics"]["Model"]["BetaRight"].as<double>();
@@ -215,25 +209,25 @@ namespace simol {
       return 1 / data["Physics"]["Model"]["TemperatureRight"].as<double>();
     else assert(false);
   }
-  
+
   /*bool Input::externalForceVarying() const {
     if (data["Physics"]["Model"]["ForceMin"] && data["Physics"]["Model"]["ForceMax"] && !data["Physics"]["Model"]["Force"]) return true;
     else if (!data["Physics"]["Model"]["ForceMin"] && !data["Physics"]["Model"]["ForceMax"]) return false;
-    else {cout << "External force input incoherent !" << endl;exit(1);}
+    else {std::cout << "External force input incoherent !" << std::endl;exit(1);}
   }*/
-  
+
   double Input::externalForceMin() const {return data["Physics"]["Model"]["Force"][0].as<double>();}
   double Input::externalForceMax() const {return data["Physics"]["Model"]["Force"][1].as<double>();}
-  
+
   double Input::externalForce(size_t indexOfReplica) const {
     if (data["Physics"]["Model"]["Force"])
       if (data["Physics"]["Model"]["Force"].size() == 2)
-	return externalForceMin() + indexOfReplica * (externalForceMax() - externalForceMin()) / max(1., numberOfReplicas()-1.);
+	return externalForceMin() + indexOfReplica * (externalForceMax() - externalForceMin()) / std::max(1., numberOfReplicas()-1.);
       else
 	return data["Physics"]["Model"]["Force"].as<double>();
-    else return 0;   
+    else return 0;
   }
-  
+
   double Input::tauBending() const
   {
     if (data["Physics"]["Model"]["Tau"])
@@ -242,20 +236,20 @@ namespace simol {
       return 0;
   }
 
-  string Input::systemName() const {return data["Physics"]["System"]["Name"].as<string>();}
-  
+  std::string Input::systemName() const {return data["Physics"]["System"]["Name"].as<std::string>();}
+
   size_t Input::numberOfParticles() const {
     if (data["Physics"]["System"]["Number"])
       return data["Physics"]["System"]["Number"].as<size_t>();
     else return 1;
   }
-  
+
   double Input::mass() const {
     if (data["Physics"]["System"]["Mass"])
       return data["Physics"]["System"]["Mass"].as<double>();
     else return 1;
-  } 	
-  
+  }
+
   double Input::initialPosition(int const& i) const {
     if (data["Physics"]["System"]["Position"])
 		{
@@ -266,58 +260,58 @@ namespace simol {
 		}
 		/*else if (settingsSize_ != -1)
 		{
-			cout << "using settings for q : " << i << "->" << initialPositions_[i] << endl;
+        std::cout << "using settings for q : " << i << "->" << initialPositions_[i] << std::endl;
 			return initialPositions_[i];
 		}*/
-			
+
 		else return 0;
-  }   
-  
-  double Input::initialMomentum(int const& /*i*/) const 
+  }
+
+  double Input::initialMomentum(int const& /*i*/) const
   {
     if (data["Physics"]["System"]["Momentum"])
       return data["Physics"]["System"]["Momentum"].as<double>();
 		/*else if (settingsSize_ != -1)
 		{
-			cout << "using settings for p : " << i << "->" << initialMomenta_[i] << endl;
+        std::cout << "using settings for p : " << i << "->" << initialMomenta_[i] << std::endl;
 			return initialMomenta_[i];
 		}*/
     else return 0;
     //else return (i < numberOfParticles()/2)?.2:-.2;
-  }  
-  
-  string Input::settingsPath() const
+  }
+
+  std::string Input::settingsPath() const
   {
 		if (data["Physics"]["System"]["SettingsPath"])
-			return finalOutputFoldername()+data["Physics"]["System"]["SettingsPath"].as<string>();
+			return finalOutputFoldername()+data["Physics"]["System"]["SettingsPath"].as<std::string>();
 		else return "";
 	}
-	
+
 	int Input::settingsSize() const
   {
 		if (data["Physics"]["System"]["SettingsSize"])
 			return data["Physics"]["System"]["SettingsSize"].as<int>();
 		else return -1;
 	}
-	
-  
+
+
   size_t Input::numberOfReplicas() const {
     if (data["Physics"]["Replicas"]["Number"])
       return data["Physics"]["Replicas"]["Number"].as<int>();
     else return 1;
   }
-  
+
   /*bool Input::doComputeCorrelations() const {
     return data["Output"]["DecorrelationTime"];
   }*/
-  
+
   size_t Input::decorrelationNumberOfIterations(size_t indexOfReplica) const
   {
     if (data["Output"]["DecorrelationTime"])
       return data["Output"]["DecorrelationTime"].as<double>() / timeStep(indexOfReplica);
     else return 0;
   }
-  
+
   double Input::decorrelationTime(size_t /*indexOfReplica*/) const
   {
     if (data["Output"]["DecorrelationTime"])
@@ -325,49 +319,49 @@ namespace simol {
     else return 0;
   }
 
-  //string Input::outputFilename() const {return data["Output"]["Filename"].as<string>();}
-  string Input::outputFoldername() const {
-    //cout << "../output/"+dynamicsName()+"/"+systemName()+"/"+potentialName()+"/" << endl;
-    string foldername = "../output/"+dynamicsName()+"/"+systemName()+"/"+potentialName()+"/";
+  //std::string Input::outputFilename() const {return data["Output"]["Filename"].as<std::string>();}
+  std::string Input::outputFoldername() const {
+    //std::cout << "../output/"+dynamicsName()+"/"+systemName()+"/"+potentialName()+"/" << std::endl;
+      std::string foldername = "../output/"+dynamicsName()+"/"+systemName()+"/"+potentialName()+"/";
     if (controlVariateName() != "None")
       foldername += controlVariateName()+"/";
     if (data["Output"]["Foldername"])
-      foldername += data["Output"]["Foldername"].as<string>()+"/";
+      foldername += data["Output"]["Foldername"].as<std::string>()+"/";
     return foldername;
   }
-  
-  string Input::finalOutputFoldername() const {
-    //cout << "../output/"+dynamicsName()+"/"+systemName()+"/"+potentialName()+"/" << endl;
-    string finalFoldername = "../output/"+dynamicsName()+"/"+systemName()+"/"+potentialName()+"/";
+
+  std::string Input::finalOutputFoldername() const {
+    //std::cout << "../output/"+dynamicsName()+"/"+systemName()+"/"+potentialName()+"/" << std::endl;
+      std::string finalFoldername = "../output/"+dynamicsName()+"/"+systemName()+"/"+potentialName()+"/";
     if (controlVariateName() != "None")
       finalFoldername += controlVariateName()+"/";
     return finalFoldername;
   }
-  
+
   size_t Input::outputPeriodNumberOfIterations(size_t indexOfReplica) const {
     if (data["Output"]["Period"])
       return data["Output"]["Period"].as<double>() / timeStep(indexOfReplica);
     else
       return 1;
   }
-  
+
   double Input::outputPeriodTime(size_t /*indexOfReplica*/) const {
     if (data["Output"]["Period"])
       return data["Output"]["Period"].as<double>();
     else
       return 1;
   }
-  
-  string Input::controlVariateName() const
+
+  std::string Input::controlVariateName() const
   {
     if (data["ControlVariate"]["Name"])
-      return data["ControlVariate"]["Name"].as<string>();
-    else 
+      return data["ControlVariate"]["Name"].as<std::string>();
+    else
       return "None";
   }
-  
+
   //####Galerkin####
- 
+
   	size_t Input::numberOfFourier() const
   	{
 			if(data["Galerkin"])
@@ -377,7 +371,7 @@ namespace simol {
 
 			return 0;
 		}
-		
+
 		size_t Input::numberOfHermite() const
 		{
 			if(data["Galerkin"])
@@ -387,10 +381,10 @@ namespace simol {
 
 			return 0;
 		}
-		
-		
-		
-		double Input::readItem(ifstream& in)
+
+
+
+		double Input::readItem(std::ifstream& in)
 		{
 			double item;
 			in >> item;

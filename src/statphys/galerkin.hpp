@@ -10,7 +10,7 @@
 namespace simol
 {
 	SMat tensor(SMat A, SMat B);
-	
+
 	class Galerkin
 	{
 		//DenseMatrix<double> A;
@@ -23,7 +23,7 @@ namespace simol
 		double beta_;
 		double amplitude_;
 		size_t nbIntegrationNodes_;
-		vector<double> fourierCoeffsExp_;
+        std::vector<double> fourierCoeffsExp_;
 	public:
 		Galerkin(Input const& input);
 		double potential(double q);

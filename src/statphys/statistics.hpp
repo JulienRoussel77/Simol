@@ -11,10 +11,10 @@ namespace simol
     /*vector<T> sumValues_;
     vector<T> lastValue_;
     vector<int> nbValues_;*/
-    
+
     Matrix<T, Dynamic, Dynamic> sumValues_;
     Matrix<T, Dynamic, Dynamic> lastValue_;
-    Matrix<size_t, Dynamic, Dynamic> nbValues_;    
+    Matrix<size_t, Dynamic, Dynamic> nbValues_;
   public:
     Statistics(size_t nbRows = 1, size_t nbCols = 1);
     //virtual ~Statistics(){};
@@ -26,7 +26,7 @@ namespace simol
     const T& lastValue(size_t i = 0, size_t j = 0) const;
     const Matrix<T, Dynamic, Dynamic>& lastValueMat() const;
   };
-  
+
   //
   //Calcule le profil de corrélation de deux observables A et B : <\Linv A, B>
   //Dans le cas où A = B on calcule la variance asymptotique de A
@@ -73,7 +73,7 @@ namespace simol
     lastValue_.fill(0);
     nbValues_.fill(0);
   };
-  
+
   template <class T>
   void Statistics<T>::append(T value, size_t i, size_t j)
   {
@@ -85,7 +85,7 @@ namespace simol
     nbValues_(i,j)++;
   }
 
-  template <class T>  
+  template <class T>
   T Statistics<T>::mean(size_t i, size_t j) const
   {
     if (nbValues_(i,j) == 0)
@@ -93,39 +93,39 @@ namespace simol
     else
       return sumValues_(i,j) / nbValues_(i,j);
   }
-  
-  template <class T>  
+
+  template <class T>
   Matrix<T, Dynamic, Dynamic> Statistics<T>::meanMat() const
   {
     return (sumValues_.array() / nbValues_.array().cast<double>()).matrix();
   }
-  
+
   template <class T>
   const size_t& Statistics<T>::nbValues(size_t i, size_t j) const
   {
     return nbValues_(i,j);
   }
-  
+
   template <class T>
   const Matrix<size_t, Dynamic, Dynamic>& Statistics<T>::nbValuesMat() const
   {
     return nbValues_;
   }
-  
+
   template <class T>
   const T& Statistics<T>::lastValue(size_t i, size_t j) const
   {
     return lastValue_(i,j);
   }
-  
+
   template <class T>
   const Matrix<T, Dynamic, Dynamic>& Statistics<T>::lastValueMat() const
   {
     return lastValue_;
   }
-  
-  
-  
+
+
+
   template <class T>
   AutocorrelationStats<T>::AutocorrelationStats():
     decorrelationNumberOfIterations_(0),
@@ -139,7 +139,7 @@ namespace simol
     statisticsCorrelation_(0, 0),
     indexRef_(0)
   {}
-  
+
   template <class T>
   AutocorrelationStats<T>::AutocorrelationStats(size_t decorrelationNumberOfIterations, double decorrelationTime, size_t nbOfObservables):
     decorrelationNumberOfIterations_(decorrelationNumberOfIterations),
@@ -153,76 +153,76 @@ namespace simol
     statisticsCorrelation_(decorrelationNumberOfIterations_, nbOfObservables),
     indexRef_(0)
   {}
-  
+
   template <class T>
   void AutocorrelationStats<T>::append(T const& newValue, size_t iOfIteration, size_t iOfObservable)
   {
     append(newValue, iOfIteration, iOfObservable, newValue);
   }
-  
+
   template <class T>
   void AutocorrelationStats<T>::append(T const& /*newValue*/, size_t /*iOfIteration*/, size_t /*iOfObservable*/, T const& /*newRefValue*/)
   {
-    cout << "AutocorrelationStats<T>::append(T newValue, size_t iOfIteration) not implemented !" << endl;
-  
+      std::cout << "AutocorrelationStats<T>::append(T newValue, size_t iOfIteration) not implemented !" << std::endl;
+
     assert(false);
   }
-  
+
   template <class T>
   double AutocorrelationStats<T>::operator()(size_t iOfIteration, size_t iOfObservable) const
   {
     return statisticsCorrelation_.mean(iOfIteration, iOfObservable);
   }
-  
+
   template <class T>
   const T& AutocorrelationStats<T>::lastValue(size_t iOfObservable) const
   {
     return statisticsValues_.lastValue(iOfObservable);
   }
-  
+
   template <class T>
   T AutocorrelationStats<T>::mean(size_t iOfObservable) const
   {
     return statisticsValues_.mean(iOfObservable);
   }
-  
+
   template <class T>
   size_t AutocorrelationStats<T>::statisticsMeanCorrelationNbValues(size_t iOfObservable) const
   {
     return statisticsMeanCorrelation_.nbValues(iOfObservable);
   }
-  
+
   template <class T>
   double AutocorrelationStats<T>::integratedAutocorrelation(size_t iOfObservable) const
   {
     return statisticsMeanCorrelation_.mean(iOfObservable) * decorrelationTime_;
   }
-  
+
   template <class T>
   Eigen::MatrixXd AutocorrelationStats<T>::integratedAutocorrelationMat() const
   {
     return statisticsMeanCorrelation_.meanMat() * decorrelationTime_;
   }
-  
+
   template <class T>
   double AutocorrelationStats<T>::integratedAutocorrelationUnbiased(size_t /*iOfObservable*/) const
   {
-    cout << "AutocorrelationStats<T>::integratedAutocorrelationUnbiased() not implemented !" << endl;
+      std::cout << "AutocorrelationStats<T>::integratedAutocorrelationUnbiased() not implemented !" << std::endl;
     exit(1);
     return 0;
   }
-  
+
   template <class T>
   double AutocorrelationStats<T>::variance(size_t iOfObservable) const
   {
     return 2 * integratedAutocorrelationUnbiased(iOfObservable);
   }
-  
+
     template <class T>
   double AutocorrelationStats<T>::standardDeviation(size_t iOfObservable) const
   {
     return sqrt(variance(iOfObservable));
   }
 
-  
+
 }

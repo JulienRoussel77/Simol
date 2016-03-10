@@ -16,13 +16,13 @@ namespace simol{
 
   class Input{
     YAML::Node data;
-		string inputPath_;
-		ifstream inputFlux_;
+    std::string inputPath_;
+    std::ifstream inputFlux_;
     double positionMin_, positionMax_;
-		ifstream inputSettings_;
+    std::ifstream inputSettings_;
 		int settingsSize_;
-		vector<double> settingsPositions_, initialPositions_;
-		vector<double> settingsMomenta_, initialMomenta_;
+        std::vector<double> settingsPositions_, initialPositions_;
+        std::vector<double> settingsMomenta_, initialMomenta_;
   public:
     Input(CommandLine cmd);
 		const std::string& inputPath() const;
@@ -72,7 +72,7 @@ namespace simol{
     double initialPosition(int const& i=0) const;
 
     double initialMomentum(int const& i=0) const;
-		string settingsPath() const;
+    std::string settingsPath() const;
 		int settingsSize() const;
 
     size_t numberOfReplicas() const;
@@ -92,7 +92,7 @@ namespace simol{
 		size_t numberOfHermite() const;
 
 
-		double readItem(ifstream& in);
+		double readItem(std::ifstream& in);
   };
 
 

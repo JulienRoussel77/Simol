@@ -42,9 +42,8 @@ namespace simol
       virtual double const& temperatureRight() const {assert(false);}
       virtual double deltaTemperature() const {assert(false);}
       virtual double const& tauBending() const {assert(false);}
-      //friend Dynamics* createDynamics(Potential const& potential);
 
-      virtual void initializeMomenta(vector<Particle>& configuration);
+      virtual void initializeMomenta(std::vector<Particle>& configuration);
 			virtual Vector<double> drawMomentum(double /*localBeta*/, double /*mass*/){assert(false);return Vector<double>();};
       virtual void setRNG(RNG* /*rng*/){};
       void resetForce(Particle& particle) const;
@@ -56,14 +55,13 @@ namespace simol
       virtual void updateAfterLeft(Particle& /*particle*/) {};
       virtual void updateAfterRight(Particle& /*particle*/) {};
       virtual void bending(Particle& /*particle1*/, Particle& /*particle2*/) const {};
-      virtual MatrixXd generatorOn(ControlVariate const* /*controlVariate*/, vector<Particle> const& /*configuration*/) const{cout << "operator not implemented !"; assert(false); return MatrixXd();}
-      virtual void updateAllControlVariates(Output& output, vector<Particle> const& configuration, size_t indexOfIteration) const;
+      virtual MatrixXd generatorOn(ControlVariate const* /*controlVariate*/, std::vector<Particle> const& /*configuration*/) const{std::cout << "operator not implemented !"; assert(false); return MatrixXd();}
+      virtual void updateAllControlVariates(Output& output, std::vector<Particle> const& configuration, size_t indexOfIteration) const;
 			virtual double computeMeanPotLaw(double betaLocal) const;
 	protected:
       double timeStep_;
       size_t numberOfIterations_;
       Potential* potential_;
-      //double timeStep;
       Vector<double> externalForce_;
   };
 
@@ -71,7 +69,7 @@ namespace simol
   {
   public:
     Hamiltonian(Input const&  input, int const& indexOfReplica=1);
-    virtual MatrixXd generatorOn(ControlVariate const* controlVariate, vector<Particle> const& configuration) const;
+    virtual MatrixXd generatorOn(ControlVariate const* controlVariate, std::vector<Particle> const& configuration) const;
 
   };
 
@@ -92,7 +90,7 @@ namespace simol
     double temperature_;
   public:
     UniformStochasticDynamics(Input const& input, int const& indexOfReplica=1);
-    void initializeMomenta(vector<Particle>& configuration);
+    void initializeMomenta(std::vector<Particle>& configuration);
     virtual double  temperature() const;
     virtual double const& beta() const;
     virtual double const& temperatureLeft() const;
@@ -106,7 +104,7 @@ namespace simol
     double const& gamma() const;
     double sigma() const;
     virtual void updateAfter(Particle& particle);
-    virtual MatrixXd generatorOn(ControlVariate const* controlVariate, vector<Particle> const& configuration) const;
+    virtual MatrixXd generatorOn(ControlVariate const* controlVariate, std::vector<Particle> const& configuration) const;
   protected:
     double gamma_;
   };
@@ -117,7 +115,7 @@ namespace simol
     Overdamped(Input const& input, int const& indexOfReplica=1);
     virtual void updateBefore(Particle& particle);
     virtual void updateAfter(Particle& particle);
-    virtual MatrixXd generatorOn(ControlVariate const* controlVariate, vector<Particle> const& configuration) const;
+    virtual MatrixXd generatorOn(ControlVariate const* controlVariate, std::vector<Particle> const& configuration) const;
   };
 
   class BoundaryStochasticDynamics : public StochasticDynamics
@@ -131,11 +129,10 @@ namespace simol
     virtual double const& temperatureRight() const;
     double deltaTemperature() const;
 
-    //virtual void updateAfter(Particle& particle);
     virtual void updateAfterLeft(Particle& particle) = 0;
     virtual void updateAfterRight(Particle& particle) = 0;
 
-    void initializeMomenta(vector<Particle>& configuration);
+    void initializeMomenta(std::vector<Particle>& configuration);
   protected:
     double betaLeft_;
     double betaRight_;
@@ -158,7 +155,7 @@ namespace simol
     virtual void updateAfterLeft(Particle& particle);
     virtual void updateAfterRight(Particle& particle);
     virtual void bending(Particle& particle1, Particle& particle2) const;
-    MatrixXd generatorOn(ControlVariate const* controlVariate, vector<Particle> const& configuration) const;
+    MatrixXd generatorOn(ControlVariate const* controlVariate, std::vector<Particle> const& configuration) const;
   protected:
     double gamma_;
     double tauBending_;
@@ -166,7 +163,5 @@ namespace simol
 
 
 }
-
-//#include "dynamics.cpp"
 
 #endif
