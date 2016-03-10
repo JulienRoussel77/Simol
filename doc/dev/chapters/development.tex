@@ -13,19 +13,15 @@ The directive named \texttt{pragma once} does not belong to C++ standard. Prefer
 \begin{cppcode}
 	#ifndef SIMOL_FOO_HPP
 	#define SIMOL_FOO_HPP
-	
 	class Foo;
-	
 	#endif
 \end{cppcode}
 but the version below is not officially supported:
 \begin{cppcode}
 	#pragma once
-	
 	class Foo;
-
 \end{cppcode}
-
+Note that if \texttt{pragma once} is added to the standard someday, then it should be preferred to include guards. But it is not planned to be added to it for the moment.
 
 
 \section{Namespaces}
