@@ -1,3 +1,8 @@
 *~
-doc
+doc/dev/*.aux
+doc/dev/*.out
+doc/dev/*.pdf
+doc/dev/*.log
+doc/dev/*.toc
+doc/dev/*.synctex.gz
 integration/buildbot
