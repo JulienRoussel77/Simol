@@ -135,11 +135,6 @@ git version 1.7.9.5
 \end{lstlisting}
 
 
-
-
-
-that the default name \textit{simol} has been keeped.
-
 \section{Installation of \Simol}
 
 \subsection{Downloading the sources}
@@ -157,27 +152,33 @@ it is possible to change the name of the cloning directory, say \textit{foo}, by
 \begin{lstlisting}
 git clone git+ssh://git@git.renater.fr:2222/simol.git foo
 \end{lstlisting}
-In this documentation, we always assume 
+
 
 
 
 \subsection{Configuration}
 
-Sources of \Simol are built in a subdirectory called \url{build}. To reach it, just type
+Sources of \Simol have to be built in a subdirectory called \url{build}. To reach it, just type
 \lstset{language=bash} 
 \begin{lstlisting}
 cd simol/build
 \end{lstlisting}
-in a terminal. Then, the installation of \Simol is very simple:
-\lstset{language=bash} 
+in a terminal. The configuration step lays on a configuration file. We provide an example of such a configuration file which should be copied in the root directory of \Simol :
 \begin{lstlisting}
-cmake ..
-make
-make install
+cp ../cmake/config.cmake ..
+\end{lstlisting}
+Please edit the copied file according to your environment. Especially, don't forget to set the variable \texttt{GCC\_ROOT} to the root of your own installation of \texttt{gcc}. Once you have edited the configuration file, all is ready to perform the configuration of \Simol by typing:
+\begin{lstlisting}
+cmake -C ../config.cmake ..
 \end{lstlisting}
 
 \subsection{Building}
 
+The building step of \Simol is very simple: just type
+\begin{lstlisting}
+make
+\end{lstlisting}
+Note that it is not necessary to add the "-j" flag to parallelize the building step. It is done automatically. 
 
 
 \subsection{Netbeans (8.0.2)}
