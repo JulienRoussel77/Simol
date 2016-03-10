@@ -38,7 +38,7 @@ namespace simol
         DenseMatrix<double> temp(overlap.numberOfRows(), V.numberOfColumns());
         temp = overlap * V;
 
-        return DenseMatrix<double>(U.wrapped_.adjoint() * temp.wrapped_);
+        return DenseMatrix<double>(U.adjoint() * temp);
     }
 
 
