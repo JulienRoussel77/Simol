@@ -36,7 +36,7 @@ namespace simol
 
         // recupere la partie non stockee (symetrique)
         DenseMatrix<double> temp(overlap.numberOfRows(), V.numberOfColumns());
-        temp.wrapped_ = overlap.wrapped_.selfadjointView<Eigen::Upper>() * V.wrapped_;
+        temp = overlap * V;
 
         return DenseMatrix<double>(U.wrapped_.adjoint() * temp.wrapped_);
     }

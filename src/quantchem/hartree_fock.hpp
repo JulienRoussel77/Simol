@@ -195,10 +195,10 @@ namespace simol
                     {
                         Vector<double> temp = O * coeffs_bas.column(l);
                         double PS = (PsiU.column(k), temp);
-                        CU.wrapped_(l,k) = PS;
+                        CU(l,k) = PS;
 
                         PS = (PsiV.column(k), temp);
-                        CV.wrapped_(l,k) = PS;
+                        CV(l,k) = PS;
                     }
                 }
 
@@ -221,7 +221,7 @@ namespace simol
                         aV.wrapped_.block(0,0, numberOfElectrons-1,k2) = CV.wrapped_.block(0,0, numberOfElectrons-1, k2);
                         aV.wrapped_.block(0,k2, numberOfElectrons-1, numberOfElectrons-1-k2) = CV.wrapped_.block(0,k2+1, numberOfElectrons-1, numberOfElectrons-1 -k2);
 
-                         sum = sum + muU(k1)*muV(k2)*(pow(-1, k1))*(pow(-1, k2))*sum2*(aU.wrapped_.determinant())*(aV.wrapped_.determinant());
+                         sum = sum + muU(k1)*muV(k2)*(pow(-1, k1))*(pow(-1, k2))*sum2*(aU.determinant())*(aV.determinant());
                     }
                 }
                 return sum;
