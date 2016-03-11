@@ -5,28 +5,23 @@ Mesh:
   Time:
     Step: 0.02
     FinalTime: 1000
-    ThermalTime: 0
-    BurningTime: 0
+    ThermalTime: 10
+    BurningTime: 10
+
 Physics:
   System:
-    Name: TriChain
+    Name: BiChain
     Number: 8
-    #SettingsPath: initialSettings/conf_N16384_eta0.2.txt
   Potential:
-    Name: Quadratic
-    Alpha: 2
-    Beta: 1
+    Name: Rotor
   Model:
     Name: BoundaryLangevin
     Gamma: 1
     TemperatureLeft: 1
     TemperatureRight: 1
-    Tau: 0
-    Xi: 1
-    Seed: 0
 
 Output:
-  Foldername: N8/s0
+  Foldername: N8
   DecorrelationTime: 20
   Period: 1
   ProfilePeriod: 1
@@ -34,5 +29,3 @@ Output:
 
 ControlVariate:
   Name: None
-
-

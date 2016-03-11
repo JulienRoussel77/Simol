@@ -1,0 +1,27 @@
+Geometry:
+  Dimension: 1
+
+Mesh:
+  Time:
+    Step: 0.01
+    Number: 1000
+
+Physics:
+  System:
+    Name: BiChain
+    Number: 3
+  Potential:
+    Name: Rotor
+  Model:
+    Name: BoundaryLangevin
+    Gamma: 1
+    TemperatureLeft: 1.0
+    TemperatureRight: 1.0
+    Tau: 0
+    Seed: 0
+
+Galerkin:
+  Resolve: Yes
+  Basis:
+    Fourier: 7
+    Hermite: 7

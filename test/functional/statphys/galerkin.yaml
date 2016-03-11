@@ -1,11 +1,10 @@
 Geometry:
   Dimension: 1
-  Length: 1
 
 Mesh:
   Time:
     Step: 0.01
-    Number: 100000
+    Number: 1000
 
 Physics:
   System:
@@ -17,10 +16,12 @@ Physics:
     Name: Langevin
     Gamma: 1
     Temperature: 1
+    Force: 0
   Replicas:
     Number: 1
 
 Galerkin:
+  Resolve: Yes
   Basis:
-    Fourier: 25
-    Hermite: 20
+    Fourier: 45
+    Hermite: 45

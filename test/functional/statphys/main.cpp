@@ -40,12 +40,18 @@ int main(int argc, char* argv[])
   //============
   // COMPUTATION
   //============
-  
-  simol::MultiSystem replica(input);
-	replica.launch(input);
-  
-	//simol::Galerkin galerkinSolver(input);
-	//galerkinSolver.compute();
+	
+	if (!input.isGalerkin())
+	{  
+		simol::MultiSystem replica(input);
+		replica.launch(input);
+	}
+	else 
+	{
+		//simol::Galerkin galerkinSolver(input);
+		simol::BoundaryLangevinGalerkin galerkinSolver(input);
+		galerkinSolver.compute();
+	}
 
   
 

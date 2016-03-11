@@ -5,13 +5,16 @@
 
 #include <cmath>
 
+using std::cout; 
+using std::endl; 
+
 namespace simol
 {
 
   Potential::Potential(){}
-
+  
   Potential::Potential(Input const & /*input*/, int const& /*indexOfReplica*/){}
-
+  
   Potential* createPotential(Input const& input, int const& /*indexOfReplica*/)
   {
     if (input.potentialName() == "Sinusoidal")
@@ -30,201 +33,358 @@ namespace simol
       return new Rotor(input);
     else if (input.potentialName() == "Quadratic")
       return new Quadratic(input);
+		else if (input.potentialName() == "SpaceSinus")
+      return new SpaceSinus(input);
     else
       std::cout << input.potentialName() << " is not a valid potential !" << std::endl;
-
+    
     return 0;
   }
-
-  Vector<double> Potential::force(Vector<double> const & position) const
-  { return -derivative(position); }
-
+  
+  double Potential::operator()(dvec const& position) const
+	{
+		//cout << "Potential::operator()(dvec const& position)" << endl;
+		return operator()(position(0));
+	}
+  
+  double Potential::operator()(double position) const
+	{
+		//cout << "Potential::operator()(double position)" << endl;
+		return operator()(dvec(1, position));
+	}
+  
+  double Potential::value(dvec const& position) const
+	{
+		//cout << "Potential::value(dvec const& position)" << endl;
+		return operator()(position);
+	}
+  
+  double Potential::value(double position) const
+	{
+		//cout << "Potential::value(double position)" << endl;
+		return operator()(position);
+	}
+	
+	dvec Potential::derivative(dvec const& position) const
+  { 
+		return derivative(position(0)); 
+	}
+	
+	dvec Potential::derivative(double position) const
+  { 
+		return -derivative(dvec(1, position)); 
+	}
+	
+	dvec Potential::force(dvec const& position) const
+  { 
+		return -derivative(position); 
+	}
+	
+	dvec Potential::force(double position) const
+  { 
+		return -derivative(position); 
+	}
+	
+	double Potential::laplacian(dvec const& position) const
+  { 
+		return laplacian(position(0)); 
+	}
+	
+	double Potential::laplacian(double position) const
+  { 
+		return laplacian(dvec(1, position));
+	}
+  
 //#### Sinusoidal #####
-
-  Sinusoidal::Sinusoidal(Input const & input, int const& indexOfReplica):Potential(input, indexOfReplica), amplitude_(input.amplitude()), pulsation_(2*M_PI/input.length())
+  
+  Sinusoidal::Sinusoidal(Input const & input, int const& indexOfReplica):
+		Potential(input, indexOfReplica), 
+		amplitude_(input.amplitude()), 
+		pulsation_(2*M_PI/input.length())
   {}
-
-  double Sinusoidal::operator()(Vector<double> const & position) const
-  {
-		return amplitude_* (1-std::cos(pulsation_*position(0)));
+  
+  double Sinusoidal::operator()(double position) const
+  { 
+		return amplitude_* (1-cos(pulsation_*position)); 
 	}
 
-  Vector<double> Sinusoidal::derivative(Vector<double> const & position) const
-  {
-    Vector<double> deriv(1);
-    deriv(0) = amplitude_*pulsation_*std::sin(pulsation_*position(0));
-    return deriv;
+  dvec Sinusoidal::derivative(double position) const
+  { 
+    return dvec(1, amplitude_*pulsation_*sin(pulsation_*position));
   }
-
-  double Sinusoidal::laplacian(Vector<double> const & position) const
+  
+  double Sinusoidal::laplacian(double position) const
   {
-    double q = position(0);
-    return -amplitude_ * pow(pulsation_, 2) * sin(pulsation_ * q);
+    return amplitude_ * pow(pulsation_, 2) * cos(pulsation_ * position);
   }
-
-
+  
+    
 //#### SumSinusoidal #####
-
+  
   SumSinusoidal::SumSinusoidal(Input const & input, int const& indexOfReplica):
-    Potential(input, indexOfReplica),
-    amplitude_(input.amplitude()),
+    Potential(input, indexOfReplica), 
+    amplitude_(input.amplitude()), 
     pulsation_(2*M_PI/input.length())
   {}
+  
+  double SumSinusoidal::operator()(double position) const  
+  { 
+		return amplitude_* (std::sin(pulsation_*position) 
+			+ cos(2 * pulsation_*position) 
+			+ cos(3 * pulsation_*position) / 3); 
+	}
 
-  double SumSinusoidal::operator()(Vector<double> const & position) const  { return amplitude_* (std::sin(pulsation_*position(0))
-
-	+ cos(2 * pulsation_*position(0))
-	+ cos(3 * pulsation_*position(0)) / 3); }
-
-  Vector<double> SumSinusoidal::derivative(Vector<double> const & position) const
-  {
-    Vector<double> deriv(1);
-    deriv(0) = amplitude_*pulsation_*(cos(pulsation_*position(0))
-	  - 2 * sin(2 * pulsation_*position(0))
-	  - sin(3 * pulsation_*position(0)));
+  dvec SumSinusoidal::derivative(double position) const
+  { 
+    dvec deriv(1);
+    deriv(0) = amplitude_*pulsation_*(cos(pulsation_*position)
+	  - 2 * sin(2 * pulsation_*position)
+	  - sin(3 * pulsation_*position));
     return deriv;
   }
 
-
-  double SumSinusoidal::laplacian(Vector<double> const & position) const
+    
+  double SumSinusoidal::laplacian(double position) const
   {
-    double q = position(0);
-    return amplitude_ * pow(pulsation_, 2) * (-sin(pulsation_ * q)
-	      - 4 * cos(2 * pulsation_ * q)
-	      - 3 * cos(3 * pulsation_ * q));
+    return amplitude_ * pow(pulsation_, 2) * (-sin(pulsation_ * position)
+	      - 4 * cos(2 * pulsation_ * position)
+	      - 3 * cos(3 * pulsation_ * position));
   }
-
-
+  
+  
   //#### FracSinusoidal #####
-
+  
   FracSinusoidal::FracSinusoidal(Input const & input, int const& indexOfReplica):
     Potential(input, indexOfReplica),
     amplitude_(input.amplitude()),
     pulsation_(2*M_PI/input.length())
   {}
-
-  double FracSinusoidal::operator()(Vector<double> const & position) const
-  {
-    double q = position(0);
-    return amplitude_ * cos(2 * M_PI * q) / (2 + sin(2 * M_PI * q));
+  
+  double FracSinusoidal::operator()(double position) const
+  { 
+    return amplitude_ * cos(2 * M_PI * position) / (2 + sin(2 * M_PI * position));
   }
 
-  Vector<double> FracSinusoidal::derivative(Vector<double> const & position) const
-  {
-    double q = position(0);
-    Vector<double> deriv(1);
-    //deriv(0) = -(2 * M_PI * sin(2 * M_PI * q))/(2 + sin(2 * M_PI * q))
-	//	-(2 * M_PI * pow(cos(2 M_PI * q),2))/(sin(2 * M_PI * q)+2)^2;
-    deriv(0) = -amplitude_ * (4 * M_PI * sin(2 * M_PI * q) + 2 * M_PI)/pow(sin(2 * M_PI * q) + 2, 2);
+  dvec FracSinusoidal::derivative(double position) const
+  { 
+    dvec deriv(1);
+    //deriv(0) = -(2 * M_PI * sin(2 * M_PI * position))/(2 + sin(2 * M_PI * position))
+	//	-(2 * M_PI * pow(cos(2 M_PI * position),2))/(sin(2 * M_PI * position)+2)^2;
+    deriv(0) = -amplitude_ * (4 * M_PI * sin(2 * M_PI * position) + 2 * M_PI)/pow(sin(2 * M_PI * position) + 2, 2);
     return deriv;
   }
 
-
-  double FracSinusoidal::laplacian(Vector<double> const & position) const
+    
+  double FracSinusoidal::laplacian(double position) const
   {
-    double q = position(0);
-    return -amplitude_ * 32 * pow(M_PI,2) * pow(sin(M_PI/4-M_PI * q), 3) * sin(M_PI * q + M_PI/4)
-	  / pow(sin(2 * M_PI * q) + 2, 3);
+    return -amplitude_ * 32 * pow(M_PI,2) * pow(sin(M_PI/4-M_PI * position), 3) * sin(M_PI * position + M_PI/4)
+	  / pow(sin(2 * M_PI * position) + 2, 3);
   }
-
-//#### DoubleWell #####
-
+  
+//#### DoubleWell #####  
+  
     DoubleWell::DoubleWell(Input const & input, int const& indexOfReplica):Potential(input, indexOfReplica), height_(input.height()), interWell_(input.interWell())
   {}
+  
+  double DoubleWell::operator()(double position) const
+  { return height_*pow(position-interWell_/2, 2)*pow(position+interWell_/2, 2); }
 
-  double DoubleWell::operator()(Vector<double> const & position) const
-  { return height_*pow(position(0)-interWell_/2, 2)*pow(position(0)+interWell_/2, 2); }
-
-  Vector<double> DoubleWell::derivative(Vector<double> const & position) const
-  {
-    Vector<double> deriv(1);
-    deriv(0) = 4*height_*position(0)*(position(0)-interWell_/2)*(position(0)+interWell_/2);
+  dvec DoubleWell::derivative(double position) const
+  { 
+    dvec deriv(1);
+    deriv(0) = 4*height_*position*(position-interWell_/2)*(position+interWell_/2);
     return deriv;
   }
-
-  //#### HarmonicWell #####
-
+  
+  //#### HarmonicWell #####  
+  
   HarmonicWell::HarmonicWell(Input const & input, int const& indexOfReplica):
-    Potential(input, indexOfReplica),
+    Potential(input, indexOfReplica), 
     stiffness_(input.potentialStiffness())
   {}
+  
+  
+  double HarmonicWell::operator()(double position) const
+  { return stiffness_ / 2 * pow(position, 2); }
 
-
-  double HarmonicWell::operator()(Vector<double> const & position) const
-  { return stiffness_ / 2 * pow(position(0), 2); }
-
-  Vector<double> HarmonicWell::derivative(Vector<double> const & position) const
-  {
-    Vector<double> deriv(1);
-    deriv(0) = stiffness_ * position(0);
+  dvec HarmonicWell::derivative(double position) const
+  { 
+    dvec deriv(1);
+    deriv(0) = stiffness_ * position;
     return deriv;
   }
 
-
-//#### Harmonic #####
-
+  
+//#### Harmonic #####  
+  
   Harmonic::Harmonic(Input const & input, int const& indexOfReplica):
-    Potential(input, indexOfReplica),
+    Potential(input, indexOfReplica), 
     stiffness_(input.potentialStiffness())
   {}
+  
+  
+  double Harmonic::operator()(double distance) const
+  { return stiffness_ / 2* pow(distance - 1, 2); }
 
-
-  double Harmonic::operator()(Vector<double> const & vecDistance) const
-  { return stiffness_ / 2* pow(vecDistance(0) - 1, 2); }
-
-  Vector<double> Harmonic::derivative(Vector<double> const & vecDistance) const
-  {
-    Vector<double> deriv(1);
-    deriv(0) = stiffness_ * (vecDistance(0) - 1);
+  dvec Harmonic::derivative(double distance) const
+  { 
+    dvec deriv(1);
+    deriv(0) = stiffness_ * (distance - 1);
     return deriv;
   }
-
-  //#### Rotor #####
-
+  
+  double Harmonic::laplacian(double /*distance*/) const
+  { 
+    return stiffness_;
+  }
+  
+  double Harmonic::drawLaw(double localBeta, RNG* rng)
+	{
+		return rng->scalarGaussian() / sqrt(localBeta);
+	}
+  
+  //#### Rotor #####  
+  
   Rotor::Rotor(Input const & input, int const& indexOfReplica):
     Potential(input, indexOfReplica)
   {}
-
-
-  double Rotor::operator()(Vector<double> const & vecDistance) const
-  {
-    //return pow(vecDistance(0) - 1, 2);
-    return 1 - cos(vecDistance(0));
+  
+  
+  double Rotor::operator()(double distance) const
+  { 
+    //return pow(distance - 1, 2);
+    return 1 - cos(distance);
   }
 
-  Vector<double> Rotor::derivative(Vector<double> const & vecDistance) const
-  {
-    Vector<double> deriv(1);
-    deriv(0) = sin(vecDistance(0));
-    //deriv(0) = 2 * (1 - vecDistance(0));
+  dvec Rotor::derivative(double distance) const
+  { 
+    dvec deriv(1);
+    deriv(0) = sin(distance);
+    //deriv(0) = 2 * (1 - distance);
     return deriv;
   }
 
-  double Rotor::laplacian(Vector<double> const & vecDistance) const
+  double Rotor::laplacian(double distance) const
   {
-    return cos(vecDistance(0));
+    return cos(distance);
   }
-
-
-//#### Quadratic #####
-
+  
+  double Rotor::drawLaw(double localBeta, RNG* rng)
+	{
+		bool reject = true;
+		double xdraw, udraw;
+		int count = 0;
+		while (reject)
+		{
+			xdraw = -M_PI + 2 * rng->scalarUniform() * M_PI;
+			//cout << ratio << " " << exp(-localBeta * (pow(xdraw, 2)/2 + ratio)) << " " << exp(- localBeta * potential_->value(xdraw)) << endl;
+			//cout << xdraw << " " << localBeta * pow(xdraw, 2)/2 - ratio << " >= " << localBeta * potential_->value(xdraw) << endl;
+			udraw = rng->scalarUniform();
+			
+			reject = (udraw > exp(- localBeta * (value(xdraw) + 2)));
+			//cout << reject << " " << xdraw << " " << udraw << endl << endl;
+			count++;
+			//xdraw = rng_->scalarGaussian() / sqrt(localBeta);
+			//udraw = scalarUniform();
+			//reject = (udraw > Zinv * exp(- localBeta * potential_->value(xdraw)) / exp(-localBeta * (pow(xdraw, 2)/2 + ratio))
+			
+		}
+		//cout << count << " tries !" << endl;
+		return xdraw;
+	}
+  
+    
+//#### Quadratic #####  
+  
   Quadratic::Quadratic(Input const & input, int const& indexOfReplica):
-    Potential(input, indexOfReplica),
+    Potential(input, indexOfReplica), 
     stiffness_(input.potentialStiffness()),
     alpha_(input.potentialAlpha()),
     beta_(input.potentialBeta())
-  {}
-
-
-  double Quadratic::operator()(Vector<double> const & vecDistance) const
-  { return stiffness_/2 * pow(vecDistance(0), 2) + alpha_/3 * pow(vecDistance(0), 3) + beta_/4 * pow(vecDistance(0), 4); }
-
-  Vector<double> Quadratic::derivative(Vector<double> const & vecDistance) const
   {
-    Vector<double> deriv(1);
-    deriv(0) = stiffness_ * vecDistance(0) + alpha_ * pow(vecDistance(0), 2) + beta_ * pow(vecDistance(0), 3);
+		assert(beta_ > 0 || (beta_ == 0 && alpha_ == 0));
+	}
+  
+  
+  double Quadratic::operator()(double distance) const
+  { return stiffness_/2 * pow(distance, 2) + alpha_/3 * pow(distance, 3) + beta_/4 * pow(distance, 4); }
+
+  dvec Quadratic::derivative(double distance) const
+  { 
+    dvec deriv(1);
+    deriv(0) = stiffness_ * distance + alpha_ * pow(distance, 2) + beta_ * pow(distance, 3);
     return deriv;
   }
+  
+  double Quadratic::laplacian(double distance) const
+  { 
+    return stiffness_ + 2 * alpha_ * distance + 3 * beta_ * pow(distance, 2);
+  }
+  
+  double Quadratic::ratioToHarmonic() const
+  {
+		assert(stiffness_ == 1);
+		if (beta_ > 0)
+			return - pow(alpha_, 4) / (12 * pow(beta_, 3));
+		else
+			return 0;
+	}
+	
+	double Quadratic::drawLaw(double localBeta, RNG* rng)
+	{
+		double ratio = ratioToHarmonic();
+		bool reject = true;
+		double xdraw, ydraw, udraw;
+		int count = 0;
+		while (reject)
+		{
+			xdraw = rng->scalarGaussian() / sqrt(localBeta);
+			//cout << ratio << " " << exp(-localBeta * (pow(xdraw, 2)/2 + ratio)) << " " << exp(- localBeta * potential_->value(xdraw)) << endl;
+			//cout << xdraw << " " << localBeta * pow(xdraw, 2)/2 - ratio << " >= " << localBeta * potential_->value(xdraw) << endl;
+			udraw = rng->scalarUniform();
+			
+			ydraw = exp(-localBeta * (pow(xdraw, 2)/2 + ratio)) * rng->scalarUniform();
+			reject = (udraw > exp(- localBeta * (value(xdraw) + pow(xdraw, 2)/2 + ratio)));
+			cout << reject << " " << xdraw << " " << ydraw << endl << endl;
+			assert(exp(-localBeta * (pow(xdraw, 2)/2 + ratio)) >= exp(- localBeta * value(xdraw)));
+			count++;
+			//xdraw = rng_->scalarGaussian() / sqrt(localBeta);
+			//udraw = scalarUniform();
+			//reject = (udraw > Zinv * exp(- localBeta * potential_->value(xdraw)) / exp(-localBeta * (pow(xdraw, 2)/2 + ratio))
+			
+		}
+		cout << count << " tries !" << endl;
+		return xdraw;
+	}
+	
+	//#### SpaceSinus #####
+  
+  SpaceSinus::SpaceSinus(Input const & input, int const& indexOfReplica):
+		Potential(input, indexOfReplica), 
+		amplitude_(input.amplitude()), 
+		pulsation_(2*M_PI/input.length())
+  {}
+  
+  double SpaceSinus::operator()(dvec const& position) const
+  { 
+		return amplitude_* (1-cos(pulsation_*position(0))*cos(pulsation_*position(1))*cos(pulsation_*position(2))); 
+	}
+
+  dvec SpaceSinus::derivative(dvec const& position) const
+  { 
+		dvec grad(3);
+		grad(0) = sin(pulsation_*position(0))*cos(pulsation_*position(1))*cos(pulsation_*position(2));
+    grad(1) = cos(pulsation_*position(0))*sin(pulsation_*position(1))*cos(pulsation_*position(2));
+		grad(2) = cos(pulsation_*position(0))*cos(pulsation_*position(1))*sin(pulsation_*position(2));
+		grad *= amplitude_*pulsation_;
+		return grad;
+	}
+  
+  double SpaceSinus::laplacian(dvec const& position) const
+  {
+    return 3 * pow(pulsation_, 2) * value(position);
+  }
+	
 }
 
 

@@ -13,20 +13,18 @@ Physics:
     Number: 8
     #SettingsPath: initialSettings/conf_N16384_eta0.2.txt
   Potential:
-    Name: Quadratic
-    Alpha: 2
-    Beta: 1
+    Name: Rotor
   Model:
     Name: BoundaryLangevin
     Gamma: 1
     TemperatureLeft: 1
     TemperatureRight: 1
     Tau: 0
-    Xi: 1
+    Xi: 0
     Seed: 0
 
 Output:
-  Foldername: N8/s0
+  Foldername: N8
   DecorrelationTime: 20
   Period: 1
   ProfilePeriod: 1

@@ -7,8 +7,8 @@
 
 #include "potential.hpp"
 //#include "ode/verlet.hpp"
-#include "core/linalg/Vector.hpp"
-#include "core/random/RNG.hpp"
+#include "linalg/Vector.hpp"
+#include "RNG.hpp"
 
 
 
@@ -16,14 +16,14 @@
 // FORWARD DECLARATIONS
 //=====================
 
-namespace simol
+/*namespace simol
 {
   class Particle;
-
+  
     void verlet_scheme(Particle & particle, double timeStep);
-    void exact_OU_scheme(Particle & particle, double const gamma, double const beta, double const timeStep, Vector<double> const& randVec);
-    void maruyama_scheme(Particle & particle, double const beta_, double const& timeStep, Vector<double> const& randVec);
-}
+    void exact_OU_scheme(Particle & particle, double const gamma, double const beta, double const timeStep, dvec const& randVec);
+    void maruyama_scheme(Particle & particle, double const beta_, const double& timeStep, dvec const& randVec);
+}*/
 
 namespace simol
 {
@@ -40,10 +40,10 @@ namespace simol
     //=================
 
     //friend void verlet(Particle & particle, HamiltonDynamics const & model, double delta_t);
-    friend void verlet_scheme(Particle & particle, double timeStep);
-    friend void exact_OU_scheme(Particle & particle, double const gamma, double const beta, double const timeStep, Vector<double> const& randVec);
-    friend void maruyama_scheme(Particle & particle, double const beta_, double const& timeStep, Vector<double> const& randVec);
-
+    /*friend void verlet_scheme(Particle & particle, double timeStep);
+    friend void exact_OU_scheme(Particle & particle, double const gamma, double const beta, double const timeStep, dvec const& randVec);
+    friend void maruyama_scheme(Particle & particle, double const beta_, const double& timeStep, dvec const& randVec);
+*/
     //=============
     // CONSTRUCTORS
     //=============
@@ -52,7 +52,7 @@ namespace simol
     public:
       Particle();
       Particle(int dimension);
-      Particle(double const & mass, Vector<double> const & position, Vector<double> const & momentum);
+      Particle(double const & mass, dvec const & position, dvec const & momentum);
       Particle(double const & mass, double const & position, double const & momentum);
 
     //==========
@@ -63,28 +63,32 @@ namespace simol
       //Particle& operator= (Particle const& particle);
       int dimension() const;
       double const & mass() const;
-      Vector<double> const & position() const;
-      Vector<double> & position();
-      double const& position(int i) const;
+      dvec const & position() const;
+      dvec & position();
+      const double& position(int i) const;
       double& position(int i);
-      Vector<double> const & momentum() const;
-      Vector<double> & momentum();
-      double const& momentum(int i) const;
+      dvec const & momentum() const;
+      dvec & momentum();
+      const double& momentum(int i) const;
       double& momentum(int i);
-      double const& kineticEnergy() const;
-      double& kineticEnergy();
-      double const& potentialEnergy() const;
-      double& potentialEnergy();
+      double kineticEnergy() const;
+      //double& kineticEnergy();      
+      const double& potentialEnergy() const;
+      double& potentialEnergy();      
       double energy() const;
-      Vector<double> const& force() const;
-      Vector<double>& force();
-      double const& force(size_t i) const;
-      double& force(size_t i);
-      Vector<double> const& energyGrad() const;
-      Vector<double>& energyGrad();
-      double const& energyGrad(int i) const;
-      double& energyGrad(int i);
-      Vector<double> velocity() const;
+      dvec const& force() const;
+      dvec& force(); 
+      const double& force(size_t i) const;
+      double& force(size_t i); 
+      dvec const& energyGrad() const;
+      dvec& energyGrad();  
+      const double& energyGrad(int i) const;
+      double& energyGrad(int i);  
+			const double& energyLapla() const;
+      double& energyLapla();  
+      dvec velocity() const;
+			int const& countdown() const;
+			int& countdown();
 
     //=============
     // DATA MEMBERS
@@ -93,16 +97,18 @@ namespace simol
     private:
 
       double mass_;
-      Vector<double> position_;
-      Vector<double> momentum_;
+      dvec position_;
+      dvec momentum_;
       double potentialEnergy_;
-      double kineticEnergy_;
-      Vector<double> force_;
-      Vector<double> energyGrad_;
+      //double kineticEnergy_;
+      dvec force_;
+      dvec energyGrad_;
+			double energyLapla_;
+			int countdown_;
   };
 
-
-
+  
+  
 }
 
 

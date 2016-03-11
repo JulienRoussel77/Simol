@@ -4,33 +4,30 @@ Geometry:
 Mesh:
   Time:
     Step: 0.02
-    FinalTime: 1000
-    ThermalTime: 0
+    FinalTime: 100
+    ThermalTime: 100
     BurningTime: 0
 Physics:
   System:
     Name: TriChain
-    Number: 8
+    Number: 16384
     #SettingsPath: initialSettings/conf_N16384_eta0.2.txt
   Potential:
     Name: Quadratic
     Alpha: 2
-    Beta: 1
   Model:
     Name: BoundaryLangevin
     Gamma: 1
     TemperatureLeft: 1
     TemperatureRight: 1
     Tau: 0
-    Xi: 1
-    Seed: 0
+    Seed: 1
 
 Output:
-  Foldername: N8/s0
+  Foldername: N16
   DecorrelationTime: 20
-  Period: 1
-  ProfilePeriod: 1
-  DoFinalFlow: No
+  Period: 10
+  ProfilePeriod: 10
 
 ControlVariate:
   Name: None

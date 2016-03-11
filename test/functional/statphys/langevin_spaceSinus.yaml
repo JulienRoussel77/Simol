@@ -1,5 +1,5 @@
 Geometry:
-  Dimension: 1
+  Dimension: 3
 
 Mesh:
   Time:
@@ -12,7 +12,7 @@ Physics:
   System:
     Name: Isolated
   Potential:
-    Name: Sinusoidal
+    Name: SpaceSinus
     Amplitude: 1
   Model:
     Name: Langevin
@@ -22,19 +22,15 @@ Physics:
   
 
 ControlVariate:
-  Name: ExpFourierHermite
+  #Name: ExpFourierHermite
   #CoeffsPath: ../CVcoeffs_G9H9/H1inv
 
 Output:
-  ParametersName: /
-  FolderName: test5
+  ParametersName: .
+  FolderName: test
   #Foldername: dt0.02_eta0_G9H9
   DecorrelationTime: 5
   Period: 1
   ProfilePeriod: 10
   FinalVelocity: Yes
 
-Galerkin:
-  Basis:
-    Fourier: 13
-    Hermite: 17
