@@ -130,15 +130,15 @@ namespace simol
 			return sqrt(2.) * cos(iOfFreq * variable);
 	}
 	
-	dvec FourierBasis::gradient(double variable, const int iOfElt) const
+	Vector<double> FourierBasis::gradient(double variable, const int iOfElt) const
 	{
 		int iOfFreq = (iOfElt+1)/2;
 		if (iOfElt == 0)
-			return dvec(1, 0);
+			return Vector<double>(1, 0);
 		else if (iOfElt % 2 == 1)
-			return dvec(1,   sqrt(2.) * iOfFreq * cos(iOfFreq * variable));
+			return Vector<double>(1,   sqrt(2.) * iOfFreq * cos(iOfFreq * variable));
 		else
-			return dvec(1, - sqrt(2.) * iOfFreq * sin(iOfFreq * variable));
+			return Vector<double>(1, - sqrt(2.) * iOfFreq * sin(iOfFreq * variable));
 	}
 	
 	double FourierBasis::laplacian(double variable, const int iOfElt) const
@@ -229,17 +229,17 @@ namespace simol
 			return sqrt(2) * cos(iOfFreq * variable) * expo;
 	}
 	
-	dvec ExpFourierBasis::gradient(double variable, const int iOfElt) const
+	Vector<double> ExpFourierBasis::gradient(double variable, const int iOfElt) const
 	{
 		//cout << basisCoefficient_ << " " << exp(beta_*potential(variable)/2) << " " << potDeriv(variable) << endl;
 		double expo = basisCoefficient_ * exp(beta_*potential(variable)/2);
 		int iOfFreq = (iOfElt+1)/2;
 		if (iOfElt == 0)
-			return dvec(1, beta_/2 * potDeriv(variable) * expo);
+			return Vector<double>(1, beta_/2 * potDeriv(variable) * expo);
 		else if (iOfElt % 2 == 1)
-			return dvec(1, sqrt(2.) * ( iOfFreq*cos(iOfFreq * variable) + sin(iOfFreq * variable) * beta_/2 * potDeriv(variable)) * expo);
+			return Vector<double>(1, sqrt(2.) * ( iOfFreq*cos(iOfFreq * variable) + sin(iOfFreq * variable) * beta_/2 * potDeriv(variable)) * expo);
 		else
-			return dvec(1, sqrt(2.) * (-iOfFreq*sin(iOfFreq * variable) + cos(iOfFreq * variable) * beta_/2 * potDeriv(variable)) * expo);
+			return Vector<double>(1, sqrt(2.) * (-iOfFreq*sin(iOfFreq * variable) + cos(iOfFreq * variable) * beta_/2 * potDeriv(variable)) * expo);
 	}
 	
 	double ExpFourierBasis::laplacian(double variable, const int iOfElt) const
@@ -286,12 +286,12 @@ namespace simol
 		return result;
 	}
 	
-	dvec HermiteBasis::gradient(double variable, const int iOfElt) const
+	Vector<double> HermiteBasis::gradient(double variable, const int iOfElt) const
 	{
 		double result = 0;
 		for (int iOfCoeff=1; iOfCoeff <= iOfElt; iOfCoeff++)
 			result += iOfCoeff * polyCoeffs_(iOfElt, iOfCoeff) * pow(variable, iOfCoeff-1);
-		return dvec(1, result);
+		return Vector<double>(1, result);
 	}
 	
 	double HermiteBasis::laplacian(double variable, const int iOfElt) const
@@ -410,7 +410,7 @@ namespace simol
 		return bases_[0]->value(configuration[0].position(0), vecIndex[0]) * bases_[1]->value(configuration[0].momentum(0), vecIndex[1]);
 	}
 	
-	dvec QPBasis::gradientQ(vector<Particle> const& configuration, size_t /*iOfParticle*/, vector<size_t>& vecIndex) const
+	Vector<double> QPBasis::gradientQ(vector<Particle> const& configuration, size_t /*iOfParticle*/, vector<size_t>& vecIndex) const
 	{
 		//cout << "QPBasis::gradientQ" << endl;
 		//cout << vecIndex[0] << " " << vecIndex[1] << endl;
@@ -420,7 +420,7 @@ namespace simol
 					* bases_[1]->value(configuration[0].momentum(0), vecIndex[1]);
 	}	
 		
-	dvec QPBasis::gradientQ(vector<Particle> const& configuration, size_t iOfParticle, size_t iOfCoeff) const
+	Vector<double> QPBasis::gradientQ(vector<Particle> const& configuration, size_t iOfParticle, size_t iOfCoeff) const
 	{
 		vector<size_t> vecIndex = vecTens(iOfCoeff);
 		return gradientQ(configuration, iOfParticle, vecIndex);
@@ -438,7 +438,7 @@ namespace simol
 		return laplacianQ(configuration, iOfParticle, vecIndex);
 	}
 	
-	dvec QPBasis::gradientP(vector<Particle> const& configuration, size_t /*iOfParticle*/, vector<size_t>& vecIndex) const
+	Vector<double> QPBasis::gradientP(vector<Particle> const& configuration, size_t /*iOfParticle*/, vector<size_t>& vecIndex) const
 	{
 		//cout << bases_[0]->value(configuration[0].position(0), vecIndex[0]) << " X "
 		//		<< bases_[1]->gradient(configuration[0].momentum(0), vecIndex[1]) << endl;
@@ -446,7 +446,7 @@ namespace simol
 					* bases_[1]->gradient(configuration[0].momentum(0), vecIndex[1]);
 	}
 	
-	dvec QPBasis::gradientP(vector<Particle> const& configuration, size_t iOfParticle, size_t iOfCoeff) const
+	Vector<double> QPBasis::gradientP(vector<Particle> const& configuration, size_t iOfParticle, size_t iOfCoeff) const
 	{
 		vector<size_t> vecIndex = vecTens(iOfCoeff);
 		return gradientP(configuration, iOfParticle, vecIndex);

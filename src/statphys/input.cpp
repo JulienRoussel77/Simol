@@ -54,8 +54,8 @@ namespace simol {
 		{
 			assert(inputFlux_.is_open());
 			cout << "Reading the settings from " << settingsPath() << "...";
-			initialPositions_ = vector<dvec>(nbOfParticles());
-			initialMomenta_ = vector<dvec>(nbOfParticles());
+			initialPositions_ = vector<Vector<double>>(nbOfParticles());
+			initialMomenta_ = vector<Vector<double>>(nbOfParticles());
 			for (int iOfParticle=0; iOfParticle < (int)nbOfParticles(); iOfParticle++)
 			{
 				readItem(inputSettings_);
@@ -227,7 +227,7 @@ namespace simol {
 		else return parametersName()+"settings/settings";
 	}
   
-  dvec Input::initialPosition(int const& iOfParticle) const {
+  Vector<double> Input::initialPosition(int const& iOfParticle) const {
     if (data["Physics"]["System"]["Position"])
 		{
       if (data["Physics"]["System"]["Position"].size() == 1)
@@ -241,10 +241,10 @@ namespace simol {
 			return initialPositions_[iOfParticle];
 		}
 			
-		else return dvec(dimension(), 0);
+		else return Vector<double>(dimension(), 0);
   }   
   
-  dvec Input::initialMomentum(int const& iOfParticle) const 
+  Vector<double> Input::initialMomentum(int const& iOfParticle) const 
   {
     if (data["Physics"]["System"]["Momentum"])
       return data["Physics"]["System"]["Momentum"].as<double>();
@@ -253,7 +253,7 @@ namespace simol {
 			cout << "using settings for p : " << iOfParticle << "->" << initialMomenta_[iOfParticle] << endl;
 			return initialMomenta_[iOfParticle];
 		}
-    else return dvec(dimension(), 0);
+    else return Vector<double>(dimension(), 0);
     //else return (i < nbOfParticles()/2)?.2:-.2;
   }  
   

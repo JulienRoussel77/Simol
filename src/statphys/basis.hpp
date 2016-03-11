@@ -25,7 +25,7 @@ namespace simol
 
 	class DTVec : public TVec
 	{
-		DVec data_;
+		Vector<double> data_;
 	public:
 		DTVec(vector<size_t>& nbOfElts0);
 		virtual size_t size() const;
@@ -49,7 +49,7 @@ namespace simol
 		virtual size_t& nbOfElts();
 		virtual const double& expFourierCoeffs(int /*iOfElt*/) const {assert(false);};
 		virtual double value(double variable, const int iOfElt) const = 0;
-		virtual dvec gradient(double variable, const int iOfElt) const = 0;
+		virtual Vector<double> gradient(double variable, const int iOfElt) const = 0;
 		virtual double laplacian(double variable, const int iOfElt) const = 0;
 	};
 
@@ -59,7 +59,7 @@ namespace simol
 		FourierBasis(const size_t nbOfElts);
 		virtual size_t nbOfFreq() const;
 		virtual double value(double variable, const int iOfElt) const;
-		virtual dvec gradient(double variable, const int iOfElt) const;
+		virtual Vector<double> gradient(double variable, const int iOfElt) const;
 		virtual double laplacian(double variable, const int iOfElt) const;
 	};
 
@@ -78,7 +78,7 @@ namespace simol
 		virtual double potDeriv(double variable) const;
 		virtual double potLapla(double variable) const;
 		virtual double value(double variable, const int iOfElt) const;
-		virtual dvec gradient(double variable, const int iOfElt) const;
+		virtual Vector<double> gradient(double variable, const int iOfElt) const;
 		virtual double laplacian(double variable, const int iOfElt) const;
 	};
 
@@ -91,7 +91,7 @@ namespace simol
 	public:
 		HermiteBasis(const size_t nbOfElts, double beta0);
 		virtual double value(double variable, const int iOfElt) const;
-		virtual dvec gradient(double variable, const int iOfElt) const;
+		virtual Vector<double> gradient(double variable, const int iOfElt) const;
 		virtual double laplacian(double variable, const int iOfElt) const;
 	};
 
@@ -109,12 +109,12 @@ namespace simol
 		virtual vector<size_t> nbOfElts() const;
 		virtual double value(vector<Particle> const& configuration, const size_t iOfElt) const = 0;
 		virtual double value(vector<Particle> const& configuration, vector<size_t>& vecIndex) const = 0;
-		virtual dvec gradientQ(vector<Particle> const& configuration, size_t iOfParticle, size_t iOfCoeff) const = 0;
-		virtual dvec gradientQ(vector<Particle> const& configuration, size_t iOfParticle, vector<size_t>& vecIndex) const = 0;
+		virtual Vector<double> gradientQ(vector<Particle> const& configuration, size_t iOfParticle, size_t iOfCoeff) const = 0;
+		virtual Vector<double> gradientQ(vector<Particle> const& configuration, size_t iOfParticle, vector<size_t>& vecIndex) const = 0;
 		virtual double laplacianQ(vector<Particle> const& configuration, size_t iOfParticle, size_t iOfCoeff) const = 0;
 		virtual double laplacianQ(vector<Particle> const& configuration, size_t iOfParticle, vector<size_t>& vecIndex) const = 0;
-		virtual dvec gradientP(vector<Particle> const& configuration, size_t iOfParticle, size_t iOfCoeff) const = 0;
-		virtual dvec gradientP(vector<Particle> const& configuration, size_t iOfParticle, vector<size_t>& vecIndex) const = 0;
+		virtual Vector<double> gradientP(vector<Particle> const& configuration, size_t iOfParticle, size_t iOfCoeff) const = 0;
+		virtual Vector<double> gradientP(vector<Particle> const& configuration, size_t iOfParticle, vector<size_t>& vecIndex) const = 0;
 		virtual double laplacianP(vector<Particle> const& configuration, size_t iOfParticle, size_t iOfCoeff) const = 0;
 		virtual double laplacianP(vector<Particle> const& configuration, size_t iOfParticle, vector<size_t>& vecIndex) const = 0;
 	};
@@ -131,12 +131,12 @@ namespace simol
 		vector<size_t> vecTens(size_t iTens0) const;
 		virtual double value(vector<Particle> const& configuration, const size_t iOfElt) const;
 		virtual double value(vector<Particle> const& configuration, vector<size_t>& vecIndex) const;
-		virtual dvec gradientQ(vector<Particle> const& configuration, size_t iOfParticle, size_t iOfCoeff) const;
-		virtual dvec gradientQ(vector<Particle> const& configuration, size_t iOfParticle, vector<size_t>& vecIndex) const;
+		virtual Vector<double> gradientQ(vector<Particle> const& configuration, size_t iOfParticle, size_t iOfCoeff) const;
+		virtual Vector<double> gradientQ(vector<Particle> const& configuration, size_t iOfParticle, vector<size_t>& vecIndex) const;
 		virtual double laplacianQ(vector<Particle> const& configuration, size_t iOfParticle, size_t iOfCoeff) const;
 		virtual double laplacianQ(vector<Particle> const& configuration, size_t iOfParticle, vector<size_t>& vecIndex) const;
-		virtual dvec gradientP(vector<Particle> const& configuration, size_t iOfParticle, size_t iOfCoeff) const;
-		virtual dvec gradientP(vector<Particle> const& configuration, size_t iOfParticle, vector<size_t>& vecIndex) const;
+		virtual Vector<double> gradientP(vector<Particle> const& configuration, size_t iOfParticle, size_t iOfCoeff) const;
+		virtual Vector<double> gradientP(vector<Particle> const& configuration, size_t iOfParticle, vector<size_t>& vecIndex) const;
 		virtual double laplacianP(vector<Particle> const& configuration, size_t iOfParticle, size_t iOfCoeff) const;
 		virtual double laplacianP(vector<Particle> const& configuration, size_t iOfParticle, vector<size_t>& vecIndex) const;
 	};

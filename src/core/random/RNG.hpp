@@ -28,9 +28,9 @@ namespace simol
 		{}
     
     //Vector<double> gaussian(double const & mean, double const & standardDeviation)
-    dvec gaussian()
+    Vector<double> gaussian()
     {
-      dvec g(dimension_);
+      Vector<double> g(dimension_);
       for (int i=0; i<dimension_; i++)
 				g(i) = normalDistribution_(generator_);
       return g;
@@ -41,9 +41,9 @@ namespace simol
       return normalDistribution_(generator_);
     }
     
-    dvec uniform()
+    Vector<double> uniform()
     {
-      dvec u(dimension_);
+      Vector<double> u(dimension_);
       for (int i=0; i<dimension_; i++)
 				u(i) = uniformDistribution_(generator_);
       return u;

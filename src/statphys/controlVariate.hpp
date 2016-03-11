@@ -46,9 +46,9 @@ namespace simol
 
     // ACCESSEURS
     virtual bool isNone() const;
-    double potential(dvec const& position) const;
-    dvec potentialDerivative(dvec const& position) const;
-    double potentialLaplacian(dvec const& position) const;
+    double potential(Vector<double> const& position) const;
+    Vector<double> potentialDerivative(Vector<double> const& position) const;
+    double potentialLaplacian(Vector<double> const& position) const;
 
     size_t decorrelationNbOfIterations() const;
     double decorrelationTime() const;
@@ -100,9 +100,9 @@ namespace simol
 
 
     virtual double laplacianQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const = 0;
-    virtual dvec gradientQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const = 0;
+    virtual Vector<double> gradientQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const = 0;
     virtual double laplacianP(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const = 0;
-    virtual dvec gradientP(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const = 0;
+    virtual Vector<double> gradientP(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const = 0;
 
     virtual void display(std::ofstream& out, double time) const;
     virtual void postTreat(std::ofstream& out, double timeStep);
@@ -123,9 +123,9 @@ namespace simol
     bool isNone() const;
     double basisFunction(vector<Particle> const& configuration, size_t iOfFunction = 0) const;
     virtual double laplacianQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
-    virtual dvec gradientQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
+    virtual Vector<double> gradientQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
     virtual double laplacianP(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
-    virtual dvec gradientP(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
+    virtual Vector<double> gradientP(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
     void update(double observable, VectorXd& generatorOnBasisFunction, vector<Particle> const& configuration, size_t iOfIteration);
     virtual void postTreat(std::ofstream& out, double timeStep);
   };
@@ -137,9 +137,9 @@ namespace simol
     SinusControlVariate(Input const& input, Potential* potential, size_t iOfReplica);
     double basisFunction(vector<Particle> const& configuration, size_t iOfFunction = 0) const;
     virtual double laplacianQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
-    virtual dvec gradientQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
+    virtual Vector<double> gradientQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
     virtual double laplacianP(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
-    virtual dvec gradientP(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
+    virtual Vector<double> gradientP(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
   };
 
   class CosControlVariate : public ControlVariate
@@ -148,9 +148,9 @@ namespace simol
     CosControlVariate(Input const& input, Potential* potential, size_t iOfReplica);
     double basisFunction(vector<Particle> const& configuration, size_t iOfFunction = 0) const;
     virtual double laplacianQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
-    virtual dvec gradientQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
+    virtual Vector<double> gradientQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
     virtual double laplacianP(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
-    virtual dvec gradientP(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
+    virtual Vector<double> gradientP(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
   };
 
   class SinExpControlVariate : public ControlVariate
@@ -159,9 +159,9 @@ namespace simol
     SinExpControlVariate(Input const& input, Potential* potential, size_t iOfReplica);
     double basisFunction(vector<Particle> const& configuration, size_t iOfFunction = 0) const;
     virtual double laplacianQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
-    virtual dvec gradientQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
+    virtual Vector<double> gradientQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
     virtual double laplacianP(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
-    virtual dvec gradientP(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
+    virtual Vector<double> gradientP(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
   };
 
   class CosExpControlVariate : public ControlVariate
@@ -170,9 +170,9 @@ namespace simol
     CosExpControlVariate(Input const& input, Potential* potential, size_t iOfReplica);
     double basisFunction(vector<Particle> const& configuration, size_t iOfFunction = 0) const;
     virtual double laplacianQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
-    virtual dvec gradientQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
+    virtual Vector<double> gradientQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
     virtual double laplacianP(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
-    virtual dvec gradientP(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
+    virtual Vector<double> gradientP(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
   };
 
   class LangevinControlVariate : public ControlVariate
@@ -181,9 +181,9 @@ namespace simol
     LangevinControlVariate(Input const& input, Potential* potential, size_t iOfReplica);
     double basisFunction(vector<Particle> const& configuration, size_t iOfFunction = 0) const;
     virtual double laplacianQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
-    virtual dvec gradientQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
+    virtual Vector<double> gradientQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
     virtual double laplacianP(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
-    virtual dvec gradientP(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
+    virtual Vector<double> gradientP(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
   };
 
   class SumEnergyControlVariate : public ControlVariate
@@ -193,9 +193,9 @@ namespace simol
     SumEnergyControlVariate(Input const& input, Potential* potential, size_t iOfReplica);
     double basisFunction(vector<Particle> const& configuration, size_t iOfFunction = 0) const;
     virtual double laplacianQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
-    virtual dvec gradientQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
+    virtual Vector<double> gradientQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
     virtual double laplacianP(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
-    virtual dvec gradientP(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
+    virtual Vector<double> gradientP(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
   };
 
   class EnergyControlVariate : public ControlVariate
@@ -205,9 +205,9 @@ namespace simol
     EnergyControlVariate(Input const& input, Potential* potential, size_t iOfReplica);
     double basisFunction(vector<Particle> const& configuration, size_t iOfFunction = 0) const;
     virtual double laplacianQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
-    virtual dvec gradientQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
+    virtual Vector<double> gradientQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
     virtual double laplacianP(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
-    virtual dvec gradientP(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
+    virtual Vector<double> gradientP(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
   };
 
   class LocalControlVariate : public ControlVariate
@@ -216,9 +216,9 @@ namespace simol
     LocalControlVariate(Input const& input, Potential* potential, size_t iOfReplica);
     double basisFunction(vector<Particle> const& configuration, size_t iOfFunction = 0) const;
     virtual double laplacianQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
-    virtual dvec gradientQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
+    virtual Vector<double> gradientQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
     virtual double laplacianP(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
-    virtual dvec gradientP(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
+    virtual Vector<double> gradientP(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
   };
 
   class KineticControlVariate : public ControlVariate
@@ -227,9 +227,9 @@ namespace simol
     KineticControlVariate(Input const& input, Potential* potential, size_t iOfReplica);
     double basisFunction(vector<Particle> const& configuration, size_t iOfFunction = 0) const;
     virtual double laplacianQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
-    virtual dvec gradientQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
+    virtual Vector<double> gradientQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
     virtual double laplacianP(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
-    virtual dvec gradientP(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
+    virtual Vector<double> gradientP(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
   };
 
 
@@ -240,9 +240,9 @@ namespace simol
     TwoControlVariate(Input const& input, Potential* potential, size_t iOfReplica);
     double basisFunction(vector<Particle> const& configuration, size_t iOfFunction = 0) const;
     virtual double laplacianQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
-    virtual dvec gradientQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
+    virtual Vector<double> gradientQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
     virtual double laplacianP(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
-    virtual dvec gradientP(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
+    virtual Vector<double> gradientP(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
   };
 
 	class BasisControlVariate : public ControlVariate
@@ -254,9 +254,9 @@ namespace simol
     BasisControlVariate(const simol::Input& input, simol::Potential* potential, simol::Galerkin* galerkin, std::size_t iOfReplica);
     double basisFunction(vector<Particle> const& configuration, size_t iOfFunction = 0) const;
     virtual double laplacianQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
-    virtual dvec gradientQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
+    virtual Vector<double> gradientQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
     virtual double laplacianP(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
-    virtual dvec gradientP(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
+    virtual Vector<double> gradientP(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
 	};
 
 	class ExpFourierHermiteControlVariate : public BasisControlVariate

@@ -355,7 +355,7 @@ namespace simol{
 	}
   
   
-  void Output::finalDisplay(vector<Particle> const& configuration, dvec const& externalForce)
+  void Output::finalDisplay(vector<Particle> const& configuration, Vector<double> const& externalForce)
   {
     cout<< "replica : " << finalTime()
 				<< " " << timeStep()

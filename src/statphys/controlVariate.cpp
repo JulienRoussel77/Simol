@@ -83,17 +83,17 @@ namespace simol
     return false;
   }
  
-  double ControlVariate::potential(dvec const& position) const
+  double ControlVariate::potential(Vector<double> const& position) const
   {
     return (*potential_)(position);
   }
   
-  dvec ControlVariate::potentialDerivative(dvec const& position) const
+  Vector<double> ControlVariate::potentialDerivative(Vector<double> const& position) const
   {
     return potential_->derivative(position);
   }
   
-  double ControlVariate::potentialLaplacian(dvec const& position) const
+  double ControlVariate::potentialLaplacian(Vector<double> const& position) const
   {
     return potential_->laplacian(position);
   }
@@ -416,9 +416,9 @@ namespace simol
     return 0;
   }
   
-  dvec NoControlVariate::gradientQ(vector<Particle> const& configuration, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
+  Vector<double> NoControlVariate::gradientQ(vector<Particle> const& configuration, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
   {
-    return dvec(configuration[0].dimension());
+    return Vector<double>(configuration[0].dimension());
   }
   
   double NoControlVariate::laplacianP(vector<Particle> const& /*configuration*/, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
@@ -426,9 +426,9 @@ namespace simol
     return 0;
   }
     
-  dvec NoControlVariate::gradientP(vector<Particle> const& configuration, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
+  Vector<double> NoControlVariate::gradientP(vector<Particle> const& configuration, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
   {
-    return dvec(configuration[0].dimension());
+    return Vector<double>(configuration[0].dimension());
   }
   
   void NoControlVariate::update(double observable, VectorXd& /*generatorOnBasisFunction*/, vector<Particle> const& /*configuration*/, size_t iOfIteration)
@@ -469,10 +469,10 @@ namespace simol
     return sin(2 * M_PI * q);
   }
    
-  dvec SinusControlVariate::gradientQ(vector<Particle> const& configuration, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
+  Vector<double> SinusControlVariate::gradientQ(vector<Particle> const& configuration, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
   {
     double q = configuration[0].position(0);
-    dvec grad(configuration[0].dimension());
+    Vector<double> grad(configuration[0].dimension());
     grad(0) = 2 * M_PI * cos(2 * M_PI * q);
     return grad;
   }
@@ -489,9 +489,9 @@ namespace simol
     return 0;
   }
   
-  dvec SinusControlVariate::gradientP(vector<Particle> const& configuration, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
+  Vector<double> SinusControlVariate::gradientP(vector<Particle> const& configuration, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
   {
-    return dvec(configuration[0].dimension());
+    return Vector<double>(configuration[0].dimension());
   }
   
   
@@ -507,10 +507,10 @@ namespace simol
     return cos(2 * M_PI *q);
   }
   
-  dvec CosControlVariate::gradientQ(vector<Particle> const& configuration, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
+  Vector<double> CosControlVariate::gradientQ(vector<Particle> const& configuration, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
   {
     double q = configuration[0].position(0);
-    dvec grad(configuration[0].dimension());
+    Vector<double> grad(configuration[0].dimension());
     grad(0) = - 2 * M_PI * sin(2 * M_PI * q);
     return grad;
   }
@@ -521,9 +521,9 @@ namespace simol
     return - pow (2 * M_PI, 2) * cos(2 * M_PI * q);
   }
   
-  dvec CosControlVariate::gradientP(vector<Particle> const& configuration, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
+  Vector<double> CosControlVariate::gradientP(vector<Particle> const& configuration, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
   {
-    return dvec(configuration[0].dimension());
+    return Vector<double>(configuration[0].dimension());
   }
   
     double CosControlVariate::laplacianP(vector<Particle> const& /*configuration*/, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
@@ -544,16 +544,16 @@ namespace simol
   
   double SinExpControlVariate::basisFunction(vector<Particle> const& configuration, size_t /*iOfFunction*/) const
   {
-    dvec q = configuration[0].position();
+    Vector<double> q = configuration[0].position();
     double q0 = q(0);
     return sin(2 * M_PI * q0) * exp(potential(q)/2);
   }
   
-  dvec SinExpControlVariate::gradientQ(vector<Particle> const& configuration, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
+  Vector<double> SinExpControlVariate::gradientQ(vector<Particle> const& configuration, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
   {
-    dvec q = configuration[0].position();
+    Vector<double> q = configuration[0].position();
     double q0 = q(0);
-    dvec grad(configuration[0].dimension());
+    Vector<double> grad(configuration[0].dimension());
     grad(0) = (2 * M_PI * cos(2 * M_PI * q0)
 	+ potentialDerivative(q)(0)/2 * sin(2 * M_PI * q0))
 	* exp(potential(q)/2);
@@ -562,7 +562,7 @@ namespace simol
   
     double SinExpControlVariate::laplacianQ(vector<Particle> const& configuration, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
   {
-    dvec q = configuration[0].position();
+    Vector<double> q = configuration[0].position();
     double q0 = q(0);
     
     return (-pow(2 * M_PI, 2) * sin(2* M_PI * q0)
@@ -572,9 +572,9 @@ namespace simol
       * exp(potential(q)/2);
   }
   
-  dvec SinExpControlVariate::gradientP(vector<Particle> const& configuration, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
+  Vector<double> SinExpControlVariate::gradientP(vector<Particle> const& configuration, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
   {
-    return dvec(configuration[0].dimension());
+    return Vector<double>(configuration[0].dimension());
   }
     
   double SinExpControlVariate::laplacianP(vector<Particle> const& /*configuration*/, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
@@ -591,16 +591,16 @@ namespace simol
   
   double CosExpControlVariate::basisFunction(vector<Particle> const& configuration, size_t /*iOfFunction*/) const
   {
-    dvec q = configuration[0].position();
+    Vector<double> q = configuration[0].position();
     double q0 = q(0);
     return cos(2 * M_PI * q0) * exp(potential(q)/2);
   }
   
-  dvec CosExpControlVariate::gradientQ(vector<Particle> const& configuration, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
+  Vector<double> CosExpControlVariate::gradientQ(vector<Particle> const& configuration, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
   {
-    dvec q = configuration[0].position();
+    Vector<double> q = configuration[0].position();
     double q0 = q(0);
-    dvec grad(configuration[0].dimension());
+    Vector<double> grad(configuration[0].dimension());
     grad(0) = (- 2 * M_PI * sin(2 * M_PI * q0)
 	+ potentialDerivative(q)(0)/2 * cos(2 * M_PI * q0))
 	* exp(potential(q)/2);
@@ -609,7 +609,7 @@ namespace simol
   
     double CosExpControlVariate::laplacianQ(vector<Particle> const& configuration, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
   {
-    dvec q = configuration[0].position();
+    Vector<double> q = configuration[0].position();
     double q0 = q(0);
     
     return (-pow(2 * M_PI, 2) * cos(2* M_PI * q0)
@@ -619,9 +619,9 @@ namespace simol
       * exp(potential(q)/2);
   }
   
-  dvec CosExpControlVariate::gradientP(vector<Particle> const& configuration, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
+  Vector<double> CosExpControlVariate::gradientP(vector<Particle> const& configuration, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
   {
-    return dvec(configuration[0].dimension());
+    return Vector<double>(configuration[0].dimension());
   }
     
   double CosExpControlVariate::laplacianP(vector<Particle> const& /*configuration*/, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
@@ -643,9 +643,9 @@ namespace simol
     return configuration[0].kineticEnergy();
   }
   
-  dvec LangevinControlVariate::gradientQ(vector<Particle> const& configuration, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
+  Vector<double> LangevinControlVariate::gradientQ(vector<Particle> const& configuration, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
   {
-     dvec grad(configuration[0].dimension());
+     Vector<double> grad(configuration[0].dimension());
      //grad(0) = pow(configuration[0].momentum(0), 2);
      grad(0) = 0;
      return grad;
@@ -657,9 +657,9 @@ namespace simol
     return 0;
   }
   
-  dvec LangevinControlVariate::gradientP(vector<Particle> const& configuration, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
+  Vector<double> LangevinControlVariate::gradientP(vector<Particle> const& configuration, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
   {
-     dvec grad(configuration[0].dimension());
+     Vector<double> grad(configuration[0].dimension());
      grad(0) = configuration[0].momentum(0);
      //grad(0) = 1;
      return grad;
@@ -687,7 +687,7 @@ namespace simol
     return result;
   }
   
-  dvec SumEnergyControlVariate::gradientQ(vector<Particle> const& configuration, size_t iOfParticle, size_t /*iOfFunction*/) const
+  Vector<double> SumEnergyControlVariate::gradientQ(vector<Particle> const& configuration, size_t iOfParticle, size_t /*iOfFunction*/) const
   {
     return (iOfParticle - i0_ - .5) * configuration[iOfParticle].energyGrad();
   }
@@ -698,7 +698,7 @@ namespace simol
     return 0;
   }
   
-  dvec SumEnergyControlVariate::gradientP(vector<Particle> const& configuration, size_t iOfParticle, size_t /*iOfFunction*/) const
+  Vector<double> SumEnergyControlVariate::gradientP(vector<Particle> const& configuration, size_t iOfParticle, size_t /*iOfFunction*/) const
   {
     return (iOfParticle - i0_) * configuration[iOfParticle].momentum();
   }
@@ -725,7 +725,7 @@ namespace simol
     return result;
   }
   
-  dvec EnergyControlVariate::gradientQ(vector<Particle> const& configuration, size_t iOfParticle, size_t /*iOfFunction*/) const
+  Vector<double> EnergyControlVariate::gradientQ(vector<Particle> const& configuration, size_t iOfParticle, size_t /*iOfFunction*/) const
   {
     return configuration[iOfParticle].energyGrad();
   }
@@ -736,7 +736,7 @@ namespace simol
     return 0;
   }
   
-  dvec EnergyControlVariate::gradientP(vector<Particle> const& configuration, size_t iOfParticle, size_t /*iOfFunction*/) const
+  Vector<double> EnergyControlVariate::gradientP(vector<Particle> const& configuration, size_t iOfParticle, size_t /*iOfFunction*/) const
   {
     return configuration[iOfParticle].momentum();
   }
@@ -758,9 +758,9 @@ namespace simol
     return configuration[0].energy(); 
   }
   
-  dvec LocalControlVariate::gradientQ(vector<Particle> const& configuration, size_t iOfParticle, size_t /*iOfFunction*/) const
+  Vector<double> LocalControlVariate::gradientQ(vector<Particle> const& configuration, size_t iOfParticle, size_t /*iOfFunction*/) const
   {
-    dvec result = dvec(configuration[0].dimension());
+    Vector<double> result = Vector<double>(configuration[0].dimension());
     
     if (iOfParticle == 0)
       result(0) = sin(configuration[0].position(0));
@@ -774,9 +774,9 @@ namespace simol
     return 0;
   }
   
-  dvec LocalControlVariate::gradientP(vector<Particle> const& configuration, size_t iOfParticle, size_t /*iOfFunction*/) const
+  Vector<double> LocalControlVariate::gradientP(vector<Particle> const& configuration, size_t iOfParticle, size_t /*iOfFunction*/) const
   {
-    dvec result = dvec(configuration[0].dimension());
+    Vector<double> result = Vector<double>(configuration[0].dimension());
     
     if (iOfParticle == 0)
       result(0) = configuration[0].momentum(0);
@@ -804,9 +804,9 @@ namespace simol
 	  + 2 * configuration[0].kineticEnergy();
   }
   
-  dvec KineticControlVariate::gradientQ(vector<Particle> const& configuration, size_t iOfParticle, size_t /*iOfFunction*/) const
+  Vector<double> KineticControlVariate::gradientQ(vector<Particle> const& configuration, size_t iOfParticle, size_t /*iOfFunction*/) const
   {
-    dvec result(configuration[0].dimension());
+    Vector<double> result(configuration[0].dimension());
     
     if (iOfParticle == 0)
       result(0) = -2 * configuration[0].momentum(0) * (cos(configuration[1].position(0) - configuration[0].position(0)) + cos(configuration[0].position(0)));
@@ -822,9 +822,9 @@ namespace simol
     return 0;
   }
   
-  dvec KineticControlVariate::gradientP(vector<Particle> const& configuration, size_t iOfParticle, size_t /*iOfFunction*/) const
+  Vector<double> KineticControlVariate::gradientP(vector<Particle> const& configuration, size_t iOfParticle, size_t /*iOfFunction*/) const
   {
-    dvec result(configuration[0].dimension());
+    Vector<double> result(configuration[0].dimension());
     
     if (iOfParticle == 0)
       result(0) = 2 * (sin(configuration[1].position(0) - configuration[0].position(0)) - sin(configuration[0].position(0)))
@@ -867,9 +867,9 @@ namespace simol
 			throw std::invalid_argument("iOfFunction must 0 or 1");
   }
   
-  dvec TwoControlVariate::gradientQ(vector<Particle> const& configuration, size_t iOfParticle, size_t iOfFunction) const
+  Vector<double> TwoControlVariate::gradientQ(vector<Particle> const& configuration, size_t iOfParticle, size_t iOfFunction) const
   {
-    dvec result = dvec(configuration[0].dimension());
+    Vector<double> result = Vector<double>(configuration[0].dimension());
     
     if (iOfFunction == 0)
       result(0) = - configuration[0].momentum(0) - configuration[configuration.size()-1].momentum(0);
@@ -889,9 +889,9 @@ namespace simol
     return 0;
   }
   
-  dvec TwoControlVariate::gradientP(vector<Particle> const& configuration, size_t iOfParticle, size_t iOfFunction) const
+  Vector<double> TwoControlVariate::gradientP(vector<Particle> const& configuration, size_t iOfParticle, size_t iOfFunction) const
   {    
-    dvec result(configuration[0].dimension());
+    Vector<double> result(configuration[0].dimension());
     
     if (iOfFunction == 0)
     {
@@ -951,10 +951,10 @@ namespace simol
 		return result;
   }
   
-  dvec BasisControlVariate::gradientQ(vector<Particle> const& configuration, size_t iOfParticle, size_t iOfFunction) const
+  Vector<double> BasisControlVariate::gradientQ(vector<Particle> const& configuration, size_t iOfParticle, size_t iOfFunction) const
   {
 		//cout << "BasisControlVariate::gradientQ" << endl;
-    dvec result(1, 0);
+    Vector<double> result(1, 0);
     assert(iOfFunction == 0);
 		//cout << "gradientQ" << endl;
 		for (SMat::iterator it = coeffsVec_.begin_col(0); it != coeffsVec_.end_col(0); ++it)
@@ -985,9 +985,9 @@ namespace simol
     return result;
   }
   
-  dvec BasisControlVariate::gradientP(vector<Particle> const& configuration, size_t iOfParticle, size_t iOfFunction) const
+  Vector<double> BasisControlVariate::gradientP(vector<Particle> const& configuration, size_t iOfParticle, size_t iOfFunction) const
   {
-		dvec result(1, 0);
+		Vector<double> result(1, 0);
     assert(iOfFunction == 0);
 		//cout << "gradientP" << endl;
 		for (SMat::iterator it = coeffsVec_.begin_col(0); it != coeffsVec_.end_col(0); ++it)
@@ -1050,8 +1050,8 @@ namespace simol
 			out << q << " ";
 			for (double p = -pMax_; p<pMax_; p += deltaP_)
 			{
-				conf[0].position() = dvec(1, q);
-				conf[0].momentum() = dvec(1, p);
+				conf[0].position() = Vector<double>(1, q);
+				conf[0].momentum() = Vector<double>(1, p);
 				out << basisFunction(conf, 0) << " ";
 			}
 			out << endl;
@@ -1073,8 +1073,8 @@ namespace simol
 			out << q << " ";
 			for (double p = -pMax_; p<pMax_; p += deltaP_)
 			{
-				conf[0].position() = dvec(1, q);
-				conf[0].momentum() = dvec(1, p);
+				conf[0].position() = Vector<double>(1, q);
+				conf[0].momentum() = Vector<double>(1, p);
 				out << gradientQ(conf, 0) << " ";
 			}
 			out << endl;
@@ -1096,8 +1096,8 @@ namespace simol
 			out << q << " ";
 			for (double p = -pMax_; p<pMax_; p += deltaP_)
 			{
-				conf[0].position() = dvec(1, q);
-				conf[0].momentum() = dvec(1, p);
+				conf[0].position() = Vector<double>(1, q);
+				conf[0].momentum() = Vector<double>(1, p);
 				out << gradientP(conf, 0) << " ";
 			}
 			out << endl;
