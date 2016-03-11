@@ -1,0 +1,6 @@
+This documentation lays on minted package.
+You must have pygments installed on your machine.
+On Ubuntu systems, it can be installed by typing
+    sudo apt-get install python-pygments
+Then, the documentation can be built with pdflatex:
+    pdflatex --shell-escape devguide.tex
