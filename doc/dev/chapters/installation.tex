@@ -91,7 +91,7 @@ cd simol/build
 \end{minted}
 in a terminal. The configuration step lays on a configuration file. We provide an example of such a configuration file which should be copied in the root directory of \Simol :
 \begin{minted}{bash}
-cp ../cmake/config.cmake ..
+cp ../cmake/config/config.cmake ..
 \end{minted}
 Please edit the copied file according to your environment. Especially, don't forget to set the variable \texttt{GCC\_ROOT} to the root of your own installation of \texttt{gcc}. Once you have edited the configuration file, all is ready to perform the configuration of \Simol by typing:
 \begin{minted}{bash}
@@ -170,7 +170,7 @@ where \textit{youlogin} stands for your own login. The installation process is d
 	cd ..
 	mkdir build-gcc-4.9.3
 	cd gcc-4.9.3
-	../gcc-4.9.3/configure --prefix=$GCC_ROOT --enable-languages=c,c++,fortran
+	../gcc-4.9.3/configure --prefix=$GCC_ROOT --enable-languages=c,c++,fortran --disable-multilib
 	make -j 4
 	make install
 \end{minted}
