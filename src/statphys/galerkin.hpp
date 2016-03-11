@@ -1,6 +1,5 @@
-#pragma once
-//#include "SparseMatrix.hpp"
-//#include <Eigen/Dense>
+#ifndef SIMOL_GALERKIN_HPP
+#define SIMOL_GALERKIN_HPP
 
 #include "tools.hpp"
 #include "input.hpp"
@@ -8,24 +7,21 @@
 #include "basis.hpp"
 
 
-//#include "eigen.hpp"
-
 namespace simol
 {
-	
+
 	SMat kron(const SMat& A, const SMat& B);
 	DMat kron(const DMat& A, const DMat& B);
-	
+
 	class Galerkin;
-  
+
   Galerkin* createLangevinGalerkin(Input const& input);
-	
+
 	class Galerkin
 	{
 	friend Galerkin* createLangevinGalerkin(Input const& input);
-	
+
 	protected:
-		//DenseMatrix<double> A;
 		int nbOfParticles_;
 		size_t nbOfFourier_, nbOfHermite_, maxOfFourier_;
 		size_t sizeOfBasis_;
@@ -41,17 +37,16 @@ namespace simol
 		double amplitude_;
 		double externalForce_;
 		size_t nbOfIntegrationNodes_;
-		//vector<double> expFourierCoeffs_;
 		DMat trigToExpMat_, expToTrigMat_;
 		DMat trigToExpTens_, expToTrigTens_;
 		Potential* potential_;
 		ExpFourierHermiteBasis basis_;
 	public:
 		Galerkin(Input const& input);
-		
+
 		virtual int nbOfVariables() const;
 		virtual int nbOfParticles() const;
-		
+
 		const double& expFourierCoeffs(int iOfElt) const;
 		size_t iTens(size_t iOfFourier2, size_t iOfHermite) const;
 		DMat shapeSaddle(const DMat& A) const;
@@ -61,8 +56,7 @@ namespace simol
 		DVec solveWithSaddle(const DMat& A, const DVec& X) const;
 		DVec solveWithSaddle(const SMat& A, const DVec& X) const;
 		DMat invWithSaddle(const DMat& A) const;
-		
-		//void computeFourierCoeffsExp();
+
 		void computeExpToTrigMat();
 		virtual void computeExpToTrigTens() = 0;
 		DMat convertToTrigBasis(const DMat& X);
@@ -71,7 +65,7 @@ namespace simol
 		void createLthm0();
 		virtual void createLthm() = 0;
 		virtual void compute();
-		
+
 		DVec gettGiHj(int i, int j) const;
 		DVec gettGiHjTrig(int i, int j) const;
 		DVec getLtGiHj(int i, int j) const;
@@ -80,16 +74,16 @@ namespace simol
 		DVec getLinvtGiHjTrig(int i, int j) const;
 		SMat CVcoeffs() const;
 	};
-	
+
 	class LangevinGalerkin : public Galerkin
 	{
 	public:
 		LangevinGalerkin(Input const& input);
-		
+
 		virtual void computeExpToTrigTens();
 		virtual void createLthm();
 	};
-	
+
 	class BoundaryLangevinGalerkin : public Galerkin
 	{
 		SMat SId_;
@@ -101,9 +95,11 @@ namespace simol
 		virtual void computeExpToTrigTens();
 		void createLham();
 		virtual void createLthm();
-		
+
 		virtual void compute();
 	};
-	
+
 
 }
+
+#endif

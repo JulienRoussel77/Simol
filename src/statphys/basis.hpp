@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SIMOL_BASIS_HPP
+#define SIMOL_BASIS_HPP
 
 #include "tools.hpp"
 #include "potential.hpp"
@@ -21,7 +22,7 @@ namespace simol
 		virtual size_t size() const = 0;
 		size_t iTens(vector<size_t>& vecOfElt) const;
 	};
-	
+
 	class DTVec : public TVec
 	{
 		DVec data_;
@@ -33,10 +34,10 @@ namespace simol
 		const double& operator()(size_t iTensOfElt) const;
 		double& operator()(size_t iTensOfElt);
 	};
-	
+
 	size_t product(vector<size_t>& nbOfElts);
 	//DTVec product(DMat& A, DTVec& X, size_t iOfVariable);
-	
+
 	class Basis
 	{
 	protected:
@@ -51,7 +52,7 @@ namespace simol
 		virtual dvec gradient(double variable, const int iOfElt) const = 0;
 		virtual double laplacian(double variable, const int iOfElt) const = 0;
 	};
-	
+
 	class FourierBasis : public Basis
 	{
 	public:
@@ -61,7 +62,7 @@ namespace simol
 		virtual dvec gradient(double variable, const int iOfElt) const;
 		virtual double laplacian(double variable, const int iOfElt) const;
 	};
-	
+
 	class ExpFourierBasis : public Basis
 	{
 		double beta_;
@@ -80,9 +81,9 @@ namespace simol
 		virtual dvec gradient(double variable, const int iOfElt) const;
 		virtual double laplacian(double variable, const int iOfElt) const;
 	};
-	
 
-	
+
+
 	class HermiteBasis : public Basis
 	{
 		double beta_;
@@ -93,7 +94,7 @@ namespace simol
 		virtual dvec gradient(double variable, const int iOfElt) const;
 		virtual double laplacian(double variable, const int iOfElt) const;
 	};
-	
+
 	class TensorBasis
 	{
 	protected:
@@ -117,7 +118,7 @@ namespace simol
 		virtual double laplacianP(vector<Particle> const& configuration, size_t iOfParticle, size_t iOfCoeff) const = 0;
 		virtual double laplacianP(vector<Particle> const& configuration, size_t iOfParticle, vector<size_t>& vecIndex) const = 0;
 	};
-	
+
 	class QPBasis : public TensorBasis
 	{
 	public:
@@ -139,20 +140,20 @@ namespace simol
 		virtual double laplacianP(vector<Particle> const& configuration, size_t iOfParticle, size_t iOfCoeff) const;
 		virtual double laplacianP(vector<Particle> const& configuration, size_t iOfParticle, vector<size_t>& vecIndex) const;
 	};
-	
+
 	class FourierHermiteBasis : public QPBasis
 	{
 	public:
 		FourierHermiteBasis(Input const& input);
 	};
-	
+
 	class ExpFourierHermiteBasis : public QPBasis
 	{
 	public:
 		ExpFourierHermiteBasis(Input const& input, Potential* potential);
 		const double& expFourierCoeffs(int iOfElt) const;
 	};
-	
+
 	/*class TrigBasis : public TensorBasis
 	{
 	public:
@@ -160,3 +161,5 @@ namespace simol
 		virtual double valueOfElt(double variable, const int iOfElt, const int iOfVariable);
 	};*/
 }
+
+#endif
