@@ -86,10 +86,15 @@ namespace simol
   template <class T>
   T Statistics<T>::mean(size_t i, size_t j) const
   {
-    if (nbValues_(i,j) == 0)
+    return T(0); // en attendant correction
+    // TODO: a reecrire (Cedric)
+    // Il y a un probleme de typage dans cette fonction
+    // La fonction est censee retourner un T mais retourne toujours un double
+
+    /*if (nbValues_(i,j) == 0)
       return 0;
     else
-      return sumValues_(i,j) / nbValues_(i,j);
+      return sumValues_(i,j) / nbValues_(i,j);*/
   }
 
   template <class T>
