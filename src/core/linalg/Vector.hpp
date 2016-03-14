@@ -1,6 +1,8 @@
 #ifndef SIMOL_VECTOR_HPP
 #define SIMOL_VECTOR_HPP
 
+#include "VectorInterface.hpp"
+
 #include "eigen.hpp"
 
 namespace simol

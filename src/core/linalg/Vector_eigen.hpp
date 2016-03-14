@@ -5,7 +5,7 @@ namespace simol
 {
 
   template<class ScalarType>
-  class Vector<ScalarType,eigen>
+  class Vector<ScalarType,eigen> : public VectorInterface<ScalarType, eigen>
   {
     public:
       explicit Vector(size_t const size=0);
