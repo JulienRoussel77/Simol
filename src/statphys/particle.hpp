@@ -16,14 +16,6 @@
 // FORWARD DECLARATIONS
 //=====================
 
-/*namespace simol
-{
-  class Particle;
-  
-    void verlet_scheme(Particle & particle, double timeStep);
-    void exact_OU_scheme(Particle & particle, double const gamma, double const beta, double const timeStep, Vector<double> const& randVec);
-    void maruyama_scheme(Particle & particle, double const beta_, const double& timeStep, Vector<double> const& randVec);
-}*/
 
 namespace simol
 {
@@ -35,15 +27,6 @@ namespace simol
   class Particle
   {
 
-    //=================
-    // FRIEND FUNCTIONS
-    //=================
-
-    //friend void verlet(Particle & particle, HamiltonDynamics const & model, double delta_t);
-    /*friend void verlet_scheme(Particle & particle, double timeStep);
-    friend void exact_OU_scheme(Particle & particle, double const gamma, double const beta, double const timeStep, Vector<double> const& randVec);
-    friend void maruyama_scheme(Particle & particle, double const beta_, const double& timeStep, Vector<double> const& randVec);
-*/
     //=============
     // CONSTRUCTORS
     //=============
@@ -72,9 +55,9 @@ namespace simol
       const double& momentum(int i) const;
       double& momentum(int i);
       double kineticEnergy() const;
-      //double& kineticEnergy();      
+      //double& kineticEnergy();
       const double& potentialEnergy() const;
-      double& potentialEnergy();      
+      double& potentialEnergy();
       double energy() const;
       Vector<double> const& force() const;
       Vector<double>& force(); 
@@ -83,8 +66,8 @@ namespace simol
       Vector<double> const& energyGrad() const;
       Vector<double>& energyGrad();  
       const double& energyGrad(int i) const;
-      double& energyGrad(int i);  
-			const double& energyLapla() const;
+      double& energyGrad(int i);
+      const double& energyLapla() const;
       double& energyLapla();  
       Vector<double> velocity() const;
 			int const& countdown() const;
@@ -107,8 +90,8 @@ namespace simol
 			int countdown_;
   };
 
-  
-  
+
+
 }
 
 

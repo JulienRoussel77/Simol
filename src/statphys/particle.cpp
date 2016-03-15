@@ -138,25 +138,4 @@ namespace simol
 
 }
 
-/*namespace simol
-{
-  void verlet_scheme(Particle & particle, double timeStep)
-  {
-    
-    particle.momentum_ += timeStep * particle.force_ / 2;
-    particle.position_ += timeStep * particle.momentum_ / particle.mass_;
-    particle.momentum_ += timeStep * particle.force_ / 2;
-  }
-  
-  void exact_OU_scheme(Particle & particle, double const gamma, double const beta, double const timeStep, Vector<double> const& randVec)
-  {
-    double alpha = exp(- gamma / particle.mass_ * timeStep);    
-    particle.momentum_ = alpha * particle.momentum_ + sqrt((1-pow(alpha, 2))/beta*particle.mass_) * randVec;
-  }
-  
-  void maruyama_scheme(Particle & particle, double const beta_, const double& timeStep, Vector<double> const& randVec)
-  {
-    particle.position_ += timeStep * particle.force_ + sqrt(2*timeStep/beta_) * randVec;
-  }
-}*/
 #endif

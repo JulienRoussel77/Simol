@@ -13,7 +13,7 @@
 #include "tools.hpp"
 
 namespace simol{
-  
+
   class Input{
     YAML::Node data;
 		string inputPath_;
@@ -25,15 +25,15 @@ namespace simol{
     Input(CommandLine cmd);
 		const string& inputPath() const;
 		const std::ifstream& inputFlux() const;
-		
+
 		string simuTypeName() const;
 		string parametersName() const;
     string outputFolderName() const;
-		
+
 		// Geometry
     int dimension() const;
     double length() const;
-		
+
     // Mesh/Time
     double timeStepMin() const;
     double timeStepMax() const;
@@ -41,10 +41,10 @@ namespace simol{
 		size_t nbOfIterations(size_t indexOfReplica=0) const;
 		size_t nbOfThermalIterations(size_t indexOfReplica=0) const;
 		size_t nbOfBurningIterations(size_t indexOfReplica=0) const;
-		
+
 		// Mesh/Replica
 		size_t nbOfReplicas() const;
-    
+
 		// Physics/System
 		string systemName() const;
     size_t nbOfParticles() const;
@@ -53,22 +53,21 @@ namespace simol{
 		string settingsPath() const;
 		Vector<double> initialPosition(int const& i=0) const;
     Vector<double> initialMomentum(int const& i=0) const;
-		
 		// Physics/Potential
-    string potentialName() const;    
+    string potentialName() const;
     //Sinus
-    double amplitude() const;    
+    double amplitude() const;
     //DoubleWell
     double height() const;
-    double interWell() const;    
+    double interWell() const;
     //Harmonic
     double potentialStiffness() const;
     double potentialAlpha() const;
     double potentialBeta() const;
-		
-		// Physics/Model	
+
+		// Physics/Model
     string dynamicsName() const;
-    double gamma() const;   
+    double gamma() const;
     double temperature(size_t indexOfReplica=0) const;
     double temperatureLeft(size_t indexOfReplica=0) const;
     double temperatureRight(size_t indexOfReplica=0) const;
@@ -82,10 +81,10 @@ namespace simol{
 		double xi() const;
 		int seed() const;
 		double eta() const;
-    
-		
-		
-		// Output    
+
+
+
+		// Output
     size_t decorrelationNbOfIterations(size_t indexOfReplica=0) const;
     double decorrelationTime(size_t indexOfReplica=0) const;
 		size_t outputPeriodNbOfIterations(size_t indexOfReplica=0) const;
@@ -95,20 +94,20 @@ namespace simol{
 		int nbOfAutocoPts() const;
 		bool doFinalFlow() const;
 		bool doFinalVelocity() const;
-    
+
 		// Controle Variate
-    string controlVariateName() const;		
+    string controlVariateName() const;
 		string controlVariateCoeffsPath() const;
-		
+
 		//Galerkin
 		bool doGalerkinCV() const;
 		bool isGalerkin() const;
 		string galerkinElts() const;
 		size_t nbOfFourier() const;
 		size_t nbOfHermite() const;
-		
+
   };
-  
+
 
 }
 

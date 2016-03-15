@@ -2,7 +2,7 @@
 #define SIMOL_POTENTIAL_HPP
 
 #include "tools.hpp"
-#include "core/linalg/Vector.hpp"	
+#include "core/linalg/Vector.hpp"
 #include "input.hpp"
 #include "core/random/RNG.hpp"
 
@@ -10,13 +10,13 @@
 namespace simol
 {
   class Potential;
-  
+
   Potential* createPotential(Input const& input, int const& indexOfReplica=1);
 
   class Potential
   {
 	friend Potential* createPotential(Input const& input, int const& indexOfReplica);
-	
+
 	public:
 		Potential();
 		virtual ~Potential(){};
@@ -35,7 +35,7 @@ namespace simol
 		virtual double drawLaw(double /*localBeta*/, RNG* /*rng*/){assert(false); return 0;};
 
   };
-  
+
   class Sinusoidal : public Potential{
     public:
       Sinusoidal(Input const& input, int const& indexOfReplica=1);
@@ -47,7 +47,7 @@ namespace simol
       double amplitude_;
       double pulsation_;
   };
-  
+
     class SumSinusoidal : public Potential{
     public:
       SumSinusoidal(Input const& input, int const& indexOfReplica=1);
@@ -60,7 +60,7 @@ namespace simol
       double amplitude_;
       double pulsation_;
   };
-  
+
   class FracSinusoidal : public Potential{
     public:
       FracSinusoidal(Input const& input, int const& indexOfReplica=1);
@@ -73,7 +73,7 @@ namespace simol
       double amplitude_;
       double pulsation_;
   };
-  
+
   class DoubleWell : public Potential{
     public:
       DoubleWell(Input const& input, int const& indexOfReplica=1);
@@ -84,7 +84,7 @@ namespace simol
       double height_;
       double interWell_;
   };
-  
+
     class HarmonicWell : public Potential{
     public:
       HarmonicWell(Input const& input, int const& indexOfReplica=1);
@@ -95,9 +95,9 @@ namespace simol
       double stiffness_;
   };
 
-  
-  
-  
+
+
+
   class Harmonic : public Potential{
     public:
       Harmonic(Input const& input, int const& indexOfReplica=1);
@@ -108,7 +108,7 @@ namespace simol
     private:
       double stiffness_;
   };
-  
+
   class Rotor : public Potential{
     public:
       Rotor(Input const& input, int const& indexOfReplica=1);
@@ -120,7 +120,7 @@ namespace simol
       double stiffness_;
   };
 
-  
+
     class Quadratic : public Potential{
     public:
       Quadratic(Input const& input, int const& indexOfReplica=1);
@@ -132,7 +132,7 @@ namespace simol
     private:
       double stiffness_, alpha_, beta_;
   };
-	
+
 	class SpaceSinus : public Potential{
     public:
       SpaceSinus(Input const& input, int const& indexOfReplica=1);
