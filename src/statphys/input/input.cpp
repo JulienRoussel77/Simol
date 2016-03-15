@@ -83,7 +83,7 @@ namespace simol {
 	}
 
 	string Input::simuTypeName() const {
-    return "../output/"+dynamicsName()+"/"+systemName()+"/"+potentialName()+"/";
+    return "../../../output/"+dynamicsName()+"/"+systemName()+"/"+potentialName()+"/";
   }
 
 	string Input::parametersName() const

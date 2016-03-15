@@ -1,7 +1,9 @@
 #====================================================
 # Store all cpp filenames into cpp-filenames variable
 #====================================================
-FILE(GLOB_RECURSE cpp-filenames "*.cpp")
+FILE(GLOB_RECURSE cpp-filenames *.cpp */*.cpp)
+
+INCLUDE_DIRECTORIES(. input output controlVariate dynamics system potential)
 
 #==============================
 # Define simol-statphys library

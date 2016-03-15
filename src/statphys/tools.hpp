@@ -39,5 +39,6 @@ typedef Eigen::Matrix<cplx, Dynamic, Dynamic> DsMat;
 typedef Eigen::Triplet<double> T;
 
 double modulo(double variable, double mini, double maxi);
+void displayTime(double time);
 
 #endif

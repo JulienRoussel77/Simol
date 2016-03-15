@@ -7,7 +7,7 @@
 #include "dynamics.hpp"
 #include "Vector.hpp"
 #include "input.hpp"
-#include "galerkin.hpp"
+#include "tools.hpp"
 
 #include <cmath>
 
