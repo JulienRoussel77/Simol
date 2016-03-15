@@ -57,22 +57,22 @@ namespace simol
 	
 	const double& DTVec::operator()(vector<size_t>& vecIndex) const
 	{
-		return data_[iTens(vecIndex)];
+		return data_(iTens(vecIndex));
 	}
 	
 	double& DTVec::operator()(vector<size_t>& vecIndex)
 	{
-		return data_[iTens(vecIndex)];
+		return data_(iTens(vecIndex));
 	}
 	
 	const double& DTVec::operator()(size_t iTensOfElt) const
 	{
-		return data_[iTensOfElt];
+		return data_(iTensOfElt);
 	}
 	
 	double& DTVec::operator()(size_t iTensOfElt)
 	{
-		return data_[iTensOfElt];
+		return data_(iTensOfElt);
 	}
 	
 	size_t product(vector<size_t>& nbOfElts)

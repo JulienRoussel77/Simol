@@ -130,7 +130,7 @@ namespace simol
     void updateControlVariate(vector<Particle> const& configuration);
 		void appendKinTempProfile(double value, size_t iOfIteration, size_t iOfParticle);
 		void appendPotTempTopProfile(double value, size_t iOfIteration, size_t iOfParticle);
-		void appendPotTpBotProfile(double value, size_t iOfIteration, size_t iOfParticle);
+		void appendPotTempBotProfile(double value, size_t iOfIteration, size_t iOfParticle);
 		void appendBendistProfile(double value, size_t iOfIteration, size_t iOfParticle);
 		void appendFlowProfile(double value, size_t iOfIteration, size_t iOfParticle);
 	};
