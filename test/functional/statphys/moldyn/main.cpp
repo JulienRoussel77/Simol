@@ -40,15 +40,14 @@ int main(int argc, char* argv[])
   //============
   // COMPUTATION
   //============
+  
+  if (input.isGalerkin())
+    throw std::invalid_argument("The input must correspond to a MD simulation !");
 	
-  if(input.isGalerkin())
-    throw std::invalid_argument("The input file should correspond to a MD simulation !");
-
 	simol::MultiSystem replica(input);
 	replica.launch(input);
 
-  
-
   displayTime(clock() - totalTime);
+
   return EXIT_SUCCESS;
 }
