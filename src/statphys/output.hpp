@@ -109,8 +109,8 @@ namespace simol
     ControlVariate* midFlowCV();
 		ControlVariate* sumFlowCV();
     
-    /*dvec& responseForces();
-    dvec const& responseForces() const;
+    /*Vector<double>& responseForces();
+    Vector<double> const& responseForces() const;
     double& responseForces(const int& i);
     const double& responseForces(const int& i) const;*/
     const size_t& decorrelationNbOfIterations() const;
@@ -122,7 +122,7 @@ namespace simol
     void display(vector<Particle> const& configuration, size_t iOfIteration);
 		void displayGeneratorOnBasis(ofstream& out, vector<Particle> const& configuration, ControlVariate* controlVariate, double time);
     void finalDisplayAutocorrelations();
-    void finalDisplay(vector<Particle> const& configuration, dvec const& externalForce);
+    void finalDisplay(vector<Particle> const& configuration, Vector<double> const& externalForce);
     void displayFinalFlow(double temperature, double delta_temperature, double tau = nan(""), double xi = 0);
     void displayFinalVelocity(double temperature, double externalForce, int nbOfFourier = 0, int nbOfHermite = 0);
 
@@ -130,7 +130,7 @@ namespace simol
     void updateControlVariate(vector<Particle> const& configuration);
 		void appendKinTempProfile(double value, size_t iOfIteration, size_t iOfParticle);
 		void appendPotTempTopProfile(double value, size_t iOfIteration, size_t iOfParticle);
-		void appendPotTempBotProfile(double value, size_t iOfIteration, size_t iOfParticle);
+		void appendPotTpBotProfile(double value, size_t iOfIteration, size_t iOfParticle);
 		void appendBendistProfile(double value, size_t iOfIteration, size_t iOfParticle);
 		void appendFlowProfile(double value, size_t iOfIteration, size_t iOfParticle);
 	};

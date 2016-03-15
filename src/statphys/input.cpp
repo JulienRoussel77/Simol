@@ -54,8 +54,8 @@ namespace simol {
 		{
 			assert(inputFlux_.is_open());
 			cout << "Reading the settings from " << settingsPath() << "...";
-			initialPositions_ = vector<dvec>(nbOfParticles());
-			initialMomenta_ = vector<dvec>(nbOfParticles());
+			initialPositions_ = vector<Vector<double>>(nbOfParticles());
+			initialMomenta_ = vector<Vector<double>>(nbOfParticles());
 			for (int iOfParticle=0; iOfParticle < (int)nbOfParticles(); iOfParticle++)
 			{
 				readItem(inputSettings_);
@@ -227,33 +227,34 @@ namespace simol {
 		else return parametersName()+"settings/settings";
 	}
   
-  dvec Input::initialPosition(int const& iOfParticle) const {
+  Vector<double> Input::initialPosition(int const& iOfParticle) const {
+    Vector<double> q0(dimension(), 0);
     if (data["Physics"]["System"]["Position"])
-		{
+      {
       if (data["Physics"]["System"]["Position"].size() == 1)
-				return data["Physics"]["System"]["Position"].as<double>();
+	q0(0) = data["Physics"]["System"]["Position"].as<double>();
       else
-				return positionMin_ + (iOfParticle + .5)/nbOfParticles() * (positionMax_ - positionMin_);
-		}
+	q0(0) = positionMin_ + (iOfParticle + .5)/nbOfParticles() * (positionMax_ - positionMin_);
+      }
 		else if (doFileSettings())
 		{
 			cout << "using settings for q : " << iOfParticle << "->" << initialPositions_[iOfParticle] << endl;
-			return initialPositions_[iOfParticle];
+			q0 = initialPositions_[iOfParticle];
 		}
-			
-		else return dvec(dimension(), 0);
+    return q0;
   }   
   
-  dvec Input::initialMomentum(int const& iOfParticle) const 
+  Vector<double> Input::initialMomentum(int const& iOfParticle) const 
   {
+    Vector<double> p0(dimension(), 0);
     if (data["Physics"]["System"]["Momentum"])
-      return data["Physics"]["System"]["Momentum"].as<double>();
+      p0(0) =  data["Physics"]["System"]["Momentum"].as<double>();
 		else if (doFileSettings())
 		{
 			cout << "using settings for p : " << iOfParticle << "->" << initialMomenta_[iOfParticle] << endl;
-			return initialMomenta_[iOfParticle];
+			p0 = initialMomenta_[iOfParticle];
 		}
-    else return dvec(dimension(), 0);
+    return p0;
     //else return (i < nbOfParticles()/2)?.2:-.2;
   }  
   

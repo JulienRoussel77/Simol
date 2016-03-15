@@ -21,7 +21,7 @@ namespace simol{
   }
   
   template <>
-  void AutocorrelationStats<dvec>::append(dvec const& newValue, size_t iOfIteration, size_t iOfObservable, dvec const& /*newRefValue*/)
+  void AutocorrelationStats<Vector<double>>::append(Vector<double> const& newValue, size_t iOfIteration, size_t iOfObservable, Vector<double> const& /*newRefValue*/)
   {
     if (iOfIteration % decorrelationNbOfIterations_ == 0)
     {
@@ -41,7 +41,7 @@ namespace simol{
   }
   
   template <>
-  double AutocorrelationStats<dvec>::integratedAutocorrelationUnbiased(size_t iOfObservable) const
+  double AutocorrelationStats<Vector<double>>::integratedAutocorrelationUnbiased(size_t iOfObservable) const
   {
     return max(0., integratedAutocorrelation(iOfObservable) - dot(mean(iOfObservable), statisticsRefValues_.mean(iOfObservable)) * decorrelationTime_);
   }

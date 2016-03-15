@@ -40,8 +40,8 @@ namespace simol {
      delete dynamics;
  }
  
- dvec MultiSystem::externalForce(int const& indexReplica){
-   dvec extForce(dimension_);
+ Vector<double> MultiSystem::externalForce(int const& indexReplica){
+   Vector<double> extForce(dimension_);
    extForce(0) = externalForceMin_ + indexReplica * (externalForceMax_ - externalForceMin_) / nbOfReplicas_;
    return extForce;
  }

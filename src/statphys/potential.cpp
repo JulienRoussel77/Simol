@@ -41,21 +41,21 @@ namespace simol
     return 0;
   }
   
-  double Potential::operator()(dvec const& position) const
+  double Potential::operator()(Vector<double> const& position) const
 	{
-		//cout << "Potential::operator()(dvec const& position)" << endl;
+		//cout << "Potential::operator()(Vector<double> const& position)" << endl;
 		return operator()(position(0));
 	}
   
   double Potential::operator()(double position) const
 	{
 		//cout << "Potential::operator()(double position)" << endl;
-		return operator()(dvec(1, position));
+		return operator()(Vector<double>(1, position));
 	}
   
-  double Potential::value(dvec const& position) const
+  double Potential::value(Vector<double> const& position) const
 	{
-		//cout << "Potential::value(dvec const& position)" << endl;
+		//cout << "Potential::value(Vector<double> const& position)" << endl;
 		return operator()(position);
 	}
   
@@ -65,34 +65,34 @@ namespace simol
 		return operator()(position);
 	}
 	
-	dvec Potential::derivative(dvec const& position) const
+	Vector<double> Potential::derivative(Vector<double> const& position) const
   { 
 		return derivative(position(0)); 
 	}
 	
-	dvec Potential::derivative(double position) const
+	Vector<double> Potential::derivative(double position) const
   { 
-		return -derivative(dvec(1, position)); 
+		return -derivative(Vector<double>(1, position)); 
 	}
 	
-	dvec Potential::force(dvec const& position) const
-  { 
-		return -derivative(position); 
-	}
-	
-	dvec Potential::force(double position) const
+	Vector<double> Potential::force(Vector<double> const& position) const
   { 
 		return -derivative(position); 
 	}
 	
-	double Potential::laplacian(dvec const& position) const
+	Vector<double> Potential::force(double position) const
+  { 
+		return -derivative(position); 
+	}
+	
+	double Potential::laplacian(Vector<double> const& position) const
   { 
 		return laplacian(position(0)); 
 	}
 	
 	double Potential::laplacian(double position) const
   { 
-		return laplacian(dvec(1, position));
+		return laplacian(Vector<double>(1, position));
 	}
   
 //#### Sinusoidal #####
@@ -108,9 +108,9 @@ namespace simol
 		return amplitude_* (1-cos(pulsation_*position)); 
 	}
 
-  dvec Sinusoidal::derivative(double position) const
+  Vector<double> Sinusoidal::derivative(double position) const
   { 
-    return dvec(1, amplitude_*pulsation_*sin(pulsation_*position));
+    return Vector<double>(1, amplitude_*pulsation_*sin(pulsation_*position));
   }
   
   double Sinusoidal::laplacian(double position) const
@@ -134,9 +134,9 @@ namespace simol
 			+ cos(3 * pulsation_*position) / 3); 
 	}
 
-  dvec SumSinusoidal::derivative(double position) const
+  Vector<double> SumSinusoidal::derivative(double position) const
   { 
-    dvec deriv(1);
+    Vector<double> deriv(1);
     deriv(0) = amplitude_*pulsation_*(cos(pulsation_*position)
 	  - 2 * sin(2 * pulsation_*position)
 	  - sin(3 * pulsation_*position));
@@ -165,9 +165,9 @@ namespace simol
     return amplitude_ * cos(2 * M_PI * position) / (2 + sin(2 * M_PI * position));
   }
 
-  dvec FracSinusoidal::derivative(double position) const
+  Vector<double> FracSinusoidal::derivative(double position) const
   { 
-    dvec deriv(1);
+    Vector<double> deriv(1);
     //deriv(0) = -(2 * M_PI * sin(2 * M_PI * position))/(2 + sin(2 * M_PI * position))
 	//	-(2 * M_PI * pow(cos(2 M_PI * position),2))/(sin(2 * M_PI * position)+2)^2;
     deriv(0) = -amplitude_ * (4 * M_PI * sin(2 * M_PI * position) + 2 * M_PI)/pow(sin(2 * M_PI * position) + 2, 2);
@@ -189,9 +189,9 @@ namespace simol
   double DoubleWell::operator()(double position) const
   { return height_*pow(position-interWell_/2, 2)*pow(position+interWell_/2, 2); }
 
-  dvec DoubleWell::derivative(double position) const
+  Vector<double> DoubleWell::derivative(double position) const
   { 
-    dvec deriv(1);
+    Vector<double> deriv(1);
     deriv(0) = 4*height_*position*(position-interWell_/2)*(position+interWell_/2);
     return deriv;
   }
@@ -207,9 +207,9 @@ namespace simol
   double HarmonicWell::operator()(double position) const
   { return stiffness_ / 2 * pow(position, 2); }
 
-  dvec HarmonicWell::derivative(double position) const
+  Vector<double> HarmonicWell::derivative(double position) const
   { 
-    dvec deriv(1);
+    Vector<double> deriv(1);
     deriv(0) = stiffness_ * position;
     return deriv;
   }
@@ -226,9 +226,9 @@ namespace simol
   double Harmonic::operator()(double distance) const
   { return stiffness_ / 2* pow(distance - 1, 2); }
 
-  dvec Harmonic::derivative(double distance) const
+  Vector<double> Harmonic::derivative(double distance) const
   { 
-    dvec deriv(1);
+    Vector<double> deriv(1);
     deriv(0) = stiffness_ * (distance - 1);
     return deriv;
   }
@@ -256,9 +256,9 @@ namespace simol
     return 1 - cos(distance);
   }
 
-  dvec Rotor::derivative(double distance) const
+  Vector<double> Rotor::derivative(double distance) const
   { 
-    dvec deriv(1);
+    Vector<double> deriv(1);
     deriv(0) = sin(distance);
     //deriv(0) = 2 * (1 - distance);
     return deriv;
@@ -309,9 +309,9 @@ namespace simol
   double Quadratic::operator()(double distance) const
   { return stiffness_/2 * pow(distance, 2) + alpha_/3 * pow(distance, 3) + beta_/4 * pow(distance, 4); }
 
-  dvec Quadratic::derivative(double distance) const
+  Vector<double> Quadratic::derivative(double distance) const
   { 
-    dvec deriv(1);
+    Vector<double> deriv(1);
     deriv(0) = stiffness_ * distance + alpha_ * pow(distance, 2) + beta_ * pow(distance, 3);
     return deriv;
   }
@@ -365,14 +365,14 @@ namespace simol
 		pulsation_(2*M_PI/input.length())
   {}
   
-  double SpaceSinus::operator()(dvec const& position) const
+  double SpaceSinus::operator()(Vector<double> const& position) const
   { 
 		return amplitude_* (1-cos(pulsation_*position(0))*cos(pulsation_*position(1))*cos(pulsation_*position(2))); 
 	}
 
-  dvec SpaceSinus::derivative(dvec const& position) const
+  Vector<double> SpaceSinus::derivative(Vector<double> const& position) const
   { 
-		dvec grad(3);
+		Vector<double> grad(3);
 		grad(0) = sin(pulsation_*position(0))*cos(pulsation_*position(1))*cos(pulsation_*position(2));
     grad(1) = cos(pulsation_*position(0))*sin(pulsation_*position(1))*cos(pulsation_*position(2));
 		grad(2) = cos(pulsation_*position(0))*cos(pulsation_*position(1))*sin(pulsation_*position(2));
@@ -380,7 +380,7 @@ namespace simol
 		return grad;
 	}
   
-  double SpaceSinus::laplacian(dvec const& position) const
+  double SpaceSinus::laplacian(Vector<double> const& position) const
   {
     return 3 * pow(pulsation_, 2) * value(position);
   }

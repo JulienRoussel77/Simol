@@ -92,7 +92,7 @@ namespace simol
     Particle ancorParticle2_;
   public:
     TriChain(Input const& input, int const& iOfReplica=0);
-		virtual void initializeSystem(Dynamics* model);
+    virtual void initializeSystem(Dynamics* model);
     void computeAllForces(Dynamics const* model);		  
 		virtual double boundaryPotEnergy() const;
 		virtual void computeProfile(Output& output, Dynamics const* model, size_t iOfIteration);

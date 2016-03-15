@@ -25,7 +25,7 @@ namespace simol
     //std::cout << "Particle vide créée !" << std::endl;      
    }
 
-  Particle::Particle(double const & mass, dvec const & position0, dvec const & momentum0):
+  Particle::Particle(double const & mass, Vector<double> const & position0, Vector<double> const & momentum0):
 		Particle(position0.size())
   {
 		mass_ = mass;
@@ -37,8 +37,8 @@ namespace simol
     Particle(1)
   {
 		mass_ = mass;
-		position_ = dvec(1, position0);
-		momentum_ = dvec(1, momentum0);
+		position_ = Vector<double>(1, position0);
+		momentum_ = Vector<double>(1, momentum0);
 	}
   
 
@@ -51,10 +51,10 @@ namespace simol
     return position_.size();
   }
 
-  dvec const & Particle::position() const
+  Vector<double> const & Particle::position() const
   { return position_; }
   
-  dvec & Particle::position()
+  Vector<double> & Particle::position()
   { return position_; }
   
   double const & Particle::position(int i) const
@@ -63,10 +63,10 @@ namespace simol
   double & Particle::position(int i)
   { return position_(i); }
 
-  dvec const & Particle::momentum() const
+  Vector<double> const & Particle::momentum() const
   { return momentum_; }
   
-  dvec & Particle::momentum()
+  Vector<double> & Particle::momentum()
   { return momentum_; }
   
   double const & Particle::momentum(int i) const
@@ -96,10 +96,10 @@ namespace simol
   double Particle::energy() const
   { return kineticEnergy() + potentialEnergy_; }
   
-  dvec const& Particle::force() const
+  Vector<double> const& Particle::force() const
   { return force_; }
   
-  dvec& Particle::force()
+  Vector<double>& Particle::force()
   { return force_; }
   
   const double& Particle::force(size_t i) const
@@ -108,10 +108,10 @@ namespace simol
   double& Particle::force(size_t i)
   { return force_(i); }
   
-  dvec const& Particle::energyGrad() const
+  Vector<double> const& Particle::energyGrad() const
   { return energyGrad_; }
   
-  dvec& Particle::energyGrad()
+  Vector<double>& Particle::energyGrad()
   { return energyGrad_; }
   
   const double& Particle::energyGrad(int i) const
@@ -126,7 +126,7 @@ namespace simol
   double& Particle::energyLapla()
 	{return energyLapla_;}
   
-  dvec Particle::velocity() const
+  Vector<double> Particle::velocity() const
   {return momentum_ / mass_;}
   
   int const& Particle::countdown() const
@@ -148,13 +148,13 @@ namespace simol
     particle.momentum_ += timeStep * particle.force_ / 2;
   }
   
-  void exact_OU_scheme(Particle & particle, double const gamma, double const beta, double const timeStep, dvec const& randVec)
+  void exact_OU_scheme(Particle & particle, double const gamma, double const beta, double const timeStep, Vector<double> const& randVec)
   {
     double alpha = exp(- gamma / particle.mass_ * timeStep);    
     particle.momentum_ = alpha * particle.momentum_ + sqrt((1-pow(alpha, 2))/beta*particle.mass_) * randVec;
   }
   
-  void maruyama_scheme(Particle & particle, double const beta_, const double& timeStep, dvec const& randVec)
+  void maruyama_scheme(Particle & particle, double const beta_, const double& timeStep, Vector<double> const& randVec)
   {
     particle.position_ += timeStep * particle.force_ + sqrt(2*timeStep/beta_) * randVec;
   }

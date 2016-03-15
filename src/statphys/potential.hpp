@@ -2,9 +2,9 @@
 #define SIMOL_POTENTIAL_HPP
 
 #include "tools.hpp"
-#include "Vector.hpp"	
+#include "core/linalg/Vector.hpp"	
 #include "input.hpp"
-#include "RNG.hpp"
+#include "core/random/RNG.hpp"
 
 
 namespace simol
@@ -21,15 +21,15 @@ namespace simol
 		Potential();
 		virtual ~Potential(){};
 		Potential(Input const& input, int const& indexOfReplica=1);
-		virtual double operator()(dvec const & position) const;
+		virtual double operator()(Vector<double> const & position) const;
 		virtual double operator()(double position) const;
-		double value(dvec const& position) const;
+		double value(Vector<double> const& position) const;
 		double value(double position) const;
-		virtual dvec derivative(dvec const & position) const;
-		virtual dvec derivative(double position) const;
-		virtual dvec force(dvec const & position) const;
-		virtual dvec force(double position) const;
-		virtual double laplacian(dvec const & position) const;
+		virtual Vector<double> derivative(Vector<double> const & position) const;
+		virtual Vector<double> derivative(double position) const;
+		virtual Vector<double> force(Vector<double> const & position) const;
+		virtual Vector<double> force(double position) const;
+		virtual double laplacian(Vector<double> const & position) const;
 		virtual double laplacian(double position) const;
 		virtual double ratioToHarmonic() const {assert(false); return 0;};
 		virtual double drawLaw(double /*localBeta*/, RNG* /*rng*/){assert(false); return 0;};
@@ -40,7 +40,7 @@ namespace simol
     public:
       Sinusoidal(Input const& input, int const& indexOfReplica=1);
       double operator()(double position) const;
-      dvec derivative(double position) const;
+      Vector<double> derivative(double position) const;
       double laplacian(double position) const;
 
     private:
@@ -52,7 +52,7 @@ namespace simol
     public:
       SumSinusoidal(Input const& input, int const& indexOfReplica=1);
       double operator()(double position) const;
-      dvec derivative(double position) const;
+      Vector<double> derivative(double position) const;
       virtual double laplacian(double position) const;
 
 
@@ -65,7 +65,7 @@ namespace simol
     public:
       FracSinusoidal(Input const& input, int const& indexOfReplica=1);
       double operator()(double position) const;
-      dvec derivative(double position) const;
+      Vector<double> derivative(double position) const;
       virtual double laplacian(double position) const;
 
 
@@ -78,7 +78,7 @@ namespace simol
     public:
       DoubleWell(Input const& input, int const& indexOfReplica=1);
       double operator()(double position) const;
-      dvec derivative(double position) const;
+      Vector<double> derivative(double position) const;
 
     private:
       double height_;
@@ -89,7 +89,7 @@ namespace simol
     public:
       HarmonicWell(Input const& input, int const& indexOfReplica=1);
       double operator()(double position) const;
-      dvec derivative(double position) const;
+      Vector<double> derivative(double position) const;
 
     private:
       double stiffness_;
@@ -102,7 +102,7 @@ namespace simol
     public:
       Harmonic(Input const& input, int const& indexOfReplica=1);
       double operator()(double position) const;
-      dvec derivative(double position) const;
+      Vector<double> derivative(double position) const;
 			double laplacian(double position) const;
 			double drawLaw(double localBeta, RNG* rng);
     private:
@@ -113,7 +113,7 @@ namespace simol
     public:
       Rotor(Input const& input, int const& indexOfReplica=1);
       double operator()(double position) const;
-      dvec derivative(double position) const;
+      Vector<double> derivative(double position) const;
       double laplacian(double position) const;
 			double drawLaw(double localBeta, RNG* rng);
     private:
@@ -125,7 +125,7 @@ namespace simol
     public:
       Quadratic(Input const& input, int const& indexOfReplica=1);
       double operator()(double position) const;
-      dvec derivative(double position) const;
+      Vector<double> derivative(double position) const;
 			double laplacian(double position) const;
 			virtual double ratioToHarmonic() const;
 			double drawLaw(double localBeta, RNG* rng);
@@ -136,9 +136,9 @@ namespace simol
 	class SpaceSinus : public Potential{
     public:
       SpaceSinus(Input const& input, int const& indexOfReplica=1);
-      double operator()(dvec const& position) const;
-      dvec derivative(dvec const& position) const;
-      double laplacian(dvec const& position) const;
+      double operator()(Vector<double> const& position) const;
+      Vector<double> derivative(Vector<double> const& position) const;
+      double laplacian(Vector<double> const& position) const;
 
     private:
       double amplitude_;

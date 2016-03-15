@@ -5,7 +5,7 @@
 #include "particle.hpp"
 #include "input.hpp"
 #include "output.hpp"
-#include "RNG.hpp"
+#include "core/random/RNG.hpp"
 #include "controlVariate.hpp"
 # include <iostream>
 #include "galerkin.hpp"
@@ -35,12 +35,12 @@ namespace simol
 			size_t& nbOfBurningIterations();
       const size_t& nbOfBurningIterations() const;
       Potential& potential();
-      double potential(dvec const& position) const;
+      double potential(Vector<double> const& position) const;
       double potential(const double& position) const;
-      dvec force(dvec const& position) const;
-			double laplacian(dvec const& position) const;
-      dvec& externalForce() ;
-      const dvec& externalForce() const;
+      Vector<double> force(Vector<double> const& position) const;
+			double laplacian(Vector<double> const& position) const;
+      Vector<double>& externalForce() ;
+      const Vector<double>& externalForce() const;
 			double& externalForce(const int& i);
       const double& externalForce(const int& i) const;
 			Galerkin* galerkin();
@@ -61,7 +61,7 @@ namespace simol
       
       virtual void initializeMomenta(vector<Particle>& configuration);
 			virtual void initializeCountdown(Particle& /*particle*/){assert(false);};
-			virtual dvec drawMomentum(double localBeta, double mass);
+			virtual Vector<double> drawMomentum(double localBeta, double mass);
 			virtual double drawPotLaw(double localBeta);
 			virtual double computeMeanPotLaw(double betaLocal) const;
 			
@@ -82,7 +82,7 @@ namespace simol
       size_t nbOfIterations_, nbOfThermalIterations_, nbOfBurningIterations_;
       Potential* potential_;
       //double timeStep;
-      dvec externalForce_;
+      Vector<double> externalForce_;
 			RNG* rng_;
 			Galerkin* galerkin_;
   };
@@ -144,7 +144,7 @@ namespace simol
     virtual void updateBefore(Particle& particle);
     virtual void updateAfter(Particle& particle);
     virtual MatrixXd generatorOn(ControlVariate const* controlVariate, vector<Particle> const& configuration) const;
-    //virtual std::function<double (ControlVariate const*, dvec const&, dvec const&)> generator() const;
+    //virtual std::function<double (ControlVariate const*, Vector<double> const&, Vector<double> const&)> generator() const;
   };
   
   class BoundaryLangevin : public StochasticDynamics

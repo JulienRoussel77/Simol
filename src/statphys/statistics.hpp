@@ -86,10 +86,18 @@ namespace simol
   T Statistics<T>::mean(size_t i, size_t j) const
   {
     if (nbValues_(i,j) == 0)
-      return 0;
+      return T();
     else
       return sumValues_(i,j) / nbValues_(i,j);
   }
+  
+  /*Vector<double> Statistics<T>::mean(size_t i, size_t j) const
+  {
+    if (nbValues_(i,j) == 0)
+      return Vector<double>;
+    else
+      return sumValues_(i,j) / nbValues_(i,j);
+  }*/
   
   template <class T>  
   Matrix<T, Dynamic, Dynamic> Statistics<T>::meanMat() const

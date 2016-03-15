@@ -3,9 +3,9 @@
 
 #include<yaml-cpp/yaml.h>
 #include <getopt.h>
-#include "Vector.hpp"
+#include "core/linalg/Vector.hpp"
 
-#include "io/CommandLine.hpp"
+#include "core/io/CommandLine.hpp"
 
 #include <string>
 #include <iostream>
@@ -20,7 +20,7 @@ namespace simol{
 		ifstream inputFlux_;
     double positionMin_, positionMax_;
 		ifstream inputSettings_;
-		vector<dvec> initialPositions_, initialMomenta_;
+		vector<Vector<double>> initialPositions_, initialMomenta_;
   public:
     Input(CommandLine cmd);
 		const string& inputPath() const;
@@ -51,8 +51,8 @@ namespace simol{
     double mass() const;
 		bool doFileSettings() const;
 		string settingsPath() const;
-		dvec initialPosition(int const& i=0) const;
-    dvec initialMomentum(int const& i=0) const;
+		Vector<double> initialPosition(int const& i=0) const;
+    Vector<double> initialMomentum(int const& i=0) const;
 		
 		// Physics/Potential
     string potentialName() const;    
