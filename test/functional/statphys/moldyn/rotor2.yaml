@@ -1,0 +1,31 @@
+Geometry:
+  Dimension: 1
+
+Mesh:
+  Time:
+    Step: 0.02
+    FinalTime: 1000
+    ThermalTime: 10
+    BurningTime: 10
+
+Physics:
+  System:
+    Name: BiChain
+    Number: 8
+  Potential:
+    Name: Rotor
+  Model:
+    Name: BoundaryLangevin
+    Gamma: 1
+    TemperatureLeft: 1
+    TemperatureRight: 1
+
+Output:
+  Foldername: N8
+  DecorrelationTime: 20
+  Period: 1
+  ProfilePeriod: 1
+  DoFinalFlow: No
+
+ControlVariate:
+  Name: None

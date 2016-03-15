@@ -1,0 +1,31 @@
+Geometry:
+  Dimension: 1
+  Length: 1
+
+Mesh:
+  Time:
+    Step: 0.01
+    Number: 10000
+
+Physics:
+  System:
+    Name: Isolated
+    Mass: 1
+    Position: 2
+    Speed: 0
+  Potential:
+    Name: DoubleWell
+    Height: 1
+    InterWell: 2
+  Model:
+    Name: Langevin
+    Gamma: 1
+    Temperature: 1
+  Replica:
+    Number: 1
+
+Output:
+  DecorrelationTime: 5
+
+ControlVariate:
+  Name: Local

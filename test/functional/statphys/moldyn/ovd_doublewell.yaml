@@ -1,0 +1,26 @@
+Geometry:
+  Dimension: 1
+  Length: 1
+
+Mesh:
+  Time:
+    Step: 0.01
+    FinalTime: 1000
+
+Physics:
+  System:
+    Name: Isolated
+  Potential:
+    Name: DoubleWell
+    Height: 1
+    InterWell: 2
+  Model:
+    Name: Overdamped
+    Temperature: 1
+
+Output:
+  DecorrelationTime: 0.2
+  Period: 0.01
+
+ControlVariate:
+  Name: None
