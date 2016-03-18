@@ -13,9 +13,9 @@ namespace simol
 
   Potential::Potential(){}
   
-  Potential::Potential(Input const & /*input*/, int const& /*indexOfReplica*/){}
+  Potential::Potential(Input const & /*input*/){}
   
-  Potential* createPotential(Input const& input, int const& /*indexOfReplica*/)
+  Potential* createPotential(Input const& input)
   {
     if (input.potentialName() == "Sinusoidal")
       return new Sinusoidal(input);
@@ -97,8 +97,8 @@ namespace simol
   
 //#### Sinusoidal #####
   
-  Sinusoidal::Sinusoidal(Input const & input, int const& indexOfReplica):
-		Potential(input, indexOfReplica), 
+  Sinusoidal::Sinusoidal(Input const & input):
+		Potential(input), 
 		amplitude_(input.amplitude()), 
 		pulsation_(2*M_PI/input.length())
   {}
@@ -121,8 +121,8 @@ namespace simol
     
 //#### SumSinusoidal #####
   
-  SumSinusoidal::SumSinusoidal(Input const & input, int const& indexOfReplica):
-    Potential(input, indexOfReplica), 
+  SumSinusoidal::SumSinusoidal(Input const & input):
+    Potential(input), 
     amplitude_(input.amplitude()), 
     pulsation_(2*M_PI/input.length())
   {}
@@ -154,8 +154,8 @@ namespace simol
   
   //#### FracSinusoidal #####
   
-  FracSinusoidal::FracSinusoidal(Input const & input, int const& indexOfReplica):
-    Potential(input, indexOfReplica),
+  FracSinusoidal::FracSinusoidal(Input const & input):
+    Potential(input),
     amplitude_(input.amplitude()),
     pulsation_(2*M_PI/input.length())
   {}
@@ -183,7 +183,7 @@ namespace simol
   
 //#### DoubleWell #####  
   
-    DoubleWell::DoubleWell(Input const & input, int const& indexOfReplica):Potential(input, indexOfReplica), height_(input.height()), interWell_(input.interWell())
+    DoubleWell::DoubleWell(Input const & input):Potential(input), height_(input.height()), interWell_(input.interWell())
   {}
   
   double DoubleWell::operator()(double position) const
@@ -198,8 +198,8 @@ namespace simol
   
   //#### HarmonicWell #####  
   
-  HarmonicWell::HarmonicWell(Input const & input, int const& indexOfReplica):
-    Potential(input, indexOfReplica), 
+  HarmonicWell::HarmonicWell(Input const & input):
+    Potential(input), 
     stiffness_(input.potentialStiffness())
   {}
   
@@ -217,8 +217,8 @@ namespace simol
   
 //#### Harmonic #####  
   
-  Harmonic::Harmonic(Input const & input, int const& indexOfReplica):
-    Potential(input, indexOfReplica), 
+  Harmonic::Harmonic(Input const & input):
+    Potential(input), 
     stiffness_(input.potentialStiffness())
   {}
   
@@ -238,15 +238,15 @@ namespace simol
     return stiffness_;
   }
   
-  double Harmonic::drawLaw(double localBeta, RNG* rng)
+  double Harmonic::drawLaw(double localBeta, std::shared_ptr<RNG> rng)
 	{
 		return rng->scalarGaussian() / sqrt(localBeta);
 	}
   
   //#### Rotor #####  
   
-  Rotor::Rotor(Input const & input, int const& indexOfReplica):
-    Potential(input, indexOfReplica)
+  Rotor::Rotor(Input const & input):
+    Potential(input)
   {}
   
   
@@ -269,7 +269,7 @@ namespace simol
     return cos(distance);
   }
   
-  double Rotor::drawLaw(double localBeta, RNG* rng)
+  double Rotor::drawLaw(double localBeta, std::shared_ptr<RNG> rng)
 	{
 		bool reject = true;
 		double xdraw, udraw;
@@ -296,8 +296,8 @@ namespace simol
     
 //#### Quadratic #####  
   
-  Quadratic::Quadratic(Input const & input, int const& indexOfReplica):
-    Potential(input, indexOfReplica), 
+  Quadratic::Quadratic(Input const & input):
+    Potential(input), 
     stiffness_(input.potentialStiffness()),
     alpha_(input.potentialAlpha()),
     beta_(input.potentialBeta())
@@ -330,7 +330,7 @@ namespace simol
 			return 0;
 	}
 	
-	double Quadratic::drawLaw(double localBeta, RNG* rng)
+	double Quadratic::drawLaw(double localBeta, std::shared_ptr<RNG> rng)
 	{
 		double ratio = ratioToHarmonic();
 		bool reject = true;
@@ -359,8 +359,8 @@ namespace simol
 	
 	//#### SpaceSinus #####
   
-  SpaceSinus::SpaceSinus(Input const & input, int const& indexOfReplica):
-		Potential(input, indexOfReplica), 
+  SpaceSinus::SpaceSinus(Input const & input):
+		Potential(input), 
 		amplitude_(input.amplitude()), 
 		pulsation_(2*M_PI/input.length())
   {}

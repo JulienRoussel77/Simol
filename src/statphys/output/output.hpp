@@ -21,7 +21,6 @@ namespace simol
     string outputFolderName_;
     ofstream outObservables_;
     ofstream outParticles_;
-    ofstream outReplica_;
 		ofstream outFinalFlow_;
 		ofstream outFinalVelocity_;
     ofstream outCorrelation_;
@@ -70,8 +69,7 @@ namespace simol
 		AutocorrelationStats<double> flowProfile_;
 	
     Output(Input const& input);
-    
-    void reset(Input const& input, Potential* potential, Galerkin* galerkin, size_t iOfReplica);
+    void setControlVariates(Input& input, Potential& potential, Galerkin* galerkin);
       
     const double& timeStep() const;
     double& timeStep();
@@ -103,11 +101,11 @@ namespace simol
 		double autocoPtsPeriod() const;
 		
     
-    ControlVariate* velocityCV();
-    ControlVariate* forceCV();
-    ControlVariate* lengthCV();
-    ControlVariate* midFlowCV();
-		ControlVariate* sumFlowCV();
+    ControlVariate& velocityCV();
+    ControlVariate& forceCV();
+    ControlVariate& lengthCV();
+    ControlVariate& midFlowCV();
+		ControlVariate& sumFlowCV();
     
     /*Vector<double>& responseForces();
     Vector<double> const& responseForces() const;
@@ -120,7 +118,7 @@ namespace simol
 		void writeProfile(ofstream& out_, size_t iOfIteration);
     //double& integratedAutocorrelationP();
     void display(vector<Particle> const& configuration, size_t iOfIteration);
-		void displayGeneratorOnBasis(ofstream& out, vector<Particle> const& configuration, ControlVariate* controlVariate, double time);
+		void displayGeneratorOnBasis(ofstream& out, vector<Particle> const& configuration, ControlVariate& controlVariate, double time);
     void finalDisplayAutocorrelations();
     void finalDisplay(vector<Particle> const& configuration, Vector<double> const& externalForce);
     void displayFinalFlow(double temperature, double delta_temperature, double tau = nan(""), double xi = 0);

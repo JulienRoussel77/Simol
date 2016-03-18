@@ -10,41 +10,41 @@ using std::ofstream;
 namespace simol 
 {
   
-  ControlVariate* createControlVariate(Input const& input, Potential* potential, Galerkin* galerkin, size_t iOfReplica)
+  ControlVariate* createControlVariate(Input const& input, Potential& potential, Galerkin* galerkin)
   {
     if (input.controlVariateName() == "None")
-      return new NoControlVariate(input, potential, iOfReplica);
+      return new NoControlVariate(input, potential);
     if (input.controlVariateName() == "Sinus")
-      return new SinusControlVariate(input, potential, iOfReplica);
+      return new SinusControlVariate(input, potential);
     if (input.controlVariateName() == "Cosine")
-      return new CosControlVariate(input, potential, iOfReplica);
+      return new CosControlVariate(input, potential);
     else if (input.controlVariateName() == "SinExp")
-      return new SinExpControlVariate(input, potential, iOfReplica);
+      return new SinExpControlVariate(input, potential);
     else if (input.controlVariateName() == "CosExp")
-      return new CosExpControlVariate(input, potential, iOfReplica);
+      return new CosExpControlVariate(input, potential);
     else if (input.controlVariateName() == "Langevin")
-      return new LangevinControlVariate(input, potential, iOfReplica);
+      return new LangevinControlVariate(input, potential);
     else if (input.controlVariateName() == "SumEnergy")
-      return new SumEnergyControlVariate(input, potential, iOfReplica);
+      return new SumEnergyControlVariate(input, potential);
     else if (input.controlVariateName() == "Energy")
-      return new EnergyControlVariate(input, potential, iOfReplica);
+      return new EnergyControlVariate(input, potential);
     else if (input.controlVariateName() == "Local")
-      return new LocalControlVariate(input, potential, iOfReplica);
+      return new LocalControlVariate(input, potential);
     else if (input.controlVariateName() == "Kinetic")
-      return new KineticControlVariate(input, potential, iOfReplica);
+      return new KineticControlVariate(input, potential);
     else if (input.controlVariateName() == "Two")
-      return new TwoControlVariate(input, potential, iOfReplica);
+      return new TwoControlVariate(input, potential);
 		else if (input.controlVariateName() == "ExpFourierHermite")
-			return new ExpFourierHermiteControlVariate(input, potential, galerkin, iOfReplica);
+			return new ExpFourierHermiteControlVariate(input, potential, galerkin);
     else
       cout << input.controlVariateName() << " is not a valid control variate !" << std::endl;
     return 0;
   }
 
   
-  ControlVariate::ControlVariate(Input const& input, Potential* potential, size_t iOfReplica, size_t nbOfFunctions):
-    decorrelationNbOfIterations_(input.decorrelationNbOfIterations(iOfReplica)),
-    decorrelationTime_(input.decorrelationTime(iOfReplica)),
+  ControlVariate::ControlVariate(Input const& input, Potential& potential, size_t nbOfFunctions):
+    decorrelationNbOfIterations_(input.decorrelationNbOfIterations()),
+    decorrelationTime_(input.decorrelationTime()),
     nbOfFunctions_(nbOfFunctions),
     nbOfFunctionPairs_(pow(nbOfFunctions_, 2)),
     periodNbOfIterations_(input.outputPeriodNbOfIterations()),
@@ -58,9 +58,9 @@ namespace simol
     lastA_(nbOfFunctions_),
     statsPostObservable_(decorrelationNbOfIterations(), decorrelationTime(), nbOfAutocoPts()),
     statsPostBetterObservable_(decorrelationNbOfIterations(), decorrelationTime(), nbOfAutocoPts()),
-    historyObservable_(input.nbOfIterations(iOfReplica)),
-    historyGeneratorOnBasis_(input.nbOfIterations(iOfReplica), nbOfFunctions_),
-    potential_(potential)    
+    historyObservable_(input.nbOfIterations()),
+    historyGeneratorOnBasis_(input.nbOfIterations(), nbOfFunctions_),
+    potential_(&potential)    
   {}
   
   size_t ControlVariate::nbOfFunctions() const
@@ -387,8 +387,8 @@ namespace simol
   
   
   
-  NoControlVariate::NoControlVariate(Input const& input, Potential* potential, size_t iOfReplica):
-    ControlVariate(input, potential, iOfReplica, 1){}
+  NoControlVariate::NoControlVariate(Input const& input, Potential& potential):
+    ControlVariate(input, potential, 1){}
     
   size_t NoControlVariate::nbOfFunctions() const
   {
@@ -459,8 +459,8 @@ namespace simol
   
   
   
-  SinusControlVariate::SinusControlVariate(Input const& input, Potential* potential, size_t iOfReplica):
-    ControlVariate(input, potential, iOfReplica, 1)
+  SinusControlVariate::SinusControlVariate(Input const& input, Potential& potential):
+    ControlVariate(input, potential, 1)
   {}
   
   double SinusControlVariate::basisFunction(vector<Particle> const& configuration, size_t /*iOfFunction*/) const
@@ -497,8 +497,8 @@ namespace simol
   
   
   
-  CosControlVariate::CosControlVariate(Input const& input, Potential* potential, size_t iOfReplica):
-    ControlVariate(input, potential, iOfReplica, 1)
+  CosControlVariate::CosControlVariate(Input const& input, Potential& potential):
+    ControlVariate(input, potential, 1)
   {}
   
   double CosControlVariate::basisFunction(vector<Particle> const& configuration, size_t /*iOfFunction*/) const
@@ -538,8 +538,8 @@ namespace simol
   
   
   
-  SinExpControlVariate::SinExpControlVariate(Input const& input, Potential* potential, size_t iOfReplica):
-    ControlVariate(input, potential, iOfReplica, 1)
+  SinExpControlVariate::SinExpControlVariate(Input const& input, Potential& potential):
+    ControlVariate(input, potential, 1)
   {}
   
   double SinExpControlVariate::basisFunction(vector<Particle> const& configuration, size_t /*iOfFunction*/) const
@@ -585,8 +585,8 @@ namespace simol
   
   
   
-  CosExpControlVariate::CosExpControlVariate(Input const& input, Potential* potential, size_t iOfReplica):
-    ControlVariate(input, potential, iOfReplica, 1)
+  CosExpControlVariate::CosExpControlVariate(Input const& input, Potential& potential):
+    ControlVariate(input, potential, 1)
   {}
   
   double CosExpControlVariate::basisFunction(vector<Particle> const& configuration, size_t /*iOfFunction*/) const
@@ -632,8 +632,8 @@ namespace simol
   
   
   
-  LangevinControlVariate::LangevinControlVariate(Input const& input, Potential* potential, size_t iOfReplica):
-    ControlVariate(input, potential, iOfReplica, 1)
+  LangevinControlVariate::LangevinControlVariate(Input const& input, Potential& potential):
+    ControlVariate(input, potential, 1)
     {}
   
   double LangevinControlVariate::basisFunction(vector<Particle> const& configuration, size_t /*iOfFunction*/) const
@@ -673,8 +673,8 @@ namespace simol
   
   
   
-  SumEnergyControlVariate::SumEnergyControlVariate(Input const& input, Potential* potential, size_t iOfReplica):
-    ControlVariate(input, potential, iOfReplica, 1), i0_(0)
+  SumEnergyControlVariate::SumEnergyControlVariate(Input const& input, Potential& potential):
+    ControlVariate(input, potential, 1), i0_(0)
   {}
   
   double SumEnergyControlVariate::basisFunction(vector<Particle> const& configuration, size_t /*iOfFunction*/) const
@@ -711,8 +711,8 @@ namespace simol
   
   
   
-  EnergyControlVariate::EnergyControlVariate(Input const& input, Potential* potential, size_t iOfReplica):
-    ControlVariate(input, potential, iOfReplica, 1), i0_(0)
+  EnergyControlVariate::EnergyControlVariate(Input const& input, Potential& potential):
+    ControlVariate(input, potential, 1), i0_(0)
   {}
   
   double EnergyControlVariate::basisFunction(vector<Particle> const& configuration, size_t /*iOfFunction*/) const
@@ -748,8 +748,8 @@ namespace simol
   
   
   
-  LocalControlVariate::LocalControlVariate(Input const& input, Potential* potential, size_t iOfReplica):
-    ControlVariate(input, potential, iOfReplica, 1)
+  LocalControlVariate::LocalControlVariate(Input const& input, Potential& potential):
+    ControlVariate(input, potential, 1)
   {}
   
   double LocalControlVariate::basisFunction(vector<Particle> const& configuration, size_t /*iOfFunction*/) const
@@ -794,8 +794,8 @@ namespace simol
   
   
   
-  KineticControlVariate::KineticControlVariate(Input const& input, Potential* potential, size_t iOfReplica):
-    ControlVariate(input, potential, iOfReplica, 1)
+  KineticControlVariate::KineticControlVariate(Input const& input, Potential& potential):
+    ControlVariate(input, potential, 1)
   {}
   
   double KineticControlVariate::basisFunction(vector<Particle> const& configuration, size_t /*iOfFunction*/) const
@@ -845,8 +845,8 @@ namespace simol
   
   //#####TwoControlVariate#####
   
-    TwoControlVariate::TwoControlVariate(Input const& input, Potential* potential, size_t iOfReplica):
-    ControlVariate(input, potential, iOfReplica, 2)
+    TwoControlVariate::TwoControlVariate(Input const& input, Potential& potential):
+    ControlVariate(input, potential, 2)
   {}
   
   double TwoControlVariate::basisFunction(vector<Particle> const& configuration, size_t iOfFunction) const
@@ -915,8 +915,8 @@ namespace simol
   
   //#####BasisControlVariate#####
   
-  BasisControlVariate::BasisControlVariate(Input const& input, Potential* potential, Galerkin* galerkin, size_t iOfReplica):
-    ControlVariate(input, potential, iOfReplica, 1),
+  BasisControlVariate::BasisControlVariate(Input const& input, Potential& potential, Galerkin* galerkin):
+    ControlVariate(input, potential, 1),
     coeffsVec_(input.nbOfFourier() * input.nbOfHermite(), 1)
   {
 		if (galerkin)
@@ -1019,8 +1019,8 @@ namespace simol
   
   
   
-  ExpFourierHermiteControlVariate::ExpFourierHermiteControlVariate(Input const& input, Potential* potential, Galerkin* galerkin, size_t iOfReplica):
-		BasisControlVariate(input, potential, galerkin, iOfReplica)
+  ExpFourierHermiteControlVariate::ExpFourierHermiteControlVariate(Input const& input, Potential& potential, Galerkin* galerkin):
+		BasisControlVariate(input, potential, galerkin)
 	{		
 		basis_ = new ExpFourierHermiteBasis(input, potential);
 		nbQ_ = 100;  // rafinement du maillage de l'output map

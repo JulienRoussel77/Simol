@@ -13,11 +13,11 @@ namespace simol
 {
 
   class ControlVariate;
-  ControlVariate* createControlVariate(const simol::Input& input, simol::Potential* potential, Galerkin* galerkin, std::size_t iOfReplica = 1);
+  ControlVariate* createControlVariate(const simol::Input& input, simol::Potential& potential, Galerkin* galerkin);
 
   class ControlVariate
   {
-  friend ControlVariate* createControlVariate(Input const& input, Potential* potential, size_t iOfReplica);
+  friend ControlVariate* createControlVariate(Input const& input, Potential& potential);
   protected:
     size_t decorrelationNbOfIterations_;
     double decorrelationTime_;
@@ -42,7 +42,7 @@ namespace simol
 
     Potential* potential_;
   public:
-    ControlVariate(Input const& input, Potential* potential, size_t iOfReplica, size_t nbOfFunctions);
+    ControlVariate(Input const& input, Potential& potential, size_t nbOfFunctions);
 
     // ACCESSEURS
     virtual bool isNone() const;
@@ -116,7 +116,7 @@ namespace simol
     class NoControlVariate : public ControlVariate
   {
   public:
-    NoControlVariate(Input const& input, Potential* potential, size_t iOfReplica);
+    NoControlVariate(Input const& input, Potential& potential);
     virtual size_t nbOfFunctions() const;
     virtual size_t nbOfFunctionPairs() const;
     bool isNone() const;
@@ -133,7 +133,7 @@ namespace simol
   class SinusControlVariate : public ControlVariate
   {
   public:
-    SinusControlVariate(Input const& input, Potential* potential, size_t iOfReplica);
+    SinusControlVariate(Input const& input, Potential& potential);
     double basisFunction(vector<Particle> const& configuration, size_t iOfFunction = 0) const;
     virtual double laplacianQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
     virtual Vector<double> gradientQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
@@ -144,7 +144,7 @@ namespace simol
   class CosControlVariate : public ControlVariate
   {
   public:
-    CosControlVariate(Input const& input, Potential* potential, size_t iOfReplica);
+    CosControlVariate(Input const& input, Potential& potential);
     double basisFunction(vector<Particle> const& configuration, size_t iOfFunction = 0) const;
     virtual double laplacianQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
     virtual Vector<double> gradientQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
@@ -155,7 +155,7 @@ namespace simol
   class SinExpControlVariate : public ControlVariate
   {
   public:
-    SinExpControlVariate(Input const& input, Potential* potential, size_t iOfReplica);
+    SinExpControlVariate(Input const& input, Potential& potential);
     double basisFunction(vector<Particle> const& configuration, size_t iOfFunction = 0) const;
     virtual double laplacianQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
     virtual Vector<double> gradientQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
@@ -166,7 +166,7 @@ namespace simol
   class CosExpControlVariate : public ControlVariate
   {
   public:
-    CosExpControlVariate(Input const& input, Potential* potential, size_t iOfReplica);
+    CosExpControlVariate(Input const& input, Potential& potential);
     double basisFunction(vector<Particle> const& configuration, size_t iOfFunction = 0) const;
     virtual double laplacianQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
     virtual Vector<double> gradientQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
@@ -177,7 +177,7 @@ namespace simol
   class LangevinControlVariate : public ControlVariate
   {
   public:
-    LangevinControlVariate(Input const& input, Potential* potential, size_t iOfReplica);
+    LangevinControlVariate(Input const& input, Potential& potential);
     double basisFunction(vector<Particle> const& configuration, size_t iOfFunction = 0) const;
     virtual double laplacianQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
     virtual Vector<double> gradientQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
@@ -189,7 +189,7 @@ namespace simol
   {
     double i0_;
   public:
-    SumEnergyControlVariate(Input const& input, Potential* potential, size_t iOfReplica);
+    SumEnergyControlVariate(Input const& input, Potential& potential);
     double basisFunction(vector<Particle> const& configuration, size_t iOfFunction = 0) const;
     virtual double laplacianQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
     virtual Vector<double> gradientQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
@@ -201,7 +201,7 @@ namespace simol
   {
     double i0_;
   public:
-    EnergyControlVariate(Input const& input, Potential* potential, size_t iOfReplica);
+    EnergyControlVariate(Input const& input, Potential& potential);
     double basisFunction(vector<Particle> const& configuration, size_t iOfFunction = 0) const;
     virtual double laplacianQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
     virtual Vector<double> gradientQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
@@ -212,7 +212,7 @@ namespace simol
   class LocalControlVariate : public ControlVariate
   {
   public:
-    LocalControlVariate(Input const& input, Potential* potential, size_t iOfReplica);
+    LocalControlVariate(Input const& input, Potential& potential);
     double basisFunction(vector<Particle> const& configuration, size_t iOfFunction = 0) const;
     virtual double laplacianQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
     virtual Vector<double> gradientQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
@@ -223,7 +223,7 @@ namespace simol
   class KineticControlVariate : public ControlVariate
   {
   public:
-    KineticControlVariate(Input const& input, Potential* potential, size_t iOfReplica);
+    KineticControlVariate(Input const& input, Potential& potential);
     double basisFunction(vector<Particle> const& configuration, size_t iOfFunction = 0) const;
     virtual double laplacianQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
     virtual Vector<double> gradientQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
@@ -236,7 +236,7 @@ namespace simol
   class TwoControlVariate : public ControlVariate
   {
   public:
-    TwoControlVariate(Input const& input, Potential* potential, size_t iOfReplica);
+    TwoControlVariate(Input const& input, Potential& potential);
     double basisFunction(vector<Particle> const& configuration, size_t iOfFunction = 0) const;
     virtual double laplacianQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
     virtual Vector<double> gradientQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
@@ -250,7 +250,7 @@ namespace simol
 		SMat coeffsVec_;
 		TensorBasis* basis_;
 	public:
-    BasisControlVariate(const simol::Input& input, simol::Potential* potential, simol::Galerkin* galerkin, std::size_t iOfReplica);
+    BasisControlVariate(const simol::Input& input, simol::Potential& potential, simol::Galerkin* galerkin);
     double basisFunction(vector<Particle> const& configuration, size_t iOfFunction = 0) const;
     virtual double laplacianQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
     virtual Vector<double> gradientQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
@@ -263,7 +263,7 @@ namespace simol
 		int nbQ_, nbP_;
 		double pMax_, deltaQ_, deltaP_;
 	public:
-		ExpFourierHermiteControlVariate(const simol::Input& input, simol::Potential* potential, Galerkin* galerkin, std::size_t iOfReplica);
+		ExpFourierHermiteControlVariate(const simol::Input& input, simol::Potential& potential, Galerkin* galerkin);
 		int nbOfFourier() const;
 		int nbOfHermite() const;
 		virtual void displayMap(ofstream& out) const;

@@ -15,7 +15,6 @@ namespace simol{
     outputFolderName_(input.outputFolderName()), 
     outObservables_(input.outputFolderName()+"observables.txt"), 
     outParticles_(input.outputFolderName()+"particles.txt"), 
-    outReplica_(input.simuTypeName()+"replicas.txt", std::ofstream::app),
     outFinalFlow_(input.simuTypeName()+"finalFlow.txt", std::ofstream::app),
     outFinalVelocity_(input.simuTypeName()+"finalVelocity.txt", std::ofstream::app),
     outCorrelation_(input.outputFolderName()+"correlations.txt"),
@@ -35,23 +34,29 @@ namespace simol{
     verbose_(1),
     periodNbOfIterations_(input.outputPeriodNbOfIterations()),
     profilePeriodNbOfIterations_(input.outputProfilePeriodNbOfIterations()),
-    timeStep_(0),
+    timeStep_(input.timeStep()),
     dimension_(input.dimension()),
     nbOfParticles_(input.nbOfParticles()),
     nbOfIterations_(input.nbOfIterations()),
-    decorrelationNbOfIterations_(0),
+    decorrelationNbOfIterations_(input.decorrelationNbOfIterations()),
     nbOfAutocoPts_(input.nbOfAutocoPts()),
     doFinalFlow_(input.doFinalFlow()),
-    doFinalVelocity_(input.doFinalVelocity())
+    doFinalVelocity_(input.doFinalVelocity()),
+    kinTempProfile_(decorrelationNbOfIterations(), decorrelationTime(), nbOfAutocoPts(), nbOfParticles_),
+    potTempTopProfile_(decorrelationNbOfIterations(), decorrelationTime(), nbOfAutocoPts(), nbOfParticles_),
+    potTempBotProfile_(decorrelationNbOfIterations(), decorrelationTime(), nbOfAutocoPts(), nbOfParticles_),
+    bendistProfile_(decorrelationNbOfIterations(), decorrelationTime(), nbOfAutocoPts(), nbOfParticles_),
+    flowProfile_(decorrelationNbOfIterations(), decorrelationTime(), nbOfAutocoPts(), nbOfParticles_),
+    energyMidFlow_(0),
+    energySumFlow_(0)
   {
     std::cout << "Output written in " << input.outputFolderName() << std::endl;
 		std::cout << "Final output written in " << input.simuTypeName() << std::endl;
     assert(outParticles_.is_open());
-    assert(outReplica_.is_open());
     
     outObservables_ << "# time kineticEnergy potentialEnergy energy temperature" << endl;
     outParticles_ << "# time index position momentum kineticEnergy potentialEnergy energy force" << endl;
-    outReplica_ << "# time dt externalForce position momentum <responseForces> <responseForces2>" << endl;
+    //outReplica_ << "# time dt externalForce position momentum <responseForces> <responseForces2>" << endl;
     outVelocities_ << "# time i=0 i=N/4 i=N/2 i=3N/4 i=N-1" << endl;
     outVelocitiesCV_ << "# time b <b> <b2> D <D> >D2> observable <observable> >observable2> LPhi <LPhi> <LPhi2>" << endl;
     outForcesCV_ << "# time b <b> <b2> D <D> >D2> observable <observable> >observable2> LPhi <LPhi> <LPhi2>" << endl;
@@ -62,42 +67,26 @@ namespace simol{
 		std::ofstream outInput(input.outputFolderName()+"inputFile.txt");
 		std::ifstream inInput(input.inputPath());
 		outInput << input.inputFlux().rdbuf();
-	}
-  
-  void Output::reset(Input const& input, Potential* potential, Galerkin* galerkin, size_t iOfReplica)
-  {
-		cout << "nbOfParticles : " << nbOfParticles_ << endl;
-    timeStep_ = input.timeStep(iOfReplica);
-		nbOfIterations_ = input.nbOfIterations(iOfReplica);
-    assert(input.outputPeriodTime(iOfReplica) == 0 || input.outputPeriodTime(iOfReplica) >= timeStep());
-    decorrelationNbOfIterations_ = input.decorrelationNbOfIterations(iOfReplica);
+    
+    cout << "nbOfParticles : " << nbOfParticles_ << endl;
+    assert(input.outputPeriodTime() == 0 || input.outputPeriodTime() >= timeStep());
+    decorrelationNbOfIterations_ = input.decorrelationNbOfIterations();
     cout << "decorrelationNbOfIterations : " << decorrelationNbOfIterations_ << endl;
-    verbose_ = (periodNbOfIterations() > 0);
-    velocityCV_ = createControlVariate(input, potential, galerkin, iOfReplica);
-    forceCV_ = createControlVariate(input, potential, galerkin, iOfReplica);
-    lengthCV_ = createControlVariate(input, potential, galerkin, iOfReplica);
-    midFlowCV_ = createControlVariate(input, potential, galerkin, iOfReplica);
-		sumFlowCV_ = createControlVariate(input, potential, galerkin, iOfReplica);
+    
 
-		cout << "Initializing the profiles : arrays " << decorrelationNbOfIterations() << " X " << nbOfParticles_ << endl;
-		kinTempProfile_ = AutocorrelationStats<double>(decorrelationNbOfIterations(), decorrelationTime(), nbOfAutocoPts(), nbOfParticles_);
-		potTempTopProfile_ = AutocorrelationStats<double>(decorrelationNbOfIterations(), decorrelationTime(), nbOfAutocoPts(), nbOfParticles_);
-		potTempBotProfile_ = AutocorrelationStats<double>(decorrelationNbOfIterations(), decorrelationTime(), nbOfAutocoPts(), nbOfParticles_);
-		bendistProfile_ = AutocorrelationStats<double>(decorrelationNbOfIterations(), decorrelationTime(), nbOfAutocoPts(), nbOfParticles_);
-  	flowProfile_ = AutocorrelationStats<double>(decorrelationNbOfIterations(), decorrelationTime(), nbOfAutocoPts(), nbOfParticles_);
-		energyMidFlow() = 0;
-		energySumFlow() = 0;
-		
-		/*ofstream outMap(input.outputFolderName()+"map.txt");
-		
-		midFlowCV_->displayMap(outMap);
-		
-		ofstream outGradQMap(input.outputFolderName()+"gradQMap.txt");
-		midFlowCV_->displayGradQMap(outGradQMap);
-		
-		ofstream outGradPMap(input.outputFolderName()+"gradPMap.txt");
-		midFlowCV_->displayGradPMap(outGradPMap);*/
+
+    cout << "Initializing the profiles : arrays " << decorrelationNbOfIterations() << " X " << nbOfParticles_ << endl;
+    
 	}
+	
+	void Output::setControlVariates(Input& input, Potential& potential, Galerkin* galerkin)
+  {
+    velocityCV_ = createControlVariate(input, potential, galerkin);
+    forceCV_ = createControlVariate(input, potential, galerkin);
+    lengthCV_ = createControlVariate(input, potential, galerkin);
+    midFlowCV_ = createControlVariate(input, potential, galerkin);
+    sumFlowCV_ = createControlVariate(input, potential, galerkin);
+  }
     
   int& Output::verbose()
   {
@@ -207,29 +196,29 @@ namespace simol{
     return decorrelationNbOfIterations();
   }
   
-  ControlVariate* Output::velocityCV()
+  ControlVariate& Output::velocityCV()
   {
-    return velocityCV_;
+    return *velocityCV_;
   }
   
-  ControlVariate* Output::forceCV()
+  ControlVariate& Output::forceCV()
   {
-    return forceCV_;
+    return *forceCV_;
   }
   
-  ControlVariate* Output::lengthCV()
+  ControlVariate& Output::lengthCV()
   {
-    return lengthCV_;
+    return *lengthCV_;
   }
   
-  ControlVariate* Output::midFlowCV()
+  ControlVariate& Output::midFlowCV()
   {
-    return midFlowCV_;
+    return *midFlowCV_;
   }
   
-  ControlVariate* Output::sumFlowCV()
+  ControlVariate& Output::sumFlowCV()
   {
-    return sumFlowCV_;
+    return *sumFlowCV_;
   }
   
   
@@ -331,10 +320,10 @@ namespace simol{
 		}
   }
   
-  void Output::displayGeneratorOnBasis(ofstream& out, vector<Particle> const& configuration, ControlVariate* controlVariate, double time)
+  void Output::displayGeneratorOnBasis(ofstream& out, vector<Particle> const& configuration, ControlVariate& controlVariate, double time)
 	{
 		//out << time << " " << configuration[0].position(0) << " " << configuration[0].momentum(0) << " " << controlVariate->lastGeneratorOnBasis()(0) << endl;
-		out << time << " " << modulo(configuration[0].position(0), -M_PI, M_PI) << " " << configuration[0].momentum(0) << " " << controlVariate->lastGeneratorOnBasis()(0) << " " << controlVariate->basisFunction(configuration) << endl;
+		out << time << " " << modulo(configuration[0].position(0), -M_PI, M_PI) << " " << configuration[0].momentum(0) << " " << controlVariate.lastGeneratorOnBasis()(0) << " " << controlVariate.basisFunction(configuration) << endl;
 		
 	}
   
@@ -356,25 +345,8 @@ namespace simol{
   
   
   void Output::finalDisplay(vector<Particle> const& configuration, Vector<double> const& externalForce)
-  {
-    cout<< "replica : " << finalTime()
-				<< " " << timeStep()
-				<< " " << externalForce(0)
-				<< " " << configuration[0].position() 
-				<< " " << configuration[0].momentum() 
-				<< " " << forceCV_->meanObservable()
-				<< " " << forceCV_->stdDeviationObservable()
-				//<< " " << forceCV_->meanBetterObservable()
-				//<< " " << forceCV_->stdDeviationBetterObservable()
-				<< " " << midFlowCV_->meanObservable()
-				<< " " << midFlowCV_->stdDeviationObservable()
-				<< " " << sumFlowCV_->meanObservable()
-				<< " " << sumFlowCV_->stdDeviationObservable()
-				<< std::endl;
-		
-    assert(outReplica_.is_open());
-    
-    outReplica_ << finalTime()
+  {    
+    /*outReplica_ << finalTime()
 								<< " " << timeStep()
 								<< " " << externalForce(0)   
 								<< " " << configuration[0].position() 
@@ -387,22 +359,8 @@ namespace simol{
 								<< " " << midFlowCV_->stdDeviationObservable()
 								<< " " << sumFlowCV_->meanObservable()
 								<< " " << sumFlowCV_->stdDeviationObservable()
-								<< std::endl;
-		
-		/*for (size_t iOfParticle = 0; iOfParticle < nbOfParticles_; iOfParticle++)
-			outProfile_ << iOfParticle << " " 
-									<< kinTempProfile_.mean(iOfParticle) << " "
-									<< kinTempProfile_.standardDeviation(iOfParticle) / sqrt(finalTime()) << " "
-									<< potTempTopProfile_.mean(iOfParticle) << " "
-									<< potTempBotProfile_.mean(iOfParticle) << " "
-									<< bendingProfile_.mean(iOfParticle) << " "
-									<< bendingProfile_.standardDeviation(iOfParticle) / sqrt(finalTime()) << " "
-									<< flowProfile_.mean(iOfParticle) << " "
-									<< flowProfile_.standardDeviation(iOfParticle) / sqrt(finalTime())
-									<< endl;*/
+								<< std::endl;*/
 									
-		//outProfile_.close();
-		//ofstream outFinalProfile_.open(outputFolderName_ + "/finalProfile.txt");
 		writeProfile(outFinalProfile_, nbOfIterations());
 									
     midFlowCV_->postTreat(outMidFlowPT_, timeStep());
@@ -411,6 +369,19 @@ namespace simol{
   
   void Output::displayFinalFlow(double temperature, double delta_temperature, double tau, double xi)
 	{
+    cout << "outFinalFlow_ : " <<  std::left << setw(10) << finalTime()
+      << " " << setw(5) << timeStep()
+      << " " << setw(6) << nbOfParticles()
+      << " " << setw(4) << temperature
+      << " " << setw(4) << delta_temperature
+      << " " << setw(4) << tau
+      << " " << setw(6) << xi
+      << " " << setw(12) << midFlowCV_->meanObservable()
+      << " " << setw(12) << midFlowCV_->stdDeviationObservable()
+      << " " << setw(12) << sumFlowCV_->meanObservable()
+      << " " << setw(12) << sumFlowCV_->stdDeviationObservable()
+      << std::endl;
+      
 		//cout << "displayFinalFlow(double temperature, double delta_temperature, double tau)";
 		if (doFinalFlow_)
 		{

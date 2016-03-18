@@ -311,7 +311,7 @@ namespace simol
 		trigToExpTens_(sizeOfBasis_, sizeOfBasis_),
 		expToTrigTens_(sizeOfBasis_, sizeOfBasis_),
 		potential_(createPotential(input)),
-		basis_(input, potential_)
+		basis_(input, *potential_)
 	{		
 		assert(nbOfFourier_ % 2 == 1);
 		cout << endl << "Number of modes : " << nbOfFourier_ << " x " << nbOfHermite_ << endl;

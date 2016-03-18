@@ -2,7 +2,7 @@
 #include <cstdlib>
 #include <iostream>
 
-#include "multiSystem.hpp"
+#include "simulation.hpp"
 #include "particleSystem.hpp"
 #include "dynamics.hpp"
 #include "Vector.hpp"
@@ -44,8 +44,9 @@ int main(int argc, char* argv[])
   if (input.isGalerkin())
     throw std::invalid_argument("The input must correspond to a MD simulation !");
 	
-	simol::MultiSystem replica(input);
-	replica.launch(input);
+	simol::Simulation simu(input);
+  //output.reset(input, &system->potential(), dynamics_->galerkin());
+	simu.launch();
 
   displayTime(clock() - totalTime);
 

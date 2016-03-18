@@ -11,6 +11,7 @@
 #include <iostream>
 #include <fstream>
 #include "tools.hpp"
+#include "core/random/RNG.hpp"
 
 namespace simol{
 
@@ -21,6 +22,7 @@ namespace simol{
     double positionMin_, positionMax_;
 		ifstream inputSettings_;
 		vector<Vector<double>> initialPositions_, initialMomenta_;
+    std::shared_ptr<RNG> rng_;
   public:
     Input(CommandLine cmd);
 		const string& inputPath() const;
@@ -29,21 +31,18 @@ namespace simol{
 		string simuTypeName() const;
 		string parametersName() const;
     string outputFolderName() const;
+    const std::shared_ptr<RNG> rng() const;
+    std::shared_ptr<RNG> rng();
 
 		// Geometry
     int dimension() const;
     double length() const;
 
     // Mesh/Time
-    double timeStepMin() const;
-    double timeStepMax() const;
-    double timeStep(size_t indexOfReplica=0) const;
-		size_t nbOfIterations(size_t indexOfReplica=0) const;
-		size_t nbOfThermalIterations(size_t indexOfReplica=0) const;
-		size_t nbOfBurningIterations(size_t indexOfReplica=0) const;
-
-		// Mesh/Replica
-		size_t nbOfReplicas() const;
+    double timeStep() const;
+		size_t nbOfIterations() const;
+		size_t nbOfThermalIterations() const;
+		size_t nbOfBurningIterations() const;
 
 		// Physics/System
 		string systemName() const;
@@ -68,15 +67,13 @@ namespace simol{
 		// Physics/Model
     string dynamicsName() const;
     double gamma() const;
-    double temperature(size_t indexOfReplica=0) const;
-    double temperatureLeft(size_t indexOfReplica=0) const;
-    double temperatureRight(size_t indexOfReplica=0) const;
-    double beta(size_t indexOfReplica=0) const;
-    double betaLeft(size_t indexOfReplica=0) const;
-    double betaRight(size_t indexOfReplica=0) const;
-    double externalForceMin() const;
-    double externalForceMax() const;
-    double externalForce(size_t indexOfReplica=0) const;
+    double temperature() const;
+    double temperatureLeft() const;
+    double temperatureRight() const;
+    double beta() const;
+    double betaLeft() const;
+    double betaRight() const;
+    double externalForce() const;
     double tauBending() const;
 		double xi() const;
 		int seed() const;
@@ -85,12 +82,12 @@ namespace simol{
 
 
 		// Output
-    size_t decorrelationNbOfIterations(size_t indexOfReplica=0) const;
-    double decorrelationTime(size_t indexOfReplica=0) const;
-		size_t outputPeriodNbOfIterations(size_t indexOfReplica=0) const;
-    double outputPeriodTime(size_t indexOfReplica=0) const;
-		size_t outputProfilePeriodNbOfIterations(size_t indexOfReplica=0) const;
-    double outputProfilePeriodTime(size_t indexOfReplica=0) const;
+    size_t decorrelationNbOfIterations() const;
+    double decorrelationTime() const;
+		size_t outputPeriodNbOfIterations() const;
+    double outputPeriodTime() const;
+		size_t outputProfilePeriodNbOfIterations() const;
+    double outputProfilePeriodTime() const;
 		int nbOfAutocoPts() const;
 		bool doFinalFlow() const;
 		bool doFinalVelocity() const;

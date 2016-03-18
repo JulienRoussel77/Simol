@@ -11,16 +11,16 @@ namespace simol
 {
   class Potential;
 
-  Potential* createPotential(Input const& input, int const& indexOfReplica=1);
+  Potential* createPotential(Input const& input);
 
   class Potential
   {
-	friend Potential* createPotential(Input const& input, int const& indexOfReplica);
+	friend Potential* createPotential(Input const& input);
 
 	public:
 		Potential();
 		virtual ~Potential(){};
-		Potential(Input const& input, int const& indexOfReplica=1);
+		Potential(Input const& input);
 		virtual double operator()(Vector<double> const & position) const;
 		virtual double operator()(double position) const;
 		double value(Vector<double> const& position) const;
@@ -32,13 +32,13 @@ namespace simol
 		virtual double laplacian(Vector<double> const & position) const;
 		virtual double laplacian(double position) const;
 		virtual double ratioToHarmonic() const {assert(false); return 0;};
-		virtual double drawLaw(double /*localBeta*/, RNG* /*rng*/){assert(false); return 0;};
+		virtual double drawLaw(double /*localBeta*/, std::shared_ptr<RNG> /*rng*/){assert(false); return 0;};
 
   };
 
   class Sinusoidal : public Potential{
     public:
-      Sinusoidal(Input const& input, int const& indexOfReplica=1);
+      Sinusoidal(Input const& input);
       double operator()(double position) const;
       Vector<double> derivative(double position) const;
       double laplacian(double position) const;
@@ -50,7 +50,7 @@ namespace simol
 
     class SumSinusoidal : public Potential{
     public:
-      SumSinusoidal(Input const& input, int const& indexOfReplica=1);
+      SumSinusoidal(Input const& input);
       double operator()(double position) const;
       Vector<double> derivative(double position) const;
       virtual double laplacian(double position) const;
@@ -63,7 +63,7 @@ namespace simol
 
   class FracSinusoidal : public Potential{
     public:
-      FracSinusoidal(Input const& input, int const& indexOfReplica=1);
+      FracSinusoidal(Input const& input);
       double operator()(double position) const;
       Vector<double> derivative(double position) const;
       virtual double laplacian(double position) const;
@@ -76,7 +76,7 @@ namespace simol
 
   class DoubleWell : public Potential{
     public:
-      DoubleWell(Input const& input, int const& indexOfReplica=1);
+      DoubleWell(Input const& input);
       double operator()(double position) const;
       Vector<double> derivative(double position) const;
 
@@ -87,7 +87,7 @@ namespace simol
 
     class HarmonicWell : public Potential{
     public:
-      HarmonicWell(Input const& input, int const& indexOfReplica=1);
+      HarmonicWell(Input const& input);
       double operator()(double position) const;
       Vector<double> derivative(double position) const;
 
@@ -100,22 +100,22 @@ namespace simol
 
   class Harmonic : public Potential{
     public:
-      Harmonic(Input const& input, int const& indexOfReplica=1);
+      Harmonic(Input const& input);
       double operator()(double position) const;
       Vector<double> derivative(double position) const;
 			double laplacian(double position) const;
-			double drawLaw(double localBeta, RNG* rng);
+			double drawLaw(double localBeta, std::shared_ptr<RNG> rng_);
     private:
       double stiffness_;
   };
 
   class Rotor : public Potential{
     public:
-      Rotor(Input const& input, int const& indexOfReplica=1);
+      Rotor(Input const& input);
       double operator()(double position) const;
       Vector<double> derivative(double position) const;
       double laplacian(double position) const;
-			double drawLaw(double localBeta, RNG* rng);
+			double drawLaw(double localBeta, std::shared_ptr<RNG> rng_);
     private:
       double stiffness_;
   };
@@ -123,19 +123,19 @@ namespace simol
 
     class Quadratic : public Potential{
     public:
-      Quadratic(Input const& input, int const& indexOfReplica=1);
+      Quadratic(Input const& input);
       double operator()(double position) const;
       Vector<double> derivative(double position) const;
 			double laplacian(double position) const;
 			virtual double ratioToHarmonic() const;
-			double drawLaw(double localBeta, RNG* rng);
+			double drawLaw(double localBeta, std::shared_ptr<RNG> rng_);
     private:
       double stiffness_, alpha_, beta_;
   };
 
 	class SpaceSinus : public Potential{
     public:
-      SpaceSinus(Input const& input, int const& indexOfReplica=1);
+      SpaceSinus(Input const& input);
       double operator()(Vector<double> const& position) const;
       Vector<double> derivative(Vector<double> const& position) const;
       double laplacian(Vector<double> const& position) const;

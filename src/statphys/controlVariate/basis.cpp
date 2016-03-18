@@ -152,15 +152,15 @@ namespace simol
 			return - sqrt(2.) * pow(iOfFreq, 2) * cos(iOfFreq * variable);
 	}
 	
-	ExpFourierBasis::ExpFourierBasis(const size_t nbOfElts0, double beta0, Potential* potential0):
+	ExpFourierBasis::ExpFourierBasis(const size_t nbOfElts0, double beta0, Potential& potential0):
 		Basis(nbOfElts0),
 		beta_(beta0),
-		potential_(potential0),
+		potential_(&potential0),
 		nbOfIntegrationNodes_(10000),
 		qRepartitionFct_(0),
 		expFourierCoeffs_(2 * nbOfElts0)
 	{
-		//cout << "ExpFourierBasis(const size_t nbOfElts0, double beta0, Potential* potential0)" << endl;
+		//cout << "ExpFourierBasis(const size_t nbOfElts0, double beta0, Potential& potential0)" << endl;
 		assert(nbOfElts0 % 2 == 1);
 				
 	//We compute the real Fourier coefficients of the function C^-1 exp(-\beta V(q)/2)
@@ -472,7 +472,7 @@ namespace simol
 		bases_[1] = new HermiteBasis(input.nbOfHermite(), input.beta());
 	}
 	
-	ExpFourierHermiteBasis::ExpFourierHermiteBasis(Input const& input, Potential* potential):
+	ExpFourierHermiteBasis::ExpFourierHermiteBasis(Input const& input, Potential& potential):
 		QPBasis()
 	{
 		//cout << "ExpFourierHermiteBasis(Input const& input)" << endl;

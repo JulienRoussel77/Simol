@@ -13,34 +13,51 @@ namespace simol
 {
   class ParticleSystem;
   
-  ParticleSystem* createSystem(Input  const& input, int const& iOfReplica=0);
+  ParticleSystem* createSystem(Input  const& input);
 
   class ParticleSystem
   {
-    friend ParticleSystem* createSystem(Input  const& input, int const& iOfReplica);
+    friend ParticleSystem* createSystem(Input  const& input);
     public:
-      ParticleSystem(Input const& input, int const& /*iOfReplica=0*/);
-      virtual ~ParticleSystem(){};
-      Particle & getParticle(size_t index);
+      ParticleSystem(Input const& input);
+      virtual ~ParticleSystem();
+      const Particle& getParticle(size_t index) const;
+      Particle& getParticle(size_t index);
 			const size_t& dimension() const;
+      const std::vector<Particle> & configuration() const; 
       std::vector<Particle> & configuration();       
       size_t nbOfParticles() const;
-			virtual void initializeSystem(Dynamics* /*model*/){};
-      void launch(Dynamics* model, Output& output);
-			virtual void thermalize(Dynamics * /*model*/) {assert(false);};
-      virtual void simulate(Dynamics* model);
-      virtual void computeAllForces(Dynamics const* model) = 0;
+      Potential& potential();
+      double potential(Vector<double> const& position) const;
+      double potential(const double& position) const;
+      Vector<double> force(Vector<double> const& position) const;
+      double laplacian(Vector<double> const& position) const;
+      const std::shared_ptr<RNG> rng() const;
+      std::shared_ptr<RNG> rng();
+      
+      virtual Vector<double> drawMomentum(double localBeta, double mass);
+      virtual double drawPotLaw(double localBeta);
+      virtual double computeMeanPotLaw(double betaLocal) const;
+      
+      void launch(Dynamics& model, Output& output);
+			virtual void thermalize(Dynamics& /*model*/) {assert(false);};
+      virtual void computeAllForces(Dynamics const& model){};
+      void computeForce(Particle& particle) const;
+      void interaction(Particle& particle1, Particle& particle2) const;
+      void triInteraction(Particle& particle1, Particle& particle2, Particle& particle3) const;
 			virtual double boundaryPotEnergy() const;
-      virtual void computeOutput(Output& output, Dynamics const* model, size_t iOfIteration);
-			virtual void computeProfile(Output& /*output*/, Dynamics const* /*model*/, size_t /*iOfIteration*/){};
+      
+			virtual void computeProfile(Output& /*output*/, Dynamics const& /*model*/, size_t /*iOfIteration*/)const{};
       void writeOutput(Output& output, size_t iOfIteration = 0);
-      virtual void computeFinalOutput(Output& output, Dynamics const* model);
-      virtual void writeFinalOutput(Output& output, Dynamics const* model);
+      virtual void computeFinalOutput(Output& output, Dynamics const& model);
+      virtual void writeFinalOutput(Output& output, Dynamics const& model);
 			
     protected:
       size_t dimension_;
       std::vector<Particle> configuration_;
 			string settingsPath_;
+      std::shared_ptr<RNG> rng_;
+      Potential* potential_;
   };
 
   // redémarrage : nombres aleatoires, juste pannes, tous les N pas de temps
@@ -49,41 +66,37 @@ namespace simol
   class Isolated : public ParticleSystem
   {
   public:
-    Isolated(Input const& input, int const& iOfReplica=0);
-    void computeAllForces(Dynamics const* model);
-		void writeFinalOutput(Output& output, Dynamics const* model);
+    Isolated(Input const& input);
+    void computeAllForces(Dynamics const& model);
+		void writeFinalOutput(Output& output, Dynamics const& model);
   };
 	
 	class Fluid : public ParticleSystem
   {
   public:
-    Fluid(Input const& input, int const& iOfReplica=0);
-		virtual void simulate(Dynamics * model);
-		void computeAllForces(Dynamics const* model);
-		void writeFinalOutput(Output& output, Dynamics const* model);
+    Fluid(Input const& input);
+		void computeAllForces(Dynamics const& model);
+		void writeFinalOutput(Output& output, Dynamics const& model);
   };
 	
 	class Chain : public ParticleSystem
 	{
 	public:
-		Chain(Input const& input, int const& iOfReplica=0);
-		virtual void initializeSystem(Dynamics* model) = 0;
-		virtual void computeAllForces(Dynamics const* model) = 0;
-		virtual void thermalize(Dynamics * model);
-    virtual void simulate(Dynamics * model);
-		virtual void computeProfile(Output& output, Dynamics const* model, size_t iOfIteration) = 0;
-		virtual void writeFinalOutput(Output& output, Dynamics const* model) = 0;
+		Chain(Input const& input);
+		virtual void computeAllForces(Dynamics const& model);
+		virtual void thermalize(Dynamics& model);
+		virtual void computeProfile(Output& output, Dynamics const& model, size_t iOfIteration) const;
+		virtual void writeFinalOutput(Output& output, Dynamics const& model);
 	};
   
   class BiChain : public Chain
   {
     Particle ancorParticle_;
   public:
-    BiChain(Input const& input, int const& iOfReplica=0);
-		virtual void initializeSystem(Dynamics* model);
-    void computeAllForces(Dynamics const* model);
-		virtual void computeProfile(Output& output, Dynamics const* model, size_t iOfIteration);
-		virtual void writeFinalOutput(Output& output, Dynamics const* model);
+    BiChain(Input const& input);
+    void computeAllForces(Dynamics const& model);
+		virtual void computeProfile(Output& output, Dynamics const& model, size_t iOfIteration) const;
+		virtual void writeFinalOutput(Output& output, Dynamics const& model);
   };
   
   class TriChain : public Chain
@@ -91,12 +104,11 @@ namespace simol
     Particle ancorParticle1_;
     Particle ancorParticle2_;
   public:
-    TriChain(Input const& input, int const& iOfReplica=0);
-    virtual void initializeSystem(Dynamics* model);
-    void computeAllForces(Dynamics const* model);		  
+    TriChain(Input const& input);
+    void computeAllForces(Dynamics const& model);		  
 		virtual double boundaryPotEnergy() const;
-		virtual void computeProfile(Output& output, Dynamics const* model, size_t iOfIteration);
-		virtual void writeFinalOutput(Output& output, Dynamics const* model);
+		virtual void computeProfile(Output& output, Dynamics const& model, size_t iOfIteration) const;
+		virtual void writeFinalOutput(Output& output, Dynamics const& model);
 	};
 
 }

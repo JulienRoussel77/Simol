@@ -6,6 +6,20 @@ using std::string;
 using std::max;
 using std::min;
 
+const double defaultMass = 1;
+const double defaultLength = 2 * M_PI;
+const int defaultNbOfParticles = 1;
+const double defaultTauBending = 0;
+const double defaultXi = 0;
+const double defaultExternalForce = 0;
+const int maxNbOfAutocoPts = 1000;
+const double defaultPotentialCoeff = 1;
+const double defaultSeed = 0;
+const int defaultOutputFrequency = 1000;
+const int defaultOutputProfileFrequency = 100;
+
+
+
 namespace simol {
 
   ///Transforms a double to a nice string
@@ -114,6 +128,16 @@ namespace simol {
 
     return name;
   }
+  
+  const std::shared_ptr<RNG> Input::rng() const
+  {
+    return rng_;
+  }
+  
+  std::shared_ptr<RNG> Input::rng()
+  {
+    return rng_;
+  }
 
 	//### Geometry ###
 
@@ -124,74 +148,52 @@ namespace simol {
 		if (data["Geometry"]["Length"])
 			return data["Geometry"]["Length"].as<double>();
 		else
-			return 2 * M_PI;
+			return defaultLength;
 	}
 
 	// ### Mesh/Time ###
 
-  double Input::timeStepMin() const
+  double Input::timeStep() const
   {
-    if (data["Mesh"]["Time"]["Step"].size() == 2)
-      return data["Mesh"]["Time"]["Step"][0].as<double>();
-    else
+    if (data["Mesh"]["Time"]["Step"])
       return data["Mesh"]["Time"]["Step"].as<double>();
-  }
-
-    double Input::timeStepMax() const
-  {
-    if (data["Mesh"]["Time"]["Step"].size() == 2)
-      return data["Mesh"]["Time"]["Step"][1].as<double>();
-    else
-      return data["Mesh"]["Time"]["Step"].as<double>();
-  }
-
-  double Input::timeStep(size_t iOfReplica) const
-  {
-    return timeStepMin() * pow(timeStepMax() / timeStepMin(), iOfReplica / max(1., nbOfReplicas()-1.));
+    throw std::invalid_argument("Timestep missing");
   }
 
   ///
 	///Number of iterations in the "output" part of the simulation
-  size_t Input::nbOfIterations(size_t iOfReplica) const
+  size_t Input::nbOfIterations() const
   {
     if (data["Mesh"]["Time"]["Number"])
       return data["Mesh"]["Time"]["Number"].as<size_t>();
     else if (data["Mesh"]["Time"]["FinalTime"])
-      return data["Mesh"]["Time"]["FinalTime"].as<double>() / timeStep(iOfReplica);
+      return data["Mesh"]["Time"]["FinalTime"].as<double>() / timeStep();
     else
 			{cout << "Nb of Iterations not specified !" << endl;exit(1);}
   }
 
   ///
   ///Number of iterations in the thermalization part (temperatures imposed everywhere)
-  size_t Input::nbOfThermalIterations(size_t iOfReplica) const
+  size_t Input::nbOfThermalIterations() const
   {
     if (data["Mesh"]["Time"]["ThermalNumber"])
       return data["Mesh"]["Time"]["ThermalNumber"].as<size_t>();
     else if (data["Mesh"]["Time"]["ThermalTime"])
-      return data["Mesh"]["Time"]["ThermalTime"].as<double>() / timeStep(iOfReplica);
+      return data["Mesh"]["Time"]["ThermalTime"].as<double>() / timeStep();
     else
 			return 0;
   }
 
   ///
   ///Number of iterations in the burning part (no output)
-  size_t Input::nbOfBurningIterations(size_t iOfReplica) const
+  size_t Input::nbOfBurningIterations() const
   {
     if (data["Mesh"]["Time"]["BurningNumber"])
       return data["Mesh"]["Time"]["BurningNumber"].as<size_t>();
     else if (data["Mesh"]["Time"]["BurningTime"])
-      return data["Mesh"]["Time"]["BurningTime"].as<double>() / timeStep(iOfReplica);
+      return data["Mesh"]["Time"]["BurningTime"].as<double>() / timeStep();
     else
 			return 0;
-  }
-
-  // ### Mesh/Replica ###
-
-  size_t Input::nbOfReplicas() const {
-    if (data["Mesh"]["Replicas"]["Number"])
-      return data["Mesh"]["Replicas"]["Number"].as<int>();
-    else return 1;
   }
 
   // ### Physics/System ###
@@ -201,13 +203,13 @@ namespace simol {
   size_t Input::nbOfParticles() const {
     if (data["Physics"]["System"]["Number"])
       return data["Physics"]["System"]["Number"].as<size_t>();
-    else return 1;
+    else return defaultNbOfParticles;
   }
 
   double Input::mass() const {
     if (data["Physics"]["System"]["Mass"])
       return data["Physics"]["System"]["Mass"].as<double>();
-    else return 1;
+    else return defaultMass;
   }
 
   ///
@@ -268,7 +270,7 @@ namespace simol {
     if (data["Physics"]["Potential"]["Amplitude"])
       return data["Physics"]["Potential"]["Amplitude"].as<double>();
     else
-      return 1;
+      return defaultPotentialCoeff;
   }
 
   //DoubleWell
@@ -280,7 +282,7 @@ namespace simol {
     if (data["Physics"]["Potential"]["Stiffness"])
       return data["Physics"]["Potential"]["Stiffness"].as<double>();
     else
-      return 1;
+      return defaultPotentialCoeff;
   }
 
   //Quadratic
@@ -288,14 +290,14 @@ namespace simol {
     if (data["Physics"]["Potential"]["Alpha"])
       return data["Physics"]["Potential"]["Alpha"].as<double>();
     else
-      return 1;
+      return defaultPotentialCoeff;
   }
 
   double Input::potentialBeta() const {
     if (data["Physics"]["Potential"]["Beta"])
       return data["Physics"]["Potential"]["Beta"].as<double>();
     else
-      return 1;
+      return defaultPotentialCoeff;
   }
 
 	// ### Physics/Model ###
@@ -304,7 +306,7 @@ namespace simol {
 
   double Input::gamma() const {return data["Physics"]["Model"]["Gamma"].as<double>();}
 
-  double Input::temperature(size_t /*iOfReplica*/) const
+  double Input::temperature() const
   {
     if (data["Physics"]["Model"]["Temperature"])
       return data["Physics"]["Model"]["Temperature"].as<double>();
@@ -318,17 +320,17 @@ namespace simol {
       {cout << "Temperature not precised !" << endl;exit(1);}
   }
 
-  double Input::temperatureLeft(size_t /*iOfReplica*/) const
+  double Input::temperatureLeft() const
   {
     return data["Physics"]["Model"]["TemperatureLeft"].as<double>();
   }
 
-    double Input::temperatureRight(size_t /*iOfReplica*/) const
+  double Input::temperatureRight() const
   {
     return data["Physics"]["Model"]["TemperatureRight"].as<double>();
   }
 
-  double Input::beta(size_t /*iOfReplica*/) const
+  double Input::beta() const
   {
     if (data["Physics"]["Model"]["Beta"])
       return data["Physics"]["Model"]["Beta"].as<double>();
@@ -339,10 +341,10 @@ namespace simol {
     else if (data["Physics"]["Model"]["TemperatureLeft"] && data["Physics"]["Model"]["TemperatureRight"])
       return 2/(temperatureLeft() + temperatureRight());
     else
-      {cout << "Beta not precised !" << endl;exit(1);}
+      throw std::invalid_argument("Beta not precised !");
   }
 
-  double Input::betaLeft(size_t /*iOfReplica*/) const
+  double Input::betaLeft() const
   {
     if (data["Physics"]["Model"]["BetaLeft"])
       return data["Physics"]["Model"]["BetaLeft"].as<double>();
@@ -351,7 +353,7 @@ namespace simol {
     else assert(false);
   }
 
-  double Input::betaRight(size_t /*iOfReplica*/) const
+  double Input::betaRight() const
   {
     if (data["Physics"]["Model"]["BetaRight"])
       return data["Physics"]["Model"]["BetaRight"].as<double>();
@@ -360,16 +362,10 @@ namespace simol {
     else assert(false);
   }
 
-  double Input::externalForceMin() const {return data["Physics"]["Model"]["Force"][0].as<double>();}
-  double Input::externalForceMax() const {return data["Physics"]["Model"]["Force"][1].as<double>();}
-
-  double Input::externalForce(size_t iOfReplica) const {
+  double Input::externalForce() const {
     if (data["Physics"]["Model"]["Force"])
-      if (data["Physics"]["Model"]["Force"].size() == 2)
-	return externalForceMin() + iOfReplica * (externalForceMax() - externalForceMin()) / max(1., nbOfReplicas()-1.);
-      else
-	return data["Physics"]["Model"]["Force"].as<double>();
-    else return 0;
+      return data["Physics"]["Model"]["Force"].as<double>();
+    else return defaultExternalForce;
   }
 
   double Input::tauBending() const
@@ -377,7 +373,7 @@ namespace simol {
     if (data["Physics"]["Model"]["Tau"])
       return data["Physics"]["Model"]["Tau"].as<double>();
     else
-      return 0;
+      return defaultTauBending;
   }
 
 
@@ -386,7 +382,7 @@ namespace simol {
     if (data["Physics"]["Model"]["Xi"])
       return data["Physics"]["Model"]["Xi"].as<double>();
     else
-      return 0;
+      return defaultXi;
   }
 
   int Input::seed() const
@@ -394,7 +390,7 @@ namespace simol {
 		if (data["Physics"]["Model"]["Seed"])
 			return data["Physics"]["Model"]["Seed"].as<int>();
 		else
-			return 0;
+			return defaultSeed;
 	}
 
 	double Input::eta() const
@@ -409,54 +405,54 @@ namespace simol {
 
 	//### Output ###
 
-  size_t Input::decorrelationNbOfIterations(size_t iOfReplica) const
+  size_t Input::decorrelationNbOfIterations() const
   {
     if (data["Output"]["DecorrelationTime"])
-      return data["Output"]["DecorrelationTime"].as<double>() / timeStep(iOfReplica);
+      return data["Output"]["DecorrelationTime"].as<double>() / timeStep();
     else
-			return decorrelationTime(iOfReplica) / timeStep(iOfReplica);
+			return decorrelationTime() / timeStep();
   }
 
-  double Input::decorrelationTime(size_t /*iOfReplica*/) const
+  double Input::decorrelationTime() const
   {
     if (data["Output"]["DecorrelationTime"])
       return data["Output"]["DecorrelationTime"].as<double>();
     else return 3*nbOfParticles();
   }
 
-  size_t Input::outputPeriodNbOfIterations(size_t iOfReplica) const {
+  size_t Input::outputPeriodNbOfIterations() const {
     if (data["Output"]["Period"])
-      return data["Output"]["Period"].as<double>() / timeStep(iOfReplica);
+      return data["Output"]["Period"].as<double>() / timeStep();
     else
-      return nbOfIterations() / 1000;
+      return nbOfIterations() / defaultOutputFrequency;
   }
 
-  double Input::outputPeriodTime(size_t iOfReplica) const {
+  double Input::outputPeriodTime() const {
     if (data["Output"]["Period"])
       return data["Output"]["Period"].as<double>();
     else
-      return outputPeriodNbOfIterations(iOfReplica) * timeStep(iOfReplica);
+      return outputPeriodNbOfIterations() * timeStep();
   }
 
-  size_t Input::outputProfilePeriodNbOfIterations(size_t iOfReplica) const {
+  size_t Input::outputProfilePeriodNbOfIterations() const {
     if (data["Output"]["ProfilePeriod"])
-      return data["Output"]["ProfilePeriod"].as<double>() / timeStep(iOfReplica);
+      return data["Output"]["ProfilePeriod"].as<double>() / timeStep();
     else
-      return nbOfIterations() / 100;
+      return nbOfIterations() / defaultOutputProfileFrequency;
   }
 
-  double Input::outputProfilePeriodTime(size_t iOfReplica) const {
+  double Input::outputProfilePeriodTime() const {
     if (data["Output"]["ProfilePeriod"])
       return data["Output"]["ProfilePeriod"].as<double>();
     else
-      return outputProfilePeriodNbOfIterations(iOfReplica) * timeStep(iOfReplica);
+      return outputProfilePeriodNbOfIterations() * timeStep();
   }
 
   /// Contains the number of values in an autocorrelation ProfilePeriod
   /// /!\ Causes a memory crash for the larger chains if too big
   int Input::nbOfAutocoPts() const
   {
-		return min(1000, (int)decorrelationNbOfIterations());
+		return min(maxNbOfAutocoPts, (int)decorrelationNbOfIterations());
 	}
 
 	bool Input::doFinalFlow() const
@@ -531,7 +527,7 @@ namespace simol {
 				if (data["Galerkin"]["Basis"]["Fourier"])
 					return data["Galerkin"]["Basis"]["Fourier"].as<size_t>();
 
-		return 0;
+		throw std::invalid_argument("Number of Fourier modes missing");
 	}
 
 	size_t Input::nbOfHermite() const
@@ -541,7 +537,7 @@ namespace simol {
 				if(data["Galerkin"]["Basis"]["Hermite"])
 					return data["Galerkin"]["Basis"]["Hermite"].as<size_t>();
 
-		return 0;
+    throw std::invalid_argument("Number of Hermite modes missing");
 	}
 
 }

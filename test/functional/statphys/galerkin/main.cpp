@@ -2,7 +2,6 @@
 #include <cstdlib>
 #include <iostream>
 
-#include "multiSystem.hpp"
 #include "particleSystem.hpp"
 #include "dynamics.hpp"
 #include "Vector.hpp"

@@ -71,7 +71,7 @@ namespace simol
 		double qRepartitionFct_, basisCoefficient_;
 		vector<double> expFourierCoeffs_;
 	public:
-		ExpFourierBasis(const size_t nbOfElts, double beta0, Potential* potential);
+		ExpFourierBasis(const size_t nbOfElts, double beta0, Potential& potential);
 		virtual size_t nbOfFreq() const;
 		const double& expFourierCoeffs(int iOfElt) const;
 		virtual double potential(double variable) const;
@@ -150,7 +150,7 @@ namespace simol
 	class ExpFourierHermiteBasis : public QPBasis
 	{
 	public:
-		ExpFourierHermiteBasis(Input const& input, Potential* potential);
+		ExpFourierHermiteBasis(Input const& input, Potential& potential);
 		const double& expFourierCoeffs(int iOfElt) const;
 	};
 

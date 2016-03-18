@@ -11,7 +11,7 @@ namespace simol
 {
 
 	SMat kron(const SMat& A, const SMat& B);
-	DMat kron(const DMat& A, const DMat& B);
+	DenseMatrix<double> kron(const DenseMatrix<double>& A, const DenseMatrix<double>& B);
 
 	class Galerkin;
 
@@ -26,7 +26,7 @@ namespace simol
 		size_t nbOfFourier_, nbOfHermite_, maxOfFourier_;
 		size_t sizeOfBasis_;
 		SMat SIdQ_, SIdP_;
-		DMat DIdQ_, DIdP_;
+		DenseMatrix<double> DIdQ_, DIdP_;
 		SMat Q_, P_;
 		SMat tQ_, tP_;
 		SMat Lthm0_;
@@ -37,8 +37,8 @@ namespace simol
 		double amplitude_;
 		double externalForce_;
 		size_t nbOfIntegrationNodes_;
-		DMat trigToExpMat_, expToTrigMat_;
-		DMat trigToExpTens_, expToTrigTens_;
+		DenseMatrix<double> trigToExpMat_, expToTrigMat_;
+		DenseMatrix<double> trigToExpTens_, expToTrigTens_;
 		Potential* potential_;
 		ExpFourierHermiteBasis basis_;
 	public:
@@ -49,17 +49,17 @@ namespace simol
 
 		const double& expFourierCoeffs(int iOfElt) const;
 		size_t iTens(size_t iOfFourier2, size_t iOfHermite) const;
-		DMat shapeSaddle(const DMat& A) const;
-		DMat unshapeSaddle(const DMat& Asad) const;
+		DenseMatrix<double> shapeSaddle(const DenseMatrix<double>& A) const;
+		DenseMatrix<double> unshapeSaddle(const DenseMatrix<double>& Asad) const;
 		DVec shapeSaddle(const DVec& X) const;
 		DVec unshapeSaddle(const DVec& Xsad) const;
-		DVec solveWithSaddle(const DMat& A, const DVec& X) const;
+		DVec solveWithSaddle(const DenseMatrix<double>& A, const DVec& X) const;
 		DVec solveWithSaddle(const SMat& A, const DVec& X) const;
-		DMat invWithSaddle(const DMat& A) const;
+		DenseMatrix<double> invWithSaddle(const DenseMatrix<double>& A) const;
 
 		void computeExpToTrigMat();
 		virtual void computeExpToTrigTens() = 0;
-		DMat convertToTrigBasis(const DMat& X);
+		DenseMatrix<double> convertToTrigBasis(const DenseMatrix<double>& X);
 		void createQ();
 		void createP();
 		void createLthm0();

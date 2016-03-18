@@ -6,34 +6,50 @@
 namespace simol
 {
   
-  ParticleSystem* createSystem(Input  const& input, int const& iOfReplica)
+  ParticleSystem* createSystem(Input  const& input)
   {
-		cout << "createSystem(Input  const& input, int const& iOfReplica)" << endl;
+		cout << "createSystem(Input  const& input)" << endl;
     if (input.systemName() == "Isolated")
-      return new Isolated(input, iOfReplica);
+      return new Isolated(input);
     else if (input.systemName() == "BiChain")
-      return new BiChain(input, iOfReplica);
+      return new BiChain(input);
     else if (input.systemName() == "TriChain")
-      return new TriChain(input, iOfReplica);
+      return new TriChain(input);
     else
       std::cout << input.systemName() << " is not a valid system !" << std::endl;
     
     return 0;
   }
   
-  ParticleSystem::ParticleSystem(Input const& input, int const& /*iOfReplica*/):
+  ParticleSystem::ParticleSystem(Input const& input):
   dimension_(input.dimension()),
   configuration_(input.nbOfParticles()),
-  settingsPath_(input.settingsPath())
-  {}
+  settingsPath_(input.settingsPath()),
+  rng_(input.rng())
+  {
+    potential_ = createPotential(input);
+  }
   
-  Particle & ParticleSystem::getParticle(size_t index) 
+  ///
+  ///Destrucor
+  ParticleSystem::~ParticleSystem()
+  {
+    delete potential_;
+  }
+  
+  const Particle& ParticleSystem::getParticle(size_t index) const
+  { return configuration_[index]; }
+  
+  Particle& ParticleSystem::getParticle(size_t index) 
   { return configuration_[index]; }
   
   const size_t& ParticleSystem::dimension() const
   {
 		return dimension_;
 	}
+	
+	const std::vector< Particle > & ParticleSystem::configuration() const
+  { return configuration_; }
 
   std::vector< Particle > & ParticleSystem::configuration() 
   { return configuration_; }
@@ -43,65 +59,117 @@ namespace simol
     return configuration_.size();
   }
   
+  ///
+  ///Returns by value the potential of the dynamics
+  Potential& ParticleSystem::potential() {return *potential_;}
+  ///
+  ///Evaluate the potential for the vector "position"
+  double ParticleSystem::potential(Vector<double> const& position) const {return (*potential_)(position);}
+  ///
+  ///Evaluate the potential for the scalar "position"
+  double ParticleSystem::potential(const double& distance) const {return (*potential_)(distance);}
+  ///
+  ///Evaluate the force for the scalar "position" (potential and external terms)
+  Vector<double> ParticleSystem::force(Vector<double> const& position) const
+  {
+    return potential_->force(position); 
+  }
+  ///
+  ///Evaluate the laplacian of the potential for the vector "position"
+  double ParticleSystem::laplacian(Vector<double> const& position) const
+  {
+    return potential_->laplacian(position); 
+  }
+  
+    
+  const std::shared_ptr<RNG> ParticleSystem::rng() const {return rng_;}
+
+  std::shared_ptr<RNG> ParticleSystem::rng() {return rng_;}
+   
+  
   double ParticleSystem::boundaryPotEnergy() const
   {return 0;}
   
-  void ParticleSystem::launch(Dynamics* model, Output& output)  
+  ///
+  ///Draw a momentum under the invariant measure at inverse temperature "localBeta"
+  Vector<double> ParticleSystem::drawMomentum(double localBeta, double mass)
   {
-		cout << "Estimated time : " << 3.5 * nbOfParticles()/1024. * model->nbOfIterations() / 1e6 << " hours" << endl;
-		//if (settingsPath_ == "")
-		//	model->initializeMomenta(configuration_);
-		//else
-		//	model->startFrom(settingsPath_);
-		
-		initializeSystem(model);
-		
-    computeAllForces(model);
-    for (size_t iOfIteration  =0; iOfIteration < model->nbOfIterations(); ++iOfIteration)
+    return sqrt(1 / (localBeta * mass)) * rng_->gaussian();
+  }
+  ///
+  ///Draw a distance or a bending under the invariant measure at inverse temperature "localBeta"
+  double ParticleSystem::drawPotLaw(double localBeta)
+  {
+    return potential_->drawLaw(localBeta, rng_);
+  }
+  ///Compute the mean distance or bending under the invariant measure
+  ///Proceeds to a simple integral quadrature using rectangles
+  double ParticleSystem::computeMeanPotLaw(double localBeta) const
+  {
+    double repFunc = 0;
+    double qInteg = 0;
+    size_t nbIntegrationNodes = 1000;
+    double step = 8. / nbIntegrationNodes;
+    Vector<double> deltaQ(1);
+    for (size_t iOfNode = 0; iOfNode < nbIntegrationNodes; iOfNode++)
     {
-      if ((10*iOfIteration) % model->nbOfIterations() == 0)
-       cout << "---- Run " << (100 * iOfIteration) / model->nbOfIterations() << " % completed ----" << endl;
-     
-      
-      //double instant = iOfIteration * model->timeStep();
-      computeOutput(output, model, iOfIteration);
-      writeOutput(output, iOfIteration);
-      simulate(model);
+      deltaQ(0) = - 4 + iOfNode * step;
+      repFunc += exp(-localBeta * potential(deltaQ));
+      qInteg += deltaQ(0) * exp(-localBeta * potential(deltaQ));
     }
-    computeFinalOutput(output, model);
-    writeFinalOutput(output, model);
+    return qInteg / repFunc;
   }
   
-  void ParticleSystem::simulate(Dynamics * model)
-  {
-    for (auto&& particle : configuration_)
-      model->updateBefore(particle);
-    
-    computeAllForces(model);
-    
-    for (auto&& particle : configuration_)
-      model->updateAfter(particle);
+  
+  ///
+  ///Computes the force and the energy of "particle" when the potential depends only on the positions
+  void ParticleSystem::computeForce(Particle& particle) const
+  {    
+    particle.potentialEnergy() += potential(particle.position());
+    particle.force() += force(particle.position());
   }
   
-  void ParticleSystem::computeOutput(Output& output, Dynamics const* model, size_t iOfIteration)
+  ///Computes the force and the energy associated to this pair interaction, and updates these 2 fields
+  ///The first 2 derivates of the potential are stored in "particle2"
+  void ParticleSystem::interaction(Particle& particle1, Particle& particle2) const
   {
-    if (output.verbose() > 0)
-    {
-      output.kineticEnergy() = 0;
-      output.potentialEnergy() = 0;
-      //Calcul de la température et de l'énergie
-      for (size_t iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
-      {
-				Particle& particle = configuration_[iOfParticle];
-				output.kineticEnergy() += particle.kineticEnergy();
-				output.potentialEnergy() += particle.potentialEnergy();
-			}
-    }
-    // In the case of the trichain we add the potential of the wall interaction
-    output.potentialEnergy() += boundaryPotEnergy();
-    computeProfile(output, model, iOfIteration);
-    model->updateAllControlVariates(output, configuration_, iOfIteration);
+    Vector<double> r12 = particle2.position() - particle1.position();
+    double energy12 = potential(r12);
+    Vector<double> force12 = force(r12);    // = - v'(q_2 - q_1)
+    double lapla12 = laplacian(r12);  // v"(q_2 - q_1)
+    
+    particle2.potentialEnergy() = energy12;
+    particle1.force() -= force12;
+    particle2.force() += force12;
+    particle2.energyGrad() = -force12;    // v'(q_2 - q_1)
+    particle2.energyLapla() = lapla12;    // v"(q_2 - q_1)
   }
+  
+  ///Computes the force and the energy associated to this triplet interaction, and updates these 2 fields
+  ///The first 2 derivates of the potential are stored in "particle2"
+  void ParticleSystem::triInteraction(Particle& particle1, Particle& particle2, Particle& particle3) const
+  {
+    Vector<double> delta = particle3.position() - 2*particle2.position() + particle1.position();
+    //double d12 = r12.norm();
+    double energy123 = potential(delta);
+    Vector<double> force123 = force(delta);    // = - v'(r_2)
+    double lapla123 = laplacian(delta);
+    
+    particle2.potentialEnergy() = energy123;
+    particle1.force() += force123;
+    particle2.force() -= 2*force123;
+    particle3.force() += force123;
+    particle2.energyGrad() = -force123;    // - v'(r_2)
+    particle2.energyLapla() = lapla123;    // v''(r_2)
+  }
+  
+  
+  
+
+  
+
+  
+
   
   void ParticleSystem::writeOutput(Output& output, size_t iOfIteration)
   {
@@ -109,19 +177,19 @@ namespace simol
       output.display(configuration_, iOfIteration);
   }
   
-  void ParticleSystem::computeFinalOutput(Output& /*output*/, Dynamics const* /*model*/) {}
+  void ParticleSystem::computeFinalOutput(Output& /*output*/, Dynamics const& /*dyna*/) {}
   
-  void ParticleSystem::writeFinalOutput(Output& output, Dynamics const* model)
+  void ParticleSystem::writeFinalOutput(Output& output, Dynamics const& dyna)
   {    
-    output.finalDisplay(configuration_, model->externalForce());
+    output.finalDisplay(configuration_, dyna.externalForce());
     if (output.doComputeCorrelations() &&  output.verbose() > 0)
       output.finalDisplayAutocorrelations();
   }
   
   //### Isolated ###
   
-  Isolated::Isolated(Input const& input, int const& iOfReplica):
-  ParticleSystem(input, iOfReplica)
+  Isolated::Isolated(Input const& input):
+  ParticleSystem(input)
   {
     //for (size_t i = 0; i<input.nbOfParticles(); i++) 
     getParticle(0) = Particle(input.mass(), input.initialPosition(), input.initialMomentum());
@@ -130,26 +198,26 @@ namespace simol
 	}
       
   
-  void Isolated::computeAllForces(Dynamics const* model)
+  void Isolated::computeAllForces(Dynamics const& dyna)
   {
-    model->resetForce(getParticle(0));
-    model->computeForce(getParticle(0));
+    dyna.resetForce(getParticle(0));
+    computeForce(getParticle(0));
   }
   
-  void Isolated::writeFinalOutput(Output& output, Dynamics const* model)
+  void Isolated::writeFinalOutput(Output& output, Dynamics const& dyna)
   {
-    //double time = model->timeStep() * model->nbOfIterations();
+    //double time = dyna.timeStep() * dyna.nbOfIterations();
     
-    output.finalDisplay(configuration_, model->externalForce());
+    output.finalDisplay(configuration_, dyna.externalForce());
     if (output.doComputeCorrelations() &&  output.verbose() > 0)
       output.finalDisplayAutocorrelations();
-		output.displayFinalVelocity(model->temperature(), model->externalForce(0), output.velocityCV_->nbOfFourier(), output.velocityCV_->nbOfHermite());
+		output.displayFinalVelocity(dyna.temperature(), dyna.externalForce(0), output.velocityCV_->nbOfFourier(), output.velocityCV_->nbOfHermite());
   }
   
   //### Fluid ###
   
-  Fluid::Fluid(Input const& input, int const& iOfReplica):
-  ParticleSystem(input, iOfReplica)
+  Fluid::Fluid(Input const& input):
+  ParticleSystem(input)
   {
 		assert(configuration_.size() > 1);
 	  for (size_t i = 0; i<input.nbOfParticles(); i++) 
@@ -158,46 +226,33 @@ namespace simol
       //std::cout << configuration_[i].force() << std::endl;
     }
   }
-  
-  void Fluid::simulate(Dynamics * model)
-  {
-    //for (auto&& particle : configuration_)
-      //model->updateBefore(particle);
-    for (size_t iOfParticle=0; iOfParticle < nbOfParticles(); iOfParticle++)
-      model->updateBefore(getParticle(iOfParticle));
-    
-    computeAllForces(model);
-    
-    for (size_t iOfParticle=0; iOfParticle < nbOfParticles(); iOfParticle++)
-      model->updateAfter(getParticle(iOfParticle));
-	}
 	
-	  void Fluid::computeAllForces(Dynamics const* model)
+	  void Fluid::computeAllForces(Dynamics const& dyna)
   {
     //std::cout << "Fluid::computeAllForces" << std::endl;
     for (auto&& particle : configuration_)
-      model->resetForce(particle);
+      dyna.resetForce(particle);
     //for (auto&& particle : configuration_)
-    //  model->computeForce(particle);
+    //  dyna.computeForce(particle);
     for (size_t i = 0; i < nbOfParticles()-1; i++)
 			for (size_t j = i+1; j < nbOfParticles(); j++)
-				model->interaction(configuration_[i], configuration_[j]);
+				interaction(configuration_[i], configuration_[j]);
   }
   
-  void Fluid::writeFinalOutput(Output& output, Dynamics const* model)
+  void Fluid::writeFinalOutput(Output& output, Dynamics const& dyna)
   {
-    //double time = model->timeStep() * model->nbOfIterations();
+    //double time = dyna.timeStep() * dyna.nbOfIterations();
     
-    output.finalDisplay(configuration_, model->externalForce());
+    output.finalDisplay(configuration_, dyna.externalForce());
     if (output.doComputeCorrelations() &&  output.verbose() > 0)
       output.finalDisplayAutocorrelations();
-		//output.displayFinalFlow(model->temperature(), model->deltaTemperature());
+		//output.displayFinalFlow(dyna.temperature(), dyna.deltaTemperature());
   }
   
   //### Chain ###
   
-  Chain::Chain(Input const& input, int const& iOfReplica):
-  ParticleSystem(input, iOfReplica)
+  Chain::Chain(Input const& input):
+  ParticleSystem(input)
   {
 		assert(configuration_.size() > 1);
 	  for (size_t i = 0; i<input.nbOfParticles(); i++) 
@@ -207,115 +262,66 @@ namespace simol
     }
   }
   
-  void Chain::thermalize(Dynamics * model)
+  
+  
+  void Chain::computeAllForces(Dynamics const& model) {throw std::invalid_argument("Function undefined");};
+  
+  void Chain::thermalize(Dynamics& dyna)
   {
     //for (auto&& particle : configuration_)
-      //model->updateBefore(particle);
+      //dyna.updateBefore(particle);
     for (size_t i=0; i < nbOfParticles(); i++)
-      model->updateBefore(getParticle(i));
+      dyna.updateBefore(getParticle(i));
     
-    computeAllForces(model);
+    computeAllForces(dyna);
     
     for (size_t i=0; i < nbOfParticles(); i++)
-      model->updateAfter(getParticle(i));
+      dyna.updateAfter(getParticle(i));
     
 		for (size_t i=0; i < nbOfParticles(); i++)
 		{
-			double localTemperature = model->temperatureLeft() + i * model->deltaTemperature() / nbOfParticles();
-			model->updateOrsteinUhlenbeck(getParticle(0), 1 / localTemperature);
+			double localTemperature = dyna.temperatureLeft() + i * dyna.deltaTemperature() / nbOfParticles();
+			dyna.updateOrsteinUhlenbeck(getParticle(0), 1 / localTemperature);
 		}
   }
   
-  void Chain::simulate(Dynamics * model)
-  {
-    //for (auto&& particle : configuration_)
-      //model->updateBefore(particle);
-    for (size_t iOfParticle=0; iOfParticle < nbOfParticles(); iOfParticle++)
-      model->updateBefore(getParticle(iOfParticle));
-    
-    computeAllForces(model);
-    
-    for (size_t iOfParticle=0; iOfParticle < nbOfParticles(); iOfParticle++)
-      model->updateAfter(getParticle(iOfParticle));
-    
-    model->updateOrsteinUhlenbeck(getParticle(0), model->betaLeft());
-    model->updateOrsteinUhlenbeck(getParticle(nbOfParticles() - 1), model->betaRight());
-		
-		if (model->doMomentaExchange())
-			for (size_t iOfParticle=0; iOfParticle < nbOfParticles()-1; iOfParticle++)
-				model->updateMomentaExchange(configuration_[iOfParticle], configuration_[iOfParticle+1]);
-	}
+
+	
+	void Chain::computeProfile(Output& output, Dynamics const& model, size_t iOfIteration) const {throw std::invalid_argument("Function undefined");} 
   
+  void Chain::writeFinalOutput(Output& output, Dynamics const& model) {throw std::invalid_argument("Function undefined");}
   
+  //###### BiChain ######
   
-  
-  BiChain::BiChain(Input const& input, int const& iOfReplica):
-  Chain(input, iOfReplica),
+  BiChain::BiChain(Input const& input):
+  Chain(input),
   ancorParticle_(input.dimension())
   {
     //ancorParticle_.position(0) = 2 * input.initialPosition(0) - input.initialPosition(1);
 		ancorParticle_.position(0) = 0;
   }
   
-  void BiChain::initializeSystem(Dynamics* model)
-	{
-		cout << "Initialization of the system...";cout.flush();
-		double alpha, localTemp, localDist;
-		//ofstream outTest("test.txt");
-		for (size_t iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
-		{
-			alpha = iOfParticle / (double) nbOfParticles();			
-			localTemp = (1-alpha) * model->temperatureLeft() + alpha * model->temperatureRight();
-			//localBending = model->computeMeanPotLaw(1/localTemp);
-			localDist = model->drawPotLaw(1/localTemp);
-			//outTest << iOfParticle << " " << localBending << endl;
-			//cout << "bending = " << localBending << " / mean = " << model->computeMeanPotLaw(1/localTemp) << endl;
-			
-			double prevPosition = (iOfParticle>0)?getParticle(iOfParticle-1).position(0):0;
-			
-			
-			getParticle(iOfParticle).position(0) = prevPosition + localDist;
-			//cout << -position2 << " + 2 * " << position1 << " + " << localBending << " = " << getParticle(iOfParticle).position(0) << endl;
-			getParticle(iOfParticle).momentum() = model->drawMomentum(1/localTemp, getParticle(iOfParticle).mass());
-		
-			model->initializeCountdown(getParticle(iOfParticle));
-		}
-		
-		cout << "Done ! / Thermalization...";cout.flush();
-		
-		for (size_t iOfIteration  =0; iOfIteration < model->nbOfThermalIterations(); ++iOfIteration)
-    {
-			thermalize(model);
-		}
-		
-		cout << "Done ! / Burning...";cout.flush();
-		
-		for (size_t iOfIteration  =0; iOfIteration < model->nbOfBurningIterations(); ++iOfIteration)
-    {
-			simulate(model);
-		}
-		cout << "Done !" << endl;
-	}
+
 	
 
   
 
   
-  void BiChain::computeAllForces(Dynamics const* model)
+  void BiChain::computeAllForces(Dynamics const& dyna)
   {
     //std::cout << "BiChain::computeAllForces" << std::endl;
     for (auto&& particle : configuration_)
-      model->resetForce(particle);
+      dyna.resetForce(particle);
     //for (auto&& particle : configuration_)
-    //  model->computeForce(particle);
-    model->interaction(ancorParticle_, configuration_[0]);
+    //  dyna.computeForce(particle);
+    interaction(ancorParticle_, configuration_[0]);
     for (size_t i = 0; i < nbOfParticles() - 1; i++)
 		{
-      model->interaction(configuration_[i], configuration_[i+1]);
+      interaction(configuration_[i], configuration_[i+1]);
 		}
   }
 	
-		void BiChain::computeProfile(Output& output, Dynamics const* model, size_t iOfIteration)
+		void BiChain::computeProfile(Output& output, Dynamics const& dyna, size_t iOfIteration) const
   {
 		output.energySumFlow() = 0;
 		size_t midNb = (nbOfParticles()-1) / 2;
@@ -330,7 +336,7 @@ namespace simol
 			if (iOfParticle == 0)
 			{
 				dist = getParticle(0).position(0) - ancorParticle_.position(0);
-				flow = model->gamma() * (model->temperatureLeft() - 2 * getParticle(0).kineticEnergy());
+				flow = dyna.gamma() * (dyna.temperatureLeft() - 2 * getParticle(0).kineticEnergy());
 			}
 			else
 			{
@@ -367,23 +373,23 @@ namespace simol
 		//cout << output.energySumFlow() << endl;
 	}
 	
-	void BiChain::writeFinalOutput(Output& output, Dynamics const* model)
+	void BiChain::writeFinalOutput(Output& output, Dynamics const& dyna)
   {
-    //double time = model->timeStep() * model->nbOfIterations();
+    //double time = dyna.timeStep() * dyna.nbOfIterations();
     
-    output.finalDisplay(configuration_, model->externalForce());
+    output.finalDisplay(configuration_, dyna.externalForce());
     if (output.doComputeCorrelations() &&  output.verbose() > 0)
       output.finalDisplayAutocorrelations();
-		output.displayFinalFlow(model->temperature(), model->deltaTemperature());
+		output.displayFinalFlow(dyna.temperature(), dyna.deltaTemperature());
   }
   
   
   
+  //###### TriChain ######
   
   
-  
-  TriChain::TriChain(Input const& input, int const& iOfReplica):
-  Chain(input, iOfReplica),
+  TriChain::TriChain(Input const& input):
+  Chain(input),
   ancorParticle1_(input.dimension()),
   ancorParticle2_(input.dimension())
   {
@@ -392,65 +398,25 @@ namespace simol
 
   }
   
-  void TriChain::initializeSystem(Dynamics* model)
-	{
-		cout << "Initialization of the system...";cout.flush();
-		double alpha, localTemp, localBending;
-		//ofstream outTest("test.txt");
-		for (size_t iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
-		{
-			alpha = iOfParticle / (double) nbOfParticles();			
-			localTemp = (1-alpha) * model->temperatureLeft() + alpha * model->temperatureRight();
-			//localBending = model->computeMeanPotLaw(1/localTemp);
-			localBending = model->drawPotLaw(1/localTemp);
-			//outTest << iOfParticle << " " << localBending << endl;
-			//cout << "bending = " << localBending << " / mean = " << model->computeMeanPotLaw(1/localTemp) << endl;
-			
-			double position1 = (iOfParticle>0)?getParticle(iOfParticle-1).position(0):0;
-			double position2 = (iOfParticle>1)?getParticle(iOfParticle-2).position(0):0;
-			
-			
-			getParticle(iOfParticle).position(0) = -position2 + 2 * position1 + localBending;
-			//cout << -position2 << " + 2 * " << position1 << " + " << localBending << " = " << getParticle(iOfParticle).position(0) << endl;
-			getParticle(iOfParticle).momentum() = model->drawMomentum(1/localTemp, getParticle(iOfParticle).mass());
-			
-			model->initializeCountdown(getParticle(iOfParticle));
-		}
-		
-		cout << "Done ! / Thermalization...";cout.flush();
-		
-		for (size_t iOfIteration  =0; iOfIteration < model->nbOfThermalIterations(); ++iOfIteration)
-    {
-			thermalize(model);
-		}
-		
-		cout << "Done ! / Burning...";cout.flush();
-		
-		for (size_t iOfIteration  =0; iOfIteration < model->nbOfBurningIterations(); ++iOfIteration)
-    {
-			simulate(model);
-		}
-		cout << "Done !" << endl;
-	}
   
-  void TriChain::computeAllForces(Dynamics const* model)
+  void TriChain::computeAllForces(Dynamics const& dyna)
   {
     //std::cout << "TriChain::computeAllForces" << std::endl;
     for (auto&& particle : configuration_)
-      model->resetForce(particle);
+      dyna.resetForce(particle);
     //for (auto&& particle : configuration_)
-    //  model->computeForce(particle);
-    model->triInteraction(ancorParticle2_, ancorParticle1_, configuration_[0]);
-    model->triInteraction(ancorParticle1_, configuration_[0], configuration_[1]);
+    //  dyna.computeForce(particle);
+    triInteraction(ancorParticle2_, ancorParticle1_, configuration_[0]);
+    triInteraction(ancorParticle1_, configuration_[0], configuration_[1]);
     for (size_t i = 0; i < nbOfParticles() - 2; i++)
-      model->triInteraction(configuration_[i], configuration_[i+1], configuration_[i+2]);
-    model->bending(configuration_[nbOfParticles() - 2], configuration_[nbOfParticles() - 1]);
+      triInteraction(configuration_[i], configuration_[i+1], configuration_[i+2]);
+    dyna.bending(configuration_[nbOfParticles() - 2], configuration_[nbOfParticles() - 1]);
   }
   
   double TriChain::boundaryPotEnergy() const
   {return ancorParticle1_.potentialEnergy();}
   
-  void TriChain::computeProfile(Output& output, Dynamics const* model, size_t iOfIteration)
+  void TriChain::computeProfile(Output& output, Dynamics const& dyna, size_t iOfIteration) const
   {
 		output.energySumFlow() = 0;
 		for (size_t iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
@@ -464,7 +430,7 @@ namespace simol
 			if (iOfParticle == 0)
 			{
 				bending = ancorParticle2_.position(0) - 2 * getParticle(0).position(0) + getParticle(1).position(0);
-				flow = model->gamma() * (model->temperatureLeft() - 2 * getParticle(0).kineticEnergy())
+				flow = dyna.gamma() * (dyna.temperatureLeft() - 2 * getParticle(0).kineticEnergy())
 					- ancorParticle2_.energyGrad(0) * getParticle(0).momentum(0);
 				potTempTop = pow(- ancorParticle2_.energyGrad(0) + 2*getParticle(0).energyGrad(0) - getParticle(1).energyGrad(0), 2);
 				potTempBot = ancorParticle2_.energyLapla() + 4*getParticle(0).energyLapla() + getParticle(1).energyLapla();
@@ -505,14 +471,14 @@ namespace simol
 	}
 	
 	
-	void TriChain::writeFinalOutput(Output& output, Dynamics const* model)
+	void TriChain::writeFinalOutput(Output& output, Dynamics const& dyna)
   {
-    //double time = model->timeStep() * model->nbOfIterations();
+    //double time = dyna.timeStep() * dyna.nbOfIterations();
     
-    output.finalDisplay(configuration_, model->externalForce());
+    output.finalDisplay(configuration_, dyna.externalForce());
     if (output.doComputeCorrelations() &&  output.verbose() > 0)
       output.finalDisplayAutocorrelations();
-		output.displayFinalFlow(model->temperature(), model->deltaTemperature(), model->tauBending(), model->xi());
+		output.displayFinalFlow(dyna.temperature(), dyna.deltaTemperature(), dyna.tauBending(), dyna.xi());
   }
   
 }
