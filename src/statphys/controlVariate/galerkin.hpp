@@ -5,7 +5,7 @@
 #include "input.hpp"
 #include "potential.hpp"
 #include "basis.hpp"
-
+#include "core/linalg/DenseMatrix.hpp"
 
 namespace simol
 {

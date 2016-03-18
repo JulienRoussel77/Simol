@@ -194,6 +194,8 @@ namespace simol
     //for (size_t i = 0; i<input.nbOfParticles(); i++) 
     getParticle(0) = Particle(input.mass(), input.initialPosition(), input.initialMomentum());
 		cout << "Particle initialized !" << endl;
+    Particle& p = getParticle(0);
+    cout << p.mass() << endl;
 		cout << getParticle(0).mass() << "  " << getParticle(0).position() << "  " << getParticle(0).momentum() << endl;
 	}
       
