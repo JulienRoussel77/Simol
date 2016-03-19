@@ -6,7 +6,7 @@
 #include <vector>
 #include <armadillo>
 #include <Eigen/Sparse>
-
+#include "core/linalg/Vector.hpp"
 #include <stdexcept>
 
 using std::ofstream;
@@ -25,7 +25,7 @@ typedef std::complex<double> cplx;
 
 typedef arma::sp_mat SMat;
 typedef arma::mat DMat;
-typedef arma::vec DVec;
+typedef simol::Vector<double> DVec;
 typedef arma::rowvec DRow;
 
 using arma::fill::zeros;

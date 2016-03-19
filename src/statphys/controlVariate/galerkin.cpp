@@ -28,39 +28,39 @@ namespace simol
 	
 	DenseMatrix<double> Galerkin::shapeSaddle(const DenseMatrix<double>& A) const
 	{
-		//DenseMatrix<double> Asad(A.n_rows+1, A.n_cols+1, fill::ones);
-		DenseMatrix<double> Asad(A.n_rows+1, A.n_cols+1, fill::zeros);
-		Asad.submat(0, 0, A.n_rows-1, A.n_cols-1) = A;
-		//Asad(A.n_rows, A.n_cols) = 0;
+		//DenseMatrix<double> Asad(A.numberOfRows()+1, A.numberOfColumns()+1, fill::ones);
+		DenseMatrix<double> Asad = DenseMatrix<double>::Zero(A.numberOfRows()+1, A.numberOfColumns()+1);
+		Asad.block(0, 0, A.numberOfRows(), A.numberOfColumns()) = A.block(0, 0, A.numberOfRows(), A.numberOfColumns());
+		//Asad(A.numberOfRows(), A.numberOfColumns()) = 0;
 		for (size_t iOfFourier2=0; iOfFourier2 <= 2*maxOfFourier_; iOfFourier2++)
 		{
-			Asad(A.n_rows, iTens(iOfFourier2, 0)) = expFourierCoeffs(iOfFourier2);
-			Asad(iTens(iOfFourier2, 0), A.n_cols) = expFourierCoeffs(iOfFourier2);
+			Asad(A.numberOfRows(), iTens(iOfFourier2, 0)) = expFourierCoeffs(iOfFourier2);
+			Asad(iTens(iOfFourier2, 0), A.numberOfColumns()) = expFourierCoeffs(iOfFourier2);
 		}
 		return Asad;
 	}
 	
 	DenseMatrix<double> Galerkin::unshapeSaddle(const DenseMatrix<double>& Asad) const
 	{
-		return Asad.submat(0, 0, Asad.n_rows-2, Asad.n_cols-2);
+		return Asad.block(0, 0, Asad.numberOfRows()-1, Asad.numberOfColumns()-1);
 	}
 	
 	DVec Galerkin::shapeSaddle(const DVec& X) const
 	{
-		DVec Xsad(X.n_rows+1, fill::zeros);
-		Xsad.subvec(0, X.n_rows-1) = X;
+		DVec Xsad = Vector<double>::Zero(X.size()+1);
+		Xsad.subvec(0, X.size()) = X;
 		return Xsad;
 	}
 	
 	DVec Galerkin::unshapeSaddle(const DVec& Xsad) const
 	{
-		return Xsad.subvec(0, Xsad.n_rows-2);
+		return Xsad.subvec(0, Xsad.size()-2);
 	}
 	
 	DenseMatrix<double> inverse(const SMat& A)
 	{
 		//DenseMatrix<double> Id = eye<DenseMatrix<double>>(A.size());
-		DenseMatrix<double> Id(A.n_rows, A.n_cols, fill::eye);
+		DenseMatrix<double> Id(A.numberOfRows(), A.numberOfColumns(), fill::eye);
 		DenseMatrix<double> C = spsolve(A, Id);
 		return C;
 	}
@@ -68,7 +68,7 @@ namespace simol
 	DenseMatrix<double> inverse(const DenseMatrix<double>& A)
 	{
 		//DenseMatrix<double> Id = eye<DenseMatrix<double>>(A.size());
-		DenseMatrix<double> Id(A.n_rows, A.n_cols, fill::eye);
+		DenseMatrix<double> Id(A.numberOfRows(), A.numberOfColumns(), fill::eye);
 		DenseMatrix<double> C = solve(A, Id);
 		return C;
 	}
@@ -104,24 +104,24 @@ namespace simol
 	//															)
 	SMat kron(const SMat& A, const SMat& B)
 	{
-		/*double a_1 = A.n_cols * (B.n_cols - 1)/(A.n_cols - 1);
-		double b_1 = a_1 - B.n_cols;
-		double a_2 = A.n_rows * (B.n_rows - 1)/(A.n_rows - 1);
-		double b_2 = a_2 - B.n_rows;*/
+		/*double a_1 = A.numberOfColumns() * (B.numberOfColumns() - 1)/(A.numberOfColumns() - 1);
+		double b_1 = a_1 - B.numberOfColumns();
+		double a_2 = A.numberOfRows() * (B.numberOfRows() - 1)/(A.numberOfRows() - 1);
+		double b_2 = a_2 - B.numberOfRows();*/
 		
-		/*cout << "A : O <= i < " << A.n_rows << ", O <= jOfA < " << A.n_cols << endl;
-		cout << "B : O <= i2 < " << B.n_rows << ", O <= jOfB < " << B.n_cols << endl;
+		/*cout << "A : O <= i < " << A.numberOfRows() << ", O <= jOfA < " << A.numberOfColumns() << endl;
+		cout << "B : O <= i2 < " << B.numberOfRows() << ", O <= jOfB < " << B.numberOfColumns() << endl;
 		cout << "We keep the coefficients such that j * (jOfB + " << b_1 << ") <= " << a_1 
 			<< " and such that i * (i2 + " << b_2 << ") <= " << a_2 << endl; */
-		SMat C(A.n_rows*B.n_rows, A.n_cols*B.n_cols);
+		SMat C(A.numberOfRows()*B.numberOfRows(), A.numberOfColumns()*B.numberOfColumns());
 		//cout << A.size() << endl << B.size() << endl;
 		//SMat C(A.size() % B.size());					//element-wise product of the dimensions
-		for (int jOfA=0; (size_t) jOfA < A.n_cols; jOfA++)
+		for (int jOfA=0; (size_t) jOfA < A.numberOfColumns(); jOfA++)
 			for (SMat::iterator it = A.begin_col(jOfA); it != A.end_col(jOfA); ++it)
 			{
 				int iOfA = it.row();
 				double valOfA = *it;
-				for (int jOfB=0; (size_t) jOfB < B.n_cols; jOfB++)
+				for (int jOfB=0; (size_t) jOfB < B.numberOfColumns(); jOfB++)
 					for (SMat::iterator it2 = B.begin_col(jOfB); it2 != B.end_col(jOfB); ++it2)
 					{
 						int iOfB = it2.row();
@@ -129,7 +129,7 @@ namespace simol
 						//cout << iOfA << " " << j << " " << iOfB << " " << jOfB << endl;
 						//if (jOfA * (b_1 + jOfB) <= a_1 && iOfA * (b_2 + iOfB) <= a_2)
 						//{						
-							C(iOfA + A.n_rows * iOfB, jOfA + A.n_cols * jOfB) = valOfA*valOfB;
+							C(iOfA + A.numberOfRows() * iOfB, jOfA + A.numberOfColumns() * jOfB) = valOfA*valOfB;
 // 							//cout << "ok"<<endl;
 						//}
 					}
@@ -140,26 +140,26 @@ namespace simol
 	DenseMatrix<double> kron(const DenseMatrix<double>& A, const DenseMatrix<double>& B)
 	{
 		cout << "kron(DenseMatrix<double>& A, DenseMatrix<double>& B)" << endl;
-		DenseMatrix<double> C(A.n_rows*B.n_rows, A.n_cols*B.n_cols);
-		for (int iOfA = 0; iOfA < (int) A.n_rows; iOfA++)
-			for (int jOfA = 0; jOfA < (int) A.n_cols; jOfA++)
-				for (int iOfB = 0; iOfB < (int) B.n_rows; iOfB++)
-					for (int jOfB = 0; jOfB < (int) B.n_cols; jOfB++)
-						C(iOfA + A.n_rows * iOfB, jOfA + A.n_cols * jOfB) = A(iOfA, jOfA) * B(iOfB, jOfB);
+		DenseMatrix<double> C(A.numberOfRows()*B.numberOfRows(), A.numberOfColumns()*B.numberOfColumns());
+		for (int iOfA = 0; iOfA < (int) A.numberOfRows(); iOfA++)
+			for (int jOfA = 0; jOfA < (int) A.numberOfColumns(); jOfA++)
+				for (int iOfB = 0; iOfB < (int) B.numberOfRows(); iOfB++)
+					for (int jOfB = 0; jOfB < (int) B.numberOfColumns(); jOfB++)
+						C(iOfA + A.numberOfRows() * iOfB, jOfA + A.numberOfColumns() * jOfB) = A(iOfA, jOfA) * B(iOfB, jOfB);
 		return C;
 	}
 
 	void displayCplx(const cx_vec& X, ostream& out)
 	{
-		for (int i=0; (size_t) i < X.n_rows; i++)
+		for (int i=0; (size_t) i < X.numberOfRows(); i++)
 			out << real(X(i)) << " " << imag(X(i)) << endl;
 	}
 	
 	void displayMat(const DenseMatrix<double>& A, ostream& out)
 	{
-		for (int i=0; (size_t) i < A.n_rows; i++)
+		for (int i=0; (size_t) i < A.numberOfRows(); i++)
 		{
-			for (int j=0; (size_t) j < A.n_cols; j++)			
+			for (int j=0; (size_t) j < A.numberOfColumns(); j++)			
 			{
 				if (true)//fabs(A(i,j)) > 1e-15)
 				{
@@ -378,8 +378,6 @@ namespace simol
 		DenseMatrix<double> LeqInv = invWithSaddle(DLeq);
 		cout << "OK" << endl;
 		
-		//DenseMatrix<double> LeqInv = LeqInvSad.submat(0, 0, sizeOfBasis_-1, sizeOfBasis_-1);
-		
 		cout << "############ LeqInv ############" << endl;
 		displayMat(LeqInv, "../output/Galerkin/LeqInv");
 		
@@ -561,7 +559,7 @@ namespace simol
 	SMat BoundaryLangevinGalerkin::PMatToTens(SMat const& PMat, int iOfParticleP)
 	{
 		assert(iOfParticleP < nbOfParticles_);
-		//SMat tempId = speye(PMat.n_rows, PMat.n_cols);
+		//SMat tempId = speye(PMat.numberOfRows(), PMat.numberOfColumns());
 		SMat res = speye(1,1);
 		for (int i = 0; i < nbOfParticles_; i++)
 		{
@@ -577,7 +575,7 @@ namespace simol
 		/*assert(iOfVariableA < iOfVariableB);
 		assert(iOfVariableB < nbOfVariables);
 		assert(A.size() == B.size());*/
-		//SMat tempId = speye(A.n_rows, A.n_cols);
+		//SMat tempId = speye(A.numberOfRows(), A.numberOfColumns());
 		SMat res = speye(1,1);
 		for (int i = 0; i < nbOfParticles_; i++)
 		{
@@ -586,7 +584,7 @@ namespace simol
 			if (i==iOfParticleP) res = kron(res, PMat);
 			else res = kron(res, SIdP_);
 		}
-		cout << "res : " << res.n_rows << " x " << res.n_cols << endl;
+		cout << "res : " << res.numberOfRows() << " x " << res.numberOfColumns() << endl;
 		return res;
 	}
 	
@@ -595,7 +593,7 @@ namespace simol
 		assert(iOfVariableA < iOfVariableB);
 		assert(iOfVariableB < nbOfVariables);
 		assert(A.size() == B.size());
-		SMat tempId = speye(A.n_rows, A.n_cols);
+		SMat tempId = speye(A.numberOfRows(), A.numberOfColumns());
 		SMat res = speye(1,1);
 		for (int i = 0; i < iOfVariableA; i++)
 			res = kron(res, tempId);
@@ -605,7 +603,7 @@ namespace simol
 		res = kron(res, B);
 		for (int i = iOfVariableB+1; i < nbOfVariables; i++)
 			res = kron(res, tempId);
-		cout << "res : " << res.n_rows << " x " << res.n_cols << endl;
+		cout << "res : " << res.numberOfRows() << " x " << res.numberOfColumns() << endl;
 		return res;
 	}*/
 	
