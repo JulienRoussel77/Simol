@@ -41,9 +41,7 @@ namespace simol
 	}
 	
 	DenseMatrix<double> Galerkin::unshapeSaddle(const DenseMatrix<double>& Asad) const
-	{
-		return Asad.block(0, 0, Asad.numberOfRows()-1, Asad.numberOfColumns()-1);
-	}
+	{ return Asad.block(0, 0, Asad.numberOfRows()-1, Asad.numberOfColumns()-1); }
 	
 	DVec Galerkin::shapeSaddle(const DVec& X) const
 	{
@@ -57,26 +55,28 @@ namespace simol
 		return Xsad.subvec(0, Xsad.size()-2);
 	}
 	
-	DenseMatrix<double> inverse(const SMat& A)
+  // TODO: utiliser des solveurs lineaires plutôt qu'inverser
+  // de plus, on n'inverse jamais une matrice creuse car 
+  // son inverse est generalement dense
+  // par consequent, pas de fonction membre inverse() dans SparseMatrix
+	
+  /*DenseMatrix<double> inverse(const SMat& A)
 	{
-		//DenseMatrix<double> Id = eye<DenseMatrix<double>>(A.size());
-		DenseMatrix<double> Id(A.numberOfRows(), A.numberOfColumns(), fill::eye);
+		DenseMatrix<double> Id = DenseMatrix<double>::Identity(A.numberOfRows());
 		DenseMatrix<double> C = spsolve(A, Id);
 		return C;
 	}
 	
 	DenseMatrix<double> inverse(const DenseMatrix<double>& A)
 	{
-		//DenseMatrix<double> Id = eye<DenseMatrix<double>>(A.size());
-		DenseMatrix<double> Id(A.numberOfRows(), A.numberOfColumns(), fill::eye);
+		DenseMatrix<double> Id = DenseMatrix<double>::Identity(A.numberOfRows());
 		DenseMatrix<double> C = solve(A, Id);
 		return C;
-	}
+	}*/
 	
 	DVec Galerkin::solveWithSaddle(const SMat& A, const DVec& X) const
 	{
-		DenseMatrix<double> DA = conv_to<DenseMatrix<double>>::from(A);
-		//DenseMatrix<double> DA = conv<DenseMatrix<double>>(A);
+		DenseMatrix<double> DA = A;
 		return solveWithSaddle(DA, X);
 	}
 	
@@ -94,8 +94,7 @@ namespace simol
 	{
 		cout << "invWithSaddle...";
 		DenseMatrix<double> Asad = shapeSaddle(A);
-		DenseMatrix<double> Bsad = inv(Asad);
-		//cout << "OK ! (lambda = " << Bsad(Bsad.size()-1) << ")" << endl;
+		DenseMatrix<double> Bsad = Asad.inverse();
 		return unshapeSaddle(Bsad);
 	}
 	
@@ -187,7 +186,7 @@ namespace simol
 	
 	void displayMat(const SMat& A, string path)
 	{
-		DenseMatrix<double> DA = conv_to<DenseMatrix<double>>::from(A);
+		DenseMatrix<double> DA = A;
 		displayMat(DA, path);
 	}
 	
@@ -382,7 +381,7 @@ namespace simol
 		displayMat(LeqInv, "../output/Galerkin/LeqInv");
 		
 
-		DVec H1Trig(sizeOfBasis_, fill::zeros);
+		DVec H1Trig = Vector<double>::Zero(sizeOfBasis);
 		H1Trig(iTens(0, 1)) = 1;
 		
 		DenseMatrix<double> H1TrigMat = reshape(H1Trig, nbOfFourier_, nbOfHermite_);
@@ -461,7 +460,7 @@ namespace simol
 	
 	DVec Galerkin::gettGiHj(int i, int j) const
 	{
-		DVec GiHjTrig(sizeOfBasis_, fill::zeros);
+		DVec GiHjTrig = Vector<double>::Zero(sizeOfBasis_);
 		GiHjTrig(iTens(i, j)) = 1;
 		DVec GiHj = trigToExpTens_ * GiHjTrig;		
 		return GiHj;
@@ -469,35 +468,25 @@ namespace simol
 	
 	DVec Galerkin::gettGiHjTrig(int i, int j) const
 	{
-		DVec GiHjTrig(sizeOfBasis_, fill::zeros);
+		DVec GiHjTrig = Vector<double>::Zero(sizeOfBasis_);
 		GiHjTrig(iTens(i, j)) = 1;
 		return GiHjTrig;
 	}
 	
 	DVec Galerkin::getLtGiHj(int i, int j) const
-	{
-		return Leq_ * gettGiHj(i,j);
-	}
+	{ return Leq_ * gettGiHj(i,j); }
 	
 	DVec Galerkin::getLtGiHjTrig(int i, int j) const
-	{
-		return expToTrigTens_ * getLtGiHj(i,j);
-	}
+	{ return expToTrigTens_ * getLtGiHj(i,j); }
 	
 	DVec Galerkin::getLinvtGiHj(int i, int j) const
-	{
-		return solveWithSaddle(Leq_, gettGiHj(i,j));
-	}
+	{ return solveWithSaddle(Leq_, gettGiHj(i,j)); }
 	
 	DVec Galerkin::getLinvtGiHjTrig(int i, int j) const
-	{
-		return expToTrigTens_ * solveWithSaddle(Leq_, gettGiHj(i,j));
-	}
+	{ return expToTrigTens_ * solveWithSaddle(Leq_, gettGiHj(i,j)); }
 	
 	SMat Galerkin::CVcoeffs() const
-	{
-		return conv_to<SMat>::from(getLinvtGiHj(0,1));
-	}
+	{ return conv_to<SMat>::from(getLinvtGiHj(0,1)); }
 	
 	
 	
@@ -687,7 +676,7 @@ namespace simol
 		cout << "OK" << endl;
 		displayMat(LeqInv, "../output/Galerkin/LeqInv");
 		
-		DVec N0H2Trig(sizeOfBasis_, fill::zeros);
+		DVec N0H2Trig = Vector<double>::Zero(sizeOfBasis_);
 		N0H2Trig(iTens(0, 2, 0)) = 1;
 		
 		DVec N0H2 = trigToExpTens_ * N0H2Trig;

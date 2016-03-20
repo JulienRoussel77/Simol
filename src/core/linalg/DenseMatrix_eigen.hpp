@@ -68,6 +68,11 @@ namespace simol
                     size_t numberOfColumns)
           { return DenseMatrix(WrappedType::Zero(numberOfRows, numberOfColumns)); }
 
+          static
+          DenseMatrix
+          Identity(std::size_t n)
+          { return DenseMatrix(WrappedType::Identity(n)); }
+
           // TODO: write a non-pessimized version
           // with CwiseBinaryOp from Eigen
           DenseMatrix operator+(DenseMatrix const & other) const

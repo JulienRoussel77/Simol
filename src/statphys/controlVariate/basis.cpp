@@ -256,10 +256,10 @@ namespace simol
 												+ (beta_/2 * potLapla(variable) + pow(beta_, 2)/4 * pow(potDeriv(variable), 2) - pow(iOfFreq, 2)) * cos(iOfFreq * variable)) * expo;
 	}
 	
-	HermiteBasis::HermiteBasis(const size_t nbOfElts0, double beta0):
-		Basis(nbOfElts0),
+	HermiteBasis::HermiteBasis(const size_t nbOfElts0, double beta0)
+  : Basis(nbOfElts0),
 		beta_(beta0),
-		polyCoeffs_(nbOfElts0, nbOfElts0, zeros)
+		polyCoeffs_(DenseMatrix<double>::Zero(nbOfElts0, nbOfElts0))
 	{
 		//cout << "HermiteBasis(const size_t nbOfElts0)" << endl;
 		polyCoeffs_(0,0) = 1;

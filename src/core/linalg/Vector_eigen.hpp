@@ -37,6 +37,14 @@ namespace simol
       Vector<ScalarType,eigen> operator+(Vector<ScalarType,eigen> const& v) const;
       Vector<ScalarType,eigen> operator-(Vector<ScalarType,eigen> const& v) const;
 
+      Vector<ScalarType, eigen> subvec(std::size_t start,
+                                       std::size_t length) const
+      {
+        Vector sub(length);
+        for (std::size_t index = 0; index < length; ++index)
+          sub.wrapped_(index) = wrapped_(index+start);
+        return sub;
+      }
 
     public:
       typedef typename eigen<ScalarType>::VectorType WrappedType;

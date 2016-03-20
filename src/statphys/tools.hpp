@@ -6,6 +6,8 @@
 #include <vector>
 #include <armadillo>
 #include <Eigen/Sparse>
+#include "core/linalg/SparseMatrix.hpp"
+#include "core/linalg/DenseMatrix.hpp"
 #include "core/linalg/Vector.hpp"
 #include <stdexcept>
 
@@ -23,8 +25,8 @@ using std::vector;
 
 typedef std::complex<double> cplx;
 
-typedef arma::sp_mat SMat;
-typedef arma::mat DMat;
+typedef simol::SparseMatrix<double> SMat;
+typedef simol::DenseMatrix<double> DMat;
 typedef simol::Vector<double> DVec;
 typedef arma::rowvec DRow;
 
