@@ -26,6 +26,16 @@ namespace simol
 
           DenseMatrix(typename eigen<ScalarType>::DenseMatrixType const & wrappedMatrix);
 
+          DenseMatrix(typename eigen<ScalarType>::DenseBlock_const const & block)
+          : wrapped_(block)
+          {}
+
+          Vector<ScalarType> solve(Vector<ScalarType> const & rhs)
+          {
+            Vector<ScalarType> sol(numberOfRows());
+            sol.wrapped_ = wrapped_.partialPivLu().solve(rhs.wrapped_);
+            return sol;
+          }
           Vector<ScalarType>
           column(size_t const index) const;
 

@@ -28,10 +28,8 @@ namespace simol
 	
 	DenseMatrix<double> Galerkin::shapeSaddle(const DenseMatrix<double>& A) const
 	{
-		//DenseMatrix<double> Asad(A.numberOfRows()+1, A.numberOfColumns()+1, fill::ones);
 		DenseMatrix<double> Asad = DenseMatrix<double>::Zero(A.numberOfRows()+1, A.numberOfColumns()+1);
 		Asad.block(0, 0, A.numberOfRows(), A.numberOfColumns()) = A.block(0, 0, A.numberOfRows(), A.numberOfColumns());
-		//Asad(A.numberOfRows(), A.numberOfColumns()) = 0;
 		for (size_t iOfFourier2=0; iOfFourier2 <= 2*maxOfFourier_; iOfFourier2++)
 		{
 			Asad(A.numberOfRows(), iTens(iOfFourier2, 0)) = expFourierCoeffs(iOfFourier2);
@@ -85,7 +83,7 @@ namespace simol
 		cout << "solveWithSaddle...";
 		DVec Xsad = shapeSaddle(X);
 		DenseMatrix<double> Asad = shapeSaddle(A);
-		DVec Bsad = solve(Asad, Xsad);
+		DVec Bsad = Asad.solve(Xsad);
 		cout << "OK ! (lambda = " << Bsad(Bsad.size()-1) << ")" << endl;
 		return unshapeSaddle(Bsad);
 	}
@@ -180,7 +178,7 @@ namespace simol
 	
 	void displayMat(const SMat& A, ostream& out)
 	{
-		DenseMatrix<double> DA = conv_to<DenseMatrix<double>>::from(A);
+		DenseMatrix<double> DA = A;
 		displayMat(DA, out);
 	}
 	
