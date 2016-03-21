@@ -7,6 +7,9 @@ namespace simol
   template<class ScalarType>
   class Vector<ScalarType,eigen> : public VectorInterface<ScalarType, eigen>
   {
+    //template<class ScalarType, template<class> class WrappedLibrary>
+    friend std::ostream & operator<<(std::ostream & fileToWrite, simol::Vector<ScalarType,eigen> const & vectorToRead);
+     
     public:
       explicit Vector(size_t const size=0);
       explicit Vector(size_t const size, ScalarType const& lambda);
@@ -245,11 +248,15 @@ namespace simol
 
 }
 
+#include <iterator>
+
 template<class ScalarType, template<class> class WrappedLibrary>
 std::ostream & operator<<(std::ostream & fileToWrite, simol::Vector<ScalarType,WrappedLibrary> const & vectorToRead)
 {
-  for (size_t index = 0; index < vectorToRead.size(); ++index)
-    fileToWrite << vectorToRead(index) << " ";
+  std::copy(begin(vectorToRead), end(vectorToRead), std::ostream_iterator<int>(fileToWrite, " "));
+
+  /*for (size_t index = 0; index < vectorToRead.size(); ++index)
+    fileToWrite << vectorToRead(index) << " ";*/
   return fileToWrite;
 }
 
