@@ -440,7 +440,7 @@ namespace simol
 		cx_mat eigvecLeq;
 		eig_gen(eigvalLeq, eigvecLeq, -DLeq);
     
-    EigenDecomposition<double> 
+    //EigenDecomposition<double> 
     
 		//eigs_gen(eigvalLeq, eigvecLeq, Leq_, 20);
 		

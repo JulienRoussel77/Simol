@@ -1,6 +1,9 @@
 #ifndef SIMOL_VECTOR_EIGEN_HPP
 #define SIMOL_VECTOR_EIGEN_HPP
 
+#include <iterator>
+#include <fstream>
+
 namespace simol
 {
 
@@ -13,6 +16,7 @@ namespace simol
     public:
       explicit Vector(size_t const size=0);
       explicit Vector(size_t const size, ScalarType const& lambda);
+      explicit Vector(std::string const & filename);
       Vector(Vector<ScalarType,eigen> const& u);
       Vector(typename eigen<ScalarType>::VectorType const & wrappedVector);
       size_t size() const;
@@ -84,6 +88,28 @@ namespace simol
   Vector<ScalarType,eigen>::Vector(Vector<ScalarType,eigen> const& u)
   :wrapped_(u.wrapped_)
   {}
+  
+  template<class ScalarType> inline
+  Vector<ScalarType,eigen>::Vector(std::string const & filename):
+    wrapped_(0)
+  {
+    std::ifstream flow(filename);
+    //Reads the number of lines
+    std::string line;
+    int nbOfLines=0;
+    for (nbOfLines = 0; std::getline(flow, line); ++nbOfLines){}
+    wrapped_ = eigen<ScalarType>::VectorType(nbOfLines);
+    //Go back to beginning of file
+    flow.clear();
+    flow.seekg(0, std::ios::beg);
+    //Reads the coefficients
+    for (size_t i = 0; i<nbOfLines; i++)
+    {
+      std::getline(flow, line);
+      wrapped_(i) = std::stod(line);
+    }
+  }
+
 
   //=====================
   // ACCESSORS / MUTATORS
@@ -247,8 +273,6 @@ namespace simol
   { return Vector<ScalarType,eigen>(*this) -= u; }
 
 }
-
-#include <iterator>
 
 template<class ScalarType, template<class> class WrappedLibrary>
 std::ostream & operator<<(std::ostream & fileToWrite, simol::Vector<ScalarType,WrappedLibrary> const & vectorToRead)

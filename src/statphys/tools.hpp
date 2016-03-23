@@ -42,5 +42,6 @@ typedef Eigen::Triplet<double> T;
 
 double modulo(double variable, double mini, double maxi);
 void displayTime(double time);
+int getNbOfLines(ifstream const& file);
 
 #endif

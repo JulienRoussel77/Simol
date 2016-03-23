@@ -927,11 +927,15 @@ namespace simol
 		else
 		{
 			cout << "CVcoeffs from file !" << endl;
-			DMat temp(0,0);
-			throw std::invalid_argument("load for DMat not implemented");
+      std::string coeffsPath = input.outputFolderName() + input.controlVariateCoeffsPath();
+      //Vector<double> temp(input.outputFolderName() + input.controlVariateCoeffsPath());
+			//DMat temp(0,0);
+			//throw std::invalid_argument("load for DMat not implemented");
       //temp.load(input.outputFolderName() + input.controlVariateCoeffsPath());
-			assert(temp.n_rows == coeffsVec_.n_rows && temp.n_cols == 1);
-			coeffsVec_ = arma::conv_to<SMat>::from(temp);
+			//assert(temp.size() == coeffsVec_.numberOfRows() && temp.numberOfColumns() == 1);
+			//coeffsVec_ = arma::conv_to<SMat>::from(temp);
+      ifstream file(coeffsPath);
+      coeffsVec_ = SparseMatrix<double>(coeffsPath, getNbOfLines(file));
 		}
 		//cout << "coeffsVec_ : " << endl;
 		//cout << coeffsVec_ << endl;
