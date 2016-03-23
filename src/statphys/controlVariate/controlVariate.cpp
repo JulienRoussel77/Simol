@@ -927,8 +927,9 @@ namespace simol
 		else
 		{
 			cout << "CVcoeffs from file !" << endl;
-			DMat temp;
-			temp.load(input.outputFolderName() + input.controlVariateCoeffsPath());
+			DMat temp(0,0);
+			throw std::invalid_argument("load for DMat not implemented");
+      //temp.load(input.outputFolderName() + input.controlVariateCoeffsPath());
 			assert(temp.n_rows == coeffsVec_.n_rows && temp.n_cols == 1);
 			coeffsVec_ = arma::conv_to<SMat>::from(temp);
 		}

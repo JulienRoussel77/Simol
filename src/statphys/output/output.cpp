@@ -269,13 +269,14 @@ namespace simol{
 		    << std::endl;
 		
     if (nbOfParticles_ > 1)
-      outVelocities_ << iOfIteration * timeStep() 
+      outVelocities_ << configuration[0].momentum();
+      /*outVelocities_ << iOfIteration * timeStep() ;
 		     << " " << configuration[0].momentum()
 		     << " " << configuration[nbOfParticles_/4].momentum()
 		     << " " << configuration[nbOfParticles_/2].momentum()
 		     << " " << configuration[3*nbOfParticles_/4].momentum()
 		     << " " << configuration[nbOfParticles_-1].momentum()
-		     << endl;
+		     << endl;*/
 		  
     if (nbOfParticles_ > 1)
       outBeam_ << iOfIteration * timeStep() 

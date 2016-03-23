@@ -23,8 +23,8 @@ namespace simol {
   };
 
   void initializeMomenta(const Dynamics& dyna, ParticleSystem& syst);
-  void simulate(Dynamics& dyna, ParticleSystem& syst);
   void initializeSystem(Dynamics& dyna, ParticleSystem& syst);
+  void simulate(Dynamics& dyna, ParticleSystem& syst);
   void updateAllControlVariates(const Dynamics& dyna, const ParticleSystem& syst, Output& output, size_t iOfIteration); 
   DenseMatrix<double> generatorOn(const Dynamics& dyna, const ParticleSystem& syst, const ControlVariate& controlVariate);
   void computeOutput(const Dynamics& dyna, const ParticleSystem& syst, Output& output,  size_t iOfIteration);
