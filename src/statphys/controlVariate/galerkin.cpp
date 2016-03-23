@@ -113,24 +113,24 @@ namespace simol
 		SMat C(A.numberOfRows()*B.numberOfRows(), A.numberOfColumns()*B.numberOfColumns());
 		//cout << A.size() << endl << B.size() << endl;
 		//SMat C(A.size() % B.size());					//element-wise product of the dimensions
-		for (int jOfA=0; (size_t) jOfA < A.numberOfColumns(); jOfA++)
-			for (SMat::iterator it = A.begin_col(jOfA); it != A.end_col(jOfA); ++it)
-			{
+    //
+    for (std::size_t jOfA=0; jOfA<A.numberOfColumns(); ++jOfA)
+    {
+      for (SMat::iterator it(A,jOfA); it; ++it)
+      {
 				int iOfA = it.row();
-				double valOfA = *it;
-				for (int jOfB=0; (size_t) jOfB < B.numberOfColumns(); jOfB++)
-					for (SMat::iterator it2 = B.begin_col(jOfB); it2 != B.end_col(jOfB); ++it2)
+				double valOfA = it.value();
+				for (std::size_t jOfB=0; jOfB < B.numberOfColumns(); jOfB++)
+				{	
+          for (SMat::iterator it2(B, jOfB); it2; ++it2)
 					{
 						int iOfB = it2.row();
-						double valOfB = *it2;
-						//cout << iOfA << " " << j << " " << iOfB << " " << jOfB << endl;
-						//if (jOfA * (b_1 + jOfB) <= a_1 && iOfA * (b_2 + iOfB) <= a_2)
-						//{						
+						double valOfB = it2.value();
 							C(iOfA + A.numberOfRows() * iOfB, jOfA + A.numberOfColumns() * jOfB) = valOfA*valOfB;
-// 							//cout << "ok"<<endl;
-						//}
 					}
-			}
+			  }
+      }
+    }
 		return C;
 	}
 	

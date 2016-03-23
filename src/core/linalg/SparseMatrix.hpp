@@ -37,6 +37,12 @@ namespace simol
     friend std::ifstream & operator>> <>(std::ifstream & fileToRead,
                                          SparseMatrix<ScalarType,eigen> & matrixToWrite);
     public:
+
+      typedef typename eigen<ScalarType>::SparseMatrixType::InnerIterator iterator;
+
+      operator typename eigen<ScalarType>::SparseMatrixType const () const
+      { return wrapped_; }
+
       std::size_t numberOfRows() const;
       std::size_t numberOfColumns() const;
       ScalarType const operator()(std::size_t const rowIndex,
