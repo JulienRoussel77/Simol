@@ -18,3 +18,11 @@ void displayTime(double time)
   int nbDays = nbHours / 24;
   cout << "Temps de calcul total : " << nbDays << " j " <<  nbHours%24  << " h " << nbMinutes%60 << " m " << nbSeconds%60 << " s " << endl;
 }
+
+int getNbOfLines(ifstream const& file)
+{
+  std::string line;
+  int nbOfLines = 0;
+  for (nbOfLines = 0; std::getline(file, line); ++nbOfLines){}
+  return nbOfLines;
+}

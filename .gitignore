@@ -10,3 +10,7 @@ doc/dev/*.synctex.gz
 doc/dev/chapters/*.log
 
 integration/buildbot
+output/*
+.kdev4/
+config.cmake
+simol.kdev4

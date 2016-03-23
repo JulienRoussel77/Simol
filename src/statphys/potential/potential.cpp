@@ -345,15 +345,9 @@ namespace simol
 			
 			ydraw = exp(-localBeta * (pow(xdraw, 2)/2 + ratio)) * rng->scalarUniform();
 			reject = (udraw > exp(- localBeta * (value(xdraw) + pow(xdraw, 2)/2 + ratio)));
-			cout << reject << " " << xdraw << " " << ydraw << endl << endl;
+			//cout << reject << " " << xdraw << " " << ydraw << endl << endl;
 			assert(exp(-localBeta * (pow(xdraw, 2)/2 + ratio)) >= exp(- localBeta * value(xdraw)));
-			count++;
-			//xdraw = rng_->scalarGaussian() / sqrt(localBeta);
-			//udraw = scalarUniform();
-			//reject = (udraw > Zinv * exp(- localBeta * potential_->value(xdraw)) / exp(-localBeta * (pow(xdraw, 2)/2 + ratio))
-			
 		}
-		cout << count << " tries !" << endl;
 		return xdraw;
 	}
 	
