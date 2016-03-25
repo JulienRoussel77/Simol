@@ -32,6 +32,12 @@ namespace simol
     cout << "finalTime = " << nbOfIterations_ * timeStep() << endl;
   }
   
+  void Dynamics::printName() const
+  {
+    std::cout << "Dynamics = Dynamics" << std::endl;
+  }
+
+  
 
   
   ///
@@ -222,6 +228,13 @@ namespace simol
   {
     galerkin_ = createLangevinGalerkin(input);
   } 
+  
+  ///
+  ///Print de name of the dynamics
+  void Langevin::printName() const
+  {
+    std::cout << "Dynamics = Langevin" << std::endl;
+  }
 
   ///
   ///Read-only accessor for the intensity of the Orstein-Uhlenbeck process

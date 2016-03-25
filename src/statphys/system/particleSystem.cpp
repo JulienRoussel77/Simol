@@ -24,6 +24,12 @@ namespace simol
     delete potential_;
   }
   
+  void ParticleSystem::printName() const
+  {
+    cout << "System = System" << endl;
+  }
+
+  
   const Particle& ParticleSystem::getParticle(size_t index) const
   { return configuration_[index]; }
   
@@ -178,13 +184,17 @@ namespace simol
   Isolated::Isolated(Input const& input):
   ParticleSystem(input)
   {
-    //for (size_t i = 0; i<input.nbOfParticles(); i++) 
+    cout << "Isolated::Isolated" << endl;
     getParticle(0) = Particle(input.mass(), input.initialPosition(), input.initialMomentum());
-		cout << "Particle initialized !" << endl;
     Particle& p = getParticle(0);
     cout << p.mass() << endl;
 		cout << getParticle(0).mass() << "  " << getParticle(0).position() << "  " << getParticle(0).momentum() << endl;
 	}
+	
+	void Isolated::printName() const
+  {
+    cout << "System = Isolated" << endl;
+  }
       
   
   void Isolated::computeAllForces(Dynamics const& dyna)

@@ -12,16 +12,15 @@
 
 namespace simol
 {
-  class ParticleSystem;
-  
-  //ParticleSystem* createSystem(Input  const& input);
 
   class ParticleSystem
   {
-    //friend ParticleSystem* createSystem(Input  const& input);
     public:
       ParticleSystem(Input const& input);
       virtual ~ParticleSystem();
+      
+      virtual void printName() const;
+      
       const Particle& getParticle(size_t index) const;
       Particle& getParticle(size_t index);
 			const size_t& dimension() const;
@@ -60,14 +59,12 @@ namespace simol
       std::shared_ptr<RNG> rng_;
       Potential* potential_;
   };
-
-  // redémarrage : nombres aleatoires, juste pannes, tous les N pas de temps
-  //
   
   class Isolated : public ParticleSystem
   {
   public:
     Isolated(Input const& input);
+    void printName() const;
     void computeAllForces(Dynamics const& model);
     void writeFinalOutput(Output& output, Dynamics const& model);
   };

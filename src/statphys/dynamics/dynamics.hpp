@@ -21,6 +21,8 @@ namespace simol
     
     public:
       Dynamics(Input const&  input);
+      
+      virtual void printName() const;
 
 			// Accessors
       double& timeStep();
@@ -116,6 +118,8 @@ namespace simol
   {
   public:
     Langevin(Input const& input);
+    virtual void printName() const;
+    
     virtual const double& gamma() const;
     double sigma() const;
     virtual void updateAfter(Particle& particle);

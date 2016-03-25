@@ -5,6 +5,26 @@ using std::endl;
 
 namespace simol {
   
+  void printClass(ParticleSystem& syst)
+  {
+    cout << "System = System" << endl;
+  }
+  
+  void printClass(Isolated& syst)
+  {
+    cout << "System = Isolated" << endl;
+  }
+  
+  void printClass(Langevin& syst)
+  {
+    cout << "Dynamics = Langevin" << endl;
+  }
+  
+  void printClass(Dynamics& syst)
+  {
+    cout << "Dynamics = Dynamics" << endl;
+  }
+  
  Simulation::Simulation(Input& input):
   dimension_(input.dimension()),
   output_(input),
@@ -16,9 +36,17 @@ namespace simol {
    output_.verbose() = 1;
    cout << "verbose = " << output_.verbose() << endl;
    system_ = createSystem(input); 
+   cout << "Simulation : ";
    //system_->setRNG(&rng_);
    dynamics_ = createDynamics(input);
    output_.setControlVariates(input, system_->potential(), dynamics_->galerkin());
+   
+   cout << "----------" << endl;
+   printClass(*system_);
+   printClass(*dynamics_);
+   system_->printName();
+   dynamics_->printName();
+   cout << "----------" << endl;
  }
  
  Simulation::~Simulation()
@@ -140,6 +168,11 @@ namespace simol {
   {
     syst.getParticle(0).momentum() = syst.drawMomentum(dyna.beta(), syst.getParticle(0).mass());
     syst.getParticle(0).position(0) = syst.drawPotLaw(dyna.beta()); 
+  }
+  
+    void initializeSystem(Langevin& dyna, Isolated& syst)
+  {
+    cout << "youpi" << endl;
   }
   
   //##################### HAMILTONIAN ####################"
@@ -383,9 +416,14 @@ namespace simol {
   }
 
   
-  //------------------------------ MAIN FUNCTION ------------------------------------
-  void launchSimu(Dynamics& dyna, ParticleSystem& syst, Output& output)
- {
+    //------------------------------ MAIN FUNCTION ------------------------------------
+  template<typename D, typename S>
+  void launchSimu(D& dyna, S& syst, Output& output)
+  {
+    //dyna.printName();
+    //syst.printName();
+    printClass(dyna);
+    printClass(syst);
     cout << "Estimated time : " << 3.5 * syst.nbOfParticles()/1024. * dyna.nbOfIterations() / 1e6 << " hours" << endl;
         
     //---- initialization (including burn-in) -----
@@ -395,16 +433,16 @@ namespace simol {
     //---- actual iterations -----
     for (size_t iOfIteration  =0; iOfIteration < dyna.nbOfIterations(); ++iOfIteration)
       {
-	//--- display progress every time 10% of simulation elapsed ---
-	if ((10*iOfIteration) % dyna.nbOfIterations() == 0) 
-	  cout << "---- Run " << (100 * iOfIteration) / dyna.nbOfIterations() << " % completed ----" << endl;
-	
-	//--- write outputs if required ----
-	computeOutput(dyna, syst, output, iOfIteration);
-	syst.writeOutput(output, iOfIteration);
+        //--- display progress every time 10% of simulation elapsed ---
+        if ((10*iOfIteration) % dyna.nbOfIterations() == 0) 
+          cout << "---- Run " << (100 * iOfIteration) / dyna.nbOfIterations() << " % completed ----" << endl;
+      
+        //--- write outputs if required ----
+        computeOutput(dyna, syst, output, iOfIteration);
+        syst.writeOutput(output, iOfIteration);
 
-	//---- update the system by the numerical integration ---
-	simulate(dyna, syst);
+        //---- update the system by the numerical integration ---
+        simulate(dyna, syst);
       }
     
     //--- write final outputs ----
@@ -417,8 +455,15 @@ namespace simol {
 
   void Simulation::launch()  
   {
+    cout << "Simulation::launch" << endl;
+    //dynamics_->printName();
+    //system_->printName();
+    printClass(*dynamics_);
+    printClass(*system_);
     launchSimu(*dynamics_, *system_, output_);
   }
+  
+
 
   
   
