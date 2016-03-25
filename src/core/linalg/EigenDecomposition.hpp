@@ -20,6 +20,11 @@ namespace simol
                        Eigen::ComputeEigenvectors|Eigen::Ax_lBx)
             {}
 
+            /*EigenDecomposition(DenseMatrix<Scalar, eigen> const & leftMatrix)
+            : wrapped_(leftMatrix.wrapped_,
+                       Eigen::ComputeEigenvectors|Eigen::Ax_lx)
+            {}*/
+
             Vector<double> eigenvalues()
             { return wrapped_.eigenvalues(); }
             DenseMatrix<double> eigenvectors()
