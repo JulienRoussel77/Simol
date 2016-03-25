@@ -4,7 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include <armadillo>
+//#include <armadillo>
 #include <Eigen/Sparse>
 #include "core/linalg/SparseMatrix.hpp"
 #include "core/linalg/DenseMatrix.hpp"
@@ -28,20 +28,21 @@ typedef std::complex<double> cplx;
 typedef simol::SparseMatrix<double> SMat;
 typedef simol::DenseMatrix<double> DMat;
 typedef simol::Vector<double> DVec;
-typedef arma::rowvec DRow;
 
-using arma::fill::zeros;
+//typedef arma::rowvec DRow;
 
-using Eigen::Matrix;
+//using arma::fill::zeros;
+
+/*using Eigen::Matrix;
 using Eigen::Dynamic;
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
 
 typedef Eigen::Matrix<cplx, Dynamic, Dynamic> DsMat;
-typedef Eigen::Triplet<double> T;
+typedef Eigen::Triplet<double> T;*/
 
 double modulo(double variable, double mini, double maxi);
 void displayTime(double time);
-int getNbOfLines(ifstream const& file);
+int getNbOfLines(ifstream& file);
 
 #endif

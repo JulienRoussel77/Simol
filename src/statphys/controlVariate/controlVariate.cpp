@@ -37,7 +37,7 @@ namespace simol
 		else if (input.controlVariateName() == "ExpFourierHermite")
 			return new ExpFourierHermiteControlVariate(input, potential, galerkin);
     else
-      cout << input.controlVariateName() << " is not a valid control variate !" << std::endl;
+      std::cout << input.controlVariateName() << " is not a valid control variate !" << std::endl;
     return 0;
   }
 
@@ -155,9 +155,9 @@ namespace simol
     return statsBetterObservable_.standardDeviation();
   }
   
-  VectorXd ControlVariate::correlationB2() const
+  Vector<double> ControlVariate::correlationB2() const
   {
-    return statsB2_.integratedAutocorrelationMat();
+    return statsB2_.integratedAutocorrelationVec();
   }
  
   double ControlVariate::correlationB2(size_t iOfFunction) const
@@ -176,19 +176,19 @@ namespace simol
     return statsObservable_(indexDifference);
   }
   
-  void ControlVariate::appendToB1(double observable, VectorXd& valueBasisFunction)
+  void ControlVariate::appendToB1(double observable, Vector<double>& valueBasisFunction)
   {
     for (size_t iOfFunction=0; iOfFunction<nbOfFunctions_; iOfFunction++)
       statsB1_.append((observable - statsObservable_.mean()) * valueBasisFunction(iOfFunction), iOfFunction);
   }
   
-  void ControlVariate::appendToB2(double observable, VectorXd& generatorOnBasisFunction, size_t iOfIteration)
+  void ControlVariate::appendToB2(double observable, Vector<double>& generatorOnBasisFunction, size_t iOfIteration)
   {
     for (size_t iOfFunction=0; iOfFunction<nbOfFunctions_; iOfFunction++)
 				statsB2_.append((observable - statsObservable_.mean()), iOfIteration, iOfFunction, generatorOnBasisFunction(iOfFunction));
 	}
   
-  void ControlVariate::appendToD(VectorXd& generatorOnBasisFunction, VectorXd& valueBasisFunction)
+  void ControlVariate::appendToD(Vector<double>& generatorOnBasisFunction, Vector<double>& valueBasisFunction)
   {
     //Eigen::Matrix<AutocorrelationStats<double>, Eigen::Dynamic, Eigen::Dynamic> A(nbOfFunctions_, nbOfFunctions_, AutocorrelationStats<double>(decorrelationNbOfIterations(), decorrelationTime()));
     
@@ -205,12 +205,12 @@ namespace simol
   
 
   
-  void ControlVariate::appendToBetterObservable(double observable, VectorXd& generatorOnBasisFunction, size_t iOfIteration)
+  void ControlVariate::appendToBetterObservable(double observable, Vector<double>& generatorOnBasisFunction, size_t iOfIteration)
   {
     //double betterObservableTerm = dot((statsB_.meanMat() - statsB2_.integratedAutocorrelationMat()), statsD_.meanMat().llt().solve(generatorOnBasisFunction));
-    /*MatrixXd Dinv = statsD_.meanMat().llt().solve(generatorOnBasisFunction);
-    VectorXd B = statsB_.meanMat() - statsB2_.integratedAutocorrelationMat();
-    cout << B.transpose() * Dinv << endl;*/
+    /*DenseMatrix<double> Dinv = statsD_.meanMat().llt().solve(generatorOnBasisFunction);
+    Vector<double> B = statsB_.meanMat() - statsB2_.integratedAutocorrelationMat();
+    std::cout << B.transpose() * Dinv << endl;*/
     //cout << (statsB_.meanMat() - statsB2_.integratedAutocorrelationMat()).transpose().size() << "  " << statsD_.meanMat().inverse().size() << endl;
     //lastA_ = (statsB_.meanMat() - statsB2_.integratedAutocorrelationMat()).transpose() * statsD_.meanMat().llt().solve(generatorOnBasisFunction);
     //cout << lastA_.size() << "   " << generatorOnBasisFunction.size() << endl;
@@ -218,9 +218,9 @@ namespace simol
     if (statsD_.meanMat().determinant() != 0)
     {
       //lastA_ = - .5 * statsD_.meanMat().llt().solve(meanB());
-			//lastA_ = VectorXd(1,1);
+			//lastA_ = Vector<double>(1,1);
 			lastA_.fill(1);
-      statsBetterObservable_.append(observable - lastA_.transpose().dot(generatorOnBasisFunction), iOfIteration);
+      statsBetterObservable_.append(observable - dot(lastA_, generatorOnBasisFunction), iOfIteration);
     }
     else
     {
@@ -237,44 +237,44 @@ namespace simol
   
   
   
-   VectorXd ControlVariate::lastB1() const
+   Vector<double> ControlVariate::lastB1() const
   {
-    /*VectorXd result(nbOfFunctions_);
+    /*Vector<double> result(nbOfFunctions_);
     for (size_t iOfFunction =0; iOfFunction < nbOfFunctions_; iOfFunction++)
       result(iOfFunction) = statsB_.lastValue(iOfFunction);
     return result;*/
-    return statsB1_.lastValueMat();
+    return statsB1_.lastValueVec();
   }
   
   
-  VectorXd ControlVariate::meanB1() const
+  Vector<double> ControlVariate::meanB1() const
   {
-    return statsB1_.meanMat();
+    return statsB1_.meanVec();
   }
   
-  VectorXd ControlVariate::meanB() const
+  Vector<double> ControlVariate::meanB() const
   {
-    return statsB1_.meanMat() - statsB2_.integratedAutocorrelationMat();
+    return statsB1_.meanVec() - statsB2_.integratedAutocorrelationVec();
   }
   
-  MatrixXd ControlVariate::lastD() const
+  DenseMatrix<double> ControlVariate::lastD() const
   {
     return statsD_.lastValueMat();
   }  
   
-  MatrixXd ControlVariate::meanD() const
+  DenseMatrix<double> ControlVariate::meanD() const
   {
     return statsD_.meanMat();
   }  
     
-    VectorXd ControlVariate::lastGeneratorOnBasis() const
+    Vector<double> ControlVariate::lastGeneratorOnBasis() const
   {
-    return statsGeneratorOnBasis_.lastValueMat();
+    return statsGeneratorOnBasis_.lastValueVec();
   }
     
-  VectorXd ControlVariate::meanGeneratorOnBasis() const
+  Vector<double> ControlVariate::meanGeneratorOnBasis() const
   {
-    return statsGeneratorOnBasis_.meanMat();
+    return statsGeneratorOnBasis_.meanVec();
   }
   
   double ControlVariate::autocorrelationB2(size_t indexDifference, size_t iOfFunction) const
@@ -282,7 +282,7 @@ namespace simol
     return statsB2_(indexDifference, iOfFunction);
   }
   
-  VectorXd ControlVariate::lastA() const
+  Vector<double> ControlVariate::lastA() const
   {
     return lastA_;
     
@@ -293,10 +293,10 @@ namespace simol
   }
 
   
-  void ControlVariate::update(double observable, VectorXd& generatorOnBasisFunction, vector<Particle> const& configuration, size_t iOfIteration)
+  void ControlVariate::update(double observable, Vector<double>& generatorOnBasisFunction, vector<Particle> const& configuration, size_t iOfIteration)
   {
 		//cout << "ControlVariate::update" << endl;
-    VectorXd valueBasisFunction(nbOfFunctions_);
+    Vector<double> valueBasisFunction(nbOfFunctions_);
     for (size_t iOfFunction =0; iOfFunction < nbOfFunctions_; iOfFunction++)
       valueBasisFunction(iOfFunction) = basisFunction(configuration, iOfFunction);
     appendToB1(observable, valueBasisFunction);
@@ -352,10 +352,10 @@ namespace simol
   
   void ControlVariate::postTreat(std::ofstream& out, double timeStep)
   {
-    cout << "Post-treatment of the output" << endl;
+    /*cout << "Post-treatment of the output" << endl;
     for (size_t iOfIteration = 0; iOfIteration < (size_t) historyObservable_.size(); iOfIteration++)
     {
-      statsPostBetterObservable_.append(historyObservable_(iOfIteration) - lastA_.dot(historyGeneratorOnBasis_.row(iOfIteration)), iOfIteration);
+      statsPostBetterObservable_.append(historyObservable_(iOfIteration) - dot(lastA_, historyGeneratorOnBasis_.row(iOfIteration)), iOfIteration);
       statsPostObservable_.append(historyObservable_(iOfIteration), iOfIteration);
 			if (doOutput(iOfIteration))
 			{
@@ -372,11 +372,12 @@ namespace simol
 			}
     }
     
-    cout << "(D + Dt)/2 = " << endl << meanD() << endl;
-    cout << "b = " << endl << meanB() << endl;
-    cout << "a = " << endl << lastA_ << endl << endl;
+    std::cout << "(D + Dt)/2 = " << endl << meanD() << endl;
+    std::cout << "b = " << endl << meanB() << endl;
+    std::cout << "a = " << endl << lastA_ << endl << endl;
     
-    cout << "-<Linv j, j> = " << .5 * pow(statsPostObservable_.standardDeviation(), 2) << endl;
+    std::cout << "-<Linv j, j> = " << .5 * pow(statsPostObservable_.standardDeviation(), 2) << endl;
+  */
   }
   
  
@@ -431,14 +432,14 @@ namespace simol
     return Vector<double>(configuration[0].dimension());
   }
   
-  void NoControlVariate::update(double observable, VectorXd& /*generatorOnBasisFunction*/, vector<Particle> const& /*configuration*/, size_t iOfIteration)
+  void NoControlVariate::update(double observable, Vector<double>& /*generatorOnBasisFunction*/, vector<Particle> const& /*configuration*/, size_t iOfIteration)
   {
     appendToObservable(observable, iOfIteration);
   }
 
   void NoControlVariate::postTreat(std::ofstream& out, double timeStep)
   {
-    cout << "Post-treatment of the output" << endl;
+    std::cout << "Post-treatment of the output" << endl;
     for (size_t iOfIteration = 0; iOfIteration < (size_t) historyObservable_.size(); iOfIteration++)
     {
       statsPostObservable_.append(historyObservable_(iOfIteration), iOfIteration);
@@ -452,7 +453,7 @@ namespace simol
 			}
     }
     
-    cout << "-<Linv j, j> = " << .5 * pow(statsPostObservable_.standardDeviation(), 2) << endl;
+    std::cout << "-<Linv j, j> = " << .5 * pow(statsPostObservable_.standardDeviation(), 2) << endl;
   } 
     
     
@@ -946,10 +947,10 @@ namespace simol
 		assert(iOfFunction == 0);
 		double result = 0;
 		
-		for (SMat::iterator it = coeffsVec_.begin_col(0); it != coeffsVec_.end_col(0); ++it)
+		for (SMat::iterator it(coeffsVec_, 0); it; ++it)
 		{
 			int iOfCoeff = it.row();
-			double valOfCoeff = *it;
+			double valOfCoeff = it.value();
 			result += valOfCoeff * basis_->value(configuration, iOfCoeff);
 		}
 		
@@ -962,10 +963,10 @@ namespace simol
     Vector<double> result(1, 0);
     assert(iOfFunction == 0);
 		//cout << "gradientQ" << endl;
-		for (SMat::iterator it = coeffsVec_.begin_col(0); it != coeffsVec_.end_col(0); ++it)
+		for (SMat::iterator it(coeffsVec_, 0); it; ++it)
 		{
 			int iOfCoeff = it.row();
-			double valOfCoeff = *it;
+			double valOfCoeff = it.value();
 			//cout << "+ " << valOfCoeff << " X ";
 			result += valOfCoeff * basis_->gradientQ(configuration, iOfParticle, iOfCoeff);
 		}
@@ -980,10 +981,10 @@ namespace simol
     double result = 0;
     assert(iOfFunction == 0);
 		
-		for (SMat::iterator it = coeffsVec_.begin_col(0); it != coeffsVec_.end_col(0); ++it)
+		for (SMat::iterator it(coeffsVec_, 0); it; ++it)
 		{
 			int iOfCoeff = it.row();
-			double valOfCoeff = *it;
+			double valOfCoeff = it.value();
 			result += valOfCoeff * basis_->laplacianQ(configuration, iOfParticle, iOfCoeff);
 		}
     //cout << "laplacianQ = " << result << endl;
@@ -995,10 +996,10 @@ namespace simol
 		Vector<double> result(1, 0);
     assert(iOfFunction == 0);
 		//cout << "gradientP" << endl;
-		for (SMat::iterator it = coeffsVec_.begin_col(0); it != coeffsVec_.end_col(0); ++it)
+		for (SMat::iterator it(coeffsVec_, 0); it; ++it)
 		{
 			int iOfCoeff = it.row();
-			double valOfCoeff = *it;
+			double valOfCoeff = it.value();
 			//cout << "+ " << valOfCoeff << " X ";
 			result += valOfCoeff * basis_->gradientP(configuration, iOfParticle, iOfCoeff);
 		}
@@ -1012,10 +1013,10 @@ namespace simol
     double result = 0;
     assert(iOfFunction == 0);
 		
-		for (SMat::iterator it = coeffsVec_.begin_col(0); it != coeffsVec_.end_col(0); ++it)
+		for (SMat::iterator it(coeffsVec_, 0); it; ++it)
 		{
 			int iOfCoeff = it.row();
-			double valOfCoeff = *it;
+			double valOfCoeff = it.value();
 			result += valOfCoeff * basis_->laplacianP(configuration, iOfParticle, iOfCoeff);
 		}
     //cout << "laplacianP = " << result << endl;

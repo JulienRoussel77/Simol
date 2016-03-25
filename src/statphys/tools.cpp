@@ -19,7 +19,7 @@ void displayTime(double time)
   cout << "Temps de calcul total : " << nbDays << " j " <<  nbHours%24  << " h " << nbMinutes%60 << " m " << nbSeconds%60 << " s " << endl;
 }
 
-int getNbOfLines(ifstream const& file)
+int getNbOfLines(ifstream& file)
 {
   std::string line;
   int nbOfLines = 0;

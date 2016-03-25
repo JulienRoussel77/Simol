@@ -55,6 +55,7 @@ namespace simol
 		DVec unshapeSaddle(const DVec& Xsad) const;
 		DVec solveWithSaddle(const DenseMatrix<double>& A, const DVec& X) const;
 		DVec solveWithSaddle(const SMat& A, const DVec& X) const;
+    DenseMatrix<double> invWithSaddle(const SparseMatrix<double>& A) const;
 		DenseMatrix<double> invWithSaddle(const DenseMatrix<double>& A) const;
 
 		void computeExpToTrigMat();

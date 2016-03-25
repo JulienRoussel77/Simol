@@ -63,7 +63,8 @@ namespace simol
 
   Vector<double,eigen> operator*(double const& lambda, Vector<double,eigen> const& v);
   double dot(Vector<double,eigen> const& u, Vector<double,eigen> const& v);
-
+  Vector<double,eigen> piecewiseDivision(Vector<double,eigen> const& u, Vector<double,eigen> const& v);
+Vector<double,eigen> piecewiseDivision(Vector<double,eigen> const& u, Vector<size_t,eigen> const& v);
   //=============
   // CONSTRUCTORS
   //=============
@@ -274,7 +275,30 @@ namespace simol
   Vector<ScalarType,eigen> Vector<ScalarType,eigen>::operator-(Vector<ScalarType,eigen> const& u) const
   { return Vector<ScalarType,eigen>(*this) -= u; }
 
+  
+  template<class ScalarType>
+  Vector<double,eigen> piecewiseDivision(Vector<double,eigen> const& u, Vector<ScalarType,eigen> const& v)
+  {
+    if (u.size() != v.size())
+      throw std::invalid_argument("Can only divide vectors of same size !");
+    Vector<double,eigen> w(u.size());
+    for (size_t i=0; i<u.size(); i++)
+        w(i) = u(i) / v(i);
+    return w;
+  }
+  
+  
+  
+  
+  
 }
+
+
+
+
+
+
+
 
 template<class ScalarType, template<class> class WrappedLibrary>
 std::ostream & operator<<(std::ostream & fileToWrite, simol::Vector<ScalarType,WrappedLibrary> const & vectorToRead)
@@ -285,6 +309,8 @@ std::ostream & operator<<(std::ostream & fileToWrite, simol::Vector<ScalarType,W
     fileToWrite << vectorToRead(index) << " ";*/
   return fileToWrite;
 }
+
+
 
 
 #endif

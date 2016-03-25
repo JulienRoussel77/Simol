@@ -29,6 +29,8 @@ namespace simol
           DenseMatrix(typename eigen<ScalarType>::DenseBlock_const const & block)
           : wrapped_(block)
           {}
+          
+          DenseMatrix(Vector<double, eigen> u, std::size_t numberOfRows, std::size_t numberOfColumns);
 
           Vector<ScalarType> solve(Vector<ScalarType> const & rhs)
           {
@@ -71,6 +73,8 @@ namespace simol
 
           double
           rcond() const;
+          
+          void fill(ScalarType scalar);
 
           static
           DenseMatrix
@@ -94,6 +98,14 @@ namespace simol
 
           DenseMatrix operator*(DenseMatrix const & matrix) const
           { return DenseMatrix( WrappedType(wrapped_ * matrix.wrapped_) ); }
+          
+          DenseMatrix operator*=(ScalarType const& scalar)
+          {
+            wrapped_ *= scalar;
+            return *this;
+          }
+          
+          DenseMatrix<ScalarType,eigen> operator*(ScalarType const& scalar) const;
 
           ScalarType trace() const
           { return wrapped_.trace(); }
@@ -110,6 +122,8 @@ namespace simol
               wrapped_ *= scalar;
               return *this;
           }
+          
+          
 
       public:
           typedef typename eigen<ScalarType>::DenseMatrixType WrappedType;
@@ -145,6 +159,17 @@ namespace simol
       wrapped_(rowIndex, columnIndex) = nonzero;
     }
   }
+  
+  template<class ScalarType>
+  DenseMatrix<ScalarType, eigen>::DenseMatrix(Vector<double, eigen> u, std::size_t numberOfRows, std::size_t numberOfColumns):
+    DenseMatrix(numberOfRows, numberOfColumns)
+  {
+    /*if (u.size() != numberOfColumns * numberOfRows)
+      throw std::invalid_argument("Matrix reshape : sizes incoherent !");
+    for (int j=0; j<numberOfColumns; j++)
+      for (int i=0; i<numberOfRows; i++)*/
+        wrapped_.reshape(u, numberOfRows, numberOfColumns);
+  }
 
   template<class ScalarType> ScalarType const &
   DenseMatrix<ScalarType, eigen>::operator()(size_t const rowIndex,
@@ -163,6 +188,14 @@ namespace simol
   template<class ScalarType> size_t
   DenseMatrix<ScalarType, eigen>::numberOfColumns() const
   { return wrapped_.cols(); }
+  
+  template<class ScalarType> inline
+  DenseMatrix<ScalarType,eigen> DenseMatrix<ScalarType,eigen>::operator*(ScalarType const& scalar) const
+  {
+    DenseMatrix<ScalarType> u(*this);
+    u.wrapped_ *= scalar;
+    return u;
+  }
 
   template<class ScalarType> double
   DenseMatrix<ScalarType, eigen>::rcond() const
@@ -175,6 +208,12 @@ namespace simol
 
     return lmin/lmax;
   }
+  
+  template<class ScalarType>
+  void DenseMatrix<ScalarType, eigen>::fill(ScalarType scalar)
+  {
+    wrapped_.fill(scalar);
+  }
 
   template<class ScalarType>
   std::ostream &
@@ -186,6 +225,45 @@ namespace simol
   Vector<ScalarType> operator*(DenseMatrix<ScalarType, eigen> const & matrix,
                                Vector<ScalarType> const & vector)
   { return Vector<ScalarType>(matrix.wrapped_ * vector.wrapped_); }
+  
+    
+
+  
+  template<class ScalarType>
+  DenseMatrix<ScalarType, eigen> eye(size_t const nbOfRows, size_t const nbOfColumns)
+  {
+    DenseMatrix<ScalarType, eigen> A(nbOfRows, nbOfColumns);
+    for (int i=0; i<A.min(nbOfRows, A.nbOfColumns); i++)
+      A(i,i) = 1;
+    //A.wrapped_.setIdentity();
+    return A;
+  }
+  
+  template<class ScalarType>
+  DenseMatrix<ScalarType, eigen> zero(size_t const nbOfRows, size_t const nbOfColumns)
+  {
+    //DenseMatrix<ScalarType, eigen> A(nbOfRows, nbOfColumns);
+    DenseMatrix<ScalarType, eigen> A = DenseMatrix<ScalarType, eigen>::Zero(nbOfRows, nbOfColumns);
+    return A;
+  }
+  
+  template<class ScalarTypeA, class ScalarTypeB>
+  DenseMatrix<double,eigen> piecewiseDivision(DenseMatrix<ScalarTypeA,eigen> const& A, DenseMatrix<ScalarTypeB,eigen> const& B)
+  {
+    if (A.numberOfRows() != B.numberOfRows() || A.numberOfColumns() != B.numberOfColumns())
+      throw std::invalid_argument("Can only divide matrices of same size !");
+    DenseMatrix<double,eigen> C(A.numberOfRows(), B.numberOfColumns());
+    for (int i=0; i<A.numberOfRows(); i++)
+      for (int j=0; j<A.numberOfColumns(); j++)
+        C(i,j) = A(i,j) / B(i,j);
+    return C;
+  }
+
+  
+  template<class ScalarType>
+  DenseMatrix<ScalarType,eigen> operator*(ScalarType const& scalar, DenseMatrix<ScalarType,eigen> const& A)
+  {return A * scalar;}
+  
 
 }
 

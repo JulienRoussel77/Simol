@@ -6,8 +6,7 @@ using std::max;
 
 namespace simol{  
   
-  template <>
-  void AutocorrelationStats<double>::append(const double& newValue, size_t iOfIteration, size_t iOfObservable, const double& newRefValue)
+  void AutocorrelationStats::append(const double& newValue, size_t iOfIteration, size_t iOfObservable, const double& newRefValue)
   {
     if (iOfIteration % decorrelationNbOfIterations_ == 0)
     {
@@ -15,13 +14,13 @@ namespace simol{
       indexRef_ = iOfIteration;
     }
     statisticsValues_.append(newValue, iOfObservable);
-		//On intègre le profil d'autocorrélation à l'ordre 2
+		//On intègre le profil d'autocorrélation à l'ordre 2 en coomptant la valeur en 0 pour un demi
     statisticsMeanCorrelation_.append(((indexRef_ == iOfIteration)?.5:1) * statisticsRefValues_.lastValue(iOfObservable) * newValue, iOfObservable);
     statisticsCorrelation_.append(statisticsRefValues_.lastValue(iOfObservable) * newValue, ((iOfIteration - indexRef_)*nbOfAutocoPts_) / decorrelationNbOfIterations_, iOfObservable);    
   }
   
-  template <>
-  void AutocorrelationStats<Vector<double>>::append(Vector<double> const& newValue, size_t iOfIteration, size_t iOfObservable, Vector<double> const& /*newRefValue*/)
+  /*template <>
+  void AutocorrelationStats<Vector<double>>::append(Vector<double> const& newValue, size_t iOfIteration, size_t iOfObservable, Vector<double> const& /*newRefValue*//*)
   {
     if (iOfIteration % decorrelationNbOfIterations_ == 0)
     {
@@ -32,18 +31,16 @@ namespace simol{
 		//On intègre le profil d'autocorrélation à l'ordre 2
     statisticsMeanCorrelation_.append(((indexRef_ == iOfIteration)?.5:1) * dot(statisticsRefValues_.lastValue(iOfObservable), newValue), iOfObservable);
     statisticsCorrelation_.append(dot(statisticsRefValues_.lastValue(iOfObservable), newValue), ((iOfIteration - indexRef_)*nbOfAutocoPts_) / decorrelationNbOfIterations_, iOfObservable);
-  }
+  }*/
   
-  template <>
-  double AutocorrelationStats<double>::integratedAutocorrelationUnbiased(size_t iOfObservable) const
+  double AutocorrelationStats::integratedAutocorrelationUnbiased(size_t iOfObservable) const
   {
     return max(0., integratedAutocorrelation(iOfObservable) - mean(iOfObservable) * statisticsRefValues_.mean(iOfObservable) * decorrelationTime_);
   }
   
-  template <>
-  double AutocorrelationStats<Vector<double>>::integratedAutocorrelationUnbiased(size_t iOfObservable) const
+  /*double AutocorrelationStats<Vector<double>>::integratedAutocorrelationUnbiased(size_t iOfObservable) const
   {
     return max(0., integratedAutocorrelation(iOfObservable) - dot(mean(iOfObservable), statisticsRefValues_.mean(iOfObservable)) * decorrelationTime_);
-  }
+  }*/
   
 }

@@ -53,7 +53,7 @@ namespace simol {
     Vector<double> q = syst.getParticle(0).position();
     Vector<double> p = syst.getParticle(0).momentum();
     Vector<double> qEnd = syst.getParticle(syst.nbOfParticles()-1).position();
-    VectorXd generatorOnBasis;
+    Vector<double> generatorOnBasis;
     generatorOnBasis = generatorOn(dyna, syst, output.velocityCV());
     output.velocityCV().update(p(0), generatorOnBasis, syst.configuration(), iOfIteration);
     generatorOnBasis = generatorOn(dyna, syst, output.forceCV());
@@ -68,7 +68,7 @@ namespace simol {
   
   ///
   ///Applies the generator of this dynamics to the basis functions of the CV
-  MatrixXd generatorOn(const Dynamics& dyna, const ParticleSystem& syst, const ControlVariate& controlVariate)
+  Vector<double> generatorOn(const Dynamics& dyna, const ParticleSystem& syst, const ControlVariate& controlVariate)
   {
     throw std::invalid_argument("GeneratorOn not defined in the general case");  
   }
@@ -97,9 +97,9 @@ namespace simol {
   
     ///
   ///Applies the generator of this dynamics to the basis functions of the CV
-  MatrixXd generatorOn(const Hamiltonian& dyna, const ParticleSystem& syst, ControlVariate const& controlVariate)
+  Vector<double> generatorOn(const Hamiltonian& dyna, const ParticleSystem& syst, ControlVariate const& controlVariate)
   {
-    VectorXd result = VectorXd::Zero(controlVariate.nbOfFunctions());
+    Vector<double> result = Vector<double>::Zero(controlVariate.nbOfFunctions());
     for (size_t iOfFunction=0; iOfFunction < controlVariate.nbOfFunctions(); iOfFunction++)
       for (size_t iOfParticle=0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
         result(iOfFunction) += syst.getParticle(iOfParticle).momentum().dot(controlVariate.gradientQ(syst.configuration(), iOfParticle, iOfFunction))
@@ -112,9 +112,9 @@ namespace simol {
   
   ///Applies the generator of this dynamics to the basis functions of the CV
   ///Evaluate at the current state of "conifguration"
-  MatrixXd generatorOn(const Langevin& dyna, const ParticleSystem& syst, const ControlVariate& controlVariate)
+  Vector<double> generatorOn(const Langevin& dyna, const ParticleSystem& syst, const ControlVariate& controlVariate)
   {
-    VectorXd result = VectorXd::Zero(controlVariate.nbOfFunctions());
+    Vector<double> result = Vector<double>::Zero(controlVariate.nbOfFunctions());
     for (size_t iOfFunction=0; iOfFunction < controlVariate.nbOfFunctions(); iOfFunction++)
       for (size_t iOfParticle=0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
       {
@@ -133,7 +133,7 @@ namespace simol {
     //cout << "Langevin::updateAllControlVariates(Output& output, vector<Particle> const& configuration, size_t iOfIteration)" << endl;
     Vector<double> q = syst.getParticle(0).position();
     Vector<double> p = syst.getParticle(0).momentum();
-    VectorXd generatorOnBasis;
+    Vector<double> generatorOnBasis;
     generatorOnBasis = generatorOn(dyna, syst, output.velocityCV());
     output.velocityCV().update(p(0), generatorOnBasis, syst.configuration(), iOfIteration);
     if (output.doOutput(iOfIteration))
@@ -150,9 +150,9 @@ namespace simol {
   
   ///Applies the generator of this dynamics to the basis functions of the CV
   ///Evaluate at the current state of "conifguration"
-  MatrixXd generatorOn(const Overdamped& dyna, const ParticleSystem& syst, const ControlVariate& controlVariate)
+  Vector<double> generatorOn(const Overdamped& dyna, const ParticleSystem& syst, const ControlVariate& controlVariate)
   {
-    VectorXd result = VectorXd::Zero(controlVariate.nbOfFunctions());
+    Vector<double> result = Vector<double>::Zero(controlVariate.nbOfFunctions());
     for (size_t iOfFunction=0; iOfFunction < controlVariate.nbOfFunctions(); iOfFunction++)
       for (size_t iOfParticle=0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
         result(iOfFunction) += controlVariate.laplacianQ(syst.configuration(), iOfParticle, iOfFunction) / dyna.beta()
@@ -285,10 +285,10 @@ namespace simol {
   
     ///Applies the generator of this dynamics to the basis functions of the CV
   ///Evaluate at the current state of "conifguration"
-  MatrixXd generatorOn(const BoundaryLangevin& dyna, const ParticleSystem& syst, const ControlVariate& controlVariate)
+  Vector<double> generatorOn(const BoundaryLangevin& dyna, const ParticleSystem& syst, const ControlVariate& controlVariate)
   {
     size_t nbOfParticles = syst.nbOfParticles();
-    VectorXd result = VectorXd::Zero(controlVariate.nbOfFunctions());
+    Vector<double> result = Vector<double>::Zero(controlVariate.nbOfFunctions());
     for (size_t iOfFunction=0; iOfFunction < controlVariate.nbOfFunctions(); iOfFunction++)
     {
       for (size_t iOfParticle=0; iOfParticle < syst.nbOfParticles(); iOfParticle++)

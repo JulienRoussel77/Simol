@@ -433,7 +433,6 @@ namespace simol{
     double integralQ = 0;
     double midFlowQ = 0;
 		double sumFlowQ = 0;
-    //VectorXd integralMidFlowB2(midFlowCV_->nbOfFunctions());
 		size_t midNb = nbOfParticles_/2;
     for (int i=0; i < nbOfAutocoPts(); i++)
     {

@@ -62,11 +62,11 @@ namespace simol
     ControlVariate* midFlowCV_;
 		ControlVariate* sumFlowCV_;
 		
-		AutocorrelationStats<double> kinTempProfile_;
-		AutocorrelationStats<double> potTempTopProfile_;
-		AutocorrelationStats<double> potTempBotProfile_;
-		AutocorrelationStats<double> bendistProfile_;
-		AutocorrelationStats<double> flowProfile_;
+		AutocorrelationStats kinTempProfile_;
+		AutocorrelationStats potTempTopProfile_;
+		AutocorrelationStats potTempBotProfile_;
+		AutocorrelationStats bendistProfile_;
+		AutocorrelationStats flowProfile_;
 	
     Output(Input const& input);
     void setControlVariates(Input& input, Potential& potential, Galerkin* galerkin);

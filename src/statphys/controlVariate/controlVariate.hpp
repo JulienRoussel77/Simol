@@ -26,19 +26,19 @@ namespace simol
 		size_t periodNbOfIterations_;
 		int nbOfAutocoPts_;
 
-    AutocorrelationStats<double> statsObservable_;
-    AutocorrelationStats<double> statsBetterObservable_;
-    Statistics<double> statsGeneratorOnBasis_;
+    AutocorrelationStats statsObservable_;
+    AutocorrelationStats statsBetterObservable_;
+    Statistics statsGeneratorOnBasis_;
 
-    Statistics<double> statsB1_;
-    AutocorrelationStats<double> statsB2_;
-    Statistics<double> statsD_;
-    VectorXd lastA_;
+    Statistics statsB1_;
+    AutocorrelationStats statsB2_;
+    Statistics statsD_;
+    Vector<double> lastA_;
 
-    AutocorrelationStats<double> statsPostObservable_;
-    AutocorrelationStats<double> statsPostBetterObservable_;
-    VectorXd historyObservable_;
-    MatrixXd historyGeneratorOnBasis_;
+    AutocorrelationStats statsPostObservable_;
+    AutocorrelationStats statsPostBetterObservable_;
+    Vector<double> historyObservable_;
+    DenseMatrix<double> historyGeneratorOnBasis_;
 
     Potential* potential_;
   public:
@@ -58,11 +58,11 @@ namespace simol
 		virtual int nbOfFourier() const;
 		virtual int nbOfHermite() const;
 
-    virtual VectorXd lastB1() const;
-    virtual VectorXd meanB1() const;
-    virtual VectorXd meanB() const;
-    virtual MatrixXd lastD() const;
-    virtual MatrixXd meanD() const;
+    virtual Vector<double> lastB1() const;
+    virtual Vector<double> meanB1() const;
+    virtual Vector<double> meanB() const;
+    virtual DenseMatrix<double> lastD() const;
+    virtual DenseMatrix<double> meanD() const;
 
     virtual double lastObservable() const;
     virtual double meanObservable() const;
@@ -71,27 +71,27 @@ namespace simol
     virtual double meanBetterObservable() const;
     virtual double stdDeviationBetterObservable() const;
 
-    virtual VectorXd lastGeneratorOnBasis() const;
-    virtual VectorXd meanGeneratorOnBasis() const;
+    virtual Vector<double> lastGeneratorOnBasis() const;
+    virtual Vector<double> meanGeneratorOnBasis() const;
 
     virtual double autocorrelation(size_t indexDifference) const;
     virtual double autocorrelationB2(size_t indexDifference, size_t iOfFunction = 0) const;
 
-    virtual VectorXd lastA() const;
+    virtual Vector<double> lastA() const;
     virtual double lastA(size_t iOfFunction = 0) const;
 
-    virtual VectorXd correlationB2() const;
+    virtual Vector<double> correlationB2() const;
     virtual double correlationB2(size_t iOfFunction) const;
 
     // APPEND
 
     void appendToObservable(double observable, size_t iOfIteration);
-    void appendToB1(double observable, VectorXd& basisFunction);
-    void appendToB2(double observable, VectorXd& generatorOnBasisFunction, size_t iOfIteration);
-    void appendToD(VectorXd& generatorOnBasisFunction, VectorXd& basisFunction);
-    void appendToBetterObservable(double observable, VectorXd& generatorOnBasisFunction, size_t iOfIteration);
+    void appendToB1(double observable, Vector<double>& basisFunction);
+    void appendToB2(double observable, Vector<double>& generatorOnBasisFunction, size_t iOfIteration);
+    void appendToD(Vector<double>& generatorOnBasisFunction, Vector<double>& basisFunction);
+    void appendToBetterObservable(double observable, Vector<double>& generatorOnBasisFunction, size_t iOfIteration);
 
-    virtual void update(double observable, VectorXd& generatorOnBasisFunction, vector<Particle> const& configuration, size_t iOfIteration);
+    virtual void update(double observable, Vector<double>& generatorOnBasisFunction, vector<Particle> const& configuration, size_t iOfIteration);
 
     // FUNCTION CARACTERIZATION
 
@@ -125,7 +125,7 @@ namespace simol
     virtual Vector<double> gradientQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
     virtual double laplacianP(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
     virtual Vector<double> gradientP(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
-    void update(double observable, VectorXd& generatorOnBasisFunction, vector<Particle> const& configuration, size_t iOfIteration);
+    void update(double observable, Vector<double>& generatorOnBasisFunction, vector<Particle> const& configuration, size_t iOfIteration);
     virtual void postTreat(std::ofstream& out, double timeStep);
   };
 
