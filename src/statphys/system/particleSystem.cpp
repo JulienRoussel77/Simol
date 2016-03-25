@@ -156,11 +156,11 @@ namespace simol
   
 
   
-
   
+  // TO DO : cette fonction ne sert pas a grand chose... ce test peut (DOIT) etre fait dans output.cpp !!
   void ParticleSystem::writeOutput(Output& output, size_t iOfIteration)
   {
-		if (output.verbose() > 0 && output.doOutput(iOfIteration))// && iOfIteration >= 100)
+    if (output.verbose() > 0 && output.doOutput(iOfIteration))// && iOfIteration >= 100)
       output.display(configuration_, iOfIteration);
   }
   

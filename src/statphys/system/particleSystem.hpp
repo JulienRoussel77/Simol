@@ -5,6 +5,7 @@
 #include <vector>
 #include "particle.hpp"
 #include "dynamics.hpp"
+#include "dpde/dpde.hpp"
 #include "output.hpp"
 
 
@@ -68,19 +69,19 @@ namespace simol
   public:
     Isolated(Input const& input);
     void computeAllForces(Dynamics const& model);
-		void writeFinalOutput(Output& output, Dynamics const& model);
+    void writeFinalOutput(Output& output, Dynamics const& model);
   };
-	
-	class Fluid : public ParticleSystem
+  
+  class Fluid : public ParticleSystem
   {
   public:
     Fluid(Input const& input);
-		void computeAllForces(Dynamics const& model);
-		void writeFinalOutput(Output& output, Dynamics const& model);
+    void computeAllForces(Dynamics const& model);
+    void writeFinalOutput(Output& output, Dynamics const& model);
   };
-	
-
-
+  
+  
+  
 }
 
 

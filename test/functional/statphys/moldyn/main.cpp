@@ -1,4 +1,3 @@
-
 #include <cstdlib>
 #include <iostream>
 
@@ -43,11 +42,11 @@ int main(int argc, char* argv[])
   
   if (input.isGalerkin())
     throw std::invalid_argument("The input must correspond to a MD simulation !");
-	
-	simol::Simulation simu(input);
+  
+  simol::Simulation simu(input);
   //output.reset(input, &system->potential(), dynamics_->galerkin());
-	simu.launch();
-
+  simu.launch();
+  
   displayTime(clock() - totalTime);
 
   return EXIT_SUCCESS;

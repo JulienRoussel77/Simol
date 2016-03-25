@@ -9,16 +9,18 @@ using std::min;
 const double defaultMass = 1;
 const double defaultLength = 2 * M_PI;
 const int defaultNbOfParticles = 1;
-const double defaultTauBending = 0;
-const double defaultXi = 0;
-const double defaultExternalForce = 0;
-const int maxNbOfAutocoPts = 1000;
 const double defaultPotentialCoeff = 1;
 const double defaultSeed = 0;
 const int defaultOutputFrequency = 1000;
 const int defaultOutputProfileFrequency = 100;
-
-
+//-- default values for dynamics --
+const double defaultHeatCapacity = 1;
+const double defaultGamma = 1; 
+const double defaultXi = 0;
+const double defaultExternalForce = 0;
+const double defaultTauBending = 0;
+//-- default values for output --
+const int maxNbOfAutocoPts = 1000;
 
 namespace simol {
 
@@ -26,8 +28,8 @@ namespace simol {
   /// 1.30000 -> 1.3     1.000 -> 1
   string doubleToString(double x)
 	{
-		string s = to_string (x);
-		if (s.find(".") != std::string::npos)
+	  string s = to_string (x);
+	  if (s.find(".") != std::string::npos)
 			s.erase ( s.find_last_not_of('0') + 1, string::npos );
 		s.erase ( s.find_last_not_of('.') + 1, string::npos );
 		return s;
@@ -387,23 +389,29 @@ namespace simol {
 
   int Input::seed() const
   {
-		if (data["Physics"]["Model"]["Seed"])
-			return data["Physics"]["Model"]["Seed"].as<int>();
-		else
-			return defaultSeed;
-	}
+    if (data["Physics"]["Model"]["Seed"])
+      return data["Physics"]["Model"]["Seed"].as<int>();
+    else
+      return defaultSeed;
+  }
 
-	double Input::eta() const
-	{
-		if (dynamicsName() == "BoundaryLangevin")
-			return (temperatureLeft() - temperatureRight())/2;
-		else
-			return externalForce();
-	}
-
-
-
-	//### Output ###
+  double Input::eta() const
+  {
+    if (dynamicsName() == "BoundaryLangevin")
+      return (temperatureLeft() - temperatureRight())/2;
+    else
+      return externalForce();
+  }
+  
+  double Input::heatCapacity() const 
+  {
+    if (data["Physics"]["Model"]["HeatCapacity"])
+      return data["Physics"]["Model"]["HeatCapacity"].as<double>();
+    else
+      return defaultHeatCapacity;
+  }
+  
+  //### Output ###
 
   size_t Input::decorrelationNbOfIterations() const
   {

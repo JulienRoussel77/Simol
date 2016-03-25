@@ -1,0 +1,28 @@
+Geometry:
+  Dimension: 1
+
+Mesh:
+  Time:
+    Step: 0.001
+    FinalTime: 20000
+
+Physics:
+  System:
+    Name: Isolated
+  Potential:
+    Name: Sinusoidal
+    Amplitude: 1
+  Model:
+    Name: DPDE
+    Gamma: 1
+    Temperature: 1
+    HeatCapacity : 1
+
+Output:
+  ParametersName: /
+  FolderName: DPDE
+  DecorrelationTime: 5
+  Period: 1
+  ProfilePeriod: 10
+
+

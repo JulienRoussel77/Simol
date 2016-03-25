@@ -44,6 +44,26 @@ namespace simol {
     
     return 0;
   }
+
+	///
+	///Calls the proper constructor of Dynamics and returns a pointer
+  Dynamics* createDynamics(Input const& input)
+  {
+		//cout << "createDynamics(Input const& input)" << endl;
+    if (input.dynamicsName() == "Hamiltonian")
+      return new Hamiltonian(input);
+    else if (input.dynamicsName() == "Langevin")
+      return new Langevin(input);
+    else if (input.dynamicsName() == "BoundaryLangevin")
+      return new BoundaryLangevin(input);
+    else if (input.dynamicsName() == "Overdamped")
+      return new Overdamped(input);
+    else if (input.dynamicsName() == "DPDE")
+      return new DPDE(input);
+    else
+      std::cout << input.dynamicsName() << " is not a valid dynamics !" << std::endl;
+    return 0;
+  }
   
   
  
@@ -331,37 +351,77 @@ namespace simol {
     }
     return result;   
   }
+
+  //-------------- algorithmes pour DPDE -------------
   
- void launchSimu(Dynamics& dyna, ParticleSystem& syst, Output& output)
+  void simulate(DPDE& dyna, ParticleSystem& syst)
+  {
+    //-- Verlet part -- TO DO : a completer...
+    //for (auto&& particle : syst.configuration())
+    //dyna.verletFirstPart(particle);
+    syst.computeAllForces(dyna);
+    //for (auto&& particle : syst.configuration())
+    //dyna.verletSecondPart(particle);
+    //-- fluctuation/dissipation --
+    //for (auto&& particle : syst.configuration())
+    for (int i=0; i < syst.nbOfParticles(); i++)  // version explicite de la ligne cachee ci dessus, utile pour faire des boucles sur les couples !
+      dyna.energyReinjection(syst.getParticle(i));  // integration de p avec gamma fixe + reinjection
+  }
+  
+  void initializeSystem(DPDE& dyna, Isolated& syst)
+  {
+    syst.getParticle(0).momentum() = syst.drawMomentum(dyna.beta(), syst.getParticle(0).mass());
+    syst.getParticle(0).position(0) = 0;
+    syst.getParticle(0).internalEnergy() = 1;  // TO DO : il faudra ici tirer selon la bonne loi ?
+  }
+
+  void computeOutput(const DPDE& dyna, const Isolated& syst, Output& output, size_t iOfIteration)
+  {
+    output.kineticEnergy() = syst.getParticle(0).kineticEnergy();
+    output.potentialEnergy() = syst.getParticle(0).potentialEnergy();
+    output.internalEnergy() = syst.getParticle(0).internalEnergy();
+  }
+
+  
+  //------------------------------ MAIN FUNCTION ------------------------------------
+  void launchSimu(Dynamics& dyna, ParticleSystem& syst, Output& output)
  {
     cout << "Estimated time : " << 3.5 * syst.nbOfParticles()/1024. * dyna.nbOfIterations() / 1e6 << " hours" << endl;
-    //if (settingsPath_ == "")
-    //  dyna.initializeMomenta(syst.configuration());
-    //else
-    //  dyna.startFrom(settingsPath_);
-    
+        
+    //---- initialization (including burn-in) -----
     initializeSystem(dyna, syst);
+    syst.computeAllForces(dyna);  // TO DO : a mettre dans la fonction d'initialisation...
     
-    syst.computeAllForces(dyna);
+    //---- actual iterations -----
     for (size_t iOfIteration  =0; iOfIteration < dyna.nbOfIterations(); ++iOfIteration)
-    {
-      if ((10*iOfIteration) % dyna.nbOfIterations() == 0)
-       cout << "---- Run " << (100 * iOfIteration) / dyna.nbOfIterations() << " % completed ----" << endl;
-     
-      
-      //double instant = iOfIteration * dyna.timeStep();
-      computeOutput(dyna, syst, output, iOfIteration);
-      syst.writeOutput(output, iOfIteration);
-      simulate(dyna, syst);
-    }
+      {
+	//--- display progress every time 10% of simulation elapsed ---
+	if ((10*iOfIteration) % dyna.nbOfIterations() == 0) 
+	  cout << "---- Run " << (100 * iOfIteration) / dyna.nbOfIterations() << " % completed ----" << endl;
+	
+	//--- write outputs if required ----
+	computeOutput(dyna, syst, output, iOfIteration);
+	syst.writeOutput(output, iOfIteration);
+
+	//---- update the system by the numerical integration ---
+	simulate(dyna, syst);
+      }
+    
+    //--- write final outputs ----
     syst.computeFinalOutput(output, dyna);
     syst.writeFinalOutput(output, dyna);
   }
   
+
+  //------------ fonction de lancement ----------------
+
   void Simulation::launch()  
   {
     launchSimu(*dynamics_, *system_, output_);
   }
 
+  
+  
+  
   
 }

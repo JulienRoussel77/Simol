@@ -159,6 +159,16 @@ namespace simol{
   {
     return potentialEnergy_;
   }
+
+  const double& Output::internalEnergy() const
+  {
+    return internalEnergy_;
+  }
+  
+  double& Output::internalEnergy()
+  {
+    return internalEnergy_;
+  }
   
   const double& Output::energyMidFlow() const
   {
@@ -259,68 +269,81 @@ namespace simol{
 
   void Output::display(vector<Particle> const& configuration, size_t iOfIteration)
   {
-		//cout << "output : n = " << iOfIteration << endl;
-		    
+    //cout << "output : n = " << iOfIteration << endl;
+    
     outObservables_ << iOfIteration * timeStep() 
 		    << " " << kineticEnergy()
 		    << " " << potentialEnergy()
 		    << " " << energy()
 		    << " " << temperature()
 		    << std::endl;
-		
+    
     if (nbOfParticles_ > 1)
       outVelocities_ << configuration[0].momentum();
       /*outVelocities_ << iOfIteration * timeStep() ;
-		     << " " << configuration[0].momentum()
-		     << " " << configuration[nbOfParticles_/4].momentum()
-		     << " " << configuration[nbOfParticles_/2].momentum()
+	<< " " << configuration[0].momentum()
+	<< " " << configuration[nbOfParticles_/4].momentum()
+	<< " " << configuration[nbOfParticles_/2].momentum()
 		     << " " << configuration[3*nbOfParticles_/4].momentum()
 		     << " " << configuration[nbOfParticles_-1].momentum()
 		     << endl;*/
 		  
     if (nbOfParticles_ > 1)
       outBeam_ << iOfIteration * timeStep() 
-		     << " " << configuration[0].position() - 2*configuration[1].position() + configuration[2].position()
-				 //<< " " << configuration[0].position() - 2*configuration[1].position() + configuration[2].position()
-		     << " " << configuration[(nbOfParticles_-2)/4].position() - 2*configuration[(nbOfParticles_-2)/4+1].position() + configuration[(nbOfParticles_-2)/4+2].position()
-		     << " " << configuration[(nbOfParticles_-2)/2].position() - 2*configuration[(nbOfParticles_-2)/2+1].position() + configuration[(nbOfParticles_-2)/2+2].position()
-		     << " " << configuration[3*(nbOfParticles_-2)/4].position() - 2*configuration[3*(nbOfParticles_-2)/4+1].position() + configuration[3*(nbOfParticles_-2)/4+2].position()
-		     << " " << configuration[nbOfParticles_-3].position() - 2*configuration[nbOfParticles_-2].position() + configuration[nbOfParticles_-1].position()
-		     << endl;	   
-				 
-		     
+	       << " " << configuration[0].position() - 2*configuration[1].position() + configuration[2].position()
+	//<< " " << configuration[0].position() - 2*configuration[1].position() + configuration[2].position()
+	       << " " << configuration[(nbOfParticles_-2)/4].position() - 2*configuration[(nbOfParticles_-2)/4+1].position() + configuration[(nbOfParticles_-2)/4+2].position()
+	       << " " << configuration[(nbOfParticles_-2)/2].position() - 2*configuration[(nbOfParticles_-2)/2+1].position() + configuration[(nbOfParticles_-2)/2+2].position()
+	       << " " << configuration[3*(nbOfParticles_-2)/4].position() - 2*configuration[3*(nbOfParticles_-2)/4+1].position() + configuration[3*(nbOfParticles_-2)/4+2].position()
+	       << " " << configuration[nbOfParticles_-3].position() - 2*configuration[nbOfParticles_-2].position() + configuration[nbOfParticles_-1].position()
+	       << endl;	   
+    
+    
     velocityCV_->display(outVelocitiesCV_, iOfIteration * timeStep());
     forceCV_->display(outForcesCV_, iOfIteration * timeStep() );
     lengthCV_->display(outLengthsCV_, iOfIteration * timeStep() );
     midFlowCV_->display(outMidFlowCV_, iOfIteration * timeStep() );
-		sumFlowCV_->display(outSumFlowCV_, iOfIteration * timeStep() );
-		
-		//displayGeneratorOnBasis(outVelocitiesGenerator_, configuration, velocityCV_, iOfIteration * timeStep());
-		
-		if (doProfileOutput(iOfIteration))
-		{
-			for (size_t i = 0; i < nbOfParticles_; i++)
-				outParticles_ << iOfIteration * timeStep() 
-		    << " " << i
-		    << " " << configuration[i].position() 
-		    << " " << configuration[i].momentum() 
-		    << " " << configuration[i].kineticEnergy()
-		    << " " << configuration[i].potentialEnergy()
-		    << " " << configuration[i].energy()
-		    << " " << configuration[i].force()		    
-		    << endl;
-				
-			if (nbOfParticles_ > 1)
-			{
-				/*outProfile_.close();
-				outProfile_.open(outputFolderName_ + "/profiles/profile" + to_string(iOfIteration * timeStep()) + ".txt");
-				writeProfile(iOfIteration);
-				outProfile_.open(outputFolderName_ + "/profile.txt", std::ofstream::app);*/
-				writeProfile(outProfile_, iOfIteration);
-			}
-		}
+    sumFlowCV_->display(outSumFlowCV_, iOfIteration * timeStep() );
+    
+    //displayGeneratorOnBasis(outVelocitiesGenerator_, configuration, velocityCV_, iOfIteration * timeStep());
+    
+    if (doProfileOutput(iOfIteration))
+      {
+	for (size_t i = 0; i < nbOfParticles_; i++)
+	  outParticles_ << iOfIteration * timeStep() 
+			<< " " << i
+			<< " " << configuration[i].position() 
+			<< " " << configuration[i].momentum() 
+			<< " " << configuration[i].kineticEnergy()
+			<< " " << configuration[i].potentialEnergy()
+			<< " " << configuration[i].energy()
+			<< " " << configuration[i].force()		    
+			<< endl;
+	
+	if (nbOfParticles_ > 1)
+	  {
+	    /*outProfile_.close();
+	      outProfile_.open(outputFolderName_ + "/profiles/profile" + to_string(iOfIteration * timeStep()) + ".txt");
+	      writeProfile(iOfIteration);
+	      outProfile_.open(outputFolderName_ + "/profile.txt", std::ofstream::app);*/
+	    writeProfile(outProfile_, iOfIteration);
+	  }
+      }
   }
   
+  void Output::display_DPDE(vector<Particle> const& configuration, size_t iOfIteration)
+  {
+    // garder le vecteur des particules pour evt sortir les positions, etc
+    //cout << "output : n = " << iOfIteration << endl;
+    
+    outObservables_ << iOfIteration * timeStep() 
+		    << " " << kineticEnergy()
+		    << " " << potentialEnergy()
+		    << " " << internalEnergy()
+		    << std::endl;
+  }
+  
+
   void Output::displayGeneratorOnBasis(ofstream& out, vector<Particle> const& configuration, ControlVariate& controlVariate, double time)
 	{
 		//out << time << " " << configuration[0].position(0) << " " << configuration[0].momentum(0) << " " << controlVariate->lastGeneratorOnBasis()(0) << endl;

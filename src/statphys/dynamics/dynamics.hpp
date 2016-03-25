@@ -14,11 +14,11 @@ namespace simol
 {
   class Dynamics;
 
-  Dynamics* createDynamics(Input  const& input);
+  
 
   class Dynamics
   {
-    friend Dynamics* createDynamics(Input  const& input);
+    
     public:
       Dynamics(Input const&  input);
 

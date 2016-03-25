@@ -24,6 +24,8 @@ namespace simol {
   };
   
   ParticleSystem* createSystem(Input  const& input);
+  Dynamics* createDynamics(Input  const& input);
+
   
   void initializeMomenta(const Dynamics& dyna, ParticleSystem& syst);
   void initializeSystem(Dynamics& dyna, ParticleSystem& syst);

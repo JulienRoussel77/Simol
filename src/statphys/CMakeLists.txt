@@ -3,7 +3,7 @@
 #====================================================
 FILE(GLOB_RECURSE cpp-filenames *.cpp */*.cpp */*/*.cpp)
 
-INCLUDE_DIRECTORIES(. input output controlVariate dynamics system potential system/chain dynamics/boundaryLangevin)
+INCLUDE_DIRECTORIES(. input output controlVariate dynamics system potential system/chain dynamics/boundaryLangevin dynamics/dpde)
 
 #==============================
 # Define simol-statphys library

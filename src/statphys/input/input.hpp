@@ -80,7 +80,6 @@ namespace simol{
     double eta() const;
     double heatCapacity() const;  // used for DPDE dynamics
 
-    
     // Output
     size_t decorrelationNbOfIterations() const;
     double decorrelationTime() const;

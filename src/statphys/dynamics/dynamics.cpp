@@ -9,23 +9,7 @@ using std::endl;
 namespace simol
 {
 
-	///
-	///Calls the proper constructor of Dynamics and returns a pointer
-  Dynamics* createDynamics(Input const& input)
-  {
-		//cout << "createDynamics(Input const& input)" << endl;
-    if (input.dynamicsName() == "Hamiltonian")
-      return new Hamiltonian(input);
-    else if (input.dynamicsName() == "Langevin")
-      return new Langevin(input);
-    else if (input.dynamicsName() == "BoundaryLangevin")
-      return new BoundaryLangevin(input);
-    else if (input.dynamicsName() == "Overdamped")
-      return new Overdamped(input);
-    else
-      std::cout << input.dynamicsName() << " is not a valid dynamics !" << std::endl;
-    return 0;
-  }
+
   
   ///
   ///Constructor
@@ -236,8 +220,8 @@ namespace simol
     UniformStochasticDynamics(input), 
     gamma_(input.gamma())
   {
-		galerkin_ = createLangevinGalerkin(input);
-	} 
+    galerkin_ = createLangevinGalerkin(input);
+  } 
 
   ///
   ///Read-only accessor for the intensity of the Orstein-Uhlenbeck process

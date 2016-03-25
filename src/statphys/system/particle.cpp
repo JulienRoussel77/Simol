@@ -78,6 +78,12 @@ namespace simol
   double const & Particle::mass() const
   { return mass_; }
 
+  double const & Particle::internalEnergy() const
+  { return internalEnergy_; }
+
+  double & Particle::internalEnergy() 
+  { return internalEnergy_; }
+
   double Particle::kineticEnergy() const
   { 
 		return pow(momentum_.norm(), 2) / 2 / mass_;
