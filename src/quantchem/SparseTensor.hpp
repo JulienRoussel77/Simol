@@ -13,12 +13,6 @@
 
 namespace simol
 {
-    /*std::size_t
-    getInd(std::size_t const M_disc,
-           std::size_t const rowIndex,
-           std::size_t const columnIndex);
-*/
-
     template<typename ScalarType = double>
     class SparseTensor
     {
