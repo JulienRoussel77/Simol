@@ -3,6 +3,7 @@
 
 #include "tools.hpp"
 #include "particleSystem.hpp"
+#include "chain/chain.hpp"
 #include "controlVariate.hpp"
 
 namespace simol {
@@ -21,7 +22,9 @@ namespace simol {
  
     void launch();
   };
-
+  
+  ParticleSystem* createSystem(Input  const& input);
+  
   void initializeMomenta(const Dynamics& dyna, ParticleSystem& syst);
   void initializeSystem(Dynamics& dyna, ParticleSystem& syst);
   void simulate(Dynamics& dyna, ParticleSystem& syst);

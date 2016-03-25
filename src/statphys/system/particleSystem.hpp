@@ -13,11 +13,11 @@ namespace simol
 {
   class ParticleSystem;
   
-  ParticleSystem* createSystem(Input  const& input);
+  //ParticleSystem* createSystem(Input  const& input);
 
   class ParticleSystem
   {
-    friend ParticleSystem* createSystem(Input  const& input);
+    //friend ParticleSystem* createSystem(Input  const& input);
     public:
       ParticleSystem(Input const& input);
       virtual ~ParticleSystem();
@@ -79,37 +79,7 @@ namespace simol
 		void writeFinalOutput(Output& output, Dynamics const& model);
   };
 	
-	class Chain : public ParticleSystem
-	{
-	public:
-		Chain(Input const& input);
-		virtual void computeAllForces(Dynamics const& model);
-		virtual void thermalize(Dynamics& model);
-		virtual void computeProfile(Output& output, Dynamics const& model, size_t iOfIteration) const;
-		virtual void writeFinalOutput(Output& output, Dynamics const& model);
-	};
-  
-  class BiChain : public Chain
-  {
-    Particle ancorParticle_;
-  public:
-    BiChain(Input const& input);
-    void computeAllForces(Dynamics const& model);
-		virtual void computeProfile(Output& output, Dynamics const& model, size_t iOfIteration) const;
-		virtual void writeFinalOutput(Output& output, Dynamics const& model);
-  };
-  
-  class TriChain : public Chain
-  {
-    Particle ancorParticle1_;
-    Particle ancorParticle2_;
-  public:
-    TriChain(Input const& input);
-    void computeAllForces(Dynamics const& model);		  
-		virtual double boundaryPotEnergy() const;
-		virtual void computeProfile(Output& output, Dynamics const& model, size_t iOfIteration) const;
-		virtual void writeFinalOutput(Output& output, Dynamics const& model);
-	};
+
 
 }
 

@@ -27,6 +27,26 @@ namespace simol {
    delete dynamics_;
  }
  
+ 
+ 
+ 
+  ParticleSystem* createSystem(Input  const& input)
+  {
+    cout << "createSystem(Input  const& input)" << endl;
+    if (input.systemName() == "Isolated")
+      return new Isolated(input);
+    else if (input.systemName() == "BiChain")
+      return new BiChain(input);
+    else if (input.systemName() == "TriChain")
+      return new TriChain(input);
+    else
+      std::cout << input.systemName() << " is not a valid system !" << std::endl;
+    
+    return 0;
+  }
+  
+  
+ 
 
  
   ///
