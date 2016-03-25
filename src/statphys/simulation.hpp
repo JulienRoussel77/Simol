@@ -28,6 +28,8 @@ namespace simol {
   void updateAllControlVariates(const Dynamics& dyna, const ParticleSystem& syst, Output& output, size_t iOfIteration); 
   Vector<double> generatorOn(const Dynamics& dyna, const ParticleSystem& syst, const ControlVariate& controlVariate);
   void computeOutput(const Dynamics& dyna, const ParticleSystem& syst, Output& output,  size_t iOfIteration);
+  //Isolated
+  void initializeSystem(Dynamics& dyna, Isolated& syst);
   //Hamiltonian
   Vector<double> generatorOn(const Hamiltonian& dyna, const ParticleSystem& syst, const ControlVariate& controlVariate);
   //Langevin

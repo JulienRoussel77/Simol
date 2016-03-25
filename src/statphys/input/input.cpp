@@ -129,12 +129,12 @@ namespace simol {
     return name;
   }
   
-  const std::shared_ptr<RNG> Input::rng() const
+  const std::shared_ptr<RNG>& Input::rng() const
   {
     return rng_;
   }
   
-  std::shared_ptr<RNG> Input::rng()
+  std::shared_ptr<RNG>& Input::rng()
   {
     return rng_;
   }

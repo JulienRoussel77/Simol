@@ -31,8 +31,8 @@ namespace simol{
 		string simuTypeName() const;
 		string parametersName() const;
     string outputFolderName() const;
-    const std::shared_ptr<RNG> rng() const;
-    std::shared_ptr<RNG> rng();
+    const std::shared_ptr<RNG>& rng() const;
+    std::shared_ptr<RNG>& rng();
 
 		// Geometry
     int dimension() const;

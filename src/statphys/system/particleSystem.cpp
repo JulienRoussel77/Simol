@@ -266,7 +266,7 @@ namespace simol
   
   
   
-  void Chain::computeAllForces(Dynamics const& model) {throw std::invalid_argument("Function undefined");};
+  void Chain::computeAllForces(Dynamics const& model) {throw std::invalid_argument("computeAllForces : Function undefined");};
   
   void Chain::thermalize(Dynamics& dyna)
   {
@@ -289,9 +289,9 @@ namespace simol
   
 
 	
-	void Chain::computeProfile(Output& output, Dynamics const& model, size_t iOfIteration) const {throw std::invalid_argument("Function undefined");} 
+	void Chain::computeProfile(Output& output, Dynamics const& model, size_t iOfIteration) const {throw std::invalid_argument("Chain::computeProfile : Function undefined");} 
   
-  void Chain::writeFinalOutput(Output& output, Dynamics const& model) {throw std::invalid_argument("Function undefined");}
+  void Chain::writeFinalOutput(Output& output, Dynamics const& model) {throw std::invalid_argument("Chain::writeFinalOutput : Function undefined");}
   
   //###### BiChain ######
   

@@ -286,31 +286,21 @@ Vector<double,eigen> piecewiseDivision(Vector<double,eigen> const& u, Vector<siz
         w(i) = u(i) / v(i);
     return w;
   }
-  
-  
-  
-  
-  
+
+
+
+
+  template<class ScalarType>
+  std::ostream & operator<<(std::ostream & fileToWrite, simol::Vector<ScalarType,eigen> const & vectorToRead)
+  {
+    //std::copy(begin(vectorToRead), end(vectorToRead), std::ostream_iterator<int>(fileToWrite, " "));
+
+    for (size_t index = 0; index < vectorToRead.size(); ++index)
+      fileToWrite << vectorToRead(index) << " ";
+    return fileToWrite;
+  }
+
+
 }
-
-
-
-
-
-
-
-
-template<class ScalarType, template<class> class WrappedLibrary>
-std::ostream & operator<<(std::ostream & fileToWrite, simol::Vector<ScalarType,WrappedLibrary> const & vectorToRead)
-{
-  std::copy(begin(vectorToRead), end(vectorToRead), std::ostream_iterator<int>(fileToWrite, " "));
-
-  /*for (size_t index = 0; index < vectorToRead.size(); ++index)
-    fileToWrite << vectorToRead(index) << " ";*/
-  return fileToWrite;
-}
-
-
-
 
 #endif

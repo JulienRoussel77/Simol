@@ -49,6 +49,7 @@ namespace simol
 			virtual double temperature() const {assert(false);}
       virtual const double& temperatureLeft() const {assert(false);}
       virtual const double& temperatureRight() const {assert(false);}
+      virtual const double& beta() const {assert(false);}
       virtual const double& betaLeft() const {assert(false);}
       virtual const double& betaRight() const {assert(false);}
       virtual double deltaTemperature() const {assert(false);}

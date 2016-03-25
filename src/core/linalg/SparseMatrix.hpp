@@ -321,7 +321,8 @@ namespace simol
   }
 
   template<class ScalarType>
-  SparseMatrix<ScalarType,eigen> operator*(ScalarType const& scalar, SparseMatrix<ScalarType,eigen> const& A);
+  SparseMatrix<ScalarType,eigen> operator*(ScalarType const& scalar, SparseMatrix<ScalarType,eigen> const& A)
+  { return SparseMatrix<ScalarType,eigen>(typename eigen<ScalarType>::SparseMatrixType(scalar*A.wrapped_)); }
 
 }
 

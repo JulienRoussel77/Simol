@@ -11,6 +11,7 @@ namespace simol {
   //controlVariates_(nbOfReplicas_),
   rng_(input.seed(), input.dimension())
  {
+   cout << "Simulation::Simulation(Input& input)" << endl;
    input.rng() = std::shared_ptr<RNG>(&rng_);
    output_.verbose() = 1;
    cout << "verbose = " << output_.verbose() << endl;
@@ -44,7 +45,7 @@ namespace simol {
       dyna.updateAfter(particle);
   }
   
-  void initializeSystem(Dynamics& dyna, ParticleSystem& syst) {throw std::invalid_argument("Function undefined");}
+  void initializeSystem(Dynamics& dyna, ParticleSystem& syst) {throw std::invalid_argument("initializeSystem : Function undefined");}
  
   ///
   ///Computes the quantities needed by the control variates (coefficients a, b, D) and {L \Phi}
@@ -91,6 +92,14 @@ namespace simol {
     output.potentialEnergy() += syst.boundaryPotEnergy();
     syst.computeProfile(output, dyna, iOfIteration);
     updateAllControlVariates(dyna, syst, output, iOfIteration);
+  }
+  
+  //##################### ISOLATED ######################
+  
+  void initializeSystem(Dynamics& dyna, Isolated& syst)
+  {
+    syst.getParticle(0).momentum() = syst.drawMomentum(dyna.beta(), syst.getParticle(0).mass());
+    syst.getParticle(0).position(0) = syst.drawPotLaw(dyna.beta()); 
   }
   
   //##################### HAMILTONIAN ####################"
@@ -305,7 +314,7 @@ namespace simol {
   
  void launchSimu(Dynamics& dyna, ParticleSystem& syst, Output& output)
  {
-        cout << "Estimated time : " << 3.5 * syst.nbOfParticles()/1024. * dyna.nbOfIterations() / 1e6 << " hours" << endl;
+    cout << "Estimated time : " << 3.5 * syst.nbOfParticles()/1024. * dyna.nbOfIterations() / 1e6 << " hours" << endl;
     //if (settingsPath_ == "")
     //  dyna.initializeMomenta(syst.configuration());
     //else

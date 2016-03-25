@@ -530,7 +530,8 @@ namespace simol
 		Leq_  = Lham_ + gamma_ * Lthm_;
 		
 		cout << "############ L1 ############" << endl;
-		L1_ = kron(SIdQ_, P_);
+		//L1_ = kron(SMat::Identity(nbOfFourier_) , P_);
+    L1_ = kron(SIdQ_, P_);
 		
 		cout << "############ Leta ############" << endl;
 		Leta_ = Leq_ + externalForce_ * L1_;
