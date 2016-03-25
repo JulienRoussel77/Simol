@@ -51,7 +51,7 @@ namespace simol
      
      ScalarType& operator()(std::size_t const rowIndex,
                                     std::size_t const columnIndex)
-     { return wrapped_.coeff(rowIndex, columnIndex); }
+     { return wrapped_.coeffRef(rowIndex, columnIndex); }
      
       SparseMatrix<ScalarType,eigen>& operator+=(SparseMatrix<ScalarType,eigen> const& A);
       SparseMatrix<ScalarType,eigen>& operator-=(SparseMatrix<ScalarType,eigen> const& A);
@@ -62,9 +62,12 @@ namespace simol
       SparseMatrix<ScalarType,eigen> operator-() const;
       SparseMatrix<ScalarType,eigen> operator+(SparseMatrix<ScalarType,eigen> const& A) const;
       SparseMatrix<ScalarType,eigen> operator-(SparseMatrix<ScalarType,eigen> const& A) const;
-      SparseMatrix<ScalarType,eigen> operator*(ScalarType const& scalar, SparseMatrix<ScalarType,eigen> const& A) const;
+      
+      // TODO: write a non-pessimized version (return type may different in eigen)
+      SparseMatrix adjoint() const
+      { return SparseMatrix(wrapped_.adjoint()); }
+      
      
-     void transposeInPlace();
 
     public:
       typename eigen<ScalarType>::SparseMatrixType const & wrapped() const
@@ -130,7 +133,7 @@ namespace simol
       }
       
       SparseMatrix(Vector<double, eigen> u, std::size_t numberOfRows, std::size_t numberOfColumns);
-      
+      SparseMatrix(const typename eigen<ScalarType>::SparseMatrixType::AdjointReturnType& A);
     public:
       typename eigen<ScalarType>::SparseMatrixType wrapped_;
   };
@@ -164,12 +167,20 @@ namespace simol
   SparseMatrix<ScalarType, eigen>::SparseMatrix(Vector<double, eigen> u, std::size_t numberOfRows, std::size_t numberOfColumns):
     SparseMatrix(numberOfRows, numberOfColumns)
   {
-    /*if (u.size() != numberOfColumns * numberOfRows)
+    
+    //wrapped_.reshape(u, numberOfRows, numberOfColumns);
+    
+    if (u.size() != numberOfColumns * numberOfRows)
       throw std::invalid_argument("Matrix reshape : sizes incoherent !");
     for (int j=0; j<numberOfColumns; j++)
-      for (int i=0; i<numberOfRows; i++)*/
-    wrapped_.reshape(u, numberOfRows, numberOfColumns);
+      for (SparseMatrix<double>::iterator it(*this,j); it; ++it)
+        wrapped_.coeffRef(it.row(), j) = u(it.row()*u.size() + j);
   }
+ 
+  template<class ScalarType>
+  SparseMatrix<ScalarType, eigen>::SparseMatrix(const typename eigen<ScalarType>::SparseMatrixType::AdjointReturnType& A)
+  :wrapped_(A)
+  {}
 
   template<class ScalarType> inline std::size_t
   SparseMatrix<ScalarType,eigen>::numberOfRows() const
@@ -179,11 +190,6 @@ namespace simol
   SparseMatrix<ScalarType,eigen>::numberOfColumns() const
   { return wrapped_.cols(); }
   
-  template<class ScalarType>
-  void SparseMatrix<ScalarType,eigen>::transposeInPlace()
-  {
-    wrapped_.transposeInPlace();
-  }
   
   /*template<class ScalarType>
   SparseMatrix<ScalarType,eigen> SparseMatrix<ScalarType,eigen>::operator*=(ScalarType const& scalar)
@@ -305,7 +311,7 @@ namespace simol
   SparseMatrix<ScalarType, eigen> speye(size_t const nbOfRows, size_t const nbOfColumns)
   {
     SparseMatrix<ScalarType, eigen> A(nbOfRows, nbOfColumns);
-    for (int i=0; i<A.min(nbOfRows, A.nbOfColumns); i++)
+    for (int i=0; i < std::min(nbOfRows, nbOfColumns); i++)
       A(i,i) = 1;
     //A.wrapped_.setIdentity();
     return A;
@@ -317,6 +323,9 @@ namespace simol
     SparseMatrix<ScalarType, eigen> A(nbOfRows, nbOfColumns);
     return A;
   }
+  
+  template<class ScalarType>
+  SparseMatrix<ScalarType,eigen> operator*(ScalarType const& scalar, SparseMatrix<ScalarType,eigen> const& A);
 
 }
 

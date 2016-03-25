@@ -164,11 +164,13 @@ namespace simol
   DenseMatrix<ScalarType, eigen>::DenseMatrix(Vector<double, eigen> u, std::size_t numberOfRows, std::size_t numberOfColumns):
     DenseMatrix(numberOfRows, numberOfColumns)
   {
-    /*if (u.size() != numberOfColumns * numberOfRows)
+    if (u.size() != numberOfColumns * numberOfRows)
       throw std::invalid_argument("Matrix reshape : sizes incoherent !");
+
+    //wrapped_.resize(u, numberOfRows, numberOfColumns);
     for (int j=0; j<numberOfColumns; j++)
-      for (int i=0; i<numberOfRows; i++)*/
-        wrapped_.reshape(u, numberOfRows, numberOfColumns);
+      for (int i=0; i<numberOfRows; i++)
+        wrapped_(i,j) = u(i*u.size() + j);
   }
 
   template<class ScalarType> ScalarType const &
@@ -233,7 +235,7 @@ namespace simol
   DenseMatrix<ScalarType, eigen> eye(size_t const nbOfRows, size_t const nbOfColumns)
   {
     DenseMatrix<ScalarType, eigen> A(nbOfRows, nbOfColumns);
-    for (int i=0; i<A.min(nbOfRows, A.nbOfColumns); i++)
+    for (int i=0; i < std::min(nbOfRows, nbOfColumns); i++)
       A(i,i) = 1;
     //A.wrapped_.setIdentity();
     return A;
@@ -253,8 +255,8 @@ namespace simol
     if (A.numberOfRows() != B.numberOfRows() || A.numberOfColumns() != B.numberOfColumns())
       throw std::invalid_argument("Can only divide matrices of same size !");
     DenseMatrix<double,eigen> C(A.numberOfRows(), B.numberOfColumns());
-    for (int i=0; i<A.numberOfRows(); i++)
-      for (int j=0; j<A.numberOfColumns(); j++)
+    for (int j=0; j<A.numberOfColumns(); j++)
+      for (int i=0; i<A.numberOfRows(); i++)
         C(i,j) = A(i,j) / B(i,j);
     return C;
   }

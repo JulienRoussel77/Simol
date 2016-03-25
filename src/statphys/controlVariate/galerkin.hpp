@@ -87,7 +87,7 @@ namespace simol
 
 	class BoundaryLangevinGalerkin : public Galerkin
 	{
-		SMat SId_;
+		//SMat SId_;
 	public:
 		BoundaryLangevinGalerkin(Input const& input);
 		size_t iTens(size_t iOfFourier2, size_t iOfHermite, int iOfParticle) const;

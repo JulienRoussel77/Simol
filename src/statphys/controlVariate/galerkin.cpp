@@ -272,8 +272,8 @@ namespace simol
 			if (iOfFourier != (int) maxOfFourier_)
 				Q_(2 * iOfFourier + 1, 2 * iOfFourier) =   amplitude_ * beta_ / 4;
 		}
-		tQ_ = Q_;
-    tQ_.transposeInPlace();
+		
+		tQ_ = Q_.adjoint();
 	}
 	
 	void Galerkin::createP()
@@ -282,8 +282,7 @@ namespace simol
 			//P_(iOfHermite, iOfHermite+1) = cplx(sqrt(beta_) * sqrt(iOfHermite+1.), 0.);
 			P_(iOfHermite-1, iOfHermite) = sqrt(beta_*iOfHermite);
 		
-		tP_ = P_;
-    tP_.transposeInPlace();
+		tP_ = P_.adjoint();
 	}
 	
 	void Galerkin::createLthm0()
@@ -322,8 +321,8 @@ namespace simol
 		externalForce_(input.externalForce()),
 		nbOfIntegrationNodes_(1000),
 		//expFourierCoeffs_(2 * nbOfFourier_, 0),
-		trigToExpMat_(zero<double>(nbOfFourier_, nbOfFourier_)),
-		expToTrigMat_(zero<double>(nbOfFourier_, nbOfFourier_)),
+		trigToExpMat_(DenseMatrix<double, eigen>::Zero(nbOfFourier_, nbOfFourier_)),
+		expToTrigMat_(DenseMatrix<double, eigen>::Zero(nbOfFourier_, nbOfFourier_)),
 		trigToExpTens_(sizeOfBasis_, sizeOfBasis_),
 		expToTrigTens_(sizeOfBasis_, sizeOfBasis_),
 		potential_(createPotential(input)),
@@ -572,7 +571,7 @@ namespace simol
 	{
 		assert(iOfParticleP < nbOfParticles_);
 		//SMat tempId = speye(PMat.numberOfRows(), PMat.numberOfColumns());
-		SMat res = speye(1,1);
+		SMat res = speye<double>(1,1);
 		for (int i = 0; i < nbOfParticles_; i++)
 		{
 			res = kron(res, SIdQ_);
@@ -588,7 +587,7 @@ namespace simol
 		assert(iOfVariableB < nbOfVariables);
 		assert(A.size() == B.size());*/
 		//SMat tempId = speye(A.numberOfRows(), A.numberOfColumns());
-		SMat res = speye(1,1);
+		SMat res = speye<double>(1,1);
 		for (int i = 0; i < nbOfParticles_; i++)
 		{
 			if (i==iOfParticleQ) res = kron(res, QMat);
@@ -641,7 +640,7 @@ namespace simol
 	void BoundaryLangevinGalerkin::createLham()
 	{
 		cout << "BoundaryLangevinGalerkin::createLham()" << endl;
-		Lham_ = arma::zeros(sizeOfBasis_, sizeOfBasis_);
+		//Lham_ = arma::zeros(sizeOfBasis_, sizeOfBasis_);
 		for (int i=0; i<nbOfParticles_; i++)
 		{
 			Lham_ += doubleMatToTens(Q_, tP_, i, i);
@@ -657,7 +656,7 @@ namespace simol
 	{
 		createLthm0();
 		//SMat Lthm1_ = kron(SIdQ_, Lthm0_);
-		Lthm_ = arma::zeros(sizeOfBasis_, sizeOfBasis_);
+		//Lthm_ = arma::zeros(sizeOfBasis_, sizeOfBasis_);
 		for (int i=0; i<nbOfParticles_; i++)
 		{
 			//cout << i << " < " << nbOfParticles_ << endl;
@@ -707,14 +706,14 @@ namespace simol
 		DenseMatrix<double> N0H2Mat(N0H2, pow(nbOfFourier_, nbOfParticles_), pow(nbOfHermite_, nbOfParticles_));
 		
 		//SparseMatrix<double> Atest;
-		cx_vec eigvalLeq;
+		/*cx_vec eigvalLeq;
 		cx_mat eigvecLeq;
 		eig_gen(eigvalLeq, eigvecLeq, -DLeq);
 		//eigs_gen(eigvalLeq, eigvecLeq, Leq_, 3);
 		
 		ofstream out_eigvalLeq("../output/Galerkin/eigvalLeq");
 		//out_eigvalLeq << eigvalLeq << endl;
-		displayCplx(eigvalLeq, out_eigvalLeq);
+		displayCplx(eigvalLeq, out_eigvalLeq);*/
 		
 		/*double varOfH1 = -2 * dot(gettGiHj(0,1), LinvH1);
 		cout << "varOfH1 = " << varOfH1 << endl;
