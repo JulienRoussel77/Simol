@@ -351,7 +351,7 @@ namespace simol
     }*/
   }
   
-  void ControlVariate::postTreat(std::ofstream& out, double timeStep)
+  void ControlVariate::postTreat(std::ofstream& /*out*/, double /*timeStep*/)
   {
     /*cout << "Post-treatment of the output" << endl;
     for (size_t iOfIteration = 0; iOfIteration < (size_t) historyObservable_.size(); iOfIteration++)
@@ -423,7 +423,7 @@ namespace simol
     return 0;
   }
   
-  Vector<double> NoControlVariate::gradientQ(vector<Particle> const& configuration, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
+  Vector<double> NoControlVariate::gradientQ(vector<Particle> const& /*configuration*/, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
   {
     return Vector<double>(dimension_);
   }
@@ -433,7 +433,7 @@ namespace simol
     return 0;
   }
     
-  Vector<double> NoControlVariate::gradientP(vector<Particle> const& configuration, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
+  Vector<double> NoControlVariate::gradientP(vector<Particle> const& /*configuration*/, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
   {
     return Vector<double>(dimension_);
   }
@@ -496,7 +496,7 @@ namespace simol
     return 0;
   }
   
-  Vector<double> SinusControlVariate::gradientP(vector<Particle> const& configuration, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
+  Vector<double> SinusControlVariate::gradientP(vector<Particle> const& /*configuration*/, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
   {
     return Vector<double>(dimension_);
   }
@@ -528,7 +528,7 @@ namespace simol
     return - pow (2 * M_PI, 2) * cos(2 * M_PI * q);
   }
   
-  Vector<double> CosControlVariate::gradientP(vector<Particle> const& configuration, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
+  Vector<double> CosControlVariate::gradientP(vector<Particle> const& /*configuration*/, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
   {
     return Vector<double>(dimension_);
   }
@@ -579,7 +579,7 @@ namespace simol
       * exp(potential(q)/2);
   }
   
-  Vector<double> SinExpControlVariate::gradientP(vector<Particle> const& configuration, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
+  Vector<double> SinExpControlVariate::gradientP(vector<Particle> const& /*configuration*/, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
   {
     return Vector<double>(dimension_);
   }
@@ -626,7 +626,7 @@ namespace simol
       * exp(potential(q)/2);
   }
   
-  Vector<double> CosExpControlVariate::gradientP(vector<Particle> const& configuration, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
+  Vector<double> CosExpControlVariate::gradientP(vector<Particle> const& /*configuration*/, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
   {
     return Vector<double>(dimension_);
   }
@@ -650,7 +650,7 @@ namespace simol
     return configuration[0].kineticEnergy();
   }
   
-  Vector<double> LangevinControlVariate::gradientQ(vector<Particle> const& configuration, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
+  Vector<double> LangevinControlVariate::gradientQ(vector<Particle> const& /*configuration*/, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
   {
      Vector<double> grad(dimension_);
      //grad(0) = pow(configuration[0].momentum(0), 2);

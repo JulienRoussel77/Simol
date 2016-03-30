@@ -94,6 +94,12 @@ namespace simol
   { 
 		return laplacian(Vector<double>(1, position));
 	}
+	
+	double Potential::ratioToHarmonic() const 
+	{throw std::invalid_argument("Potential::ratioToHarmonic : Function undefined");}
+	
+	double Potential::drawLaw(double /*localBeta*/, std::shared_ptr<RNG>& /*rng*/) const
+  {throw std::invalid_argument("Potential::drawLaw : Function undefined");}
   
 //#### Sinusoidal #####
   
@@ -102,6 +108,22 @@ namespace simol
 		amplitude_(input.amplitude()), 
 		pulsation_(2*M_PI/input.length())
   {}
+  
+  double Sinusoidal::drawLaw(double localBeta, std::shared_ptr<RNG>& rng) const
+  {
+    bool reject = true;
+    double xdraw, udraw;
+    int count = 0;
+    while (reject)
+    {
+      xdraw = -M_PI + 2 * rng->scalarUniform() * M_PI;
+      udraw = rng->scalarUniform();
+      
+      reject = (udraw > exp(- localBeta * (value(xdraw) + 2)));
+      count++;
+    }
+    return xdraw;
+  }
   
   double Sinusoidal::operator()(double position) const
   { 
@@ -238,7 +260,7 @@ namespace simol
     return stiffness_;
   }
   
-  double Harmonic::drawLaw(double localBeta, std::shared_ptr<RNG> rng)
+  double Harmonic::drawLaw(double localBeta, std::shared_ptr<RNG>& rng) const
 	{
 		return rng->scalarGaussian() / sqrt(localBeta);
 	}
@@ -269,7 +291,7 @@ namespace simol
     return cos(distance);
   }
   
-  double Rotor::drawLaw(double localBeta, std::shared_ptr<RNG> rng)
+  double Rotor::drawLaw(double localBeta, std::shared_ptr<RNG>& rng) const
 	{
 		bool reject = true;
 		double xdraw, udraw;
@@ -277,19 +299,11 @@ namespace simol
 		while (reject)
 		{
 			xdraw = -M_PI + 2 * rng->scalarUniform() * M_PI;
-			//cout << ratio << " " << exp(-localBeta * (pow(xdraw, 2)/2 + ratio)) << " " << exp(- localBeta * potential_->value(xdraw)) << endl;
-			//cout << xdraw << " " << localBeta * pow(xdraw, 2)/2 - ratio << " >= " << localBeta * potential_->value(xdraw) << endl;
 			udraw = rng->scalarUniform();
 			
 			reject = (udraw > exp(- localBeta * (value(xdraw) + 2)));
-			//cout << reject << " " << xdraw << " " << udraw << endl << endl;
 			count++;
-			//xdraw = rng_->scalarGaussian() / sqrt(localBeta);
-			//udraw = scalarUniform();
-			//reject = (udraw > Zinv * exp(- localBeta * potential_->value(xdraw)) / exp(-localBeta * (pow(xdraw, 2)/2 + ratio))
-			
 		}
-		//cout << count << " tries !" << endl;
 		return xdraw;
 	}
   
@@ -330,7 +344,7 @@ namespace simol
 			return 0;
 	}
 	
-	double Quadratic::drawLaw(double localBeta, std::shared_ptr<RNG> rng)
+	double Quadratic::drawLaw(double localBeta, std::shared_ptr<RNG>& rng) const
 	{
 		double ratio = ratioToHarmonic();
 		bool reject = true;

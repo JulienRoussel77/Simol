@@ -22,7 +22,6 @@ namespace simol{
     double positionMin_, positionMax_;
     ifstream inputSettings_;
     vector<Vector<double>> initialPositions_, initialMomenta_;
-    std::shared_ptr<RNG> rng_;
   public:
     Input(CommandLine cmd);
     const string& inputPath() const;

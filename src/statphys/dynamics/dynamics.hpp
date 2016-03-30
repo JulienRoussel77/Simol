@@ -35,8 +35,8 @@ namespace simol
       const size_t& nbOfThermalIterations() const;
 			size_t& nbOfBurningIterations();
       const size_t& nbOfBurningIterations() const;
-      const std::shared_ptr<RNG> rng() const;
-      std::shared_ptr<RNG> rng();
+      const std::shared_ptr<RNG>& rng() const;
+      std::shared_ptr<RNG>& rng();
       
       Vector<double>& externalForce() ;
       const Vector<double>& externalForce() const;
@@ -65,6 +65,8 @@ namespace simol
 
       void resetForce(Particle& particle) const;
       
+      void verletFirstPart(Particle& particle);
+      void verletSecondPart(Particle& particle);
       virtual void updateBefore(Particle& particle);
       virtual void updateAfter(Particle& particle);
 			virtual void updateOrsteinUhlenbeck(Particle& particle, double localBeta);
