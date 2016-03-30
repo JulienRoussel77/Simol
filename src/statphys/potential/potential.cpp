@@ -334,7 +334,7 @@ namespace simol
 	{
 		double ratio = ratioToHarmonic();
 		bool reject = true;
-		double xdraw, ydraw, udraw;
+		double xdraw, udraw;
 		while (reject)
 		{
 			xdraw = rng->scalarGaussian() / sqrt(localBeta);
@@ -342,7 +342,6 @@ namespace simol
 			//cout << xdraw << " " << localBeta * pow(xdraw, 2)/2 - ratio << " >= " << localBeta * potential_->value(xdraw) << endl;
 			udraw = rng->scalarUniform();
 			
-			ydraw = exp(-localBeta * (pow(xdraw, 2)/2 + ratio)) * rng->scalarUniform();
 			reject = (udraw > exp(- localBeta * (value(xdraw) + pow(xdraw, 2)/2 + ratio)));
 			//cout << reject << " " << xdraw << " " << ydraw << endl << endl;
 			assert(exp(-localBeta * (pow(xdraw, 2)/2 + ratio)) >= exp(- localBeta * value(xdraw)));
