@@ -335,7 +335,6 @@ namespace simol
 		double ratio = ratioToHarmonic();
 		bool reject = true;
 		double xdraw, ydraw, udraw;
-		int count = 0;
 		while (reject)
 		{
 			xdraw = rng->scalarGaussian() / sqrt(localBeta);
