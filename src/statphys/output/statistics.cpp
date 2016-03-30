@@ -50,7 +50,7 @@ namespace simol
     return nbValues_(i,j);
   }
 
-  const Vector<size_t>& Statistics::nbValuesVec(size_t i) const
+  const Vector<size_t> Statistics::nbValuesVec(size_t i) const
   {
     return nbValues_.column(i);
   }
@@ -66,7 +66,7 @@ namespace simol
     return lastValue_(i,j);
   }
 
-  const Vector<double>& Statistics::lastValueVec(size_t i) const
+  const Vector<double> Statistics::lastValueVec(size_t i) const
   {
     return lastValue_.column(i);
   }

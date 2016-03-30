@@ -20,10 +20,10 @@ namespace simol
     Vector<double> meanVec(size_t i = 0) const;
     DenseMatrix<double> meanMat() const;
     const size_t& nbValues(size_t i = 0, size_t j = 0) const;
-    const Vector<size_t>& nbValuesVec(size_t i = 0) const;
+    const Vector<size_t> nbValuesVec(size_t i = 0) const;
     const DenseMatrix<size_t>& nbValuesMat() const;
     const double& lastValue(size_t i = 0, size_t j = 0) const;
-    const Vector<double>& lastValueVec(size_t i = 0) const;
+    const Vector<double> lastValueVec(size_t i = 0) const;
     const DenseMatrix<double>& lastValueMat() const;
   };
 
