@@ -163,7 +163,7 @@ namespace simol
 
     if (u.size() != numberOfColumns * numberOfRows)
       throw std::invalid_argument("Matrix reshape : sizes incoherent !");
-    for (int j=0; j<numberOfColumns; j++)
+    for (std::size_t j=0; j<numberOfColumns; j++)
       for (SparseMatrix<double>::iterator it(*this,j); it; ++it)
         wrapped_.coeffRef(it.row(), j) = u(it.row()*u.size() + j);
   }
@@ -302,7 +302,7 @@ namespace simol
   SparseMatrix<ScalarType, eigen> speye(size_t const nbOfRows, size_t const nbOfColumns)
   {
     SparseMatrix<ScalarType, eigen> A(nbOfRows, nbOfColumns);
-    for (int i=0; i < std::min(nbOfRows, nbOfColumns); i++)
+    for (std::size_t i=0; i < std::min(nbOfRows, nbOfColumns); i++)
       A(i,i) = 1;
     //A.wrapped_.setIdentity();
     return A;

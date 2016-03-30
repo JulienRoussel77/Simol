@@ -168,8 +168,8 @@ namespace simol
       throw std::invalid_argument("Matrix reshape : sizes incoherent !");
 
     //wrapped_.resize(u, numberOfRows, numberOfColumns);
-    for (int j=0; j<numberOfColumns; j++)
-      for (int i=0; i<numberOfRows; i++)
+    for (std::size_t j=0; j<numberOfColumns; j++)
+      for (std::size_t i=0; i<numberOfRows; i++)
         wrapped_(i,j) = u(i*u.size() + j);
   }
 
@@ -235,7 +235,7 @@ namespace simol
   DenseMatrix<ScalarType, eigen> eye(size_t const nbOfRows, size_t const nbOfColumns)
   {
     DenseMatrix<ScalarType, eigen> A(nbOfRows, nbOfColumns);
-    for (int i=0; i < std::min(nbOfRows, nbOfColumns); i++)
+    for (std::size_t i=0; i < std::min(nbOfRows, nbOfColumns); i++)
       A(i,i) = 1;
     //A.wrapped_.setIdentity();
     return A;
@@ -255,8 +255,8 @@ namespace simol
     if (A.numberOfRows() != B.numberOfRows() || A.numberOfColumns() != B.numberOfColumns())
       throw std::invalid_argument("Can only divide matrices of same size !");
     DenseMatrix<double,eigen> C(A.numberOfRows(), B.numberOfColumns());
-    for (int j=0; j<A.numberOfColumns(); j++)
-      for (int i=0; i<A.numberOfRows(); i++)
+    for (std::size_t j=0; j<A.numberOfColumns(); j++)
+      for (std::size_t i=0; i<A.numberOfRows(); i++)
         C(i,j) = A(i,j) / B(i,j);
     return C;
   }

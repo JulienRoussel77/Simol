@@ -7,8 +7,6 @@
 #include <fstream>
 #include <string>
 
-#include <Eigen/SparseCore>
-
 #include "core/linalg/SparseMatrix.hpp"
 
 namespace simol

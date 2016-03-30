@@ -4,8 +4,6 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-//#include <armadillo>
-#include <Eigen/Sparse>
 #include "core/linalg/SparseMatrix.hpp"
 #include "core/linalg/DenseMatrix.hpp"
 #include "core/linalg/Vector.hpp"

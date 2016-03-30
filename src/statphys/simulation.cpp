@@ -397,7 +397,7 @@ namespace simol {
     //dyna.verletSecondPart(particle);
     //-- fluctuation/dissipation --
     //for (auto&& particle : syst.configuration())
-    for (int i=0; i < syst.nbOfParticles(); i++)  // version explicite de la ligne cachee ci dessus, utile pour faire des boucles sur les couples !
+    for (std::size_t i=0; i < syst.nbOfParticles(); i++)  // version explicite de la ligne cachee ci dessus, utile pour faire des boucles sur les couples !
       dyna.energyReinjection(syst.getParticle(i));  // integration de p avec gamma fixe + reinjection
   }
   

@@ -7,7 +7,7 @@
 #include <Eigen/Core>
 #include <Eigen/Dense>
 #include <Eigen/Sparse>
-#include <Eigen/Core>
+#include <Eigen/SparseCore>
 #include <Eigen/SVD>
 #pragma GCC diagnostic pop
 
