@@ -4,7 +4,7 @@ Geometry:
 Mesh:
   Time:
     Step: 0.02
-    FinalTime: 10
+    FinalTime: 1000
 
 Physics:
   System:
@@ -23,6 +23,6 @@ Output:
   FolderName: test
   #Foldername: dt0.02_eta0_G9H9
   DecorrelationTime: 5
-  Period: 1
-  ProfilePeriod: 10
+  #Period: 1
+  #ProfilePeriod: 0.02
   FinalVelocity: No

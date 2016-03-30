@@ -7,7 +7,7 @@ namespace simol
  //### Chain ###
   
   Chain::Chain(Input const& input):
-  ParticleSystem(input)
+  System(input)
   {
     assert(configuration_.size() > 1);
     for (size_t i = 0; i<input.nbOfParticles(); i++) 
@@ -19,7 +19,8 @@ namespace simol
   
   
   
-  void Chain::computeAllForces(Dynamics const& model) {throw std::invalid_argument("computeAllForces : Function undefined");};
+  //void Chain::computeAllForces(Dynamics const& /*model*/) 
+  //{throw std::invalid_argument("computeAllForces : Function undefined");};*/
   
   void Chain::thermalize(Dynamics& dyna)
   {
@@ -42,9 +43,9 @@ namespace simol
   
 
   
-  void Chain::computeProfile(Output& output, Dynamics const& model, size_t iOfIteration) const {throw std::invalid_argument("Chain::computeProfile : Function undefined");} 
+
   
-  void Chain::writeFinalOutput(Output& output, Dynamics const& model) {throw std::invalid_argument("Chain::writeFinalOutput : Function undefined");}
+  
   
   //###### BiChain ######
   
@@ -128,16 +129,7 @@ namespace simol
     //cout << output.energySumFlow() << endl;
   }
   
-  void BiChain::writeFinalOutput(Output& output, Dynamics const& dyna)
-  {
-    //double time = dyna.timeStep() * dyna.nbOfIterations();
-    
-    output.finalDisplay(configuration_, dyna.externalForce());
-    if (output.doComputeCorrelations() &&  output.verbose() > 0)
-      output.finalDisplayAutocorrelations();
-    output.displayFinalFlow(dyna.temperature(), dyna.deltaTemperature());
-  }
-  
+
   
   
   //###### TriChain ######
@@ -226,14 +218,6 @@ namespace simol
   }
   
   
-  void TriChain::writeFinalOutput(Output& output, Dynamics const& dyna)
-  {
-    //double time = dyna.timeStep() * dyna.nbOfIterations();
-    
-    output.finalDisplay(configuration_, dyna.externalForce());
-    if (output.doComputeCorrelations() &&  output.verbose() > 0)
-      output.finalDisplayAutocorrelations();
-    output.displayFinalFlow(dyna.temperature(), dyna.deltaTemperature(), dyna.tauBending(), dyna.xi());
-  }
+
   
 }

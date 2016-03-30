@@ -7,8 +7,8 @@ namespace simol
 {
   DPDE::DPDE(Input const&  input):
     UniformStochasticDynamics(input), 
-    gamma_(input.gamma()),
-    heatCapacity_(input.heatCapacity())
+    heatCapacity_(input.heatCapacity()),
+    gamma_(input.gamma())
   {}
     
   double& DPDE::gamma()

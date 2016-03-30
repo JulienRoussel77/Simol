@@ -2,7 +2,7 @@
 #include <iostream>
 
 #include "simulation.hpp"
-#include "particleSystem.hpp"
+#include "system.hpp"
 #include "dynamics.hpp"
 #include "Vector.hpp"
 #include "input.hpp"

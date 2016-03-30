@@ -19,6 +19,7 @@ namespace simol
   {
   friend ControlVariate* createControlVariate(Input const& input, Potential& potential);
   protected:
+    size_t dimension_;
     size_t decorrelationNbOfIterations_;
     double decorrelationTime_;
     size_t nbOfFunctions_;
@@ -120,6 +121,7 @@ namespace simol
     virtual size_t nbOfFunctions() const;
     virtual size_t nbOfFunctionPairs() const;
     bool isNone() const;
+    Vector<double> lastGeneratorOnBasis() const;
     double basisFunction(vector<Particle> const& configuration, size_t iOfFunction = 0) const;
     virtual double laplacianQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;
     virtual Vector<double> gradientQ(vector<Particle> const& configuration, size_t iOfParticle = 0, size_t iOfFunction = 0) const;

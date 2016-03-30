@@ -38,6 +38,11 @@ namespace simol{
     dimension_(input.dimension()),
     nbOfParticles_(input.nbOfParticles()),
     nbOfIterations_(input.nbOfIterations()),
+    kineticEnergy_(0),
+    potentialEnergy_(0),
+    internalEnergy_(0),
+    energyMidFlow_(0),
+    energySumFlow_(0),
     decorrelationNbOfIterations_(input.decorrelationNbOfIterations()),
     nbOfAutocoPts_(input.nbOfAutocoPts()),
     doFinalFlow_(input.doFinalFlow()),
@@ -46,9 +51,7 @@ namespace simol{
     potTempTopProfile_(decorrelationNbOfIterations(), decorrelationTime(), nbOfAutocoPts(), nbOfParticles_),
     potTempBotProfile_(decorrelationNbOfIterations(), decorrelationTime(), nbOfAutocoPts(), nbOfParticles_),
     bendistProfile_(decorrelationNbOfIterations(), decorrelationTime(), nbOfAutocoPts(), nbOfParticles_),
-    flowProfile_(decorrelationNbOfIterations(), decorrelationTime(), nbOfAutocoPts(), nbOfParticles_),
-    energyMidFlow_(0),
-    energySumFlow_(0)
+    flowProfile_(decorrelationNbOfIterations(), decorrelationTime(), nbOfAutocoPts(), nbOfParticles_)
   {
     std::cout << "Output written in " << input.outputFolderName() << std::endl;
 		std::cout << "Final output written in " << input.simuTypeName() << std::endl;
@@ -82,6 +85,7 @@ namespace simol{
 	void Output::setControlVariates(Input& input, Potential& potential, Galerkin* galerkin)
   {
     velocityCV_ = createControlVariate(input, potential, galerkin);
+    cout << "cv test : " << velocityCV_->nbOfFunctions() << endl;
     forceCV_ = createControlVariate(input, potential, galerkin);
     lengthCV_ = createControlVariate(input, potential, galerkin);
     midFlowCV_ = createControlVariate(input, potential, galerkin);
@@ -331,7 +335,7 @@ namespace simol{
       }
   }
   
-  void Output::display_DPDE(vector<Particle> const& configuration, size_t iOfIteration)
+  void Output::display_DPDE(vector<Particle> const& /*configuration*/, size_t iOfIteration)
   {
     // garder le vecteur des particules pour evt sortir les positions, etc
     //cout << "output : n = " << iOfIteration << endl;
@@ -346,8 +350,7 @@ namespace simol{
 
   void Output::displayGeneratorOnBasis(ofstream& out, vector<Particle> const& configuration, ControlVariate& controlVariate, double time)
 	{
-		//out << time << " " << configuration[0].position(0) << " " << configuration[0].momentum(0) << " " << controlVariate->lastGeneratorOnBasis()(0) << endl;
-		out << time << " " << modulo(configuration[0].position(0), -M_PI, M_PI) << " " << configuration[0].momentum(0) << " " << controlVariate.lastGeneratorOnBasis()(0) << " " << controlVariate.basisFunction(configuration) << endl;
+    out << time << " " << modulo(configuration[0].position(0), -M_PI, M_PI) << " " << configuration[0].momentum(0) << " " << controlVariate.lastGeneratorOnBasis()(0) << " " << controlVariate.basisFunction(configuration) << endl;
 		
 	}
   
@@ -368,23 +371,9 @@ namespace simol{
 	}
   
   
-  void Output::finalDisplay(vector<Particle> const& configuration, Vector<double> const& externalForce)
+  void Output::finalDisplay(vector<Particle> const& /*configuration*/, Vector<double> const& /*externalForce*/)
   {    
-    /*outReplica_ << finalTime()
-								<< " " << timeStep()
-								<< " " << externalForce(0)   
-								<< " " << configuration[0].position() 
-								<< " " << configuration[0].momentum() 
-								<< " " << forceCV_->meanObservable()
-								<< " " << forceCV_->stdDeviationObservable()
-								//<< " " << forceCV_->meanBetterObservable()
-								//<< " " << forceCV_->stdDeviationBetterObservable()
-								<< " " << midFlowCV_->meanObservable()
-								<< " " << midFlowCV_->stdDeviationObservable()
-								<< " " << sumFlowCV_->meanObservable()
-								<< " " << sumFlowCV_->stdDeviationObservable()
-								<< std::endl;*/
-									
+		cout << "Output::finalDisplay" << endl;
 		writeProfile(outFinalProfile_, nbOfIterations());
 									
     midFlowCV_->postTreat(outMidFlowPT_, timeStep());
@@ -450,7 +439,6 @@ namespace simol{
   
   void Output::finalDisplayAutocorrelations()
   {
-    cout << "decorrelationNbOfIterations : " << decorrelationNbOfIterations_ << endl;
     double integralV = 0;
     double integralF = 0;
     double integralQ = 0;

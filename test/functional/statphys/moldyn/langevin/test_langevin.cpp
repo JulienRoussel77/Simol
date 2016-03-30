@@ -1,12 +1,12 @@
-
 #include <cstdlib>
 #include <iostream>
 
+#include "simulation.hpp"
 #include "system.hpp"
 #include "dynamics.hpp"
 #include "Vector.hpp"
 #include "input.hpp"
-#include "galerkin.hpp"
+#include "tools.hpp"
 
 #include <cmath>
 
@@ -40,16 +40,13 @@ int main(int argc, char* argv[])
   // COMPUTATION
   //============
   
-  if(!input.isGalerkin())
-    throw std::invalid_argument("The input file should correspond to a Galerkin computation !");
-
-
-	simol::BoundaryLangevinGalerkin galerkinSolver(input);
-	galerkinSolver.compute();
-
-  displayTime(clock() - totalTime);
-
+  if (input.isGalerkin())
+    throw std::invalid_argument("The input must correspond to a MD simulation !");
   
+  simol::Simulation<simol::Langevin, simol::Isolated> simu(input);
+  simu.launch();
+  
+  displayTime(clock() - totalTime);
 
   return EXIT_SUCCESS;
 }
