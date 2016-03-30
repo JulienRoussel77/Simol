@@ -231,6 +231,7 @@ namespace simol
   //======================
 
 
+  //! addition of another vector
   template<class ScalarType> inline
   Vector<ScalarType,eigen>& Vector<ScalarType,eigen>::operator+=(Vector<ScalarType,eigen> const& u)
   {
@@ -238,6 +239,7 @@ namespace simol
     return *this;
   }
 
+  //! substraction of another vector
   template<class ScalarType> inline
   Vector<ScalarType,eigen>& Vector<ScalarType,eigen>::operator-=(Vector<ScalarType,eigen> const& u)
   {
@@ -245,6 +247,7 @@ namespace simol
     return *this;
   }
 
+  //! multiplication by a scalar
   template<class ScalarType> inline
   Vector<ScalarType,eigen>& Vector<ScalarType,eigen>::operator*=(ScalarType const& lambda)
   {
@@ -252,6 +255,7 @@ namespace simol
     return *this;
   }
 
+  //! division by a scalar
   template<class ScalarType> inline
   Vector<ScalarType,eigen>& Vector<ScalarType,eigen>::operator/=(ScalarType const& lambda)
   {
@@ -303,14 +307,10 @@ namespace simol
     return w;
   }
 
-
-
-
+  //! Print a vector into a file
   template<class ScalarType>
   std::ostream & operator<<(std::ostream & fileToWrite, simol::Vector<ScalarType,eigen> const & vectorToRead)
   {
-    //std::copy(begin(vectorToRead), end(vectorToRead), std::ostream_iterator<int>(fileToWrite, " "));
-
     for (size_t index = 0; index < vectorToRead.size(); ++index)
       fileToWrite << vectorToRead(index) << " ";
     return fileToWrite;
