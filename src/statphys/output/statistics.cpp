@@ -182,7 +182,7 @@ namespace simol
   }
   
   /*template <>
-  void AutocorrelationStats<Vector<double>>::append(Vector<double> const& newValue, size_t iOfIteration, size_t iOfObservable, Vector<double> const& /*newRefValue*//*)
+  void AutocorrelationStats<Vector<double>>::append(Vector<double> const& newValue, size_t iOfIteration, size_t iOfObservable, Vector<double> const& newRefValue)
   {
     if (iOfIteration % decorrelationNbOfIterations_ == 0)
     {

@@ -95,7 +95,7 @@ INCLUDE_DIRECTORIES(${BOOST_INSTALL_DIR}/include)
 INCLUDE_DIRECTORIES(${ARMADILLO_INSTALL_DIR}/include)
 
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SIMOL_CXX_FLAGS}  -Wall -Wextra -fopenmp -lgfortran -Wno-deprecated")
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SIMOL_CXX_FLAGS}  -Werror=sign-compare -Werror=unused-variable -Werror=unused-but-set-variable -Werror=delete-non-virtual-dtor")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SIMOL_CXX_FLAGS}  -Werror=comment -Werror=sign-compare -Werror=unused-variable -Werror=unused-but-set-variable -Werror=delete-non-virtual-dtor")
 
 CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
 IF(COMPILER_SUPPORTS_CXX11)
