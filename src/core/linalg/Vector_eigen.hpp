@@ -37,7 +37,9 @@ namespace simol
       static Vector Zero(std::size_t length);
 
       ScalarType min() const;
-      ScalarType max() const;
+
+      ScalarType max() const; 
+
       size_t index_of_minimum() const;
       
       Vector<ScalarType,eigen>& operator+=(Vector<ScalarType,eigen> const& v);
@@ -156,45 +158,38 @@ namespace simol
 
 
   //----- mathematical functions -----
-  template<typename ScalarType>
+  
+  //! Returns the maximum coefficient
+  template<typename ScalarType> inline
   ScalarType Vector<ScalarType, eigen>::max() const
   { return wrapped_.maxCoeff(); }
 
-
-  //======================
-  // Utils
-  //======================
-
-  template<class ScalarType>
-  inline
-  ScalarType
-  Vector<ScalarType, eigen>::min() const
+  //! Returns the minimum coefficient
+  template<class ScalarType> inline
+  ScalarType Vector<ScalarType, eigen>::min() const
   { return wrapped_.minCoeff(); }
-
-  template<class ScalarType>
-  inline
-  Vector<ScalarType, eigen>
-  Vector<ScalarType, eigen>::sort() const
-  {
-      Vector<ScalarType, eigen> to_be_sorted = *this;
-      std::sort( to_be_sorted.wrapped_.data(), to_be_sorted.wrapped_.data() + size() );
-      return to_be_sorted;
-  }
-
-  template<class ScalarType>
-  inline
-  size_t
-  Vector<ScalarType, eigen>::index_of_minimum() const
+  
+  //! Returns the index of the minimum coefficient
+  template<class ScalarType> inline
+  std::size_t Vector<ScalarType, eigen>::index_of_minimum() const
   {
       size_t index;
       wrapped_.minCoeff(&index);
       return index;
   }
 
+  //! Returns a sorted copy
+  template<class ScalarType> inline
+  Vector<ScalarType, eigen> Vector<ScalarType, eigen>::sort() const
+  {
+      Vector<ScalarType, eigen> to_be_sorted = *this;
+      std::sort( to_be_sorted.wrapped_.data(), to_be_sorted.wrapped_.data() + size() );
+      return to_be_sorted;
+  }
+
+  //! Returns the indices of the first smallest coefficients
   template<class ScalarType>
-  inline
-  std::vector<size_t>
-  Vector<ScalarType, eigen>::indices_of_smallest(size_t const number_of_indices)
+  std::vector<size_t> Vector<ScalarType, eigen>::indices_of_smallest(size_t const number_of_indices)
   {
     std::vector<size_t> indices(size());
     for(size_t index=0; index<size(); ++index)
@@ -211,17 +206,13 @@ namespace simol
 
   }
 
-
-  template<class ScalarType>
-  inline
-  ScalarType
-  Vector<ScalarType,eigen>::norm() const
+  //! Returns the Euclidean norm
+  template<class ScalarType> inline
+  ScalarType Vector<ScalarType,eigen>::norm() const
   { return wrapped_.norm(); }
 
-  template<class ScalarType>
-  inline
-  Vector<ScalarType,eigen> &
-  Vector<ScalarType,eigen>::fill(ScalarType const& lambda)
+  template<class ScalarType> inline
+  Vector<ScalarType,eigen> & Vector<ScalarType,eigen>::fill(ScalarType const& lambda)
   {
     wrapped_.fill(lambda);
     return *this;
