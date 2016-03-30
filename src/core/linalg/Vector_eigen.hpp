@@ -16,26 +16,32 @@ namespace simol
     friend std::ostream & operator<< <>(std::ostream & fileToWrite, simol::Vector<ScalarType,eigen> const & vectorToRead);
      
     public:
+
       explicit Vector(size_t const size=0);
       explicit Vector(size_t const size, ScalarType const& lambda);
       explicit Vector(std::string const & filename);
+      
       Vector(Vector<ScalarType,eigen> const& u);
       Vector(typename eigen<ScalarType>::VectorType const & wrappedVector);
+      
       size_t size() const;
+      
       ScalarType & operator()(size_t const index);
       ScalarType const & operator()(size_t const index) const;
+      
       ScalarType norm() const;
       Vector<ScalarType,eigen>& fill(ScalarType const& lambda);
       ScalarType dot(Vector<ScalarType,eigen> const& v) const;
-      ScalarType min() const;
-      size_t index_of_minimum() const;
       Vector<ScalarType, eigen> sort() const;
       std::vector<size_t> indices_of_smallest(size_t const number_of_indices);
-      static Vector Zero(std::size_t length)
-      { return WrappedType(WrappedType::Zero(length)); }
+      static Vector Zero(std::size_t length);
 
-      ScalarType max() const
-      { return wrapped_.maxCoeff(); }
+      ScalarType min() const;
+
+      ScalarType max() const; 
+
+      size_t index_of_minimum() const;
+      
       Vector<ScalarType,eigen>& operator+=(Vector<ScalarType,eigen> const& v);
       Vector<ScalarType,eigen>& operator-=(Vector<ScalarType,eigen> const& v);
       Vector<ScalarType,eigen>& operator*=(ScalarType const& lambda);
@@ -46,14 +52,7 @@ namespace simol
       Vector<ScalarType,eigen> operator+(Vector<ScalarType,eigen> const& v) const;
       Vector<ScalarType,eigen> operator-(Vector<ScalarType,eigen> const& v) const;
 
-      Vector<ScalarType, eigen> subvec(std::size_t start,
-                                       std::size_t length) const
-      {
-        Vector sub(length);
-        for (std::size_t index = 0; index < length; ++index)
-          sub.wrapped_(index) = wrapped_(index+start);
-        return sub;
-      }
+      Vector<ScalarType, eigen> subvec(std::size_t start, std::size_t length) const;
 
     public:
       typedef typename eigen<ScalarType>::VectorType WrappedType;
@@ -64,7 +63,16 @@ namespace simol
   Vector<double,eigen> operator*(double const& lambda, Vector<double,eigen> const& v);
   double dot(Vector<double,eigen> const& u, Vector<double,eigen> const& v);
   Vector<double,eigen> piecewiseDivision(Vector<double,eigen> const& u, Vector<double,eigen> const& v);
-Vector<double,eigen> piecewiseDivision(Vector<double,eigen> const& u, Vector<size_t,eigen> const& v);
+  Vector<double,eigen> piecewiseDivision(Vector<double,eigen> const& u, Vector<size_t,eigen> const& v);
+
+
+  //----- static functions -----
+  
+  template<typename ScalarType>
+  Vector<ScalarType, eigen> Vector<ScalarType, eigen>::Zero(std::size_t length)
+  { return WrappedType(WrappedType::Zero(length)); }
+
+
   //=============
   // CONSTRUCTORS
   //=============
@@ -136,40 +144,52 @@ Vector<double,eigen> piecewiseDivision(Vector<double,eigen> const& u, Vector<siz
   Vector<ScalarType,eigen>::operator()(size_t const index) const
   { return wrapped_(index); }
 
-  //======================
-  // Utils
-  //======================
-
   template<class ScalarType>
-  inline
-  ScalarType
-  Vector<ScalarType, eigen>::min() const
-  { return wrapped_.minCoeff(); }
-
-  template<class ScalarType>
-  inline
-  Vector<ScalarType, eigen>
-  Vector<ScalarType, eigen>::sort() const
+  Vector<ScalarType, eigen> Vector<ScalarType, eigen>::subvec(std::size_t start,
+                                                              std::size_t length) const
   {
-      Vector<ScalarType, eigen> to_be_sorted = *this;
-      std::sort( to_be_sorted.wrapped_.data(), to_be_sorted.wrapped_.data() + size() );
-      return to_be_sorted;
+    Vector sub(length);
+    for (std::size_t index = 0; index < length; ++index)
+      sub.wrapped_(index) = wrapped_(index+start);
+    return sub;
   }
 
-  template<class ScalarType>
-  inline
-  size_t
-  Vector<ScalarType, eigen>::index_of_minimum() const
+
+
+
+  //----- mathematical functions -----
+  
+  //! Returns the maximum coefficient
+  template<typename ScalarType> inline
+  ScalarType Vector<ScalarType, eigen>::max() const
+  { return wrapped_.maxCoeff(); }
+
+  //! Returns the minimum coefficient
+  template<class ScalarType> inline
+  ScalarType Vector<ScalarType, eigen>::min() const
+  { return wrapped_.minCoeff(); }
+  
+  //! Returns the index of the minimum coefficient
+  template<class ScalarType> inline
+  std::size_t Vector<ScalarType, eigen>::index_of_minimum() const
   {
       size_t index;
       wrapped_.minCoeff(&index);
       return index;
   }
 
+  //! Returns a sorted copy
+  template<class ScalarType> inline
+  Vector<ScalarType, eigen> Vector<ScalarType, eigen>::sort() const
+  {
+      Vector<ScalarType, eigen> to_be_sorted = *this;
+      std::sort( to_be_sorted.wrapped_.data(), to_be_sorted.wrapped_.data() + size() );
+      return to_be_sorted;
+  }
+
+  //! Returns the indices of the first smallest coefficients
   template<class ScalarType>
-  inline
-  std::vector<size_t>
-  Vector<ScalarType, eigen>::indices_of_smallest(size_t const number_of_indices)
+  std::vector<size_t> Vector<ScalarType, eigen>::indices_of_smallest(size_t const number_of_indices)
   {
     std::vector<size_t> indices(size());
     for(size_t index=0; index<size(); ++index)
@@ -186,17 +206,13 @@ Vector<double,eigen> piecewiseDivision(Vector<double,eigen> const& u, Vector<siz
 
   }
 
-
-  template<class ScalarType>
-  inline
-  ScalarType
-  Vector<ScalarType,eigen>::norm() const
+  //! Returns the Euclidean norm
+  template<class ScalarType> inline
+  ScalarType Vector<ScalarType,eigen>::norm() const
   { return wrapped_.norm(); }
 
-  template<class ScalarType>
-  inline
-  Vector<ScalarType,eigen> &
-  Vector<ScalarType,eigen>::fill(ScalarType const& lambda)
+  template<class ScalarType> inline
+  Vector<ScalarType,eigen> & Vector<ScalarType,eigen>::fill(ScalarType const& lambda)
   {
     wrapped_.fill(lambda);
     return *this;
@@ -215,6 +231,7 @@ Vector<double,eigen> piecewiseDivision(Vector<double,eigen> const& u, Vector<siz
   //======================
 
 
+  //! addition of another vector
   template<class ScalarType> inline
   Vector<ScalarType,eigen>& Vector<ScalarType,eigen>::operator+=(Vector<ScalarType,eigen> const& u)
   {
@@ -222,6 +239,7 @@ Vector<double,eigen> piecewiseDivision(Vector<double,eigen> const& u, Vector<siz
     return *this;
   }
 
+  //! substraction of another vector
   template<class ScalarType> inline
   Vector<ScalarType,eigen>& Vector<ScalarType,eigen>::operator-=(Vector<ScalarType,eigen> const& u)
   {
@@ -229,6 +247,7 @@ Vector<double,eigen> piecewiseDivision(Vector<double,eigen> const& u, Vector<siz
     return *this;
   }
 
+  //! multiplication by a scalar
   template<class ScalarType> inline
   Vector<ScalarType,eigen>& Vector<ScalarType,eigen>::operator*=(ScalarType const& lambda)
   {
@@ -236,6 +255,7 @@ Vector<double,eigen> piecewiseDivision(Vector<double,eigen> const& u, Vector<siz
     return *this;
   }
 
+  //! division by a scalar
   template<class ScalarType> inline
   Vector<ScalarType,eigen>& Vector<ScalarType,eigen>::operator/=(ScalarType const& lambda)
   {
@@ -287,14 +307,10 @@ Vector<double,eigen> piecewiseDivision(Vector<double,eigen> const& u, Vector<siz
     return w;
   }
 
-
-
-
+  //! Print a vector into a file
   template<class ScalarType>
   std::ostream & operator<<(std::ostream & fileToWrite, simol::Vector<ScalarType,eigen> const & vectorToRead)
   {
-    //std::copy(begin(vectorToRead), end(vectorToRead), std::ostream_iterator<int>(fileToWrite, " "));
-
     for (size_t index = 0; index < vectorToRead.size(); ++index)
       fileToWrite << vectorToRead(index) << " ";
     return fileToWrite;

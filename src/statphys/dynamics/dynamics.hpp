@@ -21,6 +21,7 @@ namespace simol
     
     public:
       Dynamics(Input const&  input);
+      virtual ~Dynamics() = default;
       
       virtual void printName() const;
 
