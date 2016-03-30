@@ -11,8 +11,8 @@ const double defaultLength = 2 * M_PI;
 const int defaultNbOfParticles = 1;
 const double defaultPotentialCoeff = 1;
 const double defaultSeed = 0;
-const int defaultOutputFrequency = 1000;
-const int defaultOutputProfileFrequency = 100;
+const int defaultOutputPeriod = 1;         //10
+const int defaultOutputProfilePeriod = 1;  //100
 //-- default values for dynamics --
 const double defaultHeatCapacity = 1;
 const double defaultGamma = 1; 
@@ -131,7 +131,7 @@ namespace simol {
     return name;
   }
   
-  const std::shared_ptr<RNG>& Input::rng() const
+  /*const std::shared_ptr<RNG>& Input::rng() const
   {
     return rng_;
   }
@@ -139,7 +139,7 @@ namespace simol {
   std::shared_ptr<RNG>& Input::rng()
   {
     return rng_;
-  }
+  }*/
 
 	//### Geometry ###
 
@@ -432,7 +432,7 @@ namespace simol {
     if (data["Output"]["Period"])
       return data["Output"]["Period"].as<double>() / timeStep();
     else
-      return nbOfIterations() / defaultOutputFrequency;
+      return defaultOutputPeriod;
   }
 
   double Input::outputPeriodTime() const {
@@ -446,7 +446,7 @@ namespace simol {
     if (data["Output"]["ProfilePeriod"])
       return data["Output"]["ProfilePeriod"].as<double>() / timeStep();
     else
-      return nbOfIterations() / defaultOutputProfileFrequency;
+      return defaultOutputProfilePeriod;
   }
 
   double Input::outputProfilePeriodTime() const {

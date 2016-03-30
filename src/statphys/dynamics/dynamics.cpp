@@ -18,8 +18,7 @@ namespace simol
     nbOfIterations_(input.nbOfIterations()), 
     nbOfThermalIterations_(input.nbOfThermalIterations()), 
     nbOfBurningIterations_(input.nbOfBurningIterations()), 
-    externalForce_(input.dimension(), 0),
-    rng_(input.rng())
+    externalForce_(input.dimension(), 0)
   {
     externalForce_(0) = input.externalForce();
 		
@@ -68,9 +67,9 @@ namespace simol
   ///Read-only accessor for the number of iterations of the burning
   const size_t& Dynamics::nbOfBurningIterations() const {return nbOfBurningIterations_;}
   
-  const std::shared_ptr<RNG> Dynamics::rng() const {return rng_;}
+  const std::shared_ptr<RNG>& Dynamics::rng() const {return rng_;}
 
-  std::shared_ptr<RNG> Dynamics::rng() {return rng_;}
+  std::shared_ptr<RNG>& Dynamics::rng() {return rng_;}
   
   ///
   ///Read-only accessor for the external force
@@ -98,7 +97,22 @@ namespace simol
     particle.potentialEnergy() = 0;
     particle.force() = externalForce();
   }
-	
+  
+  
+	///
+  ///Standard first part of the numerical integration : half upadate on "p" and update on "q"
+  void Dynamics::verletFirstPart(Particle& particle)
+  {
+    particle.momentum() += timeStep_ * particle.force() / 2;
+    particle.position() += timeStep_ * particle.momentum() / particle.mass();
+  }
+  
+  ///
+  ///Standard second part of the numerical integration : half upadate on "p"
+  void Dynamics::verletSecondPart(Particle& particle)
+  {
+    particle.momentum() += timeStep_ * particle.force() / 2;
+  }
   
   ///
   ///Standard first part of the numerical integration : half upadate on "p" and update on "q"

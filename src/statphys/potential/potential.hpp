@@ -32,13 +32,14 @@ namespace simol
 		virtual double laplacian(Vector<double> const & position) const;
 		virtual double laplacian(double position) const;
 		virtual double ratioToHarmonic() const {assert(false); return 0;};
-		virtual double drawLaw(double /*localBeta*/, std::shared_ptr<RNG> /*rng*/){assert(false); return 0;};
+		virtual double drawLaw(double /*localBeta*/, std::shared_ptr<RNG>& /*rng*/){assert(false); return 0;};
 
   };
 
   class Sinusoidal : public Potential{
     public:
       Sinusoidal(Input const& input);
+      double drawLaw(double localBeta, std::shared_ptr<RNG>& rng);
       double operator()(double position) const;
       Vector<double> derivative(double position) const;
       double laplacian(double position) const;
@@ -104,7 +105,7 @@ namespace simol
       double operator()(double position) const;
       Vector<double> derivative(double position) const;
 			double laplacian(double position) const;
-			double drawLaw(double localBeta, std::shared_ptr<RNG> rng_);
+			double drawLaw(double localBeta, std::shared_ptr<RNG>& rng_);
     private:
       double stiffness_;
   };
@@ -115,7 +116,7 @@ namespace simol
       double operator()(double position) const;
       Vector<double> derivative(double position) const;
       double laplacian(double position) const;
-			double drawLaw(double localBeta, std::shared_ptr<RNG> rng_);
+			double drawLaw(double localBeta, std::shared_ptr<RNG>& rng_);
     private:
       double stiffness_;
   };
@@ -128,7 +129,7 @@ namespace simol
       Vector<double> derivative(double position) const;
 			double laplacian(double position) const;
 			virtual double ratioToHarmonic() const;
-			double drawLaw(double localBeta, std::shared_ptr<RNG> rng_);
+			double drawLaw(double localBeta, std::shared_ptr<RNG>& rng_);
     private:
       double stiffness_, alpha_, beta_;
   };
