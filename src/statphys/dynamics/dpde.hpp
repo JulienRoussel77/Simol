@@ -1,12 +1,12 @@
 #ifndef SIMOL_DPDE_HPP
 #define SIMOL_DPDE_HPP
 
-#include "Dynamics.hpp"
+#include "UniformStochasticDynamics.hpp"
 
 namespace simol
 {
 
-  class DPDE:public UniformStochasticDynamics
+  class DPDE: public UniformStochasticDynamics
   {
     double heatCapacity_;
     double gamma_;

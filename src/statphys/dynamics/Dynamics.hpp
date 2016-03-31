@@ -12,7 +12,6 @@
 
 namespace simol
 {
-  class Dynamics;
 
   class Dynamics
   {
@@ -23,28 +22,26 @@ namespace simol
 
       virtual void printName() const;
 
-			// Accessors
+      // Accessors
       double& timeStep();
       const double& timeStep() const;
       size_t& nbOfIterations();
       const size_t& nbOfIterations() const;
       double finalTime() const;
-			size_t& nbOfThermalIterations();
+	  size_t& nbOfThermalIterations();
       const size_t& nbOfThermalIterations() const;
-			size_t& nbOfBurningIterations();
+	  size_t& nbOfBurningIterations();
       const size_t& nbOfBurningIterations() const;
       const std::shared_ptr<RNG>& rng() const;
       std::shared_ptr<RNG>& rng();
 
       Vector<double>& externalForce() ;
       const Vector<double>& externalForce() const;
-			double& externalForce(const int& i);
+	  double& externalForce(const int& i);
       const double& externalForce(const int& i) const;
-			Galerkin* galerkin();
+	  Galerkin* galerkin();
 
-      //string name() {cout << "Dynamics" << endl;}
-
-			// Accessors for daughters, fails if inadequate
+	  // Accessors for daughters, fails if inadequate
 
 	  virtual const double& gamma() const {assert(false);}
       virtual const double& temperatureLeft() const {assert(false);}
@@ -56,24 +53,18 @@ namespace simol
       void verletSecondPart(Particle& particle);
       virtual void updateBefore(Particle& particle);
       virtual void updateAfter(Particle& particle);
-			virtual void updateOrsteinUhlenbeck(Particle& particle, double localBeta);
-			virtual bool doMomentaExchange() const {return false;};
-			virtual void updateMomentaExchange(Particle& /*particle1*/, Particle& /*particle2*/){assert(false);};
+      virtual void updateOrsteinUhlenbeck(Particle& particle, double localBeta);
+      virtual bool doMomentaExchange() const {return false;};
+      virtual void updateMomentaExchange(Particle& /*particle1*/, Particle& /*particle2*/){assert(false);};
       virtual void bending(Particle& /*particle1*/, Particle& /*particle2*/) const {};
 	protected:
       double timeStep_;
       size_t nbOfIterations_, nbOfThermalIterations_, nbOfBurningIterations_;
       //double timeStep;
       Vector<double> externalForce_;
-			std::shared_ptr<RNG> rng_;
-			Galerkin* galerkin_;
+      std::shared_ptr<RNG> rng_;
+      Galerkin* galerkin_;
   };
-
-
-
-
-
-
 
 }
 
