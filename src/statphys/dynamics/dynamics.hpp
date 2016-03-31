@@ -14,15 +14,15 @@ namespace simol
 {
   class Dynamics;
 
-  
+
 
   class Dynamics
   {
-    
+
     public:
       Dynamics(Input const&  input);
       virtual ~Dynamics() = default;
-      
+
       virtual void printName() const;
 
 			// Accessors
@@ -37,34 +37,23 @@ namespace simol
       const size_t& nbOfBurningIterations() const;
       const std::shared_ptr<RNG>& rng() const;
       std::shared_ptr<RNG>& rng();
-      
+
       Vector<double>& externalForce() ;
       const Vector<double>& externalForce() const;
 			double& externalForce(const int& i);
       const double& externalForce(const int& i) const;
 			Galerkin* galerkin();
-      
+
       //string name() {cout << "Dynamics" << endl;}
 
 			// Accessors for daughters, fails if inadequate
 
-			virtual const double& gamma() const {assert(false);}
-			virtual double temperature() const {assert(false);}
+	  virtual const double& gamma() const {assert(false);}
       virtual const double& temperatureLeft() const {assert(false);}
-      virtual const double& temperatureRight() const {assert(false);}
-      virtual const double& beta() const {assert(false);}
-      virtual const double& betaLeft() const {assert(false);}
-      virtual const double& betaRight() const {assert(false);}
       virtual double deltaTemperature() const {assert(false);}
-      virtual const double& tauBending() const {assert(false);}
-      virtual const double& xi() const {assert(false);}
-			virtual double& xi() {assert(false);}
-			int xiNbOfIterations() {assert(false);}
-			
-			virtual void initializeCountdown(Particle& /*particle*/){assert(false);};
 
       void resetForce(Particle& particle) const;
-      
+
       void verletFirstPart(Particle& particle);
       void verletSecondPart(Particle& particle);
       virtual void updateBefore(Particle& particle);
@@ -122,7 +111,7 @@ namespace simol
   public:
     Langevin(Input const& input);
     virtual void printName() const;
-    
+
     virtual const double& gamma() const;
     double sigma() const;
     virtual void updateAfter(Particle& particle);
