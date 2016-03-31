@@ -1,11 +1,11 @@
 #ifndef SIMOL_DPDE_HPP
 #define SIMOL_DPDE_HPP
 
-#include "dynamics.hpp" 
+#include "Dynamics.hpp"
 
 namespace simol
 {
-  
+
   class DPDE:public UniformStochasticDynamics
   {
     double heatCapacity_;
@@ -18,7 +18,7 @@ namespace simol
     double sigma() const;
     void energyReinjection(Particle& particle);
   };
-  
+
 }
 
 #endif
