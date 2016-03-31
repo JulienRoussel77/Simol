@@ -1,4 +1,4 @@
-#include "controlVariate.hpp"
+#include "ControlVariate.hpp"
 
 using std::cout; 
 using std::endl; 

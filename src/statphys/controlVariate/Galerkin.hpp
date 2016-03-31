@@ -1,10 +1,10 @@
 #ifndef SIMOL_GALERKIN_HPP
 #define SIMOL_GALERKIN_HPP
 
-#include "tools.hpp"
-#include "input.hpp"
-#include "potential.hpp"
-#include "basis.hpp"
+#include "Tools.hpp"
+#include "Input.hpp"
+#include "Potential.hpp"
+#include "Basis.hpp"
 #include "core/linalg/DenseMatrix.hpp"
 
 namespace simol

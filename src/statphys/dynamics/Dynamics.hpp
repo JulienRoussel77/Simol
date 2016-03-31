@@ -1,14 +1,14 @@
 #ifndef SIMOL_DYNAMICS_HPP
 #define SIMOL_DYNAMICS_HPP
 
-#include "potential.hpp"
-#include "particle.hpp"
-#include "input.hpp"
-#include "output.hpp"
+#include "Potential.hpp"
+#include "Particle.hpp"
+#include "Input.hpp"
+#include "Output.hpp"
 #include "core/random/RNG.hpp"
-#include "controlVariate.hpp"
+#include "ControlVariate.hpp"
 # include <iostream>
-#include "galerkin.hpp"
+#include "Galerkin.hpp"
 
 namespace simol
 {

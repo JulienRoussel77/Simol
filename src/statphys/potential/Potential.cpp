@@ -1,7 +1,7 @@
 #ifndef POTENTIAL_IMPL_HPP
 #define POTENTIAL_IMPL_HPP
 
-#include "potential.hpp"
+#include "Potential.hpp"
 
 #include <cmath>
 

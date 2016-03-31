@@ -1,6 +1,6 @@
 //#include <core/io/CommandLine.hpp>
 
-#include "chain.hpp"
+#include "Chain.hpp"
 
 namespace simol
 {

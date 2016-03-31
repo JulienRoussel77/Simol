@@ -1,11 +1,11 @@
 #ifndef PARTICLE_HPP
 #define PARTICLE_HPP
 
-#include "tools.hpp"
+#include "Tools.hpp"
 #include <fstream>
 #include <vector>
 
-#include "potential.hpp"
+#include "Potential.hpp"
 //#include "ode/verlet.hpp"
 #include "core/linalg/Vector.hpp"
 #include "core/random/RNG.hpp"

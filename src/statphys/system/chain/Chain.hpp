@@ -1,7 +1,7 @@
 #ifndef SIMOL_CHAIN_HPP
 #define SIMOL_CHAIN_HPP
 
-#include "system.hpp"
+#include "System.hpp"
 
 
 namespace simol

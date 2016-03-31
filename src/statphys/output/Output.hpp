@@ -3,11 +3,11 @@
 
 #include <iomanip>
 using std::setw;
-#include "tools.hpp"
-#include "particle.hpp"
-#include "statistics.hpp"
-#include "controlVariate.hpp"
-#include "galerkin.hpp"
+#include "Tools.hpp"
+#include "Particle.hpp"
+#include "Statistics.hpp"
+#include "ControlVariate.hpp"
+#include "Galerkin.hpp"
 
 namespace simol
 {
@@ -36,7 +36,6 @@ namespace simol
     
     string profilePath_;
     
-    int verbose_;
     size_t periodNbOfIterations_, profilePeriodNbOfIterations_;
     double timeStep_;
     int dimension_;
@@ -71,8 +70,6 @@ namespace simol
     
     const double& timeStep() const;
     double& timeStep();
-    int& verbose();
-    const int& verbose() const;
     double period() const;
     const size_t& periodNbOfIterations() const;
     const size_t& profilePeriodNbOfIterations() const;
@@ -111,7 +108,13 @@ namespace simol
     
     void writeProfile(ofstream& out_, size_t iOfIteration);
     //double& integratedAutocorrelationP();
-    void display(vector<Particle> const& configuration, size_t iOfIteration);
+    //void display(vector<Particle> const& configuration, size_t iOfIteration);
+    void displayObservables(size_t iOfIteration);
+    void displayChainMomenta(vector<Particle> const& configuration, size_t iOfIteration);
+    void displayChainPositions(vector<Particle> const& configuration, size_t iOfIteration);
+    void displayParticles(vector<Particle> const& configuration, size_t iOfIteration);
+    void displayProfile(size_t iOfIteration);
+    
     void finalDisplayAutocorrelations();
     void finalDisplay(vector<Particle> const& configuration, Vector<double> const& externalForce);
     void displayFinalFlow(double temperature, double delta_temperature, double tau = nan(""), double xi = 0);
@@ -134,7 +137,7 @@ namespace simol
     void appendFlowProfile(double value, size_t iOfIteration, size_t iOfParticle);
   
     //------------- pour DPDE ---------------
-    void display_DPDE(vector<Particle> const& configuration, size_t iOfIteration);
+    void displayObservablesDPDE(vector<Particle> const& configuration, size_t iOfIteration);
     
   };
 

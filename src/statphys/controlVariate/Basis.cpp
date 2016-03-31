@@ -1,4 +1,4 @@
-#include "basis.hpp"
+#include "Basis.hpp"
 
 namespace simol
 {

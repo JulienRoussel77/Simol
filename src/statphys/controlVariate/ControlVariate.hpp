@@ -1,12 +1,12 @@
 #ifndef SIMOL_CONTROLVARIATE_HPP
 #define SIMOL_CONTROLVARIATE_HPP
 
-#include "tools.hpp"
-#include "statistics.hpp"
-#include "potential.hpp"
-#include "particle.hpp"
-#include "basis.hpp"
-#include "galerkin.hpp"
+#include "Tools.hpp"
+#include "Statistics.hpp"
+#include "Potential.hpp"
+#include "Particle.hpp"
+#include "Basis.hpp"
+#include "Galerkin.hpp"
 
 
 namespace simol

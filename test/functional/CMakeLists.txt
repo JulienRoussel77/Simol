@@ -1,9 +1,9 @@
 ADD_EXECUTABLE(simol_test_functional 	${CMAKE_SOURCE_DIR}/test/functional/quantchem/HartreeFockTest.cpp) 
-ADD_EXECUTABLE(test_galerkin 		${CMAKE_SOURCE_DIR}/test/functional/statphys/galerkin/main.cpp) 
-ADD_EXECUTABLE(test_hamiltonian 	${CMAKE_SOURCE_DIR}/test/functional/statphys/moldyn/hamiltonian/test_hamiltonian.cpp) 
-ADD_EXECUTABLE(test_langevin 		${CMAKE_SOURCE_DIR}/test/functional/statphys/moldyn/langevin/test_langevin.cpp) 
-ADD_EXECUTABLE(test_dpde 		${CMAKE_SOURCE_DIR}/test/functional/statphys/moldyn/dpde/test_dpde.cpp) 
-
+ADD_EXECUTABLE(test_galerkin 		${CMAKE_SOURCE_DIR}/test/functional/statphys/galerkin/TestGalerkin.cpp) 
+ADD_EXECUTABLE(test_hamiltonian 	${CMAKE_SOURCE_DIR}/test/functional/statphys/moldyn/hamiltonian/TestHamiltonian.cpp) 
+ADD_EXECUTABLE(test_langevin 		${CMAKE_SOURCE_DIR}/test/functional/statphys/moldyn/langevin/TestLangevin.cpp) 
+ADD_EXECUTABLE(test_dpde 		${CMAKE_SOURCE_DIR}/test/functional/statphys/moldyn/dpde/TestDPDE.cpp) 
+ADD_EXECUTABLE(test_rotor 		${CMAKE_SOURCE_DIR}/test/functional/statphys/moldyn/chain/TestRotor.cpp) 
 
 INCLUDE_DIRECTORIES(	${CMAKE_SOURCE_DIR}/src/statphys/
 	    		${CMAKE_SOURCE_DIR}/src/statphys/input
@@ -25,6 +25,7 @@ TARGET_LINK_LIBRARIES(test_galerkin simol-statphys)
 TARGET_LINK_LIBRARIES(test_hamiltonian simol-statphys)
 TARGET_LINK_LIBRARIES(test_langevin simol-statphys)
 TARGET_LINK_LIBRARIES(test_dpde simol-statphys)
+TARGET_LINK_LIBRARIES(test_rotor simol-statphys)
 
 TARGET_LINK_LIBRARIES(simol_test_functional simol-quantchem)
 TARGET_LINK_LIBRARIES(simol_test_functional ${EXTERNAL_DIR}/gtest/install/lib/libgtest_main.a)
@@ -40,4 +41,4 @@ ADD_CUSTOM_TARGET(galerkin COMMAND test_galerkin -i 		"${CMAKE_SOURCE_DIR}/test/
 ADD_CUSTOM_TARGET(hamiltonian COMMAND test_hamiltonian -i 	"${CMAKE_SOURCE_DIR}/test/functional/statphys/moldyn/hamiltonian/hamiltonian_test.yaml")
 ADD_CUSTOM_TARGET(langevin COMMAND test_langevin -i 		"${CMAKE_SOURCE_DIR}/test/functional/statphys/moldyn/langevin/langevin_sinusoidal_test.yaml")
 ADD_CUSTOM_TARGET(dpde COMMAND test_dpde -i 			"${CMAKE_SOURCE_DIR}/test/functional/statphys/moldyn/dpde/dpde_1D_test.yaml")
-#ADD_CUSTOM_TARGET(moldyn COMMAND test_moldyn -i tional/statphys/moldyn/langevin_sinusoidal.yaml)
+ADD_CUSTOM_TARGET(rotor COMMAND test_rotor -i 			"${CMAKE_SOURCE_DIR}/test/functional/statphys/moldyn/chain/rotor_test.yaml")

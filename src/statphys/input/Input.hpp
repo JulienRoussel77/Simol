@@ -10,7 +10,7 @@
 #include <string>
 #include <iostream>
 #include <fstream>
-#include "tools.hpp"
+#include "Tools.hpp"
 #include "core/random/RNG.hpp"
 
 namespace simol{

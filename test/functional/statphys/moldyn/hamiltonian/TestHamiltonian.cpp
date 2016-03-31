@@ -1,12 +1,10 @@
 #include <cstdlib>
 #include <iostream>
 
-#include "simulation.hpp"
-#include "system.hpp"
+#include "Simulation.hpp"
 #include "Dynamics.hpp"
 #include "Vector.hpp"
-#include "input.hpp"
-#include "tools.hpp"
+#include "Input.hpp"
 
 #include <cmath>
 

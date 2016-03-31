@@ -1,7 +1,7 @@
 #ifndef SIMOL_PARTICLESYSTEM_IMPL_HPP
 #define SIMOL_PARTICLESYSTEM_IMPL_HPP
 
-#include "system.hpp"
+#include "System.hpp"
 
 namespace simol
 {

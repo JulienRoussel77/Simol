@@ -2,11 +2,11 @@
 #include <cstdlib>
 #include <iostream>
 
-#include "system.hpp"
+#include "System.hpp"
 #include "Dynamics.hpp"
 #include "Vector.hpp"
-#include "input.hpp"
-#include "galerkin.hpp"
+#include "Input.hpp"
+#include "Galerkin.hpp"
 
 #include <cmath>
 

@@ -1,9 +1,9 @@
 #ifndef SIMOL_POTENTIAL_HPP
 #define SIMOL_POTENTIAL_HPP
 
-#include "tools.hpp"
+#include "Tools.hpp"
 #include "core/linalg/Vector.hpp"
-#include "input.hpp"
+#include "Input.hpp"
 #include "core/random/RNG.hpp"
 
 

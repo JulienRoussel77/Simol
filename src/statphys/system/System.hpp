@@ -1,12 +1,12 @@
 #ifndef SIMOL_PARTICLESYSTEM_HPP
 #define SIMOL_PARTICLESYSTEM_HPP
 
-#include "tools.hpp"
+#include "Tools.hpp"
 #include <vector>
-#include "particle.hpp"
+#include "Particle.hpp"
 #include "Dynamics.hpp"
 #include "DPDE.hpp"
-#include "output.hpp"
+#include "Output.hpp"
 
 
 

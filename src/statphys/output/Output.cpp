@@ -1,4 +1,4 @@
-#include "output.hpp"
+#include "Output.hpp"
 
 using std::cout; 
 using std::endl; 
@@ -31,7 +31,6 @@ namespace simol{
     outProfile_(input.outputFolderName()+"profile.txt"),
     outFinalProfile_(input.outputFolderName()+"finalProfile.txt"),
     //profilePath_(input.outputFolderName()+"profile.txt"),
-    verbose_(1),
     periodNbOfIterations_(input.outputPeriodNbOfIterations()),
     profilePeriodNbOfIterations_(input.outputProfilePeriodNbOfIterations()),
     timeStep_(input.timeStep()),
@@ -90,16 +89,6 @@ namespace simol{
     lengthCV_ = createControlVariate(input, potential, galerkin);
     midFlowCV_ = createControlVariate(input, potential, galerkin);
     sumFlowCV_ = createControlVariate(input, potential, galerkin);
-  }
-    
-  int& Output::verbose()
-  {
-    return verbose_;
-  }
-  
-  const int& Output::verbose() const
-  {
-    return verbose_;
   }
   
   double Output::period() const
@@ -270,8 +259,61 @@ namespace simol{
   {
 		return decorrelationTime() / nbOfAutocoPts();
 	}
+	
+	void Output::displayObservables(size_t iOfIteration)
+  {
+    outObservables_ << iOfIteration * timeStep() 
+    << " " << kineticEnergy()
+    << " " << potentialEnergy()
+    << " " << energy()
+    << " " << temperature()
+    << std::endl;
+  }
+  
+  void Output::displayChainPositions(vector<Particle> const& configuration, size_t iOfIteration)
+  {
+    outBeam_ << iOfIteration * timeStep() 
+        << " " << configuration[0].position() - 2*configuration[1].position() + configuration[2].position()
+      //<< " " << configuration[0].position() - 2*configuration[1].position() + configuration[2].position()
+        << " " << configuration[(nbOfParticles_-2)/4].position() - 2*configuration[(nbOfParticles_-2)/4+1].position() + configuration[(nbOfParticles_-2)/4+2].position()
+        << " " << configuration[(nbOfParticles_-2)/2].position() - 2*configuration[(nbOfParticles_-2)/2+1].position() + configuration[(nbOfParticles_-2)/2+2].position()
+        << " " << configuration[3*(nbOfParticles_-2)/4].position() - 2*configuration[3*(nbOfParticles_-2)/4+1].position() + configuration[3*(nbOfParticles_-2)/4+2].position()
+        << " " << configuration[nbOfParticles_-3].position() - 2*configuration[nbOfParticles_-2].position() + configuration[nbOfParticles_-1].position()
+        << endl;   
+  }
+  
+  void Output::displayChainMomenta(vector<Particle> const& configuration, size_t iOfIteration)
+  {
+    outVelocities_ << iOfIteration * timeStep()
+      << " " << configuration[0].momentum()
+      << " " << configuration[nbOfParticles_/4].momentum()
+      << " " << configuration[nbOfParticles_/2].momentum()
+      << " " << configuration[3*nbOfParticles_/4].momentum()
+      << " " << configuration[nbOfParticles_-1].momentum()
+      << endl;
+  }
+  
+  void Output::displayParticles(vector<Particle> const& configuration, size_t iOfIteration)
+  {
+    for (size_t i = 0; i < nbOfParticles_; i++)
+      outParticles_ << iOfIteration * timeStep() 
+        << " " << i
+        << " " << configuration[i].position() 
+        << " " << configuration[i].momentum() 
+        << " " << configuration[i].kineticEnergy()
+        << " " << configuration[i].potentialEnergy()
+        << " " << configuration[i].energy()
+        << " " << configuration[i].force()        
+        << endl;
+  }
+  
+  void Output::displayProfile(size_t iOfIteration)
+  {
+    writeProfile(outProfile_, iOfIteration);
+  }
 
-  void Output::display(vector<Particle> const& configuration, size_t iOfIteration)
+
+  /*void Output::display(vector<Particle> const& configuration, size_t iOfIteration)
   {
     //cout << "output : n = " << iOfIteration << endl;
     
@@ -283,14 +325,13 @@ namespace simol{
 		    << std::endl;
     
     if (nbOfParticles_ > 1)
-      outVelocities_ << configuration[0].momentum();
-      /*outVelocities_ << iOfIteration * timeStep() ;
+      outVelocities_ << iOfIteration * timeStep() ;
 	<< " " << configuration[0].momentum()
 	<< " " << configuration[nbOfParticles_/4].momentum()
 	<< " " << configuration[nbOfParticles_/2].momentum()
 		     << " " << configuration[3*nbOfParticles_/4].momentum()
 		     << " " << configuration[nbOfParticles_-1].momentum()
-		     << endl;*/
+		     << endl;
 		  
     if (nbOfParticles_ > 1)
       outBeam_ << iOfIteration * timeStep() 
@@ -313,29 +354,25 @@ namespace simol{
     
     if (doProfileOutput(iOfIteration))
       {
-	for (size_t i = 0; i < nbOfParticles_; i++)
-	  outParticles_ << iOfIteration * timeStep() 
-			<< " " << i
-			<< " " << configuration[i].position() 
-			<< " " << configuration[i].momentum() 
-			<< " " << configuration[i].kineticEnergy()
-			<< " " << configuration[i].potentialEnergy()
-			<< " " << configuration[i].energy()
-			<< " " << configuration[i].force()		    
-			<< endl;
+        for (size_t i = 0; i < nbOfParticles_; i++)
+          outParticles_ << iOfIteration * timeStep() 
+            << " " << i
+            << " " << configuration[i].position() 
+            << " " << configuration[i].momentum() 
+            << " " << configuration[i].kineticEnergy()
+            << " " << configuration[i].potentialEnergy()
+            << " " << configuration[i].energy()
+            << " " << configuration[i].force()		    
+            << endl;
 	
-	if (nbOfParticles_ > 1)
-	  {
-	    /*outProfile_.close();
-	      outProfile_.open(outputFolderName_ + "/profiles/profile" + to_string(iOfIteration * timeStep()) + ".txt");
-	      writeProfile(iOfIteration);
-	      outProfile_.open(outputFolderName_ + "/profile.txt", std::ofstream::app);*/
-	    writeProfile(outProfile_, iOfIteration);
-	  }
+          if (nbOfParticles_ > 1)
+            {
+              writeProfile(outProfile_, iOfIteration);
+            }
       }
-  }
+  }*/
   
-  void Output::display_DPDE(vector<Particle> const& /*configuration*/, size_t iOfIteration)
+  void Output::displayObservablesDPDE(vector<Particle> const& /*configuration*/, size_t iOfIteration)
   {
     // garder le vecteur des particules pour evt sortir les positions, etc
     //cout << "output : n = " << iOfIteration << endl;

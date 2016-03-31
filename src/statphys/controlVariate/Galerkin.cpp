@@ -1,4 +1,4 @@
-#include "galerkin.hpp"
+#include "Galerkin.hpp"
 
 using std::cout;
 using std::endl;

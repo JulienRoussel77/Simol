@@ -1,4 +1,4 @@
-#include "statistics.hpp"
+#include "Statistics.hpp"
 
 using std::min;
 using std::max;
