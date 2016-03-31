@@ -1,4 +1,4 @@
-#include "dpde.hpp"
+#include "DPDE.hpp"
 
 #include "UniformStochasticDynamics.hpp"
 

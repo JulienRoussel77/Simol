@@ -5,7 +5,7 @@
 #include <vector>
 #include "particle.hpp"
 #include "Dynamics.hpp"
-#include "dpde.hpp"
+#include "DPDE.hpp"
 #include "output.hpp"
 
 
