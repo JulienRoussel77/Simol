@@ -1,0 +1,25 @@
+
+Please install the following packages: doxygen, graphviz
+You may use your preferred package manager to perform these installations.
+For example, on Ubuntu systems, you can type
+    sudo apt-get install doxygen
+    sudo apt-get install graphviz
+
+Doxygen is required to generate the documentation.
+Documentation can be built by typing:
+    doxygen Doxyfile.in
+from the directory containing the Doxyfile.in file.
+
+Graphviz is required to generate useful diagrams in the documentation.
+
+Doxyfile.in is the configuration file.
+Please refer to Doxygen documentation to obtain further information about it.
+Note that there are two ways of configuring Doxygen:
+1. one can edit Doxyfile.in directly
+2. one can use doxywizard, the graphical user interface of Doxygen.
+
+Doxywizard can be installed on Ubuntu systems by typing:
+    sudo apt-get install doxygen-gui
+Then, one can type 
+    doxywizard Doxyfile.in
+from the directory containing Doxyfile.in
