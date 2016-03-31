@@ -53,7 +53,6 @@ namespace simol
         std::ifstream in(filename); //Ouverture en mode lecture de "bdd.txt"
         std::string ligne; //Création d'une chaine de caractere
         int nbLignes = 0;
-        int test = 0;
 
         typedef Eigen::Triplet<ScalarType, size_t> NonZero;
         std::vector<NonZero> nonzeros;
@@ -64,9 +63,7 @@ namespace simol
             int k;
             int l;
             long double t;
-            test = 0;
-            test = fscanf(fichier, "%d %d %d %d %Lf", &i , &j, &k, &l, &t);
-            assert(test>0);
+            fscanf(fichier, "%d %d %d %d %Lf", &i , &j, &k, &l, &t);
             double t0 =t;
 
             // A checker

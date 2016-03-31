@@ -110,9 +110,7 @@ namespace simol
           int i;
           int j;
           long double t;
-          int test = 0;
-          test = fscanf(fichier, "%d %d %Lf", &i , &j, &t);
-          assert(test>0);
+          fscanf(fichier, "%d %d %Lf", &i , &j, &t);
           double t0 =t;
           tripletList.push_back(T(i,j,t0));
 
