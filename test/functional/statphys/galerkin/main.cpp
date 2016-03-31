@@ -3,7 +3,7 @@
 #include <iostream>
 
 #include "system.hpp"
-#include "dynamics.hpp"
+#include "Dynamics.hpp"
 #include "Vector.hpp"
 #include "input.hpp"
 #include "galerkin.hpp"
@@ -16,8 +16,8 @@
 #include "CommandLine.hpp"
 #include <time.h>
 
-using std::cout; 
-using std::endl; 
+using std::cout;
+using std::endl;
 
 int main(int argc, char* argv[])
 {
@@ -32,14 +32,14 @@ int main(int argc, char* argv[])
   //===================
   // INPUT FILE LOADING
   //===================
-    
+
   cout << "Input read in " << cmd.inputFileName() << endl;
   simol::Input input(cmd);
 
   //============
   // COMPUTATION
   //============
-  
+
   if(!input.isGalerkin())
     throw std::invalid_argument("The input file should correspond to a Galerkin computation !");
 
@@ -49,7 +49,7 @@ int main(int argc, char* argv[])
 
   displayTime(clock() - totalTime);
 
-  
+
 
   return EXIT_SUCCESS;
 }
