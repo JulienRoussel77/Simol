@@ -6,117 +6,106 @@ namespace simol
   template<class ScalarType>
   class SparseMatrix<ScalarType,eigen>
   {
-    friend std::ifstream & operator>> <>(std::ifstream & fileToRead,
-                                         SparseMatrix<ScalarType,eigen> & matrixToWrite);
-    public:
-
-      typedef typename eigen<ScalarType>::SparseMatrixType::InnerIterator iterator;
-
-      operator typename eigen<ScalarType>::SparseMatrixType const () const
-      { return wrapped_; }
-
-      std::size_t numberOfRows() const;
-      std::size_t numberOfColumns() const;
-      ScalarType const operator()(std::size_t const rowIndex,
-                                    std::size_t const columnIndex) const
-     { return wrapped_.coeff(rowIndex, columnIndex); }
-
-     ScalarType& operator()(std::size_t const rowIndex,
-                                    std::size_t const columnIndex)
-     { return wrapped_.coeffRef(rowIndex, columnIndex); }
-
-      SparseMatrix<ScalarType,eigen>& operator+=(SparseMatrix<ScalarType,eigen> const& A);
-      SparseMatrix<ScalarType,eigen>& operator-=(SparseMatrix<ScalarType,eigen> const& A);
-      SparseMatrix<ScalarType,eigen>& operator*=(ScalarType const& scalar);
-      SparseMatrix<ScalarType,eigen>& operator/=(ScalarType const& scalar);
-      SparseMatrix<ScalarType,eigen> operator*(ScalarType const& scalar) const;
-      SparseMatrix<ScalarType,eigen> operator/(ScalarType const& scalar) const;
-      SparseMatrix<ScalarType,eigen> operator-() const;
-      SparseMatrix<ScalarType,eigen> operator+(SparseMatrix<ScalarType,eigen> const& A) const;
-      SparseMatrix<ScalarType,eigen> operator-(SparseMatrix<ScalarType,eigen> const& A) const;
-
-      // TODO: write a non-pessimized version (return type may different in eigen)
-      SparseMatrix adjoint() const
-      { return SparseMatrix(wrapped_.adjoint()); }
-
-
+    friend std::ifstream & operator>> <>(std::ifstream & fileToRead, SparseMatrix<ScalarType,eigen> & matrixToWrite);
 
     public:
-      typename eigen<ScalarType>::SparseMatrixType const & wrapped() const
-      { return wrapped_; }
+        typedef typename eigen<ScalarType>::SparseMatrixType::InnerIterator iterator;
+
+        explicit SparseMatrix(size_t const numberOfRows, size_t const numberOfColumns);
+        explicit SparseMatrix(MatrixMarketFile const & file);
+        explicit SparseMatrix(std::string const & filename, std::size_t const size);
+        explicit SparseMatrix(Vector<double, eigen> u, std::size_t numberOfRows, std::size_t numberOfColumns);
+        SparseMatrix(const typename eigen<ScalarType>::SparseMatrixType::AdjointReturnType& A);
+
+        operator typename eigen<ScalarType>::SparseMatrixType const () const;
+
+        std::size_t numberOfRows() const;
+        std::size_t numberOfColumns() const;
+
+        ScalarType const operator()(std::size_t const rowIndex, std::size_t const columnIndex) const;
+        ScalarType & operator()(std::size_t const rowIndex, std::size_t const columnIndex);
+
+        SparseMatrix<ScalarType,eigen>& operator+=(SparseMatrix<ScalarType,eigen> const& A);
+        SparseMatrix<ScalarType,eigen>& operator-=(SparseMatrix<ScalarType,eigen> const& A);
+        SparseMatrix<ScalarType,eigen>& operator*=(ScalarType const& scalar);
+        SparseMatrix<ScalarType,eigen>& operator/=(ScalarType const& scalar);
+        SparseMatrix<ScalarType,eigen> operator*(ScalarType const& scalar) const;
+        SparseMatrix<ScalarType,eigen> operator/(ScalarType const& scalar) const;
+        SparseMatrix<ScalarType,eigen> operator-() const;
+        SparseMatrix<ScalarType,eigen> operator+(SparseMatrix<ScalarType,eigen> const& A) const;
+        SparseMatrix<ScalarType,eigen> operator-(SparseMatrix<ScalarType,eigen> const& A) const;
+
+        SparseMatrix adjoint() const;
+
+        typename eigen<ScalarType>::SparseMatrixType const & wrapped() const;
+
     public:
-      SparseMatrix(size_t const numberOfRows, size_t const numberOfColumns);
-      SparseMatrix(MatrixMarketFile const & file);
-      //SparseMatrix(const char * filename, std::size_t const size)
-      //: SparseMatrix(filename, size) //wrapped_(size, size)
-      //{
-     	/*FILE* fichier = fopen(filename,"r" ); //ON ouvre le fichier en lecture seule
-        typedef Eigen::Triplet<double,std::size_t> T;
-	    std::vector<T> tripletList;
-        std::ifstream in(filename); //Ouverture en mode lecture de "bdd.txt"
-	    std::string ligne; //Création d'une chaine de caractere
-	    int nbLignes = 0;
-
-	    while(std::getline(in, ligne))
-	    {
-		    int i;
-		    int j;
-		    long double t;
-		    int test = 0;
-		    test = fscanf(fichier, "%d %d %Lf", &i , &j, &t);
-		    assert(test>0);
-		    double t0 =t;
-		    tripletList.push_back(T(i,j,t0));
-
-		    //On lit chaque ligne du fichier que l'on stoke dans "ligne"
-	           nbLignes++;
-
-
-	    }
-	    in.close(); //On ferme le fichier
-        wrapped_.setFromTriplets(tripletList.begin(), tripletList.end());*/
-      //}
-      SparseMatrix(std::string const & filename, std::size_t const size)
-      : wrapped_(size, size)
-      {
-        FILE* fichier = fopen(filename.c_str(),"r" ); //ON ouvre le fichier en lecture seule
-        typedef Eigen::Triplet<double,std::size_t> T;
-        std::vector<T> tripletList;
-          std::ifstream in(filename.c_str()); //Ouverture en mode lecture de "bdd.txt"
-        std::string ligne; //Création d'une chaine de caractere
-        int nbLignes = 0;
-
-        while(std::getline(in, ligne))
-        {
-          int i;
-          int j;
-          long double t;
-          fscanf(fichier, "%d %d %Lf", &i , &j, &t);
-          double t0 =t;
-          tripletList.push_back(T(i,j,t0));
-
-          //On lit chaque ligne du fichier que l'on stoke dans "ligne"
-              nbLignes++;
-        }
-        in.close(); //On ferme le fichier
-          wrapped_.setFromTriplets(tripletList.begin(), tripletList.end());
-      }
-
-      SparseMatrix(Vector<double, eigen> u, std::size_t numberOfRows, std::size_t numberOfColumns);
-      SparseMatrix(const typename eigen<ScalarType>::SparseMatrixType::AdjointReturnType& A);
-    public:
-      typename eigen<ScalarType>::SparseMatrixType wrapped_;
+        typename eigen<ScalarType>::SparseMatrixType wrapped_;
   };
 
-
-
-
+  //! Conversion to wrapped matrix
   template<class ScalarType> inline
-  SparseMatrix<ScalarType,eigen>::SparseMatrix(size_t const numberOfRows,
-                                               size_t const numberOfColumns)
+  SparseMatrix<ScalarType,eigen>::operator typename eigen<ScalarType>::SparseMatrixType const () const
+  { return wrapped_; }
+
+  //! Returns coefficient
+  template<class ScalarType> inline
+  ScalarType const SparseMatrix<ScalarType,eigen>::operator()(std::size_t const rowIndex, std::size_t const columnIndex) const
+  { return wrapped_.coeff(rowIndex, columnIndex); }
+
+  //! Modify coefficient
+  template<class ScalarType> inline
+  ScalarType& SparseMatrix<ScalarType,eigen>::operator()(std::size_t const rowIndex, std::size_t const columnIndex)
+  { return wrapped_.coeffRef(rowIndex, columnIndex); }
+
+  //! Returns adjoint matrix
+  template<class ScalarType> inline
+  typename eigen<ScalarType>::SparseMatrixType const & SparseMatrix<ScalarType, eigen>::wrapped() const
+  { return wrapped_; }
+
+  //! Returns adjoint matrix
+  // TODO: write a non-pessimized version (return type may different in eigen)
+  template<class ScalarType> inline
+  SparseMatrix<ScalarType,eigen> SparseMatrix<ScalarType, eigen>::adjoint() const
+  { return SparseMatrix(wrapped_.adjoint()); }
+
+
+  //! Construction from a file
+  template<class ScalarType>
+  SparseMatrix<ScalarType, eigen>::SparseMatrix(std::string const & filename, std::size_t const size)
+  : wrapped_(size, size)
+  {
+    FILE* fichier = fopen(filename.c_str(),"r" ); //ON ouvre le fichier en lecture seule
+    typedef Eigen::Triplet<double,std::size_t> T;
+    std::vector<T> tripletList;
+      std::ifstream in(filename.c_str()); //Ouverture en mode lecture de "bdd.txt"
+    std::string ligne; //Création d'une chaine de caractere
+    int nbLignes = 0;
+
+    while(std::getline(in, ligne))
+    {
+      int i;
+      int j;
+      long double t;
+      fscanf(fichier, "%d %d %Lf", &i , &j, &t);
+      double t0 =t;
+      tripletList.push_back(T(i,j,t0));
+
+      //On lit chaque ligne du fichier que l'on stoke dans "ligne"
+          nbLignes++;
+    }
+    in.close(); //On ferme le fichier
+      wrapped_.setFromTriplets(tripletList.begin(), tripletList.end());
+  }
+
+
+  //! Construction from a given size
+  template<class ScalarType> inline
+  SparseMatrix<ScalarType,eigen>::SparseMatrix(size_t const numberOfRows, size_t const numberOfColumns)
   : wrapped_(numberOfRows,numberOfColumns)
   {}
 
+  //! Construction from a Matrix Market file
   template<class ScalarType> inline
   SparseMatrix<ScalarType,eigen>::SparseMatrix(MatrixMarketFile const & file)
   : wrapped_(file.numberOfRows(), file.numberOfColumns())
@@ -133,13 +122,11 @@ namespace simol
     wrapped_.setFromTriplets(nonzeros.begin(),nonzeros.end());
   }
 
+  //! Construction from a vector
   template<class ScalarType>
   SparseMatrix<ScalarType, eigen>::SparseMatrix(Vector<double, eigen> u, std::size_t numberOfRows, std::size_t numberOfColumns):
     SparseMatrix(numberOfRows, numberOfColumns)
   {
-
-    //wrapped_.reshape(u, numberOfRows, numberOfColumns);
-
     if (u.size() != numberOfColumns * numberOfRows)
       throw std::invalid_argument("Matrix reshape : sizes incoherent !");
     for (std::size_t j=0; j<numberOfColumns; j++)
@@ -159,21 +146,6 @@ namespace simol
   template<class ScalarType> inline std::size_t
   SparseMatrix<ScalarType,eigen>::numberOfColumns() const
   { return wrapped_.cols(); }
-
-
-  /*template<class ScalarType>
-  SparseMatrix<ScalarType,eigen> SparseMatrix<ScalarType,eigen>::operator*=(ScalarType const& scalar)
-  {
-    return SparseMatrix (wrapped_ * scalar);
-  }
-
-  template<class ScalarType>
-  SparseMatrix<ScalarType,eigen> SparseMatrix<ScalarType,eigen>::operator*=(ScalarType const& scalar)
-  {
-    return SparseMatrix (wrapped_ * scalar);
-  }*/
-
-
 
 
 
@@ -202,14 +174,6 @@ namespace simol
       return prod;
   }
 
-  /*template<class ScalarType>
-  SparseMatrix<ScalarType, eigen> operator+(SparseMatrix<ScalarType, eigen> const & A,
-                                      SparseMatrix<ScalarType, eigen> const & B)
-  {
-      SparseMatrix<ScalarType, eigen> C(A.numberOfRows(), A.numberOfColumns());
-      C.wrapped_ = A.wrapped_ - B.wrapped_;
-      return C;
-  }*/
 
   //======================
   // Operators
@@ -283,7 +247,6 @@ namespace simol
     SparseMatrix<ScalarType, eigen> A(nbOfRows, nbOfColumns);
     for (std::size_t i=0; i < std::min(nbOfRows, nbOfColumns); i++)
       A(i,i) = 1;
-    //A.wrapped_.setIdentity();
     return A;
   }
 
