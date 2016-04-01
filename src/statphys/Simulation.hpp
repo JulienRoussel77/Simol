@@ -600,6 +600,9 @@ namespace simol {
   {
     if (output.doOutput(iOfIteration))
       output.displayObservablesDPDE(syst.configuration(), iOfIteration);
+    if (output.doProfileOutput(iOfIteration))
+      output.displayParticles(syst.configuration(), iOfIteration);        
+  
   }
 
 

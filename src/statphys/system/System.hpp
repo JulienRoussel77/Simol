@@ -51,12 +51,12 @@ namespace simol
       //virtual void computeFinalOutput(Output& output, Dynamics const& model);
       //virtual void writeFinalOutput(Output& output, Dynamics const& model);
 
-    protected:
-      size_t dimension_;
-      std::vector<Particle> configuration_;
-			string settingsPath_;
-      std::shared_ptr<RNG> rng_;
-      Potential* potential_;
+  protected:
+    size_t dimension_;
+    std::vector<Particle> configuration_;
+    string settingsPath_;
+    std::shared_ptr<RNG> rng_;
+    Potential* potential_;
   };
 
   class Isolated : public System
