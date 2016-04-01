@@ -122,8 +122,6 @@ namespace simol
       Vector<double> derivative(double position) const;
       double laplacian(double position) const;
 			double drawLaw(double localBeta, std::shared_ptr<RNG>& rng_) const;
-    private:
-      double stiffness_;
   };
 
 

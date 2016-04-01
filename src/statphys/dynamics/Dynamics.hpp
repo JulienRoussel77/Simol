@@ -28,22 +28,22 @@ namespace simol
       size_t& nbOfIterations();
       const size_t& nbOfIterations() const;
       double finalTime() const;
-	  size_t& nbOfThermalIterations();
+      size_t& nbOfThermalIterations();
       const size_t& nbOfThermalIterations() const;
-	  size_t& nbOfBurningIterations();
+      size_t& nbOfBurningIterations();
       const size_t& nbOfBurningIterations() const;
       const std::shared_ptr<RNG>& rng() const;
       std::shared_ptr<RNG>& rng();
 
       Vector<double>& externalForce() ;
       const Vector<double>& externalForce() const;
-	  double& externalForce(const int& i);
+      double& externalForce(const int& i);
       const double& externalForce(const int& i) const;
-	  Galerkin* galerkin();
+      Galerkin* galerkin();
 
-	  // Accessors for daughters, fails if inadequate
+      // Accessors for daughters, fails if inadequate
 
-	  virtual const double& gamma() const {assert(false);}
+      virtual const double& gamma() const {assert(false);}
       virtual const double& temperatureLeft() const {assert(false);}
       virtual double deltaTemperature() const {assert(false);}
 

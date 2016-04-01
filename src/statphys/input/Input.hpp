@@ -19,7 +19,6 @@ namespace simol{
     YAML::Node data;
     string inputPath_;
     ifstream inputFlux_;
-    double positionMin_, positionMax_;
     ifstream inputSettings_;
     vector<Vector<double>> initialPositions_, initialMomenta_;
   public:

@@ -18,7 +18,8 @@ namespace simol
     nbOfIterations_(input.nbOfIterations()),
     nbOfThermalIterations_(input.nbOfThermalIterations()),
     nbOfBurningIterations_(input.nbOfBurningIterations()),
-    externalForce_(input.dimension(), 0)
+    externalForce_(input.dimension(), 0),
+    galerkin_(nullptr)
   {
     externalForce_(0) = input.externalForce();
 

@@ -12,34 +12,38 @@ namespace simol
   // CONSTRUCTORS
   //=============
   
-   Particle::Particle() :mass_(0), position_(0), momentum_(0), force_(0), energyGrad_(0), countdown_(-1)
-   {
-    //std::cout << "Particle vide créée !" << std::endl;      
-   }
-   
-   Particle::Particle(int dimension) :
-		mass_(0), position_(dimension), 
-		momentum_(dimension), force_(dimension), 
-		energyGrad_(dimension, 0), energyLapla_(0)
-   {
-    //std::cout << "Particle vide créée !" << std::endl;      
-   }
-
-  Particle::Particle(double const & mass, Vector<double> const & position0, Vector<double> const & momentum0):
-		Particle(position0.size())
+  /*Particle::Particle():
+    mass_(0), 
+    position_(0), 
+    momentum_(0), 
+    force_(0), 
+    energyGrad_(0), 
+    countdown_(-1)
   {
-		mass_ = mass;
-		position_ = position0;
-		momentum_ = momentum0;
-	}
+    //std::cout << "Particle vide créée !" << std::endl;      
+  }*/
+   
+  Particle::Particle(double const & mass, Vector<double> const & position0, Vector<double> const & momentum0):
+    mass_(mass),
+    position_(position0),
+    momentum_(momentum0),
+    potentialEnergy_(0),
+    force_(dimension(), 0), 
+    energyGrad_(dimension(), 0), 
+    energyLapla_(0),
+    countdown_(0),
+    internalEnergy_(0)
+  {}
+   
+  Particle::Particle(int dimension) : 
+    Particle(0, Vector<double>(dimension, 0), Vector<double>(dimension, 0))
+  {}
+
+
   
   Particle::Particle(double const & mass, double const & position0, double const & momentum0):
-    Particle(1)
-  {
-		mass_ = mass;
-		position_ = Vector<double>(1, position0);
-		momentum_ = Vector<double>(1, momentum0);
-	}
+    Particle(mass, Vector<double>(1, position0), Vector<double>(1, momentum0))
+  {}
   
 
   //==========

@@ -1051,8 +1051,8 @@ namespace simol
 	void ExpFourierHermiteControlVariate::displayMap(ofstream& out) const
 	{
 		cout << "displayMap" << endl;
-		vector<Particle> conf(1);
-		conf[0] = Particle(0,0,0);
+		vector<Particle> conf(1, Particle(0,0,0));
+		//conf[0] = Particle(0,0,0);
 		out << nbP_ + 1 << " ";
 		for (double p = -pMax_; p<pMax_; p += deltaP_)
 			out << p << " ";
@@ -1074,8 +1074,8 @@ namespace simol
 	void ExpFourierHermiteControlVariate::displayGradQMap(ofstream& out) const
 		{
 		cout << "displayGradQMap" << endl;
-		vector<Particle> conf(1);
-		conf[0] = Particle(0,0,0);
+		vector<Particle> conf(1, Particle(0,0,0));
+		//conf[0] = Particle(0,0,0);
 		out << nbP_ + 1 << " ";
 		for (double p = -pMax_; p<pMax_; p += deltaP_)
 			out << p << " ";
@@ -1097,8 +1097,8 @@ namespace simol
 		void ExpFourierHermiteControlVariate::displayGradPMap(ofstream& out) const
 		{
 		cout << "displayGradPMap" << endl;
-		vector<Particle> conf(1);
-		conf[0] = Particle(0,0,0);
+		vector<Particle> conf(1, Particle(0,0,0));
+		//nf[0] = Particle(0,0,0);
 		out << nbP_ + 1 << " ";
 		for (double p = -pMax_; p<pMax_; p += deltaP_)
 			out << p << " ";

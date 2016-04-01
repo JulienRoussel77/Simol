@@ -9,9 +9,9 @@ namespace simol
 
   
   System::System(Input const& input):
-  dimension_(input.dimension()),
-  configuration_(input.nbOfParticles()),
-  settingsPath_(input.settingsPath())
+    dimension_(input.dimension()),
+    configuration_(input.nbOfParticles(), Particle(dimension_)),
+    settingsPath_(input.settingsPath())
   {
     potential_ = createPotential(input);
   }

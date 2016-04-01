@@ -54,19 +54,7 @@ namespace simol {
   {
 		assert(data["Physics"]);
 
-    if (data["Physics"]["System"]["Position"])
-		{
-      if (data["Physics"]["System"]["Position"].size() == 2)
-      {
-				cout << "input is double !" << endl;
-				exit(1);
-				positionMin_ = data["Physics"]["System"]["Position"][0].as<double>();
-				positionMax_ = data["Physics"]["System"]["Position"][1].as<double>();
-      }
-		}
-
-
-		else if (doFileSettings())
+		if (doFileSettings())
 		{
 			assert(inputFlux_.is_open());
 			cout << "Reading the settings from " << settingsPath() << "...";
@@ -234,12 +222,7 @@ namespace simol {
   Vector<double> Input::initialPosition(int const& iOfParticle) const {
     Vector<double> q0(dimension(), 0);
     if (data["Physics"]["System"]["Position"])
-      {
-      if (data["Physics"]["System"]["Position"].size() == 1)
-	q0(0) = data["Physics"]["System"]["Position"].as<double>();
-      else
-	q0(0) = positionMin_ + (iOfParticle + .5)/nbOfParticles() * (positionMax_ - positionMin_);
-      }
+      q0(0) = data["Physics"]["System"]["Position"].as<double>();
 		else if (doFileSettings())
 		{
 			cout << "using settings for q : " << iOfParticle << "->" << initialPositions_[iOfParticle] << endl;
