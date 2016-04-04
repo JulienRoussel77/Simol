@@ -190,31 +190,29 @@ namespace simol
   
 
   
-  //### Fluid ###
+  //------------------- NBody ----------------------------
   
-  Fluid::Fluid(Input const& input):
-  System(input)
+  NBody::NBody(Input const& input):
+    System(input)
   {
-		assert(configuration_.size() > 1);
-	  for (size_t i = 0; i<input.nbOfParticles(); i++) 
-    {
-      configuration_[i] = Particle(input.mass(), input.initialPosition(i), input.initialMomentum(i));
-      //std::cout << configuration_[i].force() << std::endl;
-    }
+    // assert(configuration_.size() > 1);
+    // for (size_t i = 0; i<input.nbOfParticles(); i++) 
+    //   {
+    // 	configuration_[i] = Particle(input.mass(), input.initialPosition(i), input.initialMomentum(i));
+    // 	//std::cout << configuration_[i].force() << std::endl;
+    //   }
   }
 	
-	  void Fluid::computeAllForces(Dynamics const& dyna)
+  void NBody::computeAllForces(Dynamics const& dyna)
   {
-    //std::cout << "Fluid::computeAllForces" << std::endl;
-    for (auto&& particle : configuration_)
-      dyna.resetForce(particle);
+    //std::cout << "NBody::computeAllForces" << std::endl;
     //for (auto&& particle : configuration_)
-    //  dyna.computeForce(particle);
-    for (size_t i = 0; i < nbOfParticles()-1; i++)
-			for (size_t j = i+1; j < nbOfParticles(); j++)
-				interaction(configuration_[i], configuration_[j]);
+    //  dyna.resetForce(particle);
+    // for (size_t i = 0; i < nbOfParticles()-1; i++)
+    //   for (size_t j = i+1; j < nbOfParticles(); j++)
+    // 	interaction(configuration_[i], configuration_[j]);
   }
-
+  
   
  
   

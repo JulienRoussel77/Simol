@@ -3,7 +3,8 @@ ADD_EXECUTABLE(test_galerkin 		${CMAKE_SOURCE_DIR}/test/functional/statphys/gale
 ADD_EXECUTABLE(test_hamiltonian 	${CMAKE_SOURCE_DIR}/test/functional/statphys/moldyn/hamiltonian/TestHamiltonian.cpp) 
 ADD_EXECUTABLE(test_langevin 		${CMAKE_SOURCE_DIR}/test/functional/statphys/moldyn/langevin/TestLangevin.cpp) 
 ADD_EXECUTABLE(test_dpde 		${CMAKE_SOURCE_DIR}/test/functional/statphys/moldyn/dpde/TestDPDE.cpp) 
-ADD_EXECUTABLE(test_rotor 		${CMAKE_SOURCE_DIR}/test/functional/statphys/moldyn/chain/TestRotor.cpp) 
+ADD_EXECUTABLE(test_rotor 		${CMAKE_SOURCE_DIR}/test/functional/statphys/moldyn/chain/TestRotor.cpp)
+ADD_EXECUTABLE(test_fluid 		${CMAKE_SOURCE_DIR}/test/functional/statphys/moldyn/fluid/TestFluid.cpp)  
 
 INCLUDE_DIRECTORIES(	${CMAKE_SOURCE_DIR}/src/statphys/
 	    		${CMAKE_SOURCE_DIR}/src/statphys/input
@@ -26,6 +27,7 @@ TARGET_LINK_LIBRARIES(test_hamiltonian simol-statphys)
 TARGET_LINK_LIBRARIES(test_langevin simol-statphys)
 TARGET_LINK_LIBRARIES(test_dpde simol-statphys)
 TARGET_LINK_LIBRARIES(test_rotor simol-statphys)
+TARGET_LINK_LIBRARIES(test_fluid simol-statphys)
 
 TARGET_LINK_LIBRARIES(simol_test_functional simol-quantchem)
 TARGET_LINK_LIBRARIES(simol_test_functional ${EXTERNAL_DIR}/gtest/install/lib/libgtest_main.a)
@@ -42,3 +44,4 @@ ADD_CUSTOM_TARGET(hamiltonian COMMAND test_hamiltonian -i 	"${CMAKE_SOURCE_DIR}/
 ADD_CUSTOM_TARGET(langevin COMMAND test_langevin -i 		"${CMAKE_SOURCE_DIR}/test/functional/statphys/moldyn/langevin/langevin_sinusoidal_test.yaml")
 ADD_CUSTOM_TARGET(dpde COMMAND test_dpde -i 			"${CMAKE_SOURCE_DIR}/test/functional/statphys/moldyn/dpde/dpde_1D_test.yaml")
 ADD_CUSTOM_TARGET(rotor COMMAND test_rotor -i 			"${CMAKE_SOURCE_DIR}/test/functional/statphys/moldyn/chain/rotor_test.yaml")
+ADD_CUSTOM_TARGET(fluid COMMAND test_fluid -i 			"${CMAKE_SOURCE_DIR}/test/functional/statphys/moldyn/fluid/fluid_test.yaml")

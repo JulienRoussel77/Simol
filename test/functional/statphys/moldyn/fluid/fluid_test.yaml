@@ -1,0 +1,26 @@
+Geometry:
+  Dimension: 3
+
+Mesh:
+  Time:
+    Step: 0.01
+    FinalTime: 100
+
+Physics:
+  System:
+    Name: NBody
+    Momentum: 1
+  Potential:
+    Name: Sinusoidal
+    Amplitude: 1
+  Model:
+    Name: Hamiltonian
+    Temperature: 1
+    
+Output:
+  ParametersName: /
+  FolderName: test
+  //Period: 1
+  //ProfilePeriod: 10
+
+

@@ -69,10 +69,10 @@ namespace simol
     //void writeFinalOutput(Output& output, Dynamics const& model);
   };
 
-  class Fluid : public System
+  class NBody : public System
   {
   public:
-    Fluid(Input const& input);
+    NBody(Input const& input);
     void computeAllForces(Dynamics const& model);
     //void writeFinalOutput(Output& output, Dynamics const& model);
   };

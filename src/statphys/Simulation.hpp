@@ -83,7 +83,7 @@ namespace simol {
   template <class D, class S>
   void writeFinalOutput(D const& dyna, S const& syst, Output& output);
 
-  //Fluid
+  //NBody
   template <class D, class S>
   void writeFinalOutput(D const& dyna, S const& syst, Output& output);
 
@@ -272,16 +272,6 @@ namespace simol {
     output.displayFinalVelocity(dyna.temperature(), dyna.externalForce(0), output.velocityCV_->nbOfFourier(), output.velocityCV_->nbOfHermite());
   }
 
-
-  //################## FLUID ########################
-
-  template <class D>
-  void writeFinalOutput(D const& dyna, Fluid const& syst, Output& output)
-  {
-    output.finalDisplay(syst.configuration(), dyna.externalForce());
-    if (output.doComputeCorrelations())
-      output.finalDisplayAutocorrelations();
-  }
 
   //##################### HAMILTONIAN ####################"
 
@@ -564,6 +554,45 @@ namespace simol {
     }
   }
 
+  //------------ NBody --------------
+
+  template <class S>
+  void simulate(Dynamics& dyna, NBody& syst)
+  {
+
+  }
+
+  template<class D>
+  void sampleSystem(D& dyna, NBody& syst)
+  {
+    //-- initialization of the momenta according to a Gaussian distribution --
+    //syst.getParticle(0).momentum() = syst.drawMomentum(dyna.beta(), syst.getParticle(0).mass());
+    //-- initialization on a cubic lattice --
+    //syst.getParticle(0).position(0) = 0;
+  }
+
+  template<class D>
+  void computeOutput(const D& /*dyna*/, const NBody& syst, Output& output, size_t /*iOfIteration*/)
+  {
+    
+  }
+
+  template <class S>
+  void writeOutput(Dynamics const& /*dyna*/, S const& syst, Output& output, size_t iOfIteration)
+  {
+    //if (output.doOutput(iOfIteration))
+    //output.displayObservablesDPDE(syst.configuration(), iOfIteration);
+    //if (output.doProfileOutput(iOfIteration))
+    //output.displayParticles(syst.configuration(), iOfIteration);        
+  }
+
+  template <class D>
+  void writeFinalOutput(Dynamics const& dyna, NBody const& syst, Output& output)
+  {
+    //output.finalDisplay(syst.configuration(), dyna.externalForce());
+  }
+
+
   //-------------- DPDE -------------
 
   template <class S>
@@ -579,6 +608,7 @@ namespace simol {
       dyna.energyReinjection(syst.getParticle(i));  // integration de p avec gamma fixe + reinjection
   }
 
+  //--- initialisation of the system --
   template<>
   void sampleSystem(DPDE& dyna, Isolated& syst)
   {
