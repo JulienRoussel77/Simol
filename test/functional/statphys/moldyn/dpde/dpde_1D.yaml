@@ -20,7 +20,7 @@ Physics:
 
 Output:
   ParametersName: /
-  FolderName: DPDE
+  FolderName: production
   DecorrelationTime: 5
   Period: 1
   ProfilePeriod: 10

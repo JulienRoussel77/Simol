@@ -382,10 +382,12 @@ namespace simol{
     // garder le vecteur des particules pour evt sortir les positions, etc
     //cout << "output : n = " << iOfIteration << endl;
     
+    double totalEnergy = kineticEnergy() + potentialEnergy() + internalEnergy();
     outObservables_ << iOfIteration * timeStep() 
 		    << " " << kineticEnergy()
 		    << " " << potentialEnergy()
 		    << " " << internalEnergy()
+		    << " " << totalEnergy 
 		    << std::endl;
   }
   

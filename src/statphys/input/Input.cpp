@@ -47,35 +47,35 @@ namespace simol {
 	///Reads the input file using the YAML library
 	///Reads the initial conditions in the "settings" file, if indicated
   Input::Input(CommandLine cmd):
-		data(YAML::LoadFile(cmd.inputFileName())),
-		inputPath_(cmd.inputFileName()),
-		inputFlux_(inputPath()),
-		inputSettings_(settingsPath())
+    data(YAML::LoadFile(cmd.inputFileName())),
+    inputPath_(cmd.inputFileName()),
+    inputFlux_(inputPath()),
+    inputSettings_(settingsPath())
   {
-		assert(data["Physics"]);
-
-		if (doFileSettings())
+    assert(data["Physics"]);
+    
+    if (doFileSettings())
 		{
-			assert(inputFlux_.is_open());
-			cout << "Reading the settings from " << settingsPath() << "...";
-			initialPositions_ = vector<Vector<double>>(nbOfParticles());
-			initialMomenta_ = vector<Vector<double>>(nbOfParticles());
-			for (int iOfParticle=0; iOfParticle < (int)nbOfParticles(); iOfParticle++)
-			{
-				readItem(inputSettings_);
-				assert( (int) readItem(inputSettings_) == (int) iOfParticle);
-				for (int i=0; i < dimension(); i++)
-					initialPositions_[iOfParticle](i) = readItem(inputSettings_);
-				for (int i=0; i < dimension(); i++)
-					initialMomenta_[iOfParticle](i) = readItem(inputSettings_);
-				for (int i=0; i<4; i++)
-					readItem(inputSettings_);
-				//cout << iOfParticle << " " << initialPositions_[iOfParticle] << " " << initialMomenta_[iOfParticle] << endl;
-			}
-			cout <<"OK !" << endl;
+		  assert(inputFlux_.is_open());
+		  cout << "Reading the settings from " << settingsPath() << "...";
+		  initialPositions_ = vector<Vector<double>>(nbOfParticles());
+		  initialMomenta_ = vector<Vector<double>>(nbOfParticles());
+		  for (int iOfParticle=0; iOfParticle < (int)nbOfParticles(); iOfParticle++)
+		    {
+		      readItem(inputSettings_);
+		      assert( (int) readItem(inputSettings_) == (int) iOfParticle);
+		      for (int i=0; i < dimension(); i++)
+			initialPositions_[iOfParticle](i) = readItem(inputSettings_);
+		      for (int i=0; i < dimension(); i++)
+			initialMomenta_[iOfParticle](i) = readItem(inputSettings_);
+		      for (int i=0; i<4; i++)
+			readItem(inputSettings_);
+		      //cout << iOfParticle << " " << initialPositions_[iOfParticle] << " " << initialMomenta_[iOfParticle] << endl;
+		    }
+		  cout <<"OK !" << endl;
 		}
   }
-
+  
   const std::string& Input::inputPath() const
   {
 		return inputPath_;
