@@ -27,21 +27,21 @@ namespace simol {
     void launch();
   };
 
-    template<class D, class S>
+  template<class D, class S>
   Simulation<D,S>::Simulation(Input& input):
     dimension_(input.dimension()),
     rng_(std::make_shared<RNG>(RNG(input.seed(), input.dimension()))),
     system_(input),
     dynamics_(input),
     output_(input)
- {
-
-   system_.rng() = rng_;
-   dynamics_.rng() = rng_;
-
-   output_.setControlVariates(input, system_.potential(), dynamics_.galerkin());
- }
-
+  {
+    
+    system_.rng() = rng_;
+    dynamics_.rng() = rng_;
+    
+    output_.setControlVariates(input, system_.potential(), dynamics_.galerkin());
+  }
+  
   template<class D, class S>
   void Simulation<D,S>::launch()
   {
@@ -49,15 +49,13 @@ namespace simol {
     launchSimu(dynamics_, system_, output_);
   }
 
-
+  
 
   // --------------- Declaration and implementation of external functions -------------------
 
 
-  template<class D, class S>
-  void sampleSystem(D& dyna, S& syst);
-  template<class D, class S>
-  void simulate(D& dyna, S& syst);
+  void sampleSystem(Dynamics & dyna, System & syst);
+  void simulate(Dynamics & dyna, System & syst);
   template<class D, class S>
   void updateAllControlVariates(const D& dyna, const S& syst, Output& output, size_t iOfIteration);
   template<class D, class S>
@@ -70,11 +68,8 @@ namespace simol {
   void writeFinalOutput(D const& dyna, S const& syst, Output& output);
   template <class D, class S>
   void updateAllControlVariates(D const& dyna, S const& syst, Output& output, size_t iOfIteration);
-  template <class D, class S>
-  void simulate(D& dyna, S& syst);
-
+  
   //Isolated
-  template <class D>
   void sampleSystem(Dynamics& dyna, Isolated& syst);
   template <class D>
   void computeOutput(D const& dyna, const Isolated& syst, Output& output, size_t iOfIteration);
@@ -108,15 +103,12 @@ namespace simol {
   Vector<double> generatorOn(const Overdamped& dyna, const System& syst, const ControlVariate& controlVariate);
 
   //Chains
-  template <>
   void sampleSystem(BoundaryLangevin& dyna, BiChain& syst);
-  template <>
   void sampleSystem(BoundaryLangevin& dyna, TriChain& syst);
   template <>
   void writeFinalOutput(BoundaryLangevin const& dyna, BiChain const& syst, Output& output);
   template <>
   void writeFinalOutput(BoundaryLangevin const& dyna, TriChain const& syst, Output& output);
-  template <>
   void simulate(BoundaryLangevin& dyna, Chain& syst);
   template <class S>
   void updateAllControlVariates(const BoundaryLangevin& dyna, S const& syst, Output& output, size_t iOfIteration);
@@ -126,9 +118,7 @@ namespace simol {
   void writeOutput(BoundaryLangevin const& dyna, S const& syst, Output& output, size_t iOfIteration);
   
   //DPDE
-  template <class S>
-  void simulate(DPDE& dyna, S& syst);
-  template<>
+  void simulate(DPDE& dyna, System & syst);
   void sampleSystem(DPDE& dyna, Isolated& syst);
   template<>
   void computeOutput(const DPDE& dyna, const Isolated& syst, Output& output, size_t iOfIteration);
@@ -140,21 +130,12 @@ namespace simol {
   void launchSimu(D& dyna, S& syst, Output& output);
 
 
-
-
-
-
-
-
-
-
-
   // -----------------------------Implementation des templates----------------------------------
 
-
-  template <class D, class S>
-  void sampleSystem(D& /*dyna*/, S& /*syst*/)
-  {throw std::invalid_argument("sampleSystem : Function undefined");}
+  void sampleSystem(Dynamics & /*dyna*/, System & /*syst*/)
+  {
+    throw std::invalid_argument("sampleSystem: Function undefined");
+  }
 
    ///
   ///Computes the quantities needed by the control variates (coefficients a, b, D) and {L \Phi}
@@ -218,16 +199,16 @@ namespace simol {
       output.finalDisplayAutocorrelations();
   }
 
-  template <class D, class S>
-  void simulate(D& dyna, S& syst)
+  void simulate(Dynamics & dyna, System & syst)
   {
-    for (auto&& particle : syst.configuration())
-      dyna.updateBefore(particle);
+    throw std::invalid_argument("simulate: Function undefined");
+    // for (auto&& particle : syst.configuration())
+    //   dyna.updateBefore(particle);
 
-    syst.computeAllForces(dyna);
+    // syst.computeAllForces(dyna);
 
-    for (auto&& particle : syst.configuration())
-      dyna.updateAfter(particle);
+    // for (auto&& particle : syst.configuration())
+    //   dyna.updateAfter(particle);
   }
 
 
@@ -236,18 +217,15 @@ namespace simol {
 
  //##################### ISOLATED ######################
   
-  template <>
   void sampleSystem(Hamiltonian& /*dyna*/, Isolated& /*syst*/)
   {}
   
-  template <>
   void sampleSystem(Langevin& dyna, Isolated& syst)
   {
     syst.getParticle(0).momentum() = syst.drawMomentum(dyna.beta(), syst.getParticle(0).mass());
     syst.getParticle(0).position(0) = syst.drawPotLaw(dyna.beta());
   }
   
-  template <>
   void sampleSystem(Overdamped& dyna, Isolated& syst)
   {
     syst.getParticle(0).position(0) = syst.drawPotLaw(dyna.beta());
@@ -375,7 +353,6 @@ namespace simol {
 
   //################### CHAINS #############################
 
-  template <>
   void sampleSystem(BoundaryLangevin& dyna, BiChain& syst)
   {
     cout << "Initialization of the system...";cout.flush();
@@ -415,7 +392,6 @@ namespace simol {
     cout << "Done !" << endl;
   }
 
-  template <>
   void sampleSystem(BoundaryLangevin& dyna, TriChain& syst)
   {
     cout << "Initialization of the system...";cout.flush();
@@ -476,7 +452,6 @@ namespace simol {
   }
 
 
-  template <>
   void simulate(BoundaryLangevin& dyna, Chain& syst)
   {
     for (auto&& particle:syst.configuration())
@@ -556,47 +531,83 @@ namespace simol {
 
   //------------ NBody --------------
 
-  template <class S>
-  void simulate(Dynamics& dyna, NBody& syst)
+  void sampleSystem(Dynamics& dyna, NBody& syst)
   {
-
-  }
-
-  template<class D>
-  void sampleSystem(D& dyna, NBody& syst)
-  {
+    int Dim = syst.dimension();   // PAS SUPER, MAIS SINON PBM DE TYPE POUR COMPARAISON ?
+    int NbPartDim = syst.nbOfParticlesPerDimension(); 
+    double latticeSize = syst.latticeParameter();
     //-- initialization of the momenta according to a Gaussian distribution --
-    //syst.getParticle(0).momentum() = syst.drawMomentum(dyna.beta(), syst.getParticle(0).mass());
+    for (size_t i = 0; i < syst.nbOfParticles(); i++)
+      syst.getParticle(i).momentum() = syst.drawMomentum(1, syst.getParticle(i).mass());   // TO DO : introduce beta in Hamiltonian...
     //-- initialization on a cubic lattice --
-    //syst.getParticle(0).position(0) = 0;
+    if (Dim == 2) 
+      {
+	for (int i = 0; i < NbPartDim; i++)
+	  for (int j = 0; j < NbPartDim; j++)
+	    {
+	      syst.getParticle(i*NbPartDim+j).position(0) = i*latticeSize;
+	      syst.getParticle(i*NbPartDim+j).position(1) = j*latticeSize;
+	    }
+      }
+    else if (Dim == 3) 
+      {
+	int NbPartDim2 = NbPartDim*NbPartDim;
+	for (int i = 0; i < NbPartDim; i++)
+	  for (int j = 0; j < NbPartDim; j++)
+	    for (int k = 0; k < NbPartDim; k++)
+	    {
+	      syst.getParticle(i*NbPartDim2+j*NbPartDim+k).position(0) = i*latticeSize;
+	      syst.getParticle(i*NbPartDim2+j*NbPartDim+k).position(1) = j*latticeSize;
+	      syst.getParticle(i*NbPartDim2+j*NbPartDim+k).position(2) = k*latticeSize;
+	    }
+      }
+    else 
+      {
+	throw std::invalid_argument("sampleSystem: Bad dimension, should be 2 or 3");
+      }
+    //cout << "    VERIFICATION : " << syst.nbOfParticlesPerDimension() << endl;
   }
-
-  template<class D>
-  void computeOutput(const D& /*dyna*/, const NBody& syst, Output& output, size_t /*iOfIteration*/)
+  
+  void simulate(Hamiltonian& dyna, NBody& syst)
   {
-    
+    for (auto&& particle : syst.configuration())
+      dyna.verletFirstPart(particle);
+    syst.computeAllForces(dyna);
+    for (auto&& particle : syst.configuration())
+      dyna.verletSecondPart(particle);
   }
-
-  template <class S>
-  void writeOutput(Dynamics const& /*dyna*/, S const& syst, Output& output, size_t iOfIteration)
+  
+  void computeOutput(Hamiltonian const& /*dyna*/, NBody const& syst, Output& output, size_t /*iOfIteration*/)
   {
-    //if (output.doOutput(iOfIteration))
-    //output.displayObservablesDPDE(syst.configuration(), iOfIteration);
-    //if (output.doProfileOutput(iOfIteration))
-    //output.displayParticles(syst.configuration(), iOfIteration);        
+    output.kineticEnergy() = 0;
+    output.potentialEnergy() = 0;
+    //Calcul de la température et de l'énergie
+    for (const auto& particle : syst.configuration())
+      {
+      output.kineticEnergy() += particle.kineticEnergy();
+      output.potentialEnergy() += particle.potentialEnergy();
+    }
   }
-
-  template <class D>
-  void writeFinalOutput(Dynamics const& dyna, NBody const& syst, Output& output)
+  
+  //--- CONFLIT DE TEMPLETAGE ICI AUSSI : entre dynamics et system... on ne peut pas preciser que le systeme ?! ---
+  void writeOutput(Hamiltonian const& /*dyna*/, NBody const& syst, Output& output, size_t iOfIteration)
+  {
+    if (output.doOutput(iOfIteration))
+      output.displayObservables(iOfIteration);
+    if (output.doProfileOutput(iOfIteration))
+      output.displayParticlesXMakeMol(syst.configuration(), iOfIteration, syst.latticeParameter()*syst.nbOfParticlesPerDimension());        
+  }
+  
+  void writeFinalOutput(Hamiltonian const& dyna, NBody const& syst, Output& output)
   {
     //output.finalDisplay(syst.configuration(), dyna.externalForce());
   }
+  
 
 
   //-------------- DPDE -------------
 
-  template <class S>
-  void simulate(DPDE& dyna, S& syst)
+  void simulate(DPDE& dyna, System & syst)
   {
     for (auto&& particle : syst.configuration())
       dyna.verletFirstPart(particle);
@@ -609,7 +620,6 @@ namespace simol {
   }
 
   //--- initialisation of the system --
-  template<>
   void sampleSystem(DPDE& dyna, Isolated& syst)
   {
     syst.getParticle(0).momentum() = syst.drawMomentum(dyna.beta(), syst.getParticle(0).mass());

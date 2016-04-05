@@ -15,6 +15,7 @@ namespace simol{
     outputFolderName_(input.outputFolderName()), 
     outObservables_(input.outputFolderName()+"observables.txt"), 
     outParticles_(input.outputFolderName()+"particles.txt"), 
+    outParticlesXMakeMol_(input.outputFolderName()+"xmakemol.xyz"), 
     outFinalFlow_(input.simuTypeName()+"finalFlow.txt", std::ofstream::app),
     outFinalVelocity_(input.simuTypeName()+"finalVelocity.txt", std::ofstream::app),
     outCorrelation_(input.outputFolderName()+"correlations.txt"),
@@ -262,17 +263,17 @@ namespace simol{
 	
   double Output::autocoPtsPeriod() const
   {
-		return decorrelationTime() / nbOfAutocoPts();
-	}
-	
-	void Output::displayObservables(size_t iOfIteration)
+    return decorrelationTime() / nbOfAutocoPts();
+  }
+  
+  void Output::displayObservables(size_t iOfIteration)
   {
     outObservables_ << iOfIteration * timeStep() 
-    << " " << kineticEnergy()
-    << " " << potentialEnergy()
-    << " " << energy()
-    << " " << temperature()
-    << std::endl;
+		    << " " << kineticEnergy()
+		    << " " << potentialEnergy()
+		    << " " << energy()
+		    << " " << temperature()
+		    << std::endl;
   }
   
   void Output::displayChainPositions(vector<Particle> const& configuration, size_t iOfIteration)
@@ -310,6 +311,26 @@ namespace simol{
 		    << " " << configuration[i].energy()
 		    << " " << configuration[i].force()        
 		    << endl;
+  }
+
+  //--- display the current configuration in XMakemol format ; specific for NBody systems ---
+  void Output::displayParticlesXMakeMol(vector<Particle> const& configuration, size_t iOfIteration, double domainSize)
+  {
+    outParticlesXMakeMol_ << nbOfParticles_ << endl;
+    outParticlesXMakeMol_ << "Time = " << iOfIteration * timeStep() << endl;
+    double coordinate = 0;
+    for (size_t i = 0; i < nbOfParticles_; i++)
+      {
+	outParticlesXMakeMol_ << " O  ";
+	for (int dim = 0; dim < dimension_; dim++)
+	  {
+	    //-- recenter all the coordinates in the interval [-domainSize/2, domainSize/2] --
+	    coordinate = configuration[i].position(dim);
+	    coordinate -= rint(coordinate/domainSize)*domainSize;
+	    outParticlesXMakeMol_ << coordinate << " "; 
+	  }
+	outParticlesXMakeMol_ << endl;
+      }
   }
   
   void Output::displayProfile(size_t iOfIteration)
@@ -381,7 +402,6 @@ namespace simol{
   {
     // garder le vecteur des particules pour evt sortir les positions, etc
     //cout << "output : n = " << iOfIteration << endl;
-    
     double totalEnergy = kineticEnergy() + potentialEnergy() + internalEnergy();
     outObservables_ << iOfIteration * timeStep() 
 		    << " " << kineticEnergy()

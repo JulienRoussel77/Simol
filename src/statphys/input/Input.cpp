@@ -8,7 +8,9 @@ using std::min;
 
 const double defaultMass = 1;
 const double defaultLength = 2 * M_PI;
+const double defaultLatticeParameter = 1.;
 const int defaultNbOfParticles = 1;
+const int defaultNbOfParticlesPerDimension = 1;
 const double defaultPotentialCoeff = 1;
 const double defaultSeed = 0;
 const int defaultOutputPeriod = 1;         //10
@@ -21,6 +23,9 @@ const double defaultExternalForce = 0;
 const double defaultTauBending = 0;
 //-- default values for output --
 const int maxNbOfAutocoPts = 1000;
+//-- default values for potentials ---
+const double defaultEpsLJ = 1.;
+const double defaultSigmaLJ = 1.;
 
 namespace simol {
 
@@ -135,14 +140,22 @@ namespace simol {
 
   double Input::length() const
   {
-		if (data["Geometry"]["Length"])
-			return data["Geometry"]["Length"].as<double>();
-		else
-			return defaultLength;
-	}
+    if (data["Geometry"]["Length"])
+      return data["Geometry"]["Length"].as<double>();
+    else
+      return defaultLength;
+  }
 
-	// ### Mesh/Time ###
-
+  double Input::latticeParameter() const
+  {
+    if (data["Geometry"]["LatticeParameter"])
+      return data["Geometry"]["LatticeParameter"].as<double>();
+    else
+      return defaultLatticeParameter;
+  }
+  
+  // ### Mesh/Time ###
+  
   double Input::timeStep() const
   {
     if (data["Mesh"]["Time"]["Step"])
@@ -183,7 +196,7 @@ namespace simol {
     else if (data["Mesh"]["Time"]["BurningTime"])
       return data["Mesh"]["Time"]["BurningTime"].as<double>() / timeStep();
     else
-			return 0;
+      return 0;
   }
 
   // ### Physics/System ###
@@ -193,7 +206,15 @@ namespace simol {
   size_t Input::nbOfParticles() const {
     if (data["Physics"]["System"]["Number"])
       return data["Physics"]["System"]["Number"].as<size_t>();
+    else if (data["Physics"]["System"]["NumberPerDimension"])
+      return pow(data["Physics"]["System"]["NumberPerDimension"].as<size_t>(),dimension());
     else return defaultNbOfParticles;
+  }
+
+  size_t Input::nbOfParticlesPerDimension() const {
+    if (data["Physics"]["System"]["NumberPerDimension"])
+      return data["Physics"]["System"]["NumberPerDimension"].as<size_t>();
+    else return defaultNbOfParticlesPerDimension;
   }
 
   double Input::mass() const {
@@ -223,11 +244,11 @@ namespace simol {
     Vector<double> q0(dimension(), 0);
     if (data["Physics"]["System"]["Position"])
       q0(0) = data["Physics"]["System"]["Position"].as<double>();
-		else if (doFileSettings())
-		{
-			cout << "using settings for q : " << iOfParticle << "->" << initialPositions_[iOfParticle] << endl;
-			q0 = initialPositions_[iOfParticle];
-		}
+    else if (doFileSettings())
+      {
+	cout << "using settings for q : " << iOfParticle << "->" << initialPositions_[iOfParticle] << endl;
+	q0 = initialPositions_[iOfParticle];
+      }
     return q0;
   }   
   
@@ -256,6 +277,23 @@ namespace simol {
       return data["Physics"]["Potential"]["Amplitude"].as<double>();
     else
       return defaultPotentialCoeff;
+  }
+
+  //--- Lennard Jones ---
+  double Input::epsLJ() const
+  {
+    if (data["Physics"]["Potential"]["EpsLJ"])
+      return data["Physics"]["Potential"]["EpsLJ"].as<double>();
+    else
+      return defaultEpsLJ;
+  }
+
+  double Input::sigmaLJ() const
+  {
+    if (data["Physics"]["Potential"]["SigmaLJ"])
+      return data["Physics"]["Potential"]["SigmaLJ"].as<double>();
+    else
+      return defaultSigmaLJ;
   }
 
   //DoubleWell

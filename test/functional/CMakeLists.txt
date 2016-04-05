@@ -11,6 +11,7 @@ INCLUDE_DIRECTORIES(	${CMAKE_SOURCE_DIR}/src/statphys/
 			${CMAKE_SOURCE_DIR}/src/statphys/output
 			${CMAKE_SOURCE_DIR}/src/statphys/dynamics
 			${CMAKE_SOURCE_DIR}/src/statphys/system	
+			${CMAKE_SOURCE_DIR}/src/statphys/simulation	
 			${CMAKE_SOURCE_DIR}/src/statphys/controlVariate
 			${CMAKE_SOURCE_DIR}/src/statphys/potential
 			${CMAKE_SOURCE_DIR}/src/core/linalg

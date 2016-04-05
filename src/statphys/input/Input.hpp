@@ -35,6 +35,7 @@ namespace simol{
     // Geometry
     int dimension() const;
     double length() const;
+    double latticeParameter() const;
     
     // Mesh/Time
     double timeStep() const;
@@ -45,6 +46,7 @@ namespace simol{
     // Physics/System
     string systemName() const;
     size_t nbOfParticles() const;
+    size_t nbOfParticlesPerDimension() const;
     double mass() const;
     bool doFileSettings() const;
     string settingsPath() const;
@@ -61,6 +63,9 @@ namespace simol{
     double potentialStiffness() const;
     double potentialAlpha() const;
     double potentialBeta() const;
+    // Lennard Jones
+    double epsLJ() const;
+    double sigmaLJ() const;
 
     // Physics/Model
     string dynamicsName() const;

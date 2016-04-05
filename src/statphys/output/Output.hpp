@@ -18,6 +18,7 @@ namespace simol
     string outputFolderName_;
     ofstream outObservables_;
     ofstream outParticles_;
+    ofstream outParticlesXMakeMol_;
     ofstream outFinalFlow_;
     ofstream outFinalVelocity_;
     ofstream outCorrelation_;
@@ -113,6 +114,7 @@ namespace simol
     void displayChainMomenta(vector<Particle> const& configuration, size_t iOfIteration);
     void displayChainPositions(vector<Particle> const& configuration, size_t iOfIteration);
     void displayParticles(vector<Particle> const& configuration, size_t iOfIteration);
+    void displayParticlesXMakeMol(vector<Particle> const& configuration, size_t iOfIteration, double domainSize);
     void displayProfile(size_t iOfIteration);
     
     void finalDisplayAutocorrelations();
