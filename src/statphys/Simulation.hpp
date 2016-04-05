@@ -54,8 +54,10 @@ namespace simol {
   // --------------- Declaration and implementation of external functions -------------------
 
 
-  template<class D, class S>
-  void sampleSystem(D& dyna, S& syst);
+  //template<class D, class S>
+  
+  
+  
   template<class D, class S>
   void simulate(D& dyna, S& syst);
   template<class D, class S>
@@ -66,26 +68,29 @@ namespace simol {
   void computeOutput(D const& dyna, S const& syst, Output& output, size_t iOfIteration);
   template <class S>
   void writeOutput(S const& syst, Output& output, size_t iOfIteration);
-  template <class D, class S>
-  void writeFinalOutput(D const& dyna, S const& syst, Output& output);
+  //template <class D, class S>
+  void writeFinalOutput(Dynamics const& dyna, System const& syst, Output& output);
   template <class D, class S>
   void updateAllControlVariates(D const& dyna, S const& syst, Output& output, size_t iOfIteration);
   template <class D, class S>
   void simulate(D& dyna, S& syst);
 
   //Isolated
-  template <class D>
-  void sampleSystem(Dynamics& dyna, Isolated& syst);
+  //template <class D>
+  //void sampleSystem(Dynamics& dyna, Isolated& syst);
+  void sampleSystem(Hamiltonian& /*dyna*/, Isolated& /*syst*/);
+  void sampleSystem(UniformStochasticDynamics& dyna, Isolated& syst);
+  void sampleSystem(Overdamped& dyna, Isolated& syst);
   template <class D>
   void computeOutput(D const& dyna, const Isolated& syst, Output& output, size_t iOfIteration);
   template <class S>
   void writeOutput(S const& syst, Output& output, size_t iOfIteration);
-  template <class D, class S>
-  void writeFinalOutput(D const& dyna, S const& syst, Output& output);
+
+  //void writeFinalOutput(Dynamics const& dyna, Isolated const& syst, Output& output);
+  void writeFinalOutput(Hamiltonian const& dyna, Isolated const& syst, Output& output);
 
   //Fluid
-  template <class D, class S>
-  void writeFinalOutput(D const& dyna, S const& syst, Output& output);
+  void writeFinalOutput(Dynamics const& dyna, Fluid const& syst, Output& output);
 
   //Hamiltonian
   template <class S>
@@ -108,13 +113,13 @@ namespace simol {
   Vector<double> generatorOn(const Overdamped& dyna, const System& syst, const ControlVariate& controlVariate);
 
   //Chains
-  template <>
+  //template <>
   void sampleSystem(BoundaryLangevin& dyna, BiChain& syst);
-  template <>
+  //template <>
   void sampleSystem(BoundaryLangevin& dyna, TriChain& syst);
-  template <>
+
   void writeFinalOutput(BoundaryLangevin const& dyna, BiChain const& syst, Output& output);
-  template <>
+
   void writeFinalOutput(BoundaryLangevin const& dyna, TriChain const& syst, Output& output);
   template <>
   void simulate(BoundaryLangevin& dyna, Chain& syst);
@@ -128,7 +133,7 @@ namespace simol {
   //DPDE
   template <class S>
   void simulate(DPDE& dyna, S& syst);
-  template<>
+  //template<>
   void sampleSystem(DPDE& dyna, Isolated& syst);
   template<>
   void computeOutput(const DPDE& dyna, const Isolated& syst, Output& output, size_t iOfIteration);
@@ -152,9 +157,9 @@ namespace simol {
   // -----------------------------Implementation des templates----------------------------------
 
 
-  template <class D, class S>
-  void sampleSystem(D& /*dyna*/, S& /*syst*/)
-  {throw std::invalid_argument("sampleSystem : Function undefined");}
+  //template <class D, class S>
+  //void sampleSystem(D& /*dyna*/, S& /*syst*/)
+  //{throw std::invalid_argument("sampleSystem : Function undefined");}
 
    ///
   ///Computes the quantities needed by the control variates (coefficients a, b, D) and {L \Phi}
@@ -236,22 +241,6 @@ namespace simol {
 
  //##################### ISOLATED ######################
   
-  template <>
-  void sampleSystem(Hamiltonian& /*dyna*/, Isolated& /*syst*/)
-  {}
-  
-  template <>
-  void sampleSystem(Langevin& dyna, Isolated& syst)
-  {
-    syst.getParticle(0).momentum() = syst.drawMomentum(dyna.beta(), syst.getParticle(0).mass());
-    syst.getParticle(0).position(0) = syst.drawPotLaw(dyna.beta());
-  }
-  
-  template <>
-  void sampleSystem(Overdamped& dyna, Isolated& syst)
-  {
-    syst.getParticle(0).position(0) = syst.drawPotLaw(dyna.beta());
-  }
 
   template <class D>
   void computeOutput(D const& dyna, const Isolated& syst, Output& output, size_t iOfIteration)
@@ -263,25 +252,11 @@ namespace simol {
     updateAllControlVariates(dyna, syst, output, iOfIteration);
   }
 
-  template <class D>
-  void writeFinalOutput(D const& dyna, Isolated const& syst, Output& output)
-  {
-    output.finalDisplay(syst.configuration(), dyna.externalForce());
-    if (output.doComputeCorrelations())
-      output.finalDisplayAutocorrelations();
-    output.displayFinalVelocity(dyna.temperature(), dyna.externalForce(0), output.velocityCV_->nbOfFourier(), output.velocityCV_->nbOfHermite());
-  }
+
 
 
   //################## FLUID ########################
 
-  template <class D>
-  void writeFinalOutput(D const& dyna, Fluid const& syst, Output& output)
-  {
-    output.finalDisplay(syst.configuration(), dyna.externalForce());
-    if (output.doComputeCorrelations())
-      output.finalDisplayAutocorrelations();
-  }
 
   //##################### HAMILTONIAN ####################"
 
@@ -303,14 +278,6 @@ namespace simol {
   void updateAllControlVariates(const Hamiltonian& /*dyna*/, S const& /*syst*/, Output& /*output*/, size_t /*iOfIteration*/)
   {}
 
-  template <>
-  void writeFinalOutput(Hamiltonian const& dyna, Isolated const& syst, Output& output)
-  {
-    output.finalDisplay(syst.configuration(), dyna.externalForce());
-    if (output.doComputeCorrelations())
-      output.finalDisplayAutocorrelations();
-    output.displayFinalVelocity(0, dyna.externalForce(0), output.velocityCV_->nbOfFourier(), output.velocityCV_->nbOfHermite());
-  }
   
   template <class S>
   void writeOutput(Hamiltonian const& /*dyna*/, S const& syst, Output& output, size_t iOfIteration)
@@ -384,106 +351,6 @@ namespace simol {
   }
 
   //################### CHAINS #############################
-
-  template <>
-  void sampleSystem(BoundaryLangevin& dyna, BiChain& syst)
-  {
-    cout << "Initialization of the system...";cout.flush();
-    double alpha, localTemp, localDist;
-    for (size_t iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
-    {
-      alpha = iOfParticle / (double) syst.nbOfParticles();
-      localTemp = (1-alpha) * dyna.temperatureLeft() + alpha * dyna.temperatureRight();
-      //localBending = dyna.computeMeanPotLaw(1/localTemp);
-      localDist = syst.drawPotLaw(1/localTemp);
-      //outTest << iOfParticle << " " << localBending << endl;
-      //cout << "bending = " << localBending << " / mean = " << dyna.computeMeanPotLaw(1/localTemp) << endl;
-
-      double prevPosition = (iOfParticle>0)?syst.getParticle(iOfParticle-1).position(0):0;
-
-
-      syst.getParticle(iOfParticle).position(0) = prevPosition + localDist;
-      //cout << -position2 << " + 2 * " << position1 << " + " << localBending << " = " << syst.getParticle(iOfParticle).position(0) << endl;
-      syst.getParticle(iOfParticle).momentum() = syst.drawMomentum(1/localTemp, syst.getParticle(iOfParticle).mass());
-
-      dyna.initializeCountdown(syst.getParticle(iOfParticle));
-    }
-
-    cout << "Done ! / Thermalization...";cout.flush();
-
-    for (size_t iOfIteration  =0; iOfIteration < dyna.nbOfThermalIterations(); ++iOfIteration)
-    {
-      syst.thermalize(dyna);
-    }
-
-    cout << "Done ! / Burning...";cout.flush();
-
-    for (size_t iOfIteration  =0; iOfIteration < dyna.nbOfBurningIterations(); ++iOfIteration)
-    {
-      simulate(dyna, syst);
-    }
-    cout << "Done !" << endl;
-  }
-
-  template <>
-  void sampleSystem(BoundaryLangevin& dyna, TriChain& syst)
-  {
-    cout << "Initialization of the system...";cout.flush();
-    double alpha, localTemp, localBending;
-    //ofstream outTest("test.txt");
-    for (size_t iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
-    {
-      alpha = iOfParticle / (double) syst.nbOfParticles();
-      localTemp = (1-alpha) * dyna.temperatureLeft() + alpha * dyna.temperatureRight();
-      //localBending = dyna.computeMeanPotLaw(1/localTemp);
-      localBending = syst.drawPotLaw(1/localTemp);
-      //outTest << iOfParticle << " " << localBending << endl;
-      //cout << "bending = " << localBending << " / mean = " << dyna.computeMeanPotLaw(1/localTemp) << endl;
-
-      double position1 = (iOfParticle>0)?syst.getParticle(iOfParticle-1).position(0):0;
-      double position2 = (iOfParticle>1)?syst.getParticle(iOfParticle-2).position(0):0;
-
-
-      syst.getParticle(iOfParticle).position(0) = -position2 + 2 * position1 + localBending;
-      //cout << -position2 << " + 2 * " << position1 << " + " << localBending << " = " << syst.getParticle(iOfParticle).position(0) << endl;
-      syst.getParticle(iOfParticle).momentum() = syst.drawMomentum(1/localTemp, syst.getParticle(iOfParticle).mass());
-
-      dyna.initializeCountdown(syst.getParticle(iOfParticle));
-    }
-
-    cout << "Done ! / Thermalization...";cout.flush();
-
-    for (size_t iOfIteration  =0; iOfIteration < dyna.nbOfThermalIterations(); ++iOfIteration)
-    {
-      syst.thermalize(dyna);
-    }
-
-    cout << "Done ! / Burning...";cout.flush();
-
-    for (size_t iOfIteration  =0; iOfIteration < dyna.nbOfBurningIterations(); ++iOfIteration)
-    {
-      simulate(dyna, syst);
-    }
-    cout << "Done !" << endl;
-  }
-
-  template <>
-  void writeFinalOutput(BoundaryLangevin const& dyna, BiChain const& syst, Output& output)
-  {
-    output.finalDisplay(syst.configuration(), dyna.externalForce());
-    if (output.doComputeCorrelations())
-      output.finalDisplayAutocorrelations();
-    output.displayFinalFlow(dyna.temperature(), dyna.deltaTemperature());
-  }
-
-  template <>
-  void writeFinalOutput(BoundaryLangevin const& dyna, TriChain const& syst, Output& output)
-  {
-    output.finalDisplay(syst.configuration(), dyna.externalForce());
-    if (output.doComputeCorrelations())
-      output.finalDisplayAutocorrelations();
-    output.displayFinalFlow(dyna.temperature(), dyna.deltaTemperature(), dyna.tauBending(), dyna.xi());
-  }
 
 
   template <>
@@ -577,14 +444,6 @@ namespace simol {
     //-- fluctuation/dissipation --
     for (size_t i=0; i < syst.nbOfParticles(); i++)  // version explicite de la ligne cachee ci dessus, utile pour faire des boucles sur les couples !
       dyna.energyReinjection(syst.getParticle(i));  // integration de p avec gamma fixe + reinjection
-  }
-
-  template<>
-  void sampleSystem(DPDE& dyna, Isolated& syst)
-  {
-    syst.getParticle(0).momentum() = syst.drawMomentum(dyna.beta(), syst.getParticle(0).mass());
-    syst.getParticle(0).position(0) = 0;
-    syst.getParticle(0).internalEnergy() = 1;  // TO DO : il faudra ici tirer selon la bonne loi ?
   }
 
   template<>
