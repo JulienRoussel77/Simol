@@ -34,7 +34,7 @@ namespace simol
 
   void Dynamics::printName() const
   {
-    std::cout << "Dynamics = Dynamics" << std::endl;
+    std::cout << "DynamicsType = Dynamics" << std::endl;
   }
 
 

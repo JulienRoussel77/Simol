@@ -12,6 +12,7 @@ namespace simol
     double gamma_;
   public:
     DPDE(Input const&  input);
+    virtual void printName() const;
     virtual double& gamma();  // friction de reference \gamma_\star
     virtual double gamma_DPDE(double intEnergy);  // friction dependant de l'energie interne
     virtual double& heatCapacity();

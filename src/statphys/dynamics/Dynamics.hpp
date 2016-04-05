@@ -20,7 +20,7 @@ namespace simol
     Dynamics(Input const&  input);
     virtual ~Dynamics() = default;
     
-      virtual void printName() const;
+    virtual void printName() const;
     
     // Accessors
     double& timeStep();

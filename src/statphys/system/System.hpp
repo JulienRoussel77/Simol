@@ -73,6 +73,7 @@ namespace simol
   {
   public:
     NBody(Input const& input);
+    void printName() const;
     void computeAllForces(Dynamics const& model);
     size_t nbOfParticlesPerDimension() const;
     double latticeParameter() const;

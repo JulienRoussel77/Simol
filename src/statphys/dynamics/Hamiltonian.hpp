@@ -9,6 +9,7 @@ namespace simol
   {
   public:
     Hamiltonian(Input const&  input);
+    virtual void printName() const;
   };
 
 }

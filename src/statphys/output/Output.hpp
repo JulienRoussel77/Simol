@@ -114,7 +114,7 @@ namespace simol
     void displayChainMomenta(vector<Particle> const& configuration, size_t iOfIteration);
     void displayChainPositions(vector<Particle> const& configuration, size_t iOfIteration);
     void displayParticles(vector<Particle> const& configuration, size_t iOfIteration);
-    void displayParticlesXMakeMol(vector<Particle> const& configuration, size_t iOfIteration, double domainSize);
+    void displayParticlesXMakeMol(vector<Particle> const& configuration, size_t iOfIteration, double domainSize=0);
     void displayProfile(size_t iOfIteration);
     
     void finalDisplayAutocorrelations();
@@ -140,7 +140,6 @@ namespace simol
   
     //------------- pour DPDE ---------------
     void displayObservablesDPDE(vector<Particle> const& configuration, size_t iOfIteration);
-    
   };
 
 }

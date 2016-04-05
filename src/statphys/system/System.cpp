@@ -25,7 +25,7 @@ namespace simol
   
   void System::printName() const
   {
-    cout << "System = System" << endl;
+    cout << "SystemType = System" << endl;
   }
 
   
@@ -203,6 +203,11 @@ namespace simol
     	//std::cout << configuration_[i].force() << std::endl;
       }
   }
+  
+  void NBody::printName() const
+  {
+    cout << "SystemType = NBody" << endl;
+  }
 
   size_t NBody::nbOfParticlesPerDimension() const
   {
@@ -231,8 +236,8 @@ namespace simol
     double distance = 0.;
     for (int d = 0; d < (int)dimension_; d++)
       {
-	r12(d) -= rint(r12(d)/domainSize_)*domainSize_;
-	distance += r12(d)*r12(d);
+        r12(d) -= rint(r12(d)/domainSize_)*domainSize_;
+        distance += r12(d)*r12(d);
       }
     distance = sqrt(distance);
     // compute energy
@@ -245,8 +250,8 @@ namespace simol
     r12 /= distance;
     for (int d = 0; d < (int)dimension_; d++)
       {
-	particle1.force(d) -= force12 * r12(d);
-	particle2.force(d) += force12 * r12(d);
+        particle1.force(d) -= force12 * r12(d);
+        particle2.force(d) += force12 * r12(d);
       }
   }
   

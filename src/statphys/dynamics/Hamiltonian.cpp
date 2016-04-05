@@ -7,4 +7,9 @@ namespace simol
     Hamiltonian::Hamiltonian(Input const& input)
     : Dynamics(input)
     {}
+    
+  void Hamiltonian::printName() const
+  {
+    std::cout << "DynamicsType = Hamiltonian" << std::endl;
+  }
 }

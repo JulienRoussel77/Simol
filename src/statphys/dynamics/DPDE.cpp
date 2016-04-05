@@ -12,6 +12,11 @@ namespace simol
     heatCapacity_(input.heatCapacity()),
     gamma_(input.gamma())
   {}
+  
+  void DPDE::printName() const
+  {
+    std::cout << "DynamicsType = DPDE" << std::endl;
+  }
 
   double& DPDE::gamma()
   {
