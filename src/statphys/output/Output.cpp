@@ -15,6 +15,7 @@ namespace simol{
     outputFolderName_(input.outputFolderName()), 
     outObservables_(input.outputFolderName()+"observables.txt"), 
     outParticles_(input.outputFolderName()+"particles.txt"), 
+    outParticlesXMakeMol_(input.outputFolderName()+"xmakemol.xyz"), 
     outFinalFlow_(input.simuTypeName()+"finalFlow.txt", std::ofstream::app),
     outFinalVelocity_(input.simuTypeName()+"finalVelocity.txt", std::ofstream::app),
     outCorrelation_(input.outputFolderName()+"correlations.txt"),
@@ -58,7 +59,7 @@ namespace simol{
     flowProfile_(decorrelationNbOfIterations(), decorrelationTime(), nbOfAutocoPts(), nbOfParticles_)
   {
     std::cout << "Output written in " << input.outputFolderName() << std::endl;
-		std::cout << "Final output written in " << input.simuTypeName() << std::endl;
+    std::cout << "Final output written in " << input.simuTypeName() << std::endl;
     assert(outParticles_.is_open());
     
     outObservables_ << "# time kineticEnergy potentialEnergy energy temperature" << endl;
@@ -69,11 +70,11 @@ namespace simol{
     outForcesCV_ << "# time b <b> <b2> D <D> >D2> observable <observable> >observable2> LPhi <LPhi> <LPhi2>" << endl;
     outLengthsCV_ << "# time b <b> <b2> D <D> >D2> observable <observable> >observable2> LPhi <LPhi> <LPhi2>" << endl;
     outMidFlowCV_ << "# time b <b> <b2> D <D> >D2> observable <observable> >observable2> LPhi <LPhi> <LPhi2>" << endl; 
-		outSumFlowCV_ << "# time b <b> <b2> D <D> >D2> observable <observable> >observable2> LPhi <LPhi> <LPhi2>" << endl; 
-		
-		std::ofstream outInput(input.outputFolderName()+"inputFile.txt");
-		std::ifstream inInput(input.inputPath());
-		outInput << input.inputFlux().rdbuf();
+    outSumFlowCV_ << "# time b <b> <b2> D <D> >D2> observable <observable> >observable2> LPhi <LPhi> <LPhi2>" << endl; 
+    
+    std::ofstream outInput(input.outputFolderName()+"inputFile.txt");
+    std::ifstream inInput(input.inputPath());
+    outInput << input.inputFlux().rdbuf();
     
     cout << "nbOfParticles : " << nbOfParticles_ << endl;
     assert(input.outputPeriodTime() == 0 || input.outputPeriodTime() >= timeStep());
@@ -113,20 +114,20 @@ namespace simol{
   
   bool Output::doOutput(size_t iOfIteration) const
   {
-		return (periodNbOfIterations() > 0 && iOfIteration % periodNbOfIterations() == 0);
+    return (periodNbOfIterations() > 0 && iOfIteration % periodNbOfIterations() == 0);
   }
   
   bool Output::doProfileOutput(size_t iOfIteration) const
   {
-		return (profilePeriodNbOfIterations() > 0 && iOfIteration % profilePeriodNbOfIterations() == 0);
+    return (profilePeriodNbOfIterations() > 0 && iOfIteration % profilePeriodNbOfIterations() == 0);
   }
   
   const size_t& Output::nbOfParticles() const
   {
-		return nbOfParticles_;
-	}
-	
-	const size_t& Output::nbOfIterations() const
+    return nbOfParticles_;
+  }
+  
+  const size_t& Output::nbOfIterations() const
 	{
 		return nbOfIterations_;
 	}
@@ -262,17 +263,17 @@ namespace simol{
 	
   double Output::autocoPtsPeriod() const
   {
-		return decorrelationTime() / nbOfAutocoPts();
-	}
-	
-	void Output::displayObservables(size_t iOfIteration)
+    return decorrelationTime() / nbOfAutocoPts();
+  }
+  
+  void Output::displayObservables(size_t iOfIteration)
   {
     outObservables_ << iOfIteration * timeStep() 
-    << " " << kineticEnergy()
-    << " " << potentialEnergy()
-    << " " << energy()
-    << " " << temperature()
-    << std::endl;
+		    << " " << kineticEnergy()
+		    << " " << potentialEnergy()
+		    << " " << energy()
+		    << " " << temperature()
+		    << std::endl;
   }
   
   void Output::displayChainPositions(vector<Particle> const& configuration, size_t iOfIteration)
@@ -302,14 +303,34 @@ namespace simol{
   {
     for (size_t i = 0; i < nbOfParticles_; i++)
       outParticles_ << iOfIteration * timeStep() 
-        << " " << i
-        << " " << configuration[i].position() 
-        << " " << configuration[i].momentum() 
-        << " " << configuration[i].kineticEnergy()
-        << " " << configuration[i].potentialEnergy()
-        << " " << configuration[i].energy()
-        << " " << configuration[i].force()        
-        << endl;
+		    << " " << i
+		    << " " << configuration[i].position() 
+		    << " " << configuration[i].momentum() 
+		    << " " << configuration[i].kineticEnergy()
+		    << " " << configuration[i].potentialEnergy()
+		    << " " << configuration[i].energy()
+		    << " " << configuration[i].force()        
+		    << endl;
+  }
+
+  //--- display the current configuration in XMakemol format ; specific for NBody systems ---
+  void Output::displayParticlesXMakeMol(vector<Particle> const& configuration, size_t iOfIteration, double domainSize)
+  {
+    outParticlesXMakeMol_ << nbOfParticles_ << endl;
+    outParticlesXMakeMol_ << "Time = " << iOfIteration * timeStep() << endl;
+    double coordinate = 0;
+    for (size_t i = 0; i < nbOfParticles_; i++)
+      {
+	outParticlesXMakeMol_ << " O  ";
+	for (int dim = 0; dim < dimension_; dim++)
+	  {
+	    //-- recenter all the coordinates in the interval [-domainSize/2, domainSize/2] --
+	    coordinate = configuration[i].position(dim);
+	    coordinate -= rint(coordinate/domainSize)*domainSize;
+	    outParticlesXMakeMol_ << coordinate << " "; 
+	  }
+	outParticlesXMakeMol_ << endl;
+      }
   }
   
   void Output::displayProfile(size_t iOfIteration)
@@ -381,11 +402,12 @@ namespace simol{
   {
     // garder le vecteur des particules pour evt sortir les positions, etc
     //cout << "output : n = " << iOfIteration << endl;
-    
+    double totalEnergy = kineticEnergy() + potentialEnergy() + internalEnergy();
     outObservables_ << iOfIteration * timeStep() 
 		    << " " << kineticEnergy()
 		    << " " << potentialEnergy()
 		    << " " << internalEnergy()
+		    << " " << totalEnergy 
 		    << std::endl;
   }
   

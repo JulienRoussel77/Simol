@@ -33,8 +33,10 @@ namespace simol
       return new Rotor(input);
     else if (input.potentialName() == "Quadratic")
       return new Quadratic(input);
-		else if (input.potentialName() == "SpaceSinus")
+    else if (input.potentialName() == "SpaceSinus")
       return new SpaceSinus(input);
+    else if (input.potentialName() == "LennardJones")
+      return new LennardJones(input);
     else
       std::cout << input.potentialName() << " is not a valid potential !" << std::endl;
     
@@ -42,71 +44,71 @@ namespace simol
   }
   
   double Potential::operator()(Vector<double> const& position) const
-	{
-		//cout << "Potential::operator()(Vector<double> const& position)" << endl;
-		return operator()(position(0));
-	}
+  {
+    //cout << "Potential::operator()(Vector<double> const& position)" << endl;
+    return operator()(position(0));
+  }
   
   double Potential::operator()(double position) const
-	{
-		//cout << "Potential::operator()(double position)" << endl;
-		return operator()(Vector<double>(1, position));
-	}
+  {
+    //cout << "Potential::operator()(double position)" << endl;
+    return operator()(Vector<double>(1, position));
+  }
   
   double Potential::value(Vector<double> const& position) const
-	{
-		//cout << "Potential::value(Vector<double> const& position)" << endl;
-		return operator()(position);
-	}
+  {
+    //cout << "Potential::value(Vector<double> const& position)" << endl;
+    return operator()(position);
+  }
   
   double Potential::value(double position) const
-	{
-		//cout << "Potential::value(double position)" << endl;
-		return operator()(position);
-	}
-	
-	Vector<double> Potential::derivative(Vector<double> const& position) const
+  {
+    //cout << "Potential::value(double position)" << endl;
+    return operator()(position);
+  }
+  
+  Vector<double> Potential::derivative(Vector<double> const& position) const
   { 
-		return derivative(position(0)); 
-	}
-	
-	Vector<double> Potential::derivative(double position) const
+    return derivative(position(0)); 
+  }
+  
+  Vector<double> Potential::derivative(double position) const
   { 
-		return -derivative(Vector<double>(1, position)); 
-	}
-	
-	Vector<double> Potential::force(Vector<double> const& position) const
+    return -derivative(Vector<double>(1, position)); 
+  }
+  
+  Vector<double> Potential::force(Vector<double> const& position) const
   { 
-		return -derivative(position); 
-	}
-	
-	Vector<double> Potential::force(double position) const
+    return -derivative(position); 
+  }
+  
+  Vector<double> Potential::force(double position) const
   { 
-		return -derivative(position); 
-	}
-	
-	double Potential::laplacian(Vector<double> const& position) const
+    return -derivative(position); 
+  }
+  
+  double Potential::laplacian(Vector<double> const& position) const
   { 
-		return laplacian(position(0)); 
-	}
-	
-	double Potential::laplacian(double position) const
+    return laplacian(position(0)); 
+  }
+  
+  double Potential::laplacian(double position) const
   { 
-		return laplacian(Vector<double>(1, position));
-	}
-	
-	double Potential::ratioToHarmonic() const 
-	{throw std::invalid_argument("Potential::ratioToHarmonic : Function undefined");}
-	
-	double Potential::drawLaw(double /*localBeta*/, std::shared_ptr<RNG>& /*rng*/) const
+    return laplacian(Vector<double>(1, position));
+  }
+  
+  double Potential::ratioToHarmonic() const 
+  {throw std::invalid_argument("Potential::ratioToHarmonic : Function undefined");}
+  
+  double Potential::drawLaw(double /*localBeta*/, std::shared_ptr<RNG>& /*rng*/) const
   {throw std::invalid_argument("Potential::drawLaw : Function undefined");}
   
-//#### Sinusoidal #####
+  //#### Sinusoidal #####
   
   Sinusoidal::Sinusoidal(Input const & input):
-		Potential(input), 
-		amplitude_(input.amplitude()), 
-		pulsation_(2*M_PI/input.length())
+    Potential(input), 
+    amplitude_(input.amplitude()), 
+    pulsation_(2*M_PI/input.length())
   {}
   
   double Sinusoidal::drawLaw(double localBeta, std::shared_ptr<RNG>& rng) const
@@ -115,21 +117,21 @@ namespace simol
     double xdraw, udraw;
     int count = 0;
     while (reject)
-    {
-      xdraw = -M_PI + 2 * rng->scalarUniform() * M_PI;
-      udraw = rng->scalarUniform();
-      
-      reject = (udraw > exp(- localBeta * (value(xdraw) + 2)));
-      count++;
-    }
+      {
+	xdraw = -M_PI + 2 * rng->scalarUniform() * M_PI;
+	udraw = rng->scalarUniform();
+	
+	reject = (udraw > exp(- localBeta * (value(xdraw) + 2)));
+	count++;
+      }
     return xdraw;
   }
   
   double Sinusoidal::operator()(double position) const
   { 
-		return amplitude_* (1-cos(pulsation_*position)); 
-	}
-
+    return amplitude_* (1-cos(pulsation_*position)); 
+  }
+  
   Vector<double> Sinusoidal::derivative(double position) const
   { 
     return Vector<double>(1, amplitude_*pulsation_*sin(pulsation_*position));
@@ -378,20 +380,36 @@ namespace simol
 
   Vector<double> SpaceSinus::derivative(Vector<double> const& position) const
   { 
-		Vector<double> grad(3);
-		grad(0) = sin(pulsation_*position(0))*cos(pulsation_*position(1))*cos(pulsation_*position(2));
+    Vector<double> grad(3);
+    grad(0) = sin(pulsation_*position(0))*cos(pulsation_*position(1))*cos(pulsation_*position(2));
     grad(1) = cos(pulsation_*position(0))*sin(pulsation_*position(1))*cos(pulsation_*position(2));
-		grad(2) = cos(pulsation_*position(0))*cos(pulsation_*position(1))*sin(pulsation_*position(2));
-		grad *= amplitude_*pulsation_;
-		return grad;
-	}
+    grad(2) = cos(pulsation_*position(0))*cos(pulsation_*position(1))*sin(pulsation_*position(2));
+    grad *= amplitude_*pulsation_;
+    return grad;
+  }
   
   double SpaceSinus::laplacian(Vector<double> const& position) const
   {
     return 3 * pow(pulsation_, 2) * value(position);
   }
 	
+  
+  //------------- Lennard Jones ---------------------
+  LennardJones::LennardJones(Input const & input):
+    Potential(input), 
+    epsLJ_(input.epsLJ()), 
+    sigmaLJ_(input.sigmaLJ())
+  {}
+  
+  double LennardJones::operator()(double const & dist) const
+  { 
+    return 4 * epsLJ_* (pow(sigmaLJ_/dist,12)-pow(sigmaLJ_/dist,6));
+  }
+  
+  double LennardJones::derivative(double const & dist) const
+  { 
+    return -24 * epsLJ_* sigmaLJ_ * (2*pow(dist/sigmaLJ_,13)-pow(dist/sigmaLJ_,7));
+  }
+  
 }
-
-
 #endif

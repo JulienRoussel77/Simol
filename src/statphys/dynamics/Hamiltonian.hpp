@@ -7,8 +7,8 @@ namespace simol
 {
   class Hamiltonian : public Dynamics
   {
-    public:
-        Hamiltonian(Input const&  input);
+  public:
+    Hamiltonian(Input const&  input);
   };
 
 }

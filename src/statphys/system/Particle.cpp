@@ -90,9 +90,9 @@ namespace simol
 
   double Particle::kineticEnergy() const
   { 
-		return pow(momentum_.norm(), 2) / 2 / mass_;
-		//return kineticEnergy_; 
-	}
+    return pow(momentum_.norm(), 2) / 2 / mass_;
+    //return kineticEnergy_; 
+  }
   
   /*double& Particle::kineticEnergy()
   { return kineticEnergy_; }*/
