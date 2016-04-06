@@ -83,7 +83,7 @@ namespace simol
     size_t nbOfParticlesPerDimension_;
     double latticeParameter_;
     double domainSize_;
-  };
+   };
 
 
 

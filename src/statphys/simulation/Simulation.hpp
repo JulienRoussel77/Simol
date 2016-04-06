@@ -79,13 +79,6 @@ namespace simol {
   //void writeFinalOutput(Dynamics const& dyna, Isolated const& syst, Output& output);
   void writeFinalOutput(Hamiltonian const& dyna, Isolated const& syst, Output& output);
 
-  //NBody
-  void sampleSystem(Dynamics& dyna, NBody& syst);
-  void simulate(Hamiltonian& dyna, NBody& syst);
-  void computeOutput(Hamiltonian const& /*dyna*/, NBody const& syst, Output& output, size_t /*iOfIteration*/);
-  void writeOutput(Hamiltonian const& /*dyna*/, NBody const& syst, Output& output, size_t iOfIteration);
-  void writeFinalOutput(Hamiltonian const& dyna, NBody const& syst, Output& output);
-
   //Hamiltonian
   Vector<double> generatorOn(const Hamiltonian& dyna, System const& syst, ControlVariate const& controlVariate);
   void updateAllControlVariates(const Hamiltonian& dyna, System const& syst, Output& output, size_t iOfIteration);
@@ -109,6 +102,13 @@ namespace simol {
   void updateAllControlVariates(const BoundaryLangevin& dyna, System const& syst, Output& output, size_t iOfIteration);
   Vector<double> generatorOn(const BoundaryLangevin& dyna, System const& syst, const ControlVariate& controlVariate);
   void writeOutput(BoundaryLangevin const& dyna, System const& syst, Output& output, size_t iOfIteration);
+  
+  //NBody
+  void sampleSystem(Dynamics& dyna, NBody& syst);
+  void simulate(Hamiltonian& dyna, NBody& syst);
+  void computeOutput(Hamiltonian const& /*dyna*/, NBody const& syst, Output& output, size_t /*iOfIteration*/);
+  void writeOutput(Hamiltonian const& /*dyna*/, NBody const& syst, Output& output, size_t iOfIteration);
+  void writeFinalOutput(Hamiltonian const& dyna, NBody const& syst, Output& output);
   
   //DPDE
   void simulate(DPDE& dyna, System& syst);

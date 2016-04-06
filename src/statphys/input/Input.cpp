@@ -26,6 +26,8 @@ const int maxNbOfAutocoPts = 1000;
 //-- default values for potentials ---
 const double defaultEpsLJ = 1.;
 const double defaultSigmaLJ = 1.;
+const double defaultSplineRatio = 0.8;
+const double defaultCutOffRatio = 2.5;
 
 namespace simol {
 
@@ -294,6 +296,22 @@ namespace simol {
       return data["Physics"]["Potential"]["SigmaLJ"].as<double>();
     else
       return defaultSigmaLJ;
+  }
+  
+  double Input::cutOffRatio() const
+  {
+    if (data["Physics"]["Potential"]["CutOffRatio"])
+      return data["Physics"]["Potential"]["CutOffRatio"].as<double>();
+    else
+      return defaultCutOffRatio;
+  }
+  
+  double Input::splineRatio() const
+  {
+    if (data["Physics"]["Potential"]["SplineRation"])
+      return data["Physics"]["Potential"]["SplineRatio"].as<double>();
+    else
+      return defaultSplineRatio;
   }
 
   //DoubleWell

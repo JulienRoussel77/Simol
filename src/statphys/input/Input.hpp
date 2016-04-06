@@ -66,7 +66,9 @@ namespace simol{
     // Lennard Jones
     double epsLJ() const;
     double sigmaLJ() const;
-
+    double cutOffRatio() const;
+    double splineRatio() const;
+    
     // Physics/Model
     string dynamicsName() const;
     double gamma() const;

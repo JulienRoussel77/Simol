@@ -237,7 +237,7 @@ namespace simol
 		
   void NBody::interaction(Particle& particle1, Particle& particle2) const
   {
-    Vector<double> r12 = particle2.position() - particle1.position();
+    Vector<double> r12 = particle1.position() - particle2.position();
     // take closest periodic image
     double distance = 0.;
     for (int d = 0; d < (int)dimension_; d++)
@@ -254,11 +254,10 @@ namespace simol
     // compute forces 
     double force12 = force(distance)(0);
     r12 /= distance;
-    //for (int d = 0; d < (int)dimension_; d++)
-    //{
-    particle1.force() -= force12 * r12;
-    particle2.force() += force12 * r12;
-    //}
+    particle1.force() += force12 * r12;
+    particle2.force() -= force12 * r12;
+    // TO DO : compute pressure 
+    // ...
   }
   
   

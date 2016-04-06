@@ -398,17 +398,32 @@ namespace simol
   LennardJones::LennardJones(Input const & input):
     Potential(input), 
     epsLJ_(input.epsLJ()), 
-    sigmaLJ_(input.sigmaLJ())
+    sigmaLJ_(input.sigmaLJ()),
+    cutOffRadius_(input.cutOffRatio()*input.sigmaLJ()),
+    splineRadius_(input.splineRatio()*input.cutOffRatio()*input.sigmaLJ()),
+    A_spline_(untruncated(cutOffRadius_)),
+    B_spline_(1)
   {}
+  
+  double LennardJones::splineFunction(double reducedDist) const
+  {
+     return pow(reducedDist,2)*(A_spline_*reducedDist+B_spline_);
+  }
+
+  double LennardJones::untruncated(double dist) const
+  { 
+    return 4 * epsLJ_* (pow(sigmaLJ_/dist,12)-pow(sigmaLJ_/dist,6));
+  }
   
   double LennardJones::operator()(double dist) const
   { 
     return 4 * epsLJ_* (pow(sigmaLJ_/dist,12)-pow(sigmaLJ_/dist,6));
   }
   
+  
   Vector<double> LennardJones::derivative(double dist) const
   { 
-    return Vector<double>(1, -24 * epsLJ_* sigmaLJ_ * (2*pow(dist/sigmaLJ_,13)-pow(dist/sigmaLJ_,7)));
+    return Vector<double>(1, -24 * epsLJ_/ sigmaLJ_ * (2*pow(sigmaLJ_/dist,13)-pow(sigmaLJ_/dist,7)));
   }
   
 }

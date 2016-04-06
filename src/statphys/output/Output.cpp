@@ -319,16 +319,31 @@ namespace simol{
     outParticlesXMakeMol_ << nbOfParticles_ << endl;
     outParticlesXMakeMol_ << "Time = " << iOfIteration * timeStep() << endl;
     double coordinate = 0;
+    int Dim = dimension_;
     for (size_t i = 0; i < nbOfParticles_; i++)
       {
 	outParticlesXMakeMol_ << " O  ";
-	for (int dim = 0; dim < dimension_; dim++)
-	  {
-	    //-- recenter all the coordinates in the interval [-domainSize/2, domainSize/2] --
-	    coordinate = configuration[i].position(dim);
-	    coordinate -= rint(coordinate/domainSize)*domainSize;
-	    outParticlesXMakeMol_ << coordinate << " "; 
-	  }
+	if (Dim == 3)
+	{
+	  for (int dim = 0; dim < dim; dim++)
+	    {
+	      //-- recenter all the coordinates in the interval [-domainSize/2, domainSize/2] --
+	      coordinate = configuration[i].position(dim);
+	      coordinate -= rint(coordinate/domainSize)*domainSize;
+	      outParticlesXMakeMol_ << coordinate << " "; 
+	    }
+	}
+	else if (Dim == 2)
+	{
+	  for (int dim = 0; dim < Dim; dim++)
+	    {
+	      //-- recenter all the coordinates in the interval [-domainSize/2, domainSize/2] --
+	      coordinate = configuration[i].position(dim);
+	      coordinate -= rint(coordinate/domainSize)*domainSize;
+	      outParticlesXMakeMol_ << coordinate << " "; 
+	    }
+	   outParticlesXMakeMol_ << 0 << " ";  
+	}
 	outParticlesXMakeMol_ << endl;
       }
   }

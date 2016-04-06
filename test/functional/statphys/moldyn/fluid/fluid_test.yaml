@@ -1,11 +1,11 @@
 Geometry:
-  Dimension: 3
+  Dimension: 2
   LatticeParameter: 2
 
 Mesh:
   Time:
-    Step: 0.01
-    FinalTime: 1
+    Step: 0.005
+    FinalTime: 100
 
 Physics:
   System:
@@ -16,6 +16,8 @@ Physics:
     Name: LennardJones
     EpsLJ: 1
     SigmaLJ: 1
+    CutOffRatio: 2.5
+    SplineRatio: 0.8
   Model:
     Name: Hamiltonian
     Temperature: 1
@@ -23,7 +25,7 @@ Physics:
 Output:
   ParametersName: /
   FolderName: test
-  Period: 0.1
+  Period: 0.02
   ProfilePeriod: 0.1
 
 

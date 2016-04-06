@@ -158,6 +158,12 @@ namespace simol
   private:
     double epsLJ_;
     double sigmaLJ_;
+    double cutOffRadius_;
+    double splineRadius_;
+    double splineFunction(double reducedDist) const;
+    double untruncated(double dist) const;
+    double A_spline_;
+    double B_spline_;
   };
 
 
