@@ -10,7 +10,6 @@ Mesh:
 Physics:
   System:
     Name: NBody
-<<<<<<< HEAD
     NumberPerDimension: 8 
     Momentum: 1
   Potential:
@@ -18,7 +17,6 @@ Physics:
     EpsLJ: 1
     SigmaLJ: 1
     CutOffRatio: 3.
-=======
     NumberPerDimension: 3
     Momentum: 1
   Potential:
@@ -26,7 +24,6 @@ Physics:
     Epsilon: 1
     Sigma: 1
     CutOffRatio: 2.5
->>>>>>> 530103c5b5da79a0c35b2109c17f278b76bf57ae
     SplineRatio: 0.9
   Model:
     Name: Hamiltonian

@@ -343,7 +343,6 @@ namespace simol{
       outParticlesXMakeMol_ << " O  ";
       if (Dim == 3)
       {
-<<<<<<< HEAD
 	outParticlesXMakeMol_ << " O  ";
 	if (Dim == 3)
 	{
@@ -367,7 +366,6 @@ namespace simol{
 	   outParticlesXMakeMol_ << 0 << " ";  
 	}
 	outParticlesXMakeMol_ << endl;
-=======
         for (int dim = 0; dim < dim; dim++)
           {
             //-- recenter all the coordinates in the interval [-domainSize/2, domainSize/2] --
@@ -386,7 +384,6 @@ namespace simol{
             outParticlesXMakeMol_ << coordinate << " "; 
           }
         outParticlesXMakeMol_ << 0 << " ";  
->>>>>>> 530103c5b5da79a0c35b2109c17f278b76bf57ae
       }
       outParticlesXMakeMol_ << endl;
     }
