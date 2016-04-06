@@ -1,6 +1,6 @@
 #include "DPDE.hpp"
 
-#include "UniformStochasticDynamics.hpp"
+#include "LangevinBase.hpp"
 
 using std::cout;
 using std::endl;
@@ -8,21 +8,15 @@ using std::endl;
 namespace simol
 {
   DPDE::DPDE(Input const&  input):
-    UniformStochasticDynamics(input),
-    heatCapacity_(input.heatCapacity()),
-    gamma_(input.gamma())
+    LangevinBase(input),
+    heatCapacity_(input.heatCapacity())
   {}
   
   void DPDE::printName() const
   {
     std::cout << "DynamicsType = DPDE" << std::endl;
   }
-
-  double& DPDE::gamma()
-  {
-    return gamma_;
-  }
-
+  
   double& DPDE::heatCapacity()
   {
     return heatCapacity_;

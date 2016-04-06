@@ -3,6 +3,8 @@
 
 #include "Tools.hpp"
 #include "System.hpp"
+#include "Isolated.hpp"
+#include "NBody.hpp"
 #include "chain/Chain.hpp"
 #include "ControlVariate.hpp"
 
@@ -10,6 +12,7 @@
 #include "dynamics/Hamiltonian.hpp"
 #include "dynamics/Overdamped.hpp"
 #include "dynamics/Langevin.hpp"
+#include "dynamics/DPDE.hpp"
 
 namespace simol {
 
@@ -71,7 +74,7 @@ namespace simol {
   //template <class D>
   //void sampleSystem(Dynamics& dyna, Isolated& syst);
   void sampleSystem(Hamiltonian& /*dyna*/, Isolated& /*syst*/);
-  void sampleSystem(UniformStochasticDynamics& dyna, Isolated& syst);
+  void sampleSystem(LangevinBase& dyna, Isolated& syst);
   void sampleSystem(Overdamped& dyna, Isolated& syst);
   void computeOutput(Dynamics const& dyna, const Isolated& syst, Output& output, size_t iOfIteration);
   void writeOutput(System const& syst, Output& output, size_t iOfIteration);
@@ -101,7 +104,8 @@ namespace simol {
   void simulate(BoundaryLangevin& dyna, Chain& syst);
   void updateAllControlVariates(const BoundaryLangevin& dyna, System const& syst, Output& output, size_t iOfIteration);
   Vector<double> generatorOn(const BoundaryLangevin& dyna, System const& syst, const ControlVariate& controlVariate);
-  void writeOutput(BoundaryLangevin const& dyna, System const& syst, Output& output, size_t iOfIteration);
+  void computeOutput(BoundaryLangevin const& dyna, Chain const& syst, Output& output, size_t iOfIteration);
+  void writeOutput(BoundaryLangevin const& dyna, Chain const& syst, Output& output, size_t iOfIteration);
   
   //NBody
   void sampleSystem(Dynamics& dyna, NBody& syst);

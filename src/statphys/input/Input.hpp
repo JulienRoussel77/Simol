@@ -64,8 +64,8 @@ namespace simol{
     double potentialAlpha() const;
     double potentialBeta() const;
     // Lennard Jones
-    double epsLJ() const;
-    double sigmaLJ() const;
+    double potentialEpsilon() const;
+    double potentialSigma() const;
     double cutOffRatio() const;
     double splineRatio() const;
     

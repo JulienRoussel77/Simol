@@ -1,31 +1,36 @@
-#include "StochasticDynamics.hpp"
+#include "LangevinBase.hpp"
 
 namespace simol
 {
   ///Constructs a purely virtual Dynamics for Dynamics using RNGs
-  StochasticDynamics::StochasticDynamics(Input const& input):
+  LangevinBase::LangevinBase(Input const& input):
     Dynamics(input),
+    gamma_(input.gamma()),
     xi_(input.xi())
   {
 		cout << "xi = " << xi() << endl;
 	}
+	
+	///
+  ///Read-only accessor of the intensity of the O-U process
+  const double& LangevinBase::gamma() const {return gamma_;}
 
   ///Read-only accessor for xi
-  const double& StochasticDynamics::xi() const {return xi_;}
+  const double& LangevinBase::xi() const {return xi_;}
 
   ///Read-write accessor for xi
-  double& StochasticDynamics::xi() {return xi_;}
+  double& LangevinBase::xi() {return xi_;}
 	///
 	///Returns the mean number of iterations between 2 random events
-	int StochasticDynamics::xiNbOfIterations()
+	int LangevinBase::xiNbOfIterations()
 		{return 1 / (xi_ * timeStep_);}
 	///
 	///Returns true if the dynamics involves a Poisson process (momenta exchange)
-	bool StochasticDynamics::doMomentaExchange() const
+	bool LangevinBase::doMomentaExchange() const
 		{return xi_ > 0;}
 	///
 	///If the momenta exchange is activated, the times of future events are drawn
-	void StochasticDynamics::initializeCountdown(Particle& particle)
+	void LangevinBase::initializeCountdown(Particle& particle)
 	{
 		if (doMomentaExchange())
 			particle.countdown() = rng_->scalarExponential() * xiNbOfIterations(); // / (xi() * timestep());
@@ -34,7 +39,7 @@ namespace simol
 	}
 	///
 	///Exchanges the momenta of the 2 particles if the time has come
-	void StochasticDynamics::updateMomentaExchange(Particle& particle1, Particle& particle2)
+	void LangevinBase::updateMomentaExchange(Particle& particle1, Particle& particle2)
 	{
 		if (particle2.countdown() == 0)
 			{
@@ -46,6 +51,14 @@ namespace simol
 			else
 				particle2.countdown()--;
 	}
+	
+	///
+  ///Analytical integration of an Orstein-Uhlenbeck process of inverse T "localBeta"
+  void LangevinBase::updateOrsteinUhlenbeck(Particle& particle, double localBeta)
+  {
+    double alpha = exp(- gamma() / particle.mass() * timeStep_);
+    particle.momentum() = alpha * particle.momentum() + sqrt((1-pow(alpha, 2))/localBeta*particle.mass()) * rng_->gaussian();
+  }
 
 
 }

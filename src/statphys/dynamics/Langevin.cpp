@@ -4,8 +4,7 @@ namespace simol
 {
   ///Constructor for the Langevin Dynamics with thermostats everywhere
   Langevin::Langevin(Input const& input):
-    UniformStochasticDynamics(input),
-    gamma_(input.gamma())
+    LangevinBase(input)
   {
     galerkin_ = createLangevinGalerkin(input);
   }
@@ -16,10 +15,6 @@ namespace simol
   {
     std::cout << "Dynamics = Langevin" << std::endl;
   }
-
-  ///
-  ///Read-only accessor for the intensity of the Orstein-Uhlenbeck process
-  const double& Langevin::gamma() const {return gamma_;}
 
   ///
   ///Returns the amplitude of the brownian motion

@@ -1,12 +1,14 @@
-#ifndef SIMOL_PARTICLESYSTEM_HPP
-#define SIMOL_PARTICLESYSTEM_HPP
+#ifndef SIMOL_SYSTEM_HPP
+#define SIMOL_SYSTEM_HPP
 
 #include "Tools.hpp"
 #include <vector>
 #include "Particle.hpp"
 #include "Dynamics.hpp"
-#include "DPDE.hpp"
+//#include "DPDE.hpp"
 #include "Output.hpp"
+
+#include "AllPotentials.hpp"
 
 // fichiers de sortie pour debugage
 #include <iomanip>
@@ -14,9 +16,11 @@ using std::setw;
 
 namespace simol
 {
+  
+  
 
   class System
-  {
+  { 
   public:
     System(Input const& input);
     virtual ~System();
@@ -42,7 +46,7 @@ namespace simol
     virtual double drawPotLaw(double localBeta);
     virtual double computeMeanPotLaw(double betaLocal) const;
     
-    void launch(Dynamics& model, Output& output);
+    //void launch(Dynamics& model, Output& output);
     virtual void thermalize(Dynamics& /*model*/) {assert(false);};
     virtual void computeAllForces(Dynamics const& /*model*/){};
     void interaction(Particle& particle1, Particle& particle2) const;
@@ -61,32 +65,6 @@ namespace simol
     std::shared_ptr<RNG> rng_;
     Potential* potential_;
   };
-
-  class Isolated : public System
-  {
-  public:
-    Isolated(Input const& input);
-    void printName() const;
-    void computeAllForces(Dynamics const& model);
-    //void computeFinalOutput(Output& /*output*/, Dynamics const& /*dyna*/);
-    //void writeFinalOutput(Output& output, Dynamics const& model);
-  };
-  
-  class NBody : public System
-  {
-  public:
-    NBody(Input const& input);
-    void printName() const;
-    void computeAllForces(Dynamics const& model);
-    size_t nbOfParticlesPerDimension() const;
-    double latticeParameter() const;
-    void interaction(Particle& particle1, Particle& particle2) const;
-  protected:
-    size_t nbOfParticlesPerDimension_;
-    double latticeParameter_;
-    double domainSize_;
-    //ofstream DEBUG_;
-   };
 
 
 

@@ -17,12 +17,12 @@ namespace simol
     }
   }
   
-  
+  void Chain::thermalize(Dynamics& /*dyna*/){}
   
   //void Chain::computeAllForces(Dynamics const& /*model*/) 
   //{throw std::invalid_argument("computeAllForces : Function undefined");};*/
   
-  void Chain::thermalize(Dynamics& dyna)
+  void Chain::thermalize(LangevinBase& dyna)
   {
     //for (auto&& particle : configuration_)
       //dyna.updateBefore(particle);
@@ -77,7 +77,10 @@ namespace simol
     }
   }
   
-    void BiChain::computeProfile(Output& output, Dynamics const& dyna, size_t iOfIteration) const
+  void BiChain::computeProfile(Output& /*output*/, Dynamics const& /*dyna*/, size_t /*iOfIteration*/) const
+  {}
+  
+  void BiChain::computeProfile(Output& output, LangevinBase const& dyna, size_t iOfIteration) const
   {
     output.energySumFlow() = 0;
     size_t midNb = (nbOfParticles()-1) / 2;
@@ -164,6 +167,9 @@ namespace simol
   {return ancorParticle1_.potentialEnergy();}
   
   void TriChain::computeProfile(Output& output, Dynamics const& dyna, size_t iOfIteration) const
+  {}
+  
+  void TriChain::computeProfile(Output& output, LangevinBase const& dyna, size_t iOfIteration) const
   {
     output.energySumFlow() = 0;
     for (size_t iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)

@@ -91,7 +91,7 @@ namespace simol
   
   Vector<double> ControlVariate::potentialDerivative(Vector<double> const& position) const
   {
-    return potential_->derivative(position);
+    return potential_->gradient(position);
   }
   
   double ControlVariate::potentialLaplacian(Vector<double> const& position) const

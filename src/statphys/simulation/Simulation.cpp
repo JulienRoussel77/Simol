@@ -89,7 +89,7 @@ namespace simol {
   void sampleSystem(Hamiltonian& /*dyna*/, Isolated& /*syst*/)
   {}
   
-  void sampleSystem(UniformStochasticDynamics& dyna, Isolated& syst)
+  void sampleSystem(LangevinBase& dyna, Isolated& syst)
   {
     syst.getParticle(0).momentum() = syst.drawMomentum(dyna.beta(), syst.getParticle(0).mass());
     syst.getParticle(0).position(0) = syst.drawPotLaw(dyna.beta());
@@ -250,7 +250,23 @@ namespace simol {
     output.sumFlowCV().update(output.energySumFlow(), generatorOnBasis, syst.configuration(), iOfIteration);
   }
   
-  void writeOutput(BoundaryLangevin const& dyna, System const& syst, Output& output, size_t iOfIteration)
+  void computeOutput(BoundaryLangevin const& dyna, Chain const& syst, Output& output, size_t iOfIteration)
+  {
+    output.kineticEnergy() = 0;
+    output.potentialEnergy() = 0;
+    //Calcul de la température et de l'énergie
+    for (const auto& particle : syst.configuration())
+    {
+      output.kineticEnergy() += particle.kineticEnergy();
+      output.potentialEnergy() += particle.potentialEnergy();
+    }
+    // In the case of the trichain we add the potential of the wall interaction
+    output.potentialEnergy() += syst.boundaryPotEnergy();
+    syst.computeProfile(output, dyna, iOfIteration);
+    updateAllControlVariates(dyna, syst, output, iOfIteration);
+  }
+  
+  void writeOutput(BoundaryLangevin const& dyna, Chain const& syst, Output& output, size_t iOfIteration)
   {
     if (output.doOutput(iOfIteration))// && iOfIteration >= 100)
     {

@@ -7,7 +7,7 @@ namespace simol
   ///
   ///Constructor for the Overdamped Langevin Dynamics
   Overdamped::Overdamped(Input const& input):
-    UniformStochasticDynamics(input)
+    Dynamics(input)
   {}
 
   ///Before refers to the fact that this step comes before the forces update
