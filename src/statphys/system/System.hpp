@@ -20,7 +20,7 @@ namespace simol
   
 
   class System
-  {
+  { 
   public:
     System(Input const& input);
     virtual ~System();

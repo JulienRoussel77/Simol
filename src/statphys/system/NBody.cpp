@@ -5,11 +5,12 @@ namespace simol
   
   // ------------------- NBody ----------------------------
   
-  NBody::NBody(Input const& input):
+NBody::NBody(Input const& input):
     System(input),
     nbOfParticlesPerDimension_(input.nbOfParticlesPerDimension()),
     latticeParameter_(input.latticeParameter()),
     domainSize_(input.latticeParameter()*input.nbOfParticlesPerDimension())
+    //DEBUG_(input.outputFolderName()+"debug_potential.txt")
   {
     assert(configuration_.size() > 1);
     for (size_t i = 0; i<input.nbOfParticles(); i++) 
@@ -17,6 +18,14 @@ namespace simol
       configuration_[i] = Particle(input.mass(), input.initialPosition(i), input.initialMomentum(i));
       //std::cout << configuration_[i].force() << std::endl;
       }
+    // debugage du potentiel !!
+    //double pas = 0.005;
+    //double Rpot = 2.2; 
+    //while (Rpot < 3.1)
+    //{
+    //  DEBUG_ << Rpot << " " << potential(Rpot) << " " << force(Rpot)(0) << endl;
+    //  Rpot += pas;
+    //} 
   }
   
   void NBody::printName() const
@@ -65,8 +74,9 @@ namespace simol
     r12 /= distance;
     particle1.force() += force12 * r12;
     particle2.force() -= force12 * r12;
-    // TO DO : compute pressure 
-    // ...
+    // compute pressure, based on the Virial formula for the potential part: P_pot = -\sum_{i < j} r_ij v'(r_ij) / d|Vol|; will divide by d|Vol| at the end
+    particle1.virial() += 0.5*force12*distance;
+    particle2.virial() += 0.5*force12*distance;
   }
   
 }

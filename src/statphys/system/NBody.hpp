@@ -4,7 +4,7 @@
 
 namespace simol
 {
-  
+
   class NBody : public System
   {
   public:
@@ -18,6 +18,7 @@ namespace simol
     size_t nbOfParticlesPerDimension_;
     double latticeParameter_;
     double domainSize_;
+    //ofstream DEBUG_;
    };
   
 }
