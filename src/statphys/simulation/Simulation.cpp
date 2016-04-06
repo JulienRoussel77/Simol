@@ -351,12 +351,14 @@ namespace simol {
   {
     output.kineticEnergy() = 0;
     output.potentialEnergy() = 0;
+    output.totalVirial() = 0;
     //Calcul de la température et de l'énergie
     for (const auto& particle : syst.configuration())
       {
       output.kineticEnergy() += particle.kineticEnergy();
-      output.potentialEnergy() += particle.potentialEnergy();
-    }
+      output.potentialEnergy() += particle.potentialEnergy();	      
+      output.totalVirial() += particle.virial();
+      }
   }
   
   //--- CONFLIT DE TEMPLETAGE ICI AUSSI : entre dynamics et system... on ne peut pas preciser que le systeme ?! ---

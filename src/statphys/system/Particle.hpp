@@ -56,6 +56,8 @@ namespace simol
     double& momentum(int i);
     double const & internalEnergy() const;
     double & internalEnergy();
+    double const & virial() const;
+    double & virial();
     double kineticEnergy() const;
     //double& kineticEnergy();
     const double& potentialEnergy() const;
@@ -91,6 +93,7 @@ namespace simol
     double energyLapla_;
     int countdown_;
     double internalEnergy_;
+    double virial_;   // to compute pressure
   };
 
 

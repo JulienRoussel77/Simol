@@ -36,11 +36,13 @@ namespace simol{
     profilePeriodNbOfIterations_(input.outputProfilePeriodNbOfIterations()),
     timeStep_(input.timeStep()),
     dimension_(input.dimension()),
+    latticeParameter_(input.latticeParameter()),
     nbOfParticles_(input.nbOfParticles()),
     nbOfIterations_(input.nbOfIterations()),
     kineticEnergy_(0),
     potentialEnergy_(0),
     internalEnergy_(0),
+    totalVirial_(0),
     energyMidFlow_(0),
     energySumFlow_(0),
     decorrelationNbOfIterations_(input.decorrelationNbOfIterations()),
@@ -169,6 +171,16 @@ namespace simol{
     return internalEnergy_;
   }
   
+  const double& Output::totalVirial() const
+  {
+    return totalVirial_;
+  }
+  
+  double& Output::totalVirial()
+  {
+    return totalVirial_;
+  }
+  
   const double& Output::energyMidFlow() const
   {
     return energyMidFlow_;
@@ -197,6 +209,11 @@ namespace simol{
   double Output::temperature() const
   {
     return 2 * kineticEnergy_ / (dimension_ * nbOfParticles_); 
+  }
+  
+  double Output::pressure() const
+  {
+    return (2 * kineticEnergy_ + totalVirial_) / (dimension_ * nbOfParticles_ * pow(latticeParameter_,dimension_)); 
   }
   
   bool Output::doComputeCorrelations() const
@@ -273,6 +290,7 @@ namespace simol{
 		    << " " << potentialEnergy()
 		    << " " << energy()
 		    << " " << temperature()
+		    << " " << pressure()
 		    << std::endl;
   }
   

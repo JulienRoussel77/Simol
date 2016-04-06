@@ -32,7 +32,8 @@ namespace simol
     energyGrad_(dimension(), 0), 
     energyLapla_(0),
     countdown_(0),
-    internalEnergy_(0)
+    internalEnergy_(0),
+    virial_(0)
   {}
    
   Particle::Particle(int dimension) : 
@@ -87,6 +88,12 @@ namespace simol
 
   double & Particle::internalEnergy() 
   { return internalEnergy_; }
+  
+  double const & Particle::virial() const
+  { return virial_; }
+
+  double & Particle::virial() 
+  { return virial_; }
 
   double Particle::kineticEnergy() const
   { 

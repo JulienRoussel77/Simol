@@ -160,8 +160,11 @@ namespace simol
     double sigmaLJ_;
     double cutOffRadius_;
     double splineRadius_;
-    double splineFunction(double reducedDist) const;
+    double splineRatio_;
+    double splineFunction(double dist) const;
+    double splineFunctionDerivative(double dist) const;
     double untruncated(double dist) const;
+    double untruncatedDerivative(double dist) const;
     double A_spline_;
     double B_spline_;
   };

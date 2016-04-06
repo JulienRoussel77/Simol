@@ -8,7 +8,9 @@
 #include "DPDE.hpp"
 #include "Output.hpp"
 
-
+// fichiers de sortie pour debugage
+#include <iomanip>
+using std::setw;
 
 namespace simol
 {
@@ -83,6 +85,7 @@ namespace simol
     size_t nbOfParticlesPerDimension_;
     double latticeParameter_;
     double domainSize_;
+    //ofstream DEBUG_;
    };
 
 

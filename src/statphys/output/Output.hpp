@@ -42,10 +42,12 @@ namespace simol
     int dimension_;
     size_t nbOfParticles_;
     size_t nbOfIterations_;
+    double latticeParameter_;
     
     double kineticEnergy_;
     double potentialEnergy_;
     double internalEnergy_;
+    double totalVirial_;
     double energyMidFlow_;
     double energySumFlow_;
     
@@ -86,8 +88,11 @@ namespace simol
     double& potentialEnergy();
     const double& internalEnergy() const;
     double& internalEnergy();
+    const double& totalVirial() const;
+    double& totalVirial();
     double energy() const;
     double temperature() const;
+    double pressure() const;
     const double& energyMidFlow() const;
     double& energyMidFlow();
     const double& energySumFlow() const;
