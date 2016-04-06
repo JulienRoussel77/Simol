@@ -2,7 +2,7 @@
 #define SIMOL_CHAIN_HPP
 
 #include "System.hpp"
-
+#include "LangevinBase.hpp"
 
 namespace simol
 {
@@ -13,6 +13,7 @@ namespace simol
     Chain(Input const& input);
     //virtual void computeAllForces(Dynamics const& model);
     virtual void thermalize(Dynamics& model);
+    virtual void thermalize(LangevinBase& dyna);
     //virtual void computeProfile(Output& output, Dynamics const& model, size_t iOfIteration) const;
     //virtual void writeFinalOutput(Output& output, Dynamics const& model);
   };
@@ -23,7 +24,8 @@ namespace simol
   public:
     BiChain(Input const& input);
     void computeAllForces(Dynamics const& model);
-    virtual void computeProfile(Output& output, Dynamics const& model, size_t iOfIteration) const;
+    virtual void computeProfile(Output& output, Dynamics const& dyna, size_t iOfIteration) const;
+    virtual void computeProfile(Output& output, LangevinBase const& model, size_t iOfIteration) const;
     //virtual void writeFinalOutput(Output& output, Dynamics const& model);
   };
   
@@ -35,7 +37,8 @@ namespace simol
     TriChain(Input const& input);
     void computeAllForces(Dynamics const& model);     
     virtual double boundaryPotEnergy() const;
-    virtual void computeProfile(Output& output, Dynamics const& model, size_t iOfIteration) const;
+    virtual void computeProfile(Output& output, Dynamics const& dyna, size_t iOfIteration) const;
+    virtual void computeProfile(Output& output, LangevinBase const& model, size_t iOfIteration) const;
     //virtual void writeFinalOutput(Output& output, Dynamics const& model);
   };
   

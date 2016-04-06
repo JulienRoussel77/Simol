@@ -1,20 +1,19 @@
 #ifndef SIMOL_LANGEVIN_HPP
 #define SIMOL_LANGEVIN_HPP
 
-#include "UniformStochasticDynamics.hpp"
+#include "LangevinBase.hpp"
 
 namespace simol
 {
-  class Langevin : public UniformStochasticDynamics
+  class Langevin : public LangevinBase
   {
   public:
     Langevin(Input const& input);
     virtual void printName() const;
-    virtual const double& gamma() const;
     double sigma() const;
     virtual void updateAfter(Particle& particle);
   protected:
-    double gamma_;
+    double sigma_;
   };
 
 }

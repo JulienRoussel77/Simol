@@ -18,6 +18,8 @@ namespace simol
     nbOfIterations_(input.nbOfIterations()),
     nbOfThermalIterations_(input.nbOfThermalIterations()),
     nbOfBurningIterations_(input.nbOfBurningIterations()),
+    beta_(input.beta()),
+    temperature_(1/beta_),
     externalForce_(input.dimension(), 0),
     galerkin_(nullptr)
   {
@@ -71,6 +73,31 @@ namespace simol
   const std::shared_ptr<RNG>& Dynamics::rng() const {return rng_;}
 
   std::shared_ptr<RNG>& Dynamics::rng() {return rng_;}
+  
+  ///
+  ///Returns the temperature
+  const double& Dynamics::temperature() const {return temperature_;}
+  ///
+  ///Read-only access for the temperature
+  const double& Dynamics::temperatureLeft() const {return temperature_;}
+  ///
+  ///Read-only access for the temperature
+  const double& Dynamics::temperatureRight() const {return temperature_;}
+  ///Returns the difference between the mean temperature and the one at the left end
+  ///This is equal to {eta}
+  double Dynamics::deltaTemperature() const
+  {
+    return (temperatureLeft() - temperatureRight())/2;
+  }
+  ///
+  ///Read-only access for the inverse temperature
+  const double& Dynamics::beta() const {return beta_;}
+  ///
+  ///Read-only access for the inverse temperature
+  const double& Dynamics::betaLeft() const {return beta_;}
+  ///
+  ///Read-only access for the inverse temperature
+  const double& Dynamics::betaRight() const {return beta_;}
 
   ///
   ///Read-only accessor for the external force
@@ -130,13 +157,7 @@ namespace simol
     particle.momentum() += timeStep_ * particle.force() / 2;
   }
 
-  ///
-  ///Analytical integration of an Orstein-Uhlenbeck process of inverse T "localBeta"
-  void Dynamics::updateOrsteinUhlenbeck(Particle& particle, double localBeta)
-  {
-    double alpha = exp(- gamma() / particle.mass() * timeStep_);
-    particle.momentum() = alpha * particle.momentum() + sqrt((1-pow(alpha, 2))/localBeta*particle.mass()) * rng_->gaussian();
-  }
+
 
 }
 #endif

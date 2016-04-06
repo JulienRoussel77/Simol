@@ -1,21 +1,18 @@
 #ifndef SIMOL_BOUNDARYLANGEVIN_HPP
 #define SIMOL_BOUNDARYLANGEVIN_HPP
 
-#include "StochasticDynamics.hpp"
+#include "LangevinBase.hpp"
 
 namespace simol
 {
-  class BoundaryLangevin : public StochasticDynamics
+  class BoundaryLangevin : public LangevinBase
   {
   public:
     BoundaryLangevin(Input const& input);
     virtual const double& betaLeft() const;
     virtual const double& betaRight() const;
-		virtual double temperature() const;
     virtual const double& temperatureLeft() const;
     virtual const double& temperatureRight() const;
-    double deltaTemperature() const;
-		const double& gamma() const;
     double sigmaLeft() const;
     double sigmaRight() const;
     const double& tauBending() const;
@@ -27,7 +24,6 @@ namespace simol
     double betaRight_;
     double temperatureLeft_;
     double temperatureRight_;
-		double gamma_;
     double tauBending_;
   };
 

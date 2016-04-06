@@ -1,11 +1,11 @@
 #ifndef SIMOL_OVERDAMPED_HPP
 #define SIMOL_OVERDAMPED_HPP
 
-#include "UniformStochasticDynamics.hpp"
+#include "Dynamics.hpp"
 
 namespace simol
 {
-  class Overdamped : public UniformStochasticDynamics
+  class Overdamped : public Dynamics
   {
     public:
         Overdamped(Input const& input);
