@@ -67,6 +67,12 @@ namespace simol
     return potential_->force(position); 
   }
   ///
+  ///Evaluate the force for the scalar "position" (potential and external terms)
+  Vector<double> System::force(double position) const
+  {
+    return potential_->force(position); 
+  }
+  ///
   ///Evaluate the laplacian of the potential for the vector "position"
   double System::laplacian(Vector<double> const& position) const
   {
@@ -241,18 +247,18 @@ namespace simol
       }
     distance = sqrt(distance);
     // compute energy
-    double energy12 = 0.; //potential(distance);
+    double energy12 = potential(distance);
     // cout << distance << "  " << energy12 << endl;
     particle1.potentialEnergy() += energy12/2;
     particle2.potentialEnergy() += energy12/2;
     // compute forces 
-    double force12 = 0.; //force(distance);
+    double force12 = force(distance)(0);
     r12 /= distance;
-    for (int d = 0; d < (int)dimension_; d++)
-      {
-        particle1.force(d) -= force12 * r12(d);
-        particle2.force(d) += force12 * r12(d);
-      }
+    //for (int d = 0; d < (int)dimension_; d++)
+    //{
+    particle1.force() -= force12 * r12;
+    particle2.force() += force12 * r12;
+    //}
   }
   
   

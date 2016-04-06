@@ -301,42 +301,77 @@ namespace simol {
   
   //------------------- NBody ---------------------
   
-  void sampleSystem(Dynamics& /*dyna*/, NBody& /*syst*/)
+    void sampleSystem(Dynamics& dyna, NBody& syst)
   {
+    int Dim = syst.dimension();   // PAS SUPER, MAIS SINON PBM DE TYPE POUR COMPARAISON ?
+    int NbPartDim = syst.nbOfParticlesPerDimension(); 
+    double latticeSize = syst.latticeParameter();
     //-- initialization of the momenta according to a Gaussian distribution --
-    //syst.getParticle(0).momentum() = syst.drawMomentum(dyna.beta(), syst.getParticle(0).mass());
+    for (size_t i = 0; i < syst.nbOfParticles(); i++)
+      syst.getParticle(i).momentum() = syst.drawMomentum(1, syst.getParticle(i).mass());   // TO DO : introduce beta in Hamiltonian...
     //-- initialization on a cubic lattice --
-    //syst.getParticle(0).position(0) = 0;
+    if (Dim == 2) 
+      {
+	for (int i = 0; i < NbPartDim; i++)
+	  for (int j = 0; j < NbPartDim; j++)
+	    {
+	      syst.getParticle(i*NbPartDim+j).position(0) = i*latticeSize;
+	      syst.getParticle(i*NbPartDim+j).position(1) = j*latticeSize;
+	    }
+      }
+    else if (Dim == 3) 
+      {
+	int NbPartDim2 = NbPartDim*NbPartDim;
+	for (int i = 0; i < NbPartDim; i++)
+	  for (int j = 0; j < NbPartDim; j++)
+	    for (int k = 0; k < NbPartDim; k++)
+	    {
+	      syst.getParticle(i*NbPartDim2+j*NbPartDim+k).position(0) = i*latticeSize;
+	      syst.getParticle(i*NbPartDim2+j*NbPartDim+k).position(1) = j*latticeSize;
+	      syst.getParticle(i*NbPartDim2+j*NbPartDim+k).position(2) = k*latticeSize;
+	    }
+      }
+    else 
+      {
+	throw std::invalid_argument("sampleSystem: Bad dimension, should be 2 or 3");
+      }
+    //cout << "    VERIFICATION : " << syst.nbOfParticlesPerDimension() << endl;
   }
-    
-  void simulate(Hamiltonian& /*dyna*/, NBody& /*syst*/)
+  
+  void simulate(Hamiltonian& dyna, NBody& syst)
   {
+    for (auto&& particle : syst.configuration())
+      dyna.verletFirstPart(particle);
+    syst.computeAllForces(dyna);
+    for (auto&& particle : syst.configuration())
+      dyna.verletSecondPart(particle);
   }
-
-  void computeOutput(Hamiltonian const& /*dyna*/, NBody const& /*syst*/, Output& output, size_t /*iOfIteration*/)
+  
+  void computeOutput(Hamiltonian const& /*dyna*/, NBody const& syst, Output& output, size_t /*iOfIteration*/)
   {
-    
+    output.kineticEnergy() = 0;
+    output.potentialEnergy() = 0;
+    //Calcul de la température et de l'énergie
+    for (const auto& particle : syst.configuration())
+      {
+      output.kineticEnergy() += particle.kineticEnergy();
+      output.potentialEnergy() += particle.potentialEnergy();
+    }
   }
-
+  
   //--- CONFLIT DE TEMPLETAGE ICI AUSSI : entre dynamics et system... on ne peut pas preciser que le systeme ?! ---
   void writeOutput(Hamiltonian const& /*dyna*/, NBody const& syst, Output& output, size_t iOfIteration)
   {
     if (output.doOutput(iOfIteration))
-      output.displayObservablesDPDE(syst.configuration(), iOfIteration);
+      output.displayObservables(iOfIteration);
     if (output.doProfileOutput(iOfIteration))
-      output.displayParticlesXMakeMol(syst.configuration(), iOfIteration);        
+      output.displayParticlesXMakeMol(syst.configuration(), iOfIteration, syst.latticeParameter()*syst.nbOfParticlesPerDimension());        
   }
-
-  void writeFinalOutput(Dynamics const& /*dyna*/, NBody const& syst, Output& output)
+  
+  void writeFinalOutput(Hamiltonian const& dyna, NBody const& syst, Output& output)
   {
     //output.finalDisplay(syst.configuration(), dyna.externalForce());
-    /*output.finalDisplay(syst.configuration(), dyna.externalForce());
-    if (output.doComputeCorrelations())
-      output.finalDisplayAutocorrelations();*/
   }
-  
-  
-  
   
   // ------------------------ Classified by Dynamics ---------------------------------
   

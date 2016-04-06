@@ -5,12 +5,12 @@ Geometry:
 Mesh:
   Time:
     Step: 0.01
-    FinalTime: 0.1
+    FinalTime: 1
 
 Physics:
   System:
     Name: NBody
-    NumberPerDimension: 2 
+    NumberPerDimension: 5 
     Momentum: 1
   Potential:
     Name: LennardJones

@@ -401,14 +401,14 @@ namespace simol
     sigmaLJ_(input.sigmaLJ())
   {}
   
-  double LennardJones::operator()(double const & dist) const
+  double LennardJones::operator()(double dist) const
   { 
     return 4 * epsLJ_* (pow(sigmaLJ_/dist,12)-pow(sigmaLJ_/dist,6));
   }
   
-  double LennardJones::derivative(double const & dist) const
+  Vector<double> LennardJones::derivative(double dist) const
   { 
-    return -24 * epsLJ_* sigmaLJ_ * (2*pow(dist/sigmaLJ_,13)-pow(dist/sigmaLJ_,7));
+    return Vector<double>(1, -24 * epsLJ_* sigmaLJ_ * (2*pow(dist/sigmaLJ_,13)-pow(dist/sigmaLJ_,7)));
   }
   
 }

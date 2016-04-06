@@ -84,7 +84,7 @@ namespace simol {
   void simulate(Hamiltonian& dyna, NBody& syst);
   void computeOutput(Hamiltonian const& /*dyna*/, NBody const& syst, Output& output, size_t /*iOfIteration*/);
   void writeOutput(Hamiltonian const& /*dyna*/, NBody const& syst, Output& output, size_t iOfIteration);
-  void writeFinalOutput(Dynamics const& dyna, NBody const& syst, Output& output);
+  void writeFinalOutput(Hamiltonian const& dyna, NBody const& syst, Output& output);
 
   //Hamiltonian
   Vector<double> generatorOn(const Hamiltonian& dyna, System const& syst, ControlVariate const& controlVariate);

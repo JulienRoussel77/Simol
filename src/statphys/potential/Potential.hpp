@@ -153,8 +153,8 @@ namespace simol
   {
   public:
     LennardJones(Input const& input);
-    double operator()(double const& dist) const;
-    double derivative(double const& dist) const;
+    double operator()(double dist) const;
+    Vector<double> derivative(double dist) const;
   private:
     double epsLJ_;
     double sigmaLJ_;

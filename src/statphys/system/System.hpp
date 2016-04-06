@@ -31,6 +31,7 @@ namespace simol
     double potential(Vector<double> const& position) const;
     double potential(const double& position) const;
     Vector<double> force(Vector<double> const& position) const;
+    Vector<double> force(double position) const;
     double laplacian(Vector<double> const& position) const;
     const std::shared_ptr<RNG>& rng() const;
     std::shared_ptr<RNG>& rng();
