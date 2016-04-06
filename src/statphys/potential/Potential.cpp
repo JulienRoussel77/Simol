@@ -80,10 +80,3 @@ namespace simol
   
 }
 #endif
-
-
-
-
-
-
-

@@ -10,6 +10,9 @@
 
 #include "AllPotentials.hpp"
 
+// fichiers de sortie pour debugage
+#include <iomanip>
+using std::setw;
 
 namespace simol
 {
@@ -62,10 +65,6 @@ namespace simol
     std::shared_ptr<RNG> rng_;
     Potential* potential_;
   };
-
-
-  
-
 
 
 

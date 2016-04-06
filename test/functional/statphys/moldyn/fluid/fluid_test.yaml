@@ -1,23 +1,23 @@
 Geometry:
-  Dimension: 2
-  LatticeParameter: 2
+  Dimension: 3
+  LatticeParameter: 1.
 
 Mesh:
   Time:
     Step: 0.005
-    FinalTime: 100
+    FinalTime: 10
 
 Physics:
   System:
     Name: NBody
-    NumberPerDimension: 3 
+    NumberPerDimension: 3
     Momentum: 1
   Potential:
     Name: LennardJones
     Epsilon: 1
     Sigma: 1
     CutOffRatio: 2.5
-    SplineRatio: 0.8
+    SplineRatio: 0.9
   Model:
     Name: Hamiltonian
     Temperature: 1

@@ -39,24 +39,6 @@ namespace simol
   
   
 
-  
-  
-  
-  
-  
-
-  
-  
-  
-  
-  
-
-  
-  
-  
-  
-
-
 
 }
 #endif

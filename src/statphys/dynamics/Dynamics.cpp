@@ -124,6 +124,7 @@ namespace simol
   {
     particle.potentialEnergy() = 0;
     particle.force() = externalForce();
+    particle.virial() = 0.;
   }
 
 
