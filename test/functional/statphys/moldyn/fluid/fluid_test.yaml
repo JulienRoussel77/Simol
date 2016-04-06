@@ -10,12 +10,12 @@ Mesh:
 Physics:
   System:
     Name: NBody
-    NumberPerDimension: 5 
+    NumberPerDimension: 3 
     Momentum: 1
   Potential:
     Name: LennardJones
-    EpsLJ: 1
-    SigmaLJ: 1
+    Epsilon: 1
+    Sigma: 1
     CutOffRatio: 2.5
     SplineRatio: 0.8
   Model:

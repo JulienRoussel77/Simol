@@ -3,7 +3,7 @@
 #====================================================
 FILE(GLOB_RECURSE cpp-filenames *.cpp */*.cpp */*/*.cpp)
 
-INCLUDE_DIRECTORIES(. input output controlVariate dynamics system potential simulation system/chain dynamics/boundaryLangevin dynamics/dpde)
+INCLUDE_DIRECTORIES(. input output controlVariate dynamics system system/chain potential simulation  dynamics/boundaryLangevin dynamics/dpde)
 
 #==============================
 # Define simol-statphys library
@@ -21,4 +21,3 @@ ADD_DEPENDENCIES(simol-statphys simol-core)
 TARGET_LINK_LIBRARIES(simol-statphys simol-core)
 TARGET_LINK_LIBRARIES(simol-statphys ${YAMLCPP_INSTALL_DIR}/lib/libyaml-cpp.a)
 TARGET_LINK_LIBRARIES(simol-statphys ${ARMADILLO_INSTALL_DIR}/lib/libarmadillo.so)
-

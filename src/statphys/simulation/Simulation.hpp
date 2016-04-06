@@ -3,6 +3,8 @@
 
 #include "Tools.hpp"
 #include "System.hpp"
+#include "Isolated.hpp"
+#include "NBody.hpp"
 #include "chain/Chain.hpp"
 #include "ControlVariate.hpp"
 
@@ -10,6 +12,7 @@
 #include "dynamics/Hamiltonian.hpp"
 #include "dynamics/Overdamped.hpp"
 #include "dynamics/Langevin.hpp"
+#include "dynamics/DPDE.hpp"
 
 namespace simol {
 

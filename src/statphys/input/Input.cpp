@@ -31,7 +31,7 @@ const double defaultCutOffRatio = 2.5;
 
 namespace simol {
 
-  ///Transforms a double to a nice string
+  ///Transforms a double into a nice string
   /// 1.30000 -> 1.3     1.000 -> 1
   string doubleToString(double x)
 	{
@@ -282,18 +282,18 @@ namespace simol {
   }
 
   //--- Lennard Jones ---
-  double Input::epsLJ() const
+  double Input::potentialEpsilon() const
   {
-    if (data["Physics"]["Potential"]["EpsLJ"])
-      return data["Physics"]["Potential"]["EpsLJ"].as<double>();
+    if (data["Physics"]["Potential"]["Epsilon"])
+      return data["Physics"]["Potential"]["Epsilon"].as<double>();
     else
       return defaultEpsLJ;
   }
 
-  double Input::sigmaLJ() const
+  double Input::potentialSigma() const
   {
-    if (data["Physics"]["Potential"]["SigmaLJ"])
-      return data["Physics"]["Potential"]["SigmaLJ"].as<double>();
+    if (data["Physics"]["Potential"]["Sigma"])
+      return data["Physics"]["Potential"]["Sigma"].as<double>();
     else
       return defaultSigmaLJ;
   }
@@ -326,7 +326,7 @@ namespace simol {
       return defaultPotentialCoeff;
   }
 
-  //Quadratic
+  //FPU
   double Input::potentialAlpha() const {
     if (data["Physics"]["Potential"]["Alpha"])
       return data["Physics"]["Potential"]["Alpha"].as<double>();

@@ -209,7 +209,7 @@ namespace simol
 	
 	double ExpFourierBasis::potDeriv(double variable) const
 	{
-		return (potential_->derivative(variable))(0);
+		return (potential_->gradient(variable))(0);
 	}
 	
 	double ExpFourierBasis::potLapla(double variable) const

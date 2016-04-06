@@ -3,7 +3,7 @@
 
 #include "Tools.hpp"
 #include "Input.hpp"
-#include "Potential.hpp"
+#include "AllPotentials.hpp"
 #include "Basis.hpp"
 #include "core/linalg/DenseMatrix.hpp"
 
