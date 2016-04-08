@@ -59,7 +59,7 @@ namespace simol {
   
   void writeFinalOutput(BoundaryLangevin const& dyna, BiChain const& syst, Output& output)
   {
-    output.finalDisplay(syst.configuration(), syst.externalForce());
+    output.finalChainDisplay(syst.configuration(), syst.externalForce());
     if (output.doComputeCorrelations())
       output.finalDisplayAutocorrelations();
     output.displayFinalFlow(dyna.temperature(), dyna.deltaTemperature());
@@ -145,7 +145,7 @@ namespace simol {
   
   void writeFinalOutput(BoundaryLangevin const& dyna, TriChain const& syst, Output& output)
   {
-    output.finalDisplay(syst.configuration(), syst.externalForce());
+    output.finalChainDisplay(syst.configuration(), syst.externalForce());
     if (output.doComputeCorrelations())
       output.finalDisplayAutocorrelations();
     output.displayFinalFlow(dyna.temperature(), dyna.deltaTemperature(), dyna.tauBending(), dyna.xi());

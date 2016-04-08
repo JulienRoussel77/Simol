@@ -19,7 +19,8 @@ Physics:
     Force: 0
 
 Output:
-  ParametersName: /
+  SystemTypeName
+  ParametersName
   FolderName: test
   #Foldername: dt0.02_eta0_G9H9
   DecorrelationTime: 5

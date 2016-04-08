@@ -9,6 +9,9 @@ doc/dev/*.synctex.gz
 
 doc/dev/chapters/*.log
 
+doc/html/
+doc/latex/
+
 integration/buildbot
 output/*
 .kdev4/

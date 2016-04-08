@@ -21,7 +21,8 @@ Dynamics:
   Force: 0
     
 Output:
-  ParametersName: /
+  SystemTypeName
+  ParametersName
   FolderName: /
   Period: 0.02
   ProfilePeriod: 0.02

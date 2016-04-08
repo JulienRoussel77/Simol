@@ -53,7 +53,6 @@ namespace simol {
 
   void writeFinalOutput(Dynamics const& /*dyna*/, System const& syst, Output& output)
   {
-    output.finalDisplay(syst.configuration(), syst.externalForce());
     if (output.doComputeCorrelations())
       output.finalDisplayAutocorrelations();
   }

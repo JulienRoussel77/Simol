@@ -134,16 +134,10 @@ namespace simol{
   {return *outParticles_;}
   ofstream & Output::outParticlesXMakeMol()
   {return *outParticlesXMakeMol_;}
-  ofstream & Output::outFinalFlow()
-  {return *outFinalFlow_;}
   ofstream & Output::outFinalVelocity()
   {return *outFinalVelocity_;}
   ofstream & Output::outCorrelation()
   {return *outCorrelation_;}
-  ofstream & Output::outChainVelocities()
-  {return *outChainVelocities_;}
-  ofstream & Output::outBeam()
-  {return *outBeam_;}
   ofstream & Output::outVelocitiesCV()
   {return *outVelocitiesCV_;}
   ofstream & Output::outVelocitiesGenerator()
@@ -152,33 +146,15 @@ namespace simol{
   {return *outForcesCV_;}
   ofstream & Output::outLengthsCV()
   {return *outLengthsCV_;}
-  ofstream & Output::outMidFlowCV()    
-  {return *outMidFlowCV_;}
-  ofstream & Output::outMidFlowPT()
-  {return *outMidFlowPT_;}
-  ofstream & Output::outSumFlowCV()    
-  {return *outSumFlowCV_;}
-  ofstream & Output::outSumFlowPT()
-  {return *outSumFlowCV_;}
-  ofstream & Output::outProfile()
-  {return *outProfile_;}
-  ofstream & Output::outFinalProfile()
-  {return *outFinalProfile_;}
   
   double Output::period() const
-  {
-    return periodNbOfIterations_ * timeStep();
-  }
+  {return periodNbOfIterations_ * timeStep();}
   
   const int& Output::periodNbOfIterations() const
-  {
-    return periodNbOfIterations_;
-  }
+  {return periodNbOfIterations_;}
   
     const int& Output::profilePeriodNbOfIterations() const
-  {
-    return profilePeriodNbOfIterations_;
-  }
+  {return profilePeriodNbOfIterations_;}
   
   bool Output::doOutput(int iOfIteration) const
   {
@@ -191,91 +167,45 @@ namespace simol{
   }
   
   const int& Output::nbOfParticles() const
-  {
-    return nbOfParticles_;
-  }
+  {return nbOfParticles_;}
   
   const int& Output::nbOfIterations() const
-	{
-		return nbOfIterations_;
-	}
+	{return nbOfIterations_;}
 	
 	double Output::finalTime() const
-	{
-		return nbOfIterations_ * timeStep_;
-	}
-	
-	
-  
+	{return nbOfIterations_ * timeStep_;}
+	  
   const double& Output::kineticEnergy() const
-  {
-    return kineticEnergy_;
-  }
+  {return kineticEnergy_;}
   
   double& Output::kineticEnergy()
-  {
-    return kineticEnergy_;
-  }
+  {return kineticEnergy_;}
   
   const double& Output::potentialEnergy() const
-  {
-    return potentialEnergy_;
-  }
+  {return potentialEnergy_;}
   
   double& Output::potentialEnergy()
-  {
-    return potentialEnergy_;
-  }
+  {return potentialEnergy_;}
 
   const double& Output::internalEnergy() const
-  {
-    return internalEnergy_;
-  }
+  {return internalEnergy_;}
   
   double& Output::internalEnergy()
-  {
-    return internalEnergy_;
-  }
+  {return internalEnergy_;}
   
   const double& Output::totalVirial() const
-  {
-    return totalVirial_;
-  }
+  {return totalVirial_;}
   
   double& Output::totalVirial()
-  {
-    return totalVirial_;
-  }
+  {return totalVirial_;}
   
-  const double& Output::energyMidFlow() const
-  {
-    return energyMidFlow_;
-  }
-  
-  double& Output::energyMidFlow()
-  {
-    return energyMidFlow_;
-  }
-  
-  const double& Output::energySumFlow() const
-  {
-    return energySumFlow_;
-  }
-  
-  double& Output::energySumFlow()
-  {
-    return energySumFlow_;
-  }
+
   
   double Output::energy() const
-  {
-    return kineticEnergy_ + potentialEnergy_;
-  }
+  {return kineticEnergy_ + potentialEnergy_;}
   
   double Output::temperature() const
-  {
-    return 2 * kineticEnergy_ / (dimension_ * nbOfParticles_); 
-  }
+  {return 2 * kineticEnergy_ / (dimension_ * nbOfParticles_); }
   
   double Output::pressure() const
   {
@@ -283,71 +213,40 @@ namespace simol{
   }
   
   bool Output::doComputeCorrelations() const
-  {
-    //return doComputeCorrelations_;
-    return decorrelationNbOfIterations();
-  }
+  {return decorrelationNbOfIterations();}
   
   ControlVariate& Output::velocityCV()
-  {
-    return *velocityCV_;
-  }
+  {return *velocityCV_;}
   
   ControlVariate& Output::forceCV()
-  {
-    return *forceCV_;
-  }
+  {return *forceCV_;}
   
   ControlVariate& Output::lengthCV()
-  {
-    return *lengthCV_;
-  }
+  {return *lengthCV_;}
   
-  ControlVariate& Output::midFlowCV()
-  {
-    return *midFlowCV_;
-  }
-  
-  ControlVariate& Output::sumFlowCV()
-  {
-    return *sumFlowCV_;
-  }
+
   
   
   const double& Output::timeStep() const
-  {
-    return timeStep_;
-  }
+  {return timeStep_;}
   
   double& Output::timeStep()
-  {
-    return timeStep_;
-  }
+  {return timeStep_;}
   
     int & Output::decorrelationNbOfIterations()
-  {
-    return decorrelationNbOfIterations_;
-  }
+  {return decorrelationNbOfIterations_;}
   
   const int& Output::decorrelationNbOfIterations() const
-  {
-    return decorrelationNbOfIterations_;
-  }
+  {return decorrelationNbOfIterations_;}
   
   double Output::decorrelationTime() const
-  {
-    return decorrelationNbOfIterations() * timeStep();
-  }
+  {return decorrelationNbOfIterations() * timeStep();}
   
   const int& Output::nbOfAutocoPts() const
-  {
-		return nbOfAutocoPts_;
-	}
+  {return nbOfAutocoPts_;}
 	
   double Output::autocoPtsPeriod() const
-  {
-    return decorrelationTime() / nbOfAutocoPts();
-  }
+  {return decorrelationTime() / nbOfAutocoPts();}
   
   void Output::displayObservables(int iOfIteration)
   {
@@ -360,28 +259,7 @@ namespace simol{
 		    << std::endl;
   }
   
-  void Output::displayChainPositions(vector<Particle> const& configuration, int iOfIteration)
-  {
-    outBeam() << iOfIteration * timeStep() 
-        << " " << configuration[0].position() - 2*configuration[1].position() + configuration[2].position()
-      //<< " " << configuration[0].position() - 2*configuration[1].position() + configuration[2].position()
-        << " " << configuration[(nbOfParticles_-2)/4].position() - 2*configuration[(nbOfParticles_-2)/4+1].position() + configuration[(nbOfParticles_-2)/4+2].position()
-        << " " << configuration[(nbOfParticles_-2)/2].position() - 2*configuration[(nbOfParticles_-2)/2+1].position() + configuration[(nbOfParticles_-2)/2+2].position()
-        << " " << configuration[3*(nbOfParticles_-2)/4].position() - 2*configuration[3*(nbOfParticles_-2)/4+1].position() + configuration[3*(nbOfParticles_-2)/4+2].position()
-        << " " << configuration[nbOfParticles_-3].position() - 2*configuration[nbOfParticles_-2].position() + configuration[nbOfParticles_-1].position()
-        << endl;   
-  }
-  
-  void Output::displayChainMomenta(vector<Particle> const& configuration, int iOfIteration)
-  {
-    outChainVelocities() << iOfIteration * timeStep()
-      << " " << configuration[0].momentum()
-      << " " << configuration[nbOfParticles_/4].momentum()
-      << " " << configuration[nbOfParticles_/2].momentum()
-      << " " << configuration[3*nbOfParticles_/4].momentum()
-      << " " << configuration[nbOfParticles_-1].momentum()
-      << endl;
-  }
+
   
   void Output::displayParticles(vector<Particle> const& configuration, int iOfIteration)
   {
@@ -480,65 +358,19 @@ namespace simol{
 		
 	}
   
-  void Output::writeProfile(ofstream & out_, int iOfIteration)
-	{
-		assert(out_.is_open());
-		for (int iOfParticle = 0; iOfParticle < nbOfParticles_; iOfParticle++)
-			out_ << iOfIteration * timeStep() << " " 
-					 << iOfParticle << " " 
-					<< bendistProfile_.mean(iOfParticle) << " "
-					<< bendistProfile_.standardDeviation(iOfParticle) / sqrt(iOfIteration * timeStep()) << " "
-					<< flowProfile_.mean(iOfParticle) << " "
-					<< flowProfile_.standardDeviation(iOfParticle) / sqrt(iOfIteration * timeStep()) << " "
-					<< kinTempProfile_.mean(iOfParticle) << " "
-					<< kinTempProfile_.standardDeviation(iOfParticle) / sqrt(iOfIteration * timeStep()) << " "
-					<< potTempTopProfile_.mean(iOfParticle) / potTempBotProfile_.mean(iOfParticle) << " "
-					<< endl;
-	}
+
   
   
-  void Output::finalDisplay(vector<Particle> const& /*configuration*/, Vector<double> const& /*externalForce*/)
+  void Output::finalChainDisplay(vector<Particle> const& /*configuration*/, Vector<double> const& /*externalForce*/)
   {    
-		cout << "Output::finalDisplay" << endl;
+		cout << "Output::finalChainDisplay" << endl;
 		writeProfile(outFinalProfile(), nbOfIterations());
 									
     midFlowCV_->postTreat(outMidFlowPT(), timeStep());
 		sumFlowCV_->postTreat(outSumFlowPT(), timeStep());
   }
   
-  void Output::displayFinalFlow(double temperature, double delta_temperature, double tau, double xi)
-	{
-    cout << "outFinalFlow_ : " <<  std::left << setw(10) << finalTime()
-      << " " << setw(5) << timeStep()
-      << " " << setw(6) << nbOfParticles()
-      << " " << setw(4) << temperature
-      << " " << setw(4) << delta_temperature
-      << " " << setw(4) << tau
-      << " " << setw(6) << xi
-      << " " << setw(12) << midFlowCV_->meanObservable()
-      << " " << setw(12) << midFlowCV_->stdDeviationObservable()
-      << " " << setw(12) << sumFlowCV_->meanObservable()
-      << " " << setw(12) << sumFlowCV_->stdDeviationObservable()
-      << std::endl;
-      
-		//cout << "displayFinalFlow(double temperature, double delta_temperature, double tau)";
-		if (doFinalFlow_)
-		{
-			assert(outFinalFlow().is_open());
-			outFinalFlow() << std::left << setw(10) << finalTime()
-			<< " " << setw(5) << timeStep()
-			<< " " << setw(6) << nbOfParticles()
-			<< " " << setw(4) << temperature
-			<< " " << setw(4) << delta_temperature
-			<< " " << setw(4) << tau
-			<< " " << setw(6) << xi
-			<< " " << setw(12) << midFlowCV_->meanObservable()
-			<< " " << setw(12) << midFlowCV_->stdDeviationObservable()
-			<< " " << setw(12) << sumFlowCV_->meanObservable()
-			<< " " << setw(12) << sumFlowCV_->stdDeviationObservable()
-			<< std::endl;
-		}
-	}
+
 	
   void Output::displayFinalVelocity(double temperature, double externalForce, int nbOfFourier, int nbOfHermite)
 	{
@@ -592,29 +424,6 @@ namespace simol{
     }
   }
  
- 	void Output::appendKinTempProfile(double value, int iOfIteration, int iOfParticle)
-	{
-		kinTempProfile_.append(value, iOfIteration, iOfParticle);
-	}
-	
-	void Output::appendPotTempTopProfile(double value, int iOfIteration, int iOfParticle)
-	{
-		potTempTopProfile_.append(value, iOfIteration, iOfParticle);
-	}
-	
-		 	void Output::appendPotTempBotProfile(double value, int iOfIteration, int iOfParticle)
-	{
-		potTempBotProfile_.append(value, iOfIteration, iOfParticle);
-	}
-	
-	void Output::appendBendistProfile(double value, int iOfIteration, int iOfParticle)
-	{
-		bendistProfile_.append(value, iOfIteration, iOfParticle);
-	}
-	
-	void Output::appendFlowProfile(double value, int iOfIteration, int iOfParticle)
-	{
-		flowProfile_.append(value, iOfIteration, iOfParticle);
-	}
+
   
 }

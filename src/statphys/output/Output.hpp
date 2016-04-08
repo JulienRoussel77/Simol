@@ -154,7 +154,7 @@ namespace simol
     void displayProfile(int iOfIteration);
     
     void finalDisplayAutocorrelations();
-    void finalDisplay(vector<Particle> const& configuration, Vector<double> const& externalForce);
+    void finalChainDisplay(vector<Particle> const& configuration, Vector<double> const& externalForce);
     void displayFinalFlow(double temperature, double delta_temperature, double tau = nan(""), double xi = 0);
     void displayFinalVelocity(double temperature, double externalForce, int nbOfFourier = 0, int nbOfHermite = 0);
 

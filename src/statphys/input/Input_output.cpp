@@ -25,7 +25,8 @@ namespace simol {
 
   string Input::simuTypeName() const 
   {
-    if (data["Output"]["SimuTypeName"])
+    if (data["Output"]["SimuTypeName"]
+        && data["Output"]["SimuTypeName"].as<string>() == "yes")        
       return "../../../output/"+dynamicsName()+"/"+systemName()+"/"+potentialName()+"/";
     else 
       return "../../../output/";
@@ -38,19 +39,19 @@ namespace simol {
     if (controlVariateName() != "None")
       name += controlVariateName()+"/";
     
-    if (data["Output"]["ParametersName"])
-      return name + data["Output"]["ParametersName"].as<string>()+"/";
-    
-    if (dynamicsName() == "BoundaryLangevin")
-      name += "N" + to_string(nbOfParticles()) + "_";
-    
-    name += "dt" + doubleToString(timeStep()) + "_eta" + doubleToString(eta());
-    
-    if (dynamicsName() == "BoundaryLangevin")
-      name += "_xi" + doubleToString(xi());
-    
-    name += "/";
-    
+    if (data["Output"]["ParametersName"]
+        && data["Output"]["ParametersName"].as<string>() == "yes")
+    {    
+      if (dynamicsName() == "BoundaryLangevin")
+        name += "N" + to_string(nbOfParticles()) + "_";
+      
+      name += "dt" + doubleToString(timeStep()) + "_eta" + doubleToString(eta());
+      
+      if (dynamicsName() == "BoundaryLangevin")
+        name += "_xi" + doubleToString(xi());
+      
+      name += "/";
+    }
     return name;
   }
   
@@ -118,7 +119,7 @@ namespace simol {
   bool Input::doFinalFlow() const
   {
     if (data["Output"]["doFinalFlow"])
-      if (data["Output"]["doFinalFlow"].as<string>() == "No")
+      if (data["Output"]["doFinalFlow"].as<string>() == "no")
 	return false;
     return true;
   }
@@ -126,7 +127,7 @@ namespace simol {
   bool Input::doFinalVelocity() const
   {
     if (data["Output"]["doFinalVelocity"])
-      if (data["Output"]["doFinalVelocity"].as<string>() == "No")
+      if (data["Output"]["doFinalVelocity"].as<string>() == "no")
 	return false;
     return true;
   }
