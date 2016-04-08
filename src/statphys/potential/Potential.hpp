@@ -9,16 +9,10 @@
 
 namespace simol
 {
-  //class Potential;
-
-  //Potential* createPotential(Input const& input);
   
   class Potential
   {
-    //friend Potential* createPotential(Input const& input);
-  protected:
-    Potential();
-    Vector<double> externalForce_;
+
   public:
     virtual ~Potential(){};
     Potential(Input const& input);
@@ -41,12 +35,12 @@ namespace simol
     virtual double laplacian(double position) const;
     virtual double ratioToHarmonic() const;
     virtual double drawLaw(double /*localBeta*/, std::shared_ptr<RNG>& /*rng*/) const;
+
+  protected:
+    Potential();
+    Vector<double> externalForce_;
     
   };
   
-  
-  
-
-
 }
 #endif

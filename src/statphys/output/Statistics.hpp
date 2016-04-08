@@ -11,19 +11,19 @@ namespace simol
   {
     DenseMatrix<double> sumValues_;
     DenseMatrix<double> lastValue_;
-    DenseMatrix<size_t> nbValues_;
+    DenseMatrix<int> nbValues_;
   public:
-    Statistics(size_t nbRows = 1, size_t nbCols = 1);
+    Statistics(int nbRows = 1, int nbCols = 1);
     //virtual ~Statistics(){};
-    void append(double value, size_t i = 0, size_t j = 0);
-    double mean(size_t i = 0, size_t j = 0) const;
-    Vector<double> meanVec(size_t i = 0) const;
+    void append(double value, int i = 0, int j = 0);
+    double mean(int i = 0, int j = 0) const;
+    Vector<double> meanVec(int i = 0) const;
     DenseMatrix<double> meanMat() const;
-    const size_t& nbValues(size_t i = 0, size_t j = 0) const;
-    const Vector<size_t> nbValuesVec(size_t i = 0) const;
-    const DenseMatrix<size_t>& nbValuesMat() const;
-    const double& lastValue(size_t i = 0, size_t j = 0) const;
-    const Vector<double> lastValueVec(size_t i = 0) const;
+    const int& nbValues(int i = 0, int j = 0) const;
+    const Vector<int> nbValuesVec(int i = 0) const;
+    const DenseMatrix<int>& nbValuesMat() const;
+    const double& lastValue(int i = 0, int j = 0) const;
+    const Vector<double> lastValueVec(int i = 0) const;
     const DenseMatrix<double>& lastValueMat() const;
   };
 
@@ -33,10 +33,10 @@ namespace simol
   //template <typename T>
   class AutocorrelationStats
   {
-    size_t decorrelationNbOfIterations_;
+    int decorrelationNbOfIterations_;
     double decorrelationTime_;
 		int nbOfAutocoPts_;
-    size_t nbOfObservables_;
+    int nbOfObservables_;
     Statistics statisticsValues_;        //calcule la moyenne de l'observable A
     Statistics statisticsRefValues_;     //calcule la moyenne de l'observable B
     Statistics statisticsMeanCorrelation_;   //calcule la moyenne de tous les A(x_i)B(x_0)
@@ -44,18 +44,18 @@ namespace simol
     double indexRef_;
   public:
 		AutocorrelationStats();
-    AutocorrelationStats(size_t decorrelationNbOfIterations, double decorrelationTime, int nbOfAutocoPts0, size_t nbOfObservables = 1);
-    void append(double const& newValue, size_t iOfIteration, size_t iOfObservable = 0);
-    void append(double const& newValue, size_t iOfIteration, size_t iOfObservable, double const& newRefValue);
-    double operator()(size_t iOfIteration, size_t iOfObservable=0) const;
-    const double& lastValue(size_t iOfObservable = 0) const;
-    double mean(size_t iOfObservable = 0) const;
-    size_t statisticsMeanCorrelationNbValues(size_t iOfObservable = 0) const;
-    double integratedAutocorrelation(size_t iOfObservable = 0) const;
+    AutocorrelationStats(int decorrelationNbOfIterations, double decorrelationTime, int nbOfAutocoPts0, int nbOfObservables = 1);
+    void append(double const& newValue, int iOfIteration, int iOfObservable = 0);
+    void append(double const& newValue, int iOfIteration, int iOfObservable, double const& newRefValue);
+    double operator()(int iOfIteration, int iOfObservable=0) const;
+    const double& lastValue(int iOfObservable = 0) const;
+    double mean(int iOfObservable = 0) const;
+    int statisticsMeanCorrelationNbValues(int iOfObservable = 0) const;
+    double integratedAutocorrelation(int iOfObservable = 0) const;
     Vector<double> integratedAutocorrelationVec() const;
-    double integratedAutocorrelationUnbiased(size_t iOfObservable = 0) const;
-    double variance(size_t iOfObservable = 0) const;
-    double standardDeviation(size_t iOfObservable = 0) const;
+    double integratedAutocorrelationUnbiased(int iOfObservable = 0) const;
+    double variance(int iOfObservable = 0) const;
+    double standardDeviation(int iOfObservable = 0) const;
   };
 }
 

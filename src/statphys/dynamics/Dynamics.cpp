@@ -46,25 +46,25 @@ namespace simol
   double const& Dynamics::timeStep() const {return timeStep_;}
   ///
   ///Read-write accessor for the number of iterations of the simulation
-  size_t& Dynamics::nbOfIterations() {return nbOfIterations_;}
+  int& Dynamics::nbOfIterations() {return nbOfIterations_;}
 	///
   ///Read-only accessor for the number of iterations of the simulation
-  size_t const& Dynamics::nbOfIterations() const {return nbOfIterations_;}
+  int const& Dynamics::nbOfIterations() const {return nbOfIterations_;}
   ///
   ///Returns the total time "t_f" of the simulation
   double Dynamics::finalTime() const {return timeStep_ * nbOfIterations_;}
   ///
   ///Read-write accessor for the number of iterations of the thermalization
-  size_t& Dynamics::nbOfThermalIterations() {return nbOfThermalIterations_;}
+  int& Dynamics::nbOfThermalIterations() {return nbOfThermalIterations_;}
   ///
   ///Read-only accessor for the number of iterations of the thermalization
-  size_t const& Dynamics::nbOfThermalIterations() const {return nbOfThermalIterations_;}
+  int const& Dynamics::nbOfThermalIterations() const {return nbOfThermalIterations_;}
   ///
   ///Read-write accessor for the number of iterations of the burning
-  size_t& Dynamics::nbOfBurningIterations() {return nbOfBurningIterations_;}
+  int& Dynamics::nbOfBurningIterations() {return nbOfBurningIterations_;}
   ///
   ///Read-only accessor for the number of iterations of the burning
-  size_t const& Dynamics::nbOfBurningIterations() const {return nbOfBurningIterations_;}
+  int const& Dynamics::nbOfBurningIterations() const {return nbOfBurningIterations_;}
 
   const std::shared_ptr<RNG>& Dynamics::rng() const {return rng_;}
 

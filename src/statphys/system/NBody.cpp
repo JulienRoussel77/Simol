@@ -13,7 +13,7 @@ NBody::NBody(Input const& input):
     //DEBUG_(input.outputFolderName()+"debug_potential.txt")
   {
     assert(configuration_.size() > 1);
-    for (size_t i = 0; i<input.nbOfParticles(); i++) 
+    for (int i = 0; i<input.nbOfParticles(); i++) 
       {
       configuration_[i] = Particle(input.mass(), input.initialPosition(i), input.initialMomentum(i));
       //std::cout << configuration_[i].force() << std::endl;
@@ -33,7 +33,7 @@ NBody::NBody(Input const& input):
     cout << "SystemType = NBody" << endl;
   }
 
-  size_t NBody::nbOfParticlesPerDimension() const
+  int NBody::nbOfParticlesPerDimension() const
   {
     return nbOfParticlesPerDimension_;
   }
@@ -48,8 +48,8 @@ NBody::NBody(Input const& input):
     //std::cout << "NBody::computeAllForces" << std::endl;
     for (auto&& particle : configuration_)
       particle.resetForce(potential());
-    for (size_t i = 0; i < nbOfParticles(); i++)
-      for (size_t j = i+1; j < nbOfParticles(); j++)
+    for (int i = 0; i < nbOfParticles(); i++)
+      for (int j = i+1; j < nbOfParticles(); j++)
       interaction(configuration_[i], configuration_[j]);
   }
     

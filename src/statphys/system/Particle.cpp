@@ -8,20 +8,6 @@ using std::endl;
 
 namespace simol
 {
-  //=============
-  // CONSTRUCTORS
-  //=============
-  
-  /*Particle::Particle():
-    mass_(0), 
-    position_(0), 
-    momentum_(0), 
-    force_(0), 
-    energyGrad_(0), 
-    countdown_(-1)
-  {
-    //std::cout << "Particle vide créée !" << std::endl;      
-  }*/
    
   Particle::Particle(double const & mass, Vector<double> const & position0, Vector<double> const & momentum0):
     mass_(mass),
@@ -34,28 +20,34 @@ namespace simol
     countdown_(0),
     internalEnergy_(0),
     virial_(0)
-  {}
+  {
+  }
    
   Particle::Particle(int dimension) : 
     Particle(0, Vector<double>(dimension, 0), Vector<double>(dimension, 0))
   {}
-
-
   
   Particle::Particle(double const & mass, double const & position0, double const & momentum0):
     Particle(mass, Vector<double>(1, position0), Vector<double>(1, momentum0))
   {}
   
-
-  //==========
-  // ACCESSORS
-  //==========
-  
   int Particle::dimension() const
   {
     return position_.size();
   }
+  
+  double const & Particle::mass() const
+  { return mass_; }
+  
+    void Particle::resetForce(Potential const& pot)
+  {
+    potentialEnergy_ = 0;
+    force_ = pot.externalForce();
+    virial_ = 0;
+  }
 
+  //--- primary variables ----
+  
   Vector<double> const & Particle::position() const
   { return position_; }
   
@@ -80,9 +72,8 @@ namespace simol
   double & Particle::momentum(int i)
   { return momentum_(i); }
 
-  double const & Particle::mass() const
-  { return mass_; }
-
+  //--- functions of the primary variables ----
+  
   double const & Particle::internalEnergy() const
   { return internalEnergy_; }
 
@@ -98,11 +89,7 @@ namespace simol
   double Particle::kineticEnergy() const
   { 
     return pow(momentum_.norm(), 2) / 2 / mass_;
-    //return kineticEnergy_; 
   }
-  
-  /*double& Particle::kineticEnergy()
-  { return kineticEnergy_; }*/
 
   const double& Particle::potentialEnergy() const
   { return potentialEnergy_; }
@@ -119,11 +106,16 @@ namespace simol
   Vector<double>& Particle::force()
   { return force_; }
   
-  const double& Particle::force(size_t i) const
+  const double& Particle::force(int i) const
   { return force_(i); }
   
-  double& Particle::force(size_t i)
+  double& Particle::force(int i)
   { return force_(i); }
+  
+  Vector<double> Particle::velocity() const
+  {return momentum_ / mass_;}
+ 
+  //---- currently specific to chains -----
   
   Vector<double> const& Particle::energyGrad() const
   { return energyGrad_; }
@@ -142,25 +134,12 @@ namespace simol
 	
   double& Particle::energyLapla()
 	{return energyLapla_;}
-  
-  Vector<double> Particle::velocity() const
-  {return momentum_ / mass_;}
-  
+   
   int const& Particle::countdown() const
   {return countdown_;}
 	
 	int& Particle::countdown()
 	{return countdown_;}
-	
-	
-	
-	void Particle::resetForce(Potential const& pot)
-  {
-    potentialEnergy_ = 0;
-    force_ = pot.externalForce();
-    virial_ = 0;
-  }
-
 
 }
 

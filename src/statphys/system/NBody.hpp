@@ -11,11 +11,11 @@ namespace simol
     NBody(Input const& input);
     void printName() const;
     void computeAllForces();
-    size_t nbOfParticlesPerDimension() const;
+    int nbOfParticlesPerDimension() const;
     double latticeParameter() const;
     void interaction(Particle& particle1, Particle& particle2) const;
   protected:
-    size_t nbOfParticlesPerDimension_;
+    int nbOfParticlesPerDimension_;
     double latticeParameter_;
     double domainSize_;
     //ofstream DEBUG_;

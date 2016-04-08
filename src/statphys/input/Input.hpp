@@ -4,9 +4,7 @@
 #include<yaml-cpp/yaml.h>
 #include <getopt.h>
 #include "core/linalg/Vector.hpp"
-
 #include "core/io/CommandLine.hpp"
-
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -26,33 +24,26 @@ namespace simol{
     const string& inputPath() const;
     const std::ifstream& inputFlux() const;
     
-    string simuTypeName() const;
-    string parametersName() const;
-    string outputFolderName() const;
-    //const std::shared_ptr<RNG>& rng() const;
-    //std::shared_ptr<RNG>& rng();
-    
-    // Geometry
+    //-- System --
     int dimension() const;
     double length() const;
     double latticeParameter() const;
-    
-    // Mesh/Time
-    double timeStep() const;
-    size_t nbOfIterations() const;
-    size_t nbOfThermalIterations() const;
-    size_t nbOfBurningIterations() const;
-    
-    // Physics/System
     string systemName() const;
-    size_t nbOfParticles() const;
-    size_t nbOfParticlesPerDimension() const;
+    int nbOfParticles() const;
+    int nbOfParticlesPerDimension() const;
     double mass() const;
     bool doFileSettings() const;
     string settingsPath() const;
     Vector<double> initialPosition(int const& i=0) const;
     Vector<double> initialMomentum(int const& i=0) const;
-    // Physics/Potential
+    
+    //-- Time --
+    double timeStep() const;
+    int nbOfIterations() const;
+    int nbOfThermalIterations() const;
+    int nbOfBurningIterations() const;
+    
+    //-- Potential --
     string potentialName() const;
     //Sinus
     double amplitude() const;
@@ -69,7 +60,7 @@ namespace simol{
     double cutOffRatio() const;
     double splineRatio() const;
     
-    // Physics/Model
+    //-- Dynamics --
     string dynamicsName() const;
     double gamma() const;
     double temperature() const;
@@ -85,27 +76,28 @@ namespace simol{
     double eta() const;
     double heatCapacity() const;  // used for DPDE dynamics
 
-    // Output
-    size_t decorrelationNbOfIterations() const;
+    //-- Output --
+    string simuTypeName() const;
+    string parametersName() const;
+    string outputFolderName() const;
+    int decorrelationNbOfIterations() const;
     double decorrelationTime() const;
-    size_t outputPeriodNbOfIterations() const;
+    int outputPeriodNbOfIterations() const;
     double outputPeriodTime() const;
-    size_t outputProfilePeriodNbOfIterations() const;
+    int outputProfilePeriodNbOfIterations() const;
     double outputProfilePeriodTime() const;
     int nbOfAutocoPts() const;
     bool doFinalFlow() const;
     bool doFinalVelocity() const;
     
-    // Controle Variate
+    //-- Controle Variate --
     string controlVariateName() const;
     string controlVariateCoeffsPath() const;
-    
-    //Galerkin
     bool doGalerkinCV() const;
     bool isGalerkin() const;
     string galerkinElts() const;
-    size_t nbOfFourier() const;
-    size_t nbOfHermite() const;
+    int nbOfFourier() const;
+    int nbOfHermite() const;
     
   };
 

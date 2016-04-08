@@ -9,44 +9,44 @@ namespace simol
 {
 	class TVec
 	{
-		vector<size_t> nbOfElts_;
+		vector<int> nbOfElts_;
 	public:
-		//virtual const double& operator()(vector<size_t>& vecOfElt) const = 0;
-		//virtual double& operator()(vector<size_t>& vecOfElt) = 0;
-		TVec(vector<size_t>& nbOfElts0);
-		size_t nbOfVariables();
-		size_t const& nbOfElts(size_t iOfVariable) const;
-		size_t& nbOfElts(size_t iOfVariable);
-		vector<size_t> const& nbOfElts() const;
-		vector<size_t>& nbOfElts();
-		virtual size_t size() const = 0;
-		size_t iTens(vector<size_t>& vecOfElt) const;
+		//virtual const double& operator()(vector<int>& vecOfElt) const = 0;
+		//virtual double& operator()(vector<int>& vecOfElt) = 0;
+		TVec(vector<int>& nbOfElts0);
+		int nbOfVariables();
+		int const& nbOfElts(int iOfVariable) const;
+		int& nbOfElts(int iOfVariable);
+		vector<int> const& nbOfElts() const;
+		vector<int>& nbOfElts();
+		virtual int size() const = 0;
+		int iTens(vector<int>& vecOfElt) const;
 	};
 
 	class DTVec : public TVec
 	{
 		Vector<double> data_;
 	public:
-		DTVec(vector<size_t>& nbOfElts0);
-		virtual size_t size() const;
-		const double& operator()(vector<size_t>& vecIndex) const;
-		double& operator()(vector<size_t>& vecIndex);
-		const double& operator()(size_t iTensOfElt) const;
-		double& operator()(size_t iTensOfElt);
+		DTVec(vector<int>& nbOfElts0);
+		virtual int size() const;
+		const double& operator()(vector<int>& vecIndex) const;
+		double& operator()(vector<int>& vecIndex);
+		const double& operator()(int iTensOfElt) const;
+		double& operator()(int iTensOfElt);
 	};
 
-	size_t product(vector<size_t>& nbOfElts);
-	//DTVec product(DMat& A, DTVec& X, size_t iOfVariable);
+	int product(vector<int>& nbOfElts);
+	//DTVec product(DMat& A, DTVec& X, int iOfVariable);
 
 	class Basis
 	{
 	protected:
-		size_t nbOfElts_;
+		int nbOfElts_;
 	public:
-		Basis(const size_t nbOfElts);
+		Basis(const int nbOfElts);
 		virtual ~Basis(){};
-		virtual size_t const& nbOfElts() const;
-		virtual size_t& nbOfElts();
+		virtual int const& nbOfElts() const;
+		virtual int& nbOfElts();
 		virtual const double& expFourierCoeffs(int /*iOfElt*/) const {assert(false);};
 		virtual double value(double variable, const int iOfElt) const = 0;
 		virtual Vector<double> gradient(double variable, const int iOfElt) const = 0;
@@ -56,8 +56,8 @@ namespace simol
 	class FourierBasis : public Basis
 	{
 	public:
-		FourierBasis(const size_t nbOfElts);
-		virtual size_t nbOfFreq() const;
+		FourierBasis(const int nbOfElts);
+		virtual int nbOfFreq() const;
 		virtual double value(double variable, const int iOfElt) const;
 		virtual Vector<double> gradient(double variable, const int iOfElt) const;
 		virtual double laplacian(double variable, const int iOfElt) const;
@@ -67,12 +67,12 @@ namespace simol
 	{
 		double beta_;
 		Potential* potential_;
-		size_t nbOfIntegrationNodes_;
+		int nbOfIntegrationNodes_;
 		double qRepartitionFct_, basisCoefficient_;
 		vector<double> expFourierCoeffs_;
 	public:
-		ExpFourierBasis(const size_t nbOfElts, double beta0, Potential& potential);
-		virtual size_t nbOfFreq() const;
+		ExpFourierBasis(const int nbOfElts, double beta0, Potential& potential);
+		virtual int nbOfFreq() const;
 		const double& expFourierCoeffs(int iOfElt) const;
 		virtual double potential(double variable) const;
 		virtual double potDeriv(double variable) const;
@@ -89,7 +89,7 @@ namespace simol
 		double beta_;
 		DMat polyCoeffs_;
 	public:
-		HermiteBasis(const size_t nbOfElts, double beta0);
+		HermiteBasis(const int nbOfElts, double beta0);
 		virtual double value(double variable, const int iOfElt) const;
 		virtual Vector<double> gradient(double variable, const int iOfElt) const;
 		virtual double laplacian(double variable, const int iOfElt) const;
@@ -99,46 +99,46 @@ namespace simol
 	{
 	protected:
 		vector<Basis*> bases_;
-		//vector<size_t> nbOfElts_;
+		//vector<int> nbOfElts_;
 	public:
-		TensorBasis(const size_t nbOfVariables);
+		TensorBasis(const int nbOfVariables);
 		virtual ~TensorBasis();
-		virtual size_t nbOfVariables() const;
-		virtual size_t const& nbOfElts(const int iOfVariable) const;
-		virtual size_t& nbOfElts(const int iOfVariable);
-		virtual vector<size_t> nbOfElts() const;
-		virtual double value(vector<Particle> const& configuration, const size_t iOfElt) const = 0;
-		virtual double value(vector<Particle> const& configuration, vector<size_t>& vecIndex) const = 0;
-		virtual Vector<double> gradientQ(vector<Particle> const& configuration, size_t iOfParticle, size_t iOfCoeff) const = 0;
-		virtual Vector<double> gradientQ(vector<Particle> const& configuration, size_t iOfParticle, vector<size_t>& vecIndex) const = 0;
-		virtual double laplacianQ(vector<Particle> const& configuration, size_t iOfParticle, size_t iOfCoeff) const = 0;
-		virtual double laplacianQ(vector<Particle> const& configuration, size_t iOfParticle, vector<size_t>& vecIndex) const = 0;
-		virtual Vector<double> gradientP(vector<Particle> const& configuration, size_t iOfParticle, size_t iOfCoeff) const = 0;
-		virtual Vector<double> gradientP(vector<Particle> const& configuration, size_t iOfParticle, vector<size_t>& vecIndex) const = 0;
-		virtual double laplacianP(vector<Particle> const& configuration, size_t iOfParticle, size_t iOfCoeff) const = 0;
-		virtual double laplacianP(vector<Particle> const& configuration, size_t iOfParticle, vector<size_t>& vecIndex) const = 0;
+		virtual int nbOfVariables() const;
+		virtual int const& nbOfElts(const int iOfVariable) const;
+		virtual int& nbOfElts(const int iOfVariable);
+		virtual vector<int> nbOfElts() const;
+		virtual double value(vector<Particle> const& configuration, const int iOfElt) const = 0;
+		virtual double value(vector<Particle> const& configuration, vector<int>& vecIndex) const = 0;
+		virtual Vector<double> gradientQ(vector<Particle> const& configuration, int iOfParticle, int iOfCoeff) const = 0;
+		virtual Vector<double> gradientQ(vector<Particle> const& configuration, int iOfParticle, vector<int>& vecIndex) const = 0;
+		virtual double laplacianQ(vector<Particle> const& configuration, int iOfParticle, int iOfCoeff) const = 0;
+		virtual double laplacianQ(vector<Particle> const& configuration, int iOfParticle, vector<int>& vecIndex) const = 0;
+		virtual Vector<double> gradientP(vector<Particle> const& configuration, int iOfParticle, int iOfCoeff) const = 0;
+		virtual Vector<double> gradientP(vector<Particle> const& configuration, int iOfParticle, vector<int>& vecIndex) const = 0;
+		virtual double laplacianP(vector<Particle> const& configuration, int iOfParticle, int iOfCoeff) const = 0;
+		virtual double laplacianP(vector<Particle> const& configuration, int iOfParticle, vector<int>& vecIndex) const = 0;
 	};
 
 	class QPBasis : public TensorBasis
 	{
 	public:
 		QPBasis();
-		size_t& nbOfFourier();
-		const size_t& nbOfFourier() const;
-		size_t& nbOfHermite();
-		const size_t& nbOfHermite() const;
-		size_t iTens(size_t iOfFourier2, size_t iOfHermite) const;
-		vector<size_t> vecTens(size_t iTens0) const;
-		virtual double value(vector<Particle> const& configuration, const size_t iOfElt) const;
-		virtual double value(vector<Particle> const& configuration, vector<size_t>& vecIndex) const;
-		virtual Vector<double> gradientQ(vector<Particle> const& configuration, size_t iOfParticle, size_t iOfCoeff) const;
-		virtual Vector<double> gradientQ(vector<Particle> const& configuration, size_t iOfParticle, vector<size_t>& vecIndex) const;
-		virtual double laplacianQ(vector<Particle> const& configuration, size_t iOfParticle, size_t iOfCoeff) const;
-		virtual double laplacianQ(vector<Particle> const& configuration, size_t iOfParticle, vector<size_t>& vecIndex) const;
-		virtual Vector<double> gradientP(vector<Particle> const& configuration, size_t iOfParticle, size_t iOfCoeff) const;
-		virtual Vector<double> gradientP(vector<Particle> const& configuration, size_t iOfParticle, vector<size_t>& vecIndex) const;
-		virtual double laplacianP(vector<Particle> const& configuration, size_t iOfParticle, size_t iOfCoeff) const;
-		virtual double laplacianP(vector<Particle> const& configuration, size_t iOfParticle, vector<size_t>& vecIndex) const;
+		int& nbOfFourier();
+		const int& nbOfFourier() const;
+		int& nbOfHermite();
+		const int& nbOfHermite() const;
+		int iTens(int iOfFourier2, int iOfHermite) const;
+		vector<int> vecTens(int iTens0) const;
+		virtual double value(vector<Particle> const& configuration, const int iOfElt) const;
+		virtual double value(vector<Particle> const& configuration, vector<int>& vecIndex) const;
+		virtual Vector<double> gradientQ(vector<Particle> const& configuration, int iOfParticle, int iOfCoeff) const;
+		virtual Vector<double> gradientQ(vector<Particle> const& configuration, int iOfParticle, vector<int>& vecIndex) const;
+		virtual double laplacianQ(vector<Particle> const& configuration, int iOfParticle, int iOfCoeff) const;
+		virtual double laplacianQ(vector<Particle> const& configuration, int iOfParticle, vector<int>& vecIndex) const;
+		virtual Vector<double> gradientP(vector<Particle> const& configuration, int iOfParticle, int iOfCoeff) const;
+		virtual Vector<double> gradientP(vector<Particle> const& configuration, int iOfParticle, vector<int>& vecIndex) const;
+		virtual double laplacianP(vector<Particle> const& configuration, int iOfParticle, int iOfCoeff) const;
+		virtual double laplacianP(vector<Particle> const& configuration, int iOfParticle, vector<int>& vecIndex) const;
 	};
 
 	class FourierHermiteBasis : public QPBasis
@@ -157,7 +157,7 @@ namespace simol
 	/*class TrigBasis : public TensorBasis
 	{
 	public:
-		TensorBasis(const size_t nbOfElts1, const size_t nbOfElts2);
+		TensorBasis(const int nbOfElts1, const int nbOfElts2);
 		virtual double valueOfElt(double variable, const int iOfElt, const int iOfVariable);
 	};*/
 }

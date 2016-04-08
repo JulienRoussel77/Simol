@@ -17,23 +17,30 @@ namespace simol
     externalForce_(input.dimension(), 0)
   {
     externalForce_(0) = input.externalForce();
-    cout << "externalForce = " << externalForce_ << endl;
+    //if (externalForce_(0) != 0)
+    // cout << "externalForce = " << externalForce_ << endl;
   }
   
   ///
   ///Read-only accessor for the external force
-  Vector<double> const& Potential::externalForce() const {return externalForce_;}
+  Vector<double> const& Potential::externalForce() const {
+    return externalForce_;
+  }
   ///
-  ///Write-read accessor for the external force
-  Vector<double>& Potential::externalForce(){return externalForce_;}
+  /// Write-read accessor for the external force
+  Vector<double>& Potential::externalForce(){
+    return externalForce_;
+  }
   ///
   ///Read-only accessor for the i-th component of the external force
-  double const& Potential::externalForce(int const& i) const {return externalForce_(i);}
+  double const& Potential::externalForce(int const& i) const {
+    return externalForce_(i);
+  }
   ///
   ///Write-read accessor for the i-th component of the external force
-  double& Potential::externalForce(int const& i) {return externalForce_(i);}
-  
-
+  double& Potential::externalForce(int const& i) {
+    return externalForce_(i);
+  }
   
   double Potential::operator()(Vector<double> const& position) const
   {
@@ -99,11 +106,18 @@ namespace simol
     return laplacian(Vector<double>(1, position));
   }
   
+  ///
+  /// ration used in the rejection method
   double Potential::ratioToHarmonic() const 
-  {throw std::invalid_argument("Potential::ratioToHarmonic : Function undefined");}
-  
+  {
+    throw std::invalid_argument("Potential::ratioToHarmonic : Function undefined");
+  }
+  ///
+  ///sampling using the rejection method
   double Potential::drawLaw(double /*localBeta*/, std::shared_ptr<RNG>& /*rng*/) const
-  {throw std::invalid_argument("Potential::drawLaw : Function undefined");}
+  {
+    throw std::invalid_argument("Potential::drawLaw : Function undefined");
+  }
 
   
 }

@@ -12,7 +12,7 @@ namespace simol
   public:
     DPDE(Input const&  input);
     virtual void printName() const;
-    virtual double gamma_DPDE(double intEnergy);  // friction dependant de l'energie interne
+    virtual double gamma_DPDE(double intEnergy);  // friction depending on internal energies
     virtual double& heatCapacity();
     double sigma() const;
     void energyReinjection(Particle& particle);

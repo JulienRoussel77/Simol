@@ -170,32 +170,32 @@ namespace simol{
     return periodNbOfIterations_ * timeStep();
   }
   
-  const size_t& Output::periodNbOfIterations() const
+  const int& Output::periodNbOfIterations() const
   {
     return periodNbOfIterations_;
   }
   
-    const size_t& Output::profilePeriodNbOfIterations() const
+    const int& Output::profilePeriodNbOfIterations() const
   {
     return profilePeriodNbOfIterations_;
   }
   
-  bool Output::doOutput(size_t iOfIteration) const
+  bool Output::doOutput(int iOfIteration) const
   {
     return (periodNbOfIterations() > 0 && iOfIteration % periodNbOfIterations() == 0);
   }
   
-  bool Output::doProfileOutput(size_t iOfIteration) const
+  bool Output::doProfileOutput(int iOfIteration) const
   {
     return (profilePeriodNbOfIterations() > 0 && iOfIteration % profilePeriodNbOfIterations() == 0);
   }
   
-  const size_t& Output::nbOfParticles() const
+  const int& Output::nbOfParticles() const
   {
     return nbOfParticles_;
   }
   
-  const size_t& Output::nbOfIterations() const
+  const int& Output::nbOfIterations() const
 	{
 		return nbOfIterations_;
 	}
@@ -324,12 +324,12 @@ namespace simol{
     return timeStep_;
   }
   
-    size_t & Output::decorrelationNbOfIterations()
+    int & Output::decorrelationNbOfIterations()
   {
     return decorrelationNbOfIterations_;
   }
   
-  const size_t& Output::decorrelationNbOfIterations() const
+  const int& Output::decorrelationNbOfIterations() const
   {
     return decorrelationNbOfIterations_;
   }
@@ -349,7 +349,7 @@ namespace simol{
     return decorrelationTime() / nbOfAutocoPts();
   }
   
-  void Output::displayObservables(size_t iOfIteration)
+  void Output::displayObservables(int iOfIteration)
   {
     outObservables() << iOfIteration * timeStep() 
 		    << " " << kineticEnergy()
@@ -360,7 +360,7 @@ namespace simol{
 		    << std::endl;
   }
   
-  void Output::displayChainPositions(vector<Particle> const& configuration, size_t iOfIteration)
+  void Output::displayChainPositions(vector<Particle> const& configuration, int iOfIteration)
   {
     outBeam() << iOfIteration * timeStep() 
         << " " << configuration[0].position() - 2*configuration[1].position() + configuration[2].position()
@@ -372,7 +372,7 @@ namespace simol{
         << endl;   
   }
   
-  void Output::displayChainMomenta(vector<Particle> const& configuration, size_t iOfIteration)
+  void Output::displayChainMomenta(vector<Particle> const& configuration, int iOfIteration)
   {
     outChainVelocities() << iOfIteration * timeStep()
       << " " << configuration[0].momentum()
@@ -383,9 +383,9 @@ namespace simol{
       << endl;
   }
   
-  void Output::displayParticles(vector<Particle> const& configuration, size_t iOfIteration)
+  void Output::displayParticles(vector<Particle> const& configuration, int iOfIteration)
   {
-    for (size_t i = 0; i < nbOfParticles_; i++)
+    for (int i = 0; i < nbOfParticles_; i++)
       outParticles() << iOfIteration * timeStep() 
 		    << " " << i
 		    << " " << configuration[i].position() 
@@ -398,13 +398,13 @@ namespace simol{
   }
 
   //--- display the current configuration in XMakemol format ; specific for NBody systems ---
-  void Output::displayParticlesXMakeMol(vector<Particle> const& configuration, size_t iOfIteration, double domainSize)
+  void Output::displayParticlesXMakeMol(vector<Particle> const& configuration, int iOfIteration, double domainSize)
   {
     outParticlesXMakeMol() << nbOfParticles_ << endl;
     outParticlesXMakeMol() << "Time = " << iOfIteration * timeStep() << endl;
     double coordinate = 0;
     int Dim = dimension_;
-    for (size_t i = 0; i < nbOfParticles_; i++)
+    for (int i = 0; i < nbOfParticles_; i++)
     {
       outParticlesXMakeMol() << " O  ";
       if (Dim == 3)
@@ -455,12 +455,12 @@ namespace simol{
     }
   }
   
-  void Output::displayProfile(size_t iOfIteration)
+  void Output::displayProfile(int iOfIteration)
   {
     writeProfile(outProfile(), iOfIteration);
   }
   
-  void Output::displayObservablesDPDE(vector<Particle> const& /*configuration*/, size_t iOfIteration)
+  void Output::displayObservablesDPDE(vector<Particle> const& /*configuration*/, int iOfIteration)
   {
     // garder le vecteur des particules pour evt sortir les positions, etc
     //cout << "output : n = " << iOfIteration << endl;
@@ -480,10 +480,10 @@ namespace simol{
 		
 	}
   
-  void Output::writeProfile(ofstream & out_, size_t iOfIteration)
+  void Output::writeProfile(ofstream & out_, int iOfIteration)
 	{
 		assert(out_.is_open());
-		for (size_t iOfParticle = 0; iOfParticle < nbOfParticles_; iOfParticle++)
+		for (int iOfParticle = 0; iOfParticle < nbOfParticles_; iOfParticle++)
 			out_ << iOfIteration * timeStep() << " " 
 					 << iOfParticle << " " 
 					<< bendistProfile_.mean(iOfParticle) << " "
@@ -570,7 +570,7 @@ namespace simol{
     double integralQ = 0;
     double midFlowQ = 0;
 		double sumFlowQ = 0;
-		size_t midNb = nbOfParticles_/2;
+		int midNb = nbOfParticles_/2;
     for (int i=0; i < nbOfAutocoPts(); i++)
     {
       outCorrelation() << i * autocoPtsPeriod() 
@@ -584,7 +584,7 @@ namespace simol{
 		  << " " << (midFlowQ += midFlowCV_->autocorrelation(i)*autocoPtsPeriod())
 			<< " " << sumFlowCV_->autocorrelation(i) - pow(sumFlowCV_->meanObservable(), 2)
 		  << " " << (sumFlowQ += sumFlowCV_->autocorrelation(i)*autocoPtsPeriod());
-      //for (size_t iOfFunction = 0; iOfFunction < flowCV_->nbOfFunctions(); iOfFunction++)
+      //for (int iOfFunction = 0; iOfFunction < flowCV_->nbOfFunctions(); iOfFunction++)
 		//		outCorrelation_  << " " << flowCV_->autocorrelationB2(i, iOfFunction) - pow(flowCV_->correlationB2(iOfFunction), 2)
 		//			<< " " << (integralFlowB2(iOfFunction) += flowCV_->autocorrelationB2(i, iOfFunction)*timeStep());
 			outCorrelation() << " " << bendistProfile_(i, midNb) - pow(bendistProfile_.mean(midNb), 2)
@@ -592,27 +592,27 @@ namespace simol{
     }
   }
  
- 	void Output::appendKinTempProfile(double value, size_t iOfIteration, size_t iOfParticle)
+ 	void Output::appendKinTempProfile(double value, int iOfIteration, int iOfParticle)
 	{
 		kinTempProfile_.append(value, iOfIteration, iOfParticle);
 	}
 	
-	void Output::appendPotTempTopProfile(double value, size_t iOfIteration, size_t iOfParticle)
+	void Output::appendPotTempTopProfile(double value, int iOfIteration, int iOfParticle)
 	{
 		potTempTopProfile_.append(value, iOfIteration, iOfParticle);
 	}
 	
-		 	void Output::appendPotTempBotProfile(double value, size_t iOfIteration, size_t iOfParticle)
+		 	void Output::appendPotTempBotProfile(double value, int iOfIteration, int iOfParticle)
 	{
 		potTempBotProfile_.append(value, iOfIteration, iOfParticle);
 	}
 	
-	void Output::appendBendistProfile(double value, size_t iOfIteration, size_t iOfParticle)
+	void Output::appendBendistProfile(double value, int iOfIteration, int iOfParticle)
 	{
 		bendistProfile_.append(value, iOfIteration, iOfParticle);
 	}
 	
-	void Output::appendFlowProfile(double value, size_t iOfIteration, size_t iOfParticle)
+	void Output::appendFlowProfile(double value, int iOfIteration, int iOfParticle)
 	{
 		flowProfile_.append(value, iOfIteration, iOfParticle);
 	}

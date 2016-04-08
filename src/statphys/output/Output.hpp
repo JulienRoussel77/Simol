@@ -14,19 +14,25 @@ namespace simol
   
   class Output
   {
-  public:
+  protected:
     string outputFolderName_;
     std::shared_ptr<ofstream> outObservables_;
     std::shared_ptr<ofstream> outParticles_;
-    std::shared_ptr<ofstream> outParticlesXMakeMol_;
-    std::shared_ptr<ofstream> outFinalVelocity_;
     std::shared_ptr<ofstream> outCorrelation_;
-    std::shared_ptr<ofstream> outVelocitiesCV_;
+    
+    //-- xmakemol outputs for NBody --
+    std::shared_ptr<ofstream> outParticlesXMakeMol_;
+    
+    //-- average velocity for Isolated --
+    std::shared_ptr<ofstream> outFinalVelocity_;
+    
+    //-- control variate outputs --
     std::shared_ptr<ofstream> outVelocitiesGenerator_;
+    std::shared_ptr<ofstream> outVelocitiesCV_;
     std::shared_ptr<ofstream> outForcesCV_;
     std::shared_ptr<ofstream> outLengthsCV_;
     
-    //For the chains
+    //-- for chains --
     std::shared_ptr<ofstream> outFinalFlow_;
     std::shared_ptr<ofstream> outBeam_;
     std::shared_ptr<ofstream> outChainVelocities_;
@@ -39,13 +45,15 @@ namespace simol
     
     string profilePath_;
     
-    size_t periodNbOfIterations_, profilePeriodNbOfIterations_;
+    //-- input parameters useful for output --
+    int periodNbOfIterations_, profilePeriodNbOfIterations_;
     double timeStep_;
     int dimension_;
-    size_t nbOfParticles_;
-    size_t nbOfIterations_;
+    int nbOfParticles_;
+    int nbOfIterations_;
     double latticeParameter_;
     
+    //-- fields to output --
     double kineticEnergy_;
     double potentialEnergy_;
     double internalEnergy_;
@@ -53,9 +61,11 @@ namespace simol
     double energyMidFlow_;
     double energySumFlow_;
     
-    size_t decorrelationNbOfIterations_;
+    //-- parametrization of outputs --
+    int decorrelationNbOfIterations_;
     int nbOfAutocoPts_;
     bool doFinalFlow_, doFinalVelocity_;
+    
   public:
     
     ControlVariate* velocityCV_;
@@ -95,12 +105,12 @@ namespace simol
     const double& timeStep() const;
     double& timeStep();
     double period() const;
-    const size_t& periodNbOfIterations() const;
-    const size_t& profilePeriodNbOfIterations() const;
-    bool doOutput(size_t iOfIteration) const;
-    bool doProfileOutput(size_t iOfIteration) const;
-    const size_t& nbOfParticles() const;
-    const size_t& nbOfIterations() const;
+    const int& periodNbOfIterations() const;
+    const int& profilePeriodNbOfIterations() const;
+    bool doOutput(int iOfIteration) const;
+    bool doProfileOutput(int iOfIteration) const;
+    const int& nbOfParticles() const;
+    const int& nbOfIterations() const;
     double finalTime() const;
     
     const double& kineticEnergy() const;
@@ -129,19 +139,19 @@ namespace simol
       Vector<double> const& responseForces() const;
       double& responseForces(const int& i);
       const double& responseForces(const int& i) const;*/
-    const size_t& decorrelationNbOfIterations() const;
-    size_t& decorrelationNbOfIterations();
+    const int& decorrelationNbOfIterations() const;
+    int& decorrelationNbOfIterations();
     double decorrelationTime() const;
     
-    void writeProfile(ofstream & out_, size_t iOfIteration);
+    void writeProfile(ofstream & out_, int iOfIteration);
     //double& integratedAutocorrelationP();
-    //void display(vector<Particle> const& configuration, size_t iOfIteration);
-    void displayObservables(size_t iOfIteration);
-    void displayChainMomenta(vector<Particle> const& configuration, size_t iOfIteration);
-    void displayChainPositions(vector<Particle> const& configuration, size_t iOfIteration);
-    void displayParticles(vector<Particle> const& configuration, size_t iOfIteration);
-    void displayParticlesXMakeMol(vector<Particle> const& configuration, size_t iOfIteration, double domainSize=0);
-    void displayProfile(size_t iOfIteration);
+    //void display(vector<Particle> const& configuration, int iOfIteration);
+    void displayObservables(int iOfIteration);
+    void displayChainMomenta(vector<Particle> const& configuration, int iOfIteration);
+    void displayChainPositions(vector<Particle> const& configuration, int iOfIteration);
+    void displayParticles(vector<Particle> const& configuration, int iOfIteration);
+    void displayParticlesXMakeMol(vector<Particle> const& configuration, int iOfIteration, double domainSize=0);
+    void displayProfile(int iOfIteration);
     
     void finalDisplayAutocorrelations();
     void finalDisplay(vector<Particle> const& configuration, Vector<double> const& externalForce);
@@ -158,14 +168,14 @@ namespace simol
     void updateControlVariate(vector<Particle> const& configuration);
     
     //------------ profils pour chaines --------------
-    void appendKinTempProfile(double value, size_t iOfIteration, size_t iOfParticle);
-    void appendPotTempTopProfile(double value, size_t iOfIteration, size_t iOfParticle);
-    void appendPotTempBotProfile(double value, size_t iOfIteration, size_t iOfParticle);
-    void appendBendistProfile(double value, size_t iOfIteration, size_t iOfParticle);
-    void appendFlowProfile(double value, size_t iOfIteration, size_t iOfParticle);
+    void appendKinTempProfile(double value, int iOfIteration, int iOfParticle);
+    void appendPotTempTopProfile(double value, int iOfIteration, int iOfParticle);
+    void appendPotTempBotProfile(double value, int iOfIteration, int iOfParticle);
+    void appendBendistProfile(double value, int iOfIteration, int iOfParticle);
+    void appendFlowProfile(double value, int iOfIteration, int iOfParticle);
   
     //------------- pour DPDE ---------------
-    void displayObservablesDPDE(vector<Particle> const& configuration, size_t iOfIteration);
+    void displayObservablesDPDE(vector<Particle> const& configuration, int iOfIteration);
   };
 
 }

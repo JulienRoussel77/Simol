@@ -15,7 +15,7 @@ namespace simol
   }
   
   ///
-  ///Destrucor
+  ///Destructor
   System::~System()
   {
     delete potential_;
@@ -26,28 +26,42 @@ namespace simol
     cout << "SystemType = System" << endl;
   }
 
+  const Particle& System::getParticle(int index) const
+  { 
+    return configuration_[index]; 
+  }
   
-  const Particle& System::getParticle(size_t index) const
-  { return configuration_[index]; }
+  Particle& System::getParticle(int index) 
+  { 
+    return configuration_[index]; 
+  }
   
-  Particle& System::getParticle(size_t index) 
-  { return configuration_[index]; }
-  
-  const size_t& System::dimension() const
+  const int& System::dimension() const
   {
     return dimension_;
   }
   
   const std::vector< Particle > & System::configuration() const
-  { return configuration_; }
+  { 
+    return configuration_; 
+  }
   
   std::vector< Particle > & System::configuration() 
   { return configuration_; }
   
-  size_t System::nbOfParticles() const
+  int System::nbOfParticles() const
   {
     return configuration_.size();
   }
+  
+  //-------------- Random numbers ----------------
+  
+  const std::shared_ptr<RNG>& System::rng() const {return rng_;}
+
+  std::shared_ptr<RNG>& System::rng() {return rng_;}
+  
+  
+  //----------------- Potential and forces ---------------
   
   ///
   ///Returns by value the potential of the dynamics
@@ -87,12 +101,6 @@ namespace simol
     return potential_->laplacian(position); 
   }
   
-    
-  const std::shared_ptr<RNG>& System::rng() const {return rng_;}
-
-  std::shared_ptr<RNG>& System::rng() {return rng_;}
-  
-  
   ///
   ///Read-only accessor for the external force
   Vector<double> const& System::externalForce() const {return potential_->externalForce();}
@@ -104,12 +112,7 @@ namespace simol
   double const& System::externalForce(int const& i) const {return potential_->externalForce(i);}
   ///
   ///Write-read accessor for the i-th component of the external force
-  double& System::externalForce(int const& i) {return potential_->externalForce(i);}
-  
-   
-  
-  double System::boundaryPotEnergy() const
-  {return 0;}
+  double& System::externalForce(int const& i) {return potential_->externalForce(i);}  
   
   ///
   ///Draw a momentum under the invariant measure at inverse temperature "localBeta"
@@ -123,29 +126,18 @@ namespace simol
   {
     return potential_->drawLaw(localBeta, rng_);
   }
-  ///Compute the mean distance or bending under the invariant measure
-  ///Proceeds to a simple integral quadrature using rectangles
-  double System::computeMeanPotLaw(double localBeta) const
-  {
-    double repFunc = 0;
-    double qInteg = 0;
-    size_t nbIntegrationNodes = 1000;
-    double step = 8. / nbIntegrationNodes;
-    Vector<double> deltaQ(1);
-    for (size_t iOfNode = 0; iOfNode < nbIntegrationNodes; iOfNode++)
-    {
-      deltaQ(0) = - 4 + iOfNode * step;
-      repFunc += exp(-localBeta * potential(deltaQ));
-      qInteg += deltaQ(0) * exp(-localBeta * potential(deltaQ));
-    }
-    return qInteg / repFunc;
-  }
   
   void System::thermalize(Dynamics& /*model*/)
   {throw std::invalid_argument("thermalize not defined");}
   
   void System::computeAllForces()
   {throw std::invalid_argument("thermalize not defined");}
+  
+  //--------------- move into chain -----------------
+  
+    double System::boundaryPotEnergy() const
+  {return 0;}
+
   
   ///Computes the force and the energy associated to this pair interaction, and updates these 2 fields
   ///The first 2 derivates of the potential are stored in "particle2"
@@ -163,22 +155,28 @@ namespace simol
     particle2.energyLapla() = lapla12;    // v"(q_2 - q_1)
   }
   
+  ///Compute the mean distance or bending under the invariant measure
+  ///Proceeds to a simple integral quadrature using rectangles
+  double System::computeMeanPotLaw(double localBeta) const
+  {
+    double repFunc = 0;
+    double qInteg = 0;
+    int nbIntegrationNodes = 1000;
+    double step = 8. / nbIntegrationNodes;
+    Vector<double> deltaQ(1);
+    for (int iOfNode = 0; iOfNode < nbIntegrationNodes; iOfNode++)
+    {
+      deltaQ(0) = - 4 + iOfNode * step;
+      repFunc += exp(-localBeta * potential(deltaQ));
+      qInteg += deltaQ(0) * exp(-localBeta * potential(deltaQ));
+    }
+    return qInteg / repFunc;
+  }
   
-  
-  void System::computeProfile(Output& /*output*/, Dynamics const& /*model*/, size_t /*iOfIteration*/) const 
-  {throw std::invalid_argument("System::computeProfile : Function undefined");} 
-  
-  
-
-  
-  //void System::computeFinalOutput(Output& /*output*/, Dynamics const& /*dyna*/)
-  //{throw std::invalid_argument("System::computeFinalOutput : Function undefined");}
-  
-
-  
-  
-  
- 
+  void System::computeProfile(Output& /*output*/, Dynamics const& /*model*/, int /*iOfIteration*/) const 
+  {
+    throw std::invalid_argument("System::computeProfile : Function undefined");
+  }  
   
 }
 

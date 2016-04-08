@@ -14,7 +14,7 @@ namespace simol
     //virtual void computeAllForces(Dynamics const& model);
     virtual void thermalize(Dynamics& model);
     virtual void thermalize(LangevinBase& dyna);
-    //virtual void computeProfile(Output& output, Dynamics const& model, size_t iOfIteration) const;
+    //virtual void computeProfile(Output& output, Dynamics const& model, int iOfIteration) const;
     //virtual void writeFinalOutput(Output& output, Dynamics const& model);
   };
   
@@ -24,8 +24,8 @@ namespace simol
   public:
     BiChain(Input const& input);
     void computeAllForces();
-    virtual void computeProfile(Output& output, Dynamics const& dyna, size_t iOfIteration) const;
-    virtual void computeProfile(Output& output, LangevinBase const& model, size_t iOfIteration) const;
+    virtual void computeProfile(Output& output, Dynamics const& dyna, int iOfIteration) const;
+    virtual void computeProfile(Output& output, LangevinBase const& model, int iOfIteration) const;
     //virtual void writeFinalOutput(Output& output, Dynamics const& model);
   };
   
@@ -38,8 +38,8 @@ namespace simol
     void triInteraction(Particle& particle1, Particle& particle2, Particle& particle3) const;
     void computeAllForces();     
     virtual double boundaryPotEnergy() const;
-    virtual void computeProfile(Output& output, Dynamics const& dyna, size_t iOfIteration) const;
-    virtual void computeProfile(Output& output, LangevinBase const& model, size_t iOfIteration) const;
+    virtual void computeProfile(Output& output, Dynamics const& dyna, int iOfIteration) const;
+    virtual void computeProfile(Output& output, LangevinBase const& model, int iOfIteration) const;
     //virtual void writeFinalOutput(Output& output, Dynamics const& model);
   };
   

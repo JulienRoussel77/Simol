@@ -30,7 +30,7 @@ namespace simol
 	{
 		DenseMatrix<double> Asad = DenseMatrix<double>::Zero(A.numberOfRows()+1, A.numberOfColumns()+1);
 		Asad.block(0, 0, A.numberOfRows(), A.numberOfColumns()) = A.block(0, 0, A.numberOfRows(), A.numberOfColumns());
-		for (size_t iOfFourier2=0; iOfFourier2 <= 2*maxOfFourier_; iOfFourier2++)
+		for (int iOfFourier2=0; iOfFourier2 <= 2*maxOfFourier_; iOfFourier2++)
 		{
 			Asad(A.numberOfRows(), iTens(iOfFourier2, 0)) = expFourierCoeffs(iOfFourier2);
 			Asad(iTens(iOfFourier2, 0), A.numberOfColumns()) = expFourierCoeffs(iOfFourier2);
@@ -130,14 +130,14 @@ namespace simol
     
 
     
-    for (std::size_t jOfA=0; jOfA<A.numberOfColumns(); ++jOfA)
+    for (int jOfA=0; jOfA<(int)A.numberOfColumns(); ++jOfA)
     {
       for (SMat::iterator it(A,jOfA); it; ++it)
       {
 				int iOfA = it.row();
 				double valOfA = it.value();
         cout << "truc : " << it.row() << " " << it.col() << " " << it.value() << endl;
-				for (std::size_t jOfB=0; jOfB < B.numberOfColumns(); jOfB++)
+				for (int jOfB=0; jOfB < (int)B.numberOfColumns(); jOfB++)
 				{	
           for (SMat::iterator it2(B, jOfB); it2; ++it2)
 					{
@@ -168,7 +168,7 @@ namespace simol
 
 	void displayCplx(const Vector<cplx>& X, ostream& out)
 	{
-		for (int i=0; (size_t) i < X.size(); i++)
+		for (int i=0; i < (int) X.size(); i++)
 			out << real(X(i)) << " " << imag(X(i)) << endl;
 	}
 	
@@ -181,9 +181,9 @@ namespace simol
 	
 	void display(const DenseMatrix<double>& A, ostream& out)
 	{
-		for (int i=0; (size_t) i < A.numberOfRows(); i++)
+		for (int i=0; i < (int) A.numberOfRows(); i++)
 		{
-			for (int j=0; (size_t) j < A.numberOfColumns(); j++)			
+			for (int j=0; j < (int) A.numberOfColumns(); j++)			
 			{
 				if (true)//fabs(A(i,j)) > 1e-15)
 				{
@@ -290,7 +290,7 @@ namespace simol
 	
 	void Galerkin::createP()
 	{
-		for (size_t iOfHermite=1; iOfHermite < nbOfHermite_; iOfHermite++)
+		for (int iOfHermite=1; iOfHermite < nbOfHermite_; iOfHermite++)
 			//P_(iOfHermite, iOfHermite+1) = cplx(sqrt(beta_) * sqrt(iOfHermite+1.), 0.);
 			P_(iOfHermite-1, iOfHermite) = sqrt(beta_*iOfHermite);
 		
@@ -342,8 +342,8 @@ namespace simol
 	{		
     
     SMat A = speye<double>(2,2);
-    for (std::size_t jOfA=0; jOfA<A.numberOfColumns(); ++jOfA)
-      for (std::size_t iOfA=0; iOfA<A.numberOfRows(); ++iOfA)
+    for (int jOfA=0; jOfA< (int) A.numberOfColumns(); ++jOfA)
+      for (int iOfA=0; iOfA< (int) A.numberOfRows(); ++iOfA)
         cout << A(iOfA,jOfA) << endl;
       
 
@@ -401,7 +401,7 @@ namespace simol
 	
 	//psi = (1,1  1,2  ...  1,N_H  2,1 ... )
 	//N_H blocks of size N_G (we concatene the columns of the matrix)
-	size_t Galerkin::iTens(size_t iOfFourier2, size_t iOfHermite) const
+	int Galerkin::iTens(int iOfFourier2, int iOfHermite) const
 	{
 		assert(iOfFourier2 < nbOfFourier_	&& iOfHermite < nbOfHermite_);
 		return nbOfFourier_ * iOfHermite + iOfFourier2;
@@ -448,7 +448,7 @@ namespace simol
 		
 		
 		/*DVec H1(sizeOfBasis_);
-		for (size_t iOfFourier2=0; iOfFourier2 <= 2*maxOfFourier_; iOfFourier2++)
+		for (int iOfFourier2=0; iOfFourier2 <= 2*maxOfFourier_; iOfFourier2++)
 			H1(iTens(iOfFourier2, 1)) = expFourierCoeffs_[iOfFourier2];*/
 		
 		cout << "############ H1Mat ############" << endl;
@@ -665,7 +665,7 @@ namespace simol
 		//psi = (1,1  1,2  ...  1,N_H  2,1 ... )
 	//N_H blocks of size N_G (we concatene the columns of the matrix)
 	//Allows to access elements involving a single particle !
-	size_t BoundaryLangevinGalerkin::iTens(size_t iOfFourier2, size_t iOfHermite, int iOfParticle) const
+	int BoundaryLangevinGalerkin::iTens(int iOfFourier2, int iOfHermite, int iOfParticle) const
 	{
 		assert(iOfFourier2 < nbOfFourier_	&& iOfHermite < nbOfHermite_ && iOfParticle < nbOfParticles_);
 		return pow(nbOfFourier_*nbOfHermite_ ,iOfParticle) * ( nbOfFourier_ * iOfHermite + iOfFourier2);

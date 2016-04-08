@@ -11,8 +11,6 @@ namespace simol
     Isolated(Input const& input);
     void printName() const;
     void computeAllForces();
-    //void computeFinalOutput(Output& /*output*/, Dynamics const& /*dyna*/);
-    //void writeFinalOutput(Output& output, Dynamics const& model);
   };
 
 

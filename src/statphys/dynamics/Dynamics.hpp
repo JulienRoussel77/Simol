@@ -22,18 +22,22 @@ namespace simol
     
     virtual void printName() const;
     
-    // Accessors
+    //-- time steps and iterations --
     double& timeStep();
     const double& timeStep() const;
-    size_t& nbOfIterations();
-    size_t const& nbOfIterations() const;
+    int& nbOfIterations();
+    int const& nbOfIterations() const;
     double finalTime() const;
-    size_t& nbOfThermalIterations();
-    size_t const& nbOfThermalIterations() const;
-    size_t& nbOfBurningIterations();
-    size_t const& nbOfBurningIterations() const;
+    int& nbOfThermalIterations();
+    int const& nbOfThermalIterations() const;
+    int& nbOfBurningIterations();
+    int const& nbOfBurningIterations() const;
+    
+    //-- random numbers ---
     std::shared_ptr<RNG> const& rng() const;
     std::shared_ptr<RNG>& rng();
+    
+    //-- (inverse) temperatures --
     virtual const double&  temperature() const;
     virtual const double& temperatureLeft() const;
     virtual const double& temperatureRight() const;
@@ -41,15 +45,12 @@ namespace simol
     virtual const double& beta() const;
     virtual const double& betaLeft() const;
     virtual const double& betaRight() const;
-    //Vector<double>& externalForce() ;
-    //Vector<double> const& externalForce() const;
+    
+    //-- external forces --
     double& externalForce(const int& i);
     double const& externalForce(const int& i) const;
-    Galerkin* galerkin();
-    
-      
-    //void resetForce(Particle& particle) const;
-    
+  
+    //-- for numerical integration --
     void verletFirstPart(Particle& particle);
     void verletSecondPart(Particle& particle);
     virtual void updateBefore(Particle& particle);
@@ -57,12 +58,16 @@ namespace simol
     virtual bool doMomentaExchange() const {return false;};
     virtual void updateMomentaExchange(Particle& /*particle1*/, Particle& /*particle2*/){assert(false);};
     virtual void bending(Particle& /*particle1*/, Particle& /*particle2*/) const {};
+    
+    //-- control variates --
+    Galerkin* galerkin();
+    
   protected:
+    
     double timeStep_;
-    size_t nbOfIterations_, nbOfThermalIterations_, nbOfBurningIterations_;
+    int nbOfIterations_, nbOfThermalIterations_, nbOfBurningIterations_;
     double beta_;
     double temperature_;
-    //double timeStep;
     std::shared_ptr<RNG> rng_;
     Galerkin* galerkin_;
   };

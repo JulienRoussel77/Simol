@@ -3,38 +3,38 @@
 namespace simol
 {
 	
-	TVec::TVec(vector<size_t>& nbOfElts0):
+	TVec::TVec(vector<int>& nbOfElts0):
 		nbOfElts_(nbOfElts0)
 	{}
 	
-	size_t TVec::nbOfVariables()
+	int TVec::nbOfVariables()
 	{
 		return nbOfElts_.size();
 	}
 	
-	size_t const& TVec::nbOfElts(size_t iOfVariable) const
+	int const& TVec::nbOfElts(int iOfVariable) const
 	{
 		return nbOfElts_[iOfVariable];
 	}
 	
-	size_t& TVec::nbOfElts(size_t iOfVariable)
+	int& TVec::nbOfElts(int iOfVariable)
 	{
 		return nbOfElts_[iOfVariable];
 	}
 	
-	vector<size_t> const& TVec::nbOfElts() const
+	vector<int> const& TVec::nbOfElts() const
 	{
 		return nbOfElts_;
 	}
 	
-	vector<size_t>& TVec::nbOfElts()
+	vector<int>& TVec::nbOfElts()
 	{
 		return nbOfElts_;
 	}
 	
-	size_t TVec::iTens(vector<size_t>& vecOfElt) const
+	int TVec::iTens(vector<int>& vecOfElt) const
 	{
-		size_t iTensOfElt = vecOfElt[vecOfElt.size() - 1];
+		int iTensOfElt = vecOfElt[vecOfElt.size() - 1];
 		for (int iOfVariable = vecOfElt.size() - 2; iOfVariable >= 0; iOfVariable--)
 		{
 			iTensOfElt *= nbOfElts(iOfVariable+1);
@@ -45,39 +45,39 @@ namespace simol
 	
 	
 	
-	DTVec::DTVec(vector<size_t>& nbOfElts0):
+	DTVec::DTVec(vector<int>& nbOfElts0):
 		TVec(nbOfElts0),
 		data_(product(nbOfElts0))
 	{}
 	
-	size_t DTVec::size() const
+	int DTVec::size() const
 	{
 		return data_.size();
 	}
 	
-	const double& DTVec::operator()(vector<size_t>& vecIndex) const
+	const double& DTVec::operator()(vector<int>& vecIndex) const
 	{
 		return data_(iTens(vecIndex));
 	}
 	
-	double& DTVec::operator()(vector<size_t>& vecIndex)
+	double& DTVec::operator()(vector<int>& vecIndex)
 	{
 		return data_(iTens(vecIndex));
 	}
 	
-	const double& DTVec::operator()(size_t iTensOfElt) const
+	const double& DTVec::operator()(int iTensOfElt) const
 	{
 		return data_(iTensOfElt);
 	}
 	
-	double& DTVec::operator()(size_t iTensOfElt)
+	double& DTVec::operator()(int iTensOfElt)
 	{
 		return data_(iTensOfElt);
 	}
 	
-	size_t product(vector<size_t>& nbOfElts)
+	int product(vector<int>& nbOfElts)
 	{
-		size_t result = 1;
+		int result = 1;
 		for (int iOfVariable = 0; iOfVariable < (int)nbOfElts.size(); iOfVariable++)
 		{
 			result *= nbOfElts[iOfVariable];
@@ -85,7 +85,7 @@ namespace simol
 		return result;
 	}
 	
-	/*DTVec product(DMat& A, DTVec& X, size_t iOfVariable)
+	/*DTVec product(DMat& A, DTVec& X, int iOfVariable)
 	{
 		DTVec AX(X.nbOfElts());
 		return AX;
@@ -93,28 +93,28 @@ namespace simol
 	
 	
 	
-	Basis::Basis(const size_t nbOfElts):
+	Basis::Basis(const int nbOfElts):
 		nbOfElts_(nbOfElts)
 	{}
 
-	size_t const& Basis::nbOfElts() const
+	int const& Basis::nbOfElts() const
 	{
 		return nbOfElts_;
 	}
 	
-	size_t& Basis::nbOfElts()
+	int& Basis::nbOfElts()
 	{
 		return nbOfElts_;
 	}
 	
 	
-	FourierBasis::FourierBasis(const size_t nbOfElts):
+	FourierBasis::FourierBasis(const int nbOfElts):
 		Basis(nbOfElts)
 	{
 		assert(nbOfElts % 2 == 1);
 	}
 	
-	size_t FourierBasis::nbOfFreq() const
+	int FourierBasis::nbOfFreq() const
 	{
 		return (nbOfElts_-1)/2;
 	}
@@ -152,7 +152,7 @@ namespace simol
 			return - sqrt(2.) * pow(iOfFreq, 2) * cos(iOfFreq * variable);
 	}
 	
-	ExpFourierBasis::ExpFourierBasis(const size_t nbOfElts0, double beta0, Potential& potential0):
+	ExpFourierBasis::ExpFourierBasis(const int nbOfElts0, double beta0, Potential& potential0):
 		Basis(nbOfElts0),
 		beta_(beta0),
 		potential_(&potential0),
@@ -160,30 +160,30 @@ namespace simol
 		qRepartitionFct_(0),
 		expFourierCoeffs_(2 * nbOfElts0)
 	{
-		//cout << "ExpFourierBasis(const size_t nbOfElts0, double beta0, Potential& potential0)" << endl;
+		//cout << "ExpFourierBasis(const int nbOfElts0, double beta0, Potential& potential0)" << endl;
 		assert(nbOfElts0 % 2 == 1);
 				
 	//We compute the real Fourier coefficients of the function C^-1 exp(-\beta V(q)/2)
 	//where C = ExpFourierBasis::basisCoefficient_
 		double step = 2 * M_PI / (double)nbOfIntegrationNodes_;
-		for (size_t iOfNode = 0; iOfNode < nbOfIntegrationNodes_; iOfNode++)
+		for (int iOfNode = 0; iOfNode < nbOfIntegrationNodes_; iOfNode++)
 		{
 			double q = - M_PI + iOfNode * step;
 			qRepartitionFct_ += exp(-beta_ * potential(q));
 			expFourierCoeffs_[0] += sqrt(2) * exp(-beta_ * potential(q)/2);
-			for (size_t iOfFourier=1; iOfFourier <= 2*nbOfFreq(); iOfFourier++)
+			for (int iOfFourier=1; iOfFourier <= 2*nbOfFreq(); iOfFourier++)
 			{
 				//cout << q << " -> " << potential(q) << endl;
 				expFourierCoeffs_[2 * iOfFourier] += sqrt(2) * cos(iOfFourier * q) * exp(-beta_ * potential(q)/2);
 				//if (iOfFourier == 1)
 					//cout << q << " " << expFourierCoeffs_[2 * iOfFourier] << endl;
 			}
-			for (size_t iOfFourier=1; iOfFourier <= 2*nbOfFreq(); iOfFourier++)
+			for (int iOfFourier=1; iOfFourier <= 2*nbOfFreq(); iOfFourier++)
 				expFourierCoeffs_[2 * iOfFourier-1] += sqrt(2) * sin(iOfFourier * q) * exp(-beta_ * potential(q)/2);
 		}
 		qRepartitionFct_ *= step / (2*M_PI);
 		basisCoefficient_ = sqrt(qRepartitionFct_);
-		for (size_t iOfFourier2=0; iOfFourier2 <= 4 * nbOfFreq(); iOfFourier2++)
+		for (int iOfFourier2=0; iOfFourier2 <= 4 * nbOfFreq(); iOfFourier2++)
 		{
 			expFourierCoeffs_[iOfFourier2] *= step / (2*M_PI*basisCoefficient_);
 			//cout << "coeff n°"<< iOfFourier2 << " = " << expFourierCoeffs_[iOfFourier2] << endl;
@@ -192,7 +192,7 @@ namespace simol
 		//cout << "basisCoefficient_ = " << basisCoefficient_ << endl;
 	}
 	
-	size_t ExpFourierBasis::nbOfFreq() const
+	int ExpFourierBasis::nbOfFreq() const
 	{
 		return (nbOfElts_-1)/2;
 	}
@@ -256,13 +256,13 @@ namespace simol
 												+ (beta_/2 * potLapla(variable) + pow(beta_, 2)/4 * pow(potDeriv(variable), 2) - pow(iOfFreq, 2)) * cos(iOfFreq * variable)) * expo;
 	}
 	
-	HermiteBasis::HermiteBasis(const size_t nbOfElts0, double beta0)
+	HermiteBasis::HermiteBasis(const int nbOfElts0, double beta0)
   : Basis(nbOfElts0),
 		beta_(beta0),
 		polyCoeffs_(zero<double>(nbOfElts0, nbOfElts0))
 		//polyCoeffs_(DenseMatrix<double>::Zero(nbOfElts0, nbOfElts0))
 	{
-		//cout << "HermiteBasis(const size_t nbOfElts0)" << endl;
+		//cout << "HermiteBasis(const int nbOfElts0)" << endl;
 		polyCoeffs_(0,0) = 1;
 		polyCoeffs_(1,1) = beta_;
 		for (int iOfElt = 2; iOfElt < (int)nbOfElts0; iOfElt++)
@@ -305,7 +305,7 @@ namespace simol
 	
 			
 	
-	TensorBasis::TensorBasis(const size_t nbOfVariables0):
+	TensorBasis::TensorBasis(const int nbOfVariables0):
 		bases_(nbOfVariables0)
 	{
 	}
@@ -316,24 +316,24 @@ namespace simol
 			delete bases_[iOfVariable];
 	}
 	
-	size_t TensorBasis::nbOfVariables() const
+	int TensorBasis::nbOfVariables() const
 	{
 		return bases_.size();
 	}
 
-	size_t const& TensorBasis::nbOfElts(const int iOfVariable) const
+	int const& TensorBasis::nbOfElts(const int iOfVariable) const
 	{
 		return bases_[iOfVariable]->nbOfElts();
 	}
 	
-	size_t& TensorBasis::nbOfElts(const int iOfVariable)
+	int& TensorBasis::nbOfElts(const int iOfVariable)
 	{
 		return bases_[iOfVariable]->nbOfElts();
 	}
 	
-	vector<size_t> TensorBasis::nbOfElts() const
+	vector<int> TensorBasis::nbOfElts() const
 	{
-		vector<size_t> nbOfElts0(nbOfVariables());
+		vector<int> nbOfElts0(nbOfVariables());
 		for (int iOfVariable = 0; iOfVariable < (int)nbOfVariables(); iOfVariable++)
 			nbOfElts0[iOfVariable] = bases_[iOfVariable]->nbOfElts();
 		return nbOfElts0;
@@ -356,62 +356,62 @@ namespace simol
 		//cout << "QPBasis()" << endl;
 	}
 	
-	/*QPBasis::QPBasis(const size_t nbOfFourier0, const size_t nbOfHermite0):
+	/*QPBasis::QPBasis(const int nbOfFourier0, const int nbOfHermite0):
 		TensorBasis(2)
 	{
 		bases_[0] = new ExpFourierBasis(nbOfFourier0);
 		bases_[1] = new HermiteBasis(nbOfHermite0);
 	}*/
 	
-	size_t& QPBasis::nbOfFourier()
+	int& QPBasis::nbOfFourier()
 	{
 		return nbOfElts(0);
 	}
 	
-	const size_t& QPBasis::nbOfFourier() const
+	const int& QPBasis::nbOfFourier() const
 	{
 		return nbOfElts(0);
 	}
 	
-	size_t& QPBasis::nbOfHermite()
+	int& QPBasis::nbOfHermite()
 	{
 		return nbOfElts(1);
 	}
 	
-	const size_t& QPBasis::nbOfHermite() const
+	const int& QPBasis::nbOfHermite() const
 	{
 		return nbOfElts(1);
 	}
 	
 	//psi = (1,1  1,2  ...  1,N_H  2,1 ... )
 	//N_H blocks of size N_G (we concatene the columns of the matrix)
-	size_t QPBasis::iTens(size_t iOfFourier2, size_t iOfHermite) const
+	int QPBasis::iTens(int iOfFourier2, int iOfHermite) const
 	{
 		assert(iOfFourier2 < nbOfFourier()	&& iOfHermite < nbOfHermite());
 		return nbOfFourier() * iOfHermite + iOfFourier2;
 	}
 	
-	vector<size_t> QPBasis::vecTens(size_t iTens0) const
+	vector<int> QPBasis::vecTens(int iTens0) const
 	{
 		assert(iTens0 < nbOfHermite() * nbOfFourier());
-		vector<size_t> vecIndex(2);
+		vector<int> vecIndex(2);
 		vecIndex[0] = iTens0 % nbOfFourier();
 		vecIndex[1] = iTens0 / nbOfFourier();
 		return vecIndex;
 	}
 	
-	double QPBasis::value(vector<Particle> const& configuration, const size_t iOfElt) const
+	double QPBasis::value(vector<Particle> const& configuration, const int iOfElt) const
 	{
-		vector<size_t> vecIndex = vecTens(iOfElt);
+		vector<int> vecIndex = vecTens(iOfElt);
 		return value(configuration, vecIndex);
 	}
 	
-	double QPBasis::value(vector<Particle> const& configuration, vector<size_t>& vecIndex) const
+	double QPBasis::value(vector<Particle> const& configuration, vector<int>& vecIndex) const
 	{
 		return bases_[0]->value(configuration[0].position(0), vecIndex[0]) * bases_[1]->value(configuration[0].momentum(0), vecIndex[1]);
 	}
 	
-	Vector<double> QPBasis::gradientQ(vector<Particle> const& configuration, size_t /*iOfParticle*/, vector<size_t>& vecIndex) const
+	Vector<double> QPBasis::gradientQ(vector<Particle> const& configuration, int /*iOfParticle*/, vector<int>& vecIndex) const
 	{
 		//cout << "QPBasis::gradientQ" << endl;
 		//cout << vecIndex[0] << " " << vecIndex[1] << endl;
@@ -421,25 +421,25 @@ namespace simol
 					* bases_[1]->value(configuration[0].momentum(0), vecIndex[1]);
 	}	
 		
-	Vector<double> QPBasis::gradientQ(vector<Particle> const& configuration, size_t iOfParticle, size_t iOfCoeff) const
+	Vector<double> QPBasis::gradientQ(vector<Particle> const& configuration, int iOfParticle, int iOfCoeff) const
 	{
-		vector<size_t> vecIndex = vecTens(iOfCoeff);
+		vector<int> vecIndex = vecTens(iOfCoeff);
 		return gradientQ(configuration, iOfParticle, vecIndex);
 	}
 		
-	double QPBasis::laplacianQ(vector<Particle> const& configuration, size_t /*iOfParticle*/, vector<size_t>& vecIndex) const
+	double QPBasis::laplacianQ(vector<Particle> const& configuration, int /*iOfParticle*/, vector<int>& vecIndex) const
 	{
 		return bases_[0]->laplacian(configuration[0].position(0), vecIndex[0]) 
 					* bases_[1]->value(configuration[0].momentum(0), vecIndex[1]);
 	}
 	
-	double QPBasis::laplacianQ(vector<Particle> const& configuration, size_t iOfParticle, size_t iOfCoeff) const
+	double QPBasis::laplacianQ(vector<Particle> const& configuration, int iOfParticle, int iOfCoeff) const
 	{
-		vector<size_t> vecIndex = vecTens(iOfCoeff);
+		vector<int> vecIndex = vecTens(iOfCoeff);
 		return laplacianQ(configuration, iOfParticle, vecIndex);
 	}
 	
-	Vector<double> QPBasis::gradientP(vector<Particle> const& configuration, size_t /*iOfParticle*/, vector<size_t>& vecIndex) const
+	Vector<double> QPBasis::gradientP(vector<Particle> const& configuration, int /*iOfParticle*/, vector<int>& vecIndex) const
 	{
 		//cout << bases_[0]->value(configuration[0].position(0), vecIndex[0]) << " X "
 		//		<< bases_[1]->gradient(configuration[0].momentum(0), vecIndex[1]) << endl;
@@ -447,21 +447,21 @@ namespace simol
 					* bases_[1]->gradient(configuration[0].momentum(0), vecIndex[1]);
 	}
 	
-	Vector<double> QPBasis::gradientP(vector<Particle> const& configuration, size_t iOfParticle, size_t iOfCoeff) const
+	Vector<double> QPBasis::gradientP(vector<Particle> const& configuration, int iOfParticle, int iOfCoeff) const
 	{
-		vector<size_t> vecIndex = vecTens(iOfCoeff);
+		vector<int> vecIndex = vecTens(iOfCoeff);
 		return gradientP(configuration, iOfParticle, vecIndex);
 	}
 	
-	double QPBasis::laplacianP(vector<Particle> const& configuration, size_t /*iOfParticle*/, vector<size_t>& vecIndex) const
+	double QPBasis::laplacianP(vector<Particle> const& configuration, int /*iOfParticle*/, vector<int>& vecIndex) const
 	{
 		return bases_[0]->value(configuration[0].position(0), vecIndex[0]) 
 					* bases_[1]->laplacian(configuration[0].momentum(0), vecIndex[1]);
 	}
 	
-	double QPBasis::laplacianP(vector<Particle> const& configuration, size_t iOfParticle, size_t iOfCoeff) const
+	double QPBasis::laplacianP(vector<Particle> const& configuration, int iOfParticle, int iOfCoeff) const
 	{
-		vector<size_t> vecIndex = vecTens(iOfCoeff);
+		vector<int> vecIndex = vecTens(iOfCoeff);
 		return laplacianP(configuration, iOfParticle, vecIndex);	
 	}
 	

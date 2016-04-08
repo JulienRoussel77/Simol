@@ -6,96 +6,71 @@
 #include <vector>
 
 #include "Potential.hpp"
-//#include "ode/verlet.hpp"
 #include "core/linalg/Vector.hpp"
 #include "core/random/RNG.hpp"
-
-
-
-//=====================
-// FORWARD DECLARATIONS
-//=====================
-
 
 namespace simol
 {
 
-  //==================
-  // CLASS DECLARATION
-  //==================
-
   class Particle
   {
 
-    //=============
-    // CONSTRUCTORS
-    //=============
-
-
     public:
-      //Particle();
       Particle(double const & mass, Vector<double> const & position, Vector<double> const & momentum);
       Particle(int dimension);
       Particle(double const & mass, double const & position, double const & momentum);
 
-    //==========
-    // ACCESSORS
-    //==========
-
-  public:
-    //Particle& operator= (Particle const& particle);
-    int dimension() const;
-    double const & mass() const;
-    Vector<double> const & position() const;
-    Vector<double> & position();
-    const double& position(int i) const;
-    double& position(int i);
-    Vector<double> const & momentum() const;
-    Vector<double> & momentum();
-    const double& momentum(int i) const;
-    double& momentum(int i);
-    double const & internalEnergy() const;
-    double & internalEnergy();
-    double const & virial() const;
-    double & virial();
-    double kineticEnergy() const;
-    //double& kineticEnergy();
-    const double& potentialEnergy() const;
-    double& potentialEnergy();
-    double energy() const;
-    Vector<double> const& force() const;
-    Vector<double>& force(); 
-    const double& force(size_t i) const;
-    double& force(size_t i); 
-    Vector<double> const& energyGrad() const;
-    Vector<double>& energyGrad();  
-    const double& energyGrad(int i) const;
-    double& energyGrad(int i);
-    const double& energyLapla() const;
-    double& energyLapla();  
-    Vector<double> velocity() const;
-    int const& countdown() const;
-    int& countdown();
+      int dimension() const;
+      double const & mass() const;
+      void resetForce(Potential const& pot);
     
-    void resetForce(Potential const& pot);
-    
-    //=============
-    // DATA MEMBERS
-    //=============
-
+      //-- access to primary variables --
+      Vector<double> const & position() const;
+      Vector<double> & position();
+      const double& position(int i) const;
+      double& position(int i);
+      Vector<double> const & momentum() const;
+      Vector<double> & momentum();
+      const double& momentum(int i) const;
+      double& momentum(int i);
+      double const & internalEnergy() const;
+      double & internalEnergy();
+      
+      //-- functions depending on the primary variables --
+      double kineticEnergy() const;
+      const double& potentialEnergy() const;
+      double& potentialEnergy();
+      double energy() const;
+      Vector<double> const& force() const;
+      Vector<double>& force(); 
+      const double& force(int i) const;
+      double& force(int i); 
+      double const & virial() const;
+      double & virial();
+      Vector<double> velocity() const;
+      
+      //-- currently specific for chains --
+      Vector<double> const& energyGrad() const;
+      Vector<double>& energyGrad();  
+      const double& energyGrad(int i) const;
+      double& energyGrad(int i);
+      const double& energyLapla() const;
+      double& energyLapla();  
+      int const& countdown() const;
+      int& countdown();
+      
     private:
     
-    double mass_;
-    Vector<double> position_;
-    Vector<double> momentum_;
-    double potentialEnergy_;
-    //double kineticEnergy_;
-    Vector<double> force_;
-    Vector<double> energyGrad_;
-    double energyLapla_;
-    int countdown_;
-    double internalEnergy_;
-    double virial_;   // to compute pressure
+      double mass_;
+      Vector<double> position_;
+      Vector<double> momentum_;
+      double potentialEnergy_;
+      Vector<double> force_;
+      Vector<double> energyGrad_;
+      double energyLapla_;
+      int countdown_;
+      double internalEnergy_;
+      double virial_;   // to compute pressure
   };
 
 

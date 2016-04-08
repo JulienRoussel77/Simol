@@ -23,8 +23,8 @@ namespace simol
 
 	protected:
 		int nbOfParticles_;
-		size_t nbOfFourier_, nbOfHermite_, maxOfFourier_;
-		size_t sizeOfBasis_;
+		int nbOfFourier_, nbOfHermite_, maxOfFourier_;
+		int sizeOfBasis_;
 		SMat SIdQ_, SIdP_;
 		DenseMatrix<double> DIdQ_, DIdP_;
 		SMat Q_, P_;
@@ -36,7 +36,7 @@ namespace simol
 		double beta_, gamma_;
 		double amplitude_;
 		double externalForce_;
-		size_t nbOfIntegrationNodes_;
+		int nbOfIntegrationNodes_;
 		DenseMatrix<double> trigToExpMat_, expToTrigMat_;
 		DenseMatrix<double> trigToExpTens_, expToTrigTens_;
 		Potential* potential_;
@@ -48,7 +48,7 @@ namespace simol
 		virtual int nbOfParticles() const;
 
 		const double& expFourierCoeffs(int iOfElt) const;
-		size_t iTens(size_t iOfFourier2, size_t iOfHermite) const;
+		int iTens(int iOfFourier2, int iOfHermite) const;
 		DenseMatrix<double> shapeSaddle(const DenseMatrix<double>& A) const;
 		DenseMatrix<double> unshapeSaddle(const DenseMatrix<double>& Asad) const;
 		DVec shapeSaddle(const DVec& X) const;
@@ -90,7 +90,7 @@ namespace simol
 		//SMat SId_;
 	public:
 		BoundaryLangevinGalerkin(Input const& input);
-		size_t iTens(size_t iOfFourier2, size_t iOfHermite, int iOfParticle) const;
+		int iTens(int iOfFourier2, int iOfHermite, int iOfParticle) const;
 		SMat PMatToTens(SMat const& PMat, int iOfParticleP);
 		SMat doubleMatToTens(SMat const& QMat, SMat const& PMat, int iOfParticleQ, int iOfParticleP);
 		virtual void computeExpToTrigTens();
