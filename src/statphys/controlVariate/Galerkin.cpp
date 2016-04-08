@@ -107,6 +107,7 @@ namespace simol
 	//															)
 	SMat kron(const SMat& A, const SMat& B)
 	{
+    cout << "kron(const SMat& A, const SMat& B)" << endl;
 		/*double a_1 = A.numberOfColumns() * (B.numberOfColumns() - 1)/(A.numberOfColumns() - 1);
 		double b_1 = a_1 - B.numberOfColumns();
 		double a_2 = A.numberOfRows() * (B.numberOfRows() - 1)/(A.numberOfRows() - 1);
@@ -117,10 +118,17 @@ namespace simol
 		cout << "We keep the coefficients such that j * (jOfB + " << b_1 << ") <= " << a_1 
 			<< " and such that i * (i2 + " << b_2 << ") <= " << a_2 << endl; */
 		SMat C(A.numberOfRows()*B.numberOfRows(), A.numberOfColumns()*B.numberOfColumns());
-		//cout << A.size() << endl << B.size() << endl;
+		cout << "A : " << A.numberOfRows() << "x" << A.numberOfColumns() << endl;
+    cout << A(0,0) << endl;
+    cout << "B : " << B.numberOfRows() << "x" << B.numberOfColumns() << endl;
+
 		//SMat C(A.size() % B.size());					//element-wise product of the dimensions
     //
-    C(0,0) = 1;
+    
+    //C(0,0) = 1;
+    
+    
+
     
     for (std::size_t jOfA=0; jOfA<A.numberOfColumns(); ++jOfA)
     {
@@ -128,17 +136,21 @@ namespace simol
       {
 				int iOfA = it.row();
 				double valOfA = it.value();
+        cout << "truc : " << it.row() << " " << it.col() << " " << it.value() << endl;
 				for (std::size_t jOfB=0; jOfB < B.numberOfColumns(); jOfB++)
 				{	
           for (SMat::iterator it2(B, jOfB); it2; ++it2)
 					{
 						int iOfB = it2.row();
 						double valOfB = it2.value();
-							C(iOfA + A.numberOfRows() * iOfB, jOfA + A.numberOfColumns() * jOfB) = valOfA*valOfB;
+            cout << iOfA << "+" << A.numberOfRows() << "*" << iOfB << endl;
+            cout << iOfA + A.numberOfRows() * iOfB << " , " << jOfA + A.numberOfColumns() * jOfB << " ->" <<valOfA*valOfB << endl; 
+						C(iOfA + A.numberOfRows() * iOfB, jOfA + A.numberOfColumns() * jOfB) = valOfA*valOfB;
 					}
 			  }
       }
     }
+    cout << "end  kron(const SMat& A, const SMat& B)" << endl;
 		return C;
 	}
 	
@@ -328,6 +340,30 @@ namespace simol
 		potential_(createPotential(input)),
 		basis_(input, *potential_)
 	{		
+    
+    SMat A = speye<double>(2,2);
+    for (std::size_t jOfA=0; jOfA<A.numberOfColumns(); ++jOfA)
+      for (std::size_t iOfA=0; iOfA<A.numberOfRows(); ++iOfA)
+        cout << A(iOfA,jOfA) << endl;
+      
+
+
+    SMat::iterator itTest(A,0);
+    cout << "bool : " << (bool)itTest << " " << itTest.row() << " " << itTest.value() << endl;
+    ++itTest;
+    cout << "bool : " << (bool)itTest << " " << itTest.row() << " " << itTest.value() << endl;
+    ++itTest;
+    cout << "bool : " << (bool)itTest << " " << itTest.row() << " " << itTest.value() << endl;
+    ++itTest;
+    cout << "bool : " << (bool)itTest << " " << itTest.row() << " " << itTest.value() << endl;
+    
+    /*cout << "test : " << itTest.row() << " " << itTest.value() << endl;
+    ++itTest;
+    cout << "test : " << itTest.row() << " " << itTest.value() << endl;*/
+    
+    for (SMat::iterator it(A,0); it; ++it)
+      cout << "test : " << it.row() << " " << it.value() << endl;
+    
 		assert(nbOfFourier_ % 2 == 1);
 		cout << endl << "Number of modes : " << nbOfFourier_ << " x " << nbOfHermite_ << endl;
 		
@@ -340,10 +376,10 @@ namespace simol
 		display(Q_, "../output/Galerkin/Q");
 		cout << "OK" << endl;
 		
-		cout << "############ P ############" << endl;
+		cout << "Computing Q...";
 		createP();
 		display(P_, "../output/Galerkin/P");
-		
+		cout << "OK" << endl;
 
 		
 	}
@@ -374,7 +410,8 @@ namespace simol
 	
 	void Galerkin::compute()
 	{
-		cout << "start Galerkin::compute()" << endl;
+		cout << "start Galerkin::compute()" << endl;  
+    
 		cout << "############ Leq ############" << endl;
 		//cout << Leq_ << endl << endl;
 		
@@ -582,8 +619,12 @@ namespace simol
 		return res;
 	}
 	
+	///
+	///Creates the tensor of size sizeOfBasis X sizeOfBasis that is identity 
+	///except for indices iOfParticleQ and iOfParticleP
 	SMat BoundaryLangevinGalerkin::doubleMatToTens(SMat const& QMat, SMat const& PMat, int iOfParticleQ, int iOfParticleP)
 	{
+    cout << "doubleMatToTens(SMat const& QMat, SMat const& PMat, int iOfParticleQ, int iOfParticleP)" << endl;
 		/*assert(iOfVariableA < iOfVariableB);
 		assert(iOfVariableB < nbOfVariables);
 		assert(A.size() == B.size());*/
@@ -591,8 +632,10 @@ namespace simol
 		SMat res = speye<double>(1,1);
 		for (int i = 0; i < nbOfParticles_; i++)
 		{
+      cout << "a" << endl;
 			if (i==iOfParticleQ) res = kron(res, QMat);
 			else res = kron(res, SIdQ_);
+      cout << "b" << endl;
 			if (i==iOfParticleP) res = kron(res, PMat);
 			else res = kron(res, SIdP_);
 		}
@@ -651,6 +694,7 @@ namespace simol
 		}
 		Lham_ /= beta_;
 		display(Lham_, "../output/Galerkin/Lham");
+    cout << "end BoundaryLangevinGalerkin::createLham()" << endl;
 	}
 	
 	void BoundaryLangevinGalerkin::createLthm()
