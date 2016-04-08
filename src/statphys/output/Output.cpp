@@ -409,6 +409,29 @@ namespace simol{
       outParticlesXMakeMol() << " O  ";
       if (Dim == 3)
       {
+	outParticlesXMakeMol_ << " O  ";
+	if (Dim == 3)
+	{
+	  for (int dim = 0; dim < Dim; dim++)
+	    {
+	      //-- recenter all the coordinates in the interval [-domainSize/2, domainSize/2] --
+	      coordinate = configuration[i].position(dim);
+	      coordinate -= rint(coordinate/domainSize)*domainSize;
+	      outParticlesXMakeMol_ << coordinate << " "; 
+	    }
+	}
+	else if (Dim == 2)
+	{
+	  for (int dim = 0; dim < Dim; dim++)
+	    {
+	      //-- recenter all the coordinates in the interval [-domainSize/2, domainSize/2] --
+	      coordinate = configuration[i].position(dim);
+	      coordinate -= rint(coordinate/domainSize)*domainSize;
+	      outParticlesXMakeMol_ << coordinate << " "; 
+	    }
+	   outParticlesXMakeMol_ << 0 << " ";  
+	}
+	outParticlesXMakeMol_ << endl;
         for (int dim = 0; dim < dim; dim++)
           {
             //-- recenter all the coordinates in the interval [-domainSize/2, domainSize/2] --
