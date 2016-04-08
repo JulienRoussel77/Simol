@@ -77,6 +77,8 @@ namespace simol
     int const& countdown() const;
     int& countdown();
     
+    void resetForce(Potential const& pot);
+    
     //=============
     // DATA MEMBERS
     //=============

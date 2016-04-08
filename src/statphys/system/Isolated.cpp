@@ -19,11 +19,11 @@ namespace simol
   }
       
   
-  void Isolated::computeAllForces(Dynamics const& dyna)
+  void Isolated::computeAllForces()
   {
-    dyna.resetForce(getParticle());
+    getParticle().resetForce(potential());
     getParticle().potentialEnergy() = potential(getParticle().position());
-    getParticle().force() = force(getParticle().position());
+    getParticle().force() = totalForce(getParticle().position());
   }
   
   //void Isolated::computeFinalOutput(Output& /*output*/, Dynamics const& /*dyna*/)

@@ -43,11 +43,11 @@ NBody::NBody(Input const& input):
     return latticeParameter_;
   }
   
-  void NBody::computeAllForces(Dynamics const& dyna)
+  void NBody::computeAllForces()
   {
     //std::cout << "NBody::computeAllForces" << std::endl;
     for (auto&& particle : configuration_)
-      dyna.resetForce(particle);
+      particle.resetForce(potential());
     for (size_t i = 0; i < nbOfParticles(); i++)
       for (size_t j = i+1; j < nbOfParticles(); j++)
       interaction(configuration_[i], configuration_[j]);
@@ -70,7 +70,7 @@ NBody::NBody(Input const& input):
     particle1.potentialEnergy() += energy12/2;
     particle2.potentialEnergy() += energy12/2;
     // compute forces 
-    double force12 = force(distance)(0);
+    double force12 = potentialForce(distance)(0);
     r12 /= distance;
     particle1.force() += force12 * r12;
     particle2.force() -= force12 * r12;

@@ -42,7 +42,7 @@ namespace simol
   }
 
   
-  ControlVariate::ControlVariate(Input const& input, Potential& potential, size_t nbOfFunctions):
+  ControlVariate::ControlVariate(Input const& input, Potential& potential, int nbOfFunctions):
     dimension_(input.dimension()),
     decorrelationNbOfIterations_(input.decorrelationNbOfIterations()),
     decorrelationTime_(input.decorrelationTime()),
@@ -64,17 +64,17 @@ namespace simol
     potential_(&potential)    
   {}
   
-  size_t ControlVariate::nbOfFunctions() const
+  int ControlVariate::nbOfFunctions() const
   {
     return nbOfFunctions_;
   }
   
-  size_t ControlVariate::nbOfFunctionPairs() const
+  int ControlVariate::nbOfFunctionPairs() const
   {
     return nbOfFunctionPairs_;
   }
   
-  bool ControlVariate::doOutput(size_t iOfIteration) const
+  bool ControlVariate::doOutput(int iOfIteration) const
   {
     return (periodNbOfIterations_ > 0 && iOfIteration % periodNbOfIterations_ == 0);
   }
@@ -101,7 +101,7 @@ namespace simol
 
   
   
-  size_t ControlVariate::decorrelationNbOfIterations() const
+  int ControlVariate::decorrelationNbOfIterations() const
   {
     return decorrelationNbOfIterations_;
   }
@@ -161,31 +161,31 @@ namespace simol
     return statsB2_.integratedAutocorrelationVec();
   }
  
-  double ControlVariate::correlationB2(size_t iOfFunction) const
+  double ControlVariate::correlationB2(int iOfFunction) const
   {
     return statsB2_.integratedAutocorrelation(iOfFunction);
   }
   
-  void ControlVariate::appendToObservable(double observable, size_t iOfIteration)
+  void ControlVariate::appendToObservable(double observable, int iOfIteration)
   {
     historyObservable_(iOfIteration) = observable;
     statsObservable_.append(observable, iOfIteration);
   }
   
-  double ControlVariate::autocorrelation(size_t indexDifference) const
+  double ControlVariate::autocorrelation(int indexDifference) const
   {
     return statsObservable_(indexDifference);
   }
   
   void ControlVariate::appendToB1(double observable, Vector<double>& valueBasisFunction)
   {
-    for (size_t iOfFunction=0; iOfFunction<nbOfFunctions_; iOfFunction++)
+    for (int iOfFunction=0; iOfFunction<nbOfFunctions_; iOfFunction++)
       statsB1_.append((observable - statsObservable_.mean()) * valueBasisFunction(iOfFunction), iOfFunction);
   }
   
-  void ControlVariate::appendToB2(double observable, Vector<double>& generatorOnBasisFunction, size_t iOfIteration)
+  void ControlVariate::appendToB2(double observable, Vector<double>& generatorOnBasisFunction, int iOfIteration)
   {
-    for (size_t iOfFunction=0; iOfFunction<nbOfFunctions_; iOfFunction++)
+    for (int iOfFunction=0; iOfFunction<nbOfFunctions_; iOfFunction++)
 				statsB2_.append((observable - statsObservable_.mean()), iOfIteration, iOfFunction, generatorOnBasisFunction(iOfFunction));
 	}
   
@@ -193,8 +193,8 @@ namespace simol
   {
     //Eigen::Matrix<AutocorrelationStats<double>, Eigen::Dynamic, Eigen::Dynamic> A(nbOfFunctions_, nbOfFunctions_, AutocorrelationStats<double>(decorrelationNbOfIterations(), decorrelationTime()));
     
-    for (size_t iOfFunction=0; iOfFunction<nbOfFunctions_; iOfFunction++)
-      for (size_t iOfFunction2=0; iOfFunction2<=iOfFunction; iOfFunction2++)
+    for (int iOfFunction=0; iOfFunction<nbOfFunctions_; iOfFunction++)
+      for (int iOfFunction2=0; iOfFunction2<=iOfFunction; iOfFunction2++)
       {
 				double valueSym = (- valueBasisFunction(iOfFunction) * generatorOnBasisFunction(iOfFunction2)
 		      - valueBasisFunction(iOfFunction2) * generatorOnBasisFunction(iOfFunction)) / 2.;
@@ -206,7 +206,7 @@ namespace simol
   
 
   
-  void ControlVariate::appendToBetterObservable(double observable, Vector<double>& generatorOnBasisFunction, size_t iOfIteration)
+  void ControlVariate::appendToBetterObservable(double observable, Vector<double>& generatorOnBasisFunction, int iOfIteration)
   {
     //double betterObservableTerm = dot((statsB_.meanMat() - statsB2_.integratedAutocorrelationMat()), statsD_.meanMat().llt().solve(generatorOnBasisFunction));
     /*DenseMatrix<double> Dinv = statsD_.meanMat().llt().solve(generatorOnBasisFunction);
@@ -229,7 +229,7 @@ namespace simol
       statsBetterObservable_.append(observable, iOfIteration);
     }
     
-    for (size_t iOfFunction =0; iOfFunction < nbOfFunctions_; iOfFunction++)
+    for (int iOfFunction =0; iOfFunction < nbOfFunctions_; iOfFunction++)
     {
       historyGeneratorOnBasis_(iOfIteration, iOfFunction) = generatorOnBasisFunction(iOfFunction);
       statsGeneratorOnBasis_.append(generatorOnBasisFunction(iOfFunction), iOfFunction);
@@ -241,7 +241,7 @@ namespace simol
    Vector<double> ControlVariate::lastB1() const
   {
     /*Vector<double> result(nbOfFunctions_);
-    for (size_t iOfFunction =0; iOfFunction < nbOfFunctions_; iOfFunction++)
+    for (int iOfFunction =0; iOfFunction < nbOfFunctions_; iOfFunction++)
       result(iOfFunction) = statsB_.lastValue(iOfFunction);
     return result;*/
     return statsB1_.lastValueVec();
@@ -278,7 +278,7 @@ namespace simol
     return statsGeneratorOnBasis_.meanVec();
   }
   
-  double ControlVariate::autocorrelationB2(size_t indexDifference, size_t iOfFunction) const
+  double ControlVariate::autocorrelationB2(int indexDifference, int iOfFunction) const
   {
     return statsB2_(indexDifference, iOfFunction);
   }
@@ -288,17 +288,17 @@ namespace simol
     return lastA_;
     
   }
-  double ControlVariate::lastA(size_t iOfFunction) const
+  double ControlVariate::lastA(int iOfFunction) const
   {
     return lastA_(iOfFunction);
   }
 
   
-  void ControlVariate::update(double observable, Vector<double>& generatorOnBasisFunction, vector<Particle> const& configuration, size_t iOfIteration)
+  void ControlVariate::update(double observable, Vector<double>& generatorOnBasisFunction, vector<Particle> const& configuration, int iOfIteration)
   {
 		//cout << "ControlVariate::update" << endl;
     Vector<double> valueBasisFunction(nbOfFunctions_);
-    for (size_t iOfFunction =0; iOfFunction < nbOfFunctions_; iOfFunction++)
+    for (int iOfFunction =0; iOfFunction < nbOfFunctions_; iOfFunction++)
       valueBasisFunction(iOfFunction) = basisFunction(configuration, iOfFunction);
     appendToB1(observable, valueBasisFunction);
     appendToB2(observable, generatorOnBasisFunction, iOfIteration);
@@ -307,23 +307,89 @@ namespace simol
     appendToBetterObservable(observable, generatorOnBasisFunction, iOfIteration);
 		//cout << "end ControlVariate::update" << endl;
   }
+  
+  
+  ///
+  ///Applies the generator of this dynamics to the basis functions of the CV
+  Vector<double> ControlVariate::generatorHamiltonian(vector<Particle> const& configuration)
+  {
+    int nbOfParticles = (int)configuration.size();
+    Vector<double> result = Vector<double>::Zero(nbOfFunctions());
+    for (int iOfFunction=0; iOfFunction < nbOfFunctions(); iOfFunction++)
+      for (int iOfParticle=0; iOfParticle < nbOfParticles; iOfParticle++)
+        result(iOfFunction) += dot( configuration[iOfParticle].momentum() , gradientQ(configuration, iOfParticle, iOfFunction))
+        + dot( configuration[iOfParticle].force() , gradientP(configuration, iOfParticle, iOfFunction));
+    return result;
+  }
+  
+  ///Applies the generator of this dynamics to the basis functions of the CV
+  ///Evaluate at the current state of "conifguration"
+  Vector<double> ControlVariate::generatorOverdamped(vector<Particle> const& configuration, double beta)
+  {
+    int nbOfParticles = (int)configuration.size();
+    Vector<double> result = Vector<double>::Zero(nbOfFunctions());
+    for (int iOfFunction=0; iOfFunction < nbOfFunctions(); iOfFunction++)
+      for (int iOfParticle=0; iOfParticle < nbOfParticles; iOfParticle++)
+        result(iOfFunction) += laplacianQ(configuration, iOfParticle, iOfFunction) / beta
+          + dot(configuration[iOfParticle].force(), gradientQ(configuration, iOfParticle, iOfFunction));
+    return result;
+  }
+  
+  ///Applies the generator of this dynamics to the basis functions of the CV
+  ///Evaluate at the current state of "conifguration"
+  Vector<double> ControlVariate::generatorLangevin(vector<Particle> const& configuration, double beta, double gamma)
+  {
+    int nbOfParticles = (int)configuration.size();
+    //cout << "generatorOn(const Langevin& dyna, S const& syst, const ControlVariate& controlVariate)" << endl;
+    Vector<double> result = Vector<double>::Zero(nbOfFunctions());
+    for (int iOfFunction=0; iOfFunction < nbOfFunctions(); iOfFunction++)
+      for (int iOfParticle=0; iOfParticle < nbOfParticles; iOfParticle++)
+      {
+        result(iOfFunction) += dot(configuration[iOfParticle].momentum() , gradientQ(configuration, iOfParticle, iOfFunction))
+          + dot(configuration[iOfParticle].force() , gradientP(configuration, iOfParticle, iOfFunction))
+          + gamma * (- dot(configuration[iOfParticle].momentum() , gradientP(configuration, iOfParticle, iOfFunction))
+              + laplacianP(configuration, iOfParticle, iOfFunction) / beta );
+      }
+    return result;
+  }
+  
+  ///Applies the generator of this dynamics to the basis functions of the CV
+  ///Evaluate at the current state of "conifguration" 
+  Vector<double> ControlVariate::generatorBoundarylangevin(vector<Particle> const& configuration, double betaLeft, double betaRight, double gamma)
+  {
+    int nbOfParticles = (int)configuration.size();
+    Vector<double> result = Vector<double>::Zero(nbOfFunctions());
+    for (int iOfFunction=0; iOfFunction < nbOfFunctions(); iOfFunction++)
+    {
+      for (int iOfParticle=0; iOfParticle < nbOfParticles; iOfParticle++)
+      result(iOfFunction) += dot(configuration[iOfParticle].momentum(), gradientQ(configuration, iOfParticle, iOfFunction))
+        + dot(configuration[iOfParticle].force(), gradientP(configuration, iOfParticle, iOfFunction));
+        //if(false)
+      result(iOfFunction) += gamma * (- dot(configuration[0].momentum(), gradientP(configuration, 0, iOfFunction))
+      + laplacianP(configuration, 0, iOfFunction) / betaLeft
+      - dot(configuration[nbOfParticles-1].momentum(), gradientP(configuration, nbOfParticles-1, iOfFunction))
+      + laplacianP(configuration, nbOfParticles-1, iOfFunction) / betaRight);
+    }
+    return result;
+  }
+  
     
     void ControlVariate::display(std::ofstream& out, double time) const
   {    
     out << time;
-    for (size_t iOfFunction = 0; iOfFunction < nbOfFunctions(); iOfFunction++)
+    for (int iOfFunction = 0; iOfFunction < nbOfFunctions(); iOfFunction++)
       out << " " << meanB()(iOfFunction) * lastA(iOfFunction);
-    for (size_t iOfFunction = 0; iOfFunction < nbOfFunctions(); iOfFunction++)
+    for (int iOfFunction = 0; iOfFunction < nbOfFunctions(); iOfFunction++)
       out << " " << lastA(iOfFunction);
-    /*for (size_t iOfFunction = 0; iOfFunction < nbOfFunctions(); iOfFunction++)
+    /*for (int iOfFunction = 0; iOfFunction < nbOfFunctions(); iOfFunction++)
       out << " " << lastB()(iOfFunction);*/
-    for (size_t iOfFunction = 0; iOfFunction < nbOfFunctions(); iOfFunction++)
+    for (int iOfFunction = 0; iOfFunction < nbOfFunctions(); iOfFunction++)
       out << " " << meanB()(iOfFunction);
-    /*for (size_t iOfFunction = 0; iOfFunction < nbOfFunctions(); iOfFunction++)
-      for (size_t iOfFunction2 = 0; iOfFunction2 < nbOfFunctions(); iOfFunction2++)
+    /*for (int iOfFunction = 0; iOfFunction < nbOfFunctions(); iOfFunction++)
+      for (int iOfFunction2 = 0; iOfFunction2 < nbOfFunctions(); iOfFunction2++)
 	out << " " << lastD()(iOfFunction, iOfFunction2);*/
-    for (size_t iOfFunction = 0; iOfFunction < nbOfFunctions(); iOfFunction++)
-      for (size_t iOfFunction2 = 0; iOfFunction2 < nbOfFunctions(); iOfFunction2++)
+    for (int iOfFunction = 0; iOfFunction < nbOfFunctions(); iOfFunction++)
+      for (int iOfFunction2 = 0; iOfFunction2 < nbOfFunctions(); iOfFunction2++)
 				out << " " << meanD()(iOfFunction, iOfFunction2);  //8-11
       
     out << " " << lastObservable()
@@ -332,20 +398,20 @@ namespace simol
       << " " << lastBetterObservable()
       << " " << meanBetterObservable()
       << " " << stdDeviationBetterObservable();
-    for (size_t iOfFunction = 0; iOfFunction < nbOfFunctions(); iOfFunction++)
+    for (int iOfFunction = 0; iOfFunction < nbOfFunctions(); iOfFunction++)
       out << " " << lastGeneratorOnBasis()(iOfFunction);
-    for (size_t iOfFunction = 0; iOfFunction < nbOfFunctions(); iOfFunction++)
+    for (int iOfFunction = 0; iOfFunction < nbOfFunctions(); iOfFunction++)
       out<< " " << meanGeneratorOnBasis()(iOfFunction);
     
-    for (size_t iOfFunction = 0; iOfFunction < nbOfFunctions(); iOfFunction++)
+    for (int iOfFunction = 0; iOfFunction < nbOfFunctions(); iOfFunction++)
       out << " " << meanB1()(iOfFunction);
     
-    for (size_t iOfFunction = 0; iOfFunction < nbOfFunctions(); iOfFunction++)
+    for (int iOfFunction = 0; iOfFunction < nbOfFunctions(); iOfFunction++)
       out << " " << -correlationB2()(iOfFunction);  //22-23
     
     out << endl;
 	
-    /*for (size_t iOfFunction = 0; iOfFunction < nbOfFunctions(); iOfFunction++)
+    /*for (int iOfFunction = 0; iOfFunction < nbOfFunctions(); iOfFunction++)
     {
       out << " " << 
     }*/
@@ -354,7 +420,7 @@ namespace simol
   void ControlVariate::postTreat(std::ofstream& /*out*/, double /*timeStep*/)
   {
     /*cout << "Post-treatment of the output" << endl;
-    for (size_t iOfIteration = 0; iOfIteration < (size_t) historyObservable_.size(); iOfIteration++)
+    for (int iOfIteration = 0; iOfIteration < (int) historyObservable_.size(); iOfIteration++)
     {
       statsPostBetterObservable_.append(historyObservable_(iOfIteration) - dot(lastA_, historyGeneratorOnBasis_.row(iOfIteration)), iOfIteration);
       statsPostObservable_.append(historyObservable_(iOfIteration), iOfIteration);
@@ -367,7 +433,7 @@ namespace simol
 						<< " " << statsPostBetterObservable_.lastValue() 
 						<< " " << statsPostBetterObservable_.mean() 
 						<< " " << statsPostBetterObservable_.standardDeviation();
-				for (size_t iOfFunction = 0; iOfFunction < nbOfFunctions(); iOfFunction++)
+				for (int iOfFunction = 0; iOfFunction < nbOfFunctions(); iOfFunction++)
 					out << " " << lastA_(iOfFunction);
 				out << endl;
 			}
@@ -392,12 +458,12 @@ namespace simol
   NoControlVariate::NoControlVariate(Input const& input, Potential& potential):
     ControlVariate(input, potential, 1){}
     
-  size_t NoControlVariate::nbOfFunctions() const
+  int NoControlVariate::nbOfFunctions() const
   {
     return 0;
   }
   
-  size_t NoControlVariate::nbOfFunctionPairs() const
+  int NoControlVariate::nbOfFunctionPairs() const
   {
     return 0;
   }
@@ -412,33 +478,33 @@ namespace simol
     return Vector<double>(dimension_,0 );
   }
     
-  double NoControlVariate::basisFunction(vector<Particle> const& /*configuration*/, size_t /*iOfFunction*/) const
+  double NoControlVariate::basisFunction(vector<Particle> const& /*configuration*/, int /*iOfFunction*/) const
   {
     return 0;
   }
   
     //double generatorOnBasisFunction(vector<Particle> const& configuration) const;
-  double NoControlVariate::laplacianQ(vector<Particle> const& /*configuration*/, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
+  double NoControlVariate::laplacianQ(vector<Particle> const& /*configuration*/, int /*iOfParticle*/, int /*iOfFunction*/) const
   {
     return 0;
   }
   
-  Vector<double> NoControlVariate::gradientQ(vector<Particle> const& /*configuration*/, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
+  Vector<double> NoControlVariate::gradientQ(vector<Particle> const& /*configuration*/, int /*iOfParticle*/, int /*iOfFunction*/) const
   {
     return Vector<double>(dimension_);
   }
   
-  double NoControlVariate::laplacianP(vector<Particle> const& /*configuration*/, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
+  double NoControlVariate::laplacianP(vector<Particle> const& /*configuration*/, int /*iOfParticle*/, int /*iOfFunction*/) const
   {
     return 0;
   }
     
-  Vector<double> NoControlVariate::gradientP(vector<Particle> const& /*configuration*/, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
+  Vector<double> NoControlVariate::gradientP(vector<Particle> const& /*configuration*/, int /*iOfParticle*/, int /*iOfFunction*/) const
   {
     return Vector<double>(dimension_);
   }
   
-  void NoControlVariate::update(double observable, Vector<double>& /*generatorOnBasisFunction*/, vector<Particle> const& /*configuration*/, size_t iOfIteration)
+  void NoControlVariate::update(double observable, Vector<double>& /*generatorOnBasisFunction*/, vector<Particle> const& /*configuration*/, int iOfIteration)
   {
     appendToObservable(observable, iOfIteration);
   }
@@ -446,7 +512,7 @@ namespace simol
   void NoControlVariate::postTreat(std::ofstream& out, double timeStep)
   {
     std::cout << "Post-treatment of the output" << endl;
-    for (size_t iOfIteration = 0; iOfIteration < (size_t) historyObservable_.size(); iOfIteration++)
+    for (int iOfIteration = 0; iOfIteration < (int) historyObservable_.size(); iOfIteration++)
     {
       statsPostObservable_.append(historyObservable_(iOfIteration), iOfIteration);
 			if (doOutput(iOfIteration))
@@ -470,13 +536,13 @@ namespace simol
     ControlVariate(input, potential, 1)
   {}
   
-  double SinusControlVariate::basisFunction(vector<Particle> const& configuration, size_t /*iOfFunction*/) const
+  double SinusControlVariate::basisFunction(vector<Particle> const& configuration, int /*iOfFunction*/) const
   {
     double q = configuration[0].position(0);
     return sin(2 * M_PI * q);
   }
    
-  Vector<double> SinusControlVariate::gradientQ(vector<Particle> const& configuration, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
+  Vector<double> SinusControlVariate::gradientQ(vector<Particle> const& configuration, int /*iOfParticle*/, int /*iOfFunction*/) const
   {
     double q = configuration[0].position(0);
     Vector<double> grad(dimension_);
@@ -484,19 +550,19 @@ namespace simol
     return grad;
   }
   
-  double SinusControlVariate::laplacianQ(vector<Particle> const& configuration, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
+  double SinusControlVariate::laplacianQ(vector<Particle> const& configuration, int /*iOfParticle*/, int /*iOfFunction*/) const
   {
     double q = configuration[0].position(0);
     return - pow (2 * M_PI, 2) * sin(2 * M_PI * q);
   }
 
   
-  double SinusControlVariate::laplacianP(vector<Particle> const& /*configuration*/, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
+  double SinusControlVariate::laplacianP(vector<Particle> const& /*configuration*/, int /*iOfParticle*/, int /*iOfFunction*/) const
   {
     return 0;
   }
   
-  Vector<double> SinusControlVariate::gradientP(vector<Particle> const& /*configuration*/, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
+  Vector<double> SinusControlVariate::gradientP(vector<Particle> const& /*configuration*/, int /*iOfParticle*/, int /*iOfFunction*/) const
   {
     return Vector<double>(dimension_);
   }
@@ -508,13 +574,13 @@ namespace simol
     ControlVariate(input, potential, 1)
   {}
   
-  double CosControlVariate::basisFunction(vector<Particle> const& configuration, size_t /*iOfFunction*/) const
+  double CosControlVariate::basisFunction(vector<Particle> const& configuration, int /*iOfFunction*/) const
   {
     double q = configuration[0].position(0);
     return cos(2 * M_PI *q);
   }
   
-  Vector<double> CosControlVariate::gradientQ(vector<Particle> const& configuration, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
+  Vector<double> CosControlVariate::gradientQ(vector<Particle> const& configuration, int /*iOfParticle*/, int /*iOfFunction*/) const
   {
     double q = configuration[0].position(0);
     Vector<double> grad(dimension_);
@@ -522,18 +588,18 @@ namespace simol
     return grad;
   }
   
-    double CosControlVariate::laplacianQ(vector<Particle> const& configuration, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
+    double CosControlVariate::laplacianQ(vector<Particle> const& configuration, int /*iOfParticle*/, int /*iOfFunction*/) const
   {
     double q = configuration[0].position(0);
     return - pow (2 * M_PI, 2) * cos(2 * M_PI * q);
   }
   
-  Vector<double> CosControlVariate::gradientP(vector<Particle> const& /*configuration*/, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
+  Vector<double> CosControlVariate::gradientP(vector<Particle> const& /*configuration*/, int /*iOfParticle*/, int /*iOfFunction*/) const
   {
     return Vector<double>(dimension_);
   }
   
-    double CosControlVariate::laplacianP(vector<Particle> const& /*configuration*/, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
+    double CosControlVariate::laplacianP(vector<Particle> const& /*configuration*/, int /*iOfParticle*/, int /*iOfFunction*/) const
   {
     return 0;
   }
@@ -549,14 +615,14 @@ namespace simol
     ControlVariate(input, potential, 1)
   {}
   
-  double SinExpControlVariate::basisFunction(vector<Particle> const& configuration, size_t /*iOfFunction*/) const
+  double SinExpControlVariate::basisFunction(vector<Particle> const& configuration, int /*iOfFunction*/) const
   {
     Vector<double> q = configuration[0].position();
     double q0 = q(0);
     return sin(2 * M_PI * q0) * exp(potential(q)/2);
   }
   
-  Vector<double> SinExpControlVariate::gradientQ(vector<Particle> const& configuration, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
+  Vector<double> SinExpControlVariate::gradientQ(vector<Particle> const& configuration, int /*iOfParticle*/, int /*iOfFunction*/) const
   {
     Vector<double> q = configuration[0].position();
     double q0 = q(0);
@@ -567,7 +633,7 @@ namespace simol
     return grad;
   }
   
-    double SinExpControlVariate::laplacianQ(vector<Particle> const& configuration, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
+    double SinExpControlVariate::laplacianQ(vector<Particle> const& configuration, int /*iOfParticle*/, int /*iOfFunction*/) const
   {
     Vector<double> q = configuration[0].position();
     double q0 = q(0);
@@ -579,12 +645,12 @@ namespace simol
       * exp(potential(q)/2);
   }
   
-  Vector<double> SinExpControlVariate::gradientP(vector<Particle> const& /*configuration*/, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
+  Vector<double> SinExpControlVariate::gradientP(vector<Particle> const& /*configuration*/, int /*iOfParticle*/, int /*iOfFunction*/) const
   {
     return Vector<double>(dimension_);
   }
     
-  double SinExpControlVariate::laplacianP(vector<Particle> const& /*configuration*/, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
+  double SinExpControlVariate::laplacianP(vector<Particle> const& /*configuration*/, int /*iOfParticle*/, int /*iOfFunction*/) const
   {
     return 0;
   }
@@ -596,14 +662,14 @@ namespace simol
     ControlVariate(input, potential, 1)
   {}
   
-  double CosExpControlVariate::basisFunction(vector<Particle> const& configuration, size_t /*iOfFunction*/) const
+  double CosExpControlVariate::basisFunction(vector<Particle> const& configuration, int /*iOfFunction*/) const
   {
     Vector<double> q = configuration[0].position();
     double q0 = q(0);
     return cos(2 * M_PI * q0) * exp(potential(q)/2);
   }
   
-  Vector<double> CosExpControlVariate::gradientQ(vector<Particle> const& configuration, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
+  Vector<double> CosExpControlVariate::gradientQ(vector<Particle> const& configuration, int /*iOfParticle*/, int /*iOfFunction*/) const
   {
     Vector<double> q = configuration[0].position();
     double q0 = q(0);
@@ -614,7 +680,7 @@ namespace simol
     return grad;
   }
   
-    double CosExpControlVariate::laplacianQ(vector<Particle> const& configuration, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
+    double CosExpControlVariate::laplacianQ(vector<Particle> const& configuration, int /*iOfParticle*/, int /*iOfFunction*/) const
   {
     Vector<double> q = configuration[0].position();
     double q0 = q(0);
@@ -626,12 +692,12 @@ namespace simol
       * exp(potential(q)/2);
   }
   
-  Vector<double> CosExpControlVariate::gradientP(vector<Particle> const& /*configuration*/, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
+  Vector<double> CosExpControlVariate::gradientP(vector<Particle> const& /*configuration*/, int /*iOfParticle*/, int /*iOfFunction*/) const
   {
     return Vector<double>(dimension_);
   }
     
-  double CosExpControlVariate::laplacianP(vector<Particle> const& /*configuration*/, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
+  double CosExpControlVariate::laplacianP(vector<Particle> const& /*configuration*/, int /*iOfParticle*/, int /*iOfFunction*/) const
   {
     return 0;
   }
@@ -643,14 +709,14 @@ namespace simol
     ControlVariate(input, potential, 1)
     {}
   
-  double LangevinControlVariate::basisFunction(vector<Particle> const& configuration, size_t /*iOfFunction*/) const
+  double LangevinControlVariate::basisFunction(vector<Particle> const& configuration, int /*iOfFunction*/) const
   {
     //return pow(configuration[0].momentum(0), 2) * configuration[0].position(0);
     //return configuration[0].momentum(0);
     return configuration[0].kineticEnergy();
   }
   
-  Vector<double> LangevinControlVariate::gradientQ(vector<Particle> const& /*configuration*/, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
+  Vector<double> LangevinControlVariate::gradientQ(vector<Particle> const& /*configuration*/, int /*iOfParticle*/, int /*iOfFunction*/) const
   {
      Vector<double> grad(dimension_);
      //grad(0) = pow(configuration[0].momentum(0), 2);
@@ -658,13 +724,13 @@ namespace simol
      return grad;
   }
   
-    double LangevinControlVariate::laplacianQ(vector<Particle> const& /*configuration*/, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
+    double LangevinControlVariate::laplacianQ(vector<Particle> const& /*configuration*/, int /*iOfParticle*/, int /*iOfFunction*/) const
   {
     assert(false);
     return 0;
   }
   
-  Vector<double> LangevinControlVariate::gradientP(vector<Particle> const& configuration, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
+  Vector<double> LangevinControlVariate::gradientP(vector<Particle> const& configuration, int /*iOfParticle*/, int /*iOfFunction*/) const
   {
      Vector<double> grad(dimension_);
      grad(0) = configuration[0].momentum(0);
@@ -672,7 +738,7 @@ namespace simol
      return grad;
   }
     
-  double LangevinControlVariate::laplacianP(vector<Particle> const& /*configuration*/, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
+  double LangevinControlVariate::laplacianP(vector<Particle> const& /*configuration*/, int /*iOfParticle*/, int /*iOfFunction*/) const
   {
     return 1;
     //return 2 * configuration[0].position(0);
@@ -684,33 +750,33 @@ namespace simol
     ControlVariate(input, potential, 1), i0_(0)
   {}
   
-  double SumEnergyControlVariate::basisFunction(vector<Particle> const& configuration, size_t /*iOfFunction*/) const
+  double SumEnergyControlVariate::basisFunction(vector<Particle> const& configuration, int /*iOfFunction*/) const
   {
     double result = 0;
-    for (size_t iOfParticle = 1; iOfParticle < configuration.size(); iOfParticle++)
+    for (int iOfParticle = 1; iOfParticle < (int)configuration.size(); iOfParticle++)
       result += configuration[iOfParticle].kineticEnergy() * (iOfParticle - i0_)
 	    + (iOfParticle - i0_ - .5) * configuration[iOfParticle].potentialEnergy();
     //cout << result << endl;
     return result;
   }
   
-  Vector<double> SumEnergyControlVariate::gradientQ(vector<Particle> const& configuration, size_t iOfParticle, size_t /*iOfFunction*/) const
+  Vector<double> SumEnergyControlVariate::gradientQ(vector<Particle> const& configuration, int iOfParticle, int /*iOfFunction*/) const
   {
     return (iOfParticle - i0_ - .5) * configuration[iOfParticle].energyGrad();
   }
   
-    double SumEnergyControlVariate::laplacianQ(vector<Particle> const& /*configuration*/, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
+    double SumEnergyControlVariate::laplacianQ(vector<Particle> const& /*configuration*/, int /*iOfParticle*/, int /*iOfFunction*/) const
   {
     assert(false);
     return 0;
   }
   
-  Vector<double> SumEnergyControlVariate::gradientP(vector<Particle> const& configuration, size_t iOfParticle, size_t /*iOfFunction*/) const
+  Vector<double> SumEnergyControlVariate::gradientP(vector<Particle> const& configuration, int iOfParticle, int /*iOfFunction*/) const
   {
     return (iOfParticle - i0_) * configuration[iOfParticle].momentum();
   }
     
-  double SumEnergyControlVariate::laplacianP(vector<Particle> const& /*configuration*/, size_t iOfParticle, size_t /*iOfFunction*/) const
+  double SumEnergyControlVariate::laplacianP(vector<Particle> const& /*configuration*/, int iOfParticle, int /*iOfFunction*/) const
   {
     return iOfParticle - i0_;
   }
@@ -722,33 +788,33 @@ namespace simol
     ControlVariate(input, potential, 1), i0_(0)
   {}
   
-  double EnergyControlVariate::basisFunction(vector<Particle> const& configuration, size_t /*iOfFunction*/) const
+  double EnergyControlVariate::basisFunction(vector<Particle> const& configuration, int /*iOfFunction*/) const
   {
     double result = 0;
-    for (size_t iOfParticle = 0; iOfParticle < configuration.size(); iOfParticle++)
+    for (int iOfParticle = 0; iOfParticle < (int)configuration.size(); iOfParticle++)
       result += configuration[iOfParticle].kineticEnergy()
 	    + configuration[iOfParticle].potentialEnergy();
     //cout << result << endl;
     return result;
   }
   
-  Vector<double> EnergyControlVariate::gradientQ(vector<Particle> const& configuration, size_t iOfParticle, size_t /*iOfFunction*/) const
+  Vector<double> EnergyControlVariate::gradientQ(vector<Particle> const& configuration, int iOfParticle, int /*iOfFunction*/) const
   {
     return configuration[iOfParticle].energyGrad();
   }
   
-    double EnergyControlVariate::laplacianQ(vector<Particle> const& /*configuration*/, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
+    double EnergyControlVariate::laplacianQ(vector<Particle> const& /*configuration*/, int /*iOfParticle*/, int /*iOfFunction*/) const
   {
     assert(false);
     return 0;
   }
   
-  Vector<double> EnergyControlVariate::gradientP(vector<Particle> const& configuration, size_t iOfParticle, size_t /*iOfFunction*/) const
+  Vector<double> EnergyControlVariate::gradientP(vector<Particle> const& configuration, int iOfParticle, int /*iOfFunction*/) const
   {
     return configuration[iOfParticle].momentum();
   }
     
-  double EnergyControlVariate::laplacianP(vector<Particle> const& /*configuration*/, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
+  double EnergyControlVariate::laplacianP(vector<Particle> const& /*configuration*/, int /*iOfParticle*/, int /*iOfFunction*/) const
   {
     return 1;
   }
@@ -759,13 +825,13 @@ namespace simol
     ControlVariate(input, potential, 1)
   {}
   
-  double LocalControlVariate::basisFunction(vector<Particle> const& configuration, size_t /*iOfFunction*/) const
+  double LocalControlVariate::basisFunction(vector<Particle> const& configuration, int /*iOfFunction*/) const
   {
     //return configuration[0].kineticEnergy() + configuration[0].potentialEnergy();
     return configuration[0].energy(); 
   }
   
-  Vector<double> LocalControlVariate::gradientQ(vector<Particle> const& configuration, size_t iOfParticle, size_t /*iOfFunction*/) const
+  Vector<double> LocalControlVariate::gradientQ(vector<Particle> const& configuration, int iOfParticle, int /*iOfFunction*/) const
   {
     Vector<double> result = Vector<double>(dimension_);
     
@@ -775,13 +841,13 @@ namespace simol
     return result;
   }
   
-    double LocalControlVariate::laplacianQ(vector<Particle> const& /*configuration*/, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
+    double LocalControlVariate::laplacianQ(vector<Particle> const& /*configuration*/, int /*iOfParticle*/, int /*iOfFunction*/) const
   {
     assert(false);
     return 0;
   }
   
-  Vector<double> LocalControlVariate::gradientP(vector<Particle> const& configuration, size_t iOfParticle, size_t /*iOfFunction*/) const
+  Vector<double> LocalControlVariate::gradientP(vector<Particle> const& configuration, int iOfParticle, int /*iOfFunction*/) const
   {
     Vector<double> result = Vector<double>(dimension_);
     
@@ -791,7 +857,7 @@ namespace simol
     return result;
   }
     
-  double LocalControlVariate::laplacianP(vector<Particle> const& /*configuration*/, size_t iOfParticle, size_t /*iOfFunction*/) const
+  double LocalControlVariate::laplacianP(vector<Particle> const& /*configuration*/, int iOfParticle, int /*iOfFunction*/) const
   {
     if (iOfParticle == 0)
       return 1;
@@ -805,13 +871,13 @@ namespace simol
     ControlVariate(input, potential, 1)
   {}
   
-  double KineticControlVariate::basisFunction(vector<Particle> const& configuration, size_t /*iOfFunction*/) const
+  double KineticControlVariate::basisFunction(vector<Particle> const& configuration, int /*iOfFunction*/) const
   {
     return 2 * configuration[0].momentum(0) * (sin(configuration[1].position(0) - configuration[0].position(0)) - sin(configuration[0].position(0)))
 	  + 2 * configuration[0].kineticEnergy();
   }
   
-  Vector<double> KineticControlVariate::gradientQ(vector<Particle> const& configuration, size_t iOfParticle, size_t /*iOfFunction*/) const
+  Vector<double> KineticControlVariate::gradientQ(vector<Particle> const& configuration, int iOfParticle, int /*iOfFunction*/) const
   {
     Vector<double> result(dimension_);
     
@@ -823,13 +889,13 @@ namespace simol
     return result;
   }
   
-    double KineticControlVariate::laplacianQ(vector<Particle> const& /*configuration*/, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
+    double KineticControlVariate::laplacianQ(vector<Particle> const& /*configuration*/, int /*iOfParticle*/, int /*iOfFunction*/) const
   {
     assert(false);
     return 0;
   }
   
-  Vector<double> KineticControlVariate::gradientP(vector<Particle> const& configuration, size_t iOfParticle, size_t /*iOfFunction*/) const
+  Vector<double> KineticControlVariate::gradientP(vector<Particle> const& configuration, int iOfParticle, int /*iOfFunction*/) const
   {
     Vector<double> result(dimension_);
     
@@ -840,7 +906,7 @@ namespace simol
     return result;
   }
     
-  double KineticControlVariate::laplacianP(vector<Particle> const& /*configuration*/, size_t iOfParticle, size_t /*iOfFunction*/) const
+  double KineticControlVariate::laplacianP(vector<Particle> const& /*configuration*/, int iOfParticle, int /*iOfFunction*/) const
   {
     if (iOfParticle == 0)
       return 2;
@@ -856,7 +922,7 @@ namespace simol
     ControlVariate(input, potential, 2)
   {}
   
-  double TwoControlVariate::basisFunction(vector<Particle> const& configuration, size_t iOfFunction) const
+  double TwoControlVariate::basisFunction(vector<Particle> const& configuration, int iOfFunction) const
   {
     /*if (iOfFunction == 0)
       return configuration[0].energy();
@@ -874,7 +940,7 @@ namespace simol
 			throw std::invalid_argument("iOfFunction must 0 or 1");
   }
   
-  Vector<double> TwoControlVariate::gradientQ(vector<Particle> const& configuration, size_t iOfParticle, size_t iOfFunction) const
+  Vector<double> TwoControlVariate::gradientQ(vector<Particle> const& configuration, int iOfParticle, int iOfFunction) const
   {
     Vector<double> result = Vector<double>(dimension_);
     
@@ -890,13 +956,13 @@ namespace simol
       return result;
   }
   
-    double TwoControlVariate::laplacianQ(vector<Particle> const& /*configuration*/, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
+    double TwoControlVariate::laplacianQ(vector<Particle> const& /*configuration*/, int /*iOfParticle*/, int /*iOfFunction*/) const
   {
     assert(false);
     return 0;
   }
   
-  Vector<double> TwoControlVariate::gradientP(vector<Particle> const& configuration, size_t iOfParticle, size_t iOfFunction) const
+  Vector<double> TwoControlVariate::gradientP(vector<Particle> const& configuration, int iOfParticle, int iOfFunction) const
   {    
     Vector<double> result(dimension_);
     
@@ -914,7 +980,7 @@ namespace simol
     return result;
   }
     
-  double TwoControlVariate::laplacianP(vector<Particle> const& /*configuration*/, size_t /*iOfParticle*/, size_t /*iOfFunction*/) const
+  double TwoControlVariate::laplacianP(vector<Particle> const& /*configuration*/, int /*iOfParticle*/, int /*iOfFunction*/) const
   {
     return 0;
   }
@@ -948,7 +1014,7 @@ namespace simol
 		//cout << coeffsVec_ << endl;
 	}
   
-  double BasisControlVariate::basisFunction(vector<Particle> const& configuration, size_t iOfFunction) const
+  double BasisControlVariate::basisFunction(vector<Particle> const& configuration, int iOfFunction) const
   {
 		assert(iOfFunction == 0);
 		double result = 0;
@@ -963,7 +1029,7 @@ namespace simol
 		return result;
   }
   
-  Vector<double> BasisControlVariate::gradientQ(vector<Particle> const& configuration, size_t iOfParticle, size_t iOfFunction) const
+  Vector<double> BasisControlVariate::gradientQ(vector<Particle> const& configuration, int iOfParticle, int iOfFunction) const
   {
 		//cout << "BasisControlVariate::gradientQ" << endl;
     Vector<double> result(1, 0);
@@ -982,7 +1048,7 @@ namespace simol
     return result;
   }
   
-  double BasisControlVariate::laplacianQ(vector<Particle> const& configuration, size_t iOfParticle, size_t iOfFunction) const
+  double BasisControlVariate::laplacianQ(vector<Particle> const& configuration, int iOfParticle, int iOfFunction) const
   {
     double result = 0;
     assert(iOfFunction == 0);
@@ -997,7 +1063,7 @@ namespace simol
     return result;
   }
   
-  Vector<double> BasisControlVariate::gradientP(vector<Particle> const& configuration, size_t iOfParticle, size_t iOfFunction) const
+  Vector<double> BasisControlVariate::gradientP(vector<Particle> const& configuration, int iOfParticle, int iOfFunction) const
   {
 		Vector<double> result(1, 0);
     assert(iOfFunction == 0);
@@ -1014,7 +1080,7 @@ namespace simol
     return result;
   }
     
-  double BasisControlVariate::laplacianP(vector<Particle> const& configuration, size_t iOfParticle, size_t iOfFunction) const
+  double BasisControlVariate::laplacianP(vector<Particle> const& configuration, int iOfParticle, int iOfFunction) const
   {
     double result = 0;
     assert(iOfFunction == 0);

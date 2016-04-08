@@ -16,8 +16,15 @@ namespace simol {
   }
   
   ///
+  ///Applies the generator of this dynamics to the basis functions of the CV
+  Vector<double> generatorOn(Dynamics const& /*dyna*/, System const& /*syst*/, const ControlVariate& /*controlVariate*/)
+  {
+    throw std::invalid_argument("GeneratorOn not defined in the general case");
+  }
+  
+  ///
   ///Computes the quantities needed by the control variates (coefficients a, b, D) and {L \Phi}
-  void updateAllControlVariates(Dynamics const& /*dyna*/, System const& /*syst*/, Output& /*output*/, size_t /*iOfIteration*/)
+  void updateAllControlVariates(Dynamics const& /*dyna*/, System const& syst, Output& /*output*/, size_t /*iOfIteration*/)
   {throw std::invalid_argument("updateAllControlVariates: Function undefined");}
 
     /*Vector<double> q = syst.getParticle(0).position();
@@ -36,28 +43,7 @@ namespace simol {
     output.sumFlowCV().update(output.energySumFlow(), generatorOnBasis, syst.configuration(), iOfIteration);
   }*/
     
-      ///
-  ///Applies the generator of this dynamics to the basis functions of the CV
-  Vector<double> generatorOn(Dynamics const& /*dyna*/, System const& /*syst*/, const ControlVariate& /*controlVariate*/)
-  {
-    throw std::invalid_argument("GeneratorOn not defined in the general case");
-  }
 
-  void computeOutput(Dynamics const& dyna, System const& syst, Output& output, size_t iOfIteration)
-  {
-    output.kineticEnergy() = 0;
-    output.potentialEnergy() = 0;
-    //Calcul de la température et de l'énergie
-    for (const auto& particle : syst.configuration())
-    {
-      output.kineticEnergy() += particle.kineticEnergy();
-      output.potentialEnergy() += particle.potentialEnergy();
-    }
-    // In the case of the trichain we add the potential of the wall interaction
-    output.potentialEnergy() += syst.boundaryPotEnergy();
-    syst.computeProfile(output, dyna, iOfIteration);
-    updateAllControlVariates(dyna, syst, output, iOfIteration);
-  }
 
   // TO DO ou pas: cette fonction ne sert pas a grand chose... ce test peut (DOIT) etre fait dans output.cpp !!
   void writeOutput(Dynamics const& /*dyna*/, System const& /*syst*/, Output& /*output*/, size_t /*iOfIteration*/)
@@ -65,9 +51,9 @@ namespace simol {
     throw std::invalid_argument("writeOutput not defined in the general case");
   }
 
-  void writeFinalOutput(Dynamics const& dyna, System const& syst, Output& output)
+  void writeFinalOutput(Dynamics const& /*dyna*/, System const& syst, Output& output)
   {
-    output.finalDisplay(syst.configuration(), dyna.externalForce());
+    output.finalDisplay(syst.configuration(), syst.externalForce());
     if (output.doComputeCorrelations())
       output.finalDisplayAutocorrelations();
   }
@@ -77,7 +63,7 @@ namespace simol {
     for (auto&& particle : syst.configuration())
       dyna.updateBefore(particle);
 
-    syst.computeAllForces(dyna);
+    syst.computeAllForces();
 
     for (auto&& particle : syst.configuration())
       dyna.updateAfter(particle);
@@ -109,21 +95,21 @@ namespace simol {
     output.displayFinalVelocity(dyna.temperature(), dyna.externalForce(0), output.velocityCV_->nbOfFourier(), output.velocityCV_->nbOfHermite());
   }*/
   
-  void computeOutput(Dynamics const& dyna, const Isolated& syst, Output& output, size_t iOfIteration)
+  template <>
+  void computeOutput(DPDE const& /*dyna*/, Isolated const& syst, Output& output, size_t /*iOfIteration*/)
   {
-    //cout << "computeOutput(D const& dyna, const Isolated& syst, Output& output, size_t iOfIteration)" << endl;
-    //Calcul de la température et de l'énergie
     output.kineticEnergy() = syst.getParticle(0).kineticEnergy();
     output.potentialEnergy() = syst.getParticle(0).potentialEnergy();
-    updateAllControlVariates(dyna, syst, output, iOfIteration);
+    output.internalEnergy() = syst.getParticle(0).internalEnergy();
   }
+
   
   void writeFinalOutput(Hamiltonian const& dyna, Isolated const& syst, Output& output)
   {
-    output.finalDisplay(syst.configuration(), dyna.externalForce());
+    output.finalDisplay(syst.configuration(), syst.externalForce());
     if (output.doComputeCorrelations())
       output.finalDisplayAutocorrelations();
-    output.displayFinalVelocity(0, dyna.externalForce(0), output.velocityCV_->nbOfFourier(), output.velocityCV_->nbOfHermite());
+    output.displayFinalVelocity(0, syst.externalForce(0), output.velocityCV_->nbOfFourier(), output.velocityCV_->nbOfHermite());
   }
   
   
@@ -168,9 +154,26 @@ namespace simol {
     cout << "Done !" << endl;
   }
   
+  template <>
+  void computeOutput(BoundaryLangevin const& dyna, Chain const& syst, Output& output, size_t iOfIteration)
+  {
+    output.kineticEnergy() = 0;
+    output.potentialEnergy() = 0;
+    //Calcul de la température et de l'énergie
+    for (const auto& particle : syst.configuration())
+    {
+      output.kineticEnergy() += particle.kineticEnergy();
+      output.potentialEnergy() += particle.potentialEnergy();
+    }
+    // In the case of the trichain we add the potential of the wall interaction
+    output.potentialEnergy() += syst.boundaryPotEnergy();
+    syst.computeProfile(output, dyna, iOfIteration);
+    updateAllControlVariates(dyna, syst, output, iOfIteration);
+  }
+  
   void writeFinalOutput(BoundaryLangevin const& dyna, BiChain const& syst, Output& output)
   {
-    output.finalDisplay(syst.configuration(), dyna.externalForce());
+    output.finalDisplay(syst.configuration(), syst.externalForce());
     if (output.doComputeCorrelations())
       output.finalDisplayAutocorrelations();
     output.displayFinalFlow(dyna.temperature(), dyna.deltaTemperature());
@@ -218,7 +221,7 @@ namespace simol {
     cout << "Done !" << endl;
   }
  
-  ///Applies the generator of this dynamics to the basis functions of the CV
+  /*///Applies the generator of this dynamics to the basis functions of the CV
   ///Evaluate at the current state of "conifguration" 
   Vector<double> generatorOn(const BoundaryLangevin& dyna, System const& syst, const ControlVariate& controlVariate)
   {
@@ -236,7 +239,7 @@ namespace simol {
       + controlVariate.laplacianP(syst.configuration(), nbOfParticles-1, iOfFunction) / dyna.betaRight());
     }
     return result;
-  }
+  }*/
   
   ///
   ///Computes the quantities needed by the control variates (coefficients a, b, D) and {L \Phi}
@@ -244,27 +247,15 @@ namespace simol {
   {
     Vector<double> generatorOnBasis;
     
-    generatorOnBasis = generatorOn(dyna, syst, output.midFlowCV());
+    //generatorOnBasis = generatorOn(dyna, syst, output.midFlowCV());
+    generatorOnBasis = output.midFlowCV().generatorBoundarylangevin(syst.configuration(), dyna.betaLeft(), dyna.betaRight(), dyna.gamma());
     output.midFlowCV().update(output.energyMidFlow(), generatorOnBasis, syst.configuration(), iOfIteration);
-    generatorOnBasis = generatorOn(dyna, syst, output.sumFlowCV());
+    //generatorOnBasis = generatorOn(dyna, syst, output.sumFlowCV());
+    generatorOnBasis = output.sumFlowCV().generatorBoundarylangevin(syst.configuration(), dyna.betaLeft(), dyna.betaRight(), dyna.gamma());
     output.sumFlowCV().update(output.energySumFlow(), generatorOnBasis, syst.configuration(), iOfIteration);
   }
   
-  void computeOutput(BoundaryLangevin const& dyna, Chain const& syst, Output& output, size_t iOfIteration)
-  {
-    output.kineticEnergy() = 0;
-    output.potentialEnergy() = 0;
-    //Calcul de la température et de l'énergie
-    for (const auto& particle : syst.configuration())
-    {
-      output.kineticEnergy() += particle.kineticEnergy();
-      output.potentialEnergy() += particle.potentialEnergy();
-    }
-    // In the case of the trichain we add the potential of the wall interaction
-    output.potentialEnergy() += syst.boundaryPotEnergy();
-    syst.computeProfile(output, dyna, iOfIteration);
-    updateAllControlVariates(dyna, syst, output, iOfIteration);
-  }
+
   
   void writeOutput(BoundaryLangevin const& dyna, Chain const& syst, Output& output, size_t iOfIteration)
   {
@@ -275,8 +266,8 @@ namespace simol {
       output.displayChainMomenta(syst.configuration(), iOfIteration);
       output.displayParticles(syst.configuration(), iOfIteration);
       
-      output.midFlowCV_->display(output.outMidFlowCV_, iOfIteration * dyna.timeStep() );
-      output.sumFlowCV_->display(output.outSumFlowCV_, iOfIteration * dyna.timeStep() );
+      output.midFlowCV_->display(output.outMidFlowCV(), iOfIteration * dyna.timeStep() );
+      output.sumFlowCV_->display(output.outSumFlowCV(), iOfIteration * dyna.timeStep() );
     }
     
     if (output.doProfileOutput(iOfIteration))
@@ -288,7 +279,7 @@ namespace simol {
   
   void writeFinalOutput(BoundaryLangevin const& dyna, TriChain const& syst, Output& output)
   {
-    output.finalDisplay(syst.configuration(), dyna.externalForce());
+    output.finalDisplay(syst.configuration(), syst.externalForce());
     if (output.doComputeCorrelations())
       output.finalDisplayAutocorrelations();
     output.displayFinalFlow(dyna.temperature(), dyna.deltaTemperature(), dyna.tauBending(), dyna.xi());
@@ -299,7 +290,7 @@ namespace simol {
     for (auto&& particle:syst.configuration())
       dyna.verletFirstPart(particle);
 
-    syst.computeAllForces(dyna);
+    syst.computeAllForces();
 
     for (auto&& particle:syst.configuration())
       dyna.verletSecondPart(particle);
@@ -317,7 +308,7 @@ namespace simol {
   
   //------------------- NBody ---------------------
   
-    void sampleSystem(Dynamics& dyna, NBody& syst)
+  void sampleSystem(Dynamics& /*dyna*/, NBody& syst)
   {
     int Dim = syst.dimension();   // PAS SUPER, MAIS SINON PBM DE TYPE POUR COMPARAISON ?
     int NbPartDim = syst.nbOfParticlesPerDimension(); 
@@ -327,30 +318,30 @@ namespace simol {
       syst.getParticle(i).momentum() = syst.drawMomentum(1, syst.getParticle(i).mass());   // TO DO : introduce beta in Hamiltonian...
     //-- initialization on a cubic lattice --
     if (Dim == 2) 
-      {
-	for (int i = 0; i < NbPartDim; i++)
-	  for (int j = 0; j < NbPartDim; j++)
-	    {
-	      syst.getParticle(i*NbPartDim+j).position(0) = i*latticeSize;
-	      syst.getParticle(i*NbPartDim+j).position(1) = j*latticeSize;
-	    }
-      }
+    {
+      for (int i = 0; i < NbPartDim; i++)
+        for (int j = 0; j < NbPartDim; j++)
+        {
+          syst.getParticle(i*NbPartDim+j).position(0) = i*latticeSize;
+          syst.getParticle(i*NbPartDim+j).position(1) = j*latticeSize;
+        }
+    }
     else if (Dim == 3) 
-      {
-	int NbPartDim2 = NbPartDim*NbPartDim;
-	for (int i = 0; i < NbPartDim; i++)
-	  for (int j = 0; j < NbPartDim; j++)
-	    for (int k = 0; k < NbPartDim; k++)
-	    {
-	      syst.getParticle(i*NbPartDim2+j*NbPartDim+k).position(0) = i*latticeSize;
-	      syst.getParticle(i*NbPartDim2+j*NbPartDim+k).position(1) = j*latticeSize;
-	      syst.getParticle(i*NbPartDim2+j*NbPartDim+k).position(2) = k*latticeSize;
-	    }
-      }
+    {
+      int NbPartDim2 = NbPartDim*NbPartDim;
+      for (int i = 0; i < NbPartDim; i++)
+        for (int j = 0; j < NbPartDim; j++)
+          for (int k = 0; k < NbPartDim; k++)
+          {
+            syst.getParticle(i*NbPartDim2+j*NbPartDim+k).position(0) = i*latticeSize;
+            syst.getParticle(i*NbPartDim2+j*NbPartDim+k).position(1) = j*latticeSize;
+            syst.getParticle(i*NbPartDim2+j*NbPartDim+k).position(2) = k*latticeSize;
+          }
+    }
     else 
-      {
-	throw std::invalid_argument("sampleSystem: Bad dimension, should be 2 or 3");
-      }
+    {
+      throw std::invalid_argument("sampleSystem: Bad dimension, should be 2 or 3");
+    }
     //cout << "    VERIFICATION : " << syst.nbOfParticlesPerDimension() << endl;
   }
   
@@ -358,11 +349,12 @@ namespace simol {
   {
     for (auto&& particle : syst.configuration())
       dyna.verletFirstPart(particle);
-    syst.computeAllForces(dyna);
+    syst.computeAllForces();
     for (auto&& particle : syst.configuration())
       dyna.verletSecondPart(particle);
   }
   
+  template <>
   void computeOutput(Hamiltonian const& /*dyna*/, NBody const& syst, Output& output, size_t /*iOfIteration*/)
   {
     output.kineticEnergy() = 0;
@@ -372,12 +364,11 @@ namespace simol {
     for (const auto& particle : syst.configuration())
       {
       output.kineticEnergy() += particle.kineticEnergy();
-      output.potentialEnergy() += particle.potentialEnergy();	      
+      output.potentialEnergy() += particle.potentialEnergy();       
       output.totalVirial() += particle.virial();
       }
   }
   
-  //--- CONFLIT DE TEMPLETAGE ICI AUSSI : entre dynamics et system... on ne peut pas preciser que le systeme ?! ---
   void writeOutput(Hamiltonian const& /*dyna*/, NBody const& syst, Output& output, size_t iOfIteration)
   {
     if (output.doOutput(iOfIteration))
@@ -386,7 +377,7 @@ namespace simol {
       output.displayParticlesXMakeMol(syst.configuration(), iOfIteration, syst.latticeParameter()*syst.nbOfParticlesPerDimension());        
   }
   
-  void writeFinalOutput(Hamiltonian const& dyna, NBody const& syst, Output& output)
+  void writeFinalOutput(Hamiltonian const& /*dyna*/, NBody const& /*syst*/, Output& /*output*/)
   {
     //output.finalDisplay(syst.configuration(), dyna.externalForce());
   }
@@ -395,7 +386,7 @@ namespace simol {
   
     //##################### HAMILTONIAN ####################"
 
-  ///
+  /*///
   ///Applies the generator of this dynamics to the basis functions of the CV
   Vector<double> generatorOn(const Hamiltonian& dyna, System const& syst, ControlVariate const& controlVariate)
   {
@@ -403,12 +394,11 @@ namespace simol {
     for (size_t iOfFunction=0; iOfFunction < controlVariate.nbOfFunctions(); iOfFunction++)
       for (size_t iOfParticle=0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
         result(iOfFunction) += syst.getParticle(iOfParticle).momentum().dot(controlVariate.gradientQ(syst.configuration(), iOfParticle, iOfFunction))
-        + syst.force(syst.getParticle(iOfParticle).position()).dot(controlVariate.gradientP(syst.configuration(), iOfParticle, iOfFunction))
-        + dyna.externalForce().dot(controlVariate.gradientP(syst.configuration(), iOfParticle, iOfFunction));
+        + syst.totalForce(syst.getParticle(iOfParticle).position()).dot(controlVariate.gradientP(syst.configuration(), iOfParticle, iOfFunction));
     return result;
-  }
+  }*/
 
-  void updateAllControlVariates(const Hamiltonian& /*dyna*/, System const& /*syst*/, Output& /*output*/, size_t /*iOfIteration*/)
+  void updateAllControlVariates(const Hamiltonian& /*dyna*/, System const& syst, Output& /*output*/, size_t /*iOfIteration*/)
   {}
 
   
@@ -423,7 +413,7 @@ namespace simol {
   
   // ###### OVERDAMPED ######
   
-    ///Applies the generator of this dynamics to the basis functions of the CV
+  /*///Applies the generator of this dynamics to the basis functions of the CV
   ///Evaluate at the current state of "conifguration"
   Vector<double> generatorOn(const Overdamped& dyna, System const& syst, const ControlVariate& controlVariate)
   {
@@ -431,13 +421,13 @@ namespace simol {
     for (size_t iOfFunction=0; iOfFunction < controlVariate.nbOfFunctions(); iOfFunction++)
       for (size_t iOfParticle=0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
         result(iOfFunction) += controlVariate.laplacianQ(syst.configuration(), iOfParticle, iOfFunction) / dyna.beta()
-          + dot(syst.force(syst.getParticle(iOfParticle).position()), controlVariate.gradientQ(syst.configuration(), iOfParticle, iOfFunction));
+          + dot(syst.totalForce(syst.getParticle(iOfParticle).position()), controlVariate.gradientQ(syst.configuration(), iOfParticle, iOfFunction));
     return result;
-  }
+  }*/
   
   // ###### LANGEVIN ######
   
-    ///Applies the generator of this dynamics to the basis functions of the CV
+  /*///Applies the generator of this dynamics to the basis functions of the CV
   ///Evaluate at the current state of "conifguration"
   Vector<double> generatorOn(const Langevin& dyna, System const& syst, const ControlVariate& controlVariate)
   {
@@ -452,7 +442,7 @@ namespace simol {
               + controlVariate.laplacianP(syst.configuration(), iOfParticle, iOfFunction) / dyna.beta() );
       }
     return result;
-  }
+  }*/
 
   ///
   ///Computes the quantities needed by the control variates (coefficients a, b, D) and {L \Phi}
@@ -462,10 +452,11 @@ namespace simol {
     Vector<double> q = syst.getParticle(0).position();
     Vector<double> p = syst.getParticle(0).momentum();
     Vector<double> generatorOnBasis;
-    generatorOnBasis = generatorOn(dyna, syst, output.velocityCV());
+    //generatorOnBasis = generatorOn(dyna, syst, output.velocityCV());
+    generatorOnBasis = output.velocityCV().generatorLangevin(syst.configuration(), dyna.beta(), dyna.gamma());
     output.velocityCV().update(p(0), generatorOnBasis, syst.configuration(), iOfIteration);
     if (output.doOutput(iOfIteration))
-      output.displayGeneratorOnBasis(output.outVelocitiesGenerator_, syst.configuration(), output.velocityCV(), iOfIteration*dyna.timeStep());
+      output.displayGeneratorOnBasis(output.outVelocitiesGenerator(), syst.configuration(), output.velocityCV(), iOfIteration*dyna.timeStep());
   }
   
   void writeOutput(Langevin const& /*dyna*/, System const& syst, Output& output, size_t iOfIteration)
@@ -486,12 +477,7 @@ namespace simol {
     syst.getParticle(0).internalEnergy() = 1;  // TO DO : il faudra ici tirer selon la bonne loi ?
   }
   
-  void computeOutput(const DPDE& /*dyna*/, const Isolated& syst, Output& output, size_t /*iOfIteration*/)
-  {
-    output.kineticEnergy() = syst.getParticle(0).kineticEnergy();
-    output.potentialEnergy() = syst.getParticle(0).potentialEnergy();
-    output.internalEnergy() = syst.getParticle(0).internalEnergy();
-  }
+
   
   void writeOutput(DPDE const& /*dyna*/, System const& syst, Output& output, size_t iOfIteration)
   {
@@ -503,7 +489,7 @@ namespace simol {
   {
     for (auto&& particle : syst.configuration())
       dyna.verletFirstPart(particle);
-    syst.computeAllForces(dyna);
+    syst.computeAllForces();
     for (auto&& particle : syst.configuration())
       dyna.verletSecondPart(particle);
     //-- fluctuation/dissipation --

@@ -56,14 +56,14 @@ namespace simol {
 
   // --------------- Declaration and implementation of external functions -------------------
 
-
-  //template<class D, class S>
+  // Global
   
-  
-  //void sampleSystem(Dynamics& /*dyna*/, System& /*syst*/){};
-  void simulate(Dynamics& dyna, System& syst);
-  void updateAllControlVariates(const Dynamics& dyna, const System& syst, Output& output, size_t iOfIteration);
+  void sampleSystem(Dynamics& dyna, System& syst);
   Vector<double> generatorOn(const Dynamics& dyna, const System& syst, const ControlVariate& controlVariate);
+  void updateAllControlVariates(const Dynamics& dyna, const System& syst, Output& output, size_t iOfIteration);
+  void simulate(Dynamics& dyna, System& syst);
+  
+  template <class D>
   void computeOutput(Dynamics const& dyna, System const& syst, Output& output, size_t iOfIteration);
   void writeOutput(System const& syst, Output& output, size_t iOfIteration);
   void writeFinalOutput(Dynamics const& dyna, System const& syst, Output& output);
@@ -71,55 +71,64 @@ namespace simol {
 
 
   //Isolated
-  //template <class D>
-  //void sampleSystem(Dynamics& dyna, Isolated& syst);
   void sampleSystem(Hamiltonian& /*dyna*/, Isolated& /*syst*/);
   void sampleSystem(LangevinBase& dyna, Isolated& syst);
   void sampleSystem(Overdamped& dyna, Isolated& syst);
-  void computeOutput(Dynamics const& dyna, const Isolated& syst, Output& output, size_t iOfIteration);
-  void writeOutput(System const& syst, Output& output, size_t iOfIteration);
-
-  //void writeFinalOutput(Dynamics const& dyna, Isolated const& syst, Output& output);
+  template <class D>
+  void computeOutput(D const& dyna, Isolated const& syst, Output& output, size_t iOfIteration);
+  template <>
+  void computeOutput(const DPDE& dyna, Isolated const& syst, Output& output, size_t iOfIteration);
   void writeFinalOutput(Hamiltonian const& dyna, Isolated const& syst, Output& output);
 
-  //Hamiltonian
-  Vector<double> generatorOn(const Hamiltonian& dyna, System const& syst, ControlVariate const& controlVariate);
-  void updateAllControlVariates(const Hamiltonian& dyna, System const& syst, Output& output, size_t iOfIteration);
-  void writeOutput(Hamiltonian const& /*dyna*/, System const& syst, Output& output, size_t iOfIteration);
   
-  //Langevin
-  Vector<double> generatorOn(const Langevin& dyna, System const& syst, const ControlVariate& controlVariate);
-  void updateAllControlVariates(const Langevin& dyna, System const& syst, Output& output, size_t iOfIteration);
-  void writeOutput(Langevin const& /*dyna*/, System const& syst, Output& output, size_t iOfIteration);
-  
-  //Overdamped
-  Vector<double> generatorOn(const Overdamped& dyna, const System& syst, const ControlVariate& controlVariate);
 
   //Chains
   void sampleSystem(BoundaryLangevin& dyna, BiChain& syst);
   void sampleSystem(BoundaryLangevin& dyna, TriChain& syst);
+
   void writeFinalOutput(BoundaryLangevin const& dyna, BiChain const& syst, Output& output);
   void writeFinalOutput(BoundaryLangevin const& dyna, TriChain const& syst, Output& output);
 
   void simulate(BoundaryLangevin& dyna, Chain& syst);
   void updateAllControlVariates(const BoundaryLangevin& dyna, System const& syst, Output& output, size_t iOfIteration);
-  Vector<double> generatorOn(const BoundaryLangevin& dyna, System const& syst, const ControlVariate& controlVariate);
+  template <class D>
+  void computeOutput(D const& dyna, Chain const& syst, Output& output, size_t iOfIteration);
+  template <>
   void computeOutput(BoundaryLangevin const& dyna, Chain const& syst, Output& output, size_t iOfIteration);
   void writeOutput(BoundaryLangevin const& dyna, Chain const& syst, Output& output, size_t iOfIteration);
   
   //NBody
   void sampleSystem(Dynamics& dyna, NBody& syst);
   void simulate(Hamiltonian& dyna, NBody& syst);
+  template <class D>
+  void computeOutput(D const& /*dyna*/, NBody const& syst, Output& output, size_t /*iOfIteration*/);
+  template <>
   void computeOutput(Hamiltonian const& /*dyna*/, NBody const& syst, Output& output, size_t /*iOfIteration*/);
   void writeOutput(Hamiltonian const& /*dyna*/, NBody const& syst, Output& output, size_t iOfIteration);
   void writeFinalOutput(Hamiltonian const& dyna, NBody const& syst, Output& output);
   
+    // ------------------------ Classified by Dynamics ---------------------------------
+  
+
+  //Hamiltonian
+  //Vector<double> generatorOn(const Hamiltonian& dyna, System const& syst, ControlVariate const& controlVariate);
+  void updateAllControlVariates(const Hamiltonian& dyna, System const& syst, Output& output, size_t iOfIteration);
+  void writeOutput(Hamiltonian const& /*dyna*/, System const& syst, Output& output, size_t iOfIteration);
+  
+  //Langevin
+  //Vector<double> generatorOn(const Langevin& dyna, System const& syst, const ControlVariate& controlVariate);
+  void updateAllControlVariates(const Langevin& dyna, System const& syst, Output& output, size_t iOfIteration);
+  void writeOutput(Langevin const& /*dyna*/, System const& syst, Output& output, size_t iOfIteration);
+  
+  //Overdamped
+  Vector<double> generatorOn(const Overdamped& dyna, const System& syst, const ControlVariate& controlVariate);
+  
   //DPDE
   void simulate(DPDE& dyna, System& syst);
   void sampleSystem(DPDE& dyna, Isolated& syst);
-  void computeOutput(const DPDE& dyna, const Isolated& syst, Output& output, size_t iOfIteration);
+  
   void writeOutput(DPDE const& dyna, System const& syst, Output& output, size_t iOfIteration);
-
+  
   //General
   template<class D, class S>
   void launchSimu(D& dyna, S& syst, Output& output);
@@ -133,6 +142,51 @@ namespace simol {
 
 
 // -------------------- Templates implementation --------------------
+  
+  // Global
+  
+  template <class D>
+  void computeOutput(D const& dyna, System const& syst, Output& output, size_t iOfIteration)
+  {
+    output.kineticEnergy() = 0;
+    output.potentialEnergy() = 0;
+    //Calcul de la température et de l'énergie
+    for (const auto& particle : syst.configuration())
+    {
+      output.kineticEnergy() += particle.kineticEnergy();
+      output.potentialEnergy() += particle.potentialEnergy();
+    }
+    // In the case of the trichain we add the potential of the wall interaction
+    output.potentialEnergy() += syst.boundaryPotEnergy();
+    syst.computeProfile(output, dyna, iOfIteration);
+    updateAllControlVariates(dyna, syst, output, iOfIteration);
+  }
+  
+  // Isolated
+  
+  template <class D>
+  void computeOutput(D const& dyna, Isolated const& syst, Output& output, size_t iOfIteration)
+  {
+    //cout << "computeOutput(D const& dyna, Isolated const& syst, Output& output, size_t iOfIteration)" << endl;
+    //Calcul de la température et de l'énergie
+    output.kineticEnergy() = syst.getParticle(0).kineticEnergy();
+    output.potentialEnergy() = syst.getParticle(0).potentialEnergy();
+    updateAllControlVariates(dyna, syst, output, iOfIteration);
+  }
+  
+  // Chain
+  
+  template <class D>
+  void computeOutput(D const& dyna, Chain const& syst, Output& output, size_t iOfIteration)
+  {throw std::invalid_argument("computeOutput(D const& dyna, Chain const& syst, Output& output, size_t iOfIteration) not defined !");}
+  
+  
+  // Nbody
+  
+  template <class D>
+  void computeOutput(D const& dyna, NBody const& syst, Output& output, size_t iOfIteration)
+  {throw std::invalid_argument("computeOutput(D const& dyna, NBody const& syst, Output& output, size_t iOfIteration) not defined !");}
+
 
   // ------------------------------- MAIN Function ----------------------
   
@@ -145,7 +199,7 @@ namespace simol {
 
     //---- initialization (including burn-in) -----
     sampleSystem(dyna, syst);
-    syst.computeAllForces(dyna);  // TO DO : a mettre dans la fonction d'initialisation...
+    syst.computeAllForces();  // TO DO : a mettre dans la fonction d'initialisation...
 
     //---- actual iterations -----
     for (size_t iOfIteration  =0; iOfIteration < dyna.nbOfIterations(); ++iOfIteration)

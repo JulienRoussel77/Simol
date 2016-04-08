@@ -13,7 +13,25 @@ namespace simol
 
   Potential::Potential(){}
   
-  Potential::Potential(Input const & /*input*/){}
+  Potential::Potential(Input const & input):
+    externalForce_(input.dimension(), 0)
+  {
+    externalForce_(0) = input.externalForce();
+    cout << "externalForce = " << externalForce_ << endl;
+  }
+  
+  ///
+  ///Read-only accessor for the external force
+  Vector<double> const& Potential::externalForce() const {return externalForce_;}
+  ///
+  ///Write-read accessor for the external force
+  Vector<double>& Potential::externalForce(){return externalForce_;}
+  ///
+  ///Read-only accessor for the i-th component of the external force
+  double const& Potential::externalForce(int const& i) const {return externalForce_(i);}
+  ///
+  ///Write-read accessor for the i-th component of the external force
+  double& Potential::externalForce(int const& i) {return externalForce_(i);}
   
 
   
@@ -51,14 +69,24 @@ namespace simol
     return -gradient(Vector<double>(1, position)); 
   }
   
-  Vector<double> Potential::force(Vector<double> const& position) const
+  Vector<double> Potential::totalForce(Vector<double> const& position) const
   { 
-    return -gradient(position); 
+    return externalForce_ - gradient(position); 
   }
   
-  Vector<double> Potential::force(double position) const
+  Vector<double> Potential::totalForce(double position) const
   { 
-    return -gradient(position); 
+    return externalForce_ - gradient(position); 
+  }
+  
+    Vector<double> Potential::potentialForce(Vector<double> const& position) const
+  { 
+    return - gradient(position); 
+  }
+  
+  Vector<double> Potential::potentialForce(double position) const
+  { 
+    return - gradient(position); 
   }
   
   double Potential::laplacian(Vector<double> const& position) const

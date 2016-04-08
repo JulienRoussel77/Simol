@@ -26,13 +26,13 @@ namespace simol
     double& timeStep();
     const double& timeStep() const;
     size_t& nbOfIterations();
-    const size_t& nbOfIterations() const;
+    size_t const& nbOfIterations() const;
     double finalTime() const;
     size_t& nbOfThermalIterations();
-    const size_t& nbOfThermalIterations() const;
+    size_t const& nbOfThermalIterations() const;
     size_t& nbOfBurningIterations();
-    const size_t& nbOfBurningIterations() const;
-    const std::shared_ptr<RNG>& rng() const;
+    size_t const& nbOfBurningIterations() const;
+    std::shared_ptr<RNG> const& rng() const;
     std::shared_ptr<RNG>& rng();
     virtual const double&  temperature() const;
     virtual const double& temperatureLeft() const;
@@ -41,14 +41,14 @@ namespace simol
     virtual const double& beta() const;
     virtual const double& betaLeft() const;
     virtual const double& betaRight() const;
-    Vector<double>& externalForce() ;
-    const Vector<double>& externalForce() const;
+    //Vector<double>& externalForce() ;
+    //Vector<double> const& externalForce() const;
     double& externalForce(const int& i);
-    const double& externalForce(const int& i) const;
+    double const& externalForce(const int& i) const;
     Galerkin* galerkin();
     
       
-    void resetForce(Particle& particle) const;
+    //void resetForce(Particle& particle) const;
     
     void verletFirstPart(Particle& particle);
     void verletSecondPart(Particle& particle);
@@ -63,7 +63,6 @@ namespace simol
     double beta_;
     double temperature_;
     //double timeStep;
-    Vector<double> externalForce_;
     std::shared_ptr<RNG> rng_;
     Galerkin* galerkin_;
   };

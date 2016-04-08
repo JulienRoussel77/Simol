@@ -36,21 +36,27 @@ namespace simol
     Potential& potential();
     double potential(Vector<double> const& position) const;
     double potential(const double& position) const;
-    Vector<double> force(Vector<double> const& position) const;
-    Vector<double> force(double position) const;
+    Vector<double> totalForce(Vector<double> const& position) const;
+    Vector<double> totalForce(double position) const;
+    Vector<double> potentialForce(Vector<double> const & position) const;
+    Vector<double> potentialForce(double position) const;
     double laplacian(Vector<double> const& position) const;
     const std::shared_ptr<RNG>& rng() const;
     std::shared_ptr<RNG>& rng();
+    
+    Vector<double>& externalForce() ;
+    Vector<double> const& externalForce() const;
+    double& externalForce(const int& i);
+    double const& externalForce(const int& i) const;
     
     virtual Vector<double> drawMomentum(double localBeta, double mass);
     virtual double drawPotLaw(double localBeta);
     virtual double computeMeanPotLaw(double betaLocal) const;
     
     //void launch(Dynamics& model, Output& output);
-    virtual void thermalize(Dynamics& /*model*/) {assert(false);};
-    virtual void computeAllForces(Dynamics const& /*model*/){};
+    virtual void thermalize(Dynamics& /*model*/);
+    virtual void computeAllForces();
     void interaction(Particle& particle1, Particle& particle2) const;
-    void triInteraction(Particle& particle1, Particle& particle2, Particle& particle3) const;
     virtual double boundaryPotEnergy() const;
     
     virtual void computeProfile(Output& /*output*/, Dynamics const& /*model*/, size_t /*iOfIteration*/)const;

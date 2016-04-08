@@ -29,7 +29,7 @@ namespace simol
     for (size_t i=0; i < nbOfParticles(); i++)
       dyna.updateBefore(getParticle(i));
     
-    computeAllForces(dyna);
+    computeAllForces();
     
     for (size_t i=0; i < nbOfParticles(); i++)
       dyna.updateAfter(getParticle(i));
@@ -40,8 +40,6 @@ namespace simol
       dyna.updateOrsteinUhlenbeck(getParticle(0), 1 / localTemperature);
     }
   }
-  
-
   
 
   
@@ -63,11 +61,11 @@ namespace simol
   
 
   
-  void BiChain::computeAllForces(Dynamics const& dyna)
+  void BiChain::computeAllForces()
   {
     //std::cout << "BiChain::computeAllForces" << std::endl;
     for (auto&& particle : configuration_)
-      dyna.resetForce(particle);
+      particle.resetForce(potential());
     //for (auto&& particle : configuration_)
     //  dyna.computeForce(particle);
     interaction(ancorParticle_, configuration_[0]);
@@ -148,25 +146,42 @@ namespace simol
 
   }
   
+  ///Computes the force and the energy associated to this triplet interaction, and updates these 2 fields
+  ///The first 2 derivates of the potential are stored in "particle2"
+  void TriChain::triInteraction(Particle& particle1, Particle& particle2, Particle& particle3) const
+  {
+    Vector<double> delta = particle3.position() - 2*particle2.position() + particle1.position();
+    //double d12 = r12.norm();
+    double energy123 = potential(delta);
+    Vector<double> force123 = potentialForce(delta);    // = - v'(r_2)
+    double lapla123 = laplacian(delta);
+    
+    particle2.potentialEnergy() = energy123;
+    particle1.force() += force123;
+    particle2.force() -= 2*force123;
+    particle3.force() += force123;
+    particle2.energyGrad() = -force123;    // - v'(r_2)
+    particle2.energyLapla() = lapla123;    // v''(r_2)
+  }
   
-  void TriChain::computeAllForces(Dynamics const& dyna)
+  void TriChain::computeAllForces()
   {
     //std::cout << "TriChain::computeAllForces" << std::endl;
     for (auto&& particle : configuration_)
-      dyna.resetForce(particle);
+      particle.resetForce(potential());
     //for (auto&& particle : configuration_)
     //  dyna.computeForce(particle);
     triInteraction(ancorParticle2_, ancorParticle1_, configuration_[0]);
     triInteraction(ancorParticle1_, configuration_[0], configuration_[1]);
     for (size_t i = 0; i < nbOfParticles() - 2; i++)
       triInteraction(configuration_[i], configuration_[i+1], configuration_[i+2]);
-    dyna.bending(configuration_[nbOfParticles() - 2], configuration_[nbOfParticles() - 1]);
+    //dyna.bending(configuration_[nbOfParticles() - 2], configuration_[nbOfParticles() - 1]);
   }
   
   double TriChain::boundaryPotEnergy() const
   {return ancorParticle1_.potentialEnergy();}
   
-  void TriChain::computeProfile(Output& output, Dynamics const& dyna, size_t iOfIteration) const
+  void TriChain::computeProfile(Output& /*output*/, Dynamics const& /*dyna*/, size_t /*iOfIteration*/) const
   {}
   
   void TriChain::computeProfile(Output& output, LangevinBase const& dyna, size_t iOfIteration) const

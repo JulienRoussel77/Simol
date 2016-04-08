@@ -15,6 +15,7 @@ Physics:
     Amplitude: 1
   Model:
     Name: Hamiltonian
+    Beta: 1
 
 Output:
   ParametersName: /

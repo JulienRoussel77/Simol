@@ -20,12 +20,8 @@ namespace simol
     nbOfBurningIterations_(input.nbOfBurningIterations()),
     beta_(input.beta()),
     temperature_(1/beta_),
-    externalForce_(input.dimension(), 0),
     galerkin_(nullptr)
   {
-    externalForce_(0) = input.externalForce();
-
-    cout << "externalForce = " << externalForce_(0) << endl;
     cout << "timeStep = " << timeStep() << endl;
     if (nbOfIterations_ < 1e6)
       cout << "nbOfIterations_ = " << nbOfIterations_ << endl;
@@ -47,13 +43,13 @@ namespace simol
   double& Dynamics::timeStep() {return timeStep_;}
   ///
   ///Read-only accessor for the time step "dt"
-  const double& Dynamics::timeStep() const {return timeStep_;}
+  double const& Dynamics::timeStep() const {return timeStep_;}
   ///
   ///Read-write accessor for the number of iterations of the simulation
   size_t& Dynamics::nbOfIterations() {return nbOfIterations_;}
 	///
   ///Read-only accessor for the number of iterations of the simulation
-  const size_t& Dynamics::nbOfIterations() const {return nbOfIterations_;}
+  size_t const& Dynamics::nbOfIterations() const {return nbOfIterations_;}
   ///
   ///Returns the total time "t_f" of the simulation
   double Dynamics::finalTime() const {return timeStep_ * nbOfIterations_;}
@@ -62,13 +58,13 @@ namespace simol
   size_t& Dynamics::nbOfThermalIterations() {return nbOfThermalIterations_;}
   ///
   ///Read-only accessor for the number of iterations of the thermalization
-  const size_t& Dynamics::nbOfThermalIterations() const {return nbOfThermalIterations_;}
+  size_t const& Dynamics::nbOfThermalIterations() const {return nbOfThermalIterations_;}
   ///
   ///Read-write accessor for the number of iterations of the burning
   size_t& Dynamics::nbOfBurningIterations() {return nbOfBurningIterations_;}
   ///
   ///Read-only accessor for the number of iterations of the burning
-  const size_t& Dynamics::nbOfBurningIterations() const {return nbOfBurningIterations_;}
+  size_t const& Dynamics::nbOfBurningIterations() const {return nbOfBurningIterations_;}
 
   const std::shared_ptr<RNG>& Dynamics::rng() const {return rng_;}
 
@@ -76,13 +72,13 @@ namespace simol
   
   ///
   ///Returns the temperature
-  const double& Dynamics::temperature() const {return temperature_;}
+  double const& Dynamics::temperature() const {return temperature_;}
   ///
   ///Read-only access for the temperature
-  const double& Dynamics::temperatureLeft() const {return temperature_;}
+  double const& Dynamics::temperatureLeft() const {return temperature_;}
   ///
   ///Read-only access for the temperature
-  const double& Dynamics::temperatureRight() const {return temperature_;}
+  double const& Dynamics::temperatureRight() const {return temperature_;}
   ///Returns the difference between the mean temperature and the one at the left end
   ///This is equal to {eta}
   double Dynamics::deltaTemperature() const
@@ -91,26 +87,26 @@ namespace simol
   }
   ///
   ///Read-only access for the inverse temperature
-  const double& Dynamics::beta() const {return beta_;}
+  double const& Dynamics::beta() const {return beta_;}
   ///
   ///Read-only access for the inverse temperature
-  const double& Dynamics::betaLeft() const {return beta_;}
+  double const& Dynamics::betaLeft() const {return beta_;}
   ///
   ///Read-only access for the inverse temperature
-  const double& Dynamics::betaRight() const {return beta_;}
+  double const& Dynamics::betaRight() const {return beta_;}
 
-  ///
+  /*///
   ///Read-only accessor for the external force
-  const Vector<double>& Dynamics::externalForce() const {return externalForce_;}
+  Vector<double> const& Dynamics::externalForce() const {return externalForce_;}
   ///
   ///Write-read accessor for the external force
-  Vector<double>& Dynamics::externalForce(){return externalForce_;}
-  ///
+  Vector<double>& Dynamics::externalForce(){return externalForce_;}*/
+  /*///
   ///Read-only accessor for the i-th component of the external force
-  const double& Dynamics::externalForce(int const& i) const {return externalForce_(i);}
+  double const& Dynamics::externalForce(int const& i) const {return externalForce_(i);}
   ///
   ///Write-read accessor for the i-th component of the external force
-  double& Dynamics::externalForce(int const& i) {return externalForce_(i);}
+  double& Dynamics::externalForce(int const& i) {return externalForce_(i);}*/
 	///
 	///Returns the pointer of the Galerkin instance of *this
   Galerkin* Dynamics::galerkin() {return galerkin_;}
@@ -118,14 +114,14 @@ namespace simol
 
 
 
-  ///
+  /*///
   ///Set the force and the potential energy of a particle to zero
   void Dynamics::resetForce(Particle& particle) const
   {
     particle.potentialEnergy() = 0;
     particle.force() = externalForce();
     particle.virial() = 0.;
-  }
+  }*/
 
 
 	///

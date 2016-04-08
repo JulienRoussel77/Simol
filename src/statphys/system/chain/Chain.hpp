@@ -23,7 +23,7 @@ namespace simol
     Particle ancorParticle_;
   public:
     BiChain(Input const& input);
-    void computeAllForces(Dynamics const& model);
+    void computeAllForces();
     virtual void computeProfile(Output& output, Dynamics const& dyna, size_t iOfIteration) const;
     virtual void computeProfile(Output& output, LangevinBase const& model, size_t iOfIteration) const;
     //virtual void writeFinalOutput(Output& output, Dynamics const& model);
@@ -35,7 +35,8 @@ namespace simol
     Particle ancorParticle2_;
   public:
     TriChain(Input const& input);
-    void computeAllForces(Dynamics const& model);     
+    void triInteraction(Particle& particle1, Particle& particle2, Particle& particle3) const;
+    void computeAllForces();     
     virtual double boundaryPotEnergy() const;
     virtual void computeProfile(Output& output, Dynamics const& dyna, size_t iOfIteration) const;
     virtual void computeProfile(Output& output, LangevinBase const& model, size_t iOfIteration) const;

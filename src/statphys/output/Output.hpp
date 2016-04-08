@@ -16,24 +16,26 @@ namespace simol
   {
   public:
     string outputFolderName_;
-    ofstream outObservables_;
-    ofstream outParticles_;
-    ofstream outParticlesXMakeMol_;
-    ofstream outFinalFlow_;
-    ofstream outFinalVelocity_;
-    ofstream outCorrelation_;
-    ofstream outVelocities_;
-    ofstream outBeam_;
-    ofstream outVelocitiesCV_;
-    ofstream outVelocitiesGenerator_;
-    ofstream outForcesCV_;
-    ofstream outLengthsCV_;
-    ofstream outMidFlowCV_;    
-    ofstream outMidFlowPT_;
-    ofstream outSumFlowCV_;    
-    ofstream outSumFlowPT_;
-    ofstream outProfile_;
-    ofstream outFinalProfile_;
+    std::shared_ptr<ofstream> outObservables_;
+    std::shared_ptr<ofstream> outParticles_;
+    std::shared_ptr<ofstream> outParticlesXMakeMol_;
+    std::shared_ptr<ofstream> outFinalVelocity_;
+    std::shared_ptr<ofstream> outCorrelation_;
+    std::shared_ptr<ofstream> outVelocitiesCV_;
+    std::shared_ptr<ofstream> outVelocitiesGenerator_;
+    std::shared_ptr<ofstream> outForcesCV_;
+    std::shared_ptr<ofstream> outLengthsCV_;
+    
+    //For the chains
+    std::shared_ptr<ofstream> outFinalFlow_;
+    std::shared_ptr<ofstream> outBeam_;
+    std::shared_ptr<ofstream> outChainVelocities_;
+    std::shared_ptr<ofstream> outMidFlowCV_;    
+    std::shared_ptr<ofstream> outMidFlowPT_;
+    std::shared_ptr<ofstream> outSumFlowCV_;    
+    std::shared_ptr<ofstream> outSumFlowPT_;
+    std::shared_ptr<ofstream> outProfile_;
+    std::shared_ptr<ofstream> outFinalProfile_;
     
     string profilePath_;
     
@@ -70,6 +72,25 @@ namespace simol
     
     Output(Input const& input);
     void setControlVariates(Input& input, Potential& potential, Galerkin* galerkin);
+    
+    ofstream & outObservables();
+    ofstream & outParticles();
+    ofstream & outParticlesXMakeMol();
+    ofstream & outFinalFlow();
+    ofstream & outFinalVelocity();
+    ofstream & outCorrelation();
+    ofstream & outChainVelocities();
+    ofstream & outBeam();
+    ofstream & outVelocitiesCV();
+    ofstream & outVelocitiesGenerator();
+    ofstream & outForcesCV();
+    ofstream & outLengthsCV();
+    ofstream & outMidFlowCV();    
+    ofstream & outMidFlowPT();
+    ofstream & outSumFlowCV();    
+    ofstream & outSumFlowPT();
+    ofstream & outProfile();
+    ofstream & outFinalProfile();
     
     const double& timeStep() const;
     double& timeStep();
@@ -112,7 +133,7 @@ namespace simol
     size_t& decorrelationNbOfIterations();
     double decorrelationTime() const;
     
-    void writeProfile(ofstream& out_, size_t iOfIteration);
+    void writeProfile(ofstream & out_, size_t iOfIteration);
     //double& integratedAutocorrelationP();
     //void display(vector<Particle> const& configuration, size_t iOfIteration);
     void displayObservables(size_t iOfIteration);

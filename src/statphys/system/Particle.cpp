@@ -151,6 +151,15 @@ namespace simol
 	
 	int& Particle::countdown()
 	{return countdown_;}
+	
+	
+	
+	void Particle::resetForce(Potential const& pot)
+  {
+    potentialEnergy_ = 0;
+    force_ = pot.externalForce();
+    virial_ = 0;
+  }
 
 
 }
