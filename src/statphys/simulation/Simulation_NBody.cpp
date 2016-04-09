@@ -2,14 +2,14 @@
 
 namespace simol {
  
-  void sampleSystem(Dynamics& /*dyna*/, NBody& syst)
+  void sampleSystem(Dynamics& dyna, NBody& syst)
   {
     int Dim = syst.dimension();   // PAS SUPER, MAIS SINON PBM DE TYPE POUR COMPARAISON ?
     int NbPartDim = syst.nbOfParticlesPerDimension(); 
     double latticeSize = syst.latticeParameter();
     //-- initialization of the momenta according to a Gaussian distribution --
     for (int i = 0; i < syst.nbOfParticles(); i++)
-      syst.getParticle(i).momentum() = syst.drawMomentum(1, syst.getParticle(i).mass());   // TO DO : introduce beta in Hamiltonian...
+      syst.getParticle(i).momentum() = syst.drawMomentum(dyna.beta(), syst.getParticle(i).mass());   
     //-- initialization on a cubic lattice --
     if (Dim == 2) 
       {

@@ -1,29 +1,24 @@
-Geometry:
+System:
   Dimension: 1
+  Name: Isolated
+   
+Time:
+  Step: 0.01
+  FinalTime: 1.
 
-Mesh:
-  Time:
-    Step: 0.01
-    FinalTime: 100
+Potential:
+  Name: Sinusoidal
+  Amplitude: 1
 
-Physics:
-  System:
-    Name: Isolated
-    Momentum: 1
-  Potential:
-    Name: Sinusoidal
-    Amplitude: 1
-  Model:
-    Name: DPDE
-    Gamma: 1
-    Temperature: 1
-    HeatCapacity : 1
+Dynamics:
+  Name: DPDE
+  Gamma: 1
+  Temperature: 1
+  HeatCapacity : 1
 
 Output:
-  ParametersName: /
-  FolderName: test
-  DecorrelationTime: 5
-  //Period: 1
-  //ProfilePeriod: 10
+  FolderName: /
+  Period: 0.02
+
 
 
