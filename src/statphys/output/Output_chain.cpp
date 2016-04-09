@@ -62,6 +62,11 @@ namespace simol{
       << endl;
   }
   
+   void Output::displayProfile(int iOfIteration)
+  {
+    writeProfile(outProfile(), iOfIteration);
+  }
+
     void Output::writeProfile(ofstream & out_, int iOfIteration)
   {
     assert(out_.is_open());

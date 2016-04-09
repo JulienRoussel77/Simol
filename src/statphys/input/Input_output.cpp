@@ -41,17 +41,17 @@ namespace simol {
     
     if (data["Output"]["ParametersName"]
         && data["Output"]["ParametersName"].as<string>() == "yes")
-    {    
-      if (dynamicsName() == "BoundaryLangevin")
-        name += "N" + to_string(nbOfParticles()) + "_";
-      
-      name += "dt" + doubleToString(timeStep()) + "_eta" + doubleToString(eta());
-      
-      if (dynamicsName() == "BoundaryLangevin")
-        name += "_xi" + doubleToString(xi());
-      
-      name += "/";
-    }
+      {    
+	if (dynamicsName() == "BoundaryLangevin")
+	  name += "N" + to_string(nbOfParticles()) + "_";
+	
+	name += "dt" + doubleToString(timeStep()) + "_eta" + doubleToString(eta());
+	
+	if (dynamicsName() == "BoundaryLangevin")
+	  name += "_xi" + doubleToString(xi());
+	
+	name += "/";
+      }
     return name;
   }
   
@@ -60,7 +60,7 @@ namespace simol {
     string name = parametersName();
     
     if (data["Output"]["FolderName"])
-      name += data["Output"]["FolderName"].as<string>()+"/";
+      name += data["Output"]["FolderName"].as<string>();
     
     return name;
   }
