@@ -17,7 +17,6 @@ Dynamics:
   HeatCapacity : 1
 
 Output:
-  FolderName: /
   Period: 0.02
 
 
