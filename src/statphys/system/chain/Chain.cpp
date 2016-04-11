@@ -139,11 +139,16 @@ namespace simol
   TriChain::TriChain(Input const& input):
   Chain(input),
   ancorParticle1_(input.dimension()),
-  ancorParticle2_(input.dimension())
+  ancorParticle2_(input.dimension()),
+  isOfFixedVolum_(input.isOfFixedVolum())
   {
     ancorParticle1_.position(0) = 0;//3 * input.initialPosition(0) - 2*input.initialPosition(1);
     ancorParticle2_.position(0) = 0;//2 * input.initialPosition(0) - input.initialPosition(1);
-
+  }
+  
+  bool const& TriChain::isOfFixedVolum() const
+  {
+    return isOfFixedVolum_;
   }
   
   ///Computes the force and the energy associated to this triplet interaction, and updates these 2 fields
@@ -171,15 +176,17 @@ namespace simol
       particle.resetForce(potential());
     //for (auto&& particle : configuration_)
     //  dyna.computeForce(particle);
-    triInteraction(ancorParticle2_, ancorParticle1_, configuration_[0]);
-    triInteraction(ancorParticle1_, configuration_[0], configuration_[1]);
+    triInteraction(ancorParticle1_, ancorParticle2_, configuration_[0]);
+    triInteraction(ancorParticle2_, configuration_[0], configuration_[1]);
     for (int i = 0; i < nbOfParticles() - 2; i++)
       triInteraction(configuration_[i], configuration_[i+1], configuration_[i+2]);
     //dyna.bending(configuration_[nbOfParticles() - 2], configuration_[nbOfParticles() - 1]);
+    if (isOfFixedVolum_)
+      triInteraction(configuration_[nbOfParticles()-1], ancorParticle1_, ancorParticle2_);
   }
   
   double TriChain::boundaryPotEnergy() const
-  {return ancorParticle1_.potentialEnergy();}
+  {return ancorParticle1_.potentialEnergy() + ancorParticle2_.potentialEnergy();}
   
   void TriChain::computeProfile(Output& /*output*/, Dynamics const& /*dyna*/, int /*iOfIteration*/) const
   {}

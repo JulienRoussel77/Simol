@@ -17,18 +17,11 @@ namespace simol
     timeStep_(input.timeStep()),
     nbOfIterations_(input.nbOfIterations()),
     nbOfThermalIterations_(input.nbOfThermalIterations()),
-    nbOfBurningIterations_(input.nbOfBurningIterations()),
+    nbOfBurnInIterations_(input.nbOfBurnInIterations()),
     beta_(input.beta()),
     temperature_(1/beta_),
     galerkin_(nullptr)
-  {
-    cout << "timeStep = " << timeStep() << endl;
-    if (nbOfIterations_ < 1e6)
-      cout << "nbOfIterations_ = " << nbOfIterations_ << endl;
-    else
-      cout << "nbOfIterations_ = " << nbOfIterations_/1e6 << "e6" << endl;
-    cout << "finalTime = " << nbOfIterations_ * timeStep() << endl;
-  }
+  {}
 
   void Dynamics::printName() const
   {
@@ -60,11 +53,11 @@ namespace simol
   ///Read-only accessor for the number of iterations of the thermalization
   int const& Dynamics::nbOfThermalIterations() const {return nbOfThermalIterations_;}
   ///
-  ///Read-write accessor for the number of iterations of the burning
-  int& Dynamics::nbOfBurningIterations() {return nbOfBurningIterations_;}
+  ///Read-write accessor for the number of iterations of the burnIn
+  int& Dynamics::nbOfBurnInIterations() {return nbOfBurnInIterations_;}
   ///
-  ///Read-only accessor for the number of iterations of the burning
-  int const& Dynamics::nbOfBurningIterations() const {return nbOfBurningIterations_;}
+  ///Read-only accessor for the number of iterations of the burnIn
+  int const& Dynamics::nbOfBurnInIterations() const {return nbOfBurnInIterations_;}
 
   const std::shared_ptr<RNG>& Dynamics::rng() const {return rng_;}
 

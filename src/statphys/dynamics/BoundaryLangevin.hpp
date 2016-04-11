@@ -20,10 +20,11 @@ namespace simol
     void initializeMomenta(vector<Particle>& configuration);
 		virtual void bending(Particle& particle1, Particle& particle2) const;
   protected:
-    double betaLeft_;
-    double betaRight_;
+    double deltaTemperature_;
     double temperatureLeft_;
     double temperatureRight_;
+    double betaLeft_;
+    double betaRight_;
     double tauBending_;
   };
 

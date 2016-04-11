@@ -83,6 +83,14 @@ namespace simol{
           << endl;
   }
   
+  void Output::finalChainDisplay(vector<Particle> const& /*configuration*/, Vector<double> const& /*externalForce*/)
+  {    
+    writeProfile(outFinalProfile(), nbOfIterations());
+    
+    midFlowCV_->postTreat(outMidFlowPT(), timeStep());
+    sumFlowCV_->postTreat(outSumFlowPT(), timeStep());
+  }
+  
     void Output::displayFinalFlow(double temperature, double delta_temperature, double tau, double xi)
   {
     cout << "outFinalFlow_ : " <<  std::left << setw(10) << finalTime()

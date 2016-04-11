@@ -8,10 +8,11 @@ namespace simol
   ///Constructor for Langevin dynamics on chains, where there is a thermostat at each end
   BoundaryLangevin::BoundaryLangevin(Input const& input):
     LangevinBase(input),
-    betaLeft_(input.betaLeft()),
-    betaRight_(input.betaRight()),
-    temperatureLeft_(1/betaLeft_),
-    temperatureRight_(1/betaRight()),
+    deltaTemperature_(input.deltaTemperature()),
+    temperatureLeft_(input.temperature() + deltaTemperature_),
+    temperatureRight_(input.temperature() - deltaTemperature_),
+    betaLeft_(1 / temperatureLeft_),
+    betaRight_(1 / temperatureRight_),    
     tauBending_(input.tauBending())
   {
     cout << "deltaTemperature = " << deltaTemperature() << endl;

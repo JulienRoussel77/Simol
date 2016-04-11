@@ -13,24 +13,6 @@ namespace simol{
   
   Output::Output(Input const& input):
     outputFolderName_(input.outputFolderName()), 
-    /*outObservables_(input.outputFolderName()+"observables.txt"), 
-    outParticles_(input.outputFolderName()+"particles.txt"), 
-    outParticlesXMakeMol_(input.outputFolderName()+"xmakemol.xyz"), 
-    outFinalFlow_(input.simuTypeName()+"finalFlow.txt", std::ofstream::app),
-    outFinalVelocity_(input.simuTypeName()+"finalVelocity.txt", std::ofstream::app),
-    outCorrelation_(input.outputFolderName()+"correlations.txt"),
-    outVelocities_(input.outputFolderName()+"velocitiesChain.txt"),
-    outBeam_(input.outputFolderName()+"beamChain.txt"),
-    outVelocitiesCV_(input.outputFolderName()+"velocities.txt"),
-    outVelocitiesGenerator_(input.outputFolderName()+"velocitiesGenerator.txt"),
-    outForcesCV_(input.outputFolderName()+"forces.txt"),
-    outLengthsCV_(input.outputFolderName()+"lengths.txt"),
-    outMidFlowCV_(input.outputFolderName()+"midFlow.txt"),
-    outMidFlowPT_(input.outputFolderName()+"midFlowPost.txt"),
-    outSumFlowCV_(input.outputFolderName()+"sumFlow.txt"),
-    outSumFlowPT_(input.outputFolderName()+"sumFlowPost.txt"),
-    outProfile_(input.outputFolderName()+"profile.txt"),
-    outFinalProfile_(input.outputFolderName()+"finalProfile.txt"),*/
     periodNbOfIterations_(input.outputPeriodNbOfIterations()),
     profilePeriodNbOfIterations_(input.outputProfilePeriodNbOfIterations()),
     timeStep_(input.timeStep()),
@@ -103,25 +85,38 @@ namespace simol{
         outFinalProfile_      = std::make_shared<ofstream>(input.outputFolderName()+"finalProfile.txt");
     }
     
+    cout << endl;
+    cout << "####################################################" << endl;
+    cout << "#" << endl;
+    cout << "# Simulation of : " << endl;
+    cout << "#    System    : " << input.systemName() << endl;
+    cout << "#    Dynamics  : " << input.dynamicsName() << endl;
+    cout << "#    Potential : " << input.potentialName() << endl;
+    cout << "#" << endl;   
+    cout << "# Number of particles  : " << nbOfParticles_ << endl;
+    if (nbOfIterations_<1e6)
+      cout << "# Number of iterations : " << nbOfIterations_ << endl;
+    else
+      cout << "# Number of iterations : " << nbOfIterations_/1e6 << "e6" << endl;
+    cout << "# Time step            : " << timeStep_ << endl;
+    cout << "#" << endl;
+    cout << "####################################################" << endl << endl;
+    
     std::cout << "Output written in " << input.outputFolderName() << std::endl;
     std::cout << "Final output written in " << input.simuTypeName() << std::endl;
-    assert(outParticles_->is_open());
+    if (!outParticles_->is_open())
+      throw std::runtime_error("The output file does not exist ! Please add it manually.");
     
     std::ofstream outInput(input.outputFolderName()+"inputFile.txt");
     outInput << input.inputFlux().rdbuf();
     
-    cout << "nbOfParticles : " << nbOfParticles_ << endl;
     assert(input.outputPeriodTime() == 0 || input.outputPeriodTime() >= timeStep());
     decorrelationNbOfIterations_ = input.decorrelationNbOfIterations();
-    cout << "decorrelationNbOfIterations : " << decorrelationNbOfIterations_ << endl;
-    
-    cout << "Initializing the profiles : arrays " << decorrelationNbOfIterations() << " X " << nbOfParticles_ << endl;
   }
 	
   void Output::setControlVariates(Input& input, Potential& potential, Galerkin* galerkin)
   {
     velocityCV_ = createControlVariate(input, potential, galerkin);
-    cout << "cv test : " << velocityCV_->nbOfFunctions() << endl;
     forceCV_ = createControlVariate(input, potential, galerkin);
     lengthCV_ = createControlVariate(input, potential, galerkin);
     midFlowCV_ = createControlVariate(input, potential, galerkin);
@@ -286,15 +281,6 @@ namespace simol{
   void Output::displayGeneratorOnBasis(ofstream& out, vector<Particle> const& configuration, ControlVariate& controlVariate, double time)
   {
     out << time << " " << modulo(configuration[0].position(0), -M_PI, M_PI) << " " << configuration[0].momentum(0) << " " << controlVariate.lastGeneratorOnBasis()(0) << " " << controlVariate.basisFunction(configuration) << endl;
-  }
-  
-  void Output::finalChainDisplay(vector<Particle> const& /*configuration*/, Vector<double> const& /*externalForce*/)
-  {    
-    cout << "Output::finalChainDisplay" << endl;
-    writeProfile(outFinalProfile(), nbOfIterations());
-    
-    midFlowCV_->postTreat(outMidFlowPT(), timeStep());
-    sumFlowCV_->postTreat(outSumFlowPT(), timeStep());
   }
   
   void Output::displayFinalVelocity(double temperature, double externalForce, int nbOfFourier, int nbOfHermite)

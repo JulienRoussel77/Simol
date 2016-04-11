@@ -2,12 +2,32 @@
 
 namespace simol {
  
-  void sampleSystem(Dynamics& dyna, System& syst)
+  void samplePositions(Dynamics& dyna, System& syst)
   {
     dyna.printName();
     syst.printName();
-    throw std::invalid_argument("sampleSystem : Function undefined");
+    throw std::invalid_argument("samplePositions : Function undefined");
   }
+  
+  //-- initialization of the momenta according to a Gaussian distribution --
+  void sampleMomenta(Dynamics& dyna, System& syst)
+  {
+    cout << "Sampling the momenta..." ;cout.flush();
+    for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
+        syst.getParticle(iOfParticle).momentum() = syst.drawMomentum(dyna.beta(), syst.getParticle(iOfParticle).mass());
+  }
+  //-- initialization of the momenta according to a Gaussian distribution --  
+  void sampleMomenta(LangevinBase& dyna, System& syst)
+  {
+    cout << "Sampling the momenta...";cout.flush();
+    for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
+    {
+      syst.getParticle(iOfParticle).momentum() = syst.drawMomentum(dyna.beta(), syst.getParticle(iOfParticle).mass());
+
+      dyna.initializeCountdown(syst.getParticle(iOfParticle));
+    }
+  }
+  
   
   void simulate(Dynamics& dyna, System& syst)
   {

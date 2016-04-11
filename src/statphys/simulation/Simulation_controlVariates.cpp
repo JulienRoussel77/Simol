@@ -40,5 +40,19 @@ namespace simol {
     if (output.doOutput(iOfIteration))
       output.displayGeneratorOnBasis(output.outVelocitiesGenerator(), syst.configuration(), output.velocityCV(), iOfIteration*dyna.timeStep());
   }
+  
+  ///
+  ///Computes the quantities needed by the control variates (coefficients a, b, D) and {L \Phi}
+  void updateAllControlVariates(const BoundaryLangevin& dyna, System const& syst, Output& output, int iOfIteration)
+  {
+    Vector<double> generatorOnBasis;
+    
+    //generatorOnBasis = generatorOn(dyna, syst, output.midFlowCV());
+    generatorOnBasis = output.midFlowCV().generatorBoundarylangevin(syst.configuration(), dyna.betaLeft(), dyna.betaRight(), dyna.gamma());
+    output.midFlowCV().update(output.energyMidFlow(), generatorOnBasis, syst.configuration(), iOfIteration);
+    //generatorOnBasis = generatorOn(dyna, syst, output.sumFlowCV());
+    generatorOnBasis = output.sumFlowCV().generatorBoundarylangevin(syst.configuration(), dyna.betaLeft(), dyna.betaRight(), dyna.gamma());
+    output.sumFlowCV().update(output.energySumFlow(), generatorOnBasis, syst.configuration(), iOfIteration);
+  }
 
 }

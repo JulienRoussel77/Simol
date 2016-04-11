@@ -11,36 +11,35 @@ namespace simol
   {
   public:
     Chain(Input const& input);
-    //virtual void computeAllForces(Dynamics const& model);
     virtual void thermalize(Dynamics& model);
     virtual void thermalize(LangevinBase& dyna);
-    //virtual void computeProfile(Output& output, Dynamics const& model, int iOfIteration) const;
-    //virtual void writeFinalOutput(Output& output, Dynamics const& model);
   };
   
   class BiChain : public Chain
   {
-    Particle ancorParticle_;
   public:
     BiChain(Input const& input);
     void computeAllForces();
     virtual void computeProfile(Output& output, Dynamics const& dyna, int iOfIteration) const;
     virtual void computeProfile(Output& output, LangevinBase const& model, int iOfIteration) const;
-    //virtual void writeFinalOutput(Output& output, Dynamics const& model);
+  protected:
+    Particle ancorParticle_;
   };
   
   class TriChain : public Chain
   {
-    Particle ancorParticle1_;
-    Particle ancorParticle2_;
   public:
     TriChain(Input const& input);
+    bool const& isOfFixedVolum() const;
     void triInteraction(Particle& particle1, Particle& particle2, Particle& particle3) const;
     void computeAllForces();     
     virtual double boundaryPotEnergy() const;
     virtual void computeProfile(Output& output, Dynamics const& dyna, int iOfIteration) const;
     virtual void computeProfile(Output& output, LangevinBase const& model, int iOfIteration) const;
-    //virtual void writeFinalOutput(Output& output, Dynamics const& model);
+  protected:
+    Particle ancorParticle1_;
+    Particle ancorParticle2_;
+    bool isOfFixedVolum_;
   };
   
 }

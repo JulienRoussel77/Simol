@@ -36,12 +36,14 @@ namespace simol{
     string settingsPath() const;
     Vector<double> initialPosition(int const& i=0) const;
     Vector<double> initialMomentum(int const& i=0) const;
+    //Chain
+    bool isOfFixedVolum() const;
     
     //-- Time --
     double timeStep() const;
     int nbOfIterations() const;
     int nbOfThermalIterations() const;
-    int nbOfBurningIterations() const;
+    int nbOfBurnInIterations() const;
     
     //-- Potential --
     string potentialName() const;
@@ -64,11 +66,12 @@ namespace simol{
     string dynamicsName() const;
     double gamma() const;
     double temperature() const;
-    double temperatureLeft() const;
-    double temperatureRight() const;
+    //double temperatureLeft() const;
+    //double temperatureRight() const;
     double beta() const;
-    double betaLeft() const;
-    double betaRight() const;
+    //double betaLeft() const;
+    //double betaRight() const;
+    double deltaTemperature() const;
     double externalForce() const;
     double tauBending() const;
     double xi() const;

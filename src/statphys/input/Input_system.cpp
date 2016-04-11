@@ -12,11 +12,17 @@ const double defaultLatticeParameter = 1.;
 
 namespace simol {
 
-  string Input::systemName() const {return data["System"]["Name"].as<string>();}
+  string Input::systemName() const {
+    if (data["System"]["Name"])
+      return data["System"]["Name"].as<string>();
+    else throw std::runtime_error("No systemName in the input file");
+  }
   
   int Input::dimension() const 
   { 
-    return data["System"]["Dimension"].as<int>();
+    if (data["System"]["Dimension"])
+      return data["System"]["Dimension"].as<int>();
+    else throw std::runtime_error("No Dimension in the input file !");
   }
   
   int Input::nbOfParticles() const {
@@ -98,6 +104,16 @@ namespace simol {
       }
     return p0;
   }  
+  
+  //Chain
+  bool Input::isOfFixedVolum() const
+  {
+    if (data["System"]["Volum"]
+        && data["System"]["Volum"].as<string>() == "fixed")
+      return true;
+    
+    return false;
+  }
   
   
 }

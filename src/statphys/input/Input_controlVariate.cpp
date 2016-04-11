@@ -35,7 +35,7 @@ namespace simol {
   {
     if (data["Galerkin"])
       if (data["Galerkin"]["Resolve"])
-	if (data["Galerkin"]["Resolve"].as<string>() == "Yes")
+	if (data["Galerkin"]["Resolve"].as<string>() == "yes")
 	  return true;
     
     return false;
@@ -45,8 +45,8 @@ namespace simol {
   {
     if (data["Galerkin"])
       if (data["Galerkin"]["Basis"])
-	if (data["Galerkin"]["Basis"]["Elements"])
-	  return data["Galerkin"]["Basis"]["Elements"].as<string>();
+        if (data["Galerkin"]["Basis"]["Elements"])
+          return data["Galerkin"]["Basis"]["Elements"].as<string>();
     return "None";
   }
 

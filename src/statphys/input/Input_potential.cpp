@@ -59,11 +59,15 @@ namespace simol {
 
   //----- DoubleWell -------
   double Input::height() const {
-    return data["Potential"]["Height"].as<double>();
+    if (data["Potential"]["Height"])
+      return data["Potential"]["Height"].as<double>();
+    else throw std::runtime_error("No Height in the input file !");
   }
   
   double Input::interWell() const {
-    return data["Potential"]["InterWell"].as<double>();
+    if (data["Potential"]["InterWell"])
+      return data["Potential"]["InterWell"].as<double>();
+    else throw std::runtime_error("No InterWell in the input file !");
   }
 
   //----- Harmonic ----

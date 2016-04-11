@@ -7,6 +7,7 @@ using std::string;
 const double defaultSeed = 0;
 const double defaultGamma = 1; 
 const double defaultXi = 0;
+const double defaultDeltaTemperature = 0;
 const double defaultExternalForce = 0;
 const double defaultTauBending = 0;
 const double defaultHeatCapacity = 1;
@@ -15,7 +16,11 @@ namespace simol {
 
   string Input::dynamicsName() const {return data["Dynamics"]["Name"].as<string>();}
   
-  double Input::gamma() const {return data["Dynamics"]["Gamma"].as<double>();}
+  double Input::gamma() const {
+    if (data["Dynamics"]["Gamma"])
+      return data["Dynamics"]["Gamma"].as<double>();
+    else throw std::runtime_error("No Gamma in the input file !");
+  }
   
   double Input::temperature() const
   {
@@ -24,44 +29,38 @@ namespace simol {
     else if (data["Dynamics"]["Beta"])
       return 1 / data["Dynamics"]["Beta"].as<double>();
     else if (data["Dynamics"]["TemperatureLeft"] && data["Dynamics"]["TemperatureRight"])
-      return (temperatureLeft() + temperatureRight()) / 2;
+      return (data["Dynamics"]["TemperatureLeft"].as<double>() + data["Dynamics"]["TemperatureRight"].as<double>()) / 2;
     else if (data["Dynamics"]["BetaLeft"] && data["Dynamics"]["BetaRight"])
-      return .5/betaLeft() + .5/betaRight();
-    else
-      {cout << "Temperature not precised !" << endl;exit(1);}
+      return .5/data["Dynamics"]["BetaLeft"].as<double>() + .5/data["Dynamics"]["BetaRight"].as<double>();
+    else throw std::runtime_error("Temperature not precised !");
   }
 
-  double Input::temperatureLeft() const
+  /*double Input::temperatureLeft() const
   {
-    return data["Dynamics"]["TemperatureLeft"].as<double>();
+    if (data["Dynamics"]["TemperatureLeft"])
+      return data["Dynamics"]["TemperatureLeft"].as<double>();
+    else throw std::runtime_error("No TemperatureLeft in the input file !");
   }
 
   double Input::temperatureRight() const
   {
-    return data["Dynamics"]["TemperatureRight"].as<double>();
-  }
+    if (data["Dynamics"]["TemperatureRight"])
+      return data["Dynamics"]["TemperatureRight"].as<double>();
+    else throw std::runtime_error("No TemperatureRight in the input file !");
+  }*/
 
   double Input::beta() const
   {
-    if (data["Dynamics"]["Beta"])
-      return data["Dynamics"]["Beta"].as<double>();
-    else if (data["Dynamics"]["Temperature"])
-      return 1 / data["Dynamics"]["Temperature"].as<double>();
-    else if (data["Dynamics"]["BetaLeft"] && data["Dynamics"]["BetaRight"])
-      return 2. / (1/betaLeft() + 1/betaRight());
-    else if (data["Dynamics"]["TemperatureLeft"] && data["Dynamics"]["TemperatureRight"])
-      return 2/(temperatureLeft() + temperatureRight());
-    else
-      throw std::invalid_argument("Beta not precised !");
+    return 1/temperature();
   }
 
-  double Input::betaLeft() const
+  /*double Input::betaLeft() const
   {
     if (data["Dynamics"]["BetaLeft"])
       return data["Dynamics"]["BetaLeft"].as<double>();
     else if (data["Dynamics"]["TemperatureLeft"])
       return 1 / data["Dynamics"]["TemperatureLeft"].as<double>();
-    else assert(false);
+    else throw std::runtime_error("No BetaLeft in the input file !");
   }
 
   double Input::betaRight() const
@@ -70,7 +69,14 @@ namespace simol {
       return data["Dynamics"]["BetaRight"].as<double>();
     else if (data["Dynamics"]["TemperatureRight"])
       return 1 / data["Dynamics"]["TemperatureRight"].as<double>();
-    else assert(false);
+    else throw std::runtime_error("No BetaRight in the input file !");
+  }*/
+  
+  double Input::deltaTemperature() const
+  {
+    if (data["Dynamics"]["deltaTemperature"])
+      return data["Dynamics"]["deltaTemperature"].as<double>();
+    else return defaultDeltaTemperature;
   }
 
   double Input::externalForce() const {
@@ -106,7 +112,7 @@ namespace simol {
   double Input::eta() const
   {
     if (dynamicsName() == "BoundaryLangevin")
-      return (temperatureLeft() - temperatureRight())/2;
+      return deltaTemperature();
     else
       return externalForce();
   }

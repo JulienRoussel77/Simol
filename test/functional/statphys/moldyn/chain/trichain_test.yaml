@@ -1,0 +1,35 @@
+Time:
+  Step: 0.02
+  FinalTime: 100
+  ThermalTime: 10
+  BurnInTime: 10
+
+System:
+  Name: TriChain
+  Dimension: 1
+  Volum: fixed
+  Number: 8
+
+Potential:
+  Name: FPU
+  Alpha: 1
+  Beta: 1
+
+Dynamics:
+  Name: BoundaryLangevin
+  Gamma: 1
+  Temperature: 1
+  DeltaTemperature: .1
+  Tau: 0
+  Xi: 1
+  Seed: 0
+
+Output:
+  SimuTypeName: yes
+  FolderName: test
+  DecorrelationTime: 20
+  Period: 1
+  ProfilePeriod: 1
+  DoFinalFlow: no
+
+

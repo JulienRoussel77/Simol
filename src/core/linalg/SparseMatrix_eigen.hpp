@@ -24,6 +24,7 @@ namespace simol
 
         ScalarType const operator()(std::size_t const rowIndex, std::size_t const columnIndex) const;
         ScalarType & operator()(std::size_t const rowIndex, std::size_t const columnIndex);
+        ScalarType& insert(std::size_t const rowIndex, std::size_t const columnIndex);
 
         SparseMatrix<ScalarType,eigen>& operator+=(SparseMatrix<ScalarType,eigen> const& A);
         SparseMatrix<ScalarType,eigen>& operator-=(SparseMatrix<ScalarType,eigen> const& A);
@@ -57,6 +58,11 @@ namespace simol
   template<class ScalarType> inline
   ScalarType& SparseMatrix<ScalarType,eigen>::operator()(std::size_t const rowIndex, std::size_t const columnIndex)
   { return wrapped_.coeffRef(rowIndex, columnIndex); }
+  
+    //! Create coefficient
+  template<class ScalarType> inline
+  ScalarType& SparseMatrix<ScalarType,eigen>::insert(std::size_t const rowIndex, std::size_t const columnIndex)
+  { return wrapped_.insert(rowIndex, columnIndex); }
 
   //! Returns adjoint matrix
   template<class ScalarType> inline
@@ -242,11 +248,12 @@ namespace simol
 
 
   template<class ScalarType>
-  SparseMatrix<ScalarType, eigen> speye(size_t const nbOfRows, size_t const nbOfColumns)
+  SparseMatrix<ScalarType> speye(size_t const nbOfRows, size_t const nbOfColumns)
   {
-    SparseMatrix<ScalarType, eigen> A(nbOfRows, nbOfColumns);
+    SparseMatrix<ScalarType> A(nbOfRows, nbOfColumns);
     for (std::size_t i=0; i < std::min(nbOfRows, nbOfColumns); i++)
       A(i,i) = 1;
+      //A.insert(i,i) = 1;
     return A;
   }
 

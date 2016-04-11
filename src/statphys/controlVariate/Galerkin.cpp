@@ -341,28 +341,57 @@ namespace simol
 		basis_(input, *potential_)
 	{		
     
-    SMat A = speye<double>(2,2);
-    for (int jOfA=0; jOfA< (int) A.numberOfColumns(); ++jOfA)
-      for (int iOfA=0; iOfA< (int) A.numberOfRows(); ++iOfA)
-        cout << A(iOfA,jOfA) << endl;
+    Eigen::SparseMatrix<double> A(2, 3);
+    A.insert(0, 1) = 34;
+    A.insert(1, 2) = 56;
+    //for (int k = 0; k < A.outerSize(); ++k){
+      //int k=1;
+      //for (Eigen::SparseMatrix<double>::InnerIterator it(A, k); it; ++it){
+    //Eigen::SparseMatrix<double>::InnerIterator it(A, 1);
+    SMat::iterator it(A,1);
+    cout << it.row() <<"\t";
+    cout << it.col() << "\t";
+    cout << it.value() << endl;
+      //}
+    //}
+    cout << "---------------------" << endl;
+    
+    //SparseMatrix<double> B(2, 3);
+    SMat B(2, 3);
+    B.insert(0,1) = 24;
+    B.insert(1,2) = 36;
+    //Eigen::SparseMatrix<double>::InnerIterator it2(B, 1);
+    SMat::iterator it2(B,1);
+    cout << it2.row() <<"\t";
+    cout << it2.col() << "\t";
+    cout << it2.value() << endl;
+    
+    SMat C = speye<double>(3,3);
+    for (int jOfC=0; jOfC< (int) C.numberOfColumns(); ++jOfC)
+      for (int iOfC=0; iOfC< (int) C.numberOfRows(); ++iOfC)
+        cout << C(iOfC,jOfC) << endl;
       
 
 
-    SMat::iterator itTest(A,0);
-    cout << "bool : " << (bool)itTest << " " << itTest.row() << " " << itTest.value() << endl;
+    SMat::iterator itTest(C,0);
+    cout << "bool : " << (bool)itTest << " (" << itTest.row() << " , " << itTest.col() << ") -> "<< itTest.value() << endl; 
     ++itTest;
-    cout << "bool : " << (bool)itTest << " " << itTest.row() << " " << itTest.value() << endl;
+    cout << "bool : " << (bool)itTest << " (" << itTest.row() << " , " << itTest.col() << ") -> "<< itTest.value() << endl; 
     ++itTest;
-    cout << "bool : " << (bool)itTest << " " << itTest.row() << " " << itTest.value() << endl;
+    cout << "bool : " << (bool)itTest << " (" << itTest.row() << " , " << itTest.col() << ") -> "<< itTest.value() << endl; 
     ++itTest;
-    cout << "bool : " << (bool)itTest << " " << itTest.row() << " " << itTest.value() << endl;
+    cout << "bool : " << (bool)itTest << " (" << itTest.row() << " , " << itTest.col() << ") -> "<< itTest.value() << endl; 
     
     /*cout << "test : " << itTest.row() << " " << itTest.value() << endl;
     ++itTest;
     cout << "test : " << itTest.row() << " " << itTest.value() << endl;*/
     
-    for (SMat::iterator it(A,0); it; ++it)
-      cout << "test : " << it.row() << " " << it.value() << endl;
+    for (SMat::iterator it(C,0); it; ++it)
+      cout << "test : (" << it.row() << " , " << it.col() << ") -> "<< it.value() << endl;
+        
+    for (SMat::iterator it(C,1); it; ++it)
+      cout << "test2 : (" << it.row() << " , " << it.col() << ") -> "<< it.value() << endl;
+    
     
 		assert(nbOfFourier_ % 2 == 1);
 		cout << endl << "Number of modes : " << nbOfFourier_ << " x " << nbOfHermite_ << endl;

@@ -4,6 +4,10 @@ using std::cout;
 using std::endl;
 using std::string;
 
+const int defaultThermalIterations = 0;
+const int defaultBurnInIterations = 0;
+
+
 namespace simol {
 
   // timestep for the discretization 
@@ -21,8 +25,7 @@ namespace simol {
       return data["Time"]["Number"].as<int>();
     else if (data["Time"]["FinalTime"])
       return data["Time"]["FinalTime"].as<double>() / timeStep();
-    else
-      {cout << "Nb of Iterations not specified !" << endl;exit(1);}
+    else throw std::runtime_error("Nb of Iterations not specified !");
   }
   
   // Number of iterations in the thermalization part (temperatures imposed everywhere)
@@ -33,18 +36,18 @@ namespace simol {
     else if (data["Time"]["ThermalTime"])
       return data["Time"]["ThermalTime"].as<double>() / timeStep();
     else
-      return 0;
+      return defaultThermalIterations;
   }
 
-  // Number of iterations in the burning part (no output)
-  int Input::nbOfBurningIterations() const
+  // Number of iterations in the burnIn part (no output)
+  int Input::nbOfBurnInIterations() const
   {
-    if (data["Time"]["BurningNumber"])
-      return data["Time"]["BurningNumber"].as<int>();
-    else if (data["Time"]["BurningTime"])
-      return data["Time"]["BurningTime"].as<double>() / timeStep();
+    if (data["Time"]["BurnInNumber"])
+      return data["Time"]["BurnInNumber"].as<int>();
+    else if (data["Time"]["BurnInTime"])
+      return data["Time"]["BurnInTime"].as<double>() / timeStep();
     else
-      return 0;
+      return defaultBurnInIterations;
   }
 
 }

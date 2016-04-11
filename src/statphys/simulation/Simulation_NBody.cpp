@@ -2,12 +2,13 @@
 
 namespace simol {
  
-  void sampleSystem(Dynamics& dyna, NBody& syst)
+  void samplePositions(Dynamics& dyna, NBody& syst)
   {
+    cout << "Sampling the positions..." ;cout.flush();
     int Dim = syst.dimension();   // PAS SUPER, MAIS SINON PBM DE TYPE POUR COMPARAISON ?
     int NbPartDim = syst.nbOfParticlesPerDimension(); 
     double latticeSize = syst.latticeParameter();
-    //-- initialization of the momenta according to a Gaussian distribution --
+
     for (int i = 0; i < syst.nbOfParticles(); i++)
       syst.getParticle(i).momentum() = syst.drawMomentum(dyna.beta(), syst.getParticle(i).mass());   
     //-- initialization on a cubic lattice --
@@ -38,6 +39,8 @@ namespace simol {
     }
     //cout << "    VERIFICATION : " << syst.nbOfParticlesPerDimension() << endl;
   }
+  
+  
   
   void simulate(Hamiltonian& dyna, NBody& syst)
   {

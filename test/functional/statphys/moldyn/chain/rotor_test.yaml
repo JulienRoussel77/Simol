@@ -1,9 +1,8 @@
-
 Time:
   Step: 0.02
   FinalTime: 100
   ThermalTime: 0
-  BurningTime: 0
+  BurnInTime: 0
 
 System:
   Name: BiChain
@@ -17,14 +16,13 @@ Potential:
 Dynamics:
   Name: BoundaryLangevin
   Gamma: 1
-  TemperatureLeft: 1.1
-  TemperatureRight: .9
+  Temperature: 1
+  DeltaTemperature: 0.1
   Tau: 0
   Seed: 0
 
 Output:
-  SystemTypeName
-  ParametersName
+  SimuTypeName: yes
   FolderName: test
   DecorrelationTime: 24
   //Period: 1

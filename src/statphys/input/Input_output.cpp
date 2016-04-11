@@ -35,23 +35,23 @@ namespace simol {
   string Input::parametersName() const
   {
     string name = simuTypeName();
-    
+        
     if (controlVariateName() != "None")
       name += controlVariateName()+"/";
     
     if (data["Output"]["ParametersName"]
         && data["Output"]["ParametersName"].as<string>() == "yes")
-      {    
-	if (dynamicsName() == "BoundaryLangevin")
-	  name += "N" + to_string(nbOfParticles()) + "_";
+    {    
+      if (dynamicsName() == "BoundaryLangevin")
+        name += "N" + to_string(nbOfParticles()) + "_";
 	
-	name += "dt" + doubleToString(timeStep()) + "_eta" + doubleToString(eta());
+      name += "dt" + doubleToString(timeStep()) + "_eta" + doubleToString(eta());
 	
-	if (dynamicsName() == "BoundaryLangevin")
-	  name += "_xi" + doubleToString(xi());
+      if (dynamicsName() == "BoundaryLangevin")
+        name += "_xi" + doubleToString(xi());
 	
-	name += "/";
-      }
+      name += "/";
+    }
     return name;
   }
   
@@ -60,7 +60,7 @@ namespace simol {
     string name = parametersName();
     
     if (data["Output"]["FolderName"])
-      name += data["Output"]["FolderName"].as<string>();
+      name += data["Output"]["FolderName"].as<string>() + "/";
     
     return name;
   }
@@ -120,7 +120,7 @@ namespace simol {
   {
     if (data["Output"]["doFinalFlow"])
       if (data["Output"]["doFinalFlow"].as<string>() == "no")
-	return false;
+        return false;
     return true;
   }
   
@@ -128,7 +128,7 @@ namespace simol {
   {
     if (data["Output"]["doFinalVelocity"])
       if (data["Output"]["doFinalVelocity"].as<string>() == "no")
-	return false;
+        return false;
     return true;
   }
   

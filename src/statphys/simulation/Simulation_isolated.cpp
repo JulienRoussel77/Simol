@@ -4,8 +4,11 @@ namespace simol {
 
   //------------- Hamiltonian --------------------
   
-  void sampleSystem(Hamiltonian& /*dyna*/, Isolated& /*syst*/)
-  {}
+  void samplePositions(Dynamics& dyna, Isolated& syst)
+  {
+    cout << "Sampling the positions..." ;cout.flush();
+    syst.getParticle(0).position(0) = syst.drawPotLaw(dyna.beta());
+  }
   
   void writeFinalOutput(Hamiltonian const& dyna, Isolated const& syst, Output& output)
   {
@@ -13,21 +16,11 @@ namespace simol {
       output.finalDisplayAutocorrelations();
     output.displayFinalVelocity(0, syst.externalForce(0), output.velocityCV_->nbOfFourier(), output.velocityCV_->nbOfHermite());
   }
- 
-  //------------- Langevin --------------------
-
-  void sampleSystem(LangevinBase& dyna, Isolated& syst)
-  {
-    syst.getParticle(0).momentum() = syst.drawMomentum(dyna.beta(), syst.getParticle(0).mass());
-    syst.getParticle(0).position(0) = syst.drawPotLaw(dyna.beta());
-  }
   
   //------------- Overdamped --------------------
   
-  void sampleSystem(Overdamped& dyna, Isolated& syst)
-  {
-    syst.getParticle(0).position(0) = syst.drawPotLaw(dyna.beta());
-  }
+  void sampleMomenta(Overdamped& dyna, Isolated& syst){}
+  
    
   //------------- DPDE --------------------
 
@@ -39,9 +32,9 @@ namespace simol {
     output.internalEnergy() = syst.getParticle(0).internalEnergy();
   }
 
-   void sampleSystem(DPDE& dyna, Isolated& syst)
+   void samplePositions(DPDE& dyna, Isolated& syst)
   {
-    syst.getParticle(0).momentum() = syst.drawMomentum(dyna.beta(), syst.getParticle(0).mass());
+    cout << "Sampling the positions..." ;cout.flush();
     syst.getParticle(0).position(0) = 0;
     syst.getParticle(0).internalEnergy() = 1;  // TO DO : sample according to equilibrium law?
   }

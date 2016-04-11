@@ -56,10 +56,14 @@ namespace simol {
   // --------------- Declaration and implementation of external functions -------------------
 
   //-- fundamental functions --
+  template <class D, class S>
+  void sampleSystem(D& dyna, S& syst);
+  void samplePositions(Dynamics& dyna, System& syst);
+  void sampleMomenta(Dynamics& dyna, System& syst);
+  void sampleMomenta(LangevinBase& dyna, System& syst);
   template<class D, class S>
   void launchSimu(D& dyna, S& syst, Output& output);
 
-  void sampleSystem(Dynamics& dyna, System& syst);
   void simulate(Dynamics& dyna, System& syst);
   
   template <class D>
@@ -70,9 +74,6 @@ namespace simol {
   //-------------------- specializations for various systems -------------------------
   
   //-- specializations for Isolated --
-  void sampleSystem(Hamiltonian& /*dyna*/, Isolated& /*syst*/);
-  void sampleSystem(LangevinBase& dyna, Isolated& syst);
-  void sampleSystem(Overdamped& dyna, Isolated& syst);
   template <class D>
   void computeOutput(D const& dyna, Isolated const& syst, Output& output, int iOfIteration);
   template <>
@@ -80,20 +81,22 @@ namespace simol {
   void writeFinalOutput(Hamiltonian const& dyna, Isolated const& syst, Output& output);
 
   //-- specializations for Chain --
-  void sampleSystem(BoundaryLangevin& dyna, BiChain& syst);
-  void sampleSystem(BoundaryLangevin& dyna, TriChain& syst);
-  void writeFinalOutput(BoundaryLangevin const& dyna, BiChain const& syst, Output& output);
-  void writeFinalOutput(BoundaryLangevin const& dyna, TriChain const& syst, Output& output);
-  void simulate(BoundaryLangevin& dyna, Chain& syst);
-  void updateAllControlVariates(const BoundaryLangevin& dyna, System const& syst, Output& output, int iOfIteration);
+  void sampleMomenta(BoundaryLangevin& dyna, Chain& syst);
+  void samplePositions(BoundaryLangevin& dyna, Chain& syst);
+  void writeOutput(BoundaryLangevin const& dyna, Chain const& syst, Output& output, int iOfIteration);
   template <class D>
   void computeOutput(D const& dyna, Chain const& syst, Output& output, int iOfIteration);
   template <>
   void computeOutput(BoundaryLangevin const& dyna, Chain const& syst, Output& output, int iOfIteration);
-  void writeOutput(BoundaryLangevin const& dyna, Chain const& syst, Output& output, int iOfIteration);
-  
+  void simulate(BoundaryLangevin& dyna, Chain& syst);
+  // Bichain
+  void samplePositions(BoundaryLangevin& dyna, BiChain& syst);
+  void writeFinalOutput(BoundaryLangevin const& dyna, BiChain const& syst, Output& output);
+  //TriChain
+  void samplePositions(BoundaryLangevin& dyna, TriChain& syst);
+  void writeFinalOutput(BoundaryLangevin const& dyna, TriChain const& syst, Output& output);
   //-- specializations for NBody --
-  void sampleSystem(Dynamics& dyna, NBody& syst);
+  void samplePositions(Dynamics& dyna, NBody& syst);
   void simulate(Hamiltonian& dyna, NBody& syst);
   template <class D>
   void computeOutput(D const& /*dyna*/, NBody const& syst, Output& output, int /*iOfIteration*/);
@@ -107,7 +110,7 @@ namespace simol {
   
   //-- DPDE --
   void simulate(DPDE& dyna, System& syst);
-  void sampleSystem(DPDE& dyna, Isolated& syst);
+  void samplePositions(DPDE& dyna, Isolated& syst);
   void writeOutput(DPDE const& dyna, System const& syst, Output& output, int iOfIteration);
 
   
@@ -126,9 +129,35 @@ namespace simol {
   // Overdamped
   Vector<double> generatorOn(const Overdamped& dyna, const System& syst, const ControlVariate& controlVariate);
   
+  //Chain
+  void updateAllControlVariates(const BoundaryLangevin& dyna, System const& syst, Output& output, int iOfIteration);
 
 
   // -------------------- Template implementation --------------------
+  
+  template <class D, class S>
+  void sampleSystem(D& dyna, S& syst)
+  {
+    cout << "Initialization of the system...";cout.flush();
+    
+    sampleMomenta(dyna, syst);
+    samplePositions(dyna, syst);
+
+    cout << "Done ! / Thermalization...";cout.flush();
+
+    for (int iOfIteration  =0; iOfIteration < dyna.nbOfThermalIterations(); ++iOfIteration)
+    {
+      syst.thermalize(dyna);
+    }
+
+    cout << "Done ! / BurnIn...";cout.flush();
+
+    for (int iOfIteration  =0; iOfIteration < dyna.nbOfBurnInIterations(); ++iOfIteration)
+    {
+      simulate(dyna, syst);
+    }
+    cout << "Done !" << endl;
+  }
   
   template <class D>
   void computeOutput(D const& dyna, System const& syst, Output& output, int iOfIteration)

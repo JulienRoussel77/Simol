@@ -30,8 +30,8 @@ namespace simol
     double finalTime() const;
     int& nbOfThermalIterations();
     int const& nbOfThermalIterations() const;
-    int& nbOfBurningIterations();
-    int const& nbOfBurningIterations() const;
+    int& nbOfBurnInIterations();
+    int const& nbOfBurnInIterations() const;
     
     //-- random numbers ---
     std::shared_ptr<RNG> const& rng() const;
@@ -65,7 +65,7 @@ namespace simol
   protected:
     
     double timeStep_;
-    int nbOfIterations_, nbOfThermalIterations_, nbOfBurningIterations_;
+    int nbOfIterations_, nbOfThermalIterations_, nbOfBurnInIterations_;
     double beta_;
     double temperature_;
     std::shared_ptr<RNG> rng_;
