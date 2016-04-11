@@ -60,7 +60,7 @@ namespace simol {
     string name = parametersName();
     
     if (data["Output"]["FolderName"])
-      name += data["Output"]["FolderName"].as<string>();
+      name += data["Output"]["FolderName"].as<string>()+"/";
     
     return name;
   }
