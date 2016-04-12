@@ -22,10 +22,10 @@ namespace simol{
       {
         for (int dim = 0; dim < Dim; dim++)
         {
-	      //-- recenter all the coordinates in the interval [-domainSize/2, domainSize/2] --
-	      coordinate = configuration[i].position(dim);
-	      coordinate -= rint(coordinate/domainSize)*domainSize;
-	      outParticlesXMakeMol() << coordinate << " "; 
+	  //-- recenter all the coordinates in the interval [-domainSize/2, domainSize/2] --
+	  coordinate = configuration[i].position(dim);
+	  coordinate -= rint(coordinate/domainSize)*domainSize;
+	  outParticlesXMakeMol() << coordinate << " "; 
         }
       }
       else if (Dim == 2)

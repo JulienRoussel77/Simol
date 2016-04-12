@@ -1,8 +1,8 @@
 System:
-  Dimension: 2
+  Dimension: 3
   LatticeParameter: 1.
   Name: NBody
-  NumberPerDimension: 6
+  NumberPerDimension: 8
    
 Time:
   Step: 0.005

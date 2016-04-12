@@ -4,8 +4,8 @@ namespace simol {
  
   void samplePositions(Dynamics& dyna, NBody& syst)
   {
-    cout << "Sampling the positions..." ;cout.flush();
-    int Dim = syst.dimension();   // PAS SUPER, MAIS SINON PBM DE TYPE POUR COMPARAISON ?
+    cout << " - Sampling the positions..." << endl;
+    int Dim = syst.dimension();   
     int NbPartDim = syst.nbOfParticlesPerDimension(); 
     double latticeSize = syst.latticeParameter();
 

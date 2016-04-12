@@ -134,9 +134,9 @@ namespace simol{
     cout << endl;   
     cout << " Number of particles  : " << nbOfParticles_ << endl;
     if (nbOfSteps_<1e6)
-      cout << " Number of steps : " << nbOfSteps_ << endl;
+      cout << " Number of steps      : " << nbOfSteps_ << endl;
     else
-      cout << " Number of steps : " << nbOfSteps_/1e6 << "e6" << endl;
+      cout << " Number of steps      : " << nbOfSteps_/1e6 << "e6" << endl;
     cout << " Time step            : " << timeStep_ << endl;
     cout << "" << endl;
     cout << "-----------------------------------------------------" << endl << endl;

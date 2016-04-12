@@ -4,21 +4,59 @@
 
 namespace simol
 {
+  
+  class Cell
+  {
+
+  public: 
+
+    Cell();
+    int size() const;
+    void clear();
+    void push_back(int ind);
+    vector<int> const& indexNeighbors() const;
+    vector<int>& indexNeighbors();
+    
+  protected:
+
+    list<int> members_;
+    vector<int> indexNeighbors_;
+
+  };
 
   class NBody : public System
   {
+    
   public:
+   
     NBody(Input const& input);
     void printName() const;
     void computeAllForces();
     int nbOfParticlesPerDimension() const;
     double latticeParameter() const;
     void interaction(Particle& particle1, Particle& particle2) const;
+  
+    //--- for cell method ---
+    void reinitializeCells();
+    void findNeighboringCells();
+    int findIndex(Vector<double> const& pos) const;
+    int returnIndexCell2D(int i1, int i2) const;
+    int returnIndexCell3D(int i1, int i2, int i3) const;
+    double periodicPosition(double x) const;
+
   protected:
+  
     int nbOfParticlesPerDimension_;
     double latticeParameter_;
     double domainSize_;
-    //ofstream DEBUG_;
+
+    //--- for cell method --- 
+    double Rcut_;
+    int nbOfCellsPerDimension_; 
+    int nbOfCells_; 
+    int nbOfNeighbors_;
+    vector<Cell> cells_; 
+
    };
   
 }

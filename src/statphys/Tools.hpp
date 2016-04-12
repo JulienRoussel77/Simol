@@ -9,6 +9,7 @@
 #include "core/linalg/DenseMatrix.hpp"
 #include "core/linalg/Vector.hpp"
 #include <stdexcept>
+#include <list>
 
 using std::ofstream;
 using std::cout;
@@ -17,11 +18,11 @@ using std::min;
 using std::max;
 using std::string;
 using std::to_string;
-using std::vector;
 using std::ifstream;
 using std::tolower;
 
 using std::vector;
+using std::list;
 
 typedef std::complex<double> cplx;
 
@@ -30,6 +31,7 @@ typedef simol::DenseMatrix<double> DMat;
 typedef simol::Vector<double> DVec;
 
 double modulo(double variable, double mini, double maxi);
+int intModulo(int variable, int maxi);
 void displayTime(double time);
 int getNbOfLines(ifstream& file);
 
