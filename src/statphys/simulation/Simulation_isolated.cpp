@@ -25,14 +25,14 @@ namespace simol {
   //------------- DPDE --------------------
 
   template <>
-  void computeOutput(DPDE const& /*dyna*/, Isolated const& syst, Output& output, int /*iOfIteration*/)
+  void computeOutput(DPDE const& /*dyna*/, Isolated const& syst, Output& output, int /*iOfStep*/)
   {
     output.kineticEnergy() = syst.getParticle(0).kineticEnergy();
     output.potentialEnergy() = syst.getParticle(0).potentialEnergy();
     output.internalEnergy() = syst.getParticle(0).internalEnergy();
   }
 
-   void samplePositions(DPDE& dyna, Isolated& syst)
+   void samplePositions(DPDE& /*dyna*/, Isolated& syst)
   {
     cout << " - Sampling the positions..." << endl;
     syst.getParticle(0).position(0) = 0;

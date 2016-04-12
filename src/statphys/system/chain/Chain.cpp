@@ -75,10 +75,10 @@ namespace simol
     }
   }
   
-  void BiChain::computeProfile(Output& /*output*/, Dynamics const& /*dyna*/, int /*iOfIteration*/) const
+  void BiChain::computeProfile(Output& /*output*/, Dynamics const& /*dyna*/, int /*iOfStep*/) const
   {}
   
-  void BiChain::computeProfile(Output& output, LangevinBase const& dyna, int iOfIteration) const
+  void BiChain::computeProfile(Output& output, LangevinBase const& dyna, int iOfStep) const
   {
     output.energySumFlow() = 0;
     int midNb = (nbOfParticles()-1) / 2;
@@ -120,11 +120,11 @@ namespace simol
         potTempBot = getParticle(iOfParticle).energyLapla() + getParticle(iOfParticle+1).energyLapla();
       }
       
-      output.appendBendistProfile(dist , iOfIteration, iOfParticle);
-      output.appendKinTempProfile(2 * getParticle(iOfParticle).kineticEnergy(), iOfIteration, iOfParticle);
-      output.appendPotTempTopProfile(potTempTop, iOfIteration, iOfParticle);
-      output.appendPotTempBotProfile(potTempBot, iOfIteration, iOfParticle);
-      output.appendFlowProfile(flow, iOfIteration, iOfParticle);
+      output.appendBendistProfile(dist , iOfStep, iOfParticle);
+      output.appendKinTempProfile(2 * getParticle(iOfParticle).kineticEnergy(), iOfStep, iOfParticle);
+      output.appendPotTempTopProfile(potTempTop, iOfStep, iOfParticle);
+      output.appendPotTempBotProfile(potTempBot, iOfStep, iOfParticle);
+      output.appendFlowProfile(flow, iOfStep, iOfParticle);
     }
     output.energySumFlow() /= (nbOfParticles()-2.);
     //cout << output.energySumFlow() << endl;
@@ -188,10 +188,10 @@ namespace simol
   double TriChain::boundaryPotEnergy() const
   {return ancorParticle1_.potentialEnergy() + ancorParticle2_.potentialEnergy();}
   
-  void TriChain::computeProfile(Output& /*output*/, Dynamics const& /*dyna*/, int /*iOfIteration*/) const
+  void TriChain::computeProfile(Output& /*output*/, Dynamics const& /*dyna*/, int /*iOfStep*/) const
   {}
   
-  void TriChain::computeProfile(Output& output, LangevinBase const& dyna, int iOfIteration) const
+  void TriChain::computeProfile(Output& output, LangevinBase const& dyna, int iOfStep) const
   {
     output.energySumFlow() = 0;
     for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
@@ -235,11 +235,11 @@ namespace simol
       if (iOfParticle == midNb)
         output.energyMidFlow() = flow;
       
-      output.appendBendistProfile(bending , iOfIteration, iOfParticle);
-      output.appendKinTempProfile(2 * getParticle(iOfParticle).kineticEnergy(), iOfIteration, iOfParticle);
-      output.appendPotTempTopProfile(potTempTop, iOfIteration, iOfParticle);
-      output.appendPotTempBotProfile(potTempBot, iOfIteration, iOfParticle);
-      output.appendFlowProfile(flow, iOfIteration, iOfParticle);
+      output.appendBendistProfile(bending , iOfStep, iOfParticle);
+      output.appendKinTempProfile(2 * getParticle(iOfParticle).kineticEnergy(), iOfStep, iOfParticle);
+      output.appendPotTempTopProfile(potTempTop, iOfStep, iOfParticle);
+      output.appendPotTempBotProfile(potTempBot, iOfStep, iOfParticle);
+      output.appendFlowProfile(flow, iOfStep, iOfParticle);
     }
     output.energySumFlow() /= (nbOfParticles()-2.);
     //cout << output.energySumFlow() << endl;

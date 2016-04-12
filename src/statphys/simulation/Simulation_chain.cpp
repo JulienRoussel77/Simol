@@ -17,33 +17,33 @@ namespace simol {
       cout << "Done." << endl;
   }
   
-  void samplePositions(BoundaryLangevin& dyna, Chain& syst)
+  void samplePositions(BoundaryLangevin& /*dyna*/, Chain& /*syst*/)
   {
     throw std::invalid_argument("samplePositions(BoundaryLangevin& dyna, Chain& syst) not defined");
   }
   
-  void writeOutput(BoundaryLangevin const& dyna, Chain const& syst, Output& output, int iOfIteration)
+  void writeOutput(BoundaryLangevin const& dyna, Chain const& syst, Output& output, int iOfStep)
   {
-    if (output.doOutput(iOfIteration))// && iOfIteration >= 100)
+    if (output.doOutput(iOfStep))// && iOfStep >= 100)
     {
-      output.displayObservables(iOfIteration);
-      output.displayChainPositions(syst.configuration(), iOfIteration);
-      output.displayChainMomenta(syst.configuration(), iOfIteration);
-      output.displayParticles(syst.configuration(), iOfIteration);
+      output.displayObservables(iOfStep);
+      output.displayChainPositions(syst.configuration(), iOfStep);
+      output.displayChainMomenta(syst.configuration(), iOfStep);
+      output.displayParticles(syst.configuration(), iOfStep);
       
-      output.midFlowCV_->display(output.outMidFlowCV(), iOfIteration * dyna.timeStep() );
-      output.sumFlowCV_->display(output.outSumFlowCV(), iOfIteration * dyna.timeStep() );
+      output.midFlowCV_->display(output.outMidFlowCV(), iOfStep * dyna.timeStep() );
+      output.sumFlowCV_->display(output.outSumFlowCV(), iOfStep * dyna.timeStep() );
     }
     
-    if (output.doLongOutput(iOfIteration))
+    if (output.doLongPeriodOutput(iOfStep))
     {
-      output.displayProfile(iOfIteration);
-      output.displayParticles(syst.configuration(), iOfIteration);
+      output.displayProfile(iOfStep);
+      output.displayParticles(syst.configuration(), iOfStep);
     }
   }
   
   template <>
-  void computeOutput(BoundaryLangevin const& dyna, Chain const& syst, Output& output, int iOfIteration)
+  void computeOutput(BoundaryLangevin const& dyna, Chain const& syst, Output& output, int iOfStep)
   {
     output.kineticEnergy() = 0;
     output.potentialEnergy() = 0;
@@ -55,8 +55,8 @@ namespace simol {
     }
     // In the case of the trichain we add the potential of the wall interaction
     output.potentialEnergy() += syst.boundaryPotEnergy();
-    syst.computeProfile(output, dyna, iOfIteration);
-    updateAllControlVariates(dyna, syst, output, iOfIteration);
+    syst.computeProfile(output, dyna, iOfStep);
+    updateAllControlVariates(dyna, syst, output, iOfStep);
   }
   
     void simulate(BoundaryLangevin& dyna, Chain& syst)

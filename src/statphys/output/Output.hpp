@@ -16,20 +16,6 @@ namespace simol
   {
  
   public:
-    
-    //----------- for autocorrelations -------------
-    AutocorrelationStats kinTempProfile_;
-    AutocorrelationStats potTempTopProfile_;
-    AutocorrelationStats potTempBotProfile_;
-    AutocorrelationStats bendistProfile_;
-    AutocorrelationStats flowProfile_;
-    
-    //---------- for control variates ------------
-    ControlVariate* velocityCV_;
-    ControlVariate* forceCV_;
-    ControlVariate* lengthCV_;
-    ControlVariate* midFlowCV_;
-    ControlVariate* sumFlowCV_;
 
     Output(Input const& input);
     void setControlVariates(Input& input, Potential& potential, Galerkin* galerkin);
@@ -56,13 +42,14 @@ namespace simol
     //-- input parameters useful for output --
     const double& timeStep() const;
     double& timeStep();
-    double period() const;
-    const int& periodNbOfIterations() const;
-    const int& longPeriodNbOfIterations() const;
-    bool doOutput(int iOfIteration) const;
-    bool doLongOutput(int iOfIteration) const;
+    double printPeriodTime() const;
+    const int& printPeriodNbOfSteps() const;
+    double printLongPeriodTime() const;
+    const int& printLongPeriodNbOfSteps() const;
+    bool doOutput(int iOfStep) const;
+    bool doLongPeriodOutput(int iOfStep) const;
     const int& nbOfParticles() const;
-    const int& nbOfIterations() const;
+    const int& nbOfSteps() const;
     double finalTime() const;
     
     //-- fields to output --
@@ -86,34 +73,34 @@ namespace simol
     bool doComputeCorrelations() const;
     const int& nbOfAutocoPts() const;
     double autocoPtsPeriod() const;
-    const int& decorrelationNbOfIterations() const;
-    int& decorrelationNbOfIterations();
+    const int& decorrelationNbOfSteps() const;
+    int& decorrelationNbOfSteps();
     double decorrelationTime() const;
     
     //-- actual outputing functions --
-    void displayObservables(int iOfIteration);
-    void displayParticles(vector<Particle> const& configuration, int iOfIteration);
+    void displayObservables(int iOfStep);
+    void displayParticles(vector<Particle> const& configuration, int iOfStep);
     void finalDisplayAutocorrelations();
     void displayFinalVelocity(double temperature, double externalForce, int nbOfFourier = 0, int nbOfHermite = 0);
     
     //-- for NBody systems --
-    void displayParticlesXMakeMol(vector<Particle> const& configuration, int iOfIteration, double domainSize=0);
+    void displayParticlesXMakeMol(vector<Particle> const& configuration, int iOfStep, double domainSize=0);
     
     //------------ profiles for chains --------------
-    void appendKinTempProfile(double value, int iOfIteration, int iOfParticle);
-    void appendPotTempTopProfile(double value, int iOfIteration, int iOfParticle);
-    void appendPotTempBotProfile(double value, int iOfIteration, int iOfParticle);
-    void appendBendistProfile(double value, int iOfIteration, int iOfParticle);
-    void appendFlowProfile(double value, int iOfIteration, int iOfParticle);
-    void writeProfile(ofstream & out_, int iOfIteration);
-    void displayChainMomenta(vector<Particle> const& configuration, int iOfIteration);
-    void displayChainPositions(vector<Particle> const& configuration, int iOfIteration);
-    void displayProfile(int iOfIteration);
+    void appendKinTempProfile(double value, int iOfStep, int iOfParticle);
+    void appendPotTempTopProfile(double value, int iOfStep, int iOfParticle);
+    void appendPotTempBotProfile(double value, int iOfStep, int iOfParticle);
+    void appendBendistProfile(double value, int iOfStep, int iOfParticle);
+    void appendFlowProfile(double value, int iOfStep, int iOfParticle);
+    void writeProfile(ofstream & out_, int iOfStep);
+    void displayChainMomenta(vector<Particle> const& configuration, int iOfStep);
+    void displayChainPositions(vector<Particle> const& configuration, int iOfStep);
+    void displayProfile(int iOfStep);
     void finalChainDisplay(vector<Particle> const& configuration, Vector<double> const& externalForce);
     void displayFinalFlow(double temperature, double delta_temperature, double tau = nan(""), double xi = 0);
 
     //------------- pour DPDE ---------------
-    void displayObservablesDPDE(vector<Particle> const& configuration, int iOfIteration);
+    void displayObservablesDPDE(vector<Particle> const& configuration, int iOfStep);
  
     //------------- for Galerkin ----------------------
     ControlVariate& velocityCV();
@@ -154,11 +141,11 @@ namespace simol
     std::shared_ptr<ofstream> outFinalProfile_;
     
     //-- input parameters useful for output --
-    int periodNbOfIterations_, longPeriodNbOfIterations_;
+    int printPeriodNbOfSteps_, printLongPeriodNbOfSteps_;
     double timeStep_;
     int dimension_;
     int nbOfParticles_;
-    int nbOfIterations_;
+    int nbOfSteps_;
     double latticeParameter_;
     
     //-- fields to output --
@@ -170,9 +157,24 @@ namespace simol
     double energySumFlow_;
     
     //-- parametrization of outputs --
-    int decorrelationNbOfIterations_;
+    int decorrelationNbOfSteps_;
     int nbOfAutocoPts_;
     bool doFinalFlow_, doFinalVelocity_;
+  public:
+
+    //---------- for control variates ------------
+    ControlVariate* velocityCV_;
+    ControlVariate* forceCV_;
+    ControlVariate* lengthCV_;
+    ControlVariate* midFlowCV_;
+    ControlVariate* sumFlowCV_;
+    
+    //----------- for autocorrelations -------------
+    AutocorrelationStats kinTempProfile_;
+    AutocorrelationStats potTempTopProfile_;
+    AutocorrelationStats potTempBotProfile_;
+    AutocorrelationStats bendistProfile_;
+    AutocorrelationStats flowProfile_;
   };
 
 }

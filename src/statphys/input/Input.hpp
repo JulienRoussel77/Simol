@@ -41,9 +41,9 @@ namespace simol{
     
     //-- Time --
     double timeStep() const;
-    int nbOfIterations() const;
-    int nbOfThermalIterations() const;
-    int nbOfBurnInIterations() const;
+    int nbOfSteps() const;
+    int thermalizationNbOfSteps() const;
+    int burninNbOfSteps() const;
     
     //-- Potential --
     string potentialName() const;
@@ -83,12 +83,12 @@ namespace simol{
     string simuTypeName() const;
     string parametersName() const;
     string outputFolderName() const;
-    int decorrelationNbOfIterations() const;
+    int decorrelationNbOfSteps() const;
     double decorrelationTime() const;
-    int outputPeriodNbOfIterations() const;
-    double outputPeriodTime() const;
-    int outputLongPeriodNbOfIterations() const;
-    double outputLongPeriodTime() const;
+    int printPeriodNbOfSteps() const;
+    double printPeriodTime() const;
+    int printLongPeriodNbOfSteps() const;
+    double printLongPeriodTime() const;
     int nbOfAutocoPts() const;
     bool doFinalFlow() const;
     bool doFinalVelocity() const;

@@ -6,7 +6,7 @@ System:
    
 Time:
   Step: 0.005
-  FinalTime: 0.2
+  TotalTime: 0.2
 
 Potential:
   Name: LennardJones

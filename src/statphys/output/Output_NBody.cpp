@@ -9,10 +9,10 @@ namespace simol{
   
   /// 
   ///-- display the current configuration in XMakemol format ; specific for NBody systems ---
-  void Output::displayParticlesXMakeMol(vector<Particle> const& configuration, int iOfIteration, double domainSize)
+  void Output::displayParticlesXMakeMol(vector<Particle> const& configuration, int iOfStep, double domainSize)
   {
     outParticlesXMakeMol() << nbOfParticles_ << endl;
-    outParticlesXMakeMol() << "Time = " << iOfIteration * timeStep() << endl;
+    outParticlesXMakeMol() << "Time = " << iOfStep * timeStep() << endl;
     double coordinate = 0;
     int Dim = dimension_;
     for (int i = 0; i < nbOfParticles_; i++)

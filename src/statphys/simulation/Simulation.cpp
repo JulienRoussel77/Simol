@@ -41,33 +41,33 @@ namespace simol {
 
   //------------------- writeOutput and its specifications by dynamics ---------------------------
 
-  void writeOutput(Dynamics const& /*dyna*/, System const& /*syst*/, Output& /*output*/, int /*iOfIteration*/)
+  void writeOutput(Dynamics const& /*dyna*/, System const& /*syst*/, Output& /*output*/, int /*iOfStep*/)
   {
     throw std::invalid_argument("writeOutput not defined in the general case");
   }
 
-  void writeOutput(Hamiltonian const& /*dyna*/, System const& syst, Output& output, int iOfIteration)
+  void writeOutput(Hamiltonian const& /*dyna*/, System const& syst, Output& output, int iOfStep)
   {
-    if (output.doOutput(iOfIteration))
-      output.displayObservables(iOfIteration);
+    if (output.doOutput(iOfStep))
+      output.displayObservables(iOfStep);
     
-    if (output.doLongOutput(iOfIteration))
-      output.displayParticles(syst.configuration(), iOfIteration);
+    if (output.doLongPeriodOutput(iOfStep))
+      output.displayParticles(syst.configuration(), iOfStep);
   }
   
-  void writeOutput(Langevin const& /*dyna*/, System const& syst, Output& output, int iOfIteration)
+  void writeOutput(Langevin const& /*dyna*/, System const& syst, Output& output, int iOfStep)
   {
-    if (output.doOutput(iOfIteration))
-      output.displayObservables(iOfIteration);
+    if (output.doOutput(iOfStep))
+      output.displayObservables(iOfStep);
     
-    if (output.doLongOutput(iOfIteration))
-      output.displayParticles(syst.configuration(), iOfIteration);
+    if (output.doLongPeriodOutput(iOfStep))
+      output.displayParticles(syst.configuration(), iOfStep);
   }
 
-  void writeOutput(DPDE const& /*dyna*/, System const& syst, Output& output, int iOfIteration)
+  void writeOutput(DPDE const& /*dyna*/, System const& syst, Output& output, int iOfStep)
   {
-    if (output.doOutput(iOfIteration))
-      output.displayObservablesDPDE(syst.configuration(), iOfIteration);
+    if (output.doOutput(iOfStep))
+      output.displayObservablesDPDE(syst.configuration(), iOfStep);
   }
 
   //--------------------------- final output ------------------------------------

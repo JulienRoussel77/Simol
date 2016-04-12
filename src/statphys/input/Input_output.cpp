@@ -6,8 +6,8 @@ using std::string;
 using std::min;
 using std::max;
 
-const int defaultOutputPeriod = 1;         
-const int defaultOutputLongPeriod = 1;  
+const int defaultPrintPeriod = 1;         
+const int defaultLongPrintPeriod = 1;  
 const int maxNbOfAutocoPts = 1000;
 const int defaultDecorrelationTime = 0; 
 
@@ -67,7 +67,7 @@ namespace simol {
   }
   
 
-  int Input::decorrelationNbOfIterations() const
+  int Input::decorrelationNbOfSteps() const
   {
     if (data["Output"]["DecorrelationTime"])
       return data["Output"]["DecorrelationTime"].as<double>() / timeStep();
@@ -83,47 +83,53 @@ namespace simol {
       return defaultDecorrelationTime;
   }
 
-  int Input::outputPeriodNbOfIterations() const {
-    if (data["Output"]["Period"])
-      return data["Output"]["Period"].as<double>() / timeStep();
+  int Input::printPeriodNbOfSteps() const {
+    if (data["Output"]["PrintPeriodNbOfSteps"])
+      return data["Output"]["PrintPeriodNbOfSteps"].as<int>();
+    else if (data["Output"]["PrintPeriod"])
+    {
+      if (modulo(data["Output"]["PrintPeriod"].as<double>(), 0, timeStep()) != 0)
+        cout << "#### PrintPeriod truncated ####" << endl;
+      return data["Output"]["PrintPeriod"].as<double>() / timeStep();
+    }
     else
-      return defaultOutputPeriod;
+      return defaultPrintPeriod;
   }
 
-  double Input::outputPeriodTime() const {
-    if (data["Output"]["Period"])
-      return data["Output"]["Period"].as<double>();
-    else
-      return outputPeriodNbOfIterations() * timeStep();
+  double Input::printPeriodTime() const {
+      return printPeriodNbOfSteps() * timeStep();
   }
 
-  int Input::outputLongPeriodNbOfIterations() const {
-    if (data["Output"]["LongPeriod"])
-      return data["Output"]["LongPeriod"].as<double>() / timeStep();
+  int Input::printLongPeriodNbOfSteps() const {
+    if (data["Output"]["LongPrintPeriodNbOfSteps"])
+      return data["Output"]["LongPrintPeriodNbOfSteps"].as<int>();
+    if (data["Output"]["LongPrintPeriod"])
+    {
+      if (modulo(data["Output"]["LongPrintPeriod"].as<double>(), 0, timeStep()) != 0)
+        cout << "#### LongPrintPeriod truncated ####" << endl;
+        return data["Output"]["LongPrintPeriod"].as<double>() / timeStep();
+    }
     else
-      return defaultOutputLongPeriod;
+      return defaultLongPrintPeriod;
   }
 
-  double Input::outputLongPeriodTime() const {
-    if (data["Output"]["LongPeriod"])
-      return data["Output"]["LongPeriod"].as<double>();
-    else
-      return outputLongPeriodNbOfIterations() * timeStep();
+  double Input::printLongPeriodTime() const {
+      return printLongPeriodNbOfSteps() * timeStep();
   }
 
   /// Contains the number of values in an autocorrelation LongPeriod
   /// /!\ Causes a memory crash for the larger chains if too big
   int Input::nbOfAutocoPts() const
   {
-    return min(maxNbOfAutocoPts, (int)decorrelationNbOfIterations());
+    return min(maxNbOfAutocoPts, (int)decorrelationNbOfSteps());
   }
   
   bool Input::doFinalFlow() const
   {
     if (data["Output"]["doFinalFlow"])
-      if (data["Output"]["doFinalFlow"].as<string>() == "no")
-        return false;
-    return true;
+      if (data["Output"]["doFinalFlow"].as<string>() == "yes")
+        return true;
+    return false;
   }
   
   bool Input::doFinalVelocity() const

@@ -4,7 +4,7 @@ Geometry:
 Mesh:
   Time:
     Step: 0.02
-    FinalTime: 20000
+    TotalTime: 20000
   Replicas:
     Number: 1
 

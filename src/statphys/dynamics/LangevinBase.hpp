@@ -11,7 +11,7 @@ namespace simol
       virtual const double& gamma() const;
 	    virtual const double& xi() const;
 	    virtual double& xi();
-	    int xiNbOfIterations();
+	    int xiNbOfSteps();
 	    virtual bool doMomentaExchange() const;
 	    virtual void initializeCountdown(Particle& particle);
 	    virtual void updateMomentaExchange(Particle& particle1, Particle& particle2);

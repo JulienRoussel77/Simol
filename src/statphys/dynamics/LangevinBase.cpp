@@ -19,8 +19,8 @@ namespace simol
   ///Read-write accessor for xi
   double& LangevinBase::xi() {return xi_;}
 	///
-	///Returns the mean number of iterations between 2 random events
-	int LangevinBase::xiNbOfIterations()
+	///Returns the mean number of steps between 2 random events
+	int LangevinBase::xiNbOfSteps()
 		{return 1 / (xi_ * timeStep_);}
 	///
 	///Returns true if the dynamics involves a Poisson process (momenta exchange)
@@ -31,7 +31,7 @@ namespace simol
 	void LangevinBase::initializeCountdown(Particle& particle)
 	{
 		if (doMomentaExchange())
-			particle.countdown() = rng_->scalarExponential() * xiNbOfIterations(); // / (xi() * timestep());
+			particle.countdown() = rng_->scalarExponential() * xiNbOfSteps(); // / (xi() * timestep());
 		else
 			particle.countdown() = -1;
 	}
@@ -44,7 +44,7 @@ namespace simol
 				Vector<double> temp = particle2.momentum();
 				particle2.momentum() = particle1.momentum();
 				particle1.momentum() = temp;
-				particle2.countdown() = rng_->scalarExponential() * xiNbOfIterations(); // / (xi() * timestep());
+				particle2.countdown() = rng_->scalarExponential() * xiNbOfSteps(); // / (xi() * timestep());
 			}
 			else
 				particle2.countdown()--;

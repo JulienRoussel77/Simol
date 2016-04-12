@@ -44,23 +44,23 @@ namespace simol
   
   ControlVariate::ControlVariate(Input const& input, Potential& potential, int nbOfFunctions):
     dimension_(input.dimension()),
-    decorrelationNbOfIterations_(input.decorrelationNbOfIterations()),
+    decorrelationNbOfSteps_(input.decorrelationNbOfSteps()),
     decorrelationTime_(input.decorrelationTime()),
     nbOfFunctions_(nbOfFunctions),
     nbOfFunctionPairs_(pow(nbOfFunctions_, 2)),
-    periodNbOfIterations_(input.outputPeriodNbOfIterations()),
+    printPeriodNbOfSteps_(input.printPeriodNbOfSteps()),
     nbOfAutocoPts_(input.nbOfAutocoPts()),
-    statsObservable_(decorrelationNbOfIterations(), decorrelationTime(), nbOfAutocoPts()),
-    statsBetterObservable_(decorrelationNbOfIterations(), decorrelationTime(), nbOfAutocoPts()),
+    statsObservable_(decorrelationNbOfSteps(), decorrelationTime(), nbOfAutocoPts()),
+    statsBetterObservable_(decorrelationNbOfSteps(), decorrelationTime(), nbOfAutocoPts()),
     statsGeneratorOnBasis_(nbOfFunctions_),
     statsB1_(nbOfFunctions_),
-    statsB2_(decorrelationNbOfIterations(), decorrelationTime(), nbOfAutocoPts(), nbOfFunctions_),
+    statsB2_(decorrelationNbOfSteps(), decorrelationTime(), nbOfAutocoPts(), nbOfFunctions_),
     statsD_(nbOfFunctions_, nbOfFunctions_),
     lastA_(nbOfFunctions_),
-    statsPostObservable_(decorrelationNbOfIterations(), decorrelationTime(), nbOfAutocoPts()),
-    statsPostBetterObservable_(decorrelationNbOfIterations(), decorrelationTime(), nbOfAutocoPts()),
-    historyObservable_(input.nbOfIterations()),
-    historyGeneratorOnBasis_(input.nbOfIterations(), nbOfFunctions_),
+    statsPostObservable_(decorrelationNbOfSteps(), decorrelationTime(), nbOfAutocoPts()),
+    statsPostBetterObservable_(decorrelationNbOfSteps(), decorrelationTime(), nbOfAutocoPts()),
+    historyObservable_(input.nbOfSteps()),
+    historyGeneratorOnBasis_(input.nbOfSteps(), nbOfFunctions_),
     potential_(&potential)    
   {}
   
@@ -74,9 +74,9 @@ namespace simol
     return nbOfFunctionPairs_;
   }
   
-  bool ControlVariate::doOutput(int iOfIteration) const
+  bool ControlVariate::doOutput(int iOfStep) const
   {
-    return (periodNbOfIterations_ > 0 && iOfIteration % periodNbOfIterations_ == 0);
+    return (printPeriodNbOfSteps_ > 0 && iOfStep % printPeriodNbOfSteps_ == 0);
   }
 
   bool ControlVariate::isNone() const
@@ -101,9 +101,9 @@ namespace simol
 
   
   
-  int ControlVariate::decorrelationNbOfIterations() const
+  int ControlVariate::decorrelationNbOfSteps() const
   {
-    return decorrelationNbOfIterations_;
+    return decorrelationNbOfSteps_;
   }
   
   double ControlVariate::decorrelationTime() const
@@ -166,10 +166,10 @@ namespace simol
     return statsB2_.integratedAutocorrelation(iOfFunction);
   }
   
-  void ControlVariate::appendToObservable(double observable, int iOfIteration)
+  void ControlVariate::appendToObservable(double observable, int iOfStep)
   {
-    historyObservable_(iOfIteration) = observable;
-    statsObservable_.append(observable, iOfIteration);
+    historyObservable_(iOfStep) = observable;
+    statsObservable_.append(observable, iOfStep);
   }
   
   double ControlVariate::autocorrelation(int indexDifference) const
@@ -183,15 +183,15 @@ namespace simol
       statsB1_.append((observable - statsObservable_.mean()) * valueBasisFunction(iOfFunction), iOfFunction);
   }
   
-  void ControlVariate::appendToB2(double observable, Vector<double>& generatorOnBasisFunction, int iOfIteration)
+  void ControlVariate::appendToB2(double observable, Vector<double>& generatorOnBasisFunction, int iOfStep)
   {
     for (int iOfFunction=0; iOfFunction<nbOfFunctions_; iOfFunction++)
-				statsB2_.append((observable - statsObservable_.mean()), iOfIteration, iOfFunction, generatorOnBasisFunction(iOfFunction));
+				statsB2_.append((observable - statsObservable_.mean()), iOfStep, iOfFunction, generatorOnBasisFunction(iOfFunction));
 	}
   
   void ControlVariate::appendToD(Vector<double>& generatorOnBasisFunction, Vector<double>& valueBasisFunction)
   {
-    //Eigen::Matrix<AutocorrelationStats<double>, Eigen::Dynamic, Eigen::Dynamic> A(nbOfFunctions_, nbOfFunctions_, AutocorrelationStats<double>(decorrelationNbOfIterations(), decorrelationTime()));
+    //Eigen::Matrix<AutocorrelationStats<double>, Eigen::Dynamic, Eigen::Dynamic> A(nbOfFunctions_, nbOfFunctions_, AutocorrelationStats<double>(decorrelationNbOfSteps(), decorrelationTime()));
     
     for (int iOfFunction=0; iOfFunction<nbOfFunctions_; iOfFunction++)
       for (int iOfFunction2=0; iOfFunction2<=iOfFunction; iOfFunction2++)
@@ -206,7 +206,7 @@ namespace simol
   
 
   
-  void ControlVariate::appendToBetterObservable(double observable, Vector<double>& generatorOnBasisFunction, int iOfIteration)
+  void ControlVariate::appendToBetterObservable(double observable, Vector<double>& generatorOnBasisFunction, int iOfStep)
   {
     //double betterObservableTerm = dot((statsB_.meanMat() - statsB2_.integratedAutocorrelationMat()), statsD_.meanMat().llt().solve(generatorOnBasisFunction));
     /*DenseMatrix<double> Dinv = statsD_.meanMat().llt().solve(generatorOnBasisFunction);
@@ -221,17 +221,17 @@ namespace simol
       //lastA_ = - .5 * statsD_.meanMat().llt().solve(meanB());
 			//lastA_ = Vector<double>(1,1);
 			lastA_.fill(1);
-      statsBetterObservable_.append(observable - dot(lastA_, generatorOnBasisFunction), iOfIteration);
+      statsBetterObservable_.append(observable - dot(lastA_, generatorOnBasisFunction), iOfStep);
     }
     else
     {
       lastA_.fill(0);
-      statsBetterObservable_.append(observable, iOfIteration);
+      statsBetterObservable_.append(observable, iOfStep);
     }
     
     for (int iOfFunction =0; iOfFunction < nbOfFunctions_; iOfFunction++)
     {
-      historyGeneratorOnBasis_(iOfIteration, iOfFunction) = generatorOnBasisFunction(iOfFunction);
+      historyGeneratorOnBasis_(iOfStep, iOfFunction) = generatorOnBasisFunction(iOfFunction);
       statsGeneratorOnBasis_.append(generatorOnBasisFunction(iOfFunction), iOfFunction);
     }
   }
@@ -294,17 +294,17 @@ namespace simol
   }
 
   
-  void ControlVariate::update(double observable, Vector<double>& generatorOnBasisFunction, vector<Particle> const& configuration, int iOfIteration)
+  void ControlVariate::update(double observable, Vector<double>& generatorOnBasisFunction, vector<Particle> const& configuration, int iOfStep)
   {
 		//cout << "ControlVariate::update" << endl;
     Vector<double> valueBasisFunction(nbOfFunctions_);
     for (int iOfFunction =0; iOfFunction < nbOfFunctions_; iOfFunction++)
       valueBasisFunction(iOfFunction) = basisFunction(configuration, iOfFunction);
     appendToB1(observable, valueBasisFunction);
-    appendToB2(observable, generatorOnBasisFunction, iOfIteration);
+    appendToB2(observable, generatorOnBasisFunction, iOfStep);
     appendToD(generatorOnBasisFunction, valueBasisFunction);
-    appendToObservable(observable, iOfIteration);
-    appendToBetterObservable(observable, generatorOnBasisFunction, iOfIteration);
+    appendToObservable(observable, iOfStep);
+    appendToBetterObservable(observable, generatorOnBasisFunction, iOfStep);
 		//cout << "end ControlVariate::update" << endl;
   }
   
@@ -420,13 +420,13 @@ namespace simol
   void ControlVariate::postTreat(std::ofstream& /*out*/, double /*timeStep*/)
   {
     /*cout << "Post-treatment of the output" << endl;
-    for (int iOfIteration = 0; iOfIteration < (int) historyObservable_.size(); iOfIteration++)
+    for (int iOfStep = 0; iOfStep < (int) historyObservable_.size(); iOfStep++)
     {
-      statsPostBetterObservable_.append(historyObservable_(iOfIteration) - dot(lastA_, historyGeneratorOnBasis_.row(iOfIteration)), iOfIteration);
-      statsPostObservable_.append(historyObservable_(iOfIteration), iOfIteration);
-			if (doOutput(iOfIteration))
+      statsPostBetterObservable_.append(historyObservable_(iOfStep) - dot(lastA_, historyGeneratorOnBasis_.row(iOfStep)), iOfStep);
+      statsPostObservable_.append(historyObservable_(iOfStep), iOfStep);
+			if (doOutput(iOfStep))
 			{
-				out << iOfIteration * timeStep
+				out << iOfStep * timeStep
 						<< " " << statsPostObservable_.lastValue() 
 						<< " " << statsPostObservable_.mean() 
 						<< " " << statsPostObservable_.standardDeviation() 
@@ -504,20 +504,20 @@ namespace simol
     return Vector<double>(dimension_);
   }
   
-  void NoControlVariate::update(double observable, Vector<double>& /*generatorOnBasisFunction*/, vector<Particle> const& /*configuration*/, int iOfIteration)
+  void NoControlVariate::update(double observable, Vector<double>& /*generatorOnBasisFunction*/, vector<Particle> const& /*configuration*/, int iOfStep)
   {
-    appendToObservable(observable, iOfIteration);
+    appendToObservable(observable, iOfStep);
   }
 
   void NoControlVariate::postTreat(std::ofstream& out, double timeStep)
   {
     std::cout << "Post-treatment of the output" << endl;
-    for (int iOfIteration = 0; iOfIteration < (int) historyObservable_.size(); iOfIteration++)
+    for (int iOfStep = 0; iOfStep < (int) historyObservable_.size(); iOfStep++)
     {
-      statsPostObservable_.append(historyObservable_(iOfIteration), iOfIteration);
-			if (doOutput(iOfIteration))
+      statsPostObservable_.append(historyObservable_(iOfStep), iOfStep);
+			if (doOutput(iOfStep))
 			{
-				out << iOfIteration * timeStep
+				out << iOfStep * timeStep
 						<< " " << statsPostObservable_.lastValue() 
 						<< " " << statsPostObservable_.mean() 
 						<< " " << statsPostObservable_.standardDeviation() 

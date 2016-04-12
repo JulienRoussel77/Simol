@@ -39,9 +39,9 @@ namespace simol{
   ControlVariate& Output::sumFlowCV()
   {return *sumFlowCV_;}
   
-  void Output::displayChainPositions(vector<Particle> const& configuration, int iOfIteration)
+  void Output::displayChainPositions(vector<Particle> const& configuration, int iOfStep)
   {
-    outBeam() << iOfIteration * timeStep() 
+    outBeam() << iOfStep * timeStep() 
         << " " << configuration[0].position() - 2*configuration[1].position() + configuration[2].position()
       //<< " " << configuration[0].position() - 2*configuration[1].position() + configuration[2].position()
         << " " << configuration[(nbOfParticles_-2)/4].position() - 2*configuration[(nbOfParticles_-2)/4+1].position() + configuration[(nbOfParticles_-2)/4+2].position()
@@ -51,9 +51,9 @@ namespace simol{
         << endl;   
   }
   
-  void Output::displayChainMomenta(vector<Particle> const& configuration, int iOfIteration)
+  void Output::displayChainMomenta(vector<Particle> const& configuration, int iOfStep)
   {
-    outChainVelocities() << iOfIteration * timeStep()
+    outChainVelocities() << iOfStep * timeStep()
       << " " << configuration[0].momentum()
       << " " << configuration[nbOfParticles_/4].momentum()
       << " " << configuration[nbOfParticles_/2].momentum()
@@ -62,31 +62,30 @@ namespace simol{
       << endl;
   }
   
-   void Output::displayProfile(int iOfIteration)
+   void Output::displayProfile(int iOfStep)
   {
-    writeProfile(outProfile(), iOfIteration);
+    writeProfile(outProfile(), iOfStep);
   }
 
-    void Output::writeProfile(ofstream & out_, int iOfIteration)
+    void Output::writeProfile(ofstream & out_, int iOfStep)
   {
-    assert(out_.is_open());
+    assert(out_ && out_.is_open());
     for (int iOfParticle = 0; iOfParticle < nbOfParticles_; iOfParticle++)
-      out_ << iOfIteration * timeStep() << " " 
+      out_ << iOfStep * timeStep() << " " 
            << iOfParticle << " " 
           << bendistProfile_.mean(iOfParticle) << " "
-          << bendistProfile_.standardDeviation(iOfParticle) / sqrt(iOfIteration * timeStep()) << " "
+          << bendistProfile_.standardDeviation(iOfParticle) / sqrt(iOfStep * timeStep()) << " "
           << flowProfile_.mean(iOfParticle) << " "
-          << flowProfile_.standardDeviation(iOfParticle) / sqrt(iOfIteration * timeStep()) << " "
+          << flowProfile_.standardDeviation(iOfParticle) / sqrt(iOfStep * timeStep()) << " "
           << kinTempProfile_.mean(iOfParticle) << " "
-          << kinTempProfile_.standardDeviation(iOfParticle) / sqrt(iOfIteration * timeStep()) << " "
+          << kinTempProfile_.standardDeviation(iOfParticle) / sqrt(iOfStep * timeStep()) << " "
           << potTempTopProfile_.mean(iOfParticle) / potTempBotProfile_.mean(iOfParticle) << " "
           << endl;
   }
   
   void Output::finalChainDisplay(vector<Particle> const& /*configuration*/, Vector<double> const& /*externalForce*/)
   {    
-    writeProfile(outFinalProfile(), nbOfIterations());
-    
+    writeProfile(outFinalProfile(), nbOfSteps());
     midFlowCV_->postTreat(outMidFlowPT(), timeStep());
     sumFlowCV_->postTreat(outSumFlowPT(), timeStep());
   }
@@ -125,29 +124,29 @@ namespace simol{
     }
   }
   
-  void Output::appendKinTempProfile(double value, int iOfIteration, int iOfParticle)
+  void Output::appendKinTempProfile(double value, int iOfStep, int iOfParticle)
   {
-    kinTempProfile_.append(value, iOfIteration, iOfParticle);
+    kinTempProfile_.append(value, iOfStep, iOfParticle);
   }
   
-  void Output::appendPotTempTopProfile(double value, int iOfIteration, int iOfParticle)
+  void Output::appendPotTempTopProfile(double value, int iOfStep, int iOfParticle)
   {
-    potTempTopProfile_.append(value, iOfIteration, iOfParticle);
+    potTempTopProfile_.append(value, iOfStep, iOfParticle);
   }
   
-      void Output::appendPotTempBotProfile(double value, int iOfIteration, int iOfParticle)
+      void Output::appendPotTempBotProfile(double value, int iOfStep, int iOfParticle)
   {
-    potTempBotProfile_.append(value, iOfIteration, iOfParticle);
+    potTempBotProfile_.append(value, iOfStep, iOfParticle);
   }
   
-  void Output::appendBendistProfile(double value, int iOfIteration, int iOfParticle)
+  void Output::appendBendistProfile(double value, int iOfStep, int iOfParticle)
   {
-    bendistProfile_.append(value, iOfIteration, iOfParticle);
+    bendistProfile_.append(value, iOfStep, iOfParticle);
   }
   
-  void Output::appendFlowProfile(double value, int iOfIteration, int iOfParticle)
+  void Output::appendFlowProfile(double value, int iOfStep, int iOfParticle)
   {
-    flowProfile_.append(value, iOfIteration, iOfParticle);
+    flowProfile_.append(value, iOfStep, iOfParticle);
   }
   
 }

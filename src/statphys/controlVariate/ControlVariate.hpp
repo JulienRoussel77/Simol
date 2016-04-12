@@ -20,11 +20,11 @@ namespace simol
   friend ControlVariate* createControlVariate(Input const& input, Potential& potential);
   protected:
     int dimension_;
-    int decorrelationNbOfIterations_;
+    int decorrelationNbOfSteps_;
     double decorrelationTime_;
     int nbOfFunctions_;
     int nbOfFunctionPairs_;
-		int periodNbOfIterations_;
+		int printPeriodNbOfSteps_;
 		int nbOfAutocoPts_;
 
     AutocorrelationStats statsObservable_;
@@ -50,11 +50,11 @@ namespace simol
     double potential(Vector<double> const& position) const;
     Vector<double> potentialDerivative(Vector<double> const& position) const;
     double potentialLaplacian(Vector<double> const& position) const;
-    int decorrelationNbOfIterations() const;
+    int decorrelationNbOfSteps() const;
     double decorrelationTime() const;
     virtual int nbOfFunctions() const;
     virtual int nbOfFunctionPairs() const;
-		bool doOutput(int iOfIteration) const;
+		bool doOutput(int iOfStep) const;
 		int const& nbOfAutocoPts() const;
 		virtual int nbOfFourier() const;
 		virtual int nbOfHermite() const;
@@ -86,13 +86,13 @@ namespace simol
 
     // APPEND
 
-    void appendToObservable(double observable, int iOfIteration);
+    void appendToObservable(double observable, int iOfStep);
     void appendToB1(double observable, Vector<double>& basisFunction);
-    void appendToB2(double observable, Vector<double>& generatorOnBasisFunction, int iOfIteration);
+    void appendToB2(double observable, Vector<double>& generatorOnBasisFunction, int iOfStep);
     void appendToD(Vector<double>& generatorOnBasisFunction, Vector<double>& basisFunction);
-    void appendToBetterObservable(double observable, Vector<double>& generatorOnBasisFunction, int iOfIteration);
+    void appendToBetterObservable(double observable, Vector<double>& generatorOnBasisFunction, int iOfStep);
 
-    virtual void update(double observable, Vector<double>& generatorOnBasisFunction, vector<Particle> const& configuration, int iOfIteration);
+    virtual void update(double observable, Vector<double>& generatorOnBasisFunction, vector<Particle> const& configuration, int iOfStep);
 
     // FUNCTION CARACTERIZATION
 
@@ -134,7 +134,7 @@ namespace simol
     virtual Vector<double> gradientQ(vector<Particle> const& configuration, int iOfParticle = 0, int iOfFunction = 0) const;
     virtual double laplacianP(vector<Particle> const& configuration, int iOfParticle = 0, int iOfFunction = 0) const;
     virtual Vector<double> gradientP(vector<Particle> const& configuration, int iOfParticle = 0, int iOfFunction = 0) const;
-    void update(double observable, Vector<double>& generatorOnBasisFunction, vector<Particle> const& configuration, int iOfIteration);
+    void update(double observable, Vector<double>& generatorOnBasisFunction, vector<Particle> const& configuration, int iOfStep);
     virtual void postTreat(std::ofstream& out, double timeStep);
   };
 

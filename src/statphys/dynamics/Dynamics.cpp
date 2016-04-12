@@ -15,9 +15,9 @@ namespace simol
   ///Constructor
   Dynamics::Dynamics(Input const& input):
     timeStep_(input.timeStep()),
-    nbOfIterations_(input.nbOfIterations()),
-    nbOfThermalIterations_(input.nbOfThermalIterations()),
-    nbOfBurnInIterations_(input.nbOfBurnInIterations()),
+    nbOfSteps_(input.nbOfSteps()),
+    thermalizationNbOfSteps_(input.thermalizationNbOfSteps()),
+    burninNbOfSteps_(input.burninNbOfSteps()),
     beta_(input.beta()),
     temperature_(1/beta_),
     galerkin_(nullptr)
@@ -38,26 +38,26 @@ namespace simol
   ///Read-only accessor for the time step "dt"
   double const& Dynamics::timeStep() const {return timeStep_;}
   ///
-  ///Read-write accessor for the number of iterations of the simulation
-  int& Dynamics::nbOfIterations() {return nbOfIterations_;}
+  ///Read-write accessor for the number of steps of the simulation
+  int& Dynamics::nbOfSteps() {return nbOfSteps_;}
 	///
-  ///Read-only accessor for the number of iterations of the simulation
-  int const& Dynamics::nbOfIterations() const {return nbOfIterations_;}
+  ///Read-only accessor for the number of steps of the simulation
+  int const& Dynamics::nbOfSteps() const {return nbOfSteps_;}
   ///
   ///Returns the total time "t_f" of the simulation
-  double Dynamics::finalTime() const {return timeStep_ * nbOfIterations_;}
+  double Dynamics::finalTime() const {return timeStep_ * nbOfSteps_;}
   ///
-  ///Read-write accessor for the number of iterations of the thermalization
-  int& Dynamics::nbOfThermalIterations() {return nbOfThermalIterations_;}
+  ///Read-write accessor for the number of steps of the thermalization
+  int& Dynamics::thermalizationNbOfSteps() {return thermalizationNbOfSteps_;}
   ///
-  ///Read-only accessor for the number of iterations of the thermalization
-  int const& Dynamics::nbOfThermalIterations() const {return nbOfThermalIterations_;}
+  ///Read-only accessor for the number of steps of the thermalization
+  int const& Dynamics::thermalizationNbOfSteps() const {return thermalizationNbOfSteps_;}
   ///
-  ///Read-write accessor for the number of iterations of the burnIn
-  int& Dynamics::nbOfBurnInIterations() {return nbOfBurnInIterations_;}
+  ///Read-write accessor for the number of steps of the burnIn
+  int& Dynamics::burninNbOfSteps() {return burninNbOfSteps_;}
   ///
-  ///Read-only accessor for the number of iterations of the burnIn
-  int const& Dynamics::nbOfBurnInIterations() const {return nbOfBurnInIterations_;}
+  ///Read-only accessor for the number of steps of the burnIn
+  int const& Dynamics::burninNbOfSteps() const {return burninNbOfSteps_;}
 
   const std::shared_ptr<RNG>& Dynamics::rng() const {return rng_;}
 

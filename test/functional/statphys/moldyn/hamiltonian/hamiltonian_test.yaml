@@ -1,7 +1,7 @@
 
 Time:
   Step: 0.02
-  FinalTime: 1000
+  TotalTime: 1000
 
 System:
   Name: Isolated

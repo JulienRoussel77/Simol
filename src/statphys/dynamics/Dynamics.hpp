@@ -22,16 +22,16 @@ namespace simol
     
     virtual void printName() const;
     
-    //-- time steps and iterations --
+    //-- time step and numbers of steps --
     double& timeStep();
     const double& timeStep() const;
-    int& nbOfIterations();
-    int const& nbOfIterations() const;
+    int& nbOfSteps();
+    int const& nbOfSteps() const;
     double finalTime() const;
-    int& nbOfThermalIterations();
-    int const& nbOfThermalIterations() const;
-    int& nbOfBurnInIterations();
-    int const& nbOfBurnInIterations() const;
+    int& thermalizationNbOfSteps();
+    int const& thermalizationNbOfSteps() const;
+    int& burninNbOfSteps();
+    int const& burninNbOfSteps() const;
     
     //-- random numbers ---
     std::shared_ptr<RNG> const& rng() const;
@@ -65,7 +65,7 @@ namespace simol
   protected:
     
     double timeStep_;
-    int nbOfIterations_, nbOfThermalIterations_, nbOfBurnInIterations_;
+    int nbOfSteps_, thermalizationNbOfSteps_, burninNbOfSteps_;
     double beta_;
     double temperature_;
     std::shared_ptr<RNG> rng_;

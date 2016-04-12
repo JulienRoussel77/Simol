@@ -11,12 +11,12 @@ namespace simol{
   /// including creation/opening of appropriate output files
   Output::Output(Input const& input):
     outputFolderName_(input.outputFolderName()), 
-    periodNbOfIterations_(input.outputPeriodNbOfIterations()),
-    longPeriodNbOfIterations_(input.outputLongPeriodNbOfIterations()),
+    printPeriodNbOfSteps_(input.printPeriodNbOfSteps()),
+    printLongPeriodNbOfSteps_(input.printLongPeriodNbOfSteps()),
     timeStep_(input.timeStep()),
     dimension_(input.dimension()),
     nbOfParticles_(input.nbOfParticles()),
-    nbOfIterations_(input.nbOfIterations()),
+    nbOfSteps_(input.nbOfSteps()),
     latticeParameter_(input.latticeParameter()),
     kineticEnergy_(0),
     potentialEnergy_(0),
@@ -24,7 +24,7 @@ namespace simol{
     totalVirial_(0),
     energyMidFlow_(0),
     energySumFlow_(0),
-    decorrelationNbOfIterations_(input.decorrelationNbOfIterations()),
+    decorrelationNbOfSteps_(input.decorrelationNbOfSteps()),
     nbOfAutocoPts_(input.nbOfAutocoPts()),
     doFinalFlow_(input.doFinalFlow()),
     doFinalVelocity_(input.doFinalVelocity()),
@@ -33,18 +33,18 @@ namespace simol{
     lengthCV_(nullptr),
     midFlowCV_(nullptr),
     sumFlowCV_(nullptr),
-    kinTempProfile_(decorrelationNbOfIterations(), decorrelationTime(), nbOfAutocoPts(), nbOfParticles_),
-    potTempTopProfile_(decorrelationNbOfIterations(), decorrelationTime(), nbOfAutocoPts(), nbOfParticles_),
-    potTempBotProfile_(decorrelationNbOfIterations(), decorrelationTime(), nbOfAutocoPts(), nbOfParticles_),
-    bendistProfile_(decorrelationNbOfIterations(), decorrelationTime(), nbOfAutocoPts(), nbOfParticles_),
-    flowProfile_(decorrelationNbOfIterations(), decorrelationTime(), nbOfAutocoPts(), nbOfParticles_)
+    kinTempProfile_(decorrelationNbOfSteps(), decorrelationTime(), nbOfAutocoPts(), nbOfParticles_),
+    potTempTopProfile_(decorrelationNbOfSteps(), decorrelationTime(), nbOfAutocoPts(), nbOfParticles_),
+    potTempBotProfile_(decorrelationNbOfSteps(), decorrelationTime(), nbOfAutocoPts(), nbOfParticles_),
+    bendistProfile_(decorrelationNbOfSteps(), decorrelationTime(), nbOfAutocoPts(), nbOfParticles_),
+    flowProfile_(decorrelationNbOfSteps(), decorrelationTime(), nbOfAutocoPts(), nbOfParticles_)
   {
     //-- standard observables in this file --
     outObservables_       = std::make_shared<ofstream>(input.outputFolderName()+"observables.txt");
     outObservables() << "# time kineticEnergy potentialEnergy energy temperature" << endl;
     
     //-- longer outputs if required, e.g. configuration of the system --
-    if (longPeriodNbOfIterations_ > 0)
+    if (printLongPeriodNbOfSteps_ > 0)
     { 
       if (input.systemName() == "NBody")
       {
@@ -58,7 +58,7 @@ namespace simol{
     }
 
     //-- for autocorrelations --
-    if (decorrelationNbOfIterations_ > 0)
+    if (decorrelationNbOfSteps_ > 0)
       outCorrelation_ = std::make_shared<ofstream>(input.outputFolderName()+"correlations.txt");
     
     //-- average velocities for 1D nonequilibrium --
@@ -90,7 +90,8 @@ namespace simol{
     //-- outputs specific to chains --
     if (input.systemName() == "BiChain" || input.systemName() == "TriChain")
     {
-      outFinalFlow_         = std::make_shared<ofstream>(input.simuTypeName()+"finalFlow.txt", std::ofstream::app);
+      outFinalProfile_      = std::make_shared<ofstream>(input.outputFolderName()+"finalProfile.txt");
+      
       outBeam_              = std::make_shared<ofstream>(input.outputFolderName()+"beamChain.txt");
       
       outChainVelocities_   = std::make_shared<ofstream>(input.outputFolderName()+"velocitiesChain.txt");
@@ -107,7 +108,7 @@ namespace simol{
       outProfile_           = std::make_shared<ofstream>(input.outputFolderName()+"profile.txt");
       
       if (doFinalFlow_)
-        outFinalProfile_      = std::make_shared<ofstream>(input.outputFolderName()+"finalProfile.txt");
+        outFinalFlow_         = std::make_shared<ofstream>(input.simuTypeName()+"finalFlow.txt", std::ofstream::app);
     }
     
     //--------- announce where input/outputs are ----------------------------
@@ -121,9 +122,7 @@ namespace simol{
     //-- copy read input into file --
     std::ofstream outInput(input.outputFolderName()+"inputFile.txt");
     outInput << input.inputFlux().rdbuf();
-    
-    assert(input.outputPeriodTime() == 0 || input.outputPeriodTime() >= timeStep());  // TO DO: KEEP IT?
-  
+      
     //------------------ screen output for control --------------------------
     cout << endl;
     cout << "-----------------------------------------------------" << endl;
@@ -134,10 +133,10 @@ namespace simol{
     cout << "    Potential : " << input.potentialName() << endl;
     cout << endl;   
     cout << " Number of particles  : " << nbOfParticles_ << endl;
-    if (nbOfIterations_<1e6)
-      cout << " Number of iterations : " << nbOfIterations_ << endl;
+    if (nbOfSteps_<1e6)
+      cout << " Number of steps : " << nbOfSteps_ << endl;
     else
-      cout << " Number of iterations : " << nbOfIterations_/1e6 << "e6" << endl;
+      cout << " Number of steps : " << nbOfSteps_/1e6 << "e6" << endl;
     cout << " Time step            : " << timeStep_ << endl;
     cout << "" << endl;
     cout << "-----------------------------------------------------" << endl << endl;
@@ -170,23 +169,26 @@ namespace simol{
   ofstream & Output::outLengthsCV()
   {return *outLengthsCV_;}
   
-  double Output::period() const
-  {return periodNbOfIterations_ * timeStep();}
+  double Output::printPeriodTime() const
+  {return printPeriodNbOfSteps_ * timeStep();}
   
-  const int& Output::periodNbOfIterations() const
-  {return periodNbOfIterations_;}
+  const int& Output::printPeriodNbOfSteps() const
+  {return printPeriodNbOfSteps_;}
   
-  const int& Output::longPeriodNbOfIterations() const
-  {return longPeriodNbOfIterations_;}
+  double Output::printLongPeriodTime() const
+  {return printLongPeriodNbOfSteps_ * timeStep();}
+  
+  const int& Output::printLongPeriodNbOfSteps() const
+  {return printLongPeriodNbOfSteps_;}
   
   const int& Output::nbOfParticles() const
   {return nbOfParticles_;}
   
-  const int& Output::nbOfIterations() const
-  {return nbOfIterations_;}
+  const int& Output::nbOfSteps() const
+  {return nbOfSteps_;}
   
   double Output::finalTime() const
-  {return nbOfIterations_ * timeStep_;}
+  {return nbOfSteps_ * timeStep_;}
   
   const double& Output::kineticEnergy() const
   {return kineticEnergy_;}
@@ -222,7 +224,7 @@ namespace simol{
   {return (2 * kineticEnergy_ + totalVirial_) / (dimension_ * nbOfParticles_ * pow(latticeParameter_,dimension_));}
   
   bool Output::doComputeCorrelations() const
-  {return decorrelationNbOfIterations();}
+  {return decorrelationNbOfSteps();}
   
   ControlVariate& Output::velocityCV()
   {return *velocityCV_;}
@@ -239,14 +241,14 @@ namespace simol{
   double& Output::timeStep()
   {return timeStep_;}
   
-  int & Output::decorrelationNbOfIterations()
-  {return decorrelationNbOfIterations_;}
+  int & Output::decorrelationNbOfSteps()
+  {return decorrelationNbOfSteps_;}
   
-  const int& Output::decorrelationNbOfIterations() const
-  {return decorrelationNbOfIterations_;}
+  const int& Output::decorrelationNbOfSteps() const
+  {return decorrelationNbOfSteps_;}
   
   double Output::decorrelationTime() const
-  {return decorrelationNbOfIterations() * timeStep();}
+  {return decorrelationNbOfSteps() * timeStep();}
   
   const int& Output::nbOfAutocoPts() const
   {return nbOfAutocoPts_;}
@@ -256,21 +258,21 @@ namespace simol{
   
   //---------------- check whether outputs should be performed --------------------
   
-  bool Output::doOutput(int iOfIteration) const
+  bool Output::doOutput(int iOfStep) const
   {
-    return (periodNbOfIterations() > 0 && iOfIteration % periodNbOfIterations() == 0);
+    return (printPeriodNbOfSteps() > 0 && iOfStep % printPeriodNbOfSteps() == 0);
   }
   
-  bool Output::doLongOutput(int iOfIteration) const
+  bool Output::doLongPeriodOutput(int iOfStep) const
   {
-    return (longPeriodNbOfIterations() > 0 && iOfIteration % longPeriodNbOfIterations() == 0);
+    return (printLongPeriodNbOfSteps() > 0 && iOfStep % printLongPeriodNbOfSteps() == 0);
   }
   
   //----------------- display functions --------------------------
   
-  void Output::displayObservables(int iOfIteration)
+  void Output::displayObservables(int iOfStep)
   {
-    outObservables() << iOfIteration * timeStep() 
+    outObservables() << iOfStep * timeStep() 
 		    << " " << kineticEnergy()
 		    << " " << potentialEnergy()
 		    << " " << energy()
@@ -279,10 +281,10 @@ namespace simol{
 		     << std::endl;
   }
   
-  void Output::displayParticles(vector<Particle> const& configuration, int iOfIteration)
+  void Output::displayParticles(vector<Particle> const& configuration, int iOfStep)
   {
     for (int i = 0; i < nbOfParticles_; i++)
-      outParticles() << iOfIteration * timeStep() 
+      outParticles() << iOfStep * timeStep() 
 		     << " " << i
 		     << " " << configuration[i].position() 
 		     << " " << configuration[i].momentum() 
@@ -313,10 +315,10 @@ namespace simol{
       }
   }
   
-  void Output::displayObservablesDPDE(vector<Particle> const& /*configuration*/, int iOfIteration)
+  void Output::displayObservablesDPDE(vector<Particle> const& /*configuration*/, int iOfStep)
   {
     double totalEnergy = kineticEnergy() + potentialEnergy() + internalEnergy();
-    outObservables() << iOfIteration * timeStep() 
+    outObservables() << iOfStep * timeStep() 
 		    << " " << kineticEnergy()
 		    << " " << potentialEnergy()
 		    << " " << internalEnergy()

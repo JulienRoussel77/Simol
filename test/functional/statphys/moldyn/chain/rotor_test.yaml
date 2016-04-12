@@ -1,7 +1,7 @@
 Time:
   Step: 0.02
-  FinalTime: 100
-  ThermalTime: 0
+  TotalTime: 100
+  ThermalizationTime: 0
   BurnInTime: 0
 
 System:

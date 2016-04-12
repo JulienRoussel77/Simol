@@ -52,7 +52,7 @@ namespace simol {
   }
   
   template <>
-  void computeOutput(Hamiltonian const& /*dyna*/, NBody const& syst, Output& output, int /*iOfIteration*/)
+  void computeOutput(Hamiltonian const& /*dyna*/, NBody const& syst, Output& output, int /*iOfStep*/)
   {
     output.kineticEnergy() = 0;
     output.potentialEnergy() = 0;
@@ -66,12 +66,12 @@ namespace simol {
       }
   }
   
-  void writeOutput(Hamiltonian const& /*dyna*/, NBody const& syst, Output& output, int iOfIteration)
+  void writeOutput(Hamiltonian const& /*dyna*/, NBody const& syst, Output& output, int iOfStep)
   {
-    if (output.doOutput(iOfIteration))
-      output.displayObservables(iOfIteration);
-    if (output.doLongOutput(iOfIteration))
-      output.displayParticlesXMakeMol(syst.configuration(), iOfIteration, syst.latticeParameter()*syst.nbOfParticlesPerDimension());        
+    if (output.doOutput(iOfStep))
+      output.displayObservables(iOfStep);
+    if (output.doLongPeriodOutput(iOfStep))
+      output.displayParticlesXMakeMol(syst.configuration(), iOfStep, syst.latticeParameter()*syst.nbOfParticlesPerDimension());        
   }
   
   void writeFinalOutput(Hamiltonian const& /*dyna*/, NBody const& /*syst*/, Output& /*output*/)

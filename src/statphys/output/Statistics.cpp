@@ -78,7 +78,7 @@ namespace simol
 
   
   AutocorrelationStats::AutocorrelationStats():
-    decorrelationNbOfIterations_(0),
+    decorrelationNbOfSteps_(0),
     decorrelationTime_(0),
     nbOfAutocoPts_(0),
     nbOfObservables_(0),
@@ -93,8 +93,8 @@ namespace simol
   }
 
 
-  AutocorrelationStats::AutocorrelationStats(int decorrelationNbOfIterations0, double decorrelationTime, int nbOfAutocoPts0, int nbOfObservables):
-    decorrelationNbOfIterations_(decorrelationNbOfIterations0),
+  AutocorrelationStats::AutocorrelationStats(int decorrelationNbOfSteps0, double decorrelationTime, int nbOfAutocoPts0, int nbOfObservables):
+    decorrelationNbOfSteps_(decorrelationNbOfSteps0),
     decorrelationTime_(decorrelationTime),
     nbOfAutocoPts_(nbOfAutocoPts0),
     nbOfObservables_(nbOfObservables),
@@ -109,15 +109,15 @@ namespace simol
   }
 
 
-  void AutocorrelationStats::append(double const& newValue, int iOfIteration, int iOfObservable)
+  void AutocorrelationStats::append(double const& newValue, int iOfStep, int iOfObservable)
   {
-    append(newValue, iOfIteration, iOfObservable, newValue);
+    append(newValue, iOfStep, iOfObservable, newValue);
   }
 
 
-  double AutocorrelationStats::operator()(int iOfIteration, int iOfObservable) const
+  double AutocorrelationStats::operator()(int iOfStep, int iOfObservable) const
   {
-    return statisticsCorrelation_.mean(iOfIteration, iOfObservable);
+    return statisticsCorrelation_.mean(iOfStep, iOfObservable);
   }
 
 
@@ -164,31 +164,31 @@ namespace simol
     return sqrt(variance(iOfObservable));
   }
   
-  void AutocorrelationStats::append(const double& newValue, int iOfIteration, int iOfObservable, const double& newRefValue)
+  void AutocorrelationStats::append(const double& newValue, int iOfStep, int iOfObservable, const double& newRefValue)
   {
-    if (iOfIteration % decorrelationNbOfIterations_ == 0)
+    if (iOfStep % decorrelationNbOfSteps_ == 0)
     {
       statisticsRefValues_.append(newRefValue, iOfObservable);
-      indexRef_ = iOfIteration;
+      indexRef_ = iOfStep;
     }
     statisticsValues_.append(newValue, iOfObservable);
 		//On intègre le profil d'autocorrélation à l'ordre 2 en coomptant la valeur en 0 pour un demi
-    statisticsMeanCorrelation_.append(((indexRef_ == iOfIteration)?.5:1) * statisticsRefValues_.lastValue(iOfObservable) * newValue, iOfObservable);
-    statisticsCorrelation_.append(statisticsRefValues_.lastValue(iOfObservable) * newValue, ((iOfIteration - indexRef_)*nbOfAutocoPts_) / decorrelationNbOfIterations_, iOfObservable);    
+    statisticsMeanCorrelation_.append(((indexRef_ == iOfStep)?.5:1) * statisticsRefValues_.lastValue(iOfObservable) * newValue, iOfObservable);
+    statisticsCorrelation_.append(statisticsRefValues_.lastValue(iOfObservable) * newValue, ((iOfStep - indexRef_)*nbOfAutocoPts_) / decorrelationNbOfSteps_, iOfObservable);    
   }
   
   /*template <>
-  void AutocorrelationStats<Vector<double>>::append(Vector<double> const& newValue, int iOfIteration, int iOfObservable, Vector<double> const& newRefValue)
+  void AutocorrelationStats<Vector<double>>::append(Vector<double> const& newValue, int iOfStep, int iOfObservable, Vector<double> const& newRefValue)
   {
-    if (iOfIteration % decorrelationNbOfIterations_ == 0)
+    if (iOfStep % decorrelationNbOfSteps_ == 0)
     {
       statisticsRefValues_.append(newValue, iOfObservable);
-      indexRef_ = iOfIteration;
+      indexRef_ = iOfStep;
     }
     statisticsValues_.append(newValue, iOfObservable);
 		//On intègre le profil d'autocorrélation à l'ordre 2
-    statisticsMeanCorrelation_.append(((indexRef_ == iOfIteration)?.5:1) * dot(statisticsRefValues_.lastValue(iOfObservable), newValue), iOfObservable);
-    statisticsCorrelation_.append(dot(statisticsRefValues_.lastValue(iOfObservable), newValue), ((iOfIteration - indexRef_)*nbOfAutocoPts_) / decorrelationNbOfIterations_, iOfObservable);
+    statisticsMeanCorrelation_.append(((indexRef_ == iOfStep)?.5:1) * dot(statisticsRefValues_.lastValue(iOfObservable), newValue), iOfObservable);
+    statisticsCorrelation_.append(dot(statisticsRefValues_.lastValue(iOfObservable), newValue), ((iOfStep - indexRef_)*nbOfAutocoPts_) / decorrelationNbOfSteps_, iOfObservable);
   }*/
   
   double AutocorrelationStats::integratedAutocorrelationUnbiased(int iOfObservable) const

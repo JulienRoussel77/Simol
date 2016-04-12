@@ -4,8 +4,8 @@ Geometry:
 Mesh:
   Time:
     Step: 0.02
-    FinalTime: 1000
-    ThermalTime: 0
+    TotalTime: 1000
+    ThermalizationTime: 0
     BurningTime: 0
 Physics:
   System:
