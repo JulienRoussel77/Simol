@@ -14,58 +14,7 @@ namespace simol
   
   class Output
   {
-  protected:
-    string outputFolderName_;
-    std::shared_ptr<ofstream> outObservables_;
-    std::shared_ptr<ofstream> outParticles_;
-    std::shared_ptr<ofstream> outCorrelation_;
-    
-    //-- xmakemol outputs for NBody --
-    std::shared_ptr<ofstream> outParticlesXMakeMol_;
-    
-    //-- average velocity for Isolated --
-    std::shared_ptr<ofstream> outFinalVelocity_;
-    
-    //-- control variate outputs --
-    std::shared_ptr<ofstream> outVelocitiesGenerator_;
-    std::shared_ptr<ofstream> outVelocitiesCV_;
-    std::shared_ptr<ofstream> outForcesCV_;
-    std::shared_ptr<ofstream> outLengthsCV_;
-    
-    //-- for chains --
-    std::shared_ptr<ofstream> outFinalFlow_;
-    std::shared_ptr<ofstream> outBeam_;
-    std::shared_ptr<ofstream> outChainVelocities_;
-    std::shared_ptr<ofstream> outMidFlowCV_;    
-    std::shared_ptr<ofstream> outMidFlowPT_;
-    std::shared_ptr<ofstream> outSumFlowCV_;    
-    std::shared_ptr<ofstream> outSumFlowPT_;
-    std::shared_ptr<ofstream> outProfile_;
-    std::shared_ptr<ofstream> outFinalProfile_;
-    
-    string profilePath_;
-    
-    //-- input parameters useful for output --
-    int periodNbOfIterations_, profilePeriodNbOfIterations_;
-    double timeStep_;
-    int dimension_;
-    int nbOfParticles_;
-    int nbOfIterations_;
-    double latticeParameter_;
-    
-    //-- fields to output --
-    double kineticEnergy_;
-    double potentialEnergy_;
-    double internalEnergy_;
-    double totalVirial_;
-    double energyMidFlow_;
-    double energySumFlow_;
-    
-    //-- parametrization of outputs --
-    int decorrelationNbOfIterations_;
-    int nbOfAutocoPts_;
-    bool doFinalFlow_, doFinalVelocity_;
-    
+ 
   public:
     
     ControlVariate* velocityCV_;
@@ -176,6 +125,58 @@ namespace simol
   
     //------------- pour DPDE ---------------
     void displayObservablesDPDE(vector<Particle> const& configuration, int iOfIteration);
+ 
+  protected:
+    string outputFolderName_;
+    std::shared_ptr<ofstream> outObservables_;
+    std::shared_ptr<ofstream> outParticles_;
+    std::shared_ptr<ofstream> outCorrelation_;
+    
+    //-- xmakemol outputs for NBody --
+    std::shared_ptr<ofstream> outParticlesXMakeMol_;
+    
+    //-- average velocity for Isolated --
+    std::shared_ptr<ofstream> outFinalVelocity_;
+    
+    //-- control variate outputs --
+    std::shared_ptr<ofstream> outVelocitiesGenerator_;
+    std::shared_ptr<ofstream> outVelocitiesCV_;
+    std::shared_ptr<ofstream> outForcesCV_;
+    std::shared_ptr<ofstream> outLengthsCV_;
+    
+    //-- for chains --
+    std::shared_ptr<ofstream> outFinalFlow_;
+    std::shared_ptr<ofstream> outBeam_;
+    std::shared_ptr<ofstream> outChainVelocities_;
+    std::shared_ptr<ofstream> outMidFlowCV_;    
+    std::shared_ptr<ofstream> outMidFlowPT_;
+    std::shared_ptr<ofstream> outSumFlowCV_;    
+    std::shared_ptr<ofstream> outSumFlowPT_;
+    std::shared_ptr<ofstream> outProfile_;
+    std::shared_ptr<ofstream> outFinalProfile_;
+    
+    string profilePath_;
+    
+    //-- input parameters useful for output --
+    int periodNbOfIterations_, profilePeriodNbOfIterations_;
+    double timeStep_;
+    int dimension_;
+    int nbOfParticles_;
+    int nbOfIterations_;
+    double latticeParameter_;
+    
+    //-- fields to output --
+    double kineticEnergy_;
+    double potentialEnergy_;
+    double internalEnergy_;
+    double totalVirial_;
+    double energyMidFlow_;
+    double energySumFlow_;
+    
+    //-- parametrization of outputs --
+    int decorrelationNbOfIterations_;
+    int nbOfAutocoPts_;
+    bool doFinalFlow_, doFinalVelocity_;
   };
 
 }

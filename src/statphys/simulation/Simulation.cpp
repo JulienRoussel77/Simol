@@ -71,7 +71,7 @@ namespace simol {
 
   //---------------------------------------------------------------
 
-  void writeFinalOutput(Dynamics const& /*dyna*/, System const& syst, Output& output)
+  void writeFinalOutput(Dynamics const& /*dyna*/, System const& /*syst*/, Output& output)
   {
     if (output.doComputeCorrelations())
       output.finalDisplayAutocorrelations();

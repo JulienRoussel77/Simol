@@ -14,9 +14,7 @@ namespace simol
     betaLeft_(1 / temperatureLeft_),
     betaRight_(1 / temperatureRight_),    
     tauBending_(input.tauBending())
-  {
-    cout << "deltaTemperature = " << deltaTemperature() << endl;
-  }
+  {}
 
   ///
   ///Read-only access for the inverse temperature at the left end

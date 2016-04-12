@@ -157,6 +157,8 @@ namespace simol {
       simulate(dyna, syst);
     }
     cout << "Done !" << endl;
+    
+    syst.computeAllForces();
   }
   
   template <class D>
@@ -205,12 +207,8 @@ namespace simol {
   template<class D, class S>
   void launchSimu(D& dyna, S& syst, Output& output)
   {
-    dyna.printName();
-    syst.printName();
-
     //---- initialization (including burn-in) -----
     sampleSystem(dyna, syst);
-    syst.computeAllForces();  // TO DO : put in initialization function
 
     //---- actual iterations -----
     for (int iOfIteration  =0; iOfIteration < dyna.nbOfIterations(); ++iOfIteration)

@@ -525,7 +525,7 @@ namespace simol
 			}
     }
     
-    std::cout << "-<Linv j, j> = " << .5 * pow(statsPostObservable_.standardDeviation(), 2) << endl;
+    //std::cout << "-<Linv j, j> = " << .5 * pow(statsPostObservable_.standardDeviation(), 2) << endl;
   } 
     
     

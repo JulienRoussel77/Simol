@@ -10,7 +10,7 @@ namespace simol {
     syst.getParticle(0).position(0) = syst.drawPotLaw(dyna.beta());
   }
   
-  void writeFinalOutput(Hamiltonian const& dyna, Isolated const& syst, Output& output)
+  void writeFinalOutput(Hamiltonian const& /*dyna*/, Isolated const& syst, Output& output)
   {
     if (output.doComputeCorrelations())
       output.finalDisplayAutocorrelations();
@@ -19,7 +19,7 @@ namespace simol {
   
   //------------- Overdamped --------------------
   
-  void sampleMomenta(Overdamped& dyna, Isolated& syst){}
+  void sampleMomenta(Overdamped& /*dyna*/, Isolated& /*syst*/){}
   
    
   //------------- DPDE --------------------

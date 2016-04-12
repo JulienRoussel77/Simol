@@ -7,9 +7,7 @@ namespace simol
     Dynamics(input),
     gamma_(input.gamma()),
     xi_(input.xi())
-  {
-		cout << "xi = " << xi() << endl;
-	}
+  {}
 	
 	///
   ///Read-only accessor of the intensity of the O-U process

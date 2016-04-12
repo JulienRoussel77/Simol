@@ -4,7 +4,7 @@ namespace simol {
   
   ///
   ///Computes the quantities needed by the control variates (coefficients a, b, D) and {L \Phi}
-  void updateAllControlVariates(Dynamics const& /*dyna*/, System const& syst, Output& /*output*/, int /*iOfIteration*/)
+  void updateAllControlVariates(Dynamics const& /*dyna*/, System const& /*syst*/, Output& /*output*/, int /*iOfIteration*/)
   {throw std::invalid_argument("updateAllControlVariates: Function undefined");}
   
     /*Vector<double> q = syst.getParticle(0).position();
