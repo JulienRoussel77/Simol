@@ -3,18 +3,16 @@
 using std::cout; 
 using std::endl; 
 using std::vector;
-using std::sin;
-using std::cos;
-
-// #include <cmath>
 
 namespace simol{
   
-  
+  ///
+  /// creation of output class
+  /// including creation/opening of appropriate output files
   Output::Output(Input const& input):
     outputFolderName_(input.outputFolderName()), 
     periodNbOfIterations_(input.outputPeriodNbOfIterations()),
-    profilePeriodNbOfIterations_(input.outputProfilePeriodNbOfIterations()),
+    longPeriodNbOfIterations_(input.outputLongPeriodNbOfIterations()),
     timeStep_(input.timeStep()),
     dimension_(input.dimension()),
     nbOfParticles_(input.nbOfParticles()),
@@ -41,28 +39,55 @@ namespace simol{
     bendistProfile_(decorrelationNbOfIterations(), decorrelationTime(), nbOfAutocoPts(), nbOfParticles_),
     flowProfile_(decorrelationNbOfIterations(), decorrelationTime(), nbOfAutocoPts(), nbOfParticles_)
   {
+    //-- standard observables in this file --
     outObservables_       = std::make_shared<ofstream>(input.outputFolderName()+"observables.txt");
     outObservables() << "# time kineticEnergy potentialEnergy energy temperature" << endl;
     
-    outParticles_         = std::make_shared<ofstream>(input.outputFolderName()+"particles.txt");
-    outParticles() << "# time index position momentum kineticEnergy potentialEnergy energy force" << endl;
+    //-- longer outputs if required, e.g. configuration of the system --
+    if (longPeriodNbOfIterations_ > 0)
+    { 
+      if (input.systemName() == "NBody")
+      {
+        outParticlesXMakeMol_ = std::make_shared<ofstream>(input.outputFolderName()+"xmakemol.xyz");
+      }
+      else
+      {
+        outParticles_ = std::make_shared<ofstream>(input.outputFolderName()+"particles.txt");
+        outParticles() << "# time index position momentum kineticEnergy potentialEnergy energy force" << endl;
+      }
+    }
 
-    outParticlesXMakeMol_ = std::make_shared<ofstream>(input.outputFolderName()+"xmakemol.xyz");
+    //-- for autocorrelations --
+    if (decorrelationNbOfIterations_ > 0)
+      outCorrelation_ = std::make_shared<ofstream>(input.outputFolderName()+"correlations.txt");
     
-    outCorrelation_       = std::make_shared<ofstream>(input.outputFolderName()+"correlations.txt");
-    outVelocitiesCV_      = std::make_shared<ofstream>(input.outputFolderName()+"velocities.txt");
-    outVelocitiesCV() << "# time b <b> <b2> D <D> >D2> observable <observable> >observable2> LPhi <LPhi> <LPhi2>" << endl;
-
-    outVelocitiesGenerator_ = std::make_shared<ofstream>(input.outputFolderName()+"velocitiesGenerator.txt");
-    outForcesCV_          = std::make_shared<ofstream>(input.outputFolderName()+"forces.txt");
-    outForcesCV() << "# time b <b> <b2> D <D> >D2> observable <observable> >observable2> LPhi <LPhi> <LPhi2>" << endl;
-
+    //-- average velocities for 1D nonequilibrium --
+    if ( (input.systemName() == "Isolated") && (input.dynamicsName() == "Langevin") )
+    {
+      outVelocitiesCV_      = std::make_shared<ofstream>(input.outputFolderName()+"velocities.txt");
+      outVelocitiesCV() << "# time b <b> <b2> D <D> <D2> observable <observable> <observable2> LPhi <LPhi> <LPhi2>" << endl;  
+    }
+    
+    //-- average forces for 1D nonequilibrium overdamped --
+    if ( (input.systemName() == "Isolated") && (input.dynamicsName() == "Overdamped") )
+    {  
+      outForcesCV_ = std::make_shared<ofstream>(input.outputFolderName()+"forces.txt");
+      outForcesCV() << "# time b <b> <b2> D <D> >D2> observable <observable> >observable2> LPhi <LPhi> <LPhi2>" << endl;
+    }
+    
+    //-- used for control variates --
+    if (input.controlVariateName() != "None")
+      outVelocitiesGenerator_ = std::make_shared<ofstream>(input.outputFolderName()+"velocitiesGenerator.txt");
+    
+    //---- TO DO: check status ---
     outLengthsCV_         = std::make_shared<ofstream>(input.outputFolderName()+"lengths.txt");
     outLengthsCV() << "# time b <b> <b2> D <D> >D2> observable <observable> >observable2> LPhi <LPhi> <LPhi2>" << endl;
   
+    //--- to have a summary of the fina, estimated average velocity ---
     if (doFinalVelocity_)
       outFinalVelocity_     = std::make_shared<ofstream>(input.simuTypeName()+"finalVelocity.txt", std::ofstream::app);
 
+    //-- outputs specific to chains --
     if (input.systemName() == "BiChain" || input.systemName() == "TriChain")
     {
       outFinalFlow_         = std::make_shared<ofstream>(input.simuTypeName()+"finalFlow.txt", std::ofstream::app);
@@ -85,59 +110,63 @@ namespace simol{
         outFinalProfile_      = std::make_shared<ofstream>(input.outputFolderName()+"finalProfile.txt");
     }
     
-    cout << endl;
-    cout << "####################################################" << endl;
-    cout << "#" << endl;
-    cout << "# Simulation of : " << endl;
-    cout << "#    System    : " << input.systemName() << endl;
-    cout << "#    Dynamics  : " << input.dynamicsName() << endl;
-    cout << "#    Potential : " << input.potentialName() << endl;
-    cout << "#" << endl;   
-    cout << "# Number of particles  : " << nbOfParticles_ << endl;
-    if (nbOfIterations_<1e6)
-      cout << "# Number of iterations : " << nbOfIterations_ << endl;
-    else
-      cout << "# Number of iterations : " << nbOfIterations_/1e6 << "e6" << endl;
-    cout << "# Time step            : " << timeStep_ << endl;
-    cout << "#" << endl;
-    cout << "####################################################" << endl << endl;
-    
+    //--------- announce where input/outputs are ----------------------------
+    std::cout << endl;
     std::cout << "Output written in " << input.outputFolderName() << std::endl;
     std::cout << "Final output written in " << input.simuTypeName() << std::endl;
-    if (!outParticles_->is_open())
+    
+    if (outParticles_ && !outParticles_->is_open())
       throw std::runtime_error("The output file does not exist ! Please add it manually.");
     
+    //-- copy read input into file --
     std::ofstream outInput(input.outputFolderName()+"inputFile.txt");
     outInput << input.inputFlux().rdbuf();
     
-    assert(input.outputPeriodTime() == 0 || input.outputPeriodTime() >= timeStep());
-    decorrelationNbOfIterations_ = input.decorrelationNbOfIterations();
+    assert(input.outputPeriodTime() == 0 || input.outputPeriodTime() >= timeStep());  // TO DO: KEEP IT?
+  
+    //------------------ screen output for control --------------------------
+    cout << endl;
+    cout << "-----------------------------------------------------" << endl;
+    cout << endl;
+    cout << " Simulation of : " << endl;
+    cout << "    System    : " << input.systemName() << endl;
+    cout << "    Dynamics  : " << input.dynamicsName() << endl;
+    cout << "    Potential : " << input.potentialName() << endl;
+    cout << endl;   
+    cout << " Number of particles  : " << nbOfParticles_ << endl;
+    if (nbOfIterations_<1e6)
+      cout << " Number of iterations : " << nbOfIterations_ << endl;
+    else
+      cout << " Number of iterations : " << nbOfIterations_/1e6 << "e6" << endl;
+    cout << " Time step            : " << timeStep_ << endl;
+    cout << "" << endl;
+    cout << "-----------------------------------------------------" << endl << endl;
+    
   }
 	
-  void Output::setControlVariates(Input& input, Potential& potential, Galerkin* galerkin)
-  {
-    velocityCV_ = createControlVariate(input, potential, galerkin);
-    forceCV_ = createControlVariate(input, potential, galerkin);
-    lengthCV_ = createControlVariate(input, potential, galerkin);
-    midFlowCV_ = createControlVariate(input, potential, galerkin);
-    sumFlowCV_ = createControlVariate(input, potential, galerkin);
-  }
-  
+	//----- various assessors --------
+	
   ofstream & Output::outObservables()
   {return *outObservables_;}
+  
   ofstream & Output::outParticles()
   {return *outParticles_;}
   
   ofstream & Output::outFinalVelocity()
   {return *outFinalVelocity_;}
+  
   ofstream & Output::outCorrelation()
   {return *outCorrelation_;}
+  
   ofstream & Output::outVelocitiesCV()
   {return *outVelocitiesCV_;}
+  
   ofstream & Output::outVelocitiesGenerator()
   {return *outVelocitiesGenerator_;}
+  
   ofstream & Output::outForcesCV()
   {return *outForcesCV_;}
+  
   ofstream & Output::outLengthsCV()
   {return *outLengthsCV_;}
   
@@ -147,18 +176,8 @@ namespace simol{
   const int& Output::periodNbOfIterations() const
   {return periodNbOfIterations_;}
   
-  const int& Output::profilePeriodNbOfIterations() const
-  {return profilePeriodNbOfIterations_;}
-  
-  bool Output::doOutput(int iOfIteration) const
-  {
-    return (periodNbOfIterations() > 0 && iOfIteration % periodNbOfIterations() == 0);
-  }
-  
-  bool Output::doProfileOutput(int iOfIteration) const
-  {
-    return (profilePeriodNbOfIterations() > 0 && iOfIteration % profilePeriodNbOfIterations() == 0);
-  }
+  const int& Output::longPeriodNbOfIterations() const
+  {return longPeriodNbOfIterations_;}
   
   const int& Output::nbOfParticles() const
   {return nbOfParticles_;}
@@ -235,6 +254,18 @@ namespace simol{
   double Output::autocoPtsPeriod() const
   {return decorrelationTime() / nbOfAutocoPts();}
   
+  //---------------- check whether outputs should be performed --------------------
+  
+  bool Output::doOutput(int iOfIteration) const
+  {
+    return (periodNbOfIterations() > 0 && iOfIteration % periodNbOfIterations() == 0);
+  }
+  
+  bool Output::doLongOutput(int iOfIteration) const
+  {
+    return (longPeriodNbOfIterations() > 0 && iOfIteration % longPeriodNbOfIterations() == 0);
+  }
+  
   //----------------- display functions --------------------------
   
   void Output::displayObservables(int iOfIteration)
@@ -261,35 +292,13 @@ namespace simol{
 		     << " " << configuration[i].force()        
 		     << endl;
   }
-  
 
-  
-  void Output::displayObservablesDPDE(vector<Particle> const& /*configuration*/, int iOfIteration)
+    void Output::displayFinalVelocity(double temperature, double externalForce, int nbOfFourier, int nbOfHermite)
   {
-    // garder le vecteur des particules pour evt sortir les positions, etc
-    //cout << "output : n = " << iOfIteration << endl;
-    double totalEnergy = kineticEnergy() + potentialEnergy() + internalEnergy();
-    outObservables() << iOfIteration * timeStep() 
-		    << " " << kineticEnergy()
-		    << " " << potentialEnergy()
-		    << " " << internalEnergy()
-		    << " " << totalEnergy 
-		    << std::endl;
-  }
-  
-
-  void Output::displayGeneratorOnBasis(ofstream& out, vector<Particle> const& configuration, ControlVariate& controlVariate, double time)
-  {
-    out << time << " " << modulo(configuration[0].position(0), -M_PI, M_PI) << " " << configuration[0].momentum(0) << " " << controlVariate.lastGeneratorOnBasis()(0) << " " << controlVariate.basisFunction(configuration) << endl;
-  }
-  
-  void Output::displayFinalVelocity(double temperature, double externalForce, int nbOfFourier, int nbOfHermite)
-  {
-    //cout << "displayFinalFlow(double temperature, double delta_temperature, double tau)";
     if (doFinalVelocity_)
       {
-	assert(outFinalVelocity().is_open());
-	outFinalVelocity() << std::left << setw(10) << finalTime()
+      assert(outFinalVelocity().is_open());
+    outFinalVelocity() << std::left << setw(10) << finalTime()
 			   << " " << setw(5) << timeStep()
 			   << " " << setw(6) << nbOfParticles()
 			   << " " << setw(4) << temperature
@@ -302,6 +311,17 @@ namespace simol{
 			   << " " << setw(12) << velocityCV_->stdDeviationBetterObservable()
 			   << std::endl;
       }
+  }
+  
+  void Output::displayObservablesDPDE(vector<Particle> const& /*configuration*/, int iOfIteration)
+  {
+    double totalEnergy = kineticEnergy() + potentialEnergy() + internalEnergy();
+    outObservables() << iOfIteration * timeStep() 
+		    << " " << kineticEnergy()
+		    << " " << potentialEnergy()
+		    << " " << internalEnergy()
+		    << " " << totalEnergy 
+		    << std::endl;
   }
   
   void Output::finalDisplayAutocorrelations()
@@ -325,9 +345,6 @@ namespace simol{
 			 << " " << (midFlowQ += midFlowCV_->autocorrelation(i)*autocoPtsPeriod())
 			 << " " << sumFlowCV_->autocorrelation(i) - pow(sumFlowCV_->meanObservable(), 2)
 			 << " " << (sumFlowQ += sumFlowCV_->autocorrelation(i)*autocoPtsPeriod());
-	//for (int iOfFunction = 0; iOfFunction < flowCV_->nbOfFunctions(); iOfFunction++)
-	//		outCorrelation_  << " " << flowCV_->autocorrelationB2(i, iOfFunction) - pow(flowCV_->correlationB2(iOfFunction), 2)
-	//			<< " " << (integralFlowB2(iOfFunction) += flowCV_->autocorrelationB2(i, iOfFunction)*timeStep());
 	outCorrelation() << " " << bendistProfile_(i, midNb) - pow(bendistProfile_.mean(midNb), 2)
 			 << std::endl;
       }

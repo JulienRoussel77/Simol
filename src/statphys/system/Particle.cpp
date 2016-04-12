@@ -39,7 +39,7 @@ namespace simol
   double const & Particle::mass() const
   { return mass_; }
   
-    void Particle::resetForce(Potential const& pot)
+  void Particle::resetForce(Potential const& pot)
   {
     potentialEnergy_ = 0;
     force_ = pot.externalForce();

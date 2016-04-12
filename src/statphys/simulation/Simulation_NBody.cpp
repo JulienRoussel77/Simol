@@ -70,13 +70,12 @@ namespace simol {
   {
     if (output.doOutput(iOfIteration))
       output.displayObservables(iOfIteration);
-    if (output.doProfileOutput(iOfIteration))
+    if (output.doLongOutput(iOfIteration))
       output.displayParticlesXMakeMol(syst.configuration(), iOfIteration, syst.latticeParameter()*syst.nbOfParticlesPerDimension());        
   }
   
   void writeFinalOutput(Hamiltonian const& /*dyna*/, NBody const& /*syst*/, Output& /*output*/)
   {
-    //output.finalDisplay(syst.configuration(), dyna.externalForce());
   }
 
 }

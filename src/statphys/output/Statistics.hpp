@@ -35,10 +35,10 @@ namespace simol
   {
     int decorrelationNbOfIterations_;
     double decorrelationTime_;
-		int nbOfAutocoPts_;
+    int nbOfAutocoPts_;
     int nbOfObservables_;
     Statistics statisticsValues_;        //calcule la moyenne de l'observable A
-    Statistics statisticsRefValues_;     //calcule la moyenne de l'observable B
+    Statistics statisticsRefValues_;         //calcule la moyenne de l'observable B
     Statistics statisticsMeanCorrelation_;   //calcule la moyenne de tous les A(x_i)B(x_0)
     Statistics statisticsCorrelation_;   //calcule la moyenne de A(t)B(0) pour t < decorrelationTime_
     double indexRef_;

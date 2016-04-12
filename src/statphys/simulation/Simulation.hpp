@@ -129,7 +129,7 @@ namespace simol {
   // Overdamped
   Vector<double> generatorOn(const Overdamped& dyna, const System& syst, const ControlVariate& controlVariate);
   
-  //Chain
+  // Chain
   void updateAllControlVariates(const BoundaryLangevin& dyna, System const& syst, Output& output, int iOfIteration);
 
 
@@ -138,25 +138,26 @@ namespace simol {
   template <class D, class S>
   void sampleSystem(D& dyna, S& syst)
   {
-    cout << "Initialization of the system...";cout.flush();
+    cout << " Initialization of the system..." << endl; 
     
     sampleMomenta(dyna, syst);
     samplePositions(dyna, syst);
 
-    cout << "Done ! / Thermalization...";cout.flush();
+    cout << " Thermalization..." << endl; 
 
     for (int iOfIteration  =0; iOfIteration < dyna.nbOfThermalIterations(); ++iOfIteration)
     {
       syst.thermalize(dyna);
     }
 
-    cout << "Done ! / BurnIn...";cout.flush();
+    cout << " Burn-in..." << endl;
 
     for (int iOfIteration  =0; iOfIteration < dyna.nbOfBurnInIterations(); ++iOfIteration)
     {
       simulate(dyna, syst);
     }
-    cout << "Done !" << endl;
+    cout << " Starting production mode" << endl;
+    cout << endl;
     
     syst.computeAllForces();
   }

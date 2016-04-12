@@ -1,5 +1,5 @@
 System:
-  Dimension: 3
+  Dimension: 2
   LatticeParameter: 1.
   Name: NBody
   NumberPerDimension: 6
@@ -22,6 +22,6 @@ Dynamics:
 Output:
   FolderName: /
   Period: 0.02
-  ProfilePeriod: 0.02
+  LongPeriod: 0.05
 
 

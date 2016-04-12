@@ -87,8 +87,8 @@ namespace simol{
     double decorrelationTime() const;
     int outputPeriodNbOfIterations() const;
     double outputPeriodTime() const;
-    int outputProfilePeriodNbOfIterations() const;
-    double outputProfilePeriodTime() const;
+    int outputLongPeriodNbOfIterations() const;
+    double outputLongPeriodTime() const;
     int nbOfAutocoPts() const;
     bool doFinalFlow() const;
     bool doFinalVelocity() const;

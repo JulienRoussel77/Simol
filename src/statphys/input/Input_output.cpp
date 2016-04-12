@@ -7,8 +7,9 @@ using std::min;
 using std::max;
 
 const int defaultOutputPeriod = 1;         
-const int defaultOutputProfilePeriod = 1;  
+const int defaultOutputLongPeriod = 1;  
 const int maxNbOfAutocoPts = 1000;
+const int defaultDecorrelationTime = 0; 
 
 namespace simol {
 
@@ -71,14 +72,15 @@ namespace simol {
     if (data["Output"]["DecorrelationTime"])
       return data["Output"]["DecorrelationTime"].as<double>() / timeStep();
     else
-      return decorrelationTime() / timeStep();
+      return defaultDecorrelationTime;
   }
 
   double Input::decorrelationTime() const
   {
     if (data["Output"]["DecorrelationTime"])
       return data["Output"]["DecorrelationTime"].as<double>();
-    else return 3*nbOfParticles();
+    else 
+      return defaultDecorrelationTime;
   }
 
   int Input::outputPeriodNbOfIterations() const {
@@ -95,21 +97,21 @@ namespace simol {
       return outputPeriodNbOfIterations() * timeStep();
   }
 
-  int Input::outputProfilePeriodNbOfIterations() const {
-    if (data["Output"]["ProfilePeriod"])
-      return data["Output"]["ProfilePeriod"].as<double>() / timeStep();
+  int Input::outputLongPeriodNbOfIterations() const {
+    if (data["Output"]["LongPeriod"])
+      return data["Output"]["LongPeriod"].as<double>() / timeStep();
     else
-      return defaultOutputProfilePeriod;
+      return defaultOutputLongPeriod;
   }
 
-  double Input::outputProfilePeriodTime() const {
-    if (data["Output"]["ProfilePeriod"])
-      return data["Output"]["ProfilePeriod"].as<double>();
+  double Input::outputLongPeriodTime() const {
+    if (data["Output"]["LongPeriod"])
+      return data["Output"]["LongPeriod"].as<double>();
     else
-      return outputProfilePeriodNbOfIterations() * timeStep();
+      return outputLongPeriodNbOfIterations() * timeStep();
   }
 
-  /// Contains the number of values in an autocorrelation ProfilePeriod
+  /// Contains the number of values in an autocorrelation LongPeriod
   /// /!\ Causes a memory crash for the larger chains if too big
   int Input::nbOfAutocoPts() const
   {
@@ -127,9 +129,9 @@ namespace simol {
   bool Input::doFinalVelocity() const
   {
     if (data["Output"]["doFinalVelocity"])
-      if (data["Output"]["doFinalVelocity"].as<string>() == "no")
-        return false;
-    return true;
+      if (data["Output"]["doFinalVelocity"].as<string>() == "yes")
+        return true;
+    return false;
   }
   
 }

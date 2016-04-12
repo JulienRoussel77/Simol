@@ -76,10 +76,6 @@ namespace simol
     return lastValue_;
   }
 
-
-
-  
-  
   
   AutocorrelationStats::AutocorrelationStats():
     decorrelationNbOfIterations_(0),

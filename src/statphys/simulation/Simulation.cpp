@@ -12,14 +12,15 @@ namespace simol {
   //-- initialization of the momenta according to a Gaussian distribution --
   void sampleMomenta(Dynamics& dyna, System& syst)
   {
-    cout << "Sampling the momenta..." ;cout.flush();
+    cout << " - Sampling the momenta..." << endl;
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
         syst.getParticle(iOfParticle).momentum() = syst.drawMomentum(dyna.beta(), syst.getParticle(iOfParticle).mass());
   }
+  
   //-- initialization of the momenta according to a Gaussian distribution --  
   void sampleMomenta(LangevinBase& dyna, System& syst)
   {
-    cout << "Sampling the momenta...";cout.flush();
+    cout << " - Sampling the momenta..." << endl;
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
     {
       syst.getParticle(iOfParticle).momentum() = syst.drawMomentum(dyna.beta(), syst.getParticle(iOfParticle).mass());
@@ -50,7 +51,7 @@ namespace simol {
     if (output.doOutput(iOfIteration))
       output.displayObservables(iOfIteration);
     
-    if (output.doProfileOutput(iOfIteration))
+    if (output.doLongOutput(iOfIteration))
       output.displayParticles(syst.configuration(), iOfIteration);
   }
   
@@ -59,7 +60,7 @@ namespace simol {
     if (output.doOutput(iOfIteration))
       output.displayObservables(iOfIteration);
     
-    if (output.doProfileOutput(iOfIteration))
+    if (output.doLongOutput(iOfIteration))
       output.displayParticles(syst.configuration(), iOfIteration);
   }
 
@@ -69,7 +70,7 @@ namespace simol {
       output.displayObservablesDPDE(syst.configuration(), iOfIteration);
   }
 
-  //---------------------------------------------------------------
+  //--------------------------- final output ------------------------------------
 
   void writeFinalOutput(Dynamics const& /*dyna*/, System const& /*syst*/, Output& output)
   {

@@ -35,7 +35,7 @@ namespace simol {
       output.sumFlowCV_->display(output.outSumFlowCV(), iOfIteration * dyna.timeStep() );
     }
     
-    if (output.doProfileOutput(iOfIteration))
+    if (output.doLongOutput(iOfIteration))
     {
       output.displayProfile(iOfIteration);
       output.displayParticles(syst.configuration(), iOfIteration);

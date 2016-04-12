@@ -6,7 +6,7 @@ namespace simol {
   
   void samplePositions(Dynamics& dyna, Isolated& syst)
   {
-    cout << "Sampling the positions..." ;cout.flush();
+    cout << " - Sampling the positions..." << endl; 
     syst.getParticle(0).position(0) = syst.drawPotLaw(dyna.beta());
   }
   
@@ -34,7 +34,7 @@ namespace simol {
 
    void samplePositions(DPDE& dyna, Isolated& syst)
   {
-    cout << "Sampling the positions..." ;cout.flush();
+    cout << " - Sampling the positions..." << endl;
     syst.getParticle(0).position(0) = 0;
     syst.getParticle(0).internalEnergy() = 1;  // TO DO : sample according to equilibrium law?
   }

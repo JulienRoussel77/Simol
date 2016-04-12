@@ -33,6 +33,7 @@ int main(int argc, char* argv[])
   // INPUT FILE LOADING
   //===================
 
+  cout << endl;
   cout << "Input read in " << cmd.inputFileName() << endl;
   simol::Input input(cmd);
 
@@ -41,12 +42,7 @@ int main(int argc, char* argv[])
   //============
 
   if (input.isGalerkin())
-    throw std::invalid_argument("The input must correspond to a MD simulation !");
-  
-  cout << endl;
-  cout << "      SIMULATION OF A LENNARD-JONES FLUID " << endl;
-  cout << endl;
-  
+    throw std::invalid_argument("The input must correspond to a MD simulation !");  
 
   simol::Simulation<simol::Hamiltonian, simol::NBody> simu(input);
   simu.launch();

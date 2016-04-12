@@ -11,12 +11,12 @@ double modulo(double variable, double mini, double maxi)
 
 void displayTime(double time)
 {
-  std::cout << "Fin de la simulation" << std::endl;
+  std::cout << endl << "End of simulation" << std::endl;
   int nbSeconds = time / CLOCKS_PER_SEC;
   int nbMinutes = nbSeconds / 60;
   int nbHours = nbMinutes / 60;
   int nbDays = nbHours / 24;
-  cout << "Temps de calcul total : " << nbDays << " j " <<  nbHours%24  << " h " << nbMinutes%60 << " m " << nbSeconds%60 << " s " << endl;
+  cout << "Total computation time: " << nbDays << " j " <<  nbHours%24  << " h " << nbMinutes%60 << " m " << nbSeconds%60 << " s " << endl;
 }
 
 int getNbOfLines(ifstream& file)

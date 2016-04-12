@@ -45,7 +45,6 @@ NBody::NBody(Input const& input):
   
   void NBody::computeAllForces()
   {
-    //std::cout << "NBody::computeAllForces" << std::endl;
     for (auto&& particle : configuration_)
       particle.resetForce(potential());
     for (int i = 0; i < nbOfParticles(); i++)

@@ -33,6 +33,7 @@ int main(int argc, char* argv[])
   // INPUT FILE LOADING
   //===================
 
+  cout << endl;
   cout << "Input read in " << cmd.inputFileName() << endl;
   simol::Input input(cmd);
 
