@@ -33,6 +33,16 @@ namespace simol
     return indexNeighbors_;
   }
 
+  list<int> const& Cell::members() const
+  {
+    return members_;
+  }
+
+  list<int>& Cell::members() 
+  {
+    return members_;
+  }
+
   // ------------------- NBody ----------------------------
   
   NBody::NBody(Input const& input):
@@ -203,21 +213,24 @@ namespace simol
 	//-- reinitialize cells before looping on the pair interactions --
 	reinitializeCells();
 	//-- compute the interactions --
-	int neighborIndex = 0;
+	int neighborIndex = 1;
 	for (int k = 0; k < nbOfCells_; k++)
 	  {
 	    //-- interaction within cells --
-	    
-	    //interaction(configuration_[i], configuration_[j]);
+	    for (list<int>::iterator it1 = cells_[k].members().begin(); it1 != cells_[k].members().end(); it1++)
+	      for (list<int>::iterator it2 = std::next(it1,1); it2 != cells_[k].members().end(); it2++)
+		//cout << " cell " << k << ", indices " << *it1 << " " << *it2 << endl; 
+		interaction(configuration_[*it1], configuration_[*it2]); 
 	    //-- interactions between neighboring cells --
 	    for (int l = 0; l < nbOfNeighbors_; l++)
 	      {
 		neighborIndex = cells_[k].indexNeighbors()[l];
-		
-		//cout << " cell " << k << " interacting with cell " << neighborIndex << endl; 
-		
+		//cout << neighborIndex << endl;
 		// complete double loop between the elements of cells_[k] and its neighbor cells_[neighborIndex]
-		//interaction(configuration_[i], configuration_[j]);
+		for (list<int>::iterator it1 = cells_[k].members().begin(); it1 != cells_[k].members().end(); it1++)
+		  for (list<int>::iterator it2 = cells_[neighborIndex].members().begin(); it2 != cells_[neighborIndex].members().end(); it2++)
+		    //cout << " cell " << k << " interacting with cell " << neighborIndex << endl; 
+		    interaction(configuration_[*it1], configuration_[*it2]);
 	      }
 	  }
       }

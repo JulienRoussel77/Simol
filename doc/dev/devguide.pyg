@@ -1,0 +1,8 @@
+	#include "string.hpp"
+	int main()
+	{
+		std::string hello = "hello"; // ok, std::string
+		string world = "world"; // ok, string from string.hpp
+		std::cout << hello << std::endl;
+		std::cout << world << std::endl;
+	}

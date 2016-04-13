@@ -16,6 +16,8 @@ namespace simol
     void push_back(int ind);
     vector<int> const& indexNeighbors() const;
     vector<int>& indexNeighbors();
+    list<int> const& members() const;
+    list<int>& members();
     
   protected:
 

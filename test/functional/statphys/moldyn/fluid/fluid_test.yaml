@@ -6,8 +6,8 @@ System:
   Cells: yes
    
 Time:
-  Step: 0.5
-  TotalTime: 5
+  Step: 0.005
+  TotalTime: 10.
 
 Potential:
   Name: LennardJones
@@ -22,7 +22,7 @@ Dynamics:
     
 Output:
   FolderName: /
-  Period: 0.5
-  LongPeriod: 0.5
+  Period: 0.005
+  LongPeriod: 0.05
 
 
