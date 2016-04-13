@@ -31,6 +31,7 @@ namespace simol{
     string systemName() const;
     int nbOfParticles() const;
     int nbOfParticlesPerDimension() const;
+    bool doCellMethod() const;
     double mass() const;
     bool doFileSettings() const;
     string settingsPath() const;

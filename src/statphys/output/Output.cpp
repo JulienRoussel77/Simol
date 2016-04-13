@@ -56,7 +56,7 @@ namespace simol{
         outParticles() << "# time index position momentum kineticEnergy potentialEnergy energy force" << endl;
       }
     }
-
+    
     //-- for autocorrelations --
     if (decorrelationNbOfSteps_ > 0)
       outCorrelation_ = std::make_shared<ofstream>(input.outputFolderName()+"correlations.txt");
@@ -138,13 +138,18 @@ namespace simol{
     else
       cout << " Number of steps      : " << nbOfSteps_/1e6 << "e6" << endl;
     cout << " Time step            : " << timeStep_ << endl;
-    cout << "" << endl;
+    if (input.systemName() == "NBody" && input.doCellMethod())
+      {
+	cout << endl;
+	cout << " Using the method of cells " << endl;
+      }
+    cout << endl;
     cout << "-----------------------------------------------------" << endl << endl;
     
   }
-	
-	//----- various assessors --------
-	
+  
+  //----- various assessors --------
+  
   ofstream & Output::outObservables()
   {return *outObservables_;}
   

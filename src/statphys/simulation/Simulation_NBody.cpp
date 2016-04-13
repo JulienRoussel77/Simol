@@ -37,10 +37,7 @@ namespace simol {
     {
       throw std::invalid_argument("sampleSystem: Bad dimension, should be 2 or 3");
     }
-    //cout << "    VERIFICATION : " << syst.nbOfParticlesPerDimension() << endl;
   }
-  
-  
   
   void simulate(Hamiltonian& dyna, NBody& syst)
   {

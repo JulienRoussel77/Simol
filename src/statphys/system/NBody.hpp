@@ -51,7 +51,9 @@ namespace simol
     double domainSize_;
 
     //--- for cell method --- 
+    bool doCells_;
     double Rcut_;
+    double cellSize_;
     int nbOfCellsPerDimension_; 
     int nbOfCells_; 
     int nbOfNeighbors_;

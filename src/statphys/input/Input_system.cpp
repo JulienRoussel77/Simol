@@ -33,10 +33,19 @@ namespace simol {
     else return defaultNbOfParticles;
   }
 
+  //--- for NBody systems -----------------
   int Input::nbOfParticlesPerDimension() const {
     if (data["System"]["NumberPerDimension"])
       return data["System"]["NumberPerDimension"].as<int>();
     else return defaultNbOfParticlesPerDimension;
+  }
+
+  bool Input::doCellMethod() const
+  {
+    if (data["System"]["Cells"] && data["System"]["Cells"].as<string>() == "yes")
+      return true;
+    else
+      return false;
   }
 
   double Input::mass() const {

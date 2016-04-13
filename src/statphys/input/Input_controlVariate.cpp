@@ -28,7 +28,7 @@ namespace simol {
     if (data["ControlVariate"])
       if (data["Galerkin"]["Basis"] && !data["ControlVariate"]["CoeffsPath"])
 	return true;
-		return false;
+    return false;
   }
   
   bool Input::isGalerkin() const

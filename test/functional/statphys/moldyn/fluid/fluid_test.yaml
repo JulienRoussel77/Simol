@@ -1,12 +1,13 @@
 System:
-  Dimension: 3
+  Dimension: 2
   LatticeParameter: 1.
   Name: NBody
   NumberPerDimension: 8
+  Cells: yes
    
 Time:
-  Step: 0.005
-  TotalTime: 0.2
+  Step: 0.5
+  TotalTime: 5
 
 Potential:
   Name: LennardJones
@@ -21,7 +22,7 @@ Dynamics:
     
 Output:
   FolderName: /
-  Period: 0.02
-  LongPeriod: 0.05
+  Period: 0.5
+  LongPeriod: 0.5
 
 
