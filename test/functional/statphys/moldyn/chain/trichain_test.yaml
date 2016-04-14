@@ -1,8 +1,8 @@
 Time:
   Step: 0.02
-  TotalTime: 100
-  ThermalizationTime: 10
-  BurnInTime: 10
+  TotalTime: 10000
+  ThermalizationTime: 100
+  BurnInTime: 100
 
 System:
   Name: TriChain
@@ -19,16 +19,16 @@ Dynamics:
   Name: BoundaryLangevin
   Gamma: 1
   Temperature: 1
-  DeltaTemperature: .1
+  DeltaTemperature: 0.2
   Tau: 0
-  Xi: 1
+  Xi: 0
   Seed: 0
 
 Output:
   SimuTypeName: yes
   FolderName: test
   DecorrelationTime: 20
-  Period: 1
-  LongPeriod: 1
+  PrintPeriod: 10
+  LongPrintPeriod: 100
 
 

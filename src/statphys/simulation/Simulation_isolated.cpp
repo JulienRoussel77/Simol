@@ -1,14 +1,14 @@
 #include "Simulation.hpp"
 
 namespace simol {
-
-  //------------- Hamiltonian --------------------
   
   void samplePositions(Dynamics& dyna, Isolated& syst)
   {
     cout << " - Sampling the positions..." << endl; 
     syst.getParticle(0).position(0) = syst.drawPotLaw(dyna.beta());
   }
+  
+  //------------- Hamiltonian --------------------
   
   void writeFinalOutput(Hamiltonian const& /*dyna*/, Isolated const& syst, Output& output)
   {

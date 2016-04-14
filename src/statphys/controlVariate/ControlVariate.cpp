@@ -410,11 +410,6 @@ namespace simol
       out << " " << -correlationB2()(iOfFunction);  //22-23
     
     out << endl;
-	
-    /*for (int iOfFunction = 0; iOfFunction < nbOfFunctions(); iOfFunction++)
-    {
-      out << " " << 
-    }*/
   }
   
   void ControlVariate::postTreat(std::ofstream& /*out*/, double /*timeStep*/)
@@ -524,9 +519,9 @@ namespace simol
 						<< endl;
 			}
     }
-    
-    //std::cout << "-<Linv j, j> = " << .5 * pow(statsPostObservable_.standardDeviation(), 2) << endl;
   } 
+  
+
     
     
   

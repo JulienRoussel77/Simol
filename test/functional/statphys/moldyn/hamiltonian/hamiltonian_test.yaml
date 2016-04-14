@@ -18,9 +18,7 @@ Dynamics:
 
 Output:
   SimuTypeName: yes
-  ParametersName: no
   FolderName: test
   DecorrelationTime: 5
-  #Period: 1
-  #ProfilePeriod: 0.02
-  FinalVelocity: no
+  PrintPeriod: 1
+  PrintLongPeriod: 100

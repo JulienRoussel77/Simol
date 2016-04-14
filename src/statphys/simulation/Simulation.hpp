@@ -66,28 +66,33 @@ namespace simol {
 
   void simulate(Dynamics& dyna, System& syst);
   
-  template <class D>
-  void computeOutput(Dynamics const& dyna, System const& syst, Output& output, int iOfStep);
+  template <class D, class S>
+  void computeOutput(D const& dyna, S const& syst, Output& output, int iOfStep);
   void writeOutput(System const& syst, Output& output, int iOfStep);
   void writeFinalOutput(Dynamics const& dyna, System const& syst, Output& output);
 
   //-------------------- specializations for various systems -------------------------
   
   //-- specializations for Isolated --
+  void samplePositions(Dynamics& dyna, Isolated& syst);
   template <class D>
   void computeOutput(D const& dyna, Isolated const& syst, Output& output, int iOfStep);
+  void writeFinalOutput(Hamiltonian const& dyna, Isolated const& syst, Output& output);
+  void sampleMomenta(Overdamped& /*dyna*/, Isolated& /*syst*/);
   template <>
   void computeOutput(const DPDE& dyna, Isolated const& syst, Output& output, int iOfStep);
-  void writeFinalOutput(Hamiltonian const& dyna, Isolated const& syst, Output& output);
+  void samplePositions(DPDE& dyna, Isolated& syst);
+  void simulate(DPDE& dyna, System& syst);
+  
 
   //-- specializations for Chain --
   void sampleMomenta(BoundaryLangevin& dyna, Chain& syst);
   void samplePositions(BoundaryLangevin& dyna, Chain& syst);
   void writeOutput(BoundaryLangevin const& dyna, Chain const& syst, Output& output, int iOfStep);
-  template <class D>
-  void computeOutput(D const& dyna, Chain const& syst, Output& output, int iOfStep);
-  template <>
-  void computeOutput(BoundaryLangevin const& dyna, Chain const& syst, Output& output, int iOfStep);
+  //template <class D>
+  //void computeOutput(D const& dyna, Chain const& syst, Output& output, int iOfStep);
+  template <class S>
+  void computeOutput(BoundaryLangevin const& dyna, S const& syst, Output& output, int iOfStep);
   void simulate(BoundaryLangevin& dyna, Chain& syst);
   // Bichain
   void samplePositions(BoundaryLangevin& dyna, BiChain& syst);
@@ -110,7 +115,6 @@ namespace simol {
   
   //-- DPDE --
   void simulate(DPDE& dyna, System& syst);
-  void samplePositions(DPDE& dyna, Isolated& syst);
   void writeOutput(DPDE const& dyna, System const& syst, Output& output, int iOfStep);
 
   
@@ -143,14 +147,14 @@ namespace simol {
     sampleMomenta(dyna, syst);
     samplePositions(dyna, syst);
 
-    cout << " Thermalization..." << endl; 
+    cout << " - Thermalization (" << dyna.thermalizationNbOfSteps() << " steps)..." << endl; 
 
     for (int iOfStep  =0; iOfStep < dyna.thermalizationNbOfSteps(); ++iOfStep)
     {
       syst.thermalize(dyna);
     }
 
-    cout << " Burn-in..." << endl;
+    cout << " - Burn-in (" << dyna.burninNbOfSteps() << " steps)..." << endl;
 
     for (int iOfStep  =0; iOfStep < dyna.burninNbOfSteps(); ++iOfStep)
     {
@@ -162,8 +166,8 @@ namespace simol {
     syst.computeAllForces();
   }
   
-  template <class D>
-  void computeOutput(D const& dyna, System const& syst, Output& output, int iOfStep)
+  template <class D, class S>
+  void computeOutput(D const& dyna, S const& syst, Output& output, int iOfStep)
   {
     output.kineticEnergy() = 0;
     output.potentialEnergy() = 0;
@@ -192,6 +196,23 @@ namespace simol {
   }
   
   // Chain
+  template <class S>
+  void computeOutput(BoundaryLangevin const& dyna, S const& syst, Output& output, int iOfStep)
+  {
+    output.kineticEnergy() = 0;
+    output.potentialEnergy() = 0;
+    //Calcul de la température et de l'énergie
+    for (const auto& particle : syst.configuration())
+    {
+      output.kineticEnergy() += particle.kineticEnergy();
+      output.potentialEnergy() += particle.potentialEnergy();
+    }
+    // In the case of the trichain we add the potential of the wall interaction
+    output.potentialEnergy() += syst.boundaryPotEnergy();
+    syst.computeProfile(output, dyna, iOfStep);
+    updateAllControlVariates(dyna, syst, output, iOfStep);
+  }
+  
   template <class D>
   void computeOutput(D const& dyna, Chain const& syst, Output& output, int iOfStep)
   {throw std::invalid_argument("computeOutput(D const& dyna, Chain const& syst, Output& output, int iOfStep) not defined !");}

@@ -6,8 +6,8 @@ using std::string;
 using std::min;
 using std::max;
 
-const int defaultPrintPeriod = 1;         
-const int defaultLongPrintPeriod = 1;  
+const int defaultPrintPeriod = 0;         
+const int defaultLongPrintPeriod = 0;  
 const int maxNbOfAutocoPts = 1000;
 const int defaultDecorrelationTime = 0; 
 
@@ -66,34 +66,53 @@ namespace simol {
     return name;
   }
   
-
+  ///
+  ///Returns the a number of steps
   int Input::decorrelationNbOfSteps() const
   {
+    static bool warningGiven = false;
     if (data["Output"]["DecorrelationTime"])
-      return data["Output"]["DecorrelationTime"].as<double>() / timeStep();
-    else
-      return defaultDecorrelationTime;
-  }
+    {
+      double decoTime = data["Output"]["DecorrelationTime"].as<double>();  // decorrelation time not truncated
+      int decoNb = (int)(decoTime / timeStep());
+      double decoTrunc = decoNb * timeStep();                 // decorrelation time truncated
+      if (!warningGiven && (decoTime != decoTrunc))           //sends a warning the first time the function is called
+      {
+        warningGiven = true;
+        cout << "#### /!\\ DecorrelationTime truncated to " << decoTrunc << " ####" << endl;
+      }
+      return decoNb;
+    }
+    else 
+      return (int)(defaultDecorrelationTime / timeStep());
 
+  }
+  ///
+  ///Returns the truncated decorrelation time, which is a multiple of the one given in input
   double Input::decorrelationTime() const
   {
-    if (data["Output"]["DecorrelationTime"])
-      return data["Output"]["DecorrelationTime"].as<double>();
-    else 
-      return defaultDecorrelationTime;
+    return decorrelationNbOfSteps() * timeStep();
   }
 
-  int Input::printPeriodNbOfSteps() const {
+  int Input::printPeriodNbOfSteps() const 
+  {
+    static bool warningGiven = false;
     if (data["Output"]["PrintPeriodNbOfSteps"])
       return data["Output"]["PrintPeriodNbOfSteps"].as<int>();
     else if (data["Output"]["PrintPeriod"])
     {
-      if (modulo(data["Output"]["PrintPeriod"].as<double>(), 0, timeStep()) != 0)
-        cout << "#### PrintPeriod truncated ####" << endl;
-      return data["Output"]["PrintPeriod"].as<double>() / timeStep();
+      double periodTime = data["Output"]["PrintPeriod"].as<double>();
+      int periodNb = (int)( periodTime / timeStep());
+      double periodTrunc = periodNb * timeStep();
+      if (!warningGiven && (periodTime != periodTrunc))
+      {
+        warningGiven = true;
+        cout << "#### /!\\ PrintPeriod truncated to " << periodTrunc << " ####" << endl;
+      }
+      return periodNb;
     }
     else
-      return defaultPrintPeriod;
+      return defaultPrintPeriod / timeStep();
   }
 
   double Input::printPeriodTime() const {
@@ -101,16 +120,23 @@ namespace simol {
   }
 
   int Input::printLongPeriodNbOfSteps() const {
+    static bool warningGiven = false;
     if (data["Output"]["LongPrintPeriodNbOfSteps"])
       return data["Output"]["LongPrintPeriodNbOfSteps"].as<int>();
     if (data["Output"]["LongPrintPeriod"])
     {
-      if (modulo(data["Output"]["LongPrintPeriod"].as<double>(), 0, timeStep()) != 0)
-        cout << "#### LongPrintPeriod truncated ####" << endl;
-        return data["Output"]["LongPrintPeriod"].as<double>() / timeStep();
+      double periodTime = data["Output"]["LongPrintPeriod"].as<double>();
+      int periodNb = (int)( periodTime / timeStep());
+      double periodTrunc = periodNb * timeStep();
+      if (!warningGiven && (periodTime != periodTrunc))
+      {
+        warningGiven = true;
+        cout << "#### /!\\ LongPrintPeriod truncated to " << periodTrunc << " ####" << endl;
+      }
+      return periodTrunc;
     }
     else
-      return defaultLongPrintPeriod;
+      return defaultLongPrintPeriod / timeStep();
   }
 
   double Input::printLongPeriodTime() const {

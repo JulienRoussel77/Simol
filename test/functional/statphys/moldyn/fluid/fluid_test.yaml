@@ -22,7 +22,7 @@ Dynamics:
     
 Output:
   FolderName: /
-  Period: 0.005
-  LongPeriod: 0.05
+  PrintPeriod: 0.005
+  LongPrintPeriod: 0.05
 
 

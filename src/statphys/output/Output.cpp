@@ -229,7 +229,7 @@ namespace simol{
   {return (2 * kineticEnergy_ + totalVirial_) / (dimension_ * nbOfParticles_ * pow(latticeParameter_,dimension_));}
   
   bool Output::doComputeCorrelations() const
-  {return decorrelationNbOfSteps();}
+  {return decorrelationNbOfSteps() > 0;}
   
   ControlVariate& Output::velocityCV()
   {return *velocityCV_;}

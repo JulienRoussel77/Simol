@@ -6,7 +6,6 @@
 
 namespace simol
 {
-  //template <typename T>
   class Statistics
   {
     DenseMatrix<double> sumValues_;

@@ -4,7 +4,7 @@ namespace simol {
   
   void sampleMomenta(BoundaryLangevin& dyna, Chain& syst)
   {
-    cout << "Sampling the momenta...";cout.flush();
+    cout << " - Sampling the momenta..." << endl;
     double alpha, localTemp;
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
       {
@@ -14,7 +14,6 @@ namespace simol {
 
         dyna.initializeCountdown(syst.getParticle(iOfParticle));
       }
-      cout << "Done." << endl;
   }
   
   void samplePositions(BoundaryLangevin& /*dyna*/, Chain& /*syst*/)
@@ -42,22 +41,7 @@ namespace simol {
     }
   }
   
-  template <>
-  void computeOutput(BoundaryLangevin const& dyna, Chain const& syst, Output& output, int iOfStep)
-  {
-    output.kineticEnergy() = 0;
-    output.potentialEnergy() = 0;
-    //Calcul de la température et de l'énergie
-    for (const auto& particle : syst.configuration())
-    {
-      output.kineticEnergy() += particle.kineticEnergy();
-      output.potentialEnergy() += particle.potentialEnergy();
-    }
-    // In the case of the trichain we add the potential of the wall interaction
-    output.potentialEnergy() += syst.boundaryPotEnergy();
-    syst.computeProfile(output, dyna, iOfStep);
-    updateAllControlVariates(dyna, syst, output, iOfStep);
-  }
+
   
     void simulate(BoundaryLangevin& dyna, Chain& syst)
   {
@@ -85,7 +69,7 @@ namespace simol {
   
   void samplePositions(BoundaryLangevin& dyna, BiChain& syst)
   {
-    cout << "Sampling the positions..." ;cout.flush();
+    cout << " - Sampling the positions..." << endl;
     double alpha, localTemp, localDist;
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
       {
@@ -111,10 +95,13 @@ namespace simol {
   
   void samplePositions(BoundaryLangevin& dyna, TriChain& syst)
   {
-    cout << "Sampling the positions..." ;cout.flush();
+    cout << " - Sampling the positions..." << endl;
     if (syst.isOfFixedVolum())
+    {
+      cout << "    - Simulation of fixed volum : q_i = 0..." << endl;
       for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
         syst.getParticle(iOfParticle).position(0) = 0;
+    }
     else{
       double alpha, localTemp, localBending;
       for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)

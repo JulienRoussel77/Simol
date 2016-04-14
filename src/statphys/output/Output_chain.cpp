@@ -15,7 +15,7 @@ namespace simol{
   ofstream & Output::outSumFlowCV()    
   {return *outSumFlowCV_;}
   ofstream & Output::outSumFlowPT()
-  {return *outSumFlowCV_;}
+  {return *outSumFlowPT_;}
   ofstream & Output::outProfile()
   {return *outProfile_;}
   ofstream & Output::outFinalProfile()

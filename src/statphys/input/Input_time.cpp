@@ -4,8 +4,8 @@ using std::cout;
 using std::endl;
 using std::string;
 
-const int defaultThermalizationNbOfSteps = 0;
-const int defaultBurnInNbOfSteps = 0;
+const int defaultThermalizationTime = 0;
+const int defaultBurnInTime = 0;
 
 
 namespace simol {
@@ -18,36 +18,72 @@ namespace simol {
     throw std::invalid_argument("Timestep missing");
   }
   
-  // Number of steps in the "output" part of the simulation
+  /// Number of steps in the "output" part of the simulation
+  /// Truncated to a multiple of the timeStep
   int Input::nbOfSteps() const
   {
+    static bool warningGiven = false;
     if (data["Time"]["TotalNbOfSteps"])
       return data["Time"]["TotalNbOfSteps"].as<int>();
     else if (data["Time"]["TotalTime"])
-      return data["Time"]["TotalTime"].as<double>() / timeStep();
+    {
+      double totalTime = data["Time"]["TotalTime"].as<double>();
+      int totalNb = (int)( totalTime / timeStep());
+      double totalTrunc = totalNb * timeStep();
+      if (!warningGiven && (totalTime != totalTrunc))
+      {
+        warningGiven = true;
+        cout << "#### /!\\ totalTime truncated to " << totalTrunc << " ####" << endl;
+      }
+      return totalNb;
+    }
     else throw std::runtime_error("Number of Iterations not specified !");
   }
   
-  // Number of steps in the thermalization part (temperatures imposed everywhere)
+  /// Number of steps in the thermalization part (temperatures imposed everywhere)
+  /// Truncated to a multiple of the timeStep
   int Input::thermalizationNbOfSteps() const
   {
+    static bool warningGiven = false;
     if (data["Time"]["ThermalizationNbOfSteps"])
       return data["Time"]["ThermalizationNbOfSteps"].as<int>();
     else if (data["Time"]["ThermalizationTime"])
-      return data["Time"]["ThermalizationTime"].as<double>() / timeStep();
+    {
+      double thermalTime = data["Time"]["ThermalizationTime"].as<double>();
+      int thermalNb = (int)( thermalTime / timeStep());
+      double thermalTrunc = thermalNb * timeStep();
+      if (!warningGiven && (thermalTime != thermalTrunc))
+      {
+        warningGiven = true;
+        cout << "#### /!\\ thermalTime truncated to " << thermalTrunc << " ####" << endl;
+      }
+      return thermalNb;
+    }
     else
-      return defaultThermalizationNbOfSteps;
+      return defaultThermalizationTime / timeStep();
   }
 
-  // Number of steps in the burnIn part (no output)
+  /// Number of steps in the burnIn part (no output)
+  /// Truncated to a multiple of the timeStep
   int Input::burninNbOfSteps() const
   {
+    static bool warningGiven = false;
     if (data["Time"]["BurnInNbOfSteps"])
       return data["Time"]["BurnInNbOfSteps"].as<int>();
     else if (data["Time"]["BurnInTime"])
-      return data["Time"]["BurnInTime"].as<double>() / timeStep();
+    {
+      double burninTime = data["Time"]["BurnInTime"].as<double>();
+      int burninNb = (int)( burninTime / timeStep());
+      double burninTrunc = burninNb * timeStep();
+      if (!warningGiven && (burninTime != burninTrunc))
+      {
+        warningGiven = true;
+        cout << "#### /!\\ burninTime truncated to " << burninTrunc << " ####" << endl;
+      }
+      return burninNb;
+    } 
     else
-      return defaultBurnInNbOfSteps;
+      return defaultBurnInTime / timeStep();
   }
 
 }
