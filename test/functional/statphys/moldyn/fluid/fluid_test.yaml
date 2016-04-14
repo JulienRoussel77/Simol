@@ -1,5 +1,5 @@
 System:
-  Dimension: 2
+  Dimension: 3
   LatticeParameter: 1.
   Name: NBody
   NumberPerDimension: 8
@@ -7,22 +7,21 @@ System:
    
 Time:
   Step: 0.005
-  TotalTime: 10.
+  TotalTime: 1.
 
 Potential:
   Name: LennardJones
   Epsilon: 1
   Sigma: 1
   CutOffRatio: 2.5
-  SplineRatio: 0.9
+  SplineRatio: 0.8
 
 Dynamics:
   Name: Hamiltonian
   Temperature: 1
     
 Output:
-  FolderName: /
-  PrintPeriod: 0.005
-  LongPrintPeriod: 0.05
+  Period: 0.05
+  LongPeriod: 0.5
 
 

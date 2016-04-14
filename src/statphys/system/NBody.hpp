@@ -5,6 +5,7 @@
 namespace simol
 {
   
+  //----- when the cell method is used -----
   class Cell
   {
 
@@ -26,6 +27,7 @@ namespace simol
 
   };
 
+  //------------------ class for multiparticle systems in 2D/3D ------------------------
   class NBody : public System
   {
     

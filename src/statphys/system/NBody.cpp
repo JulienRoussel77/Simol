@@ -101,6 +101,8 @@ namespace simol
     return x - floor(x/domainSize_)*domainSize_;
   }
   
+  ///
+  /// find the index of the cell in which a particle is
   int NBody::findIndex(Vector<double> const& pos) const
   {
     int i1 = floor(periodicPosition(pos(0))/cellSize_);
@@ -117,17 +119,24 @@ namespace simol
     return 0;
   }
 
+  ///
+  /// determine the index of a cell in a 2D setting from the vector of integers characterizing the cell
   int NBody::returnIndexCell2D(int i1, int i2) const
   {
     return  intModulo(i1,nbOfCellsPerDimension_) + intModulo(i2,nbOfCellsPerDimension_) * nbOfCellsPerDimension_;
   }
 
+  ///
+  /// determine the index of a cell in a 3D setting from the vector of integers characterizing the cell
   int NBody::returnIndexCell3D(int i1, int i2, int i3) const
   {
     return  intModulo(i1,nbOfCellsPerDimension_) + nbOfCellsPerDimension_ * intModulo(i2,nbOfCellsPerDimension_) 
       + pow(nbOfCellsPerDimension_,2) * intModulo(i3,nbOfCellsPerDimension_); 
   }
   
+  ///
+  /// construct the list of neighboring cells for all cells
+  /// only half of the neighbors are considered (in order to avoid double counting of interactions)
   void NBody::findNeighboringCells()
   {
     //-- initialize the vector of indices of neighboring cells --
@@ -174,17 +183,14 @@ namespace simol
 		     cells_[currentCellIndex].indexNeighbors()[10] = returnIndexCell3D(i1  ,i2+1,i3-1);
 		     cells_[currentCellIndex].indexNeighbors()[11] = returnIndexCell3D(i1+1,i2  ,i3-1);
 		     cells_[currentCellIndex].indexNeighbors()[12] = returnIndexCell3D(i1+1,i2-1,i3);
-		     //cout << i1 << " " << i2 << " " << i3 << " : " << currentCellIndex << endl;
-		     // cout << "  ";
-		     // for (int k = 0; k < 13; k++)
-		     //   cout << cells_[currentCellIndex].indexNeighbors()[k] << " ";
-		     // cout << endl;
 		   }
 	      }
 	  }
       }
   }
-
+  
+  ///
+  /// recreate the list of particles for each cell
   void NBody::reinitializeCells()
   {
     //-- clear the lists --
@@ -195,15 +201,12 @@ namespace simol
     for (int i = 0; i < nbOfParticles(); i++)
       {
 	index = findIndex(getParticle(i).position());
-	// int i3 = index/pow(nbOfCellsPerDimension_,2);
-	// int i2 = (index-i3*pow(nbOfCellsPerDimension_,2))/nbOfCellsPerDimension_;
-	// int i1 = index-i3*pow(nbOfCellsPerDimension_,2)-i2*nbOfCellsPerDimension_;
-	// cout << i << ", position : " << getParticle(i).position() << ", " << index << "; cf. cellSize " << cellSize_ 
-	//      << " so " << i1 << ", " << i2 << " ," << i3 << endl;
 	cells_[index].push_back(i);
       }
   }
-
+  
+  ///
+  /// compute the forces (with or without cell method)
   void NBody::computeAllForces()
   {
     for (auto&& particle : configuration_)
@@ -216,33 +219,33 @@ namespace simol
 	int neighborIndex = 1;
 	for (int k = 0; k < nbOfCells_; k++)
 	  {
-	    //-- interaction within cells --
+	    //-- interaction within cells: avoid double counting by setting i1 \leq i2 + 1 --
 	    for (list<int>::iterator it1 = cells_[k].members().begin(); it1 != cells_[k].members().end(); it1++)
 	      for (list<int>::iterator it2 = std::next(it1,1); it2 != cells_[k].members().end(); it2++)
-		//cout << " cell " << k << ", indices " << *it1 << " " << *it2 << endl; 
 		interaction(configuration_[*it1], configuration_[*it2]); 
-	    //-- interactions between neighboring cells --
+	    //-- interactions between neighboring cells: full double loops --
 	    for (int l = 0; l < nbOfNeighbors_; l++)
 	      {
+		// index of neighboring cell
 		neighborIndex = cells_[k].indexNeighbors()[l];
-		//cout << neighborIndex << endl;
 		// complete double loop between the elements of cells_[k] and its neighbor cells_[neighborIndex]
 		for (list<int>::iterator it1 = cells_[k].members().begin(); it1 != cells_[k].members().end(); it1++)
 		  for (list<int>::iterator it2 = cells_[neighborIndex].members().begin(); it2 != cells_[neighborIndex].members().end(); it2++)
-		    //cout << " cell " << k << " interacting with cell " << neighborIndex << endl; 
 		    interaction(configuration_[*it1], configuration_[*it2]);
 	      }
 	  }
       }
     else 
       {
-	//-- standard double loop --
+	//-- no cell method: standard double loop --
 	for (int i = 0; i < nbOfParticles(); i++)
 	  for (int j = i+1; j < nbOfParticles(); j++)
 	    interaction(configuration_[i], configuration_[j]);
       }
   }
-    
+  
+  ///
+  /// elementary interaction between two particles
   void NBody::interaction(Particle& particle1, Particle& particle2) const
   {
     Vector<double> r12 = particle1.position() - particle2.position();
@@ -256,7 +259,6 @@ namespace simol
     distance = sqrt(distance);
     // compute energy
     double energy12 = potential(distance);
-    // cout << distance << "  " << energy12 << endl;
     particle1.potentialEnergy() += energy12/2;
     particle2.potentialEnergy() += energy12/2;
     // compute forces 
