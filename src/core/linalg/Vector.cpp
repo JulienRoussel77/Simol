@@ -1,17 +1,17 @@
-#include "Vector.hpp"
+#include "simol/core/linalg/Vector.hpp"
 
 namespace simol {
-    
+
   Vector<double,eigen> operator*(double const& lambda, Vector<double,eigen> const& v)
     {
       return v*lambda;
     }
-    
+
     double dot(Vector<double,eigen> const& u, Vector<double,eigen> const& v)
     {
       return u.wrapped_.dot(v.wrapped_);
     }
-    
+
     /*Vector<double,eigen> piecewiseDivision(Vector<double,eigen> const& u, Vector<double,eigen> const& v)
     {
       if (u.size() != v.size())
@@ -21,7 +21,7 @@ namespace simol {
         w(i) = u(i) / v(i);
       return w;
     }*/
-    
+
   Vector<double,eigen> piecewiseDivision(Vector<double,eigen> const& u, Vector<double,eigen> const& v)
   {
     if (u.size() != v.size())
@@ -31,7 +31,7 @@ namespace simol {
         w(i) = u(i) / v(i);
     return w;
   }
-  
+
   Vector<double,eigen> piecewiseDivision(Vector<double,eigen> const& u, Vector<size_t,eigen> const& v)
   {
     if (u.size() != v.size())
@@ -44,4 +44,4 @@ namespace simol {
 }
 
 
-  
+

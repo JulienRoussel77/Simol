@@ -3,13 +3,13 @@
 
 #include<yaml-cpp/yaml.h>
 #include <getopt.h>
-#include "core/linalg/Vector.hpp"
-#include "core/io/CommandLine.hpp"
+#include "simol/core/linalg/Vector.hpp"
+#include "simol/core/io/CommandLine.hpp"
 #include <string>
 #include <iostream>
 #include <fstream>
-#include "Tools.hpp"
-#include "core/random/RNG.hpp"
+#include "simol/statphys/Tools.hpp"
+#include "simol/core/random/RNG.hpp"
 
 namespace simol{
 
@@ -23,7 +23,7 @@ namespace simol{
     Input(CommandLine cmd);
     const string& inputPath() const;
     const std::ifstream& inputFlux() const;
-    
+
     //-- System --
     int dimension() const;
     double length() const;
@@ -39,13 +39,13 @@ namespace simol{
     Vector<double> initialMomentum(int const& i=0) const;
     //Chain
     bool isOfFixedVolum() const;
-    
+
     //-- Time --
     double timeStep() const;
     int nbOfSteps() const;
     int thermalizationNbOfSteps() const;
     int burninNbOfSteps() const;
-    
+
     //-- Potential --
     string potentialName() const;
     //Sinus
@@ -62,7 +62,7 @@ namespace simol{
     double potentialSigma() const;
     double cutOffRatio() const;
     double splineRatio() const;
-    
+
     //-- Dynamics --
     string dynamicsName() const;
     double gamma() const;
@@ -93,7 +93,7 @@ namespace simol{
     int nbOfAutocoPts() const;
     bool doFinalFlow() const;
     bool doFinalVelocity() const;
-    
+
     //-- Controle Variate --
     string controlVariateName() const;
     string controlVariateCoeffsPath() const;
@@ -102,7 +102,7 @@ namespace simol{
     string galerkinElts() const;
     int nbOfFourier() const;
     int nbOfHermite() const;
-    
+
   };
 
 

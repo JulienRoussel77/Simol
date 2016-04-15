@@ -1,9 +1,9 @@
 #ifndef SIMOL_BASIS_HPP
 #define SIMOL_BASIS_HPP
 
-#include "Tools.hpp"
-#include "Potential.hpp"
-#include "Particle.hpp"
+#include "simol/statphys/Tools.hpp"
+#include "simol/statphys/potential/Potential.hpp"
+#include "simol/statphys/system/Particle.hpp"
 
 namespace simol
 {

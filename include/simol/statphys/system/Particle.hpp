@@ -1,13 +1,13 @@
 #ifndef PARTICLE_HPP
 #define PARTICLE_HPP
 
-#include "Tools.hpp"
+#include "simol/statphys/Tools.hpp"
+#include "simol/statphys/potential/Potential.hpp"
+#include "simol/core/linalg/Vector.hpp"
+#include "simol/core/random/RNG.hpp"
+
 #include <fstream>
 #include <vector>
-
-#include "Potential.hpp"
-#include "core/linalg/Vector.hpp"
-#include "core/random/RNG.hpp"
 
 namespace simol
 {
@@ -23,7 +23,7 @@ namespace simol
       int dimension() const;
       double const & mass() const;
       void resetForce(Potential const& pot);
-    
+
       //-- access to primary variables --
       Vector<double> const & position() const;
       Vector<double> & position();
@@ -35,32 +35,32 @@ namespace simol
       double& momentum(int i);
       double const & internalEnergy() const;
       double & internalEnergy();
-      
+
       //-- functions depending on the primary variables --
       double kineticEnergy() const;
       const double& potentialEnergy() const;
       double& potentialEnergy();
       double energy() const;
       Vector<double> const& force() const;
-      Vector<double>& force(); 
+      Vector<double>& force();
       const double& force(int i) const;
-      double& force(int i); 
+      double& force(int i);
       double const & virial() const;
       double & virial();
       Vector<double> velocity() const;
-      
+
       //-- currently specific for chains --
       Vector<double> const& energyGrad() const;
-      Vector<double>& energyGrad();  
+      Vector<double>& energyGrad();
       const double& energyGrad(int i) const;
       double& energyGrad(int i);
       const double& energyLapla() const;
-      double& energyLapla();  
+      double& energyLapla();
       int const& countdown() const;
       int& countdown();
-      
+
     private:
-    
+
       double mass_;
       Vector<double> position_;
       Vector<double> momentum_;

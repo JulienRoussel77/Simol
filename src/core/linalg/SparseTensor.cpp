@@ -1,4 +1,4 @@
-#include "SparseTensor.hpp"
+#include "simol/core/linalg/SparseTensor.hpp"
 
 namespace simol
 {

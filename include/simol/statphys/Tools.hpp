@@ -5,9 +5,9 @@
 #include <fstream>
 #include <locale>   //contains std::tolower
 #include <vector>
-#include "core/linalg/SparseMatrix.hpp"
-#include "core/linalg/DenseMatrix.hpp"
-#include "core/linalg/Vector.hpp"
+#include "simol/core/linalg/SparseMatrix.hpp"
+#include "simol/core/linalg/DenseMatrix.hpp"
+#include "simol/core/linalg/Vector.hpp"
 #include <stdexcept>
 #include <list>
 

@@ -1,8 +1,8 @@
 #ifndef SIMOL_STATISTICS_HPP
 #define SIMOL_STATISTICS_HPP
 
-#include "Tools.hpp"
-#include "Input.hpp"
+#include "simol/statphys/Tools.hpp"
+#include "simol/statphys/input/Input.hpp"
 
 namespace simol
 {

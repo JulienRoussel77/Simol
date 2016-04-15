@@ -1,15 +1,15 @@
 #ifndef SIMOL_POTENTIAL_HPP
 #define SIMOL_POTENTIAL_HPP
 
-#include "Tools.hpp"
-#include "core/linalg/Vector.hpp"
-#include "Input.hpp"
-#include "core/random/RNG.hpp"
+#include "simol/statphys/Tools.hpp"
+#include "simol/core/linalg/Vector.hpp"
+#include "simol/statphys/input/Input.hpp"
+#include "simol/core/random/RNG.hpp"
 
 
 namespace simol
 {
-  
+
   class Potential
   {
 
@@ -20,7 +20,7 @@ namespace simol
     Vector<double> const& externalForce() const;
     double& externalForce(const int& i);
     double const& externalForce(const int& i) const;
-    
+
     virtual double operator()(Vector<double> const & position) const;
     virtual double operator()(double position) const;
     double value(Vector<double> const& position) const;
@@ -39,8 +39,8 @@ namespace simol
   protected:
     Potential();
     Vector<double> externalForce_;
-    
+
   };
-  
+
 }
 #endif

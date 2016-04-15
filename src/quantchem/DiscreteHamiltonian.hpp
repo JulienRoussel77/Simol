@@ -1,7 +1,7 @@
 #ifndef SIMOL_DISCRETEHAMILTONIAN_HPP
 #define	SIMOL_DISCRETEHAMILTONIAN_HPP
 
-#include "core/linalg/SparseTensor.hpp"
+#include "simol/core/linalg/SparseTensor.hpp"
 
 #include <string>
 

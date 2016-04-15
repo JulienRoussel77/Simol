@@ -3,7 +3,7 @@
 #define	SIMOL_HARTREE_FOCK_HPP
 
 #include "SlaterDeterminant.hpp"
-#include "SparseTensor.hpp"
+#include "simol/core/linalg/SparseTensor.hpp"
 #include <vector>
 #include "core/linalg/Vector.hpp"
 #include "DiscreteHamiltonian.hpp"

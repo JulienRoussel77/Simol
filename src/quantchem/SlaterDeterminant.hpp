@@ -1,7 +1,7 @@
 #ifndef SIMOL_SLATERDETERMINANT_HPP
 #define	SIMOL_SLATERDETERMINANT_HPP
 
-#include "core/linalg/DenseMatrix.hpp"
+#include "simol/core/linalg/DenseMatrix.hpp"
 
 namespace simol
 {

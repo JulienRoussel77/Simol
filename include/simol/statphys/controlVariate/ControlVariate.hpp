@@ -1,12 +1,12 @@
 #ifndef SIMOL_CONTROLVARIATE_HPP
 #define SIMOL_CONTROLVARIATE_HPP
 
-#include "Tools.hpp"
+#include "simol/statphys/Tools.hpp"
 #include "Statistics.hpp"
-#include "Potential.hpp"
-#include "Particle.hpp"
-#include "Basis.hpp"
-#include "Galerkin.hpp"
+#include "simol/statphys/potential/Potential.hpp"
+#include "simol/statphys/system/Particle.hpp"
+#include "simol/statphys/controlVariate/Basis.hpp"
+#include "simol/statphys/controlVariate/Galerkin.hpp"
 
 
 namespace simol
@@ -109,8 +109,8 @@ namespace simol
     Vector<double> generatorLangevin(vector<Particle> const& configuration, double beta, double gamma);
     Vector<double> generatorBoundarylangevin(vector<Particle> const& configuration, double betaLeft, double betaRight, double gamma);
 
-    
-    
+
+
     virtual void display(std::ofstream& out, double time) const;
     virtual void postTreat(std::ofstream& out, double timeStep);
 
@@ -204,8 +204,8 @@ namespace simol
     virtual Vector<double> gradientQ(vector<Particle> const& configuration, int iOfParticle = 0, int iOfFunction = 0) const;
     virtual double laplacianP(vector<Particle> const& configuration, int iOfParticle = 0, int iOfFunction = 0) const;
     virtual Vector<double> gradientP(vector<Particle> const& configuration, int iOfParticle = 0, int iOfFunction = 0) const;
-  };  
-  
+  };
+
   class EnergyControlVariate : public ControlVariate
   {
     double i0_;

@@ -1,10 +1,8 @@
 #ifndef SIMOL_DENSEMATRIX_HPP
 #define SIMOL_DENSEMATRIX_HPP
 
-#include "core/io/MatrixMarketFile.hpp"
-
-
-#include "Vector.hpp"
+#include "simol/core/io/MatrixMarketFile.hpp"
+#include "simol/core/linalg/Vector.hpp"
 
 #include <ostream>
 
@@ -16,6 +14,6 @@ namespace simol
 
 }
 
-#include "DenseMatrix_eigen.hpp"
+#include "simol/core/linalg/DenseMatrix_eigen.hpp"
 
 #endif
