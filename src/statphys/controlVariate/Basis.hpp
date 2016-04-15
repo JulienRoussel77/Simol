@@ -11,7 +11,7 @@ namespace simol
 	{
 		vector<int> nbOfElts_;
 	public:
-		//virtual const double& operator()(vector<int>& vecOfElt) const = 0;
+		//virtual double const& operator()(vector<int>& vecOfElt) const = 0;
 		//virtual double& operator()(vector<int>& vecOfElt) = 0;
 		TVec(vector<int>& nbOfElts0);
 		int nbOfVariables();
@@ -29,9 +29,9 @@ namespace simol
 	public:
 		DTVec(vector<int>& nbOfElts0);
 		virtual int size() const;
-		const double& operator()(vector<int>& vecIndex) const;
+		double const& operator()(vector<int>& vecIndex) const;
 		double& operator()(vector<int>& vecIndex);
-		const double& operator()(int iTensOfElt) const;
+		double const& operator()(int iTensOfElt) const;
 		double& operator()(int iTensOfElt);
 	};
 
@@ -47,7 +47,7 @@ namespace simol
 		virtual ~Basis(){};
 		virtual int const& nbOfElts() const;
 		virtual int& nbOfElts();
-		virtual const double& expFourierCoeffs(int /*iOfElt*/) const {assert(false);};
+		virtual double const& expFourierCoeffs(int /*iOfElt*/) const;
 		virtual double value(double variable, const int iOfElt) const = 0;
 		virtual Vector<double> gradient(double variable, const int iOfElt) const = 0;
 		virtual double laplacian(double variable, const int iOfElt) const = 0;
@@ -73,7 +73,7 @@ namespace simol
 	public:
 		ExpFourierBasis(const int nbOfElts, double beta0, Potential& potential);
 		virtual int nbOfFreq() const;
-		const double& expFourierCoeffs(int iOfElt) const;
+		double const& expFourierCoeffs(int iOfElt) const;
 		virtual double potential(double variable) const;
 		virtual double potDeriv(double variable) const;
 		virtual double potLapla(double variable) const;
@@ -151,7 +151,7 @@ namespace simol
 	{
 	public:
 		ExpFourierHermiteBasis(Input const& input, Potential& potential);
-		const double& expFourierCoeffs(int iOfElt) const;
+		double const& expFourierCoeffs(int iOfElt) const;
 	};
 
 	/*class TrigBasis : public TensorBasis

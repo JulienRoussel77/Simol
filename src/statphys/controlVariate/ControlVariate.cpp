@@ -721,7 +721,7 @@ namespace simol
   
     double LangevinControlVariate::laplacianQ(vector<Particle> const& /*configuration*/, int /*iOfParticle*/, int /*iOfFunction*/) const
   {
-    assert(false);
+    throw std::runtime_error("LangevinControlVariate::laplacianQ should not be called");
     return 0;
   }
   
@@ -762,7 +762,7 @@ namespace simol
   
     double SumEnergyControlVariate::laplacianQ(vector<Particle> const& /*configuration*/, int /*iOfParticle*/, int /*iOfFunction*/) const
   {
-    assert(false);
+    throw std::runtime_error("SumEnergyControlVariate::laplacianQ should not be called");
     return 0;
   }
   
@@ -798,10 +798,9 @@ namespace simol
     return configuration[iOfParticle].energyGrad();
   }
   
-    double EnergyControlVariate::laplacianQ(vector<Particle> const& /*configuration*/, int /*iOfParticle*/, int /*iOfFunction*/) const
+  double EnergyControlVariate::laplacianQ(vector<Particle> const& /*configuration*/, int /*iOfParticle*/, int /*iOfFunction*/) const
   {
-    assert(false);
-    return 0;
+    throw std::runtime_error("EnergyControlVariate::laplacianQ should not be called");
   }
   
   Vector<double> EnergyControlVariate::gradientP(vector<Particle> const& configuration, int iOfParticle, int /*iOfFunction*/) const
@@ -838,8 +837,7 @@ namespace simol
   
     double LocalControlVariate::laplacianQ(vector<Particle> const& /*configuration*/, int /*iOfParticle*/, int /*iOfFunction*/) const
   {
-    assert(false);
-    return 0;
+    throw std::runtime_error("LocalControlVariate::laplacianQ should not be called");
   }
   
   Vector<double> LocalControlVariate::gradientP(vector<Particle> const& configuration, int iOfParticle, int /*iOfFunction*/) const
@@ -886,8 +884,7 @@ namespace simol
   
     double KineticControlVariate::laplacianQ(vector<Particle> const& /*configuration*/, int /*iOfParticle*/, int /*iOfFunction*/) const
   {
-    assert(false);
-    return 0;
+    throw std::runtime_error("KineticControlVariate::laplacianQ should not be called");
   }
   
   Vector<double> KineticControlVariate::gradientP(vector<Particle> const& configuration, int iOfParticle, int /*iOfFunction*/) const
@@ -918,13 +915,7 @@ namespace simol
   {}
   
   double TwoControlVariate::basisFunction(vector<Particle> const& configuration, int iOfFunction) const
-  {
-    /*if (iOfFunction == 0)
-      return configuration[0].energy();
-    else if (iOfFunction == 1)
-      return configuration[0].momentum(0);
-    else assert(false);*/
-    
+  {    
     if (iOfFunction == 0)
       return (configuration[0].momentum(0) - configuration[configuration.size()-1].momentum(0))
 	  * (configuration[0].position(0) + configuration[configuration.size()-1].position(0));
@@ -953,8 +944,7 @@ namespace simol
   
     double TwoControlVariate::laplacianQ(vector<Particle> const& /*configuration*/, int /*iOfParticle*/, int /*iOfFunction*/) const
   {
-    assert(false);
-    return 0;
+    throw std::runtime_error("TwoControlVariate::laplacianQ should not be called");
   }
   
   Vector<double> TwoControlVariate::gradientP(vector<Particle> const& configuration, int iOfParticle, int iOfFunction) const
@@ -996,12 +986,6 @@ namespace simol
 		{
 			cout << "CVcoeffs from file !" << endl;
       std::string coeffsPath = input.outputFolderName() + input.controlVariateCoeffsPath();
-      //Vector<double> temp(input.outputFolderName() + input.controlVariateCoeffsPath());
-			//DMat temp(0,0);
-			//throw std::invalid_argument("load for DMat not implemented");
-      //temp.load(input.outputFolderName() + input.controlVariateCoeffsPath());
-			//assert(temp.size() == coeffsVec_.numberOfRows() && temp.numberOfColumns() == 1);
-			//coeffsVec_ = arma::conv_to<SMat>::from(temp);
       ifstream file(coeffsPath);
       coeffsVec_ = SparseMatrix<double>(coeffsPath, getNbOfLines(file));
 		}

@@ -19,7 +19,7 @@ Dynamics:
   Force: 0
 
 Galerkin:
-  Resolve: Yes
+  Resolve: yes
   Basis:
     Fourier: 5
     Hermite: 5
