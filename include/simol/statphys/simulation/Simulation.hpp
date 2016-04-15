@@ -1,18 +1,18 @@
 #ifndef SIMOL_SIMULATION_HPP
 #define SIMOL_SIMULATION_HPP
 
-#include "Tools.hpp"
-#include "System.hpp"
-#include "Isolated.hpp"
-#include "NBody.hpp"
-#include "chain/Chain.hpp"
-#include "ControlVariate.hpp"
+#include "simol/statphys/Tools.hpp"
+#include "simol/statphys/system/System.hpp"
+#include "simol/statphys/system/Isolated.hpp"
+#include "simol/statphys/system/NBody.hpp"
+#include "simol/statphys/system/Chain.hpp"
+#include "simol/statphys/controlVariate/ControlVariate.hpp"
 
-#include "dynamics/BoundaryLangevin.hpp"
-#include "dynamics/Hamiltonian.hpp"
-#include "dynamics/Overdamped.hpp"
-#include "dynamics/Langevin.hpp"
-#include "dynamics/DPDE.hpp"
+#include "simol/statphys/dynamics/BoundaryLangevin.hpp"
+#include "simol/statphys/dynamics/Hamiltonian.hpp"
+#include "simol/statphys/dynamics/Overdamped.hpp"
+#include "simol/statphys/dynamics/Langevin.hpp"
+#include "simol/statphys/dynamics/DPDE.hpp"
 
 namespace simol {
 

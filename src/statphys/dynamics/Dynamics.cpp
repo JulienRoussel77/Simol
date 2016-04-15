@@ -1,7 +1,7 @@
 #ifndef SIMOL_DYNAMICS_IPP
 #define SIMOL_DYNAMICS_IPP
 
-#include "Dynamics.hpp"
+#include "simol/statphys/dynamics/Dynamics.hpp"
 
 using std::cout;
 using std::endl;

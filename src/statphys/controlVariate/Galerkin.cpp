@@ -1,4 +1,4 @@
-#include "Galerkin.hpp"
+#include "simol/statphys/controlVariate/Galerkin.hpp"
 
 using std::cout;
 using std::endl;

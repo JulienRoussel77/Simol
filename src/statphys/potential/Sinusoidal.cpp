@@ -1,4 +1,4 @@
-#include "Sinusoidal.hpp"
+#include "simol/statphys/potential/Sinusoidal.hpp"
 
 namespace simol
 {

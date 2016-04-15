@@ -1,4 +1,4 @@
-#include "Input.hpp"
+#include "simol/statphys/input/Input.hpp"
 
 using std::cout;
 using std::endl;

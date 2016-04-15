@@ -1,4 +1,4 @@
-#include "Rotor.hpp"
+#include "simol/statphys/potential/Rotor.hpp"
 
 namespace simol
 {

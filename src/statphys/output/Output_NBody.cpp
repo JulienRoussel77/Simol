@@ -1,4 +1,4 @@
-#include "Output.hpp"
+#include "simol/statphys/output/Output.hpp"
 
 namespace simol{
  

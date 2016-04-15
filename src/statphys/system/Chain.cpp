@@ -1,6 +1,6 @@
 //#include <core/io/CommandLine.hpp>
 
-#include "Chain.hpp"
+#include "simol/statphys/system/Chain.hpp"
 
 namespace simol
 {

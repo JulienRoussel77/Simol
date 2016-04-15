@@ -1,4 +1,4 @@
-#include "DoubleWell.hpp"
+#include "simol/statphys/potential/DoubleWell.hpp"
 
 namespace simol
 {

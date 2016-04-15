@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "Vector.hpp"
+#include "simol/core/linalg/Vector.hpp"
 
 namespace simol
 {

@@ -1,4 +1,4 @@
-#include "FPU.hpp"
+#include "simol/statphys/potential/FPU.hpp"
 
 namespace simol
 {

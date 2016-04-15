@@ -1,4 +1,4 @@
-#include "Isolated.hpp"
+#include "simol/statphys/system/Isolated.hpp"
 
 namespace simol
 {

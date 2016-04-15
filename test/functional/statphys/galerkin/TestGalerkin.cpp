@@ -2,18 +2,19 @@
 #include <cstdlib>
 #include <iostream>
 
-#include "System.hpp"
-#include "Dynamics.hpp"
-#include "Vector.hpp"
-#include "Input.hpp"
-#include "Galerkin.hpp"
+#include "simol/statphys/system/System.hpp"
+#include "simol/statphys/system/System.hpp"
+#include "simol/statphys/dynamics/Dynamics.hpp"
+#include "simol/core/linalg/Vector.hpp"
+#include "simol/statphys/input/Input.hpp"
+#include "simol/statphys/controlVariate/Galerkin.hpp"
 
 #include <cmath>
 
 #include<yaml-cpp/yaml.h>
 #include <getopt.h>
 
-#include "CommandLine.hpp"
+#include "simol/core/io/CommandLine.hpp"
 #include <time.h>
 
 using std::cout;

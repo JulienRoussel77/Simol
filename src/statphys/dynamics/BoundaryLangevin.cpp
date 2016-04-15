@@ -1,4 +1,4 @@
-#include "BoundaryLangevin.hpp"
+#include "simol/statphys/dynamics/BoundaryLangevin.hpp"
 
 namespace simol
 {

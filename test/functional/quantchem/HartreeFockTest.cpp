@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "hartree_fock.hpp"
+#include "simol/quantchem/hartree_fock.hpp"
 
 namespace simol
 {

@@ -1,4 +1,4 @@
-#include "Simulation.hpp"
+#include "simol/statphys/simulation/Simulation.hpp"
 
 namespace simol {
  

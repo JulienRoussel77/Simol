@@ -1,4 +1,4 @@
-#include "Statistics.hpp"
+#include "simol/statphys/output/Statistics.hpp"
 
 using std::min;
 using std::max;

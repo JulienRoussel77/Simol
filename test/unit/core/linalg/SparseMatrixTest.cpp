@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 
-#include "SparseMatrix.hpp"
+#include "simol/core/linalg/SparseMatrix.hpp"
 
 namespace simol
 {

@@ -1,5 +1,5 @@
 
-#include "DiscreteHamiltonian.hpp"
+#include "simol/quantchem/DiscreteHamiltonian.hpp"
 
 namespace simol
 {

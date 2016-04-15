@@ -1,4 +1,4 @@
-#include "AllPotentials.hpp"
+#include "simol/statphys/potential/AllPotentials.hpp"
 
 namespace simol
 {

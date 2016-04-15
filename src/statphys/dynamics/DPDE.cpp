@@ -1,6 +1,6 @@
-#include "DPDE.hpp"
+#include "simol/statphys/dynamics/DPDE.hpp"
 
-#include "LangevinBase.hpp"
+#include "simol/statphys/dynamics/LangevinBase.hpp"
 
 using std::cout;
 using std::endl;

@@ -2,12 +2,12 @@
 #ifndef SIMOL_HARTREE_FOCK_HPP
 #define	SIMOL_HARTREE_FOCK_HPP
 
-#include "SlaterDeterminant.hpp"
+#include "simol/quantchem/SlaterDeterminant.hpp"
 #include "simol/core/linalg/SparseTensor.hpp"
 #include <vector>
-#include "core/linalg/Vector.hpp"
-#include "DiscreteHamiltonian.hpp"
-#include "core/linalg/EigenDecomposition.hpp"
+#include "simol/core/linalg/Vector.hpp"
+#include "simol/quantchem/DiscreteHamiltonian.hpp"
+#include "simol/core/linalg/EigenDecomposition.hpp"
 namespace simol
 {
 

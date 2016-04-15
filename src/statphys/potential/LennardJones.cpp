@@ -1,4 +1,4 @@
-#include "LennardJones.hpp"
+#include "simol/statphys/potential/LennardJones.hpp"
 
 namespace simol
 {

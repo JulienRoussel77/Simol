@@ -2,7 +2,7 @@
 #define SIMOL_CONTROLVARIATE_HPP
 
 #include "simol/statphys/Tools.hpp"
-#include "Statistics.hpp"
+#include "simol/statphys/output/Statistics.hpp"
 #include "simol/statphys/potential/Potential.hpp"
 #include "simol/statphys/system/Particle.hpp"
 #include "simol/statphys/controlVariate/Basis.hpp"

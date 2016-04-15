@@ -1,4 +1,4 @@
-#include "ControlVariate.hpp"
+#include "simol/statphys/controlVariate/ControlVariate.hpp"
 
 using std::cout; 
 using std::endl; 

@@ -1,4 +1,4 @@
-#include "SpaceSinus.hpp"
+#include "simol/statphys/potential/SpaceSinus.hpp"
 
 namespace simol
 {

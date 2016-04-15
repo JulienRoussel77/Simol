@@ -1,4 +1,4 @@
-#include "Overdamped.hpp"
+#include "simol/statphys/dynamics/Overdamped.hpp"
 
 namespace simol
 {

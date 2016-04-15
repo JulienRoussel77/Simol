@@ -1,13 +1,13 @@
 #ifndef SIMOL_SYSTEM_HPP
 #define SIMOL_SYSTEM_HPP
 
-#include "Tools.hpp"
+#include "simol/statphys/Tools.hpp"
 #include <vector>
-#include "Particle.hpp"
-#include "Dynamics.hpp"
-#include "Output.hpp"
+#include "simol/statphys/system/Particle.hpp"
+#include "simol/statphys/dynamics/Dynamics.hpp"
+#include "simol/statphys/output/Output.hpp"
 
-#include "AllPotentials.hpp"
+#include "simol/statphys/potential/AllPotentials.hpp"
 
 #include <iomanip>
 using std::setw;

@@ -1,8 +1,8 @@
 #ifndef SIMOL_CHAIN_HPP
 #define SIMOL_CHAIN_HPP
 
-#include "System.hpp"
-#include "LangevinBase.hpp"
+#include "simol/statphys/system/System.hpp"
+#include "simol/statphys/dynamics/LangevinBase.hpp"
 
 namespace simol
 {

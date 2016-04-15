@@ -1,5 +1,5 @@
 
-#include "Hamiltonian.hpp"
+#include "simol/statphys/dynamics/Hamiltonian.hpp"
 
 namespace simol
 {

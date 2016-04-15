@@ -1,4 +1,4 @@
-#include "SlaterDeterminant.hpp"
+#include "simol/quantchem/SlaterDeterminant.hpp"
 
 namespace simol
 {

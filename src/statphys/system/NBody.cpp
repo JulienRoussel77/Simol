@@ -1,4 +1,4 @@
-#include "NBody.hpp"
+#include "simol/statphys/system/NBody.hpp"
 
 namespace simol
 {

@@ -1,4 +1,4 @@
-#include "FracSinusoidal.hpp"
+#include "simol/statphys/potential/FracSinusoidal.hpp"
 
 namespace simol
 {

@@ -1,7 +1,7 @@
 #ifndef PARTICLE_IMPL_HPP
 #define PARTICLE_IMPL_HPP
 
-#include "Particle.hpp"
+#include "simol/statphys/system/Particle.hpp"
 
 using std::cout; 
 using std::endl; 

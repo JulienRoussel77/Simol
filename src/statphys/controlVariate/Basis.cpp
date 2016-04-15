@@ -1,4 +1,4 @@
-#include "Basis.hpp"
+#include "simol/statphys/controlVariate/Basis.hpp"
 
 namespace simol
 {

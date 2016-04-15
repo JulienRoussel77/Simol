@@ -1,4 +1,4 @@
-#include "Harmonic.hpp"
+#include "simol/statphys/potential/Harmonic.hpp"
 
 namespace simol
 {

@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 
-#include "DenseMatrix.hpp"
+#include "simol/core/linalg/DenseMatrix.hpp"
 
 namespace simol
 {

@@ -1,4 +1,4 @@
-#include "Langevin.hpp"
+#include "simol/statphys/dynamics/Langevin.hpp"
 
 namespace simol
 {

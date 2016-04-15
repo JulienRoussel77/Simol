@@ -1,11 +1,11 @@
 #ifndef SIMOL_GALERKIN_HPP
 #define SIMOL_GALERKIN_HPP
 
-#include "Tools.hpp"
-#include "Input.hpp"
-#include "AllPotentials.hpp"
-#include "Basis.hpp"
-#include "core/linalg/DenseMatrix.hpp"
+#include "simol/statphys/Tools.hpp"
+#include "simol/statphys/input/Input.hpp"
+#include "simol/statphys/potential/AllPotentials.hpp"
+#include "simol/statphys/controlVariate/Basis.hpp"
+#include "simol/core/linalg/DenseMatrix.hpp"
 
 namespace simol
 {
