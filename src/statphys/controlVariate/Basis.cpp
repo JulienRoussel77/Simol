@@ -55,7 +55,7 @@ namespace simol
 		return data_.size();
 	}
 	
-	const double& DTVec::operator()(vector<int>& vecIndex) const
+	double const& DTVec::operator()(vector<int>& vecIndex) const
 	{
 		return data_(iTens(vecIndex));
 	}
@@ -65,7 +65,7 @@ namespace simol
 		return data_(iTens(vecIndex));
 	}
 	
-	const double& DTVec::operator()(int iTensOfElt) const
+	double const& DTVec::operator()(int iTensOfElt) const
 	{
 		return data_(iTensOfElt);
 	}
@@ -106,6 +106,11 @@ namespace simol
 	{
 		return nbOfElts_;
 	}
+	
+	double const& Basis::expFourierCoeffs(int /*iOfElt*/) const 
+	{
+    throw std::runtime_error("Basis::expFourierCoeffs is not implemented");
+  };
 	
 	
 	FourierBasis::FourierBasis(const int nbOfElts):
@@ -197,7 +202,7 @@ namespace simol
 		return (nbOfElts_-1)/2;
 	}
 	
-	const double& ExpFourierBasis::expFourierCoeffs(int iOfElt) const
+	double const& ExpFourierBasis::expFourierCoeffs(int iOfElt) const
 	{
 		return expFourierCoeffs_[iOfElt];
 	}
@@ -482,7 +487,7 @@ namespace simol
 		//cout << "end ExpFourierHermiteBasis(Input const& input)" << endl;
 	}
 	
-	const double& ExpFourierHermiteBasis::expFourierCoeffs(int iOfElt) const
+	double const& ExpFourierHermiteBasis::expFourierCoeffs(int iOfElt) const
 	{
 		return bases_[0]->expFourierCoeffs(iOfElt);
 	}
