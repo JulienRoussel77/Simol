@@ -1,6 +1,7 @@
 
 ADD_EXECUTABLE(simol_test_unit ${CMAKE_SOURCE_DIR}/test/unit/core/linalg/VectorTest.cpp 
-                               ${CMAKE_SOURCE_DIR}/test/unit/core/linalg/DenseMatrixTest.cpp)
+                               ${CMAKE_SOURCE_DIR}/test/unit/core/linalg/DenseMatrixTest.cpp
+                               ${CMAKE_SOURCE_DIR}/test/unit/core/linalg/SparseMatrixTest.cpp)
 
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/src/core/linalg)
 INCLUDE_DIRECTORIES(${EXTERNAL_DIR}/gtest/install/include)

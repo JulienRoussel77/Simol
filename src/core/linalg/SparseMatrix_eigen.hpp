@@ -17,7 +17,7 @@ namespace simol
         explicit SparseMatrix(Vector<double, eigen> u, std::size_t numberOfRows, std::size_t numberOfColumns);
         SparseMatrix(const typename eigen<ScalarType>::SparseMatrixType::AdjointReturnType& A);
 
-        operator typename eigen<ScalarType>::SparseMatrixType const () const;
+        operator typename eigen<ScalarType>::SparseMatrixType const & () const;
 
         std::size_t numberOfRows() const;
         std::size_t numberOfColumns() const;
@@ -46,7 +46,7 @@ namespace simol
 
   //! Conversion to wrapped matrix
   template<class ScalarType> inline
-  SparseMatrix<ScalarType,eigen>::operator typename eigen<ScalarType>::SparseMatrixType const () const
+  SparseMatrix<ScalarType,eigen>::operator typename eigen<ScalarType>::SparseMatrixType const & () const
   { return wrapped_; }
 
   //! Returns coefficient
@@ -58,7 +58,7 @@ namespace simol
   template<class ScalarType> inline
   ScalarType& SparseMatrix<ScalarType,eigen>::operator()(std::size_t const rowIndex, std::size_t const columnIndex)
   { return wrapped_.coeffRef(rowIndex, columnIndex); }
-  
+
     //! Create coefficient
   template<class ScalarType> inline
   ScalarType& SparseMatrix<ScalarType,eigen>::insert(std::size_t const rowIndex, std::size_t const columnIndex)
