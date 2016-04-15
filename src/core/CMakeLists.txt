@@ -12,3 +12,5 @@ ADD_LIBRARY(simol-core SHARED ${random} ${io} ${linalg})
 ADD_CUSTOM_TARGET(core DEPENDS simol-core)
 ADD_DEPENDENCIES(simol-core eigen)
 
+INSTALL(TARGETS simol-core LIBRARY DESTINATION lib)
+

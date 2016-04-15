@@ -19,6 +19,8 @@ ADD_DEPENDENCIES(simol-quantchem simol-core)
 TARGET_LINK_LIBRARIES(simol-quantchem simol-core)
 TARGET_LINK_LIBRARIES(simol-quantchem ${YAMLCPP_INSTALL_DIR}/lib/libyaml-cpp.a)
 
+INSTALL(TARGETS simol-quantchem ARCHIVE DESTINATION lib)
+
 #add_executable(quantum_chemistry core/io/mmio.c)
 #add_dependencies(quantum_chemistry eigen)
 #target_link_libraries(quantum_chemistry ${YAMLCPP_INSTALL_DIR}/lib/libyaml-cpp.a)
