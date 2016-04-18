@@ -18,19 +18,19 @@ sudo apt-get install astyle
 \end{minted}
 We use the following command line from the root directory of \Simol to make C++ source files be conforming to our coding rules:
 \begin{minted}{bash}
-astyle --recursive --style=allman --indent=spaces=2 --convert-tabs \
-       --indent-namespaces --indent-classes --indent-col1-comments \
-       --indent-switches --indent-labels --keep-one-line-blocks \
-       --pad-oper --suffix=none *.cpp
+astyle --recursive --style=allman --indent=spaces=2 --indent-namespaces \
+       --indent-col1-comments --indent-classes --indent-switches \
+       --indent-labels --keep-one-line-blocks --pad-oper --convert-tabs \
+       --suffix=none *.cpp
 \end{minted}
 To do the same for header files, we use the command line below:
 \begin{minted}{bash}
-astyle --recursive --style=allman --indent=spaces=2 --convert-tabs \
-       --indent-namespaces --indent-classes --indent-col1-comments \
-       --indent-switches --indent-labels --keep-one-line-blocks \
-       --pad-oper --suffix=none *.hpp
+astyle --recursive --style=allman --indent=spaces=2 --indent-namespaces \
+       --indent-col1-comments --indent-classes --indent-switches \
+       --indent-labels --keep-one-line-blocks --pad-oper --convert-tabs \
+       --suffix=none ../*.hpp
 \end{minted}
-To understand the meaning of this command line, please refer to the official documentation.
+
 
 
 \section{Preprocessor directives}
