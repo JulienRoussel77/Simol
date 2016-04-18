@@ -15,9 +15,9 @@
 namespace simol
 {
 
-  template<class ScalarType>
-  struct eigen
-  {
+template<class ScalarType>
+struct eigen
+{
     typedef Eigen::Matrix<ScalarType, Eigen::Dynamic, 1> VectorType;
     typedef Eigen::SparseMatrix<ScalarType> SparseMatrixType;
     typedef Eigen::Matrix<ScalarType, Eigen::Dynamic, Eigen::Dynamic> DenseMatrixType;
@@ -27,7 +27,11 @@ namespace simol
     typedef typename DenseMatrixType::ColXpr DenseMatrixColumn;
     typedef Eigen::Block<DenseMatrixType> DenseBlock;
     typedef Eigen::Block<DenseMatrixType const> DenseBlock_const;
-  };
+
+    static std::size_t length(VectorType const & vector) {
+        return 0;
+    }
+};
 
 }
 
