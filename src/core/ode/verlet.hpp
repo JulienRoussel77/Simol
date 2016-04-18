@@ -9,9 +9,9 @@
   //class Particle;
   class Potential;
   class HamiltonDynamics;
-  
-  void verlet(Particle & particle, 
-              HamiltonDynamics const & model, 
+
+  void verlet(Particle & particle,
+              HamiltonDynamics const & model,
               double timeStep)
   {
     particle.momentum_ += timeStep * particle.force_ / 2;
@@ -25,4 +25,4 @@
 
 
 
-#endif 
+#endif
