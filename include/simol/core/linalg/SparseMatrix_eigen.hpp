@@ -171,6 +171,7 @@ namespace simol
     return fileToRead;
   }
 
+  // TODO: attention version symetrique
   template<class ScalarType>
   Vector<ScalarType, eigen> operator*(SparseMatrix<ScalarType, eigen> const & matrix,
                                       Vector<ScalarType, eigen> const & vector)

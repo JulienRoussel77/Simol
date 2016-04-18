@@ -8,6 +8,7 @@
 #include "simol/core/linalg/Vector.hpp"
 #include "simol/quantchem/DiscreteHamiltonian.hpp"
 #include "simol/core/linalg/EigenDecomposition.hpp"
+
 namespace simol
 {
 
