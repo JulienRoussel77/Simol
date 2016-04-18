@@ -4,6 +4,35 @@
 \chapter{Coding rules}
 
 
+\section{Automatic formatting with \Astyle}
+
+\subsection{Usage of \Astyle}
+
+Automatic formatting of C++ files may be performed by means of a command-line tool named \Astyle, also known as \texttt{Artistic Style}. The official website of this tool is 
+\begin{center}
+\url{http://astyle.sourceforge.net}
+\end{center}
+Documentation about this tool and how it could be used is available on this website. For the sake of simplicity, we only emphasize on how \Astyle is used in \Simol. On Ubuntu systems, \Astyle can be installed from the command line
+\begin{minted}{bash}
+sudo apt-get install astyle
+\end{minted}
+We use the following command line from the root directory of \Simol to C++ source file be conforming to our coding rules:
+\begin{minted}{bash}
+astyle --recursive --style=allman --indent=spaces=2 --indent-namespaces \
+       --indent-col1-comments --indent-classes --indent-switches \
+       --indent-labels --keep-one-line-blocks --pad-oper --convert-tabs \
+       --suffix=none *.cpp
+\end{minted}
+To do the same for header files, we use the command line below:
+\begin{minted}{bash}
+astyle --recursive --style=allman --indent=spaces=2 --indent-namespaces \
+       --indent-col1-comments --indent-classes --indent-switches \
+       --indent-labels --keep-one-line-blocks --pad-oper --convert-tabs \
+       --suffix=none ../*.hpp
+\end{minted}
+
+
+
 \section{Preprocessor directives}
 
 
