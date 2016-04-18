@@ -5,19 +5,19 @@
 
 namespace simol
 {
-  
+
   class DoubleWell : public Potential
   {
-  public:
-    DoubleWell(Input const& input);
-    double operator()(double position) const;
-    Vector<double> gradient(double position) const;
-    
-  private:
-    double height_;
-    double interWell_;
+    public:
+      DoubleWell(Input const& input);
+      double operator()(double position) const;
+      Vector<double> gradient(double position) const;
+
+    private:
+      double height_;
+      double interWell_;
   };
-  
+
 }
 
 #endif

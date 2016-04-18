@@ -5,23 +5,25 @@ using std::endl;
 using std::string;
 
 const double defaultSeed = 0;
-const double defaultGamma = 1; 
+const double defaultGamma = 1;
 const double defaultXi = 0;
 const double defaultDeltaTemperature = 0;
 const double defaultExternalForce = 0;
 const double defaultTauBending = 0;
 const double defaultHeatCapacity = 1;
 
-namespace simol {
+namespace simol
+{
 
   string Input::dynamicsName() const {return data["Dynamics"]["Name"].as<string>();}
-  
-  double Input::gamma() const {
+
+  double Input::gamma() const
+  {
     if (data["Dynamics"]["Gamma"])
       return data["Dynamics"]["Gamma"].as<double>();
     else throw std::runtime_error("No Gamma in the input file !");
   }
-  
+
   double Input::temperature() const
   {
     if (data["Dynamics"]["Temperature"])
@@ -31,7 +33,7 @@ namespace simol {
     else if (data["Dynamics"]["TemperatureLeft"] && data["Dynamics"]["TemperatureRight"])
       return (data["Dynamics"]["TemperatureLeft"].as<double>() + data["Dynamics"]["TemperatureRight"].as<double>()) / 2;
     else if (data["Dynamics"]["BetaLeft"] && data["Dynamics"]["BetaRight"])
-      return .5/data["Dynamics"]["BetaLeft"].as<double>() + .5/data["Dynamics"]["BetaRight"].as<double>();
+      return .5 / data["Dynamics"]["BetaLeft"].as<double>() + .5 / data["Dynamics"]["BetaRight"].as<double>();
     else throw std::runtime_error("Temperature not precised !");
   }
 
@@ -51,7 +53,7 @@ namespace simol {
 
   double Input::beta() const
   {
-    return 1/temperature();
+    return 1 / temperature();
   }
 
   /*double Input::betaLeft() const
@@ -71,7 +73,7 @@ namespace simol {
       return 1 / data["Dynamics"]["TemperatureRight"].as<double>();
     else throw std::runtime_error("No BetaRight in the input file !");
   }*/
-  
+
   double Input::deltaTemperature() const
   {
     if (data["Dynamics"]["deltaTemperature"])
@@ -79,7 +81,8 @@ namespace simol {
     else return defaultDeltaTemperature;
   }
 
-  double Input::externalForce() const {
+  double Input::externalForce() const
+  {
     if (data["Dynamics"]["Force"])
       return data["Dynamics"]["Force"].as<double>();
     else return defaultExternalForce;
@@ -117,13 +120,13 @@ namespace simol {
       return externalForce();
   }
 
-  double Input::heatCapacity() const 
+  double Input::heatCapacity() const
   {
     if (data["Physics"]["Model"]["HeatCapacity"])
       return data["Physics"]["Model"]["HeatCapacity"].as<double>();
     else
       return defaultHeatCapacity;
   }
-  
+
 
 }

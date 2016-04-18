@@ -16,8 +16,8 @@
 #include "simol/core/io/CommandLine.hpp"
 #include <time.h>
 
-using std::cout; 
-using std::endl; 
+using std::cout;
+using std::endl;
 
 int main(int argc, char* argv[])
 {
@@ -27,26 +27,26 @@ int main(int argc, char* argv[])
   // COMMAND LINE PARSING
   //=====================
 
-  simol::CommandLine cmd(argc,argv);
+  simol::CommandLine cmd(argc, argv);
 
   //===================
   // INPUT FILE LOADING
   //===================
-    
+
   cout << "Input read in " << cmd.inputFileName() << endl;
   simol::Input input(cmd);
 
   //============
   // COMPUTATION
   //============
-  
+
   if (input.isGalerkin())
     throw std::invalid_argument("The input must correspond to a MD simulation !");
-  
-  
+
+
   simol::Simulation<simol::BoundaryLangevin, simol::TriChain> simu(input);
   simu.launch();
-  
+
   displayTime(clock() - totalTime);
 
   return EXIT_SUCCESS;

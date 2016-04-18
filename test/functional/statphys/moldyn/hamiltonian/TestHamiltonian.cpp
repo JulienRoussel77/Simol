@@ -25,7 +25,7 @@ int main(int argc, char* argv[])
   // COMMAND LINE PARSING
   //=====================
 
-  simol::CommandLine cmd(argc,argv);
+  simol::CommandLine cmd(argc, argv);
 
   //===================
   // INPUT FILE LOADING

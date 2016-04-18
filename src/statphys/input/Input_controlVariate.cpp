@@ -4,8 +4,9 @@ using std::cout;
 using std::endl;
 using std::string;
 
-namespace simol {
-  
+namespace simol
+{
+
   string Input::controlVariateName() const
   {
     if (data["ControlVariate"]["Name"])
@@ -22,25 +23,25 @@ namespace simol {
       assert(false);
     return "None";
   }
-  
+
   bool Input::doGalerkinCV() const
   {
     if (data["ControlVariate"])
       if (data["Galerkin"]["Basis"] && !data["ControlVariate"]["CoeffsPath"])
-	return true;
+        return true;
     return false;
   }
-  
+
   bool Input::isGalerkin() const
   {
     if (data["Galerkin"])
       if (data["Galerkin"]["Resolve"])
-	if (data["Galerkin"]["Resolve"].as<string>() == "yes")
-	  return true;
-    
+        if (data["Galerkin"]["Resolve"].as<string>() == "yes")
+          return true;
+
     return false;
   }
-  
+
   string Input::galerkinElts() const
   {
     if (data["Galerkin"])
@@ -54,20 +55,20 @@ namespace simol {
   {
     if (data["Galerkin"])
       if (data["Galerkin"]["Basis"])
-	if (data["Galerkin"]["Basis"]["Fourier"])
-	  return data["Galerkin"]["Basis"]["Fourier"].as<int>();
-    
+        if (data["Galerkin"]["Basis"]["Fourier"])
+          return data["Galerkin"]["Basis"]["Fourier"].as<int>();
+
     throw std::invalid_argument("Number of Fourier modes missing");
   }
-  
+
   int Input::nbOfHermite() const
   {
     if(data["Galerkin"])
       if(data["Galerkin"]["Basis"])
-	if(data["Galerkin"]["Basis"]["Hermite"])
-	  return data["Galerkin"]["Basis"]["Hermite"].as<int>();
-    
+        if(data["Galerkin"]["Basis"]["Hermite"])
+          return data["Galerkin"]["Basis"]["Hermite"].as<int>();
+
     throw std::invalid_argument("Number of Hermite modes missing");
   }
-  
+
 }

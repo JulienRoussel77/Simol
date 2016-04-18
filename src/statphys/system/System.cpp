@@ -5,7 +5,7 @@
 
 namespace simol
 {
-  
+
   System::System(Input const& input):
     dimension_(input.dimension()),
     configuration_(input.nbOfParticles(), Particle(dimension_)),
@@ -13,56 +13,56 @@ namespace simol
   {
     potential_ = createPotential(input);
   }
-  
+
   ///
   ///Destructor
   System::~System()
   {
     delete potential_;
   }
-  
+
   void System::printName() const
   {
     cout << "SystemType = System" << endl;
   }
 
   const Particle& System::getParticle(int index) const
-  { 
-    return configuration_[index]; 
+  {
+    return configuration_[index];
   }
-  
-  Particle& System::getParticle(int index) 
-  { 
-    return configuration_[index]; 
+
+  Particle& System::getParticle(int index)
+  {
+    return configuration_[index];
   }
-  
+
   const int& System::dimension() const
   {
     return dimension_;
   }
-  
+
   const std::vector< Particle > & System::configuration() const
-  { 
-    return configuration_; 
+  {
+    return configuration_;
   }
-  
-  std::vector< Particle > & System::configuration() 
+
+  std::vector< Particle > & System::configuration()
   { return configuration_; }
-  
+
   int System::nbOfParticles() const
   {
     return configuration_.size();
   }
-  
+
   //-------------- Random numbers ----------------
-  
+
   const std::shared_ptr<RNG>& System::rng() const {return rng_;}
 
   std::shared_ptr<RNG>& System::rng() {return rng_;}
-  
-  
+
+
   //----------------- Potential and forces ---------------
-  
+
   ///
   ///Returns by value the potential of the dynamics
   Potential& System::potential() {return *potential_;}
@@ -76,44 +76,44 @@ namespace simol
   ///Evaluate the force for the scalar "position" (potential and external terms)
   Vector<double> System::totalForce(Vector<double> const& position) const
   {
-    return potential_->totalForce(position); 
+    return potential_->totalForce(position);
   }
-  
+
   Vector<double> System::potentialForce(Vector<double> const& position) const
-  { 
-    return - potential_->gradient(position); 
+  {
+    return - potential_->gradient(position);
   }
-  
+
   Vector<double> System::potentialForce(double position) const
-  { 
-    return - potential_->gradient(position); 
+  {
+    return - potential_->gradient(position);
   }
   ///
   ///Evaluate the force for the scalar "position" (potential and external terms)
   Vector<double> System::totalForce(double position) const
   {
-    return potential_->totalForce(position); 
+    return potential_->totalForce(position);
   }
   ///
   ///Evaluate the laplacian of the potential for the vector "position"
   double System::laplacian(Vector<double> const& position) const
   {
-    return potential_->laplacian(position); 
+    return potential_->laplacian(position);
   }
-  
+
   ///
   ///Read-only accessor for the external force
   Vector<double> const& System::externalForce() const {return potential_->externalForce();}
   ///
   ///Write-read accessor for the external force
-  Vector<double>& System::externalForce(){return potential_->externalForce();}
+  Vector<double>& System::externalForce() {return potential_->externalForce();}
   ///
   ///Read-only accessor for the i-th component of the external force
   double const& System::externalForce(int const& i) const {return potential_->externalForce(i);}
   ///
   ///Write-read accessor for the i-th component of the external force
-  double& System::externalForce(int const& i) {return potential_->externalForce(i);}  
-  
+  double& System::externalForce(int const& i) {return potential_->externalForce(i);}
+
   ///
   ///Draw a momentum under the invariant measure at inverse temperature "localBeta"
   Vector<double> System::drawMomentum(double localBeta, double mass)
@@ -126,19 +126,19 @@ namespace simol
   {
     return potential_->drawLaw(localBeta, rng_);
   }
-  
+
   void System::thermalize(Dynamics& /*model*/)
   {throw std::invalid_argument("thermalize not defined");}
-  
+
   void System::computeAllForces()
   {throw std::invalid_argument("thermalize not defined");}
-  
+
   //--------------- move into chain -----------------
-  
-    double System::boundaryPotEnergy() const
+
+  double System::boundaryPotEnergy() const
   {return 0;}
 
-  
+
   ///Computes the force and the energy associated to this pair interaction, and updates these 2 fields
   ///The first 2 derivates of the potential are stored in "particle2"
   void System::interaction(Particle& particle1, Particle& particle2) const
@@ -147,14 +147,14 @@ namespace simol
     double energy12 = potential(r12);
     Vector<double> force12 = potentialForce(r12);    // = - v'(q_2 - q_1)
     double lapla12 = laplacian(r12);  // v"(q_2 - q_1)
-    
+
     particle2.potentialEnergy() = energy12;
     particle1.force() -= force12;
     particle2.force() += force12;
     particle2.energyGrad() = -force12;    // v'(q_2 - q_1)
     particle2.energyLapla() = lapla12;    // v"(q_2 - q_1)
   }
-  
+
   ///Compute the mean distance or bending under the invariant measure
   ///Proceeds to a simple integral quadrature using rectangles
   double System::computeMeanPotLaw(double localBeta) const
@@ -172,12 +172,12 @@ namespace simol
     }
     return qInteg / repFunc;
   }
-  
-  void System::computeProfile(Output& /*output*/, Dynamics const& /*model*/, int /*iOfStep*/) const 
+
+  void System::computeProfile(Output& /*output*/, Dynamics const& /*model*/, int /*iOfStep*/) const
   {
     throw std::invalid_argument("System::computeProfile : Function undefined");
-  }  
-  
+  }
+
 }
 
 #endif

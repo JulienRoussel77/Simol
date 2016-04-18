@@ -2,7 +2,7 @@
 
 namespace simol
 {
-  
+
   Potential* createPotential(Input const& input)
   {
     if (input.potentialName() == "Sinusoidal")
@@ -25,8 +25,8 @@ namespace simol
       return new LennardJones(input);
     else
       std::cout << input.potentialName() << " is not a valid potential !" << std::endl;
-    
+
     return 0;
   }
-  
+
 }

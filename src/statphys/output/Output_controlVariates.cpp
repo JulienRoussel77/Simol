@@ -1,10 +1,11 @@
 #include "simol/statphys/output/Output.hpp"
 
-using std::cout; 
-using std::endl; 
+using std::cout;
+using std::endl;
 using std::vector;
 
-namespace simol{
+namespace simol
+{
 
   void Output::setControlVariates(Input& input, Potential& potential, Galerkin* galerkin)
   {
@@ -19,5 +20,5 @@ namespace simol{
   {
     out << time << " " << modulo(configuration[0].position(0), -M_PI, M_PI) << " " << configuration[0].momentum(0) << " " << controlVariate.lastGeneratorOnBasis()(0) << " " << controlVariate.basisFunction(configuration) << endl;
   }
-  
+
 }

@@ -26,9 +26,9 @@ namespace simol
               int *iparam, int *ipntr, double *workd,
               double *workl, int &lworkl, int &info)
   {
-    dsaupd_(&ido, &bmat, &n, which, &nev, &tol, resid, 
-            &ncv, v, &ldv, iparam, ipntr, workd, workl, 
-           &lworkl, &info);
+    dsaupd_(&ido, &bmat, &n, which, &nev, &tol, resid,
+            &ncv, v, &ldv, iparam, ipntr, workd, workl,
+            &lworkl, &info);
   }
 }
 

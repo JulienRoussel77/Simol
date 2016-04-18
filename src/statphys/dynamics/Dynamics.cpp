@@ -19,7 +19,7 @@ namespace simol
     thermalizationNbOfSteps_(input.thermalizationNbOfSteps()),
     burninNbOfSteps_(input.burninNbOfSteps()),
     beta_(input.beta()),
-    temperature_(1/beta_),
+    temperature_(1 / beta_),
     galerkin_(nullptr)
   {}
 
@@ -40,7 +40,7 @@ namespace simol
   ///
   ///Read-write accessor for the number of steps of the simulation
   int& Dynamics::nbOfSteps() {return nbOfSteps_;}
-	///
+  ///
   ///Read-only accessor for the number of steps of the simulation
   int const& Dynamics::nbOfSteps() const {return nbOfSteps_;}
   ///
@@ -62,7 +62,7 @@ namespace simol
   const std::shared_ptr<RNG>& Dynamics::rng() const {return rng_;}
 
   std::shared_ptr<RNG>& Dynamics::rng() {return rng_;}
-  
+
   ///
   ///Returns the temperature
   double const& Dynamics::temperature() const {return temperature_;}
@@ -76,7 +76,7 @@ namespace simol
   ///This is equal to {eta}
   double Dynamics::deltaTemperature() const
   {
-    return (temperatureLeft() - temperatureRight())/2;
+    return (temperatureLeft() - temperatureRight()) / 2;
   }
   ///
   ///Read-only access for the inverse temperature
@@ -100,8 +100,8 @@ namespace simol
   ///
   ///Write-read accessor for the i-th component of the external force
   double& Dynamics::externalForce(int const& i) {return externalForce_(i);}*/
-	///
-	///Returns the pointer of the Galerkin instance of *this
+  ///
+  ///Returns the pointer of the Galerkin instance of *this
   Galerkin* Dynamics::galerkin() {return galerkin_;}
 
 
@@ -117,7 +117,7 @@ namespace simol
   }*/
 
 
-	///
+  ///
   ///Standard first part of the numerical integration : half upadate on "p" and update on "q"
   void Dynamics::verletFirstPart(Particle& particle)
   {

@@ -6,8 +6,8 @@ using std::max;
 namespace simol
 {
   Statistics::Statistics(int nbRows, int nbCols):
-    sumValues_(nbRows, nbCols), 
-    lastValue_(nbRows, nbCols), 
+    sumValues_(nbRows, nbCols),
+    lastValue_(nbRows, nbCols),
     nbValues_(nbRows, nbCols)
   {
     sumValues_.fill(0);
@@ -17,28 +17,28 @@ namespace simol
 
   void Statistics::append(double value, int i, int j)
   {
-    lastValue_(i,j) = value;
-    if (nbValues_(i,j) == 0)
-      sumValues_(i,j) = value;
+    lastValue_(i, j) = value;
+    if (nbValues_(i, j) == 0)
+      sumValues_(i, j) = value;
     else
-      sumValues_(i,j) += value;
-    nbValues_(i,j)++;
+      sumValues_(i, j) += value;
+    nbValues_(i, j)++;
   }
 
 
   double Statistics::mean(int i, int j) const
   {
-    if (nbValues_(i,j) == 0)
+    if (nbValues_(i, j) == 0)
       return 0;
-    else 
-      return sumValues_(i,j) / nbValues(i,j);
+    else
+      return sumValues_(i, j) / nbValues(i, j);
   }
-  
+
   Vector<double> Statistics::meanVec(int i) const
   {
     return piecewiseDivision(sumValues_.column(i), nbValues_.column(i));
   }
-  
+
   DenseMatrix<double> Statistics::meanMat() const
   {
     return piecewiseDivision(sumValues_, nbValues_);
@@ -47,7 +47,7 @@ namespace simol
 
   const int& Statistics::nbValues(int i, int j) const
   {
-    return nbValues_(i,j);
+    return nbValues_(i, j);
   }
 
   const Vector<int> Statistics::nbValuesVec(int i) const
@@ -63,7 +63,7 @@ namespace simol
 
   const double& Statistics::lastValue(int i, int j) const
   {
-    return lastValue_(i,j);
+    return lastValue_(i, j);
   }
 
   const Vector<double> Statistics::lastValueVec(int i) const
@@ -76,7 +76,7 @@ namespace simol
     return lastValue_;
   }
 
-  
+
   AutocorrelationStats::AutocorrelationStats():
     decorrelationNbOfSteps_(0),
     decorrelationTime_(0),
@@ -89,7 +89,8 @@ namespace simol
     //statisticsMeanCorrelationTemp_(),
     statisticsCorrelation_(0, 0),
     indexRef_(0)
-  {//cout << "AutocorrelationStats()" << endl;
+  {
+    //cout << "AutocorrelationStats()" << endl;
   }
 
 
@@ -105,7 +106,8 @@ namespace simol
     //statisticsMeanCorrelationTemp_(),
     statisticsCorrelation_(nbOfAutocoPts_, nbOfObservables),
     indexRef_(0)
-  {//cout << "AutocorrelationStats(int decorrelation : nbObs = " << decorrelationTime << endl;
+  {
+    //cout << "AutocorrelationStats(int decorrelation : nbObs = " << decorrelationTime << endl;
   }
 
 
@@ -158,12 +160,12 @@ namespace simol
     return 2 * integratedAutocorrelationUnbiased(iOfObservable);
   }
 
-  
+
   double AutocorrelationStats::standardDeviation(int iOfObservable) const
   {
     return sqrt(variance(iOfObservable));
   }
-  
+
   void AutocorrelationStats::append(const double& newValue, int iOfStep, int iOfObservable, const double& newRefValue)
   {
     statisticsValues_.append(newValue, iOfObservable);
@@ -175,14 +177,14 @@ namespace simol
         indexRef_ = iOfStep;
       }
       //On intègre le profil d'autocorrélation à l'ordre 2 en coomptant la valeur en 0 pour un demi
-      statisticsMeanCorrelation_.append(((indexRef_ == iOfStep)?.5:1) * statisticsRefValues_.lastValue(iOfObservable) * newValue, iOfObservable);
-      statisticsCorrelation_.append(statisticsRefValues_.lastValue(iOfObservable) * newValue, ((iOfStep - indexRef_)*nbOfAutocoPts_) / decorrelationNbOfSteps_, iOfObservable);    
+      statisticsMeanCorrelation_.append(((indexRef_ == iOfStep) ? .5 : 1) * statisticsRefValues_.lastValue(iOfObservable) * newValue, iOfObservable);
+      statisticsCorrelation_.append(statisticsRefValues_.lastValue(iOfObservable) * newValue, ((iOfStep - indexRef_)*nbOfAutocoPts_) / decorrelationNbOfSteps_, iOfObservable);
     }
   }
-  
+
   double AutocorrelationStats::integratedAutocorrelationUnbiased(int iOfObservable) const
   {
     return max(0., integratedAutocorrelation(iOfObservable) - mean(iOfObservable) * statisticsRefValues_.mean(iOfObservable) * decorrelationTime_);
   }
-  
+
 }

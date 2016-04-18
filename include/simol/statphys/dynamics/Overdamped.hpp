@@ -8,10 +8,10 @@ namespace simol
   class Overdamped : public Dynamics
   {
     public:
-        Overdamped(Input const& input);
-        virtual void updateBefore(Particle& particle);
-        virtual void updateAfter(Particle& particle);
- };
+      Overdamped(Input const& input);
+      virtual void updateBefore(Particle& particle);
+      virtual void updateAfter(Particle& particle);
+  };
 
 }
 

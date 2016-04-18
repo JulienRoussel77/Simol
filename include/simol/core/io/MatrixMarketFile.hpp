@@ -9,7 +9,7 @@
 
 extern "C"
 {
-  #include "mmio.h"
+#include "mmio.h"
 }
 
 
@@ -34,20 +34,20 @@ namespace simol
 
   inline
   MatrixMarketFile::MatrixMarketFile(std::string const & filename)
-  : content_(fopen(filename.c_str(), "r"))
+    : content_(fopen(filename.c_str(), "r"))
   {
     if(!content_)
       throw std::ios_base::failure("Unable to open " + filename);
     MM_typecode matcode;
     if (mm_read_banner(content_, &matcode) != 0)
       throw new std::ios_base::failure("Unable to read the banner");
-    int ret_code = mm_read_mtx_crd_size(content_, 
+    int ret_code = mm_read_mtx_crd_size(content_,
                                         &numberOfRows_,
                                         &numberOfColumns_,
                                         &numberOfNonzeros_);
     if( ret_code != 0 )
       throw new std::ios_base::failure("Unable to read the data");
-      
+
   }
 
   inline FILE *
@@ -58,15 +58,15 @@ namespace simol
   MatrixMarketFile::~MatrixMarketFile()
   { fclose(content_); }
 
-  inline std::size_t 
+  inline std::size_t
   MatrixMarketFile::numberOfRows() const
   { return numberOfRows_; }
 
-  inline std::size_t 
+  inline std::size_t
   MatrixMarketFile::numberOfColumns() const
   { return numberOfColumns_; }
-  
-  inline std::size_t 
+
+  inline std::size_t
   MatrixMarketFile::numberOfNonzeros() const
   { return numberOfNonzeros_; }
 

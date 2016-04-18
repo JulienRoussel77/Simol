@@ -27,7 +27,7 @@ int main(int argc, char* argv[])
   // COMMAND LINE PARSING
   //=====================
 
-  simol::CommandLine cmd(argc,argv);
+  simol::CommandLine cmd(argc, argv);
 
   //===================
   // INPUT FILE LOADING
@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
   //============
 
   if (input.isGalerkin())
-    throw std::invalid_argument("The input must correspond to a MD simulation !");  
+    throw std::invalid_argument("The input must correspond to a MD simulation !");
 
   simol::Simulation<simol::Hamiltonian, simol::NBody> simu(input);
   simu.launch();

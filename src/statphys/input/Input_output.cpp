@@ -6,12 +6,13 @@ using std::string;
 using std::min;
 using std::max;
 
-const int defaultPrintPeriod = 0;         
-const int defaultLongPrintPeriod = 0;  
+const int defaultPrintPeriod = 0;
+const int defaultLongPrintPeriod = 0;
 const int maxNbOfAutocoPts = 1000;
-const int defaultDecorrelationTime = 0; 
+const int defaultDecorrelationTime = 0;
 
-namespace simol {
+namespace simol
+{
 
   ///Transforms a double into a nice string
   /// 1.30000 -> 1.3     1.000 -> 1
@@ -24,48 +25,48 @@ namespace simol {
     return s;
   }
 
-  string Input::simuTypeName() const 
+  string Input::simuTypeName() const
   {
     if (data["Output"]["SimuTypeName"]
-        && data["Output"]["SimuTypeName"].as<string>() == "yes")        
-      return "../../../output/"+dynamicsName()+"/"+systemName()+"/"+potentialName()+"/";
-    else 
+        && data["Output"]["SimuTypeName"].as<string>() == "yes")
+      return "../../../output/" + dynamicsName() + "/" + systemName() + "/" + potentialName() + "/";
+    else
       return "../../../output/";
   }
-  
+
   string Input::parametersName() const
   {
     string name = simuTypeName();
-        
+
     if (controlVariateName() != "None")
-      name += controlVariateName()+"/";
-    
+      name += controlVariateName() + "/";
+
     if (data["Output"]["ParametersName"]
         && data["Output"]["ParametersName"].as<string>() == "yes")
-    {    
+    {
       if (dynamicsName() == "BoundaryLangevin")
         name += "N" + to_string(nbOfParticles()) + "_";
-	
+
       name += "dt" + doubleToString(timeStep()) + "_eta" + doubleToString(eta());
-	
+
       if (dynamicsName() == "BoundaryLangevin")
         name += "_xi" + doubleToString(xi());
-	
+
       name += "/";
     }
     return name;
   }
-  
-  string Input::outputFolderName() const 
+
+  string Input::outputFolderName() const
   {
     string name = parametersName();
-    
+
     if (data["Output"]["FolderName"])
       name += data["Output"]["FolderName"].as<string>() + "/";
-    
+
     return name;
   }
-  
+
   ///
   ///Returns the a number of steps
   int Input::decorrelationNbOfSteps() const
@@ -83,7 +84,7 @@ namespace simol {
       }
       return decoNb;
     }
-    else 
+    else
       return (int)(defaultDecorrelationTime / timeStep());
 
   }
@@ -94,7 +95,7 @@ namespace simol {
     return decorrelationNbOfSteps() * timeStep();
   }
 
-  int Input::printPeriodNbOfSteps() const 
+  int Input::printPeriodNbOfSteps() const
   {
     static bool warningGiven = false;
     if (data["Output"]["PrintPeriodNbOfSteps"])
@@ -115,11 +116,13 @@ namespace simol {
       return defaultPrintPeriod / timeStep();
   }
 
-  double Input::printPeriodTime() const {
-      return printPeriodNbOfSteps() * timeStep();
+  double Input::printPeriodTime() const
+  {
+    return printPeriodNbOfSteps() * timeStep();
   }
 
-  int Input::printLongPeriodNbOfSteps() const {
+  int Input::printLongPeriodNbOfSteps() const
+  {
     static bool warningGiven = false;
     if (data["Output"]["LongPrintPeriodNbOfSteps"])
       return data["Output"]["LongPrintPeriodNbOfSteps"].as<int>();
@@ -139,8 +142,9 @@ namespace simol {
       return defaultLongPrintPeriod / timeStep();
   }
 
-  double Input::printLongPeriodTime() const {
-      return printLongPeriodNbOfSteps() * timeStep();
+  double Input::printLongPeriodTime() const
+  {
+    return printLongPeriodNbOfSteps() * timeStep();
   }
 
   /// Contains the number of values in an autocorrelation LongPeriod
@@ -149,7 +153,7 @@ namespace simol {
   {
     return min(maxNbOfAutocoPts, (int)decorrelationNbOfSteps());
   }
-  
+
   bool Input::doFinalFlow() const
   {
     if (data["Output"]["doFinalFlow"])
@@ -157,7 +161,7 @@ namespace simol {
         return true;
     return false;
   }
-  
+
   bool Input::doFinalVelocity() const
   {
     if (data["Output"]["doFinalVelocity"])
@@ -165,5 +169,5 @@ namespace simol {
         return true;
     return false;
   }
-  
+
 }

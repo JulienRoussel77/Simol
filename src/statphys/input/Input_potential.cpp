@@ -11,10 +11,11 @@ const double defaultSigmaLJ = 1.;
 const double defaultSplineRatio = 0.8;
 const double defaultCutOffRatio = 2.5;
 
-namespace simol {
-  
+namespace simol
+{
+
   string Input::potentialName() const {return data["Potential"]["Name"].as<string>();}
-  
+
   //--- Sinusoidal ---
   double Input::amplitude() const
   {
@@ -40,7 +41,7 @@ namespace simol {
     else
       return defaultSigmaLJ;
   }
-  
+
   double Input::cutOffRatio() const
   {
     if (data["Potential"]["CutOffRatio"])
@@ -48,7 +49,7 @@ namespace simol {
     else
       return defaultCutOffRatio;
   }
-  
+
   double Input::splineRatio() const
   {
     if (data["Potential"]["SplineRation"])
@@ -58,20 +59,23 @@ namespace simol {
   }
 
   //----- DoubleWell -------
-  double Input::height() const {
+  double Input::height() const
+  {
     if (data["Potential"]["Height"])
       return data["Potential"]["Height"].as<double>();
     else throw std::runtime_error("No Height in the input file !");
   }
-  
-  double Input::interWell() const {
+
+  double Input::interWell() const
+  {
     if (data["Potential"]["InterWell"])
       return data["Potential"]["InterWell"].as<double>();
     else throw std::runtime_error("No InterWell in the input file !");
   }
 
   //----- Harmonic ----
-  double Input::potentialStiffness() const {
+  double Input::potentialStiffness() const
+  {
     if (data["Potential"]["Stiffness"])
       return data["Potential"]["Stiffness"].as<double>();
     else
@@ -79,14 +83,16 @@ namespace simol {
   }
 
   //------- FPU ----------
-  double Input::potentialAlpha() const {
+  double Input::potentialAlpha() const
+  {
     if (data["Potential"]["Alpha"])
       return data["Potential"]["Alpha"].as<double>();
     else
       return defaultPotentialCoeff;
   }
 
-  double Input::potentialBeta() const {
+  double Input::potentialBeta() const
+  {
     if (data["Potential"]["Beta"])
       return data["Potential"]["Beta"].as<double>();
     else

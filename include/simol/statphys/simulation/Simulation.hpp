@@ -14,41 +14,42 @@
 #include "simol/statphys/dynamics/Langevin.hpp"
 #include "simol/statphys/dynamics/DPDE.hpp"
 
-namespace simol {
+namespace simol
+{
 
   template<typename D, typename S>
   class Simulation
   {
-    
-  public:
-    Simulation(Input& input);
-    void launch();
-    
-  protected:
-    int dimension_;
-    std::shared_ptr<RNG> rng_;
-    S system_;
-    D dynamics_;
-    Output output_;
+
+    public:
+      Simulation(Input& input);
+      void launch();
+
+    protected:
+      int dimension_;
+      std::shared_ptr<RNG> rng_;
+      S system_;
+      D dynamics_;
+      Output output_;
   };
 
   template<class D, class S>
-  Simulation<D,S>::Simulation(Input& input):
+  Simulation<D, S>::Simulation(Input& input):
     dimension_(input.dimension()),
     rng_(std::make_shared<RNG>(RNG(input.seed(), input.dimension()))),
     system_(input),
     dynamics_(input),
     output_(input)
   {
-   system_.rng() = rng_;
-   dynamics_.rng() = rng_;
+    system_.rng() = rng_;
+    dynamics_.rng() = rng_;
 
-   //-- when using control variates --
-   output_.setControlVariates(input, system_.potential(), dynamics_.galerkin());
+    //-- when using control variates --
+    output_.setControlVariates(input, system_.potential(), dynamics_.galerkin());
   }
 
   template<class D, class S>
-  void Simulation<D,S>::launch()
+  void Simulation<D, S>::launch()
   {
     launchSimu(dynamics_, system_, output_);
   }
@@ -65,14 +66,14 @@ namespace simol {
   void launchSimu(D& dyna, S& syst, Output& output);
 
   void simulate(Dynamics& dyna, System& syst);
-  
+
   template <class D, class S>
   void computeOutput(D const& dyna, S const& syst, Output& output, int iOfStep);
   void writeOutput(System const& syst, Output& output, int iOfStep);
   void writeFinalOutput(Dynamics const& dyna, System const& syst, Output& output);
 
   //-------------------- specializations for various systems -------------------------
-  
+
   //-- specializations for Isolated --
   void samplePositions(Dynamics& dyna, Isolated& syst);
   template <class D>
@@ -83,7 +84,7 @@ namespace simol {
   void computeOutput(const DPDE& dyna, Isolated const& syst, Output& output, int iOfStep);
   void samplePositions(DPDE& dyna, Isolated& syst);
   void simulate(DPDE& dyna, System& syst);
-  
+
 
   //-- specializations for Chain --
   void sampleMomenta(BoundaryLangevin& dyna, Chain& syst);
@@ -109,70 +110,70 @@ namespace simol {
   void computeOutput(Hamiltonian const& /*dyna*/, NBody const& syst, Output& output, int /*iOfStep*/);
   void writeOutput(Hamiltonian const& /*dyna*/, NBody const& syst, Output& output, int iOfStep);
   void writeFinalOutput(Hamiltonian const& dyna, NBody const& syst, Output& output);
-  
+
 
   // ------------------------ specializations for various dynamics ---------------------------------
-  
+
   //-- DPDE --
   void simulate(DPDE& dyna, System& syst);
   void writeOutput(DPDE const& dyna, System const& syst, Output& output, int iOfStep);
 
-  
+
   //--------------- control variates -----------------
-  
+
   void updateAllControlVariates(Dynamics const& dyna, System const& syst, Output& output, int iOfStep);
- 
+
   // Hamiltonian
   void updateAllControlVariates(const Hamiltonian& dyna, System const& syst, Output& output, int iOfStep);
   void writeOutput(Hamiltonian const& /*dyna*/, System const& syst, Output& output, int iOfStep);
-  
+
   // Langevin
   void updateAllControlVariates(const Langevin& dyna, System const& syst, Output& output, int iOfStep);
   void writeOutput(Langevin const& /*dyna*/, System const& syst, Output& output, int iOfStep);
-  
+
   // Overdamped
   Vector<double> generatorOn(const Overdamped& dyna, const System& syst, const ControlVariate& controlVariate);
-  
+
   // Chain
   void updateAllControlVariates(const BoundaryLangevin& dyna, System const& syst, Output& output, int iOfStep);
 
 
   // -------------------- Template implementation --------------------
-  
+
   template <class D, class S>
   void sampleSystem(D& dyna, S& syst)
   {
-    cout << " Initialization of the system..." << endl; 
-    
+    cout << " Initialization of the system..." << endl;
+
     sampleMomenta(dyna, syst);
     samplePositions(dyna, syst);
 
-    cout << " - Thermalization (" << dyna.thermalizationNbOfSteps() << " steps)..." << endl; 
+    cout << " - Thermalization (" << dyna.thermalizationNbOfSteps() << " steps)..." << endl;
 
-    for (int iOfStep  =0; iOfStep < dyna.thermalizationNbOfSteps(); ++iOfStep)
+    for (int iOfStep  = 0; iOfStep < dyna.thermalizationNbOfSteps(); ++iOfStep)
     {
       syst.thermalize(dyna);
     }
 
     cout << " - Burn-in (" << dyna.burninNbOfSteps() << " steps)..." << endl;
 
-    for (int iOfStep  =0; iOfStep < dyna.burninNbOfSteps(); ++iOfStep)
+    for (int iOfStep  = 0; iOfStep < dyna.burninNbOfSteps(); ++iOfStep)
     {
       simulate(dyna, syst);
     }
     cout << " Starting production mode" << endl;
     cout << endl;
-    
+
     syst.computeAllForces();
   }
-  
+
   template <class D, class S>
   void computeOutput(D const& dyna, S const& syst, Output& output, int iOfStep)
   {
     output.kineticEnergy() = 0;
     output.potentialEnergy() = 0;
     //-- compute temperature and kinetic energy --
-    for (const auto& particle : syst.configuration())
+  for (const auto & particle : syst.configuration())
     {
       output.kineticEnergy() += particle.kineticEnergy();
       output.potentialEnergy() += particle.potentialEnergy();
@@ -183,9 +184,9 @@ namespace simol {
     // use control variates
     updateAllControlVariates(dyna, syst, output, iOfStep);
   }
-  
+
   // Isolated
-  
+
   template <class D>
   void computeOutput(D const& dyna, Isolated const& syst, Output& output, int iOfStep)
   {
@@ -194,7 +195,7 @@ namespace simol {
     output.potentialEnergy() = syst.getParticle(0).potentialEnergy();
     updateAllControlVariates(dyna, syst, output, iOfStep);
   }
-  
+
   // Chain
   template <class S>
   void computeOutput(BoundaryLangevin const& dyna, S const& syst, Output& output, int iOfStep)
@@ -202,7 +203,7 @@ namespace simol {
     output.kineticEnergy() = 0;
     output.potentialEnergy() = 0;
     //Calcul de la température et de l'énergie
-    for (const auto& particle : syst.configuration())
+  for (const auto & particle : syst.configuration())
     {
       output.kineticEnergy() += particle.kineticEnergy();
       output.potentialEnergy() += particle.potentialEnergy();
@@ -212,12 +213,12 @@ namespace simol {
     syst.computeProfile(output, dyna, iOfStep);
     updateAllControlVariates(dyna, syst, output, iOfStep);
   }
-  
+
   template <class D>
   void computeOutput(D const& dyna, Chain const& syst, Output& output, int iOfStep)
   {throw std::invalid_argument("computeOutput(D const& dyna, Chain const& syst, Output& output, int iOfStep) not defined !");}
-  
-  
+
+
   // Nbody
   template <class D>
   void computeOutput(D const& dyna, NBody const& syst, Output& output, int iOfStep)
@@ -225,7 +226,7 @@ namespace simol {
 
 
   // ------------------------------- MAIN Function ----------------------
-  
+
   template<class D, class S>
   void launchSimu(D& dyna, S& syst, Output& output)
   {
@@ -233,19 +234,19 @@ namespace simol {
     sampleSystem(dyna, syst);
 
     //---- actual steps -----
-    for (int iOfStep  =0; iOfStep < dyna.nbOfSteps(); ++iOfStep)
-      {
-        //--- display progress every time 10% of simulation elapsed ---
-        if ((10*iOfStep) % dyna.nbOfSteps() == 0)
-          cout << "---- Run " << (100 * iOfStep) / dyna.nbOfSteps() << " % completed ----" << endl;
+    for (int iOfStep  = 0; iOfStep < dyna.nbOfSteps(); ++iOfStep)
+    {
+      //--- display progress every time 10% of simulation elapsed ---
+      if ((10 * iOfStep) % dyna.nbOfSteps() == 0)
+        cout << "---- Run " << (100 * iOfStep) / dyna.nbOfSteps() << " % completed ----" << endl;
 
-        //--- write outputs if required ----
-        computeOutput(dyna, syst, output, iOfStep);
-        writeOutput(dyna, syst, output, iOfStep);
+      //--- write outputs if required ----
+      computeOutput(dyna, syst, output, iOfStep);
+      writeOutput(dyna, syst, output, iOfStep);
 
-        //---- update the system by the numerical integration ---
-        simulate(dyna, syst);
-      }
+      //---- update the system by the numerical integration ---
+      simulate(dyna, syst);
+    }
 
     //--- write final outputs ----
     writeFinalOutput(dyna, syst, output);

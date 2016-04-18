@@ -18,7 +18,7 @@ namespace simol
   template<class ScalarType>
   struct eigen
   {
-    typedef Eigen::Matrix<ScalarType,Eigen::Dynamic,1> VectorType;
+    typedef Eigen::Matrix<ScalarType, Eigen::Dynamic, 1> VectorType;
     typedef Eigen::SparseMatrix<ScalarType> SparseMatrixType;
     typedef Eigen::Matrix<ScalarType, Eigen::Dynamic, Eigen::Dynamic> DenseMatrixType;
     typedef Eigen::Map<VectorType> VectorMap;

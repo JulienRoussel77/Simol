@@ -5,11 +5,11 @@
 
 namespace simol
 {
-    static struct option long_options[] =
-    {
-      {"input-file", required_argument, 0, 'i'},
-      {0, 0, 0, 0}
-    };
+  static struct option long_options[] =
+  {
+    {"input-file", required_argument, 0, 'i'},
+    {0, 0, 0, 0}
+  };
 
   class CommandLine
   {
@@ -33,22 +33,22 @@ namespace simol
           switch (c)
           {
             case 0:
-            /* If this option sets a flag, do nothing else now. */
-            if (long_options[option_index].flag != 0)
+              /* If this option sets a flag, do nothing else now. */
+              if (long_options[option_index].flag != 0)
+                break;
+              printf ("option %s", long_options[option_index].name);
+              if (optarg)
+                printf (" with arg %s", optarg);
+              printf ("\n");
               break;
-            printf ("option %s", long_options[option_index].name);
-            if (optarg)
-              printf (" with arg %s", optarg);
-            printf ("\n");
-            break;
 
             case 'i':
               inputFileName_ = optarg;
               printf ("option -i with value `%s'\n", optarg);
 
             case '?':
-            /* getopt_long already printed an error message. */
-            break;
+              /* getopt_long already printed an error message. */
+              break;
 
             default:
               abort ();
@@ -56,8 +56,8 @@ namespace simol
         }
       }
 
-    std::string const & inputFileName() const
-    { return inputFileName_; }
+      std::string const & inputFileName() const
+      { return inputFileName_; }
 
     private:
       std::string inputFileName_;

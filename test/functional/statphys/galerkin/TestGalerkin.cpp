@@ -28,7 +28,7 @@ int main(int argc, char* argv[])
   // COMMAND LINE PARSING
   //=====================
 
-  simol::CommandLine cmd(argc,argv);
+  simol::CommandLine cmd(argc, argv);
 
   //===================
   // INPUT FILE LOADING
@@ -45,8 +45,8 @@ int main(int argc, char* argv[])
     throw std::invalid_argument("The input file should correspond to a Galerkin computation !");
 
 
-	simol::BoundaryLangevinGalerkin galerkinSolver(input);
-	galerkinSolver.compute();
+  simol::BoundaryLangevinGalerkin galerkinSolver(input);
+  galerkinSolver.compute();
 
   displayTime(clock() - totalTime);
 

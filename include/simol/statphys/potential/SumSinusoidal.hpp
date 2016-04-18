@@ -5,20 +5,21 @@
 
 namespace simol
 {
-  
-  class SumSinusoidal : public Potential{
-  public:
-    SumSinusoidal(Input const& input);
-    double operator()(double position) const;
-    Vector<double> gradient(double position) const;
-    virtual double laplacian(double position) const;
-    
-    
-  private:
-    double amplitude_;
-    double pulsation_;
+
+  class SumSinusoidal : public Potential
+  {
+    public:
+      SumSinusoidal(Input const& input);
+      double operator()(double position) const;
+      Vector<double> gradient(double position) const;
+      virtual double laplacian(double position) const;
+
+
+    private:
+      double amplitude_;
+      double pulsation_;
   };
-  
+
 }
 
 #endif

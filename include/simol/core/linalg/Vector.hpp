@@ -7,7 +7,7 @@
 
 namespace simol
 {
-  template<class ScalarType=double, template<class> class WrappedLibrary=eigen>
+  template<class ScalarType = double, template<class> class WrappedLibrary = eigen>
   class Vector;
 }
 

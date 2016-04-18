@@ -9,18 +9,18 @@ namespace simol
 {
   class EigenSolverTest : public CppUnit::TestFixture
   {
-    CPPUNIT_TEST_SUITE(EigenSolverTest);
+      CPPUNIT_TEST_SUITE(EigenSolverTest);
       CPPUNIT_TEST(testEigenvaluesOfIdentityAreAllOne);
-    CPPUNIT_TEST_SUITE_END();
+      CPPUNIT_TEST_SUITE_END();
 
-  public:
-    void setUp();
-    void tearDown();
-  public:
-    void testEigenvaluesOfIdentityAreAllOne();
-  private:
-    SparseMatrix<double> * identity_;
+    public:
+      void setUp();
+      void tearDown();
+    public:
+      void testEigenvaluesOfIdentityAreAllOne();
+    private:
+      SparseMatrix<double> * identity_;
   };
 }
-#endif 
+#endif
 

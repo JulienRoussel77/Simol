@@ -8,16 +8,17 @@ const int defaultThermalizationTime = 0;
 const int defaultBurnInTime = 0;
 
 
-namespace simol {
+namespace simol
+{
 
-  // timestep for the discretization 
+  // timestep for the discretization
   double Input::timeStep() const
   {
     if (data["Time"]["Step"])
       return data["Time"]["Step"].as<double>();
     throw std::invalid_argument("Timestep missing");
   }
-  
+
   /// Number of steps in the "output" part of the simulation
   /// Truncated to a multiple of the timeStep
   int Input::nbOfSteps() const
@@ -39,7 +40,7 @@ namespace simol {
     }
     else throw std::runtime_error("Number of Iterations not specified !");
   }
-  
+
   /// Number of steps in the thermalization part (temperatures imposed everywhere)
   /// Truncated to a multiple of the timeStep
   int Input::thermalizationNbOfSteps() const
@@ -81,7 +82,7 @@ namespace simol {
         cout << "#### /!\\ burninTime truncated to " << burninTrunc << " ####" << endl;
       }
       return burninNb;
-    } 
+    }
     else
       return defaultBurnInTime / timeStep();
   }

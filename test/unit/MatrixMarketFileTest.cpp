@@ -16,7 +16,7 @@ namespace simol
 
   void MatrixMarketFileTest::tearDown()
   {
-  //  delete kinetic_;
+    //  delete kinetic_;
   }
 
   void MatrixMarketFileTest::testNonExistentFilenameThrowsException()

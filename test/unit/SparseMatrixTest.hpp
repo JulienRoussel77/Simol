@@ -9,13 +9,13 @@ namespace simol
 {
   class SparseMatrixTest : public CppUnit::TestFixture
   {
-    CPPUNIT_TEST_SUITE(SparseMatrixTest);
-    CPPUNIT_TEST_SUITE_END();
+      CPPUNIT_TEST_SUITE(SparseMatrixTest);
+      CPPUNIT_TEST_SUITE_END();
 
-  public:
-    void setUp();
-    void tearDown();
+    public:
+      void setUp();
+      void tearDown();
   };
 }
-#endif 
+#endif
 

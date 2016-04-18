@@ -33,24 +33,24 @@ namespace simol
     SparseMatrix<double> potential_matrix(potential_txt.c_str(), M_disc);
 
     SparseTensor<double> twoelectron_matrix(dataPath + "twoelectron_matrix.txt", M_disc);
-   std::size_t numberOfElectrons = 2;
+    std::size_t numberOfElectrons = 2;
 
-   DenseMatrix<double> matrix(M_disc,M_disc);
-   matrix.wrapped_ = eigen<double>::DenseMatrixType::Zero(M_disc, numberOfElectrons);
-   SlaterDeterminant initial_solution(matrix);
+    DenseMatrix<double> matrix(M_disc, M_disc);
+    matrix.wrapped_ = eigen<double>::DenseMatrixType::Zero(M_disc, numberOfElectrons);
+    SlaterDeterminant initial_solution(matrix);
 
-   std::size_t numberOfIterations = 2;
+    std::size_t numberOfIterations = 2;
 
-   DiscreteHamiltonian H(dataPath, M_disc);
+    DiscreteHamiltonian H(dataPath, M_disc);
 
-   SlaterDeterminant solution = hartree_fock(H,
-                                             numberOfElectrons,
-                                             initial_solution,
-                                             numberOfIterations);
+    SlaterDeterminant solution = hartree_fock(H,
+                                 numberOfElectrons,
+                                 initial_solution,
+                                 numberOfIterations);
 
 
 
-    EXPECT_EQ(1,1);
+    EXPECT_EQ(1, 1);
 
   }
 

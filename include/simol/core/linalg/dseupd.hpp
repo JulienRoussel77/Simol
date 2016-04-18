@@ -32,12 +32,12 @@ namespace simol
               char *which, int &nev, double &tol,
               double *resid, int &ncv, double *v,
               int &ldv, int *iparam, int *ipntr,
-             double *workd, double *workl,
+              double *workd, double *workl,
               int &lworkl, int &info)
   {
-    dseupd_( &rvec, &howmny, select, d, z, &ldz, &sigma, 
-             &bmat, &n, which, &nev, &tol, resid, &ncv, 
-             v, &ldv, iparam, ipntr, workd, workl, &lworkl, 
+    dseupd_( &rvec, &howmny, select, d, z, &ldz, &sigma,
+             &bmat, &n, which, &nev, &tol, resid, &ncv,
+             v, &ldv, iparam, ipntr, workd, workl, &lworkl,
              &info );
   }
 

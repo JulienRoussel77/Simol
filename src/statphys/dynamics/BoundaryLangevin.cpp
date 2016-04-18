@@ -12,14 +12,14 @@ namespace simol
     temperatureLeft_(input.temperature() + deltaTemperature_),
     temperatureRight_(input.temperature() - deltaTemperature_),
     betaLeft_(1 / temperatureLeft_),
-    betaRight_(1 / temperatureRight_),    
+    betaRight_(1 / temperatureRight_),
     tauBending_(input.tauBending())
   {}
 
   ///
   ///Read-only access for the inverse temperature at the left end
   const double& BoundaryLangevin::betaLeft() const {return betaLeft_;}
-   ///
+  ///
   ///Read-only access for the inverse temperature at the right end
   const double& BoundaryLangevin::betaRight() const {return betaRight_;}
   ///

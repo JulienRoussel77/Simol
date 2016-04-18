@@ -9,7 +9,7 @@
 namespace simol
 {
   class Arpack
-  : public EigenSolver
+    : public EigenSolver
   {
     public:
       Arpack();
