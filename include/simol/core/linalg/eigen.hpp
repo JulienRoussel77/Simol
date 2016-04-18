@@ -28,9 +28,10 @@ namespace simol
     typedef Eigen::Block<DenseMatrixType> DenseBlock;
     typedef Eigen::Block<DenseMatrixType const> DenseBlock_const;
 
-    static std::size_t length(VectorType const & vector)   {
-             return 0;
-        }
+    static std::size_t length(VectorType const & vector)
+    {
+      return 0;
+    }
   };
 
 }
