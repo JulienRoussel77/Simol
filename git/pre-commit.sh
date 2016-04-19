@@ -1,6 +1,10 @@
 #!/bin/sh
  
-OPTIONS="--style=allman --indent=spaces=2 --convert-tabs --indent-namespaces --indent-classes --indent-col1-comments --indent-switches --indent-labels --keep-one-line-blocks --pad-oper --suffix=none"
+OPTIONS="--style=allman 
+         --convert-tabs
+         --indent=spaces=2 
+         --indent-namespaces 
+         --indent-classes --indent-col1-comments --indent-switches --indent-labels --keep-one-line-blocks --pad-oper --suffix=none --formatted"
 RETURN=0
 ASTYLE=$(which astyle)
 
