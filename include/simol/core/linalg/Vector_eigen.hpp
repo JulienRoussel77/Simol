@@ -22,25 +22,24 @@ namespace simol
       explicit Vector(std::string const & filename);
 
       Vector(Vector<ScalarType, eigen> const& u);
-      Vector(typename eigen<ScalarType>::VectorType const & wrappedVector);
+      Vector(typename eigen<ScalarType>::Vector const & wrappedVector);
 
       size_t size() const;
+      std::size_t min_index() const;
+      ScalarType min() const;
+      ScalarType max() const;
+      ScalarType norm() const;
+      Vector<ScalarType, eigen> sort() const;
+
 
       ScalarType & operator()(size_t const index);
       ScalarType const & operator()(size_t const index) const;
 
-      ScalarType norm() const;
       Vector<ScalarType, eigen>& fill(ScalarType const& lambda);
       ScalarType dot(Vector<ScalarType, eigen> const& v) const;
-      Vector<ScalarType, eigen> sort() const;
       std::vector<size_t> indices_of_smallest(size_t const number_of_indices);
       static Vector Zero(std::size_t length);
 
-      ScalarType min() const;
-
-      ScalarType max() const;
-
-      size_t index_of_minimum() const;
 
       Vector<ScalarType, eigen>& operator+=(Vector<ScalarType, eigen> const& v);
       Vector<ScalarType, eigen>& operator-=(Vector<ScalarType, eigen> const& v);
@@ -55,8 +54,8 @@ namespace simol
       Vector<ScalarType, eigen> subvec(std::size_t start, std::size_t length) const;
 
     public:
-      typedef typename eigen<ScalarType>::VectorType WrappedType;
-      typename eigen<ScalarType>::VectorType wrapped_;
+      typedef typename eigen<ScalarType>::Vector WrappedType;
+      typename eigen<ScalarType>::Vector wrapped_;
 
   };
 
@@ -79,7 +78,7 @@ namespace simol
 
   template<class ScalarType>
   inline
-  Vector<ScalarType, eigen>::Vector(typename eigen<ScalarType>::VectorType const & wrappedVector)
+  Vector<ScalarType, eigen>::Vector(typename eigen<ScalarType>::Vector const & wrappedVector)
     : wrapped_(wrappedVector)
   {}
 
@@ -126,11 +125,9 @@ namespace simol
   // ACCESSORS / MUTATORS
   //=====================
 
-  template<class ScalarType>
-  inline
-  size_t
-  Vector<ScalarType, eigen>::size() const
-  { return wrapped_.size(); }
+  template<typename Scalar> inline
+  std::size_t Vector<Scalar, eigen>::size() const
+  { return eigen<Scalar>::size(wrapped_); }
 
   template<class ScalarType>
   inline
@@ -160,32 +157,24 @@ namespace simol
   //----- mathematical functions -----
 
   //! Returns the maximum coefficient
-  template<typename ScalarType> inline
-  ScalarType Vector<ScalarType, eigen>::max() const
-  { return wrapped_.maxCoeff(); }
+  template<typename Scalar> inline
+  Scalar Vector<Scalar, eigen>::max() const
+  { return eigen<Scalar>::max(wrapped_); }
 
   //! Returns the minimum coefficient
-  template<class ScalarType> inline
-  ScalarType Vector<ScalarType, eigen>::min() const
-  { return wrapped_.minCoeff(); }
+  template<typename Scalar> inline
+  Scalar Vector<Scalar, eigen>::min() const
+  { return eigen<Scalar>::min(wrapped_); }
 
   //! Returns the index of the minimum coefficient
-  template<class ScalarType> inline
-  std::size_t Vector<ScalarType, eigen>::index_of_minimum() const
-  {
-    size_t index;
-    wrapped_.minCoeff(&index);
-    return index;
-  }
+  template<typename Scalar> inline
+  std::size_t Vector<Scalar, eigen>::min_index() const
+  { return eigen<Scalar>::min_index(wrapped_); };
 
   //! Returns a sorted copy
-  template<class ScalarType> inline
-  Vector<ScalarType, eigen> Vector<ScalarType, eigen>::sort() const
-  {
-    Vector<ScalarType, eigen> to_be_sorted = *this;
-    std::sort( to_be_sorted.wrapped_.data(), to_be_sorted.wrapped_.data() + size() );
-    return to_be_sorted;
-  }
+  template<typename Scalar> inline
+  Vector<Scalar, eigen> Vector<Scalar, eigen>::sort() const
+  { return eigen<Scalar>::sort(wrapped_); }
 
   //! Returns the indices of the first smallest coefficients
   template<class ScalarType>
@@ -207,12 +196,12 @@ namespace simol
   }
 
   //! Returns the Euclidean norm
-  template<class ScalarType> inline
-  ScalarType Vector<ScalarType, eigen>::norm() const
-  { return wrapped_.norm(); }
+  template<typename Scalar> inline
+  Scalar Vector<Scalar, eigen>::norm() const
+  { return eigen<Scalar>::norm(wrapped_); }
 
-  template<class ScalarType> inline
-  Vector<ScalarType, eigen> & Vector<ScalarType, eigen>::fill(ScalarType const& lambda)
+  template<typename Scalar> inline
+  Vector<Scalar, eigen> & Vector<Scalar, eigen>::fill(Scalar const& lambda)
   {
     wrapped_.fill(lambda);
     return *this;
