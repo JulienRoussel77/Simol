@@ -40,6 +40,13 @@ INCLUDE(ExternalProject)
 INCLUDE(SimolInstallPackage)
 
 
+#==========
+# Git hook
+#=========
+
+EXECUTE_PROCESS(COMMAND ln -s ${CMAKE_SOURCE_DIR}/git/pre-commit.sh ${CMAKE_SOURCE_DIR}/.git/hooks/pre-commit)
+
+
 #===========================
 # Automatic setting of make
 # to perform parallel builds
