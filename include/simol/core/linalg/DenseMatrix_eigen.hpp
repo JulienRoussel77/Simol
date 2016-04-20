@@ -9,8 +9,8 @@
 
 namespace simol
 {
-  template<class ScalarType>
-  class DenseMatrix<ScalarType, eigen>
+  template<class Scalar>
+  class DenseMatrix<Scalar, eigen>
   {
 
     public:
@@ -20,37 +20,37 @@ namespace simol
 
       DenseMatrix(DenseMatrix const & matrix) = default;
       DenseMatrix(MatrixMarketFile const & file);
-      DenseMatrix(SparseMatrix<ScalarType, eigen> const & matrix);
+      DenseMatrix(SparseMatrix<Scalar, eigen> const & matrix);
       DenseMatrix(std::size_t numberOfRows, std::size_t numberOfColumns);
-      DenseMatrix(typename eigen<ScalarType>::DenseMatrix const & wrappedMatrix);
-      DenseMatrix(typename eigen<ScalarType>::DenseBlock_const const & block);
+      DenseMatrix(typename eigen::DenseMatrix<Scalar> const & wrappedMatrix);
+      DenseMatrix(typename eigen::DenseBlock_const<Scalar> const & block);
       DenseMatrix(Vector<double, eigen> u, std::size_t numberOfRows, std::size_t numberOfColumns);
 
-      void fill(ScalarType scalar);
+      void fill(Scalar scalar);
 
       std::size_t number_of_rows() const;
       std::size_t number_of_columns() const;
 
       double rcond() const;
 
-      ScalarType trace() const;
-      ScalarType determinant() const;
+      Scalar trace() const;
+      Scalar determinant() const;
 
       DenseMatrix inverse() const;
 
-      Vector<ScalarType> column(size_t const index) const;
-      Vector<ScalarType> solve(Vector<ScalarType> const & rhs)
+      Vector<Scalar> column(size_t const index) const;
+      Vector<Scalar> solve(Vector<Scalar> const & rhs)
       {
-        Vector<ScalarType> sol(number_of_rows());
+        Vector<Scalar> sol(number_of_rows());
         sol.wrapped_ = wrapped_.partialPivLu().solve(rhs.wrapped_);
         return sol;
       }
 
 
-      typename eigen<ScalarType>::DenseBlock block(size_t startRow, size_t startCol, size_t blockRows, size_t blockCols)
+      typename eigen::DenseBlock<Scalar> block(size_t startRow, size_t startCol, size_t blockRows, size_t blockCols)
       { return wrapped_.block(startRow, startCol, blockRows, blockCols); }
 
-      typename eigen<ScalarType>::DenseBlock_const block(size_t startRow, size_t startCol, size_t blockRows, size_t blockCols) const
+      typename eigen::DenseBlock_const<Scalar> block(size_t startRow, size_t startCol, size_t blockRows, size_t blockCols) const
       { return wrapped_.block(startRow, startCol, blockRows, blockCols); }
 
       DenseMatrix permute_columns(std::vector<std::size_t> const & permutation) const
@@ -62,8 +62,8 @@ namespace simol
       }
 
 
-      ScalarType const & operator()(size_t const rowIndex, size_t const columnIndex) const;
-      ScalarType & operator()(size_t const rowIndex, size_t const columnIndex);
+      Scalar const & operator()(size_t const rowIndex, size_t const columnIndex) const;
+      Scalar & operator()(size_t const rowIndex, size_t const columnIndex);
 
 
 
@@ -80,90 +80,90 @@ namespace simol
       DenseMatrix operator*(DenseMatrix const & matrix) const
       { return DenseMatrix( WrappedType(wrapped_ * matrix.wrapped_) ); }
 
-      DenseMatrix operator*=(ScalarType const& scalar)
+      DenseMatrix operator*=(Scalar const& scalar)
       {
         wrapped_ *= scalar;
         return *this;
       }
 
-      DenseMatrix<ScalarType, eigen> operator*(ScalarType const& scalar) const;
+      DenseMatrix<Scalar, eigen> operator*(Scalar const& scalar) const;
 
 
-      DenseMatrix & operator*=(ScalarType const scalar)
+      DenseMatrix & operator*=(Scalar const scalar)
       {
         wrapped_ *= scalar;
         return *this;
       }
 
     public:
-      typedef typename eigen<ScalarType>::DenseMatrix WrappedType;
-      typename eigen<ScalarType>::DenseMatrix wrapped_;
+      typedef typename eigen::DenseMatrix<Scalar> WrappedType;
+      typename eigen::DenseMatrix<Scalar> wrapped_;
   };
 
   template<typename Scalar> inline
   DenseMatrix<Scalar, eigen> DenseMatrix<Scalar, eigen>::Zero(std::size_t numberOfRows, size_t numberOfColumns)
-  { return DenseMatrix(eigen<Scalar>::Zero(numberOfRows, numberOfColumns)); }
+  { return DenseMatrix(eigen::Zero<Scalar>(numberOfRows, numberOfColumns)); }
 
   template<typename Scalar> inline
   DenseMatrix<Scalar, eigen> DenseMatrix<Scalar, eigen>::Identity(std::size_t const dimension)
-  { return DenseMatrix(eigen<Scalar>::Identity(dimension)); }
+  { return DenseMatrix(eigen::Identity<Scalar>(dimension)); }
 
   //! Construction from a sparse matrix
-  template<typename ScalarType> inline
-  DenseMatrix<ScalarType, eigen>::DenseMatrix(SparseMatrix<ScalarType, eigen> const & matrix)
+  template<typename Scalar> inline
+  DenseMatrix<Scalar, eigen>::DenseMatrix(SparseMatrix<Scalar, eigen> const & matrix)
     : wrapped_(matrix.wrapped_.template triangularView<Eigen::Upper>())
   { wrapped_ += matrix.wrapped_.transpose().template triangularView<Eigen::StrictlyLower>(); }
 
   //! Construction from a matrix block
-  template<typename ScalarType> inline
-  DenseMatrix<ScalarType, eigen>::DenseMatrix(typename eigen<ScalarType>::DenseBlock_const const & block)
+  template<typename Scalar> inline
+  DenseMatrix<Scalar, eigen>::DenseMatrix(typename eigen::DenseBlock_const<Scalar> const & block)
     : wrapped_(block)
   {}
 
   //! Construction with prescribed size
-  template<class ScalarType>
-  DenseMatrix<ScalarType, eigen>::DenseMatrix(std::size_t numberOfRows, std::size_t numberOfColumns)
+  template<class Scalar>
+  DenseMatrix<Scalar, eigen>::DenseMatrix(std::size_t numberOfRows, std::size_t numberOfColumns)
     : wrapped_(numberOfRows, numberOfColumns)
   {}
 
   //! Construction from eigen's DenseMatrix
-  template<class ScalarType>
-  DenseMatrix<ScalarType, eigen>::DenseMatrix(typename eigen<ScalarType>::DenseMatrix const & wrappedMatrix)
+  template<class Scalar>
+  DenseMatrix<Scalar, eigen>::DenseMatrix(typename eigen::DenseMatrix<Scalar> const & wrappedMatrix)
     : wrapped_(wrappedMatrix)
   {}
 
   //! Returns the trace
   template<typename Scalar> inline
   Scalar DenseMatrix<Scalar, eigen>::trace() const
-  { return eigen<Scalar>::trace(wrapped_); }
+  { return eigen::trace(wrapped_); }
 
   //! Returns the determinant
   template<typename Scalar> inline
   Scalar DenseMatrix<Scalar, eigen>::determinant() const
-  { return eigen<Scalar>::determinant(wrapped_); }
+  { return eigen::determinant(wrapped_); }
 
   //! Returns the inverse
   template<typename Scalar> inline
   DenseMatrix<Scalar, eigen> DenseMatrix<Scalar, eigen>::inverse() const
-  { return DenseMatrix(eigen<Scalar>::inverse(wrapped_)); }
+  { return DenseMatrix(eigen::inverse(wrapped_)); }
 
   //! Returns a column
-  template<class ScalarType> Vector<ScalarType>
-  DenseMatrix<ScalarType, eigen>::column(size_t const index) const
-  { return Vector<ScalarType>(wrapped_.col(index)); }
+  template<class Scalar> Vector<Scalar>
+  DenseMatrix<Scalar, eigen>::column(size_t const index) const
+  { return Vector<Scalar>(wrapped_.col(index)); }
 
 
   //! Construction from a Matrix Market file
-  template<class ScalarType>
-  DenseMatrix<ScalarType, eigen>::DenseMatrix(MatrixMarketFile const & file)
-    : wrapped_(eigen<double>::DenseMatrix::Zero(file.numberOfRows(), file.numberOfRows()))
+  template<class Scalar>
+  DenseMatrix<Scalar, eigen>::DenseMatrix(MatrixMarketFile const & file)
+    : wrapped_(eigen::Zero<Scalar>(file.numberOfRows(), file.numberOfRows()))
   {
-    std::vector< Eigen::Triplet<ScalarType, std::size_t> > nonzeros(file.numberOfNonzeros());
+    std::vector< Eigen::Triplet<Scalar, std::size_t> > nonzeros(file.numberOfNonzeros());
     for(size_t nonzeroIndex = 0; nonzeroIndex < file.numberOfNonzeros(); ++nonzeroIndex)
     {
       int rowIndex;
       int columnIndex;
-      ScalarType nonzero;
+      Scalar nonzero;
       fscanf(file.content(), "%d %d %lg\n", &rowIndex, &columnIndex, &nonzero);
       wrapped_(rowIndex, columnIndex) = nonzero;
     }
@@ -171,8 +171,8 @@ namespace simol
 
   // TODO: move this function to Vector class
   //! Construction from a vector
-  template<class ScalarType>
-  DenseMatrix<ScalarType, eigen>::DenseMatrix(Vector<double, eigen> u, std::size_t numberOfRows, std::size_t numberOfColumns):
+  template<class Scalar>
+  DenseMatrix<Scalar, eigen>::DenseMatrix(Vector<double, eigen> u, std::size_t numberOfRows, std::size_t numberOfColumns):
     DenseMatrix(numberOfRows, numberOfColumns)
   {
     if (u.size() != numberOfColumns * numberOfRows)
@@ -184,36 +184,36 @@ namespace simol
   }
 
   //! Returns a coefficient
-  template<class ScalarType> inline
-  ScalarType const & DenseMatrix<ScalarType, eigen>::operator()(size_t const rowIndex, size_t const columnIndex) const
+  template<class Scalar> inline
+  Scalar const & DenseMatrix<Scalar, eigen>::operator()(size_t const rowIndex, size_t const columnIndex) const
   { return wrapped_(rowIndex, columnIndex); }
 
   //! Modify a coefficient
-  template<class ScalarType> inline
-  ScalarType & DenseMatrix<ScalarType, eigen>::operator()(size_t const rowIndex, size_t const columnIndex)
+  template<class Scalar> inline
+  Scalar & DenseMatrix<Scalar, eigen>::operator()(size_t const rowIndex, size_t const columnIndex)
   { return wrapped_(rowIndex, columnIndex); }
 
   //! Returns the number of rows
   template<typename Scalar> inline
   std::size_t DenseMatrix<Scalar, eigen>::number_of_rows() const
-  { return eigen<Scalar>::number_of_rows(wrapped_); }
+  { return eigen::number_of_rows(wrapped_); }
 
   //! Returns the number of columns
   template<typename Scalar> inline
   std::size_t DenseMatrix<Scalar, eigen>::number_of_columns() const
-  { return eigen<Scalar>::number_of_rows(wrapped_); }
+  { return eigen::number_of_rows(wrapped_); }
 
-  template<class ScalarType> inline
-  DenseMatrix<ScalarType, eigen> DenseMatrix<ScalarType, eigen>::operator*(ScalarType const& scalar) const
+  template<class Scalar> inline
+  DenseMatrix<Scalar, eigen> DenseMatrix<Scalar, eigen>::operator*(Scalar const& scalar) const
   {
-    DenseMatrix<ScalarType> u(*this);
+    DenseMatrix<Scalar> u(*this);
     u.wrapped_ *= scalar;
     return u;
   }
 
   //! Returns reciprocal condition number
-  template<class ScalarType> inline
-  double DenseMatrix<ScalarType, eigen>::rcond() const
+  template<class Scalar> inline
+  double DenseMatrix<Scalar, eigen>::rcond() const
   {
     Eigen::JacobiSVD<Eigen::MatrixXd> svd(wrapped_);
 
@@ -224,33 +224,33 @@ namespace simol
     return lmin / lmax;
   }
 
-  template<class ScalarType> inline
-  void DenseMatrix<ScalarType, eigen>::fill(ScalarType scalar)
+  template<class Scalar> inline
+  void DenseMatrix<Scalar, eigen>::fill(Scalar scalar)
   { wrapped_.fill(scalar); }
 
   //! Print a matrix into a file
-  template<class ScalarType> inline
-  std::ostream & operator<<(std::ostream & output, DenseMatrix<ScalarType, eigen> const & matrixToPrint)
+  template<class Scalar> inline
+  std::ostream & operator<<(std::ostream & output, DenseMatrix<Scalar, eigen> const & matrixToPrint)
   { return output << matrixToPrint.wrapped_; }
 
   //! Returns matrix-vector product
-  template<typename ScalarType> inline
-  Vector<ScalarType> operator*(DenseMatrix<ScalarType, eigen> const & matrix, Vector<ScalarType> const & vector)
-  { return Vector<ScalarType>(matrix.wrapped_ * vector.wrapped_); }
+  template<typename Scalar> inline
+  Vector<Scalar> operator*(DenseMatrix<Scalar, eigen> const & matrix, Vector<Scalar> const & vector)
+  { return Vector<Scalar>(matrix.wrapped_ * vector.wrapped_); }
 
   // TODO: rename it Identity and call the right function from eigen
-  template<class ScalarType>
-  DenseMatrix<ScalarType, eigen> eye(size_t const nbOfRows, size_t const nbOfColumns)
+  template<class Scalar>
+  DenseMatrix<Scalar, eigen> eye(size_t const nbOfRows, size_t const nbOfColumns)
   {
-    DenseMatrix<ScalarType, eigen> A(nbOfRows, nbOfColumns);
+    DenseMatrix<Scalar, eigen> A(nbOfRows, nbOfColumns);
     for (std::size_t i = 0; i < std::min(nbOfRows, nbOfColumns); i++)
       A(i, i) = 1;
     //A.wrapped_.setIdentity();
     return A;
   }
 
-  template<class ScalarTypeA, class ScalarTypeB>
-  DenseMatrix<double, eigen> piecewiseDivision(DenseMatrix<ScalarTypeA, eigen> const& A, DenseMatrix<ScalarTypeB, eigen> const& B)
+  template<class ScalarA, class ScalarB>
+  DenseMatrix<double, eigen> piecewiseDivision(DenseMatrix<ScalarA, eigen> const& A, DenseMatrix<ScalarB, eigen> const& B)
   {
     if (A.number_of_rows() != B.number_of_rows() || A.number_of_columns() != B.number_of_columns())
       throw std::invalid_argument("Can only divide matrices of same size !");
@@ -262,8 +262,8 @@ namespace simol
   }
 
 
-  template<class ScalarType>
-  DenseMatrix<ScalarType, eigen> operator*(ScalarType const& scalar, DenseMatrix<ScalarType, eigen> const& A)
+  template<class Scalar>
+  DenseMatrix<Scalar, eigen> operator*(Scalar const& scalar, DenseMatrix<Scalar, eigen> const& A)
   {return A * scalar;}
 
 

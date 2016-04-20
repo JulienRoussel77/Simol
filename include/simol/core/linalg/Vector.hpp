@@ -1,13 +1,11 @@
 #ifndef SIMOL_VECTOR_HPP
 #define SIMOL_VECTOR_HPP
 
-#include "VectorInterface.hpp"
-
 #include "eigen.hpp"
 
 namespace simol
 {
-  template<typename Scalar = double, template<class> class Wrapper = eigen>
+  template<typename Scalar = double, typename Wrapper = eigen>
   class Vector
   {
     public:
@@ -23,13 +21,13 @@ namespace simol
 
     private:
 
-      Wrapper<Scalar> wrapped_;
+      typename Wrapper::template Vector<Scalar> wrapped_;
 
   };
 
-  template<typename Scalar, template<class> class Wrapper> inline
+  template<typename Scalar, typename Wrapper> inline
   std::size_t Vector<Scalar, Wrapper>::size() const
-  { return Wrapper<Scalar>::size(wrapped_); }
+  { return Wrapper::size(wrapped_); }
 
 
 }

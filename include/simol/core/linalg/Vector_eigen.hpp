@@ -7,55 +7,55 @@
 namespace simol
 {
 
-  template<typename ScalarType>
-  std::ostream & operator<<(std::ostream & fileToWrite, simol::Vector<ScalarType, eigen> const & vectorToRead);
+  template<typename Scalar>
+  std::ostream & operator<<(std::ostream & fileToWrite, simol::Vector<Scalar, eigen> const & vectorToRead);
 
-  template<class ScalarType>
-  class Vector<ScalarType, eigen> : public VectorInterface<ScalarType, eigen>
+  template<class Scalar>
+  class Vector<Scalar, eigen>
   {
-      friend std::ostream & operator<< <>(std::ostream & fileToWrite, simol::Vector<ScalarType, eigen> const & vectorToRead);
+      friend std::ostream & operator<< <>(std::ostream & fileToWrite, simol::Vector<Scalar, eigen> const & vectorToRead);
 
     public:
 
       static Vector Zero(std::size_t length);
 
       explicit Vector(size_t const size = 0);
-      explicit Vector(size_t const size, ScalarType const& lambda);
+      explicit Vector(size_t const size, Scalar const& lambda);
       explicit Vector(std::string const & filename);
 
-      Vector(Vector<ScalarType, eigen> const& u);
-      Vector(typename eigen<ScalarType>::Vector const & wrappedVector);
+      Vector(Vector const & vector) = default;
+      Vector(typename eigen::Vector<Scalar> const & wrappedVector);
 
       std::size_t size() const;
       std::size_t min_index() const;
 
       std::vector<size_t> indices_of_smallest(size_t const number_of_indices);
 
-      ScalarType min() const;
-      ScalarType max() const;
-      ScalarType norm() const;
-      ScalarType & operator()(size_t const index);
-      ScalarType const & operator()(size_t const index) const;
+      Scalar min() const;
+      Scalar max() const;
+      Scalar norm() const;
+      Scalar & operator()(size_t const index);
+      Scalar const & operator()(size_t const index) const;
 
       Vector sort() const;
       Vector subvector(std::size_t start, std::size_t length) const;
-      Vector & fill(ScalarType const& lambda);
+      Vector & fill(Scalar const& lambda);
 
 
-      Vector<ScalarType, eigen>& operator+=(Vector<ScalarType, eigen> const& v);
-      Vector<ScalarType, eigen>& operator-=(Vector<ScalarType, eigen> const& v);
-      Vector<ScalarType, eigen>& operator*=(ScalarType const& lambda);
-      Vector<ScalarType, eigen>& operator/=(ScalarType const& lambda);
-      Vector<ScalarType, eigen> operator*(ScalarType const& lambda) const;
-      Vector<ScalarType, eigen> operator/(ScalarType const& lambda) const;
-      Vector<ScalarType, eigen> operator-() const;
-      Vector<ScalarType, eigen> operator+(Vector<ScalarType, eigen> const& v) const;
-      Vector<ScalarType, eigen> operator-(Vector<ScalarType, eigen> const& v) const;
+      Vector<Scalar, eigen>& operator+=(Vector<Scalar, eigen> const& v);
+      Vector<Scalar, eigen>& operator-=(Vector<Scalar, eigen> const& v);
+      Vector<Scalar, eigen>& operator*=(Scalar const& lambda);
+      Vector<Scalar, eigen>& operator/=(Scalar const& lambda);
+      Vector<Scalar, eigen> operator*(Scalar const& lambda) const;
+      Vector<Scalar, eigen> operator/(Scalar const& lambda) const;
+      Vector<Scalar, eigen> operator-() const;
+      Vector<Scalar, eigen> operator+(Vector<Scalar, eigen> const& v) const;
+      Vector<Scalar, eigen> operator-(Vector<Scalar, eigen> const& v) const;
 
 
     public:
-      typedef typename eigen<ScalarType>::Vector WrappedType;
-      typename eigen<ScalarType>::Vector wrapped_;
+      typedef typename eigen::Vector<Scalar> WrappedType;
+      typename eigen::Vector<Scalar> wrapped_;
 
   };
 
@@ -66,37 +66,37 @@ namespace simol
   //! Returns a null vector
   template<typename Scalar>
   Vector<Scalar, eigen> Vector<Scalar, eigen>::Zero(std::size_t length)
-  { return eigen<Scalar>::Zero(length); }
+  { return eigen::Zero<Scalar>(length); }
 
   //! Returns the size
   template<typename Scalar> inline
   std::size_t Vector<Scalar, eigen>::size() const
-  { return eigen<Scalar>::size(wrapped_); }
+  { return eigen::size(wrapped_); }
 
   //! Returns the maximum coefficient
   template<typename Scalar> inline
   Scalar Vector<Scalar, eigen>::max() const
-  { return eigen<Scalar>::max(wrapped_); }
+  { return eigen::max(wrapped_); }
 
   //! Returns the minimum coefficient
   template<typename Scalar> inline
   Scalar Vector<Scalar, eigen>::min() const
-  { return eigen<Scalar>::min(wrapped_); }
+  { return eigen::min(wrapped_); }
 
   //! Returns the index of the minimum coefficient
   template<typename Scalar> inline
   std::size_t Vector<Scalar, eigen>::min_index() const
-  { return eigen<Scalar>::min_index(wrapped_); };
+  { return eigen::min_index(wrapped_); };
 
   //! Returns a sorted copy
   template<typename Scalar> inline
   Vector<Scalar, eigen> Vector<Scalar, eigen>::sort() const
-  { return eigen<Scalar>::sort(wrapped_); }
+  { return eigen::sort(wrapped_); }
 
   //! Returns a subvector
   template<class Scalar> inline
   Vector<Scalar, eigen> Vector<Scalar, eigen>::subvector(std::size_t start, std::size_t length) const
-  { return Vector<Scalar, eigen>(eigen<Scalar>::subvector(wrapped_, start, length)); }
+  { return Vector<Scalar, eigen>(eigen::subvector(wrapped_, start, length)); }
 
   //! Returns a coefficient to be modified
   template<typename Scalar> inline
@@ -114,31 +114,26 @@ namespace simol
   // CONSTRUCTORS
   //=============
 
-  template<class ScalarType> inline
-  Vector<ScalarType, eigen>::Vector(typename eigen<ScalarType>::Vector const & wrappedVector)
+  template<class Scalar> inline
+  Vector<Scalar, eigen>::Vector(typename eigen::Vector<Scalar> const & wrappedVector)
     : wrapped_(wrappedVector)
   {}
 
-  template<class ScalarType> inline
-  Vector<ScalarType, eigen>::Vector(size_t const size)
+  template<class Scalar> inline
+  Vector<Scalar, eigen>::Vector(size_t const size)
     : wrapped_(size)
   {}
 
-  template<class ScalarType> inline
-  Vector<ScalarType, eigen>::Vector(size_t const size, ScalarType const& lambda)
+  template<class Scalar> inline
+  Vector<Scalar, eigen>::Vector(size_t const size, Scalar const& lambda)
     : wrapped_(size)
   {
     for (size_t i = 0; i < size; i++)
       wrapped_(i) = lambda;
   }
 
-  template<class ScalarType> inline
-  Vector<ScalarType, eigen>::Vector(Vector<ScalarType, eigen> const& u)
-    : wrapped_(u.wrapped_)
-  {}
-
-  template<class ScalarType> inline
-  Vector<ScalarType, eigen>::Vector(std::string const & filename):
+  template<class Scalar> inline
+  Vector<Scalar, eigen>::Vector(std::string const & filename):
     wrapped_(0)
   {
     std::ifstream flow(filename);
@@ -146,7 +141,7 @@ namespace simol
     std::string line;
     int nbOfLines = 0;
     for (nbOfLines = 0; std::getline(flow, line); ++nbOfLines) {}
-    wrapped_ = eigen<ScalarType>::VectorType(nbOfLines);
+    wrapped_ = eigen::Vector<Scalar>(nbOfLines);
     //Go back to beginning of file
     flow.clear();
     flow.seekg(0, std::ios::beg);
@@ -165,8 +160,8 @@ namespace simol
   //----- mathematical functions -----
 
   //! Returns the indices of the first smallest coefficients
-  template<class ScalarType>
-  std::vector<size_t> Vector<ScalarType, eigen>::indices_of_smallest(size_t const number_of_indices)
+  template<class Scalar>
+  std::vector<size_t> Vector<Scalar, eigen>::indices_of_smallest(size_t const number_of_indices)
   {
     std::vector<size_t> indices(size());
     for(size_t index = 0; index < size(); ++index)
@@ -186,7 +181,7 @@ namespace simol
   //! Returns the Euclidean norm
   template<typename Scalar> inline
   Scalar Vector<Scalar, eigen>::norm() const
-  { return eigen<Scalar>::norm(wrapped_); }
+  { return eigen::norm(wrapped_); }
 
   template<typename Scalar> inline
   Vector<Scalar, eigen> & Vector<Scalar, eigen>::fill(Scalar const& lambda)
@@ -205,72 +200,72 @@ namespace simol
 
 
   //! addition of another vector
-  template<class ScalarType> inline
-  Vector<ScalarType, eigen>& Vector<ScalarType, eigen>::operator+=(Vector<ScalarType, eigen> const& u)
+  template<class Scalar> inline
+  Vector<Scalar, eigen>& Vector<Scalar, eigen>::operator+=(Vector<Scalar, eigen> const& u)
   {
     wrapped_ += u.wrapped_;
     return *this;
   }
 
   //! substraction of another vector
-  template<class ScalarType> inline
-  Vector<ScalarType, eigen>& Vector<ScalarType, eigen>::operator-=(Vector<ScalarType, eigen> const& u)
+  template<class Scalar> inline
+  Vector<Scalar, eigen>& Vector<Scalar, eigen>::operator-=(Vector<Scalar, eigen> const& u)
   {
     wrapped_ -= u.wrapped_;
     return *this;
   }
 
   //! multiplication by a scalar
-  template<class ScalarType> inline
-  Vector<ScalarType, eigen>& Vector<ScalarType, eigen>::operator*=(ScalarType const& lambda)
+  template<class Scalar> inline
+  Vector<Scalar, eigen>& Vector<Scalar, eigen>::operator*=(Scalar const& lambda)
   {
     wrapped_ *= lambda;
     return *this;
   }
 
   //! division by a scalar
-  template<class ScalarType> inline
-  Vector<ScalarType, eigen>& Vector<ScalarType, eigen>::operator/=(ScalarType const& lambda)
+  template<class Scalar> inline
+  Vector<Scalar, eigen>& Vector<Scalar, eigen>::operator/=(Scalar const& lambda)
   {
     wrapped_ /= lambda;
     return *this;
   }
 
-  template<class ScalarType> inline
-  Vector<ScalarType, eigen> Vector<ScalarType, eigen>::operator*(ScalarType const& lambda) const
+  template<class Scalar> inline
+  Vector<Scalar, eigen> Vector<Scalar, eigen>::operator*(Scalar const& lambda) const
   {
-    Vector<ScalarType> u(*this);
+    Vector<Scalar> u(*this);
     u.wrapped_ *= lambda;
     return u;
   }
 
-  template<class ScalarType> inline
-  Vector<ScalarType, eigen> Vector<ScalarType, eigen>::operator/(ScalarType const& lambda) const
+  template<class Scalar> inline
+  Vector<Scalar, eigen> Vector<Scalar, eigen>::operator/(Scalar const& lambda) const
   {
-    Vector<ScalarType> u(*this);
+    Vector<Scalar> u(*this);
     u.wrapped_ /= lambda;
     return u;
   }
 
-  template<class ScalarType> inline
-  Vector<ScalarType, eigen> Vector<ScalarType, eigen>::operator-() const
+  template<class Scalar> inline
+  Vector<Scalar, eigen> Vector<Scalar, eigen>::operator-() const
   {
-    Vector<ScalarType> u(*this);
+    Vector<Scalar> u(*this);
     u.wrapped_ *= -1;
     return u;
   }
 
-  template<class ScalarType> inline
-  Vector<ScalarType, eigen> Vector<ScalarType, eigen>::operator+(Vector<ScalarType, eigen> const& u) const
-  { return Vector<ScalarType, eigen>(*this) += u; }
+  template<class Scalar> inline
+  Vector<Scalar, eigen> Vector<Scalar, eigen>::operator+(Vector<Scalar, eigen> const& u) const
+  { return Vector<Scalar, eigen>(*this) += u; }
 
-  template<class ScalarType> inline
-  Vector<ScalarType, eigen> Vector<ScalarType, eigen>::operator-(Vector<ScalarType, eigen> const& u) const
-  { return Vector<ScalarType, eigen>(*this) -= u; }
+  template<class Scalar> inline
+  Vector<Scalar, eigen> Vector<Scalar, eigen>::operator-(Vector<Scalar, eigen> const& u) const
+  { return Vector<Scalar, eigen>(*this) -= u; }
 
 
-  template<class ScalarType>
-  Vector<double, eigen> piecewiseDivision(Vector<double, eigen> const& u, Vector<ScalarType, eigen> const& v)
+  template<class Scalar>
+  Vector<double, eigen> piecewiseDivision(Vector<double, eigen> const& u, Vector<Scalar, eigen> const& v)
   {
     if (u.size() != v.size())
       throw std::invalid_argument("Can only divide vectors of same size !");
@@ -281,8 +276,8 @@ namespace simol
   }
 
   //! Print a vector into a file
-  template<class ScalarType>
-  std::ostream & operator<<(std::ostream & fileToWrite, simol::Vector<ScalarType, eigen> const & vectorToRead)
+  template<class Scalar>
+  std::ostream & operator<<(std::ostream & fileToWrite, simol::Vector<Scalar, eigen> const & vectorToRead)
   {
     for (size_t index = 0; index < vectorToRead.size(); ++index)
       fileToWrite << vectorToRead(index) << " ";

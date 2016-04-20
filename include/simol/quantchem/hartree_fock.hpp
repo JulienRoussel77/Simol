@@ -101,7 +101,7 @@ namespace simol
     }
     else
     {
-      Eigen::JacobiSVD<eigen<double>::DenseMatrix> svd(S.wrapped_, Eigen::ComputeThinU | Eigen::ComputeThinV);
+      Eigen::JacobiSVD<eigen::DenseMatrix<double>> svd(S.wrapped_, Eigen::ComputeThinU | Eigen::ComputeThinV);
 
       DenseMatrix<double> Uvec = svd.matrixU();
       DenseMatrix<double> Vvec = svd.matrixV();
@@ -276,7 +276,7 @@ namespace simol
       DenseMatrix<double> U = Phi.matrix();
       DenseMatrix<double> V = Psi.matrix();
 
-      Eigen::JacobiSVD<eigen<double>::DenseMatrix> svd(S.wrapped_);
+      Eigen::JacobiSVD<eigen::DenseMatrix<double>> svd(S.wrapped_);
 
       Vector<double> D = svd.singularValues();
       double lmin = D.min();
@@ -320,7 +320,7 @@ namespace simol
       }
       else
       {
-        Eigen::JacobiSVD<eigen<double>::DenseMatrix> svd(S.wrapped_, Eigen::ComputeThinU | Eigen::ComputeThinV);
+        Eigen::JacobiSVD<eigen::DenseMatrix<double>> svd(S.wrapped_, Eigen::ComputeThinU | Eigen::ComputeThinV);
 
         DenseMatrix<double> Uvec = svd.matrixU();
         DenseMatrix<double> Vvec = svd.matrixV();

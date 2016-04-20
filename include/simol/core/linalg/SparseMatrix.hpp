@@ -14,12 +14,12 @@
 namespace simol
 {
 
-  template<class ScalarType, template<class> class WrappedLibrary = eigen>
+  template<typename Scalar, typename Wrapper = eigen>
   class SparseMatrix;
 
-  template<class ScalarType, template<class> class Library>
+  template<typename Scalar, typename Wrapper>
   std::ifstream & operator>>(std::ifstream & fileToRead,
-                             SparseMatrix<ScalarType, Library> & matrixToWrite);
+                             SparseMatrix<Scalar, Wrapper> & matrixToWrite);
 
 
 }

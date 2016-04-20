@@ -9,7 +9,7 @@
 namespace simol
 {
 
-  template<class ScalarType, template<class> class WrappedLibrary = eigen>
+  template<typename Scalar, typename Wrapper = eigen>
   class DenseMatrix;
 
 }

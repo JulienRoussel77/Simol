@@ -36,7 +36,7 @@ namespace simol
     std::size_t numberOfElectrons = 2;
 
     DenseMatrix<double> matrix(M_disc, M_disc);
-    matrix.wrapped_ = eigen<double>::DenseMatrix::Zero(M_disc, numberOfElectrons);
+    matrix.wrapped_ = eigen::DenseMatrix<double>::Zero(M_disc, numberOfElectrons);
     SlaterDeterminant initial_solution(matrix);
 
     std::size_t numberOfIterations = 2;

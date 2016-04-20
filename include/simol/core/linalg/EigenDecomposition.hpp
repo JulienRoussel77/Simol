@@ -9,7 +9,7 @@ namespace simol
   template<typename Scalar>
   class EigenDecomposition
   {
-      typedef typename eigen<Scalar>::DenseMatrix WrappedMatrix;
+      typedef typename eigen::DenseMatrix<Scalar> WrappedMatrix;
       typedef Eigen::GeneralizedSelfAdjointEigenSolver<WrappedMatrix> EigenSolver;
 
     public:
