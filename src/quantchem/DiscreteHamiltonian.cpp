@@ -28,6 +28,6 @@ namespace simol
 
   std::size_t
   DiscreteHamiltonian::basisDimension() const
-  { return kinetic_.numberOfRows(); }
+  { return kinetic_.number_of_rows(); }
 
 }

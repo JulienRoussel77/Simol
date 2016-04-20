@@ -19,8 +19,8 @@ namespace simol
 
       operator typename eigen<ScalarType>::SparseMatrixType const & () const;
 
-      std::size_t numberOfRows() const;
-      std::size_t numberOfColumns() const;
+      std::size_t number_of_rows() const;
+      std::size_t number_of_columns() const;
 
       ScalarType const operator()(std::size_t const rowIndex, std::size_t const columnIndex) const;
       ScalarType & operator()(std::size_t const rowIndex, std::size_t const columnIndex);
@@ -146,11 +146,11 @@ namespace simol
   {}
 
   template<class ScalarType> inline std::size_t
-  SparseMatrix<ScalarType, eigen>::numberOfRows() const
+  SparseMatrix<ScalarType, eigen>::number_of_rows() const
   { return wrapped_.rows(); }
 
   template<class ScalarType> inline std::size_t
-  SparseMatrix<ScalarType, eigen>::numberOfColumns() const
+  SparseMatrix<ScalarType, eigen>::number_of_columns() const
   { return wrapped_.cols(); }
 
 
@@ -176,7 +176,7 @@ namespace simol
   Vector<ScalarType, eigen> operator*(SparseMatrix<ScalarType, eigen> const & matrix,
                                       Vector<ScalarType, eigen> const & vector)
   {
-    Vector<ScalarType, eigen> prod(matrix.numberOfRows());
+    Vector<ScalarType, eigen> prod(matrix.number_of_rows());
     prod.wrapped_ = matrix.wrapped_.template selfadjointView<Eigen::Upper>() * vector.wrapped_;
     return prod;
   }

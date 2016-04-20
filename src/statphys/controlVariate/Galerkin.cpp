@@ -25,18 +25,18 @@ namespace simol
 
   DenseMatrix<double> Galerkin::shapeSaddle(const DenseMatrix<double>& A) const
   {
-    DenseMatrix<double> Asad = DenseMatrix<double>::Zero(A.numberOfRows() + 1, A.numberOfColumns() + 1);
-    Asad.block(0, 0, A.numberOfRows(), A.numberOfColumns()) = A.block(0, 0, A.numberOfRows(), A.numberOfColumns());
+    DenseMatrix<double> Asad = DenseMatrix<double>::Zero(A.number_of_rows() + 1, A.number_of_columns() + 1);
+    Asad.block(0, 0, A.number_of_rows(), A.number_of_columns()) = A.block(0, 0, A.number_of_rows(), A.number_of_columns());
     for (int iOfFourier2 = 0; iOfFourier2 <= 2 * maxOfFourier_; iOfFourier2++)
     {
-      Asad(A.numberOfRows(), iTens(iOfFourier2, 0)) = expFourierCoeffs(iOfFourier2);
-      Asad(iTens(iOfFourier2, 0), A.numberOfColumns()) = expFourierCoeffs(iOfFourier2);
+      Asad(A.number_of_rows(), iTens(iOfFourier2, 0)) = expFourierCoeffs(iOfFourier2);
+      Asad(iTens(iOfFourier2, 0), A.number_of_columns()) = expFourierCoeffs(iOfFourier2);
     }
     return Asad;
   }
 
   DenseMatrix<double> Galerkin::unshapeSaddle(const DenseMatrix<double>& Asad) const
-  { return Asad.block(0, 0, Asad.numberOfRows() - 1, Asad.numberOfColumns() - 1); }
+  { return Asad.block(0, 0, Asad.number_of_rows() - 1, Asad.number_of_columns() - 1); }
 
   DVec Galerkin::shapeSaddle(const DVec& X) const
   {
@@ -87,30 +87,30 @@ namespace simol
   {
     cout << "kron(const SMat& A, const SMat& B)" << endl;
 
-    SMat C(A.numberOfRows()*B.numberOfRows(), A.numberOfColumns()*B.numberOfColumns());
-    cout << "A : " << A.numberOfRows() << "x" << A.numberOfColumns() << endl;
+    SMat C(A.number_of_rows()*B.number_of_rows(), A.number_of_columns()*B.number_of_columns());
+    cout << "A : " << A.number_of_rows() << "x" << A.number_of_columns() << endl;
     cout << A(0, 0) << endl;
-    cout << "B : " << B.numberOfRows() << "x" << B.numberOfColumns() << endl;
+    cout << "B : " << B.number_of_rows() << "x" << B.number_of_columns() << endl;
 
 
 
 
-    for (int jOfA = 0; jOfA < (int)A.numberOfColumns(); ++jOfA)
+    for (int jOfA = 0; jOfA < (int)A.number_of_columns(); ++jOfA)
     {
       for (SMat::iterator it(A, jOfA); it; ++it)
       {
         int iOfA = it.row();
         double valOfA = it.value();
         cout << "truc : " << it.row() << " " << it.col() << " " << it.value() << endl;
-        for (int jOfB = 0; jOfB < (int)B.numberOfColumns(); jOfB++)
+        for (int jOfB = 0; jOfB < (int)B.number_of_columns(); jOfB++)
         {
           for (SMat::iterator it2(B, jOfB); it2; ++it2)
           {
             int iOfB = it2.row();
             double valOfB = it2.value();
-            cout << iOfA << "+" << A.numberOfRows() << "*" << iOfB << endl;
-            cout << iOfA + A.numberOfRows() * iOfB << " , " << jOfA + A.numberOfColumns() * jOfB << " ->" << valOfA*valOfB << endl;
-            C(iOfA + A.numberOfRows() * iOfB, jOfA + A.numberOfColumns() * jOfB) = valOfA * valOfB;
+            cout << iOfA << "+" << A.number_of_rows() << "*" << iOfB << endl;
+            cout << iOfA + A.number_of_rows() * iOfB << " , " << jOfA + A.number_of_columns() * jOfB << " ->" << valOfA*valOfB << endl;
+            C(iOfA + A.number_of_rows() * iOfB, jOfA + A.number_of_columns() * jOfB) = valOfA * valOfB;
           }
         }
       }
@@ -122,12 +122,12 @@ namespace simol
   DenseMatrix<double> kron(const DenseMatrix<double>& A, const DenseMatrix<double>& B)
   {
     cout << "kron(DenseMatrix<double>& A, DenseMatrix<double>& B)" << endl;
-    DenseMatrix<double> C(A.numberOfRows()*B.numberOfRows(), A.numberOfColumns()*B.numberOfColumns());
-    for (int iOfA = 0; iOfA < (int) A.numberOfRows(); iOfA++)
-      for (int jOfA = 0; jOfA < (int) A.numberOfColumns(); jOfA++)
-        for (int iOfB = 0; iOfB < (int) B.numberOfRows(); iOfB++)
-          for (int jOfB = 0; jOfB < (int) B.numberOfColumns(); jOfB++)
-            C(iOfA + A.numberOfRows() * iOfB, jOfA + A.numberOfColumns() * jOfB) = A(iOfA, jOfA) * B(iOfB, jOfB);
+    DenseMatrix<double> C(A.number_of_rows()*B.number_of_rows(), A.number_of_columns()*B.number_of_columns());
+    for (int iOfA = 0; iOfA < (int) A.number_of_rows(); iOfA++)
+      for (int jOfA = 0; jOfA < (int) A.number_of_columns(); jOfA++)
+        for (int iOfB = 0; iOfB < (int) B.number_of_rows(); iOfB++)
+          for (int jOfB = 0; jOfB < (int) B.number_of_columns(); jOfB++)
+            C(iOfA + A.number_of_rows() * iOfB, jOfA + A.number_of_columns() * jOfB) = A(iOfA, jOfA) * B(iOfB, jOfB);
     return C;
   }
 
@@ -145,9 +145,9 @@ namespace simol
 
   void display(const DenseMatrix<double>& A, ostream& out)
   {
-    for (int i = 0; i < (int) A.numberOfRows(); i++)
+    for (int i = 0; i < (int) A.number_of_rows(); i++)
     {
-      for (int j = 0; j < (int) A.numberOfColumns(); j++)
+      for (int j = 0; j < (int) A.number_of_columns(); j++)
       {
         if (true)//fabs(A(i,j)) > 1e-15)
         {
@@ -320,8 +320,8 @@ namespace simol
     cout << it2.value() << endl;
 
     SMat C = speye<double>(3, 3);
-    for (int jOfC = 0; jOfC < (int) C.numberOfColumns(); ++jOfC)
-      for (int iOfC = 0; iOfC < (int) C.numberOfRows(); ++iOfC)
+    for (int jOfC = 0; jOfC < (int) C.number_of_columns(); ++jOfC)
+      for (int iOfC = 0; iOfC < (int) C.number_of_rows(); ++iOfC)
         cout << C(iOfC, jOfC) << endl;
 
 
@@ -577,7 +577,7 @@ namespace simol
       if (i == iOfParticleP) res = kron(res, PMat);
       else res = kron(res, SIdP_);
     }
-    cout << "res : " << res.numberOfRows() << " x " << res.numberOfColumns() << endl;
+    cout << "res : " << res.number_of_rows() << " x " << res.number_of_columns() << endl;
     return res;
   }
 

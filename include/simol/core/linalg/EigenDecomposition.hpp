@@ -9,26 +9,24 @@ namespace simol
   template<typename Scalar>
   class EigenDecomposition
   {
-      typedef typename eigen<Scalar>::DenseMatrixType WrappedMatrix;
+      typedef typename eigen<Scalar>::DenseMatrix WrappedMatrix;
       typedef Eigen::GeneralizedSelfAdjointEigenSolver<WrappedMatrix> EigenSolver;
 
     public:
+   
       EigenDecomposition(DenseMatrix<Scalar, eigen> const & leftMatrix,
                          DenseMatrix<Scalar, eigen> const & rightMatrix)
-        : wrapped_(leftMatrix.wrapped_,
-                   rightMatrix.wrapped_,
-                   Eigen::ComputeEigenvectors | Eigen::Ax_lBx)
-      {}
-
-      /*EigenDecomposition(DenseMatrix<Scalar, eigen> const & leftMatrix)
       : wrapped_(leftMatrix.wrapped_,
-                 Eigen::ComputeEigenvectors|Eigen::Ax_lx)
-      {}*/
+                 rightMatrix.wrapped_,
+                 Eigen::ComputeEigenvectors | Eigen::Ax_lBx)
+      {}
 
       Vector<double> eigenvalues()
       { return wrapped_.eigenvalues(); }
+      
       DenseMatrix<double> eigenvectors()
       { return wrapped_.eigenvectors(); }
+    
     private:
       EigenSolver wrapped_;
   };

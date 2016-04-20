@@ -18,7 +18,7 @@ namespace simol
     public:
 
       static Vector Zero(std::size_t length);
-      
+
       explicit Vector(size_t const size = 0);
       explicit Vector(size_t const size, ScalarType const& lambda);
       explicit Vector(std::string const & filename);
@@ -28,15 +28,15 @@ namespace simol
 
       std::size_t size() const;
       std::size_t min_index() const;
-      
+
       std::vector<size_t> indices_of_smallest(size_t const number_of_indices);
-      
+
       ScalarType min() const;
       ScalarType max() const;
       ScalarType norm() const;
       ScalarType & operator()(size_t const index);
       ScalarType const & operator()(size_t const index) const;
-      
+
       Vector sort() const;
       Vector subvector(std::size_t start, std::size_t length) const;
       Vector & fill(ScalarType const& lambda);
@@ -103,7 +103,7 @@ namespace simol
   Scalar & Vector<Scalar, eigen>::operator()(size_t const index)
   { return wrapped_(index); }
 
-  // Returns a non-modifiable coefficient 
+  // Returns a non-modifiable coefficient
   template<class Scalar> inline
   Scalar const & Vector<Scalar, eigen>::operator()(size_t const index) const
   { return wrapped_(index); }
@@ -116,17 +116,17 @@ namespace simol
 
   template<class ScalarType> inline
   Vector<ScalarType, eigen>::Vector(typename eigen<ScalarType>::Vector const & wrappedVector)
-  : wrapped_(wrappedVector)
+    : wrapped_(wrappedVector)
   {}
 
   template<class ScalarType> inline
   Vector<ScalarType, eigen>::Vector(size_t const size)
-  : wrapped_(size)
+    : wrapped_(size)
   {}
 
   template<class ScalarType> inline
   Vector<ScalarType, eigen>::Vector(size_t const size, ScalarType const& lambda)
-  : wrapped_(size)
+    : wrapped_(size)
   {
     for (size_t i = 0; i < size; i++)
       wrapped_(i) = lambda;

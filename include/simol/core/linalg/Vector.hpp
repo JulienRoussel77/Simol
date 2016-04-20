@@ -14,15 +14,15 @@ namespace simol
 
       std::size_t size() const;
       std::size_t min_index() const;
-    
+
       Scalar min() const;
       Scalar max() const;
       Scalar norm() const;
-      
+
       Vector sort() const;
 
     private:
-      
+
       Wrapper<Scalar> wrapped_;
 
   };

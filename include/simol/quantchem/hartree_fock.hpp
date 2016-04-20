@@ -101,7 +101,7 @@ namespace simol
     }
     else
     {
-      Eigen::JacobiSVD<eigen<double>::DenseMatrixType> svd(S.wrapped_, Eigen::ComputeThinU | Eigen::ComputeThinV);
+      Eigen::JacobiSVD<eigen<double>::DenseMatrix> svd(S.wrapped_, Eigen::ComputeThinU | Eigen::ComputeThinV);
 
       DenseMatrix<double> Uvec = svd.matrixU();
       DenseMatrix<double> Vvec = svd.matrixV();
@@ -276,7 +276,7 @@ namespace simol
       DenseMatrix<double> U = Phi.matrix();
       DenseMatrix<double> V = Psi.matrix();
 
-      Eigen::JacobiSVD<eigen<double>::DenseMatrixType> svd(S.wrapped_);
+      Eigen::JacobiSVD<eigen<double>::DenseMatrix> svd(S.wrapped_);
 
       Vector<double> D = svd.singularValues();
       double lmin = D.min();
@@ -287,7 +287,7 @@ namespace simol
       //Si le ratio n'est pas trop petit, c'est la formule habituelle
       if (ratio > ratio_)
       {
-        DenseMatrix<double> Sinv(S.numberOfRows(), S.numberOfColumns());
+        DenseMatrix<double> Sinv(S.number_of_rows(), S.number_of_columns());
         Sinv = S.inverse();
         double scal0 = 0;
 
@@ -320,7 +320,7 @@ namespace simol
       }
       else
       {
-        Eigen::JacobiSVD<eigen<double>::DenseMatrixType> svd(S.wrapped_, Eigen::ComputeThinU | Eigen::ComputeThinV);
+        Eigen::JacobiSVD<eigen<double>::DenseMatrix> svd(S.wrapped_, Eigen::ComputeThinU | Eigen::ComputeThinV);
 
         DenseMatrix<double> Uvec = svd.matrixU();
         DenseMatrix<double> Vvec = svd.matrixV();
