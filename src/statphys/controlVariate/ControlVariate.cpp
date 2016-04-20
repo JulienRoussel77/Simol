@@ -208,20 +208,11 @@ namespace simol
 
   void ControlVariate::appendToBetterObservable(double observable, Vector<double>& generatorOnBasisFunction, int iOfStep)
   {
-    //double betterObservableTerm = dot((statsB_.meanMat() - statsB2_.integratedAutocorrelationMat()), statsD_.meanMat().llt().solve(generatorOnBasisFunction));
-    /*DenseMatrix<double> Dinv = statsD_.meanMat().llt().solve(generatorOnBasisFunction);
-    Vector<double> B = statsB_.meanMat() - statsB2_.integratedAutocorrelationMat();
-    std::cout << B.transpose() * Dinv << endl;*/
-    //cout << (statsB_.meanMat() - statsB2_.integratedAutocorrelationMat()).transpose().size() << "  " << statsD_.meanMat().inverse().size() << endl;
-    //lastA_ = (statsB_.meanMat() - statsB2_.integratedAutocorrelationMat()).transpose() * statsD_.meanMat().llt().solve(generatorOnBasisFunction);
-    //cout << lastA_.size() << "   " << generatorOnBasisFunction.size() << endl;
 
     if (statsD_.meanMat().determinant() != 0)
     {
-      //lastA_ = - .5 * statsD_.meanMat().llt().solve(meanB());
-      //lastA_ = Vector<double>(1,1);
       lastA_.fill(1);
-      statsBetterObservable_.append(observable - dot(lastA_, generatorOnBasisFunction), iOfStep);
+      statsBetterObservable_.append(observable - inner_product(lastA_, generatorOnBasisFunction), iOfStep);
     }
     else
     {
@@ -317,8 +308,8 @@ namespace simol
     Vector<double> result = Vector<double>::Zero(nbOfFunctions());
     for (int iOfFunction = 0; iOfFunction < nbOfFunctions(); iOfFunction++)
       for (int iOfParticle = 0; iOfParticle < nbOfParticles; iOfParticle++)
-        result(iOfFunction) += dot( configuration[iOfParticle].momentum() , gradientQ(configuration, iOfParticle, iOfFunction))
-                               + dot( configuration[iOfParticle].force() , gradientP(configuration, iOfParticle, iOfFunction));
+        result(iOfFunction) += inner_product( configuration[iOfParticle].momentum() , gradientQ(configuration, iOfParticle, iOfFunction))
+                               + inner_product( configuration[iOfParticle].force() , gradientP(configuration, iOfParticle, iOfFunction));
     return result;
   }
 
@@ -331,7 +322,7 @@ namespace simol
     for (int iOfFunction = 0; iOfFunction < nbOfFunctions(); iOfFunction++)
       for (int iOfParticle = 0; iOfParticle < nbOfParticles; iOfParticle++)
         result(iOfFunction) += laplacianQ(configuration, iOfParticle, iOfFunction) / beta
-                               + dot(configuration[iOfParticle].force(), gradientQ(configuration, iOfParticle, iOfFunction));
+                               + inner_product(configuration[iOfParticle].force(), gradientQ(configuration, iOfParticle, iOfFunction));
     return result;
   }
 
@@ -345,9 +336,9 @@ namespace simol
     for (int iOfFunction = 0; iOfFunction < nbOfFunctions(); iOfFunction++)
       for (int iOfParticle = 0; iOfParticle < nbOfParticles; iOfParticle++)
       {
-        result(iOfFunction) += dot(configuration[iOfParticle].momentum() , gradientQ(configuration, iOfParticle, iOfFunction))
-                               + dot(configuration[iOfParticle].force() , gradientP(configuration, iOfParticle, iOfFunction))
-                               + gamma * (- dot(configuration[iOfParticle].momentum() , gradientP(configuration, iOfParticle, iOfFunction))
+        result(iOfFunction) += inner_product(configuration[iOfParticle].momentum() , gradientQ(configuration, iOfParticle, iOfFunction))
+                               + inner_product(configuration[iOfParticle].force() , gradientP(configuration, iOfParticle, iOfFunction))
+                               + gamma * (- inner_product(configuration[iOfParticle].momentum() , gradientP(configuration, iOfParticle, iOfFunction))
                                           + laplacianP(configuration, iOfParticle, iOfFunction) / beta );
       }
     return result;
@@ -362,12 +353,12 @@ namespace simol
     for (int iOfFunction = 0; iOfFunction < nbOfFunctions(); iOfFunction++)
     {
       for (int iOfParticle = 0; iOfParticle < nbOfParticles; iOfParticle++)
-        result(iOfFunction) += dot(configuration[iOfParticle].momentum(), gradientQ(configuration, iOfParticle, iOfFunction))
-                               + dot(configuration[iOfParticle].force(), gradientP(configuration, iOfParticle, iOfFunction));
+        result(iOfFunction) += inner_product(configuration[iOfParticle].momentum(), gradientQ(configuration, iOfParticle, iOfFunction))
+                               + inner_product(configuration[iOfParticle].force(), gradientP(configuration, iOfParticle, iOfFunction));
       //if(false)
-      result(iOfFunction) += gamma * (- dot(configuration[0].momentum(), gradientP(configuration, 0, iOfFunction))
+      result(iOfFunction) += gamma * (- inner_product(configuration[0].momentum(), gradientP(configuration, 0, iOfFunction))
                                       + laplacianP(configuration, 0, iOfFunction) / betaLeft
-                                      - dot(configuration[nbOfParticles - 1].momentum(), gradientP(configuration, nbOfParticles - 1, iOfFunction))
+                                      - inner_product(configuration[nbOfParticles - 1].momentum(), gradientP(configuration, nbOfParticles - 1, iOfFunction))
                                       + laplacianP(configuration, nbOfParticles - 1, iOfFunction) / betaRight);
     }
     return result;
@@ -417,7 +408,7 @@ namespace simol
     /*cout << "Post-treatment of the output" << endl;
     for (int iOfStep = 0; iOfStep < (int) historyObservable_.size(); iOfStep++)
     {
-      statsPostBetterObservable_.append(historyObservable_(iOfStep) - dot(lastA_, historyGeneratorOnBasis_.row(iOfStep)), iOfStep);
+      statsPostBetterObservable_.append(historyObservable_(iOfStep) - inner_product(lastA_, historyGeneratorOnBasis_.row(iOfStep)), iOfStep);
       statsPostObservable_.append(historyObservable_(iOfStep), iOfStep);
       if (doOutput(iOfStep))
       {

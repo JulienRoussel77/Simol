@@ -17,6 +17,8 @@ namespace simol
 
     public:
 
+      static Vector Zero(std::size_t length);
+      
       explicit Vector(size_t const size = 0);
       explicit Vector(size_t const size, ScalarType const& lambda);
       explicit Vector(std::string const & filename);
@@ -24,21 +26,20 @@ namespace simol
       Vector(Vector<ScalarType, eigen> const& u);
       Vector(typename eigen<ScalarType>::Vector const & wrappedVector);
 
-      size_t size() const;
+      std::size_t size() const;
       std::size_t min_index() const;
+      
+      std::vector<size_t> indices_of_smallest(size_t const number_of_indices);
+      
       ScalarType min() const;
       ScalarType max() const;
       ScalarType norm() const;
-      Vector<ScalarType, eigen> sort() const;
-
-
       ScalarType & operator()(size_t const index);
       ScalarType const & operator()(size_t const index) const;
-
-      Vector<ScalarType, eigen>& fill(ScalarType const& lambda);
-      ScalarType dot(Vector<ScalarType, eigen> const& v) const;
-      std::vector<size_t> indices_of_smallest(size_t const number_of_indices);
-      static Vector Zero(std::size_t length);
+      
+      Vector sort() const;
+      Vector subvector(std::size_t start, std::size_t length) const;
+      Vector & fill(ScalarType const& lambda);
 
 
       Vector<ScalarType, eigen>& operator+=(Vector<ScalarType, eigen> const& v);
@@ -51,7 +52,6 @@ namespace simol
       Vector<ScalarType, eigen> operator+(Vector<ScalarType, eigen> const& v) const;
       Vector<ScalarType, eigen> operator-(Vector<ScalarType, eigen> const& v) const;
 
-      Vector<ScalarType, eigen> subvec(std::size_t start, std::size_t length) const;
 
     public:
       typedef typename eigen<ScalarType>::Vector WrappedType;
@@ -60,35 +60,73 @@ namespace simol
   };
 
   Vector<double, eigen> operator*(double const& lambda, Vector<double, eigen> const& v);
-  double dot(Vector<double, eigen> const& u, Vector<double, eigen> const& v);
   Vector<double, eigen> piecewiseDivision(Vector<double, eigen> const& u, Vector<double, eigen> const& v);
   Vector<double, eigen> piecewiseDivision(Vector<double, eigen> const& u, Vector<size_t, eigen> const& v);
 
+  //! Returns a null vector
+  template<typename Scalar>
+  Vector<Scalar, eigen> Vector<Scalar, eigen>::Zero(std::size_t length)
+  { return eigen<Scalar>::Zero(length); }
 
-  //----- static functions -----
+  //! Returns the size
+  template<typename Scalar> inline
+  std::size_t Vector<Scalar, eigen>::size() const
+  { return eigen<Scalar>::size(wrapped_); }
 
-  template<typename ScalarType>
-  Vector<ScalarType, eigen> Vector<ScalarType, eigen>::Zero(std::size_t length)
-  { return WrappedType(WrappedType::Zero(length)); }
+  //! Returns the maximum coefficient
+  template<typename Scalar> inline
+  Scalar Vector<Scalar, eigen>::max() const
+  { return eigen<Scalar>::max(wrapped_); }
+
+  //! Returns the minimum coefficient
+  template<typename Scalar> inline
+  Scalar Vector<Scalar, eigen>::min() const
+  { return eigen<Scalar>::min(wrapped_); }
+
+  //! Returns the index of the minimum coefficient
+  template<typename Scalar> inline
+  std::size_t Vector<Scalar, eigen>::min_index() const
+  { return eigen<Scalar>::min_index(wrapped_); };
+
+  //! Returns a sorted copy
+  template<typename Scalar> inline
+  Vector<Scalar, eigen> Vector<Scalar, eigen>::sort() const
+  { return eigen<Scalar>::sort(wrapped_); }
+
+  //! Returns a subvector
+  template<class Scalar> inline
+  Vector<Scalar, eigen> Vector<Scalar, eigen>::subvector(std::size_t start, std::size_t length) const
+  { return Vector<Scalar, eigen>(eigen<Scalar>::subvector(wrapped_, start, length)); }
+
+  //! Returns a coefficient to be modified
+  template<typename Scalar> inline
+  Scalar & Vector<Scalar, eigen>::operator()(size_t const index)
+  { return wrapped_(index); }
+
+  // Returns a non-modifiable coefficient 
+  template<class Scalar> inline
+  Scalar const & Vector<Scalar, eigen>::operator()(size_t const index) const
+  { return wrapped_(index); }
+
 
 
   //=============
   // CONSTRUCTORS
   //=============
 
-  template<class ScalarType>
-  inline
+  template<class ScalarType> inline
   Vector<ScalarType, eigen>::Vector(typename eigen<ScalarType>::Vector const & wrappedVector)
-    : wrapped_(wrappedVector)
+  : wrapped_(wrappedVector)
   {}
 
   template<class ScalarType> inline
   Vector<ScalarType, eigen>::Vector(size_t const size)
-    : wrapped_(size)
+  : wrapped_(size)
   {}
 
   template<class ScalarType> inline
-  Vector<ScalarType, eigen>::Vector(size_t const size, ScalarType const& lambda): wrapped_(size)
+  Vector<ScalarType, eigen>::Vector(size_t const size, ScalarType const& lambda)
+  : wrapped_(size)
   {
     for (size_t i = 0; i < size; i++)
       wrapped_(i) = lambda;
@@ -120,61 +158,11 @@ namespace simol
     }
   }
 
-
   //=====================
   // ACCESSORS / MUTATORS
   //=====================
 
-  template<typename Scalar> inline
-  std::size_t Vector<Scalar, eigen>::size() const
-  { return eigen<Scalar>::size(wrapped_); }
-
-  template<class ScalarType>
-  inline
-  ScalarType &
-  Vector<ScalarType, eigen>::operator()(size_t const index)
-  { return wrapped_(index); }
-
-  template<class ScalarType>
-  inline
-  ScalarType const &
-  Vector<ScalarType, eigen>::operator()(size_t const index) const
-  { return wrapped_(index); }
-
-  template<class ScalarType>
-  Vector<ScalarType, eigen> Vector<ScalarType, eigen>::subvec(std::size_t start,
-      std::size_t length) const
-  {
-    Vector sub(length);
-    for (std::size_t index = 0; index < length; ++index)
-      sub.wrapped_(index) = wrapped_(index + start);
-    return sub;
-  }
-
-
-
-
   //----- mathematical functions -----
-
-  //! Returns the maximum coefficient
-  template<typename Scalar> inline
-  Scalar Vector<Scalar, eigen>::max() const
-  { return eigen<Scalar>::max(wrapped_); }
-
-  //! Returns the minimum coefficient
-  template<typename Scalar> inline
-  Scalar Vector<Scalar, eigen>::min() const
-  { return eigen<Scalar>::min(wrapped_); }
-
-  //! Returns the index of the minimum coefficient
-  template<typename Scalar> inline
-  std::size_t Vector<Scalar, eigen>::min_index() const
-  { return eigen<Scalar>::min_index(wrapped_); };
-
-  //! Returns a sorted copy
-  template<typename Scalar> inline
-  Vector<Scalar, eigen> Vector<Scalar, eigen>::sort() const
-  { return eigen<Scalar>::sort(wrapped_); }
 
   //! Returns the indices of the first smallest coefficients
   template<class ScalarType>
@@ -207,13 +195,9 @@ namespace simol
     return *this;
   }
 
-  template<class ScalarType> inline
-  ScalarType Vector<ScalarType, eigen>::dot(Vector<ScalarType, eigen> const& v) const
-  { return wrapped_.dot(v.wrapped_); }
-
-  template<class ScalarType> inline
-  ScalarType operator, (Vector<ScalarType, eigen> const& v, Vector<ScalarType, eigen> const & w)
-  { return v.wrapped_.dot(w.wrapped_); }
+  template<typename Scalar> inline
+  Scalar inner_product(Vector<Scalar, eigen> const& v, Vector<Scalar, eigen> const & w)
+  { return inner_product(v, w); }
 
   //======================
   // Operators

@@ -34,7 +34,7 @@ namespace simol
     }
 
     Vector<double> temp = E * U12v;
-    return (U34v, temp);
+    return inner_product(U34v, temp);
   }
 
   double
@@ -134,11 +134,11 @@ namespace simol
         Vector<double> orthV = V * xV;  //Vecteur dans l'orthogonal du sous-espace engendré par U
 
         Vector<double> temp = O * orthU;
-        double n2orthU = (orthU, temp);
+        double n2orthU = inner_product(orthU, temp);
         orthU = ( 1.0 / sqrt(n2orthU) ) * orthU;
 
         temp = O * orthV;
-        double n2orthV = (orthV, temp);
+        double n2orthV = inner_product(orthV, temp);
         orthV = ( 1.0 / sqrt(n2orthV) ) * orthV;
 
         DenseMatrix<double> PsiU = DenseMatrix<double>::Zero(M_disc_, numberOfElectrons); //Le reste des fonctions: le deux sous-espaces engendrés sont les mêmes, égaux à l'intersection de deux sous-espaces de départ
@@ -150,12 +150,12 @@ namespace simol
         for(size_t k = 0; k < numberOfElectrons; k++)
         {
           temp = O * U.column(k);
-          double PS = (orthU, temp);
+          double PS = inner_product(orthU, temp);
           PsiU.column(k) = U.column(k) - PS * orthU;
           muU(k) = PS;
 
           temp = O * V.column(k);
-          PS = (orthV, temp);
+          PS = inner_product(orthV, temp);
           PsiV.column(k) = V.column(k) - PS * orthV;
           muV(k) = PS;
         }
@@ -171,18 +171,18 @@ namespace simol
         for (size_t i = 0; i < (numberOfElectrons - 1); i++)
         {
           Vector<double> temp2 = O * coeffs_bas.column(i);
-          double PS2 = (orthU, temp2);
+          double PS2 = inner_product(orthU, temp2);
           coeffs_bas.column(i) = coeffs_bas.column(i) - PS2 * orthU;
 
           for (size_t j = 0; j < i; j++)
           {
             temp2 = O * coeffs_bas.column(j);
-            PS2 = (coeffs_bas.column(i), temp2);
+            PS2 = inner_product(coeffs_bas.column(i), temp2);
             coeffs_bas.column(i) = coeffs_bas.column(i) - PS2 * coeffs_bas.column(j);
           }
 
           temp2 = O * coeffs_bas.column(i);
-          PS2 = (coeffs_bas.column(i), temp2);
+          PS2 = inner_product(coeffs_bas.column(i), temp2);
           coeffs_bas.column(i) = (1.0 / sqrt(PS2)) * coeffs_bas.column(i);
 
         }
@@ -195,16 +195,16 @@ namespace simol
           for (size_t l = 0; l < (numberOfElectrons - 1); l++)
           {
             Vector<double> temp = O * coeffs_bas.column(l);
-            double PS = (PsiU.column(k), temp);
+            double PS = inner_product(PsiU.column(k), temp);
             CU(l, k) = PS;
 
-            PS = (PsiV.column(k), temp);
+            PS = inner_product(PsiV.column(k), temp);
             CV(l, k) = PS;
           }
         }
 
         Vector<double> temp3 = H * orthV;
-        double sum2 = (orthU, temp3);
+        double sum2 = inner_product(orthU, temp3);
 
         //On a alors pour tout k U(:,k) = muU(k)*orthU + PsiU(:,k)
 
@@ -355,9 +355,9 @@ namespace simol
             Vector<double> orthV = V * xV;  //Vecteur dans l'orthogonal du sous-espace engendré par U
 
             Vector<double> temp = O * orthU;
-            orthU = 1.0 / sqrt( (orthU, temp) ) * orthU;
+            orthU = 1.0 / sqrt( inner_product(orthU, temp) ) * orthU;
             temp = O * orthV;
-            orthV = 1.0 / sqrt( (orthV, temp) ) * orthV;
+            orthV = 1.0 / sqrt( inner_product(orthV, temp) ) * orthV;
 
 
             DenseMatrix<double> PsiU = DenseMatrix<double>::Zero(M_disc_, numberOfElectrons); //Le reste des fonctions: le deux sous-espaces engendrés sont les mêmes, égaux à l'intersection de deux sous-espaces de départ
@@ -369,12 +369,12 @@ namespace simol
             for(size_t k = 0; k < numberOfElectrons; k++)
             {
               temp = O * U.column(k);
-              double PS = (orthU, temp);
+              double PS = inner_product(orthU, temp);
               PsiU.column(k) = U.column(k) - PS * orthU;
               muU(k) = PS;
 
               temp = O * V.column(k);
-              PS = (orthV, temp);
+              PS = inner_product(orthV, temp);
               PsiV.column(k) = V.column(k) - PS * orthV;
               muV(k) = PS;
             }
@@ -390,18 +390,18 @@ namespace simol
             for (size_t i = 0; i < (numberOfElectrons - 1); i++)
             {
               Vector<double> temp2 = O * coeffs_bas.column(i);
-              double PS2 = (orthU, temp2);
+              double PS2 = inner_product(orthU, temp2);
               coeffs_bas.column(i) = coeffs_bas.column(i) - PS2 * orthU;
 
               for (size_t j = 0; j < i; j++)
               {
                 temp2 = O * coeffs_bas.column(j);
-                PS2 = (coeffs_bas.column(i), temp2);
+                PS2 = inner_product(coeffs_bas.column(i), temp2);
                 coeffs_bas.column(i) = coeffs_bas.column(i) - PS2 * coeffs_bas.column(j);
               }
 
               temp2 = O * coeffs_bas.column(i);
-              PS2 = (coeffs_bas.column(i), temp2);
+              PS2 = inner_product(coeffs_bas.column(i), temp2);
               coeffs_bas.column(i) = (1.0 / sqrt(PS2)) * coeffs_bas.column(i);
 
             }
@@ -414,11 +414,11 @@ namespace simol
               for (size_t l = 0; l < (numberOfElectrons - 1); l++)
               {
                 Vector<double> temp = O * coeffs_bas.column(l);
-                double PS = (PsiU.column(k), temp);
+                double PS = inner_product(PsiU.column(k), temp);
                 CU(l, k) = PS;
 
                 temp = O * coeffs_bas.column(l);
-                PS = (PsiV.column(k), temp);
+                PS = inner_product(PsiV.column(k), temp);
                 CV(l, k) = PS;
               }
             }
@@ -476,22 +476,22 @@ namespace simol
             Vector<double> orthV2 = V * xV2;
 
             Vector<double> temp = O * orthU1;
-            orthU1 = ( 1.0 / sqrt( (orthU1, temp) ) ) * orthU1;
+            orthU1 = ( 1.0 / sqrt( inner_product(orthU1, temp) ) ) * orthU1;
 
             temp = O * orthU2;
-            double PS = (orthU1, temp);
+            double PS = inner_product(orthU1, temp);
             orthU2 -= PS * orthU1;
             temp = O * orthU2;
-            orthU2 = ( 1.0 / sqrt( (orthU2, temp) ) ) * orthU2;
+            orthU2 = ( 1.0 / sqrt( inner_product(orthU2, temp) ) ) * orthU2;
 
             temp = O * orthV1;
-            orthV1 = ( 1.0 / sqrt( (orthV1, temp) ) ) * orthV1;
+            orthV1 = ( 1.0 / sqrt( inner_product(orthV1, temp) ) ) * orthV1;
 
             temp = O * orthV2;
-            PS = (orthV1, temp);
+            PS = inner_product(orthV1, temp);
             orthV2 -= PS * orthV1;
             temp = O * orthV2;
-            orthV2 = ( 1.0 / sqrt( (orthV2, temp) ) ) * orthV2;
+            orthV2 = ( 1.0 / sqrt( inner_product(orthV2, temp) ) ) * orthV2;
 
             DenseMatrix<double> PsiU = DenseMatrix<double>::Zero(M_disc_, numberOfElectrons); //Le reste des fonctions: les deux sous-espaces engendrés sont les mêmes, égaux à l'intersection de deux sous-espaces de départ
             DenseMatrix<double> PsiV = DenseMatrix<double>::Zero(M_disc_, numberOfElectrons);
@@ -505,12 +505,12 @@ namespace simol
             {
 
               Vector<double> temp2 = O * U.column(k);
-              muU1(k) = (orthU1, temp2);
-              muU2(k) = (orthU2, temp2);
+              muU1(k) = inner_product(orthU1, temp2);
+              muU2(k) = inner_product(orthU2, temp2);
 
               temp2 = O * V.column(k);
-              muV1(k) = (orthV1, temp2);
-              muV2(k) = (orthV2, temp2);
+              muV1(k) = inner_product(orthV1, temp2);
+              muV2(k) = inner_product(orthV2, temp2);
 
 
               PsiU.column(k) = U.column(k) - muU1(k) * orthU1 - muU2(k) * orthU2;
@@ -537,19 +537,19 @@ namespace simol
             {
               //On commence par orthonormaliser par rapport à orthU1 et orthU2
               Vector<double> temp3 = O * coeffs_bas.column(i);
-              double PS3 = (orthU1, temp3);
+              double PS3 = inner_product(orthU1, temp3);
               coeffs_bas.column(i) = coeffs_bas.column(i) - PS3 * orthU1;
               temp3 = O * coeffs_bas.column(i);
-              PS3 = (orthU2, temp3);
+              PS3 = inner_product(orthU2, temp3);
               coeffs_bas.column(i) = coeffs_bas.column(i) - PS3 * orthU2;
               for (size_t j = 0; j < i; j++)
               {
                 temp3 = O * coeffs_bas.column(i);
-                PS3 = (coeffs_bas.column(j), temp3);
+                PS3 = inner_product(coeffs_bas.column(j), temp3);
                 coeffs_bas.column(i) = coeffs_bas.column(i) - PS3 * coeffs_bas.column(j);
               }
               temp3 = O * coeffs_bas.column(i);
-              coeffs_bas.column(i) = ( 1.0 / sqrt( (coeffs_bas.column(i), temp3) ) ) * coeffs_bas.column(i);
+              coeffs_bas.column(i) = ( 1.0 / sqrt( inner_product(coeffs_bas.column(i), temp3) ) ) * coeffs_bas.column(i);
             }
 
             DenseMatrix<double> CU = DenseMatrix<double>::Zero(numberOfElectrons - 2, numberOfElectrons);
@@ -560,8 +560,8 @@ namespace simol
               for (size_t l = 0; l < numberOfElectrons - 2; l++)
               {
                 Vector<double> temp4 = O * coeffs_bas.column(l);
-                CU(l, k) = (PsiU.column(k), temp4);
-                CV(l, k) = (PsiV.column(k), temp4);
+                CU(l, k) = inner_product(PsiU.column(k), temp4);
+                CV(l, k) = inner_product(PsiV.column(k), temp4);
               }
             }
 
