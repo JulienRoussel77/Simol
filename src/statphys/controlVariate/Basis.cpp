@@ -264,8 +264,7 @@ namespace simol
   HermiteBasis::HermiteBasis(const int nbOfElts0, double beta0)
     : Basis(nbOfElts0),
       beta_(beta0),
-      polyCoeffs_(zero<double>(nbOfElts0, nbOfElts0))
-      //polyCoeffs_(DenseMatrix<double>::Zero(nbOfElts0, nbOfElts0))
+      polyCoeffs_(DenseMatrix<double>::Zero(nbOfElts0, nbOfElts0))
   {
     //cout << "HermiteBasis(const int nbOfElts0)" << endl;
     polyCoeffs_(0, 0) = 1;

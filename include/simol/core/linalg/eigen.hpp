@@ -19,7 +19,7 @@ namespace simol
   struct eigen
   {
     typedef Eigen::Matrix<Scalar, Eigen::Dynamic, 1> Vector;
-    typedef Eigen::SparseMatrix<Scalar> SparseMatrixType;
+    typedef Eigen::SparseMatrix<Scalar> SparseMatrix;
     typedef Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic> DenseMatrix;
     typedef Eigen::Map<Vector> VectorMap;
     typedef Eigen::JacobiSVD<DenseMatrix> SVDType;
@@ -33,7 +33,9 @@ namespace simol
     static std::size_t size(Vector const & vector);
     static std::size_t min_index(Vector const & vector);
     static std::size_t number_of_rows(DenseMatrix const & matrix);
+    static std::size_t number_of_rows(SparseMatrix const & matrix);
     static std::size_t number_of_columns(DenseMatrix const & matrix);
+    static std::size_t number_of_columns(SparseMatrix const & matrix);
 
     static Scalar min(Vector const & vector);
     static Scalar max(Vector const & vector);
@@ -45,11 +47,12 @@ namespace simol
     static Vector sort(Vector const & vector);
     static Vector subvector(Vector const & vector, std::size_t start, std::size_t length);
     static Vector Zero(std::size_t const length);
-    
+
     static DenseMatrix Zero(std::size_t const numberOfRows, std::size_t const numberOfColumns);
     static DenseMatrix Identity(std::size_t const dimension);
     static DenseMatrix inverse(DenseMatrix const & matrix);
 
+    static SparseMatrix adjoint(SparseMatrix const & matrix);
   };
 
   //! Returns the size of a vector
@@ -71,9 +74,19 @@ namespace simol
   std::size_t eigen<Scalar>::number_of_rows(eigen<Scalar>::DenseMatrix const & matrix)
   { return matrix.rows(); }
 
+  //! Returns the number of rows of a sparse matrix
+  template<typename Scalar> inline
+  std::size_t eigen<Scalar>::number_of_rows(eigen<Scalar>::SparseMatrix const & matrix)
+  { return matrix.rows(); }
+
   //! Returns the number of columns of a dense matrix
   template<typename Scalar> inline
   std::size_t eigen<Scalar>::number_of_columns(eigen<Scalar>::DenseMatrix const & matrix)
+  { return matrix.cols(); }
+
+  //! Returns the number of columns of a sparse matrix
+  template<typename Scalar> inline
+  std::size_t eigen<Scalar>::number_of_columns(eigen<Scalar>::SparseMatrix const & matrix)
   { return matrix.cols(); }
 
   //! Returns the minimum coefficient of a vector
@@ -95,12 +108,12 @@ namespace simol
   template<typename Scalar> inline
   Scalar eigen<Scalar>::trace(eigen<Scalar>::DenseMatrix const & matrix)
   { return matrix.trace(); }
-  
+
   //! Returns the determinant of a dense matrix
   template<typename Scalar> inline
   Scalar eigen<Scalar>::determinant(eigen<Scalar>::DenseMatrix const & matrix)
   { return matrix.determinant(); }
-  
+
 
   //! Returns a sorted copy of a vector
   template<typename Scalar> inline
@@ -134,7 +147,7 @@ namespace simol
   Scalar eigen<Scalar>::inner_product(eigen<Scalar>::Vector const & lhs,
                                       eigen<Scalar>::Vector const & rhs)
   { return lhs.dot(rhs); }
-  
+
   //! Returns a null dense matrix
   template<typename Scalar> inline
   typename eigen<Scalar>::DenseMatrix eigen<Scalar>::Zero(std::size_t const numberOfRows, size_t const numberOfColumns)
@@ -149,7 +162,13 @@ namespace simol
   template<typename Scalar> inline
   typename eigen<Scalar>::DenseMatrix eigen<Scalar>::inverse(eigen<Scalar>::DenseMatrix const & matrix)
   { return eigen<Scalar>::DenseMatrix(matrix.inverse()); }
-      
+
+  // TODO: write a non-pessimized version (return type may different in eigen)
+  //! Returns adjoint matrix
+  template<typename Scalar> inline
+  typename eigen<Scalar>::SparseMatrix eigen<Scalar>::adjoint(eigen<Scalar>::SparseMatrix const & matrix)
+  { return eigen<Scalar>::SparseMatrix(matrix.adjoint()); }
+
 
 }
 

@@ -27,17 +27,17 @@ namespace simol
       DenseMatrix(Vector<double, eigen> u, std::size_t numberOfRows, std::size_t numberOfColumns);
 
       void fill(ScalarType scalar);
-      
+
       std::size_t number_of_rows() const;
       std::size_t number_of_columns() const;
 
       double rcond() const;
-      
+
       ScalarType trace() const;
       ScalarType determinant() const;
 
       DenseMatrix inverse() const;
-      
+
       Vector<ScalarType> column(size_t const index) const;
       Vector<ScalarType> solve(Vector<ScalarType> const & rhs)
       {
@@ -107,7 +107,7 @@ namespace simol
   template<typename Scalar> inline
   DenseMatrix<Scalar, eigen> DenseMatrix<Scalar, eigen>::Identity(std::size_t const dimension)
   { return DenseMatrix(eigen<Scalar>::Identity(dimension)); }
-  
+
   //! Construction from a sparse matrix
   template<typename ScalarType> inline
   DenseMatrix<ScalarType, eigen>::DenseMatrix(SparseMatrix<ScalarType, eigen> const & matrix)
@@ -146,7 +146,7 @@ namespace simol
   template<typename Scalar> inline
   DenseMatrix<Scalar, eigen> DenseMatrix<Scalar, eigen>::inverse() const
   { return DenseMatrix(eigen<Scalar>::inverse(wrapped_)); }
-  
+
   //! Returns a column
   template<class ScalarType> Vector<ScalarType>
   DenseMatrix<ScalarType, eigen>::column(size_t const index) const
@@ -156,7 +156,7 @@ namespace simol
   //! Construction from a Matrix Market file
   template<class ScalarType>
   DenseMatrix<ScalarType, eigen>::DenseMatrix(MatrixMarketFile const & file)
-  : wrapped_(eigen<double>::DenseMatrix::Zero(file.numberOfRows(), file.numberOfRows()))
+    : wrapped_(eigen<double>::DenseMatrix::Zero(file.numberOfRows(), file.numberOfRows()))
   {
     std::vector< Eigen::Triplet<ScalarType, std::size_t> > nonzeros(file.numberOfNonzeros());
     for(size_t nonzeroIndex = 0; nonzeroIndex < file.numberOfNonzeros(); ++nonzeroIndex)
@@ -246,14 +246,6 @@ namespace simol
     for (std::size_t i = 0; i < std::min(nbOfRows, nbOfColumns); i++)
       A(i, i) = 1;
     //A.wrapped_.setIdentity();
-    return A;
-  }
-
-  // TODO: remove it and call Zero instead
-  template<class ScalarType> inline
-  DenseMatrix<ScalarType, eigen> zero(size_t const nbOfRows, size_t const nbOfColumns)
-  {
-    DenseMatrix<ScalarType, eigen> A = DenseMatrix<ScalarType, eigen>::Zero(nbOfRows, nbOfColumns);
     return A;
   }
 

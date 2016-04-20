@@ -13,20 +13,20 @@ namespace simol
       typedef Eigen::GeneralizedSelfAdjointEigenSolver<WrappedMatrix> EigenSolver;
 
     public:
-   
+
       EigenDecomposition(DenseMatrix<Scalar, eigen> const & leftMatrix,
                          DenseMatrix<Scalar, eigen> const & rightMatrix)
-      : wrapped_(leftMatrix.wrapped_,
-                 rightMatrix.wrapped_,
-                 Eigen::ComputeEigenvectors | Eigen::Ax_lBx)
+        : wrapped_(leftMatrix.wrapped_,
+                   rightMatrix.wrapped_,
+                   Eigen::ComputeEigenvectors | Eigen::Ax_lBx)
       {}
 
       Vector<double> eigenvalues()
       { return wrapped_.eigenvalues(); }
-      
+
       DenseMatrix<double> eigenvectors()
       { return wrapped_.eigenvectors(); }
-    
+
     private:
       EigenSolver wrapped_;
   };
