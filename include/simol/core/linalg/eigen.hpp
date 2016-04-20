@@ -18,15 +18,15 @@ namespace simol
   template<typename Scalar>
   struct eigen
   {
-    typedef Eigen::Matrix<Scalar, Eigen::Dynamic, 1> Vector;
-    typedef Eigen::SparseMatrix<Scalar> SparseMatrix;
-    typedef Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic> DenseMatrix;
-    typedef Eigen::Map<Vector> VectorMap;
-    typedef Eigen::JacobiSVD<DenseMatrix> SVDType;
-    typedef typename DenseMatrix::AdjointReturnType AdjointReturnType;
-    typedef typename DenseMatrix::ColXpr DenseMatrixColumn;
-    typedef Eigen::Block<DenseMatrix> DenseBlock;
-    typedef Eigen::Block<DenseMatrix const> DenseBlock_const;
+    using DenseMatrix      = Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic>;
+    using DenseAdjoint     = typename DenseMatrix::AdjointReturnType;
+    using DenseColumn      = typename DenseMatrix::ColXpr;
+    using DenseBlock       = Eigen::Block<DenseMatrix>;
+    using DenseBlock_const = Eigen::Block<DenseMatrix const>;
+    using Vector           = Eigen::Matrix<Scalar, Eigen::Dynamic, 1>;
+    using VectorMap        = Eigen::Map<Vector>;
+    using SparseMatrix     = Eigen::SparseMatrix<Scalar>;
+    using SVD              = Eigen::JacobiSVD<DenseMatrix>;
 
     static void fill(DenseMatrix const & matrix, Scalar scalar);
 

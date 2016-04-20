@@ -10,15 +10,14 @@ namespace simol
 
     public:
 
-      typedef typename eigen<ScalarType>::SparseMatrix::InnerIterator iterator;
 
+      operator typename eigen<ScalarType>::SparseMatrix const & () const;
+      
       explicit SparseMatrix(size_t const numberOfRows, size_t const numberOfColumns);
       explicit SparseMatrix(MatrixMarketFile const & file);
       explicit SparseMatrix(std::string const & filename, std::size_t const size);
       explicit SparseMatrix(Vector<double, eigen> u, std::size_t numberOfRows, std::size_t numberOfColumns);
       SparseMatrix(const typename eigen<ScalarType>::SparseMatrix::AdjointReturnType& A);
-
-      operator typename eigen<ScalarType>::SparseMatrix const & () const;
 
       std::size_t number_of_rows() const;
       std::size_t number_of_columns() const;
@@ -26,7 +25,7 @@ namespace simol
       ScalarType const operator()(std::size_t const rowIndex, std::size_t const columnIndex) const;
       ScalarType & operator()(std::size_t const rowIndex, std::size_t const columnIndex);
       ScalarType & insert(std::size_t const rowIndex, std::size_t const columnIndex);
-      
+
       SparseMatrix adjoint() const;
 
       SparseMatrix<ScalarType, eigen>& operator+=(SparseMatrix<ScalarType, eigen> const& A);
@@ -43,6 +42,7 @@ namespace simol
       typename eigen<ScalarType>::SparseMatrix const & wrapped() const;
 
     public:
+      typedef typename eigen<ScalarType>::SparseMatrix::InnerIterator iterator;
       typename eigen<ScalarType>::SparseMatrix wrapped_;
   };
 
@@ -148,12 +148,12 @@ namespace simol
   {}
 
   //! Returns the number of rows
-  template<class Scalar> inline 
+  template<class Scalar> inline
   std::size_t SparseMatrix<Scalar, eigen>::number_of_rows() const
   { return eigen<Scalar>::number_of_rows(wrapped_); }
 
   //! Returns the number of columns
-  template<class Scalar> inline 
+  template<class Scalar> inline
   std::size_t SparseMatrix<Scalar, eigen>::number_of_columns() const
   { return eigen<Scalar>::number_of_columns(wrapped_); }
 
