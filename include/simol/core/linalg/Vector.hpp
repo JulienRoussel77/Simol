@@ -9,38 +9,38 @@ namespace simol
   class Vector;
 
   template<class Scalar, typename Wrapper>
-  std::ostream & operator<<(std::ostream & output, 
+  std::ostream & operator<<(std::ostream & output,
                             Vector<Scalar, Wrapper> const & vector);
-  
+
   template<typename Scalar, typename Wrapper>
-  Scalar inner_product(Vector<Scalar, Wrapper> const & lhs, 
+  Scalar inner_product(Vector<Scalar, Wrapper> const & lhs,
                        Vector<Scalar, Wrapper> const & rhs);
-  
+
   template<typename Scalar, typename Wrapper>
-  Vector<Scalar, Wrapper> operator*(Scalar const lhs, 
+  Vector<Scalar, Wrapper> operator*(Scalar const lhs,
                                     Vector<Scalar, Wrapper> const & rhs);
-  
+
   template<typename Scalar, typename Wrapper>
-  Vector<Scalar, Wrapper> operator-(Vector<Scalar, Wrapper> const & lhs, 
+  Vector<Scalar, Wrapper> operator-(Vector<Scalar, Wrapper> const & lhs,
                                     Vector<Scalar, Wrapper> const & rhs);
-  
+
   template<typename Scalar = double, typename Wrapper = eigen>
   class Vector
   {
-    
-    friend std::ostream & operator<<<>(std::ostream & output, Vector const & vector);
-    friend Scalar inner_product<>(Vector const & lhs, Vector const & rhs);
-    friend Vector operator*<>(Scalar const scalar, Vector const & rhs);
-    friend Vector operator-<>(Vector const & lhs, Vector const & rhs);
-    
+
+      friend std::ostream & operator<<< > (std::ostream & output, Vector const & vector);
+      friend Scalar inner_product<>(Vector const & lhs, Vector const & rhs);
+      friend Vector operator*<>(Scalar const scalar, Vector const & rhs);
+      friend Vector operator-<>(Vector const & lhs, Vector const & rhs);
+
     public:
 
       static Vector Zero(std::size_t const length);
-      
+
       Vector(std::size_t const length = 0);
       Vector(std::size_t const length, Scalar const scalar);
       Vector(typename eigen::Vector<Scalar> const & vector);
-      
+
       void fill(Scalar const scalar);
 
 
@@ -48,7 +48,7 @@ namespace simol
       std::size_t min_index() const;
 
       std::vector<size_t> indices_of_smallest(size_t const number_of_indices);
-      
+
       Scalar min() const;
       Scalar max() const;
       Scalar norm() const;
@@ -85,19 +85,19 @@ namespace simol
   //! Construction of a vector from a length
   template<typename Scalar, typename Wrapper> inline
   Vector<Scalar, Wrapper>::Vector(std::size_t const length)
-  : wrapped_(length)
+    : wrapped_(length)
   {}
 
   //! Construction of a vector from a length
   template<typename Scalar, typename Wrapper> inline
   Vector<Scalar, Wrapper>::Vector(std::size_t const length, Scalar const scalar)
-  : wrapped_(length)
+    : wrapped_(length)
   { Wrapper::fill(wrapped_, scalar); }
 
   //! Construction of a vector from a wrapped vector
   template<typename Scalar, typename Wrapper> inline
   Vector<Scalar, Wrapper>::Vector(typename eigen::Vector<Scalar> const & vector)
-  : wrapped_(vector)
+    : wrapped_(vector)
   {}
 
   // Returns the size
@@ -199,7 +199,7 @@ namespace simol
   //! Multiply by a scalar
   template<typename Scalar, typename Wrapper> inline
   Vector<Scalar, Wrapper> & Vector<Scalar, Wrapper>::operator*=(Scalar const scalar)
-  { 
+  {
     Wrapper::multiply(wrapped_, scalar);
     return *this;
   }
@@ -207,7 +207,7 @@ namespace simol
   //! Divide by a scalar
   template<typename Scalar, typename Wrapper> inline
   Vector<Scalar, Wrapper> & Vector<Scalar, Wrapper>::operator/=(Scalar const scalar)
-  { 
+  {
     wrapped_ /= scalar;
     return *this;
   }
@@ -215,7 +215,7 @@ namespace simol
   //! Add a vector
   template<typename Scalar, typename Wrapper> inline
   Vector<Scalar, Wrapper> & Vector<Scalar, Wrapper>::operator+=(Vector<Scalar, Wrapper> const & vector)
-  { 
+  {
     Wrapper::add(wrapped_, vector.wrapped_);
     return *this;
   }
@@ -223,14 +223,14 @@ namespace simol
   //! Substract a vector
   template<typename Scalar, typename Wrapper> inline
   Vector<Scalar, Wrapper> & Vector<Scalar, Wrapper>::operator-=(Vector<Scalar, Wrapper> const & vector)
-  { 
+  {
     wrapped_ -= vector.wrapped_;
     return *this;
   }
 
   //! Print a vector into a file
   template<class Scalar, typename Wrapper> inline
-  std::ostream & operator<<(std::ostream & output, 
+  std::ostream & operator<<(std::ostream & output,
                             Vector<Scalar, Wrapper> const & vector)
   {
     for (size_t index = 0; index < vector.size(); ++index)
@@ -240,24 +240,24 @@ namespace simol
 
   //! Vector inner product
   template<typename Scalar, typename Wrapper> inline
-  Scalar inner_product(Vector<Scalar, Wrapper> const & lhs, 
+  Scalar inner_product(Vector<Scalar, Wrapper> const & lhs,
                        Vector<Scalar, Wrapper> const & rhs)
   { return Wrapper::inner_product(lhs.wrapped_, rhs.wrapped_); }
 
   //! Product between a scalar and a vector
   template<typename Scalar, typename Wrapper> inline
-  Vector<Scalar, Wrapper> operator*(Scalar const lhs, 
+  Vector<Scalar, Wrapper> operator*(Scalar const lhs,
                                     Vector<Scalar, Wrapper> const & rhs)
   { return Vector<Scalar, Wrapper>(lhs * rhs); }
 
   //! Vector difference
   template<typename Scalar, typename Wrapper> inline
-  Vector<Scalar, Wrapper> operator-(Vector<Scalar, Wrapper> const & lhs, 
+  Vector<Scalar, Wrapper> operator-(Vector<Scalar, Wrapper> const & lhs,
                                     Vector<Scalar, Wrapper> const & rhs)
   { return Vector<Scalar, Wrapper>(lhs - rhs); }
 
   template<typename Scalar, typename Wrapper> inline
-  Vector<double, eigen> piecewiseDivision(Vector<Scalar, Wrapper> const & lhs, 
+  Vector<double, eigen> piecewiseDivision(Vector<Scalar, Wrapper> const & lhs,
                                           Vector<int, Wrapper> const & rhs)
   {
     if (lhs.size() != rhs.size())

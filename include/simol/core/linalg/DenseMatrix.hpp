@@ -11,18 +11,18 @@ namespace simol
 
   template<typename Scalar, typename Wrapper>
   class SparseMatrix;
-  
+
   template<typename Scalar, typename Wrapper = eigen>
   class DenseMatrix
   {
     public:
-      
+
       static DenseMatrix Zero(std::size_t const numberOfRows, std::size_t numberOfColumns);
       static DenseMatrix Identity(std::size_t const dimension);
 
       DenseMatrix(DenseMatrix const & matrix) = default;
       ~DenseMatrix() = default;
-      
+
       DenseMatrix(MatrixMarketFile const & file);
       DenseMatrix(SparseMatrix<Scalar, Wrapper> const & matrix);
       DenseMatrix(std::size_t numberOfRows, std::size_t numberOfColumns);
@@ -34,13 +34,13 @@ namespace simol
 
       std::size_t number_of_rows() const;
       std::size_t number_of_columns() const;
-      
+
       Scalar determinant() const;
       Scalar rcond() const;
       Scalar trace() const;
 
       Scalar & operator()(size_t const rowIndex, size_t const columnIndex);
-      
+
       Scalar const & operator()(size_t const rowIndex, size_t const columnIndex) const;
 
       Vector<Scalar, Wrapper> column(size_t const index) const;
@@ -57,16 +57,16 @@ namespace simol
 
       typename eigen::DenseBlock_const<Scalar> block(size_t startRow, size_t startCol, size_t blockRows, size_t blockCols) const
       { return wrapped_.block(startRow, startCol, blockRows, blockCols); }
-      /*typename Wrapper::template DenseBlock<Scalar> block(std::size_t const startRow, 
-                                                          std::size_t const startCol, 
-                                                          std::size_t const blockRows, 
+      /*typename Wrapper::template DenseBlock<Scalar> block(std::size_t const startRow,
+                                                          std::size_t const startCol,
+                                                          std::size_t const blockRows,
                                                           std::size_t const blockCols);
-      
-      typename Wrapper::template DenseBlock_const<Scalar> block(std::size_t const startRow, 
-                                                                std::size_t const startCol, 
-                                                                std::size_t const blockRows, 
+
+      typename Wrapper::template DenseBlock_const<Scalar> block(std::size_t const startRow,
+                                                                std::size_t const startCol,
+                                                                std::size_t const blockRows,
                                                                 std::size_t const blockCols) const;
-*/
+      */
 
     public:
       typename Wrapper::template DenseMatrix<Scalar> wrapped_;
@@ -74,8 +74,8 @@ namespace simol
 
   //! Null matrix
   template<typename Scalar, typename Wrapper> inline
-  DenseMatrix<Scalar, Wrapper> DenseMatrix<Scalar, Wrapper>::Zero(std::size_t const numberOfRows, 
-                                                                  std::size_t const numberOfColumns)
+  DenseMatrix<Scalar, Wrapper> DenseMatrix<Scalar, Wrapper>::Zero(std::size_t const numberOfRows,
+      std::size_t const numberOfColumns)
   { return DenseMatrix<Scalar>(Wrapper::template Zero<Scalar>(numberOfRows, numberOfColumns)); }
 
   //! Identity matrix
@@ -87,20 +87,20 @@ namespace simol
   //! Construction from a sparse matrix
   template<typename Scalar, typename Wrapper> inline
   DenseMatrix<Scalar, Wrapper>::DenseMatrix(SparseMatrix<Scalar, Wrapper> const & matrix)
-  : wrapped_(matrix.wrapped_.template triangularView<Eigen::Upper>())
+    : wrapped_(matrix.wrapped_.template triangularView<Eigen::Upper>())
   { wrapped_ += matrix.wrapped_.transpose().template triangularView<Eigen::StrictlyLower>(); }
 
   //! Construction from a matrix block
   template<typename Scalar, typename Wrapper> inline
   DenseMatrix<Scalar, Wrapper>::DenseMatrix(typename Wrapper::template DenseBlock_const<Scalar> const & block)
-  : wrapped_(block)
+    : wrapped_(block)
   {}
 
   // TODO: move this function to Vector class
   //! Construction from a vector
   template<typename Scalar, typename Wrapper> inline
   DenseMatrix<Scalar, Wrapper>::DenseMatrix(Vector<Scalar, Wrapper> u, std::size_t const numberOfRows, std::size_t const numberOfColumns)
-  : DenseMatrix<Scalar, Wrapper>(numberOfRows, numberOfColumns)
+    : DenseMatrix<Scalar, Wrapper>(numberOfRows, numberOfColumns)
   {
     if (u.size() != numberOfColumns * numberOfRows)
       throw std::invalid_argument("Matrix reshape : sizes incoherent !");
@@ -113,20 +113,20 @@ namespace simol
   //! Construction with prescribed size
   template<typename Scalar, typename Wrapper> inline
   DenseMatrix<Scalar, Wrapper>::DenseMatrix(std::size_t numberOfRows, std::size_t numberOfColumns)
-  : wrapped_(numberOfRows, numberOfColumns)
+    : wrapped_(numberOfRows, numberOfColumns)
   {}
 
   //! Construction from wrapped DenseMatrix
   template<typename Scalar, typename Wrapper> inline
   DenseMatrix<Scalar, Wrapper>::DenseMatrix(typename Wrapper::template DenseMatrix<Scalar> const & matrix)
-  : wrapped_(matrix)
+    : wrapped_(matrix)
   {}
 
   //! Fill with a scalar
   template<typename Scalar, typename Wrapper> inline
   void DenseMatrix<Scalar, Wrapper>::fill(Scalar const scalar)
   { wrapped_.fill(scalar); }
- 
+
   //! Returns the number of rows
   template<typename Scalar, typename Wrapper> inline
   std::size_t DenseMatrix<Scalar, Wrapper>::number_of_rows() const
@@ -136,7 +136,7 @@ namespace simol
   template<typename Scalar, typename Wrapper> inline
   std::size_t DenseMatrix<Scalar, Wrapper>::number_of_columns() const
   { return Wrapper::number_of_columns(wrapped_); }
-  
+
   //! Returns the determinant
   template<typename Scalar, typename Wrapper> inline
   Scalar DenseMatrix<Scalar, Wrapper>::determinant() const
@@ -215,41 +215,41 @@ namespace simol
 
   //! Returns a mutable submatrix
   /*template<typename Scalar, typename Wrapper> inline
-  typename Wrapper::template DenseBlock<Scalar> DenseMatrix<Scalar, Wrapper>::block(std::size_t const startRow, 
-                                                          std::size_t const startCol, 
-                                                          std::size_t const blockRows, 
+  typename Wrapper::template DenseBlock<Scalar> DenseMatrix<Scalar, Wrapper>::block(std::size_t const startRow,
+                                                          std::size_t const startCol,
+                                                          std::size_t const blockRows,
                                                           std::size_t const blockCols)
   { return Wrapper::block(wrapped_, startRow, startCol, blockRows, blockCols); }
 
   //! Returns an immutable submatrix
   template<typename Scalar, typename Wrapper> inline
-  typename Wrapper::template DenseBlock_const<Scalar> DenseMatrix<Scalar, Wrapper>::block(std::size_t const startRow, 
-                                                          std::size_t const startCol, 
-                                                          std::size_t const blockRows, 
+  typename Wrapper::template DenseBlock_const<Scalar> DenseMatrix<Scalar, Wrapper>::block(std::size_t const startRow,
+                                                          std::size_t const startCol,
+                                                          std::size_t const blockRows,
                                                           std::size_t const blockCols) const
   { return Wrapper::block(wrapped_, startRow, startCol, blockRows, blockCols); }*/
 
   //! Matrix-vector product
   template<typename Scalar, typename Wrapper> inline
-  Vector<Scalar, Wrapper> operator*(DenseMatrix<Scalar, Wrapper> const & matrix, 
+  Vector<Scalar, Wrapper> operator*(DenseMatrix<Scalar, Wrapper> const & matrix,
                                     Vector<Scalar, Wrapper> const & vector)
   { return Vector<Scalar, Wrapper>(matrix.wrapped_ * vector.wrapped_); }
-  
+
   //! Matrix-matrix product
   template<typename Scalar, typename Wrapper> inline
-  DenseMatrix<Scalar, Wrapper> operator*(DenseMatrix<Scalar, Wrapper> const & lhs, 
+  DenseMatrix<Scalar, Wrapper> operator*(DenseMatrix<Scalar, Wrapper> const & lhs,
                                          DenseMatrix<Scalar, Wrapper> const & rhs)
   { return DenseMatrix<Scalar, Wrapper>(lhs.wrapped_ * rhs.wrapped_); }
 
   //! Piecewise division
   template<typename Scalar, typename Wrapper> inline
   DenseMatrix<Scalar, Wrapper> piecewiseDivision(DenseMatrix<Scalar, Wrapper> const & lhs,
-                                                 DenseMatrix<int, Wrapper> const & rhs)
+      DenseMatrix<int, Wrapper> const & rhs)
   {
-    if (lhs.number_of_rows() != rhs.number_of_rows() || 
+    if (lhs.number_of_rows() != rhs.number_of_rows() ||
         lhs.number_of_columns() != rhs.number_of_columns())
       throw std::invalid_argument("Can only divide matrices of same size !");
-    
+
     DenseMatrix<Scalar, Wrapper> division(lhs.number_of_rows(), rhs.number_of_columns());
     for (std::size_t j = 0; j < lhs.number_of_columns(); j++)
       for (std::size_t i = 0; i < lhs.number_of_rows(); i++)
