@@ -178,7 +178,7 @@ namespace simol
   // TODO: attention version symetrique
   template<class Scalar>
   Vector<Scalar, eigen> operator*(SparseMatrix<Scalar, eigen> const & matrix,
-                                      Vector<Scalar, eigen> const & vector)
+                                  Vector<Scalar, eigen> const & vector)
   {
     Vector<Scalar, eigen> prod(matrix.number_of_rows());
     prod.wrapped_ = matrix.wrapped_.template selfadjointView<Eigen::Upper>() * vector.wrapped_;

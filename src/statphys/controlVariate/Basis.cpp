@@ -421,8 +421,8 @@ namespace simol
     //cout << vecIndex[0] << " " << vecIndex[1] << endl;
     //cout << bases_[0]->gradient(configuration[0].position(0), vecIndex[0]) << " X "
     //    << bases_[1]->value(configuration[0].momentum(0), vecIndex[1]) << endl;
-    return bases_[0]->gradient(configuration[0].position(0), vecIndex[0])
-           * bases_[1]->value(configuration[0].momentum(0), vecIndex[1]);
+    return bases_[1]->value(configuration[0].momentum(0), vecIndex[1])
+           * bases_[0]->gradient(configuration[0].position(0), vecIndex[0]);
   }
 
   Vector<double> QPBasis::gradientQ(vector<Particle> const& configuration, int iOfParticle, int iOfCoeff) const
