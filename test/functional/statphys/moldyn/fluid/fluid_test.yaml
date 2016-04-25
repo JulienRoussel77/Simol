@@ -1,8 +1,8 @@
 System:
-  Dimension: 3
+  Dimension: 2
   LatticeParameter: 1.
   Name: NBody
-  NumberPerDimension: 8
+  NumberPerDimension: 10
   Cells: yes
    
 Time:
@@ -21,7 +21,7 @@ Dynamics:
   Temperature: 1
     
 Output:
-  Period: 0.05
-  LongPeriod: 0.5
+  PrintPeriod: 0.005
+  PrintLongPeriod: 0.1
 
 
