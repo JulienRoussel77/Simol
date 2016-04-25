@@ -43,12 +43,12 @@ namespace simol
   void Output::displayChainPositions(vector<Particle> const& configuration, int iOfStep)
   {
     outBeam() << iOfStep * timeStep()
-              << " " << configuration[0].position() - 2.0 * configuration[1].position() + configuration[2].position()
+              << " " << configuration[0].position() - 2 * configuration[1].position() + configuration[2].position()
               //<< " " << configuration[0].position() - 2*configuration[1].position() + configuration[2].position()
-              << " " << configuration[(nbOfParticles_ - 2) / 4].position() - 2.0 * configuration[(nbOfParticles_ - 2) / 4 + 1].position() + configuration[(nbOfParticles_ - 2) / 4 + 2].position()
-              << " " << configuration[(nbOfParticles_ - 2) / 2].position() - 2.0 * configuration[(nbOfParticles_ - 2) / 2 + 1].position() + configuration[(nbOfParticles_ - 2) / 2 + 2].position()
-              << " " << configuration[3 * (nbOfParticles_ - 2) / 4].position() - 2.0 * configuration[3 * (nbOfParticles_ - 2) / 4 + 1].position() + configuration[3 * (nbOfParticles_ - 2) / 4 + 2].position()
-              << " " << configuration[nbOfParticles_ - 3].position() - 2.0 * configuration[nbOfParticles_ - 2].position() + configuration[nbOfParticles_ - 1].position()
+              << " " << configuration[(nbOfParticles_ - 2) / 4].position() - 2 * configuration[(nbOfParticles_ - 2) / 4 + 1].position() + configuration[(nbOfParticles_ - 2) / 4 + 2].position()
+              << " " << configuration[(nbOfParticles_ - 2) / 2].position() - 2 * configuration[(nbOfParticles_ - 2) / 2 + 1].position() + configuration[(nbOfParticles_ - 2) / 2 + 2].position()
+              << " " << configuration[3 * (nbOfParticles_ - 2) / 4].position() - 2 * configuration[3 * (nbOfParticles_ - 2) / 4 + 1].position() + configuration[3 * (nbOfParticles_ - 2) / 4 + 2].position()
+              << " " << configuration[nbOfParticles_ - 3].position() - 2 * configuration[nbOfParticles_ - 2].position() + configuration[nbOfParticles_ - 1].position()
               << endl;
   }
 

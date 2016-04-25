@@ -1,8 +1,8 @@
 System:
-  Dimension: 2
+  Dimension: 3
   LatticeParameter: 1.
   Name: NBody
-  NumberPerDimension: 10
+  NumberPerDimension: 8
   Cells: yes
    
 Time:

@@ -93,7 +93,7 @@ namespace simol
       if (iOfParticle == 0)
       {
         dist = getParticle(0).position(0) - ancorParticle_.position(0);
-        flow = dyna.gamma() * (dyna.temperatureLeft() - 2.0 * getParticle(0).kineticEnergy());
+        flow = dyna.gamma() * (dyna.temperatureLeft() - 2 * getParticle(0).kineticEnergy());
       }
       else
       {
@@ -155,7 +155,7 @@ namespace simol
   ///The first 2 derivates of the potential are stored in "particle2"
   void TriChain::triInteraction(Particle& particle1, Particle& particle2, Particle& particle3) const
   {
-    Vector<double> delta = particle3.position() - 2.0 * particle2.position() + particle1.position();
+    Vector<double> delta = particle3.position() - 2 * particle2.position() + particle1.position();
     //double d12 = r12.norm();
     double energy123 = potential(delta);
     Vector<double> force123 = potentialForce(delta);    // = - v'(r_2)
@@ -163,7 +163,7 @@ namespace simol
 
     particle2.potentialEnergy() = energy123;
     particle1.force() += force123;
-    particle2.force() -= 2.0 * force123;
+    particle2.force() -= 2 * force123;
     particle3.force() += force123;
     particle2.energyGrad() = -force123;    // - v'(r_2)
     particle2.energyLapla() = lapla123;    // v''(r_2)
@@ -204,23 +204,23 @@ namespace simol
 
       if (iOfParticle == 0)
       {
-        bending = ancorParticle2_.position(0) - 2.0 * getParticle(0).position(0) + getParticle(1).position(0);
-        flow = dyna.gamma() * (dyna.temperatureLeft() - 2.0 * getParticle(0).kineticEnergy())
+        bending = ancorParticle2_.position(0) - 2 * getParticle(0).position(0) + getParticle(1).position(0);
+        flow = dyna.gamma() * (dyna.temperatureLeft() - 2 * getParticle(0).kineticEnergy())
                - ancorParticle2_.energyGrad(0) * getParticle(0).momentum(0);
-        potTempTop = pow(- ancorParticle2_.energyGrad(0) + 2.0 * getParticle(0).energyGrad(0) - getParticle(1).energyGrad(0), 2);
-        potTempBot = ancorParticle2_.energyLapla() + 4.0 * getParticle(0).energyLapla() + getParticle(1).energyLapla();
+        potTempTop = pow(- ancorParticle2_.energyGrad(0) + 2 * getParticle(0).energyGrad(0) - getParticle(1).energyGrad(0), 2);
+        potTempBot = ancorParticle2_.energyLapla() + 4 * getParticle(0).energyLapla() + getParticle(1).energyLapla();
 
       }
       else if (iOfParticle < (int)configuration_.size() - 1)
       {
         // bending is k_iOfParticle
-        bending = getParticle(iOfParticle - 1).position(0) - 2.0 * getParticle(iOfParticle).position(0) + configuration_[iOfParticle + 1].position(0);
+        bending = getParticle(iOfParticle - 1).position(0) - 2 * getParticle(iOfParticle).position(0) + configuration_[iOfParticle + 1].position(0);
         // flow is j_iOfParticle
         flow = - getParticle(iOfParticle - 1).energyGrad(0) * getParticle(iOfParticle).momentum(0)
                + getParticle(iOfParticle).energyGrad(0) * getParticle(iOfParticle - 1).momentum(0);
 
-        potTempTop = pow(- getParticle(iOfParticle - 1).energyGrad(0) + 2.0 * getParticle(iOfParticle).energyGrad(0) - getParticle(iOfParticle + 1).energyGrad(0), 2);
-        potTempBot = getParticle(iOfParticle - 1).energyLapla() + 4.0 * getParticle(iOfParticle).energyLapla() + getParticle(iOfParticle + 1).energyLapla();
+        potTempTop = pow(- getParticle(iOfParticle - 1).energyGrad(0) + 2 * getParticle(iOfParticle).energyGrad(0) - getParticle(iOfParticle + 1).energyGrad(0), 2);
+        potTempBot = getParticle(iOfParticle - 1).energyLapla() + 4 * getParticle(iOfParticle).energyLapla() + getParticle(iOfParticle + 1).energyLapla();
         output.energySumFlow() += flow;
       }
       else

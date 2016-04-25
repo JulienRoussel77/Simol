@@ -264,7 +264,8 @@ namespace simol
   HermiteBasis::HermiteBasis(const int nbOfElts0, double beta0)
     : Basis(nbOfElts0),
       beta_(beta0),
-      polyCoeffs_(DenseMatrix<double>::Zero(nbOfElts0, nbOfElts0))
+      polyCoeffs_(zero<double>(nbOfElts0, nbOfElts0))
+      //polyCoeffs_(DenseMatrix<double>::Zero(nbOfElts0, nbOfElts0))
   {
     //cout << "HermiteBasis(const int nbOfElts0)" << endl;
     polyCoeffs_(0, 0) = 1;
@@ -421,8 +422,8 @@ namespace simol
     //cout << vecIndex[0] << " " << vecIndex[1] << endl;
     //cout << bases_[0]->gradient(configuration[0].position(0), vecIndex[0]) << " X "
     //    << bases_[1]->value(configuration[0].momentum(0), vecIndex[1]) << endl;
-    return bases_[1]->value(configuration[0].momentum(0), vecIndex[1])
-           * bases_[0]->gradient(configuration[0].position(0), vecIndex[0]);
+    return bases_[0]->gradient(configuration[0].position(0), vecIndex[0])
+           * bases_[1]->value(configuration[0].momentum(0), vecIndex[1]);
   }
 
   Vector<double> QPBasis::gradientQ(vector<Particle> const& configuration, int iOfParticle, int iOfCoeff) const

@@ -9,13 +9,13 @@ namespace simol
   {
     DenseMatrix<double, eigen> mat(3, 5);
     size_t expected = 5;
-    EXPECT_EQ(expected, mat.number_of_columns());
+    EXPECT_EQ(expected, mat.numberOfColumns());
   }
 
   TEST(MatrixTest, NumberOfRowsIsCorrect)
   {
     DenseMatrix<double, eigen> mat(3, 5);
     size_t expected = 3;
-    EXPECT_EQ(expected, mat.number_of_rows());
+    EXPECT_EQ(expected, mat.numberOfRows());
   }
 }

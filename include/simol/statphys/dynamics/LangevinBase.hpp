@@ -1,5 +1,5 @@
-#ifndef SIMOL_LANGEVINBASE_HPP
-#define SIMOL_LANGEVINBASE_HPP
+#ifndef LANGEVINBASE_HPP
+#define LANGEVINBASE_HPP
 
 #include "Dynamics.hpp"
 

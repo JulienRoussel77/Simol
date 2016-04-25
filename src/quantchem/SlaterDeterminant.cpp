@@ -7,7 +7,7 @@ namespace simol
   {}
 
   std::size_t SlaterDeterminant::number_of_electrons() const
-  { return matrix_.number_of_columns(); }
+  { return matrix_.numberOfColumns(); }
 
   DenseMatrix<double> const &
   SlaterDeterminant::matrix() const
@@ -22,7 +22,7 @@ namespace simol
     DenseMatrix<double> V = Psi.matrix();
 
     // recupere la partie non stockee (symetrique)
-    DenseMatrix<double> temp(overlap.number_of_rows(), V.number_of_columns());
+    DenseMatrix<double> temp(overlap.numberOfRows(), V.numberOfColumns());
     temp = overlap * V;
 
     return DenseMatrix<double>(U.adjoint() * temp);
