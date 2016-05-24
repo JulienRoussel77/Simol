@@ -40,7 +40,7 @@ namespace simol
 
       ScalarType max() const;
 
-      size_t index_of_minimum() const;
+      size_t min_index() const;
 
       Vector<ScalarType, eigen>& operator+=(Vector<ScalarType, eigen> const& v);
       Vector<ScalarType, eigen>& operator-=(Vector<ScalarType, eigen> const& v);
@@ -171,7 +171,7 @@ namespace simol
 
   //! Returns the index of the minimum coefficient
   template<class ScalarType> inline
-  std::size_t Vector<ScalarType, eigen>::index_of_minimum() const
+  std::size_t Vector<ScalarType, eigen>::min_index() const
   {
     size_t index;
     wrapped_.minCoeff(&index);

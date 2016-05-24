@@ -125,7 +125,7 @@ namespace simol
       //Sinon, on utilise une formule patriculière
       else
       {
-        int indmin = D.index_of_minimum();
+        int indmin = D.min_index();
 
         Vector<double> xV = Vvec.column(indmin);
         Vector<double> xU = Uvec.column(indmin);
@@ -347,7 +347,7 @@ namespace simol
           if ((1.5 > mult) && (mult > 0.5)) //mult = 1
           {
 
-            int indmin = D.index_of_minimum();
+            int indmin = D.min_index();
             Vector<double> xV = Vvec.column(indmin);
             Vector<double> xU = Uvec.column(indmin);
 
@@ -460,13 +460,13 @@ namespace simol
             //faut récupérer pour U et pour V les deux vecteurs qui sont
             //orthonormaux à l'espace
 
-            size_t indmin = D.index_of_minimum();
+            size_t indmin = D.min_index();
             Vector<double> xV1 = Vvec.column(indmin);
             Vector<double> xU1 = Uvec.column(indmin);
 
             D(indmin) = 1e20;
 
-            size_t indmin2 = D.index_of_minimum();
+            size_t indmin2 = D.min_index();
             Vector<double> xV2 = Vvec.column(indmin2);
             Vector<double> xU2 = Uvec.column(indmin2);
 
