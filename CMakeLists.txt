@@ -1,9 +1,8 @@
-########################################################################
-# Minimum version is 2.8 because it the default version for Ubuntu 12.04
-# However, older versions may be used (not tested)
-########################################################################
+#####################################################################
+# Minimum version is 2.6 because it the default version for SourceSup
+#####################################################################
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 ################################################################
 # The SIMOL_GCC_ROOT has been defined for two main reasons:
