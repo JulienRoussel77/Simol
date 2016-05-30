@@ -1,6 +1,6 @@
-#####################################################################
-# Minimum version is 2.6 because it the default version for SourceSup
-#####################################################################
+########################
+# Minimum version is 2.8
+########################
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
