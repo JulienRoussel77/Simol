@@ -24,7 +24,94 @@ to build and install \Simol. Note that the build step may last a long time becau
 \chapter{Downloading \Simol}\label{chap:download}
 
 
+\section{Having an account on \SourceSup}
+
+Sources of \Simol are stored on a software forge called \SourceSup, which you can connect to at \urlSourceSup.  
+
+The sources of \Simol can only be accessed through the SSH protocol. To be able to use this protocol, you need to have a private key and a public key. These keys are usually located at \url{~/.ssh} in your machine. If you have already defined a key called \textit{mykey}, you should see the two files \url{mykey} and \url{mykey.pub} in this directory. The former is private and should never be communicated to anyone else. The latter is public and must be uploaded on \SourceSup. 
+
+If you do not have any SSH pair of keys, you need to create one. To do it, just type
+\begin{minted}{bash}
+ssh keygen -t dsa
+\end{minted}
+in a terminal.
+
+\section{Installing \Git}
+
+
+\Git is a popular version control system which has been written by Linus Thorvald, the creator of \Linux. The best way to learn more about \Git is to visit its official website: \urlGit. Please refer to the official documentation to find the installation steps for you own machine. In most cases, the easiest way to install it is to use a package manager like \texttt{apt-get}, \texttt{yum}, \texttt{homebrew}, etc. For example, you can install \Git on Ubuntu systems by simply typing
+\begin{minted}{bash}
+sudo apt-get install git
+\end{minted}
+in a terminal. You can check that \Git is installed on your machine with the command
+\begin{minted}{bash}
+git --version
+\end{minted}
+which should return something like this:
+\begin{minted}{bash}
+git version 1.7.9.5
+\end{minted}
+
+\section{Cloning \Simol repository}
+
+To clone the source repository of \Simol, you need to be located in the directory where you want to store the development version of the software. Then, you have to type
+\begin{minted}{bash}
+git clone git+ssh://git@git.renater.fr:2222/simol.git
+\end{minted}
+in a terminal. This will create a directory \url{simol} and copy the sources of \Simol in it. 
+
+\paragraph{Note:}
+it is possible to change the name of the cloning directory, say \textit{foo}, by typing 
+\begin{minted}{bash}
+git clone git+ssh://git@git.renater.fr:2222/simol.git foo
+\end{minted}
+
+
+
+
 \chapter{Configuring \Simol}\label{chap:configure}
+
+
+\section{Installing \CMake}
+
+\section{Customizing configuration}
+
+\section{Running configuration}
+
+Sources of \Simol have to be built in a subdirectory called \url{build}. To reach it, just type
+\begin{minted}{bash}
+cd simol/build
+\end{minted}
+in a terminal. The configuration step lays on a configuration file. We provide an example of such a configuration file which should be copied in the root directory of \Simol :
+\begin{minted}{bash}
+cp ../cmake/config/config.cmake ..
+\end{minted}
+Please edit the copied file according to your environment. Especially, don't forget to set the variable \texttt{GCC\_ROOT} to the root of your own installation of \texttt{gcc}. Once you have edited the configuration file, all is ready to perform the configuration of \Simol by typing:
+\begin{minted}{bash}
+cmake -C ../config.cmake ..
+\end{minted}
+
+
+\chapter{Building \Simol}
+
+\section{Setting your proxy}
+
+If you do not use any proxy to connect the internet, you can skip this step. If you try to download and install the development version of \Simol behind a proxy, you have to define the environment variables named \texttt{http\_proxy} and \texttt{https\_proxy}. These variables are required to download external libraries of \Simol. For example, let us assume that your proxy identifier is \texttt{proxy.enpc.fr} with port 3128. To define \texttt{http\_proxy}, you need to type the following line in your terminal:
+
+\begin{minted}{bash}
+    export http_proxy=http://proxy.enpc.fr:3128
+    export https_proxy=https://proxy.enpc.fr:3128
+\end{minted}
+
+Note that the scope of these variables is limited to the current terminal. If you want them to be defined each time you open a new terminal, you need to add theses lines at the end of your \url{~/.bashrc} file.
+
+\subsection{Building}
+
+The building step of \Simol is very simple: just type
+\begin{minted}{bash}
+make
+\end{minted}
+Note that it is not necessary to add the "-j" flag to parallelize the building step. It is done automatically. 
 
 
 \chapter{Getting started}
@@ -43,97 +130,17 @@ The sources of \Simol are stored on a server of the \SourceSup forge. To be able
 \end{itemize}
 This section explains how to satisfy these conditions.
 
-\subsection{Having an HTTP/HTTPS access to the web}
 
-If you do not use any proxy to connect the internet, you can skip this step. If you try to download and install the development version of \Simol behind a proxy, you have to define the environment variables named \texttt{http\_proxy} and \texttt{https\_proxy}. These variables are required to download external libraries of \Simol. For example, let us assume that your proxy identifier is \texttt{proxy.enpc.fr} with port 3128. To define \texttt{http\_proxy}, you need to type the following line in your terminal:
-
-\begin{minted}{bash}
-    export http_proxy=http://proxy.enpc.fr:3128
-    export https_proxy=https://proxy.enpc.fr:3128
-\end{minted}
-
-Note that the scope of these variables is limited to the current terminal. If you want them to be defined each time you open a new terminal, you need to add theses lines at the end of your \url{~/.bashrc} file.
-
-\subsection{Having an SSH access to \SourceSup}
-
-
-\subsection{Having an account on \SourceSup}
-
-Sources of \Simol are stored on a software forge called \SourceSup, which you can connect to at \urlSourceSup.  
-
-The sources of \Simol can only be accessed through the SSH protocol. To be able to use this protocol, you need to have a private key and a public key. These keys are usually located at \url{~/.ssh} in your machine. If you have already defined a key called \textit{mykey}, you should see the two files \url{mykey} and \url{mykey.pub} in this directory. The former is private and should never be communicated to anyone else. The latter is public and must be uploaded on \SourceSup. 
-
-If you do not have any SSH pair of keys, you need to create one. To do it, just type
-\begin{minted}{bash}
-ssh keygen -t dsa
-\end{minted}
-in a terminal.
-
-\subsection{Being a member of the \Simol team}
-
-
-
-
-
-
-\subsection{Having \Git installed}
-
-
-\Git is a popular version control system which has been written by Linus Thorvald, the creator of \Linux. The best way to learn more about \Git is to visit its official website: \urlGit. Please refer to the official documentation to find the installation steps for you own machine. In most cases, the easiest way to install it is to use a package manager like \texttt{apt-get}, \texttt{yum}, \texttt{homebrew}, etc. For example, you can install \Git on Ubuntu systems by simply typing
-\begin{minted}{bash}
-sudo apt-get install git
-\end{minted}
-in a terminal. You can check that \Git is installed on your machine with the command
-\begin{minted}{bash}
-git --version
-\end{minted}
-which should return something like this:
-\begin{minted}{bash}
-git version 1.7.9.5
-\end{minted}
 
 
 \section{Installation of \Simol}
 
-\subsection{Downloading the sources}
-
-To clone the source repository of \Simol, you need to be located in the directory where you want to store the development version of the software. Then, you have to type
-\begin{minted}{bash}
-git clone git+ssh://git@git.renater.fr:2222/simol.git
-\end{minted}
-in a terminal. This will create a directory \url{simol} and copy the sources of \Simol in it. 
-
-\paragraph{Note:}
-it is possible to change the name of the cloning directory, say \textit{foo}, by typing 
-\begin{minted}{bash}
-git clone git+ssh://git@git.renater.fr:2222/simol.git foo
-\end{minted}
 
 
 
 
-\subsection{Configuration}
 
-Sources of \Simol have to be built in a subdirectory called \url{build}. To reach it, just type
-\begin{minted}{bash}
-cd simol/build
-\end{minted}
-in a terminal. The configuration step lays on a configuration file. We provide an example of such a configuration file which should be copied in the root directory of \Simol :
-\begin{minted}{bash}
-cp ../cmake/config/config.cmake ..
-\end{minted}
-Please edit the copied file according to your environment. Especially, don't forget to set the variable \texttt{GCC\_ROOT} to the root of your own installation of \texttt{gcc}. Once you have edited the configuration file, all is ready to perform the configuration of \Simol by typing:
-\begin{minted}{bash}
-cmake -C ../config.cmake ..
-\end{minted}
 
-\subsection{Building}
-
-The building step of \Simol is very simple: just type
-\begin{minted}{bash}
-make
-\end{minted}
-Note that it is not necessary to add the "-j" flag to parallelize the building step. It is done automatically. 
 
 
 \subsection{Netbeans (8.0.2)}
