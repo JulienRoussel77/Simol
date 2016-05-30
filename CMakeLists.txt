@@ -58,7 +58,7 @@ OPTION(ENABLE_DOWNLOAD "Enables downloading of missing external libraries" True)
 OPTION(INSTALL_GCC "Automatic installation of GCC" False)
 
 IF(NOT EXTERNAL_DIR)
-  SET(EXTERNAL_DIR ${CMAKE_CURRENT_BINARY_DIR}/third-party)
+  SET(EXTERNAL_DIR ${CMAKE_SOURCE_DIR}/download)
 ENDIF()
 
 FIND_PACKAGE(BLAS)
@@ -126,3 +126,10 @@ INCLUDE_DIRECTORIES(include)
 
 ADD_SUBDIRECTORY(src)
 ADD_SUBDIRECTORY(test)
+
+#=============
+# INSTALLATION
+#=============
+INSTALL(DIRECTORY include/simol 
+        DESTINATION include)
+
