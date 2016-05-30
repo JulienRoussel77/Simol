@@ -1,3 +1,32 @@
+
+\chapter{Running \Simol in 5 minutes}
+
+
+Since you are reading this documentation, we might assume that you have already downloaded the sources of \Simol. If it is not the case, please refer to chapter \ref{chap:download} to see how you can get them. In the sequel, we suppose that the full path to the source directory of \Simol is stored in an environment variable named \texttt{SIMOL\_ROOT}. You can define this variable by typing 
+\begin{minted}{bash}
+    export SIMOL_ROOT=/full/path/to/the/source/directory/of/simol
+\end{minted}
+in your terminal, where \texttt{/path/to/the/source/directory/of/simol} stands for the full path to the repository which contains the source directory of \Simol. For example, if this repository is \texttt{/home/simol}, you will have to type
+\begin{minted}{bash}
+    export SIMOL_ROOT=/home/simol
+\end{minted}
+in your terminal. Now, change the directory to \texttt{\$SIMOL\_ROOT/build} and run the configuration step:
+\begin{minted}{bash}
+    cd $SIMOL_ROOT/build
+    cmake -C ../cmake/config/config.cmake -D CMAKE_INSTALL_PREFIX=$SIMOL_INSTALL_DIR ..
+\end{minted}
+If you want to modify the configuration parameters, or if you encounter any problem during the configuration step, pleaser refer to chapter \ref{chap:configure}. Now, just type
+\begin{minted}{bash}
+    make && make install
+\end{minted}
+to build and install \Simol. Note that the build step may last a long time because third-party libraries are automatically downloaded and installed in \texttt{\$SIMOL\_ROOT/download}. 
+
+\chapter{Downloading \Simol}\label{chap:download}
+
+
+\chapter{Configuring \Simol}\label{chap:configure}
+
+
 \chapter{Getting started}
 
 
