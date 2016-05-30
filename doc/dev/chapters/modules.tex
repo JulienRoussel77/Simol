@@ -6,5 +6,117 @@
 
 \subsection{Vectors}
 
+In \Simol, the \texttt{Vector} class implements mathematical vectors, contrary to the \texttt{std::vector} class of the standard template library. Therefore, they should be preferred when one wants to compute arithmetic or geometric operations on vectors, such as inner products, norms, etc. Furthermore, vector computations may automatically take advantage of parallel architectures, contrary to vectors from the STL. 
 
-\subsection{Matrices}
+\subsubsection{Construction}
+
+Vectors may be initialized in different ways which are illustrated below.
+\begin{cppcode}
+#include "simol/core/linalg/Vector.hpp"
+
+Vector<double> u; // empty vector
+Vector<double> v(3); // vector of size 3
+Vector<double> w(2, 4.0); // constant vector of size 2 with 4.0 as coefficient
+Vector<double> x("data.txt"); // vector read from data.txt file
+\end{cppcode}
+
+In this example, vector \texttt{u} is allocated as an empty vector while vector \texttt{v} is allocated as a three-dimensional vector. Note that initialization of vector \texttt{v} is never guaranteed. To force initialization of a vector, one may declare it as a constant vector:  it is the case for vector \texttt{w} which is
+\begin{equation*}
+w = (4.0, 4.0).
+\end{equation*}
+Another solution is to provide the values of the coefficients of a vector in a file. Vector \texttt{x} is initialized in this way. Finally, it is also possible to initialize a vector by copying the values of another vector.
+\begin{cppcode}
+#include "simol/core/linalg/Vector.hpp"
+
+Vector<double> a = w; // a is a copy of x
+Vector<double> b = Vector<double>::Zero(6); // zero vector of size 6
+\end{cppcode}
+In the code above, vector \texttt{a} is a copy of \texttt{w}, which means that \texttt{a} is defined by
+\begin{equation*}
+a = w = (4.0, 4.0).
+\end{equation*}
+Vector \texttt{b} is a zero vector of size 6:
+\begin{equation*}
+b = (0, 0, 0, 0, 0, 0).
+\end{equation*}
+
+
+\subsubsection{Accessing and modifying coefficients}
+
+Accessing and modifying coefficients of a vector is very natural and easy thanks to the operator overloading mechanism provided by the C++ language. 
+\begin{cppcode}
+#include "simol/core/linalg/Vector.hpp"
+
+Vector<double> v(3); // uninitialized vector of size 3
+v.fill(1.0); // set all coefficients to 1.0
+v(1) = -2.0; // set the second coefficient to -2.0
+double c = v(v.size()-1); // get the last coefficient 
+\end{cppcode}
+In the example above, a vector $\texttt{v}$ of size 3 is first declared without any initialization. Then, all its coefficients are set to 1.0 by calling the \texttt{fill} member function. Vector's coefficients are indexed from 0 to its size. The size of a vector can be accessed through the \texttt{size} member function. 
+
+
+\subsubsection{Mathematical operations}
+
+
+\begin{cppcode}
+#include "simol/core/linalg/Vector.hpp"
+
+// First canonical vector of R2
+Vector<double> e1 = Vector<double>::Zero(2);
+e1(0) = 1;
+
+// Second canonical vector of R2
+Vector<double> e2 = Vector<double>::Zero(2);
+e2(1) = 1;
+
+std::cout << e1.norm() << std::endl;
+std::cout << e1.dot(2) << std::endl;
+std::cout << e1.min() << std::endl;
+std::cout << e1.max() << std::endl;
+
+\end{cppcode}
+
+
+\subsection{Dense matrices}
+
+Dense matrices should be used to store matrices whose almost coefficients are not zeros. Otherwise, it may be far more efficient to use sparse matrices described in the next section. The class which implements dense matrices is named \DenseMatrix. There exists many different ways to declare a dense matrix in \Simol:
+\begin{cppcode}
+#include "simol/core/linalg/DenseMatrix.hpp"
+
+DenseMatrix<double> A(3,2); // 3x2 matrix
+
+DenseMatrix<double> I = DenseMatrix<double>::Identity(4); // 4x4 identity matrix
+DenseMatrix<double> Z = DenseMatrix<double>::Zero(2,5); // 4x5 zero matrix
+
+DenseMatrix<double> F("matrix.mtx"); // matrix from Matrix Market file
+\end{cppcode}
+In the code above, matrix \texttt{A} is a $3\times 2$ matrix and it is not guaranteed to be initialized. Matrix \texttt{I} is the $4\times 4$ identity matrix:
+\begin{equation*}
+I=
+\begin{pmatrix}
+1 & 0 & 0 & 0 \\
+0 & 1 & 0 & 0 \\
+0 & 0 & 1 & 0 \\
+0 & 0 & 0 & 1 
+\end{pmatrix}
+\end{equation*}
+Matrix \texttt{Z} is the $2\times 5$ zero matrix:
+\begin{equation*}
+Z=
+\begin{pmatrix}
+0 & 0 & 0 & 0 & 0\\
+0 & 0 & 0 & 0 & 0
+\end{pmatrix}
+\end{equation*}
+Matrix $\texttt{F}$ is constructed from a \MatrixMarket file\footnote{http://math.nist.gov/MatrixMarket}.
+
+\subsection{Sparse matrices}
+
+Sparse matrices should be used to store matrices which contains many zeros as coefficients. Otherwise, dense matrices described in the previous question should be used for the sake of efficiency. The class representing sparse matrices is named \SparseMatrix in \Simol. Ways of constructing such sparse matrices is illustrated below.
+\begin{cppcode}
+#include "simol/core/linalg/SparseMatrix.hpp"
+
+SparseMatrix<double> A(3,2); // 3x2 matrix
+
+SparseMatrix<double> F("matrix.mtx"); // matrix from Matrix Market file
+\end{cppcode}
