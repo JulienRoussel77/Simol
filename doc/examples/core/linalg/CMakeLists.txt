@@ -1,0 +1,8 @@
+
+
+ADD_EXECUTABLE(ex_vector ex_vector.cpp)
+
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+
+INCLUDE_DIRECTORIES(${CMAKE_INSTALL_PREFIX}/include)
+INCLUDE_DIRECTORIES(${EXTERNAL_DIR}/eigen/install/include/eigen3)
