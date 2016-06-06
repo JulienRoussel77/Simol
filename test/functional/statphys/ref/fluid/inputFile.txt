@@ -1,0 +1,27 @@
+System:
+  Dimension: 2
+  LatticeParameter: 1.
+  Name: NBody
+  NumberPerDimension: 10
+  Cells: yes
+   
+Time:
+  Step: 0.005
+  TotalTime: 1.
+
+Potential:
+  Name: LennardJones
+  Epsilon: 1
+  Sigma: 1
+  CutOffRatio: 2.5
+  SplineRatio: 0.8
+
+Dynamics:
+  Name: Hamiltonian
+  Temperature: 1
+    
+Output:
+  PrintPeriod: 0.005
+  PrintLongPeriod: 0.1
+
+
