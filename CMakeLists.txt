@@ -16,10 +16,12 @@ IF(SIMOL_GCC_ROOT)
   SET(CMAKE_CXX_COMPILER ${SIMOL_GCC_ROOT}/bin/g++)
   SET(CMAKE_Fortran_COMPILER ${SIMOL_GCC_ROOT}/bin/gfortran)
   SET(LD_LIBRARY_PATH ${LD_LIBRARY_PATH} ${SIMOL_GCC_ROOT}/lib64)
+  SET(CMAKE_INSTALL_RPATH ${SIMOL_GCC_ROOT}/lib64) 
   LINK_DIRECTORIES(${SIMOL_GCC_ROOT}/lib64)
 ENDIF(SIMOL_GCC_ROOT)
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-################################################
+#SET(CMAKE_EXE_LINKER_FLAGS 
+#          "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath -Wl,/usr/local/lib")################################################
 # Project definition:
 #   1. its name is simol
 #   2. it involves both fortran, c and c++ files
