@@ -68,7 +68,7 @@ namespace simol
       particle.resetForce(potential());
     //for (auto&& particle : configuration_)
     //  dyna.computeForce(particle);
-    interaction(ancorParticle_, configuration_[0]);
+    //interaction(ancorParticle_, configuration_[0]);
     for (int i = 0; i < nbOfParticles() - 1; i++)
     {
       interaction(configuration_[i], configuration_[i + 1]);
@@ -81,24 +81,35 @@ namespace simol
   void BiChain::computeProfile(Output& output, LangevinBase const& dyna, int iOfStep) const
   {
     output.energySumFlow() = 0;
+    output.energyModiFlow() = dyna.gamma() * dyna.deltaTemperature() / 2;
+    //cout << dyna.gamma() << " " << dyna.deltaTemperature()<< endl;
+    assert(nbOfParticles() % 2 == 0);
     int midNb = (nbOfParticles() - 1) / 2;
     for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
     {
       //Particle& particle = configuration_[iOfParticle];
       double dist = 0;
+      double distPr = 0;
+      double distNe = 0;
       double flow = 0;
       double potTempTop = 0;
       double potTempBot = 0;
+      
 
       if (iOfParticle == 0)
       {
         dist = getParticle(0).position(0) - ancorParticle_.position(0);
         flow = dyna.gamma() * (dyna.temperatureLeft() - 2 * getParticle(0).kineticEnergy());
+        //distNe = getParticle(1).position(0) - getParticle(0).position(0);
+        //output.energyModiFlow() += (getParticle(0).momentum(0) + distNe) / 4 * (getParticle(0).energyGrad(0) - dist);
+        //cout << iOfParticle << " : " << getParticle(0).energyGrad(0) << " " << dist << endl;
       }
       else
       {
         // dist is r_iOfParticle
         dist = getParticle(iOfParticle).position(0) - getParticle(iOfParticle - 1).position(0);
+        if (iOfParticle != 1)
+          distPr = getParticle(iOfParticle-1).position(0) - getParticle(iOfParticle-2).position(0);
         // flow is j_iOfParticle
         flow = - getParticle(iOfParticle).energyGrad(0) * getParticle(iOfParticle - 1).momentum(0);
         if (iOfParticle != nbOfParticles() - 1)
@@ -106,7 +117,19 @@ namespace simol
           output.energySumFlow() += flow;
           if (iOfParticle == midNb)
             output.energyMidFlow() = flow;
+          
+          distNe = getParticle(iOfParticle+1).position(0) - getParticle(iOfParticle).position(0);
+          
+          if (iOfParticle == 1)
+            output.energyModiFlow() += (distNe - getParticle(0).momentum(0)) / 4 * (getParticle(iOfParticle).energyGrad(0) - dist);
+          // iOfParticle != 0, 1, N-1
+          else
+            output.energyModiFlow() += (distNe - distPr) / 4 * (getParticle(iOfParticle).energyGrad(0) - dist);
         }
+        else
+          output.energyModiFlow() -= (getParticle(iOfParticle).momentum(0) + distPr) / 4 * (getParticle(iOfParticle).energyGrad(0) - dist);
+        
+        //cout << iOfParticle << " : " << getParticle(iOfParticle).energyGrad(0) << " " << dist << endl;
       }
 
       if (iOfParticle == nbOfParticles() - 1)
@@ -119,6 +142,8 @@ namespace simol
         potTempTop = pow(getParticle(iOfParticle).energyGrad(0) - getParticle(iOfParticle + 1).energyGrad(0), 2);
         potTempBot = getParticle(iOfParticle).energyLapla() + getParticle(iOfParticle + 1).energyLapla();
       }
+      
+      
 
       output.appendBendistProfile(dist , iOfStep, iOfParticle);
       output.appendKinTempProfile(2 * getParticle(iOfParticle).kineticEnergy(), iOfStep, iOfParticle);
@@ -127,6 +152,7 @@ namespace simol
       output.appendFlowProfile(flow, iOfStep, iOfParticle);
     }
     output.energySumFlow() /= (nbOfParticles() - 2.);
+    //output.energyModiFlow() /= nbOfParticles();
     //cout << output.energySumFlow() << endl;
   }
 
@@ -194,13 +220,16 @@ namespace simol
   void TriChain::computeProfile(Output& output, LangevinBase const& dyna, int iOfStep) const
   {
     output.energySumFlow() = 0;
+    
+    // modiFlow expression is easier for pair nbOfParticles
+    
     for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
     {
-      //Particle& particle = configuration_[iOfParticle];
       double bending = 0;
       double flow = 0;
       double potTempTop = 0;
       double potTempBot = 0;
+
 
       if (iOfParticle == 0)
       {
@@ -209,7 +238,6 @@ namespace simol
                - ancorParticle2_.energyGrad(0) * getParticle(0).momentum(0);
         potTempTop = pow(- ancorParticle2_.energyGrad(0) + 2 * getParticle(0).energyGrad(0) - getParticle(1).energyGrad(0), 2);
         potTempBot = ancorParticle2_.energyLapla() + 4 * getParticle(0).energyLapla() + getParticle(1).energyLapla();
-
       }
       else if (iOfParticle < (int)configuration_.size() - 1)
       {
@@ -230,6 +258,8 @@ namespace simol
         potTempTop = pow(- getParticle(iOfParticle - 1).energyGrad(0), 2);
         potTempBot = getParticle(iOfParticle - 1).energyLapla();
       }
+      
+      
 
       int midNb = (nbOfParticles() - 1) / 2;
       if (iOfParticle == midNb)

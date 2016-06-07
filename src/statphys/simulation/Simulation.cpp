@@ -60,7 +60,6 @@ namespace simol
   {
     if (output.doOutput(iOfStep))
       output.displayObservables(iOfStep);
-
     if (output.doLongPeriodOutput(iOfStep))
       output.displayParticles(syst.configuration(), iOfStep);
   }

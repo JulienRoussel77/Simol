@@ -21,6 +21,7 @@ namespace simol
 
       std::size_t numberOfRows() const;
       std::size_t numberOfColumns() const;
+      std::size_t nonZeros() const;
 
       ScalarType const operator()(std::size_t const rowIndex, std::size_t const columnIndex) const;
       ScalarType & operator()(std::size_t const rowIndex, std::size_t const columnIndex);
@@ -153,7 +154,10 @@ namespace simol
   SparseMatrix<ScalarType, eigen>::numberOfColumns() const
   { return wrapped_.cols(); }
 
-
+  template<class ScalarType> inline std::size_t
+  SparseMatrix<ScalarType, eigen>::nonZeros() const
+  { return wrapped_.nonZeros(); }
+  
 
   template<class ScalarType, template<class> class Library>
   std::ifstream & operator>>(std::ifstream & fileToRead, SparseMatrix<ScalarType, Library> & matrixToWrite)

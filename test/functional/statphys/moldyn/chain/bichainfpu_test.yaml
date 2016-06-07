@@ -1,0 +1,31 @@
+Time:
+  Step: 0.02
+  TotalTime: 1000000
+  ThermalizationTime: 10
+  BurnInTime: 10
+
+System:
+  Name: BiChain
+  Number: 8
+  Dimension: 1
+  //Settings: FileSettings
+
+Potential:
+  Name: FPU
+  Alpha: 0.1
+  Beta: 0.1
+
+Dynamics:
+  Name: BoundaryLangevin
+  Gamma: 1
+  Temperature: 2
+  DeltaTemperature: 1
+  Tau: 0
+  Seed: 0
+
+Output:
+  SimuTypeName: yes
+  FolderName: N8_alpha0.1
+  DecorrelationTime: 24
+  PrintPeriod: 10
+  LongPrintPeriod: 10000

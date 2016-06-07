@@ -38,7 +38,7 @@ namespace simol
     //generatorOnBasis = generatorOn(dyna, syst, output.velocityCV());
     generatorOnBasis = output.velocityCV().generatorLangevin(syst.configuration(), dyna.beta(), dyna.gamma());
     output.velocityCV().update(p(0), generatorOnBasis, syst.configuration(), iOfStep);
-    if (output.doOutput(iOfStep))
+    if (!output.velocityCV().isNone() && output.doOutput(iOfStep))
       output.displayGeneratorOnBasis(output.outVelocitiesGenerator(), syst.configuration(), output.velocityCV(), iOfStep * dyna.timeStep());
   }
 
@@ -54,6 +54,9 @@ namespace simol
     //generatorOnBasis = generatorOn(dyna, syst, output.sumFlowCV());
     generatorOnBasis = output.sumFlowCV().generatorBoundarylangevin(syst.configuration(), dyna.betaLeft(), dyna.betaRight(), dyna.gamma());
     output.sumFlowCV().update(output.energySumFlow(), generatorOnBasis, syst.configuration(), iOfStep);
+    
+    generatorOnBasis = output.modiFlowCV().generatorBoundarylangevin(syst.configuration(), dyna.betaLeft(), dyna.betaRight(), dyna.gamma());
+    output.modiFlowCV().update(output.energyModiFlow(), generatorOnBasis, syst.configuration(), iOfStep);
   }
 
 }

@@ -162,7 +162,8 @@ namespace simol
 
     for (std::size_t j = 0; j < numberOfColumns; j++)
       for (std::size_t i = 0; i < numberOfRows; i++)
-        wrapped_(i, j) = u(i * u.size() + j);
+        wrapped_(i, j) = u(j * numberOfRows+ i);
+        //wrapped_(i, j) = u(i * numberOfColumns + j);
   }
 
   //! Returns a coefficient

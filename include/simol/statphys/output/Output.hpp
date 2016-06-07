@@ -35,6 +35,7 @@ namespace simol
       ofstream & outMidFlowCV();
       ofstream & outMidFlowPT();
       ofstream & outSumFlowCV();
+      ofstream & outModiFlowCV();
       ofstream & outSumFlowPT();
       ofstream & outProfile();
       ofstream & outFinalProfile();
@@ -68,6 +69,8 @@ namespace simol
       double& energyMidFlow();
       const double& energySumFlow() const;
       double& energySumFlow();
+      const double& energyModiFlow() const;
+      double& energyModiFlow();
 
       //-- parametrization of outputs --
       bool doComputeCorrelations() const;
@@ -108,6 +111,7 @@ namespace simol
       ControlVariate& lengthCV();
       ControlVariate& midFlowCV();
       ControlVariate& sumFlowCV();
+      ControlVariate& modiFlowCV();
       void displayGeneratorOnBasis(ofstream& out, vector<Particle> const& configuration, ControlVariate& controlVariate, double time);
       void updateControlVariate(vector<Particle> const& configuration);
 
@@ -137,6 +141,7 @@ namespace simol
       std::shared_ptr<ofstream> outMidFlowPT_;
       std::shared_ptr<ofstream> outSumFlowCV_;
       std::shared_ptr<ofstream> outSumFlowPT_;
+      std::shared_ptr<ofstream> outModiFlowCV_;
       std::shared_ptr<ofstream> outProfile_;
       std::shared_ptr<ofstream> outFinalProfile_;
 
@@ -155,6 +160,7 @@ namespace simol
       double totalVirial_;
       double energyMidFlow_;
       double energySumFlow_;
+      double energyModiFlow_;
 
       //-- parametrization of outputs --
       int decorrelationNbOfSteps_;
@@ -168,6 +174,7 @@ namespace simol
       ControlVariate* lengthCV_;
       ControlVariate* midFlowCV_;
       ControlVariate* sumFlowCV_;
+      ControlVariate* modiFlowCV_;
 
       //----------- for autocorrelations -------------
       AutocorrelationStats kinTempProfile_;

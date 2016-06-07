@@ -14,6 +14,7 @@ namespace simol
     lengthCV_ = createControlVariate(input, potential, galerkin);
     midFlowCV_ = createControlVariate(input, potential, galerkin);
     sumFlowCV_ = createControlVariate(input, potential, galerkin);
+    modiFlowCV_ = createControlVariate(input, potential, galerkin);
   }
 
   void Output::displayGeneratorOnBasis(ofstream& out, vector<Particle> const& configuration, ControlVariate& controlVariate, double time)

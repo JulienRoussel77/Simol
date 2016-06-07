@@ -12,8 +12,11 @@ doc/dev/chapters/*.log
 doc/html/
 doc/latex/
 
+download
 integration/buildbot
 output/*
 .kdev4/
 config.cmake
 simol.kdev4
+
+launcher_cluster_*

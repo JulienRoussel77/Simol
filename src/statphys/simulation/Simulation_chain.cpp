@@ -33,6 +33,7 @@ namespace simol
 
       output.midFlowCV_->display(output.outMidFlowCV(), iOfStep * dyna.timeStep() );
       output.sumFlowCV_->display(output.outSumFlowCV(), iOfStep * dyna.timeStep() );
+      output.modiFlowCV_->display(output.outModiFlowCV(), iOfStep * dyna.timeStep() );
     }
 
     if (output.doLongPeriodOutput(iOfStep))

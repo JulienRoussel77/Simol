@@ -173,7 +173,7 @@ namespace simol
     output.kineticEnergy() = 0;
     output.potentialEnergy() = 0;
     //-- compute temperature and kinetic energy --
-  for (const auto & particle : syst.configuration())
+    for (const auto & particle : syst.configuration())
     {
       output.kineticEnergy() += particle.kineticEnergy();
       output.potentialEnergy() += particle.potentialEnergy();
@@ -203,7 +203,7 @@ namespace simol
     output.kineticEnergy() = 0;
     output.potentialEnergy() = 0;
     //Calcul de la température et de l'énergie
-  for (const auto & particle : syst.configuration())
+    for (const auto & particle : syst.configuration())
     {
       output.kineticEnergy() += particle.kineticEnergy();
       output.potentialEnergy() += particle.potentialEnergy();

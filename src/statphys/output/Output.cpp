@@ -100,12 +100,15 @@ namespace simol
 
       outMidFlowCV_         = std::make_shared<ofstream>(input.outputFolderName() + "midFlow.txt");
       outMidFlowCV() << "# time b <b> <b2> D <D> >D2> observable <observable> >observable2> LPhi <LPhi> <LPhi2>" << endl;
-
       outMidFlowPT_         = std::make_shared<ofstream>(input.outputFolderName() + "midFlowPost.txt");
+
       outSumFlowCV_         = std::make_shared<ofstream>(input.outputFolderName() + "sumFlow.txt");
       outSumFlowCV() << "# time b <b> <b2> D <D> >D2> observable <observable> >observable2> LPhi <LPhi> <LPhi2>" << endl;
-
       outSumFlowPT_         = std::make_shared<ofstream>(input.outputFolderName() + "sumFlowPost.txt");
+
+      outModiFlowCV_         = std::make_shared<ofstream>(input.outputFolderName() + "modiFlow.txt");
+      outModiFlowCV() << "# time b <b> <b2> D <D> >D2> observable <observable> >observable2> LPhi <LPhi> <LPhi2>" << endl;
+      
       outProfile_           = std::make_shared<ofstream>(input.outputFolderName() + "profile.txt");
 
       if (doFinalFlow_)

@@ -17,6 +17,8 @@ namespace simol
   {return *outSumFlowCV_;}
   ofstream & Output::outSumFlowPT()
   {return *outSumFlowPT_;}
+  ofstream & Output::outModiFlowCV()
+  {return *outModiFlowCV_;}
   ofstream & Output::outProfile()
   {return *outProfile_;}
   ofstream & Output::outFinalProfile()
@@ -33,12 +35,21 @@ namespace simol
 
   double& Output::energySumFlow()
   {return energySumFlow_;}
+  
+  const double& Output::energyModiFlow() const
+  {return energyModiFlow_;}
+
+  double& Output::energyModiFlow()
+  {return energyModiFlow_;}
 
   ControlVariate& Output::midFlowCV()
   {return *midFlowCV_;}
 
   ControlVariate& Output::sumFlowCV()
   {return *sumFlowCV_;}
+  
+  ControlVariate& Output::modiFlowCV()
+  {return *modiFlowCV_;}
 
   void Output::displayChainPositions(vector<Particle> const& configuration, int iOfStep)
   {
@@ -121,6 +132,8 @@ namespace simol
                      << " " << setw(12) << midFlowCV_->stdDeviationObservable()
                      << " " << setw(12) << sumFlowCV_->meanObservable()
                      << " " << setw(12) << sumFlowCV_->stdDeviationObservable()
+                     << " " << setw(12) << modiFlowCV_->meanObservable()
+                     << " " << setw(12) << modiFlowCV_->stdDeviationObservable()
                      << std::endl;
     }
   }

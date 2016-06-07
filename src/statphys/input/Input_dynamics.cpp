@@ -76,8 +76,8 @@ namespace simol
 
   double Input::deltaTemperature() const
   {
-    if (data["Dynamics"]["deltaTemperature"])
-      return data["Dynamics"]["deltaTemperature"].as<double>();
+    if (data["Dynamics"]["DeltaTemperature"])
+      return data["Dynamics"]["DeltaTemperature"].as<double>();
     else return defaultDeltaTemperature;
   }
 
