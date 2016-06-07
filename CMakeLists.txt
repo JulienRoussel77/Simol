@@ -18,7 +18,7 @@ IF(SIMOL_GCC_ROOT)
   SET(LD_LIBRARY_PATH ${LD_LIBRARY_PATH} ${SIMOL_GCC_ROOT}/lib64)
   LINK_DIRECTORIES(${SIMOL_GCC_ROOT}/lib64)
 ENDIF(SIMOL_GCC_ROOT)
-
+SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 ################################################
 # Project definition:
 #   1. its name is simol
