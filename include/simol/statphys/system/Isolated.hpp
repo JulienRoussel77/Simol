@@ -11,6 +11,7 @@ namespace simol
       Isolated(Input const& input);
       void printName() const;
       void computeAllForces();
+      virtual void thermalize(Dynamics& model);
   };
 
 

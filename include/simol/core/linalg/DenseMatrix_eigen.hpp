@@ -105,11 +105,17 @@ namespace simol
       typename eigen<ScalarType>::DenseMatrixType wrapped_;
   };
 
-  //! Construction from a sparse matrix
+  /*//! Construction from a sparse matrix
   template<typename ScalarType> inline
   DenseMatrix<ScalarType, eigen>::DenseMatrix(SparseMatrix<ScalarType, eigen> const & matrix)
     : wrapped_(matrix.wrapped_.template triangularView<Eigen::Upper>())
-  { wrapped_ += matrix.wrapped_.transpose().template triangularView<Eigen::StrictlyLower>(); }
+  { wrapped_ += matrix.wrapped_.transpose().template triangularView<Eigen::StrictlyLower>(); }*/
+  
+  //! Construction from a sparse matrix
+  template<typename ScalarType> inline
+  DenseMatrix<ScalarType, eigen>::DenseMatrix(SparseMatrix<ScalarType, eigen> const & matrix)
+    : wrapped_(matrix.wrapped_)
+  {}
 
   //! Construction from a matrix block
   template<typename ScalarType> inline

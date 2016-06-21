@@ -29,9 +29,11 @@ namespace simol
   {
     if (data["Output"]["SimuTypeName"]
         && data["Output"]["SimuTypeName"].as<string>() == "yes")
-      return "../../../output/" + dynamicsName() + "/" + systemName() + "/" + potentialName() + "/";
+      //return "../../../output/" + dynamicsName() + "/" + systemName() + "/" + potentialName() + "/";
+      return "output/" + dynamicsName() + "/" + systemName() + "/" + potentialName() + "/";
     else
-      return "../../../output/";
+      //return "../../../output/";
+      return "output";
   }
 
   string Input::parametersName() const

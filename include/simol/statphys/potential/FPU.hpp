@@ -13,8 +13,8 @@ namespace simol
       double operator()(double position) const;
       Vector<double> gradient(double position) const;
       double laplacian(double position) const;
-      virtual double ratioToHarmonic() const;
-      double drawLaw(double localBeta, std::shared_ptr<RNG>& rng_) const;
+      virtual double shiftToHarmonic() const;
+      //double drawLaw(double localBeta, std::shared_ptr<RNG>& rng_) const;
     private:
       double stiffness_, alpha_, beta_;
   };

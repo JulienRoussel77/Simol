@@ -12,6 +12,7 @@ namespace simol
       DoubleWell(Input const& input);
       double operator()(double position) const;
       Vector<double> gradient(double position) const;
+      virtual double shiftToHarmonic() const;
 
     private:
       double height_;

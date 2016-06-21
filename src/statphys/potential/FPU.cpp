@@ -28,16 +28,16 @@ namespace simol
     return stiffness_ + 2 * alpha_ * distance + 3 * beta_ * pow(distance, 2);
   }
 
-  double FPU::ratioToHarmonic() const
+  double FPU::shiftToHarmonic() const
   {
     assert(stiffness_ == 1);
     if (beta_ > 0)
-      return - pow(alpha_, 4) / (12 * pow(beta_, 3));
+      return pow(alpha_, 4) / (12 * pow(beta_, 3));
     else
       return 0;
   }
 
-  double FPU::drawLaw(double localBeta, std::shared_ptr<RNG>& rng) const
+  /*double FPU::drawLaw(double localBeta, std::shared_ptr<RNG>& rng) const
   {
     double ratio = ratioToHarmonic();
     bool reject = true;
@@ -54,6 +54,6 @@ namespace simol
       assert(exp(-localBeta * (pow(xdraw, 2) / 2 + ratio)) >= exp(- localBeta * value(xdraw)));
     }
     return xdraw;
-  }
+  }*/
 
 }

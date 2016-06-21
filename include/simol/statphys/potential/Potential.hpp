@@ -33,7 +33,7 @@ namespace simol
       virtual Vector<double> potentialForce(double position) const;
       virtual double laplacian(Vector<double> const & position) const;
       virtual double laplacian(double position) const;
-      virtual double ratioToHarmonic() const;
+      virtual double shiftToHarmonic() const;
       virtual double drawLaw(double /*localBeta*/, std::shared_ptr<RNG>& /*rng*/) const;
 
     protected:

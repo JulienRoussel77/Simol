@@ -46,6 +46,7 @@ namespace simol
 
       virtual int nbOfVariables() const;
       virtual int nbOfParticles() const;
+      virtual int sizeOfBasis() const;
 
       const double& expFourierCoeffs(int iOfElt) const;
       int iTens(int iOfFourier2, int iOfHermite) const;
@@ -57,6 +58,8 @@ namespace simol
       DVec solveWithSaddle(const SMat& A, const DVec& X) const;
       DenseMatrix<double> invWithSaddle(const SparseMatrix<double>& A) const;
       DenseMatrix<double> invWithSaddle(const DenseMatrix<double>& A) const;
+      
+      Eigen::EigenSolver<Eigen::MatrixXd> getEigenSolver() const;
 
       void computeExpToTrigMat();
       virtual void computeExpToTrigTens() = 0;

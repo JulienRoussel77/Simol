@@ -26,6 +26,8 @@ namespace simol
     inputFlux_(inputPath()),
     inputSettings_(settingsPath())
   {
+    cout << "Input::Input" << endl;
+    assert(data.IsDefined());
     if (doFileSettings())
     {
       assert(inputFlux_.is_open());

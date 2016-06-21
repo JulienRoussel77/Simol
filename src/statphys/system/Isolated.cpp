@@ -22,5 +22,8 @@ namespace simol
     getParticle().potentialEnergy() = potential(getParticle().position());
     getParticle().force() = totalForce(getParticle().position());
   }
+  
+  void Isolated::thermalize(Dynamics& /*model*/)
+  {}
 
 }

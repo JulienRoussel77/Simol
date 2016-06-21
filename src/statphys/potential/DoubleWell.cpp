@@ -13,5 +13,11 @@ namespace simol
   {
     return Vector<double>(1, 4 * height_ * position * (position - interWell_ / 2) * (position + interWell_ / 2));
   }
+  
+  double DoubleWell::shiftToHarmonic() const
+  {
+    assert(height_ > 0);
+    return (2 * pow(interWell_, 2)*height_ + 1) / (16 * height_);
+  }
 
 }

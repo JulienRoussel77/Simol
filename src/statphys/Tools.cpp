@@ -31,3 +31,8 @@ int getNbOfLines(ifstream& file)
   for (nbOfLines = 0; std::getline(file, line); ++nbOfLines) {}
   return nbOfLines;
 }
+
+bool hasSmallerNorm(const cplx& a, const cplx& b)
+{
+  return (norm(a) < norm(b));
+}

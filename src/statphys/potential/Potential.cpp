@@ -112,15 +112,37 @@ namespace simol
 
   ///
   /// ration used in the rejection method
-  double Potential::ratioToHarmonic() const
+  double Potential::shiftToHarmonic() const
   {
-    throw std::invalid_argument("Potential::ratioToHarmonic : Function undefined");
+    throw std::invalid_argument("Potential::shiftToHarmonic : Function undefined");
   }
+  
   ///
   ///sampling using the rejection method
-  double Potential::drawLaw(double /*localBeta*/, std::shared_ptr<RNG>& /*rng*/) const
+  //double Potential::drawLaw(double /*localBeta*/, std::shared_ptr<RNG>& /*rng*/) const
+  //{
+  //  throw std::invalid_argument("Potential::drawLaw : Function undefined");
+  //}
+  
+  ///
+  ///sampling using the rejection method
+  double Potential::drawLaw(double localBeta, std::shared_ptr<RNG>& rng) const
   {
-    throw std::invalid_argument("Potential::drawLaw : Function undefined");
+    double ratio = shiftToHarmonic();
+    bool reject = true;
+    double xdraw, udraw;
+    while (reject)
+    {
+      xdraw = rng->scalarGaussian() / sqrt(localBeta);
+      //cout << ratio << " " << exp(-localBeta * (pow(xdraw, 2)/2 + ratio)) << " " << exp(- localBeta * potential_->value(xdraw)) << endl;
+      //cout << xdraw << " " << localBeta * pow(xdraw, 2)/2 - ratio << " >= " << localBeta * potential_->value(xdraw) << endl;
+      udraw = rng->scalarUniform();
+
+      reject = (udraw > exp(- localBeta * (value(xdraw) + pow(xdraw, 2) / 2 - ratio)));
+      //cout << reject << " " << xdraw << " " << ydraw << endl << endl;
+      assert(exp(-localBeta * (pow(xdraw, 2) / 2 - ratio)) >= exp(- localBeta * value(xdraw)));
+    }
+    return xdraw;
   }
 
 

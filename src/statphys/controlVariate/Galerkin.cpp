@@ -4,8 +4,6 @@ using std::cout;
 using std::endl;
 using std::ostream;
 
-//using namespace arma;
-
 
 namespace simol
 {
@@ -258,7 +256,7 @@ namespace simol
       }
 
 
-    ofstream out_trigToExpMat("../../../output/Galerkin/trigToExpMat");
+    ofstream out_trigToExpMat("output/Galerkin/trigToExpMat");
     display(trigToExpMat_, out_trigToExpMat);
 
     expToTrigMat_  = trigToExpMat_.inverse();
@@ -355,12 +353,12 @@ namespace simol
     
     cout << "Computing Q..."; cout.flush();
     createQ();
-    display(Q_, "../../../output/Galerkin/Q");
+    display(Q_, "output/Galerkin/Q");
     cout << "OK" << endl;
 
     cout << "Computing P..."; cout.flush();
     createP();
-    display(P_, "../../../output/Galerkin/P");
+    display(P_, "output/Galerkin/P");
     cout << "OK" << endl;
 
 
@@ -374,6 +372,11 @@ namespace simol
   int Galerkin::nbOfParticles() const
   {
     return nbOfParticles_;
+  }
+  
+  int Galerkin::sizeOfBasis() const
+  {
+    return sizeOfBasis_;
   }
 
   const double& Galerkin::expFourierCoeffs(int iOfElt) const
@@ -398,10 +401,10 @@ namespace simol
     //cout << Leq_ << endl << endl;
 
     DenseMatrix<double> DLeq(Leq_);
-    display(Leq_, "../../../output/Galerkin/Leq");
+    display(Leq_, "output/Galerkin/Leq");
 
     //DenseMatrix<double> DLeqSad = shapeSaddle(DLeq);
-    //display(DLeqSad, "../../../output/Galerkin/LeqSad");
+    //display(DLeqSad, "output/Galerkin/LeqSad");
 
     cout << "############ DLeqSad ############" << endl;
     //cout << DLeqSad << endl << endl;
@@ -413,7 +416,7 @@ namespace simol
     DenseMatrix<double> DLeqInv = invWithSaddle(DLeq);
 
     cout << "############ LeqInv ############" << endl;
-    display(DLeqInv, "../../../output/Galerkin/DLeqInv");
+    display(DLeqInv, "output/Galerkin/DLeqInv");
 
 
     DVec H1Trig = Vector<double>::Zero(sizeOfBasis_);
@@ -433,28 +436,28 @@ namespace simol
       H1(iTens(iOfFourier2, 1)) = expFourierCoeffs_[iOfFourier2];*/
 
     cout << "############ H1Mat ############" << endl;
-    display(gettGiHj(0, 1), "../../../output/Galerkin/H1");
+    display(gettGiHj(0, 1), "output/Galerkin/H1");
     //DenseMatrix<double> H1Mat = reshape(gettGiHj(0,1), nbOfFourier_, nbOfHermite_);
     DenseMatrix<double> H1Mat(gettGiHj(0, 1), nbOfFourier_, nbOfHermite_);
-    display(H1Mat, "../../../output/Galerkin/H1Mat");
+    display(H1Mat, "output/Galerkin/H1Mat");
 
-    display(H1Trig, "../../../output/Galerkin/H1Trig");
-    display(H1TrigMat, "../../../output/Galerkin/H1TrigMat");
+    display(H1Trig, "output/Galerkin/H1Trig");
+    display(H1TrigMat, "output/Galerkin/H1TrigMat");
 
 
-    display(gettGiHj(0, 0), "../../../output/Galerkin/G0Trig");
+    display(gettGiHj(0, 0), "output/Galerkin/G0Trig");
 
     DenseMatrix<double> G0Mat(gettGiHj(0, 0), nbOfFourier_, nbOfHermite_);
-    display(G0Mat, "../../../output/Galerkin/G0Mat");
+    display(G0Mat, "output/Galerkin/G0Mat");
     DenseMatrix<double> LG0Mat(getLtGiHj(0, 0), nbOfFourier_, nbOfHermite_);
-    display(LG0Mat, "../../../output/Galerkin/LG0Mat");
+    display(LG0Mat, "output/Galerkin/LG0Mat");
 
-    display(gettGiHj(1, 2), "../../../output/Galerkin/G1H2Trig");
-    display(getLtGiHj(1, 2), "../../../output/Galerkin/LG1H2Trig");
+    display(gettGiHj(1, 2), "output/Galerkin/G1H2Trig");
+    display(getLtGiHj(1, 2), "output/Galerkin/LG1H2Trig");
 
-    display(getLtGiHj(0, 1), "../../../output/Galerkin/LH1");
+    display(getLtGiHj(0, 1), "output/Galerkin/LH1");
     DVec LinvH1 = getLinvtGiHj(0, 1);
-    display(LinvH1, "../../../output/Galerkin/LinvH1");
+    display(LinvH1, "output/Galerkin/LinvH1");
 
     //double lambda = LinvH1Sad(sizeOfBasis_);
 
@@ -464,24 +467,25 @@ namespace simol
     DenseMatrix<double> LinvH1Mat(LinvH1, nbOfFourier_, nbOfHermite_);
 
     cout << "############ LinvH1Mat ############" << endl;
-    display(LinvH1Mat, "../../../output/Galerkin/LinvH1Mat");
+    display(LinvH1Mat, "output/Galerkin/LinvH1Mat");
 
     DenseMatrix<double> LinvH1MatTrig = convertToTrigBasis(LinvH1Mat);
-    display(LinvH1MatTrig, "../../../output/Galerkin/LinvH1MatTrig");
+    display(LinvH1MatTrig, "output/Galerkin/LinvH1MatTrig");
 
     DVec H1back = Leq_ * LinvH1;
     DenseMatrix<double> H1backMat(H1back, nbOfFourier_, nbOfHermite_);
-    display(H1backMat, "../../../output/Galerkin/H1backMat");
+    display(H1backMat, "output/Galerkin/H1backMat");
 
     /*cx_vec eigvalLeq;
     cx_mat eigvecLeq;
-    eig_gen(eigvalLeq, eigvecLeq, -DLeq);
+    eig_gen(eigvalLeq, eigvecLeq, -DLeq);*/
 
-    //EigenDecomposition<double>
+    //DenseMatrix<double> DLeqW = Leq_.wrapped_;
+    EigenSolver<MatrixXd> eigSol(DLeq.wrapped_);
 
-    //eigs_gen(eigvalLeq, eigvecLeq, Leq_, 20);
+    /*/eigs_gen(eigvalLeq, eigvecLeq, Leq_, 20);
 
-    ofstream out_eigvalLeq("../../../output/Galerkin/eigvalLeq");
+    ofstream out_eigvalLeq("output/Galerkin/eigvalLeq");
     //out_eigvalLeq << eigvalLeq << endl;
     displayCplx(eigvalLeq, out_eigvalLeq);*/
 
@@ -493,6 +497,13 @@ namespace simol
     //double varCoeff = -.5 * dot( L1_ * LinvH1, LeqInv * L1_ * LinvH1);
     double varCoeff = -2 * dot( L1_ * LinvH1, LinvL1LinvH1);
     cout << "varCoeff = " << varCoeff << endl;
+  }
+  
+  EigenSolver<MatrixXd> Galerkin::getEigenSolver() const
+  {
+    cout << "Getting eigen elements by a dense matrix method !" << endl;
+    DenseMatrix<double> DLeq(Leq_);
+    return EigenSolver<MatrixXd>(DLeq.wrapped_);
   }
 
   DVec Galerkin::gettGiHj(int i, int j) const
@@ -541,11 +552,11 @@ namespace simol
     
     cout << "############ Lham ############" << endl;
     Lham_ = kron(Q_, tP_) - kron(tQ_, P_);
-    display(Lham_, "../../../output/Galerkin/Lham");
+    display(Lham_, "output/Galerkin/Lham");
 
     cout << "############ Lthm ############" << endl;
     createLthm();
-    display(Lthm_, "../../../output/Galerkin/Lthm");
+    display(Lthm_, "output/Galerkin/Lthm");
 
     cout << "############ Leq ############" << endl;
     Leq_  = Lham_ + gamma_ * Lthm_;
@@ -682,7 +693,7 @@ namespace simol
       if (i < nbOfParticles_ - 1) Lham_ += doubleMatToTens(Q_, tP_, i + 1, i);
     }
     Lham_ /= beta_;
-    display(Lham_, "../../../output/Galerkin/Lham");
+    display(Lham_, "output/Galerkin/Lham");
     cout << "end BoundaryLangevinGalerkin::createLham()" << endl;
   }
 
@@ -697,7 +708,7 @@ namespace simol
       Lthm_ += PMatToTens(Lthm0_, i);
     }
     Lthm_ /= beta_;
-    display(Lthm_, "../../../output/Galerkin/Lthm");
+    display(Lthm_, "output/Galerkin/Lthm");
   }
 
   void BoundaryLangevinGalerkin::computeExpToTrigTens()
@@ -707,7 +718,7 @@ namespace simol
     expToTrigTens_ = simol::kron(expToTrigMat_, DIdP_);
     expToTrigTens_ = tensorPower(expToTrigTens_, nbOfParticles_);
     
-    display(trigToExpTens_, "../../../output/Galerkin/trigToExpTens");
+    display(trigToExpTens_, "output/Galerkin/trigToExpTens");
   }
 
 
@@ -721,10 +732,10 @@ namespace simol
     cout << "Leq_ nnz : " << Leq_.nonZeros() << endl;
 
     DenseMatrix<double> DLeq(Leq_);
-    display(Leq_, "../../../output/Galerkin/Leq");
+    display(Leq_, "output/Galerkin/Leq");
 
     //DenseMatrix<double> DLeqSad = shapeSaddle(DLeq);
-    //display(DLeqSad, "../../../output/Galerkin/LeqSad");
+    //display(DLeqSad, "output/Galerkin/LeqSad");
 
     cout << "############ DLeqSad ############" << endl;
     //cout << DLeqSad << endl << endl;
@@ -735,37 +746,37 @@ namespace simol
     //DenseMatrix<double> LeqInvSad = inv(DLeqSad);
     DenseMatrix<double> DLeqInv = invWithSaddle(DLeq);
     cout << "OK" << endl;
-    display(DLeqInv, "../../../output/Galerkin/DLeqInv");
+    display(DLeqInv, "output/Galerkin/DLeqInv");
     
     cout << "Computing LeqInv..."; cout.flush();
     //DenseMatrix<double> LeqInvSad = inv(DLeqSad);
     DenseMatrix<double> LeqInv = invWithSaddle(Leq_);
     cout << "OK" << endl;
-    display(DLeqInv, "../../../output/Galerkin/DLeqInv");
+    display(DLeqInv, "output/Galerkin/DLeqInv");
 
     DVec N0H2Trig = Vector<double>::Zero(sizeOfBasis_);
     N0H2Trig(iTens(0, 2, 0)) = 1;
-    display(N0H2Trig, "../../../output/Galerkin/N0H2Trig");
+    display(N0H2Trig, "output/Galerkin/N0H2Trig");
     DVec N0H2 = trigToExpTens_ * N0H2Trig;
-    display(N0H2, "../../../output/Galerkin/N0H2");
+    display(N0H2, "output/Galerkin/N0H2");
     
     //DenseMatrix<double> N0H2TrigMat(N0H2Trig, nbOfFourier_, nbOfHermite_); 
     //DenseMatrix<double> N0H2Mat = trigToExpMat_ * N0H2TrigMat;
     
     DenseMatrix<double> N0H2Mat(N0H2, pow(nbOfFourier_, nbOfParticles_), pow(nbOfHermite_, nbOfParticles_));
     
-    display(N0H2Mat, "../../../output/Galerkin/N0H2Mat");
+    display(N0H2Mat, "output/Galerkin/N0H2Mat");
     
     DVec LinvN0H2 = solveWithSaddle(Leq_, N0H2);
     DenseMatrix<double> LinvN0H2Mat(LinvN0H2, pow(nbOfFourier_, nbOfParticles_), pow(nbOfHermite_, nbOfParticles_));
-    display(LinvN0H2Mat, "../../../output/Galerkin/LinvN0H2Mat");
+    display(LinvN0H2Mat, "output/Galerkin/LinvN0H2Mat");
     
     /*cx_vec eigvalLeq;
     cx_mat eigvecLeq;
     eig_gen(eigvalLeq, eigvecLeq, -DLeq);
     //eigs_gen(eigvalLeq, eigvecLeq, Leq_, 3);
 
-    ofstream out_eigvalLeq("../../../output/Galerkin/eigvalLeq");
+    ofstream out_eigvalLeq("output/Galerkin/eigvalLeq");
     //out_eigvalLeq << eigvalLeq << endl;
     displayCplx(eigvalLeq, out_eigvalLeq);*/
 
