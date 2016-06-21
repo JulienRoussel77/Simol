@@ -22,7 +22,7 @@ INCLUDE_DIRECTORIES(	${CMAKE_SOURCE_DIR}/src/statphys/
 			${CMAKE_SOURCE_DIR}/src/core
 )
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/src/quantchem)
-INCLUDE_DIRECTORIES(${EXTERNAL_DIR}/gtest/install/include)
+INCLUDE_DIRECTORIES(${SIMOL_EXTERNAL_DIR}/gtest/install/include)
 
 
 TARGET_LINK_LIBRARIES(test_galerkin simol-statphys)
@@ -35,8 +35,8 @@ TARGET_LINK_LIBRARIES(test_trichain simol-statphys)
 TARGET_LINK_LIBRARIES(test_fluid simol-statphys)
 
 TARGET_LINK_LIBRARIES(simol_test_functional simol-quantchem)
-TARGET_LINK_LIBRARIES(simol_test_functional ${EXTERNAL_DIR}/gtest/install/lib/libgtest_main.a)
-TARGET_LINK_LIBRARIES(simol_test_functional ${EXTERNAL_DIR}/gtest/install/lib/libgtest.a)
+TARGET_LINK_LIBRARIES(simol_test_functional ${SIMOL_EXTERNAL_DIR}/gtest/install/lib/libgtest_main.a)
+TARGET_LINK_LIBRARIES(simol_test_functional ${SIMOL_EXTERNAL_DIR}/gtest/install/lib/libgtest.a)
 TARGET_LINK_LIBRARIES(simol_test_functional ${CMAKE_THREAD_LIBS_INIT})
 
 ENABLE_TESTING()

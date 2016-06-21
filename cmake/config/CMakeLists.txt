@@ -16,8 +16,8 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 ADD_EXECUTABLE(main main.cpp)
 
 # Include directories containing header files
-INCLUDE_DIRECTORIES(${EXTERNAL_DIR}/yamlcpp/install/include)
-INCLUDE_DIRECTORIES(${EXTERNAL_DIR}/eigen/install/include/eigen3)
+INCLUDE_DIRECTORIES(${SIMOL_EXTERNAL_DIR}/yamlcpp/install/include)
+INCLUDE_DIRECTORIES(${SIMOL_EXTERNAL_DIR}/eigen/install/include/eigen3)
 INCLUDE_DIRECTORIES(${SIMOL_INSTALL_PREFIX}/include)
 
 # Libraries to link with

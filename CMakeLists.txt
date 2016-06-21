@@ -61,8 +61,8 @@ ENDIF()
 OPTION(ENABLE_DOWNLOAD "Enables downloading of missing external libraries" True)
 OPTION(INSTALL_GCC "Automatic installation of GCC" False)
 
-IF(NOT EXTERNAL_DIR)
-  SET(EXTERNAL_DIR ${CMAKE_SOURCE_DIR}/download)
+IF(NOT SIMOL_EXTERNAL_DIR)
+    MESSAGE(FATAL_ERROR "You MUST set SIMOL_EXTERNAL_DIR in ${CMAKE_SOURCE_DIR}/cmake/config/config.cmake")
 ENDIF()
 
 FIND_PACKAGE(BLAS)
