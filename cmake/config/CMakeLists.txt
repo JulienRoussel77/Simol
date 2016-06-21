@@ -18,12 +18,13 @@ ADD_EXECUTABLE(main main.cpp)
 # Include directories containing header files
 INCLUDE_DIRECTORIES(${SIMOL_EXTERNAL_DIR}/yamlcpp/install/include)
 INCLUDE_DIRECTORIES(${SIMOL_EXTERNAL_DIR}/eigen/install/include/eigen3)
+INCLUDE_DIRECTORIES(${SIMOL_EXTERNAL_DIR}/boost/install/include)
 INCLUDE_DIRECTORIES(${SIMOL_INSTALL_PREFIX}/include)
 
 # Libraries to link with
-TARGET_LINK_LIBRARIES(main ${SIMOL_INSTALL_PREFIX}/lib/libsimol-core.so)
-TARGET_LINK_LIBRARIES(main ${SIMOL_INSTALL_PREFIX}/lib/libsimol-quantchem.a)
 TARGET_LINK_LIBRARIES(main ${SIMOL_INSTALL_PREFIX}/lib/libsimol-statphys.a)
+TARGET_LINK_LIBRARIES(main ${SIMOL_INSTALL_PREFIX}/lib/libsimol-quantchem.a)
+TARGET_LINK_LIBRARIES(main ${SIMOL_INSTALL_PREFIX}/lib/libsimol-core.so)
 TARGET_LINK_LIBRARIES(main ${SIMOL_EXTERNAL_DIR}/yamlcpp/install/lib/libyaml-cpp.a)
 
 # Compiler flag for C++11 support
