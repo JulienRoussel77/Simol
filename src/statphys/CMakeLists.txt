@@ -20,7 +20,6 @@ ADD_DEPENDENCIES(simol-statphys simol-core)
 #===========================================
 TARGET_LINK_LIBRARIES(simol-statphys simol-core)
 TARGET_LINK_LIBRARIES(simol-statphys ${YAMLCPP_INSTALL_DIR}/lib/libyaml-cpp.a)
-TARGET_LINK_LIBRARIES(simol-statphys ${ARMADILLO_INSTALL_DIR}/lib/libarmadillo.so)
 
 INSTALL(TARGETS simol-statphys ARCHIVE DESTINATION lib)
 

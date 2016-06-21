@@ -61,8 +61,16 @@ ENDIF()
 OPTION(ENABLE_DOWNLOAD "Enables downloading of missing external libraries" True)
 OPTION(INSTALL_GCC "Automatic installation of GCC" False)
 
+#===================
+# CONFIGURATION FILE
+#===================
+
 IF(NOT SIMOL_EXTERNAL_DIR)
     MESSAGE(FATAL_ERROR "You MUST set SIMOL_EXTERNAL_DIR in ${CMAKE_SOURCE_DIR}/cmake/config/config.cmake")
+ENDIF()
+
+IF(NOT SIMOL_INSTALL_PREFIX)
+    MESSAGE(FATAL_ERROR "You MUST set SIMOL_INSTALL_PREFIX in ${CMAKE_SOURCE_DIR}/cmake/config/config.cmake")
 ENDIF()
 
 FIND_PACKAGE(BLAS)
@@ -85,7 +93,6 @@ ENDIF(INSTALL_GCC)
 
 IF(ENABLE_DOWNLOAD)
   MESSAGE(STATUS "libraries to download ${LIBRARIES_TO_DOWNLOAD}")
-  simol_install_package(Armadillo)
   simol_install_package(Arpack)
   simol_install_package(Boost)
   simol_install_package(Eigen)
