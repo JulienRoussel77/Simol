@@ -26,6 +26,7 @@ SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath -Wl,${SIMOL_GCC
 #   1. its name is simol
 #   2. it involves both fortran, c and c++ files
 ################################################
+SET(CMAKE_INSTALL_PREFIX ${SIMOL_INSTALL_PREFIX})
 
 PROJECT(simol Fortran C CXX)
 
