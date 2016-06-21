@@ -136,3 +136,6 @@ ADD_SUBDIRECTORY(test)
 INSTALL(DIRECTORY include/simol 
         DESTINATION include)
 
+INSTALL(FILES cmake/config/config.cmake cmake/config/CMakeLists.txt
+        DESTINATION share/cmake/config)
+
