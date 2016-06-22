@@ -38,7 +38,8 @@ namespace simol
     potTempTopProfile_(decorrelationNbOfSteps(), decorrelationTime(), nbOfAutocoPts(), nbOfParticles_),
     potTempBotProfile_(decorrelationNbOfSteps(), decorrelationTime(), nbOfAutocoPts(), nbOfParticles_),
     bendistProfile_(decorrelationNbOfSteps(), decorrelationTime(), nbOfAutocoPts(), nbOfParticles_),
-    flowProfile_(decorrelationNbOfSteps(), decorrelationTime(), nbOfAutocoPts(), nbOfParticles_)
+    flowProfile_(decorrelationNbOfSteps(), decorrelationTime(), nbOfAutocoPts(), nbOfParticles_),
+    averageKineticEnergy_(decorrelationNbOfSteps(), decorrelationTime(), nbOfAutocoPts())
   {
     //-- standard observables in this file --
     outObservables_       = std::make_shared<ofstream>(input.outputFolderName() + "observables.txt");
@@ -332,6 +333,11 @@ namespace simol
                          << std::endl;
     }
   }
+  
+  void Output::appendKineticEnergy(double value, int iOfStep)
+  {
+    averageKineticEnergy_.append(value, iOfStep);
+  }
 
   void Output::displayObservablesDPDE(vector<Particle> const& configuration, int iOfStep)
   {
@@ -343,6 +349,7 @@ namespace simol
                      << " " << kineticEnergy()
                      << " " << potentialEnergy()
 		     << " " << totalEnergy
+		     << " " << averageKineticEnergy_.mean(0)
 		     << std::endl;
   }
 

@@ -26,11 +26,14 @@ namespace simol
   //------------- DPDE --------------------
 
   template <>
-  void computeOutput(DPDE const& /*dyna*/, Isolated const& syst, Output& output, int /*iOfStep*/)
+  void computeOutput(DPDE const& /*dyna*/, Isolated const& syst, Output& output, int iOfStep)
   {
+    //-- instantaneous values --
     output.kineticEnergy() = syst.getParticle(0).kineticEnergy();
     output.potentialEnergy() = syst.getParticle(0).potentialEnergy();
     output.internalEnergy() = syst.getParticle(0).internalEnergy();
+    // -- averages --
+    output.appendKineticEnergy(syst.getParticle(0).kineticEnergy(), iOfStep);
   }
 
   void samplePositions(DPDE& /*dyna*/, Isolated& syst)

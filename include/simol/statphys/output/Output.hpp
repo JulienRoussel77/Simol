@@ -103,7 +103,8 @@ namespace simol
       void displayFinalFlow(double temperature, double delta_temperature, double tau = nan(""), double xi = 0);
 
       //------------- pour DPDE ---------------
-      void displayObservablesDPDE(vector<Particle> const& configuration, int iOfStep);
+    void displayObservablesDPDE(vector<Particle> const& configuration, int iOfStep);
+    void appendKineticEnergy(double value, int iOfStep);
 
       //------------- for Galerkin ----------------------
       ControlVariate& velocityCV();
@@ -185,7 +186,7 @@ namespace simol
       AutocorrelationStats flowProfile_;
     
     //-- DPDE --
-    AutocorrelationStats averageEnergies_;
+    AutocorrelationStats averageKineticEnergy_;
     
   };
 
