@@ -177,11 +177,16 @@ namespace simol
       ControlVariate* modiFlowCV_;
 
       //----------- for autocorrelations -------------
-      AutocorrelationStats kinTempProfile_;
+    //-- chains --
+    AutocorrelationStats kinTempProfile_;
       AutocorrelationStats potTempTopProfile_;
       AutocorrelationStats potTempBotProfile_;
       AutocorrelationStats bendistProfile_;
       AutocorrelationStats flowProfile_;
+    
+    //-- DPDE --
+    AutocorrelationStats averageEnergies_;
+    
   };
 
 }

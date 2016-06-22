@@ -333,15 +333,17 @@ namespace simol
     }
   }
 
-  void Output::displayObservablesDPDE(vector<Particle> const& /*configuration*/, int iOfStep)
+  void Output::displayObservablesDPDE(vector<Particle> const& configuration, int iOfStep)
   {
     double totalEnergy = kineticEnergy() + potentialEnergy() + internalEnergy();
     outObservables() << iOfStep * timeStep()
+		     << " " << configuration[0].position() 
+		     << " " << configuration[0].momentum() 
+		     << " " << internalEnergy() 
                      << " " << kineticEnergy()
                      << " " << potentialEnergy()
-                     << " " << internalEnergy()
-                     << " " << totalEnergy
-                     << std::endl;
+		     << " " << totalEnergy
+		     << std::endl;
   }
 
   void Output::finalDisplayAutocorrelations()
