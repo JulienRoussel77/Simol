@@ -27,6 +27,8 @@ SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath -Wl,${SIMOL_GCC
 #   2. it involves both fortran, c and c++ files
 ################################################
 SET(CMAKE_INSTALL_PREFIX ${SIMOL_INSTALL_PREFIX})
+MESSAGE(STATUS "Simol will be installed in ${CMAKE_INSTALL_PREFIX}")
+
 
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/config)
 INCLUDE(config)

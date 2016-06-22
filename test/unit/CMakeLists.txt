@@ -1,5 +1,6 @@
 
-ADD_EXECUTABLE(simol_test_unit ${CMAKE_SOURCE_DIR}/test/unit/core/linalg/VectorTest.cpp 
+ADD_EXECUTABLE(simol_test_unit EXCLUDE_FROM_ALL
+                               ${CMAKE_SOURCE_DIR}/test/unit/core/linalg/VectorTest.cpp 
                                ${CMAKE_SOURCE_DIR}/test/unit/core/linalg/DenseMatrixTest.cpp
                                ${CMAKE_SOURCE_DIR}/test/unit/core/linalg/SparseMatrixTest.cpp)
 

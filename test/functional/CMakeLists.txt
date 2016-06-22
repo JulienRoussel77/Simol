@@ -1,12 +1,12 @@
-ADD_EXECUTABLE(simol_test_functional 	${CMAKE_SOURCE_DIR}/test/functional/quantchem/HartreeFockTest.cpp) 
-ADD_EXECUTABLE(test_galerkin 		${CMAKE_SOURCE_DIR}/test/functional/statphys/galerkin/TestGalerkin.cpp) 
-ADD_EXECUTABLE(test_hamiltonian 	${CMAKE_SOURCE_DIR}/test/functional/statphys/moldyn/hamiltonian/TestHamiltonian.cpp) 
-ADD_EXECUTABLE(test_langevin 		${CMAKE_SOURCE_DIR}/test/functional/statphys/moldyn/langevin/TestLangevin.cpp) 
-ADD_EXECUTABLE(test_dpde 		${CMAKE_SOURCE_DIR}/test/functional/statphys/moldyn/dpde/TestDPDE.cpp) 
-ADD_EXECUTABLE(test_rotor 		${CMAKE_SOURCE_DIR}/test/functional/statphys/moldyn/chain/TestRotor.cpp)
-ADD_EXECUTABLE(test_bichainfpu 		${CMAKE_SOURCE_DIR}/test/functional/statphys/moldyn/chain/TestBiChainFPU.cpp)
-ADD_EXECUTABLE(test_trichain 		${CMAKE_SOURCE_DIR}/test/functional/statphys/moldyn/chain/TestTriChain.cpp)
-ADD_EXECUTABLE(test_fluid 		${CMAKE_SOURCE_DIR}/test/functional/statphys/moldyn/fluid/TestFluid.cpp)  
+ADD_EXECUTABLE(simol_test_functional EXCLUDE_FROM_ALL ${CMAKE_SOURCE_DIR}/test/functional/quantchem/HartreeFockTest.cpp) 
+ADD_EXECUTABLE(test_galerkin EXCLUDE_FROM_ALL ${CMAKE_SOURCE_DIR}/test/functional/statphys/galerkin/TestGalerkin.cpp) 
+ADD_EXECUTABLE(test_hamiltonian EXCLUDE_FROM_ALL ${CMAKE_SOURCE_DIR}/test/functional/statphys/moldyn/hamiltonian/TestHamiltonian.cpp) 
+ADD_EXECUTABLE(test_langevin EXCLUDE_FROM_ALL ${CMAKE_SOURCE_DIR}/test/functional/statphys/moldyn/langevin/TestLangevin.cpp) 
+ADD_EXECUTABLE(test_dpde EXCLUDE_FROM_ALL ${CMAKE_SOURCE_DIR}/test/functional/statphys/moldyn/dpde/TestDPDE.cpp) 
+ADD_EXECUTABLE(test_rotor EXCLUDE_FROM_ALL ${CMAKE_SOURCE_DIR}/test/functional/statphys/moldyn/chain/TestRotor.cpp)
+ADD_EXECUTABLE(test_bichainfpu EXCLUDE_FROM_ALL ${CMAKE_SOURCE_DIR}/test/functional/statphys/moldyn/chain/TestBiChainFPU.cpp)
+ADD_EXECUTABLE(test_trichain EXCLUDE_FROM_ALL ${CMAKE_SOURCE_DIR}/test/functional/statphys/moldyn/chain/TestTriChain.cpp)
+ADD_EXECUTABLE(test_fluid EXCLUDE_FROM_ALL ${CMAKE_SOURCE_DIR}/test/functional/statphys/moldyn/fluid/TestFluid.cpp)  
 
 INCLUDE_DIRECTORIES(	${CMAKE_SOURCE_DIR}/src/statphys/
 	    		${CMAKE_SOURCE_DIR}/src/statphys/input
