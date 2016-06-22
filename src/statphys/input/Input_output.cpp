@@ -33,7 +33,7 @@ namespace simol
       return "output/" + dynamicsName() + "/" + systemName() + "/" + potentialName() + "/";
     else
       //return "../../../output/";
-      return "output";
+      return "output/";
   }
 
   string Input::parametersName() const
