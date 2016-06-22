@@ -46,7 +46,12 @@ namespace simol
 
       virtual int nbOfVariables() const;
       virtual int nbOfParticles() const;
+      
+      virtual int nbOfFourier() const;
+      virtual int nbOfHermite() const;
       virtual int sizeOfBasis() const;
+      
+      const double& gamma() const;
 
       const double& expFourierCoeffs(int iOfElt) const;
       int iTens(int iOfFourier2, int iOfHermite) const;

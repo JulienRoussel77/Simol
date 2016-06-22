@@ -80,10 +80,6 @@ namespace simol
     if (input.controlVariateName() != "None")
       outVelocitiesGenerator_ = std::make_shared<ofstream>(input.outputFolderName() + "velocitiesGenerator.txt");
 
-    //---- TO DO: check status ---
-    outLengthsCV_         = std::make_shared<ofstream>(input.outputFolderName() + "lengths.txt");
-    outLengthsCV() << "# time b <b> <b2> D <D> >D2> observable <observable> >observable2> LPhi <LPhi> <LPhi2>" << endl;
-
     //--- to have a summary of the fina, estimated average velocity ---
     if (doFinalVelocity_)
       outFinalVelocity_     = std::make_shared<ofstream>(input.simuTypeName() + "finalVelocity.txt", std::ofstream::app);
@@ -94,6 +90,9 @@ namespace simol
       outFinalProfile_      = std::make_shared<ofstream>(input.outputFolderName() + "finalProfile.txt");
 
       outBeam_              = std::make_shared<ofstream>(input.outputFolderName() + "beamChain.txt");
+      
+      outLengthsCV_         = std::make_shared<ofstream>(input.outputFolderName() + "lengths.txt");
+      outLengthsCV() << "# time b <b> <b2> D <D> >D2> observable <observable> >observable2> LPhi <LPhi> <LPhi2>" << endl;
 
       outChainVelocities_   = std::make_shared<ofstream>(input.outputFolderName() + "velocitiesChain.txt");
       outChainVelocities() << "# time i=0 i=N/4 i=N/2 i=3N/4 i=N-1" << endl;

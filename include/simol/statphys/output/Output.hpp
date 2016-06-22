@@ -131,11 +131,11 @@ namespace simol
       std::shared_ptr<ofstream> outVelocitiesGenerator_;
       std::shared_ptr<ofstream> outVelocitiesCV_;
       std::shared_ptr<ofstream> outForcesCV_;
-      std::shared_ptr<ofstream> outLengthsCV_;
 
       //-- for chains --
       std::shared_ptr<ofstream> outFinalFlow_;
       std::shared_ptr<ofstream> outBeam_;
+      std::shared_ptr<ofstream> outLengthsCV_;      
       std::shared_ptr<ofstream> outChainVelocities_;
       std::shared_ptr<ofstream> outMidFlowCV_;
       std::shared_ptr<ofstream> outMidFlowPT_;

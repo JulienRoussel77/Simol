@@ -378,7 +378,22 @@ namespace simol
   {
     return sizeOfBasis_;
   }
+  
+  int Galerkin::nbOfFourier() const
+  {
+    return nbOfFourier_;
+  }
+  
+  int Galerkin::nbOfHermite() const
+  {
+    return nbOfHermite_;
+  }
 
+  const double& Galerkin::gamma() const
+  {
+    return gamma_;
+  }
+  
   const double& Galerkin::expFourierCoeffs(int iOfElt) const
   {
     return basis_.expFourierCoeffs(iOfElt);
