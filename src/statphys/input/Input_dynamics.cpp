@@ -10,7 +10,6 @@ const double defaultXi = 0;
 const double defaultDeltaTemperature = 0;
 const double defaultExternalForce = 0;
 const double defaultTauBending = 0;
-const double defaultHeatCapacity = 1;
 
 namespace simol
 {
@@ -118,14 +117,6 @@ namespace simol
       return deltaTemperature();
     else
       return externalForce();
-  }
-
-  double Input::heatCapacity() const
-  {
-    if (data["Physics"]["Model"]["HeatCapacity"])
-      return data["Physics"]["Model"]["HeatCapacity"].as<double>();
-    else
-      return defaultHeatCapacity;
   }
 
 

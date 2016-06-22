@@ -42,10 +42,10 @@ namespace simol
 
   void simulate(DPDE& dyna, System& syst)
   {
-  for (auto && particle : syst.configuration())
+    for (auto && particle : syst.configuration())
       dyna.verletFirstPart(particle);
     syst.computeAllForces();
-  for (auto && particle : syst.configuration())
+    for (auto && particle : syst.configuration())
       dyna.verletSecondPart(particle);
     //-- fluctuation/dissipation --
     for (int i = 0; i < syst.nbOfParticles(); i++)

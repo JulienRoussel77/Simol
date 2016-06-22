@@ -9,6 +9,7 @@ const int defaultNbOfParticles = 1;
 const int defaultNbOfParticlesPerDimension = 1;
 const double defaultLength = 2 * M_PI;
 const double defaultLatticeParameter = 1.;
+const double defaultHeatCapacity = 1;
 
 namespace simol
 {
@@ -129,6 +130,14 @@ namespace simol
 
     return false;
   }
-
+  
+  //-- heat capacity for DPDE --
+  double Input::heatCapacity() const
+  {
+    if (data["System"]["HeatCapacity"])
+      return data["System"]["HeatCapacity"].as<double>();
+    else
+      return defaultHeatCapacity;
+  }
 
 }

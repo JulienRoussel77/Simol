@@ -44,6 +44,13 @@ namespace simol
     outObservables_       = std::make_shared<ofstream>(input.outputFolderName() + "observables.txt");
     outObservables() << "# time kineticEnergy potentialEnergy energy temperature" << endl;
 
+    //-- override the standrd observable files for 1D DPDE --
+    if ( (input.systemName() == "Isolated") && (input.dynamicsName() == "DPDE") )
+      {
+	outObservables_       = std::make_shared<ofstream>(input.outputFolderName() + "observables.txt");
+	outObservables() << "# time position momentum internalEnergy kineticEnergy potentialEnergy totalEnergy" << endl;
+      }
+
     //-- longer outputs if required, e.g. configuration of the system --
     if (printLongPeriodNbOfSteps_ > 0)
     {
@@ -141,6 +148,9 @@ namespace simol
     else
       cout << " Number of steps      : " << nbOfSteps_ / 1e6 << "e6" << endl;
     cout << " Time step            : " << timeStep_ << endl;
+    //-- specific screen outputs --
+    if (input.dynamicsName() == "DPDE")
+      cout << " Heat capacity        : " << input.heatCapacity() << endl;
     if (input.systemName() == "NBody" && input.doCellMethod())
     {
       cout << endl;
