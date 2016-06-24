@@ -43,7 +43,7 @@ namespace simol
 
       typename eigen<ScalarType>::SparseMatrixType const & wrapped() const;
 
-      virtual DenseMatrix<ScalarType, eigen> dense() const;
+      virtual DenseMatrix<ScalarType, eigen> dense() const; 
 
     public:
       typename eigen<ScalarType>::SparseMatrixType wrapped_;
@@ -193,13 +193,12 @@ namespace simol
     return fileToRead;
   }
 
-  // TODO: attention version symetrique
+  // Does a matrix by vector product
   template<class ScalarType>
-  Vector<ScalarType, eigen> operator*(SparseMatrix<ScalarType, eigen> const & matrix,
-                                      Vector<ScalarType, eigen> const & vector)
+  Vector<ScalarType, eigen> operator*(SparseMatrix<ScalarType, eigen> matrix, Vector<ScalarType, eigen> const & vector)
   {
-    Vector<ScalarType, eigen> prod(matrix.numberOfRows());
-    prod.wrapped_ = matrix.wrapped_.template selfadjointView<Eigen::Upper>() * vector.wrapped_;
+    Vector<ScalarType, eigen> prod(matrix.wrapped_.rows());
+    prod.wrapped_ = matrix.wrapped_ * vector.wrapped_;
     return prod;
   }
 
