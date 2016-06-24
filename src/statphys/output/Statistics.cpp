@@ -168,7 +168,9 @@ namespace simol
 
   void AutocorrelationStats::append(const double& newValue, int iOfStep, int iOfObservable, const double& newRefValue)
   {
+    //-- update the average --
     statisticsValues_.append(newValue, iOfObservable);
+    //-- update the autocorrelations --
     if (decorrelationNbOfSteps_ != 0)
     {
       if (iOfStep % decorrelationNbOfSteps_ == 0)
@@ -176,9 +178,11 @@ namespace simol
         statisticsRefValues_.append(newRefValue, iOfObservable);
         indexRef_ = iOfStep;
       }
-      //On intègre le profil d'autocorrélation à l'ordre 2 en coomptant la valeur en 0 pour un demi
-      statisticsMeanCorrelation_.append(((indexRef_ == iOfStep) ? .5 : 1) * statisticsRefValues_.lastValue(iOfObservable) * newValue, iOfObservable);
+      //-- update the correlation function --
+      // TO DO: comment more precisely!
       statisticsCorrelation_.append(statisticsRefValues_.lastValue(iOfObservable) * newValue, ((iOfStep - indexRef_)*nbOfAutocoPts_) / decorrelationNbOfSteps_, iOfObservable);
+      //-- integration of the correlation function with a trapezoidal rule --
+      statisticsMeanCorrelation_.append(((indexRef_ == iOfStep) ? .5 : 1) * statisticsRefValues_.lastValue(iOfObservable) * newValue, iOfObservable);
     }
   }
 

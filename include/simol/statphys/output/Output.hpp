@@ -105,6 +105,7 @@ namespace simol
       //------------- pour DPDE ---------------
     void displayObservablesDPDE(vector<Particle> const& configuration, int iOfStep);
     void appendKineticEnergy(double value, int iOfStep);
+    void finalDisplayAutocorrelationsDPDE();
 
       //------------- for Galerkin ----------------------
       ControlVariate& velocityCV();
@@ -177,18 +178,18 @@ namespace simol
       ControlVariate* sumFlowCV_;
       ControlVariate* modiFlowCV_;
 
-      //----------- for autocorrelations -------------
+    //----------- for autocorrelations -------------
     //-- chains --
     AutocorrelationStats kinTempProfile_;
-      AutocorrelationStats potTempTopProfile_;
-      AutocorrelationStats potTempBotProfile_;
-      AutocorrelationStats bendistProfile_;
-      AutocorrelationStats flowProfile_;
+    AutocorrelationStats potTempTopProfile_;
+    AutocorrelationStats potTempBotProfile_;
+    AutocorrelationStats bendistProfile_;
+    AutocorrelationStats flowProfile_;
     
     //-- DPDE --
     AutocorrelationStats averageKineticEnergy_;
     
   };
-
+  
 }
 #endif
