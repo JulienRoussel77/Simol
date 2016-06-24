@@ -1,5 +1,5 @@
-#ifndef SIMOL_SPARSEMATRIX_HPP
-#define SIMOL_SPARSEMATRIX_HPP
+#ifndef SIMOL_SYMSPARSEMATRIX_HPP
+#define SIMOL_SYMSPARSEMATRIX_HPP
 
 #include "simol/core/linalg/Vector.hpp"
 #include "simol/core/io/MatrixMarketFile.hpp"
@@ -15,15 +15,12 @@ namespace simol
 {
 
   template<class ScalarType, template<class> class WrappedLibrary = eigen>
-  class SparseMatrix;
+  class SymSparseMatrix;
 
-  template<class ScalarType, template<class> class Library>
-  std::ifstream & operator>>(std::ifstream & fileToRead,
-                             SparseMatrix<ScalarType, Library> & matrixToWrite);
 
 }
 
-#include "simol/core/linalg/SparseMatrix_eigen.hpp"
+#include "simol/core/linalg/SymSparseMatrix_eigen.hpp"
 
 
 #endif

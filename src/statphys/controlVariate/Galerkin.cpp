@@ -104,7 +104,7 @@ namespace simol
 
   DenseMatrix<double> Galerkin::invWithSaddle(const SparseMatrix<double>& A) const
   {
-    DenseMatrix<double> DA(A);
+    DenseMatrix<double> DA = A.dense();
     return invWithSaddle(DA);
   }
 
@@ -209,13 +209,13 @@ namespace simol
 
   void display(const SMat& A, ostream& out)
   {
-    DenseMatrix<double> DA = A;
+    DenseMatrix<double> DA = A.dense();
     display(DA, out);
   }
 
   void display(const SMat& A, string path)
   {
-    DenseMatrix<double> DA = A;
+    DenseMatrix<double> DA = A.dense();
     display(DA, path);
   }
 
@@ -415,7 +415,7 @@ namespace simol
     cout << "############ Leq ############" << endl;
     //cout << Leq_ << endl << endl;
 
-    DenseMatrix<double> DLeq(Leq_);
+    DenseMatrix<double> DLeq = Leq_.dense();
     display(Leq_, "output/Galerkin/Leq");
 
     //DenseMatrix<double> DLeqSad = shapeSaddle(DLeq);
@@ -517,7 +517,7 @@ namespace simol
   EigenSolver<MatrixXd> Galerkin::getEigenSolver() const
   {
     cout << "Getting eigen elements by a dense matrix method !" << endl;
-    DenseMatrix<double> DLeq(Leq_);
+    DenseMatrix<double> DLeq = Leq_.dense();
     return EigenSolver<MatrixXd>(DLeq.wrapped_);
   }
 
@@ -746,7 +746,7 @@ namespace simol
     cout << "Leq_ size : " << Leq_.numberOfRows() << " x " << Leq_.numberOfColumns() << endl;
     cout << "Leq_ nnz : " << Leq_.nonZeros() << endl;
 
-    DenseMatrix<double> DLeq(Leq_);
+    DenseMatrix<double> DLeq = Leq_.dense();
     display(Leq_, "output/Galerkin/Leq");
 
     //DenseMatrix<double> DLeqSad = shapeSaddle(DLeq);

@@ -2,7 +2,8 @@
 ADD_EXECUTABLE(simol_test_unit EXCLUDE_FROM_ALL
                                ${CMAKE_SOURCE_DIR}/test/unit/core/linalg/VectorTest.cpp 
                                ${CMAKE_SOURCE_DIR}/test/unit/core/linalg/DenseMatrixTest.cpp
-                               ${CMAKE_SOURCE_DIR}/test/unit/core/linalg/SparseMatrixTest.cpp)
+                               ${CMAKE_SOURCE_DIR}/test/unit/core/linalg/SparseMatrixTest.cpp
+                               ${CMAKE_SOURCE_DIR}/test/unit/core/linalg/SymSparseMatrixTest.cpp)
 
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/src/core/linalg)
 INCLUDE_DIRECTORIES(${SIMOL_EXTERNAL_DIR}/gtest/install/include)

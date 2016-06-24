@@ -5,7 +5,6 @@
 #include <Eigen/Dense>
 
 #include "eigen.hpp"
-#include "SparseMatrix.hpp"
 
 namespace simol
 {
@@ -16,7 +15,7 @@ namespace simol
     public:
 
       DenseMatrix(DenseMatrix const & matrix) = default;
-      DenseMatrix(SparseMatrix<ScalarType, eigen> const & matrix);
+      //DenseMatrix(SparseMatrix<ScalarType, eigen> const & matrix);
       DenseMatrix(std::size_t numberOfRows, std::size_t numberOfColumns);
       DenseMatrix(typename eigen<ScalarType>::DenseMatrixType const & wrappedMatrix);
       DenseMatrix(typename eigen<ScalarType>::DenseBlock_const const & block);
@@ -112,10 +111,10 @@ namespace simol
   { wrapped_ += matrix.wrapped_.transpose().template triangularView<Eigen::StrictlyLower>(); }*/
   
   //! Construction from a sparse matrix
-  template<typename ScalarType> inline
+  /*template<typename ScalarType> inline
   DenseMatrix<ScalarType, eigen>::DenseMatrix(SparseMatrix<ScalarType, eigen> const & matrix)
     : wrapped_(matrix.wrapped_)
-  {}
+  {}*/
 
   //! Construction from a matrix block
   template<typename ScalarType> inline

@@ -625,9 +625,9 @@ namespace simol
 
     DenseMatrix<double> Phi0 = initial_solution.matrix();
 
-    DenseMatrix<double> K = H.kinetic();
-    DenseMatrix<double> O = H.overlap();
-    DenseMatrix<double> Nu = H.potential();
+    DenseMatrix<double> K = H.kinetic().dense();
+    DenseMatrix<double> O = H.overlap().dense();
+    DenseMatrix<double> Nu = H.potential().dense();
 
     DenseMatrix<double> F0 = K + Nu;
 

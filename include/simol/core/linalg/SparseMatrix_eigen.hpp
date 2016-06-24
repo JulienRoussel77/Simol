@@ -1,6 +1,8 @@
 #ifndef SIMOL_SPARSEMATRIX_EIGEN_HPP
 #define SIMOL_SPARSEMATRIX_EIGEN_HPP
 
+#include "DenseMatrix.hpp"
+
 namespace simol
 {
   template<class ScalarType>
@@ -41,6 +43,8 @@ namespace simol
 
       typename eigen<ScalarType>::SparseMatrixType const & wrapped() const;
 
+      virtual DenseMatrix<ScalarType, eigen> dense() const;
+
     public:
       typename eigen<ScalarType>::SparseMatrixType wrapped_;
   };
@@ -75,6 +79,20 @@ namespace simol
   template<class ScalarType> inline
   SparseMatrix<ScalarType, eigen> SparseMatrix<ScalarType, eigen>::adjoint() const
   { return SparseMatrix(wrapped_.adjoint()); }
+
+
+    //! Returns a dense matrix equal to the sparse matrix
+    template<typename ScalarType> inline
+    DenseMatrix<ScalarType, eigen> SparseMatrix<ScalarType, eigen>::dense() const
+    {
+       DenseMatrix<ScalarType, eigen> M(wrapped_.rows(), wrapped_.cols());
+       M.wrapped_ = wrapped_.template triangularView<Eigen::Upper>();
+       M.wrapped_ += wrapped_.template triangularView<Eigen::StrictlyLower>();
+        return M;
+    }
+
+
+
 
 
   //! Construction from a file
@@ -157,7 +175,7 @@ namespace simol
   template<class ScalarType> inline std::size_t
   SparseMatrix<ScalarType, eigen>::nonZeros() const
   { return wrapped_.nonZeros(); }
-  
+
 
   template<class ScalarType, template<class> class Library>
   std::ifstream & operator>>(std::ifstream & fileToRead, SparseMatrix<ScalarType, Library> & matrixToWrite)
