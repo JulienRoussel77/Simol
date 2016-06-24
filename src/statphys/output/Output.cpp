@@ -349,8 +349,19 @@ namespace simol
                      << " " << kineticEnergy()
                      << " " << potentialEnergy()
 		     << " " << totalEnergy
-		     << " " << averageKineticEnergy_.mean(0)
+		     << " " << averageKineticEnergy_.mean()
 		     << std::endl;
+  }
+
+  //------------ autocorrelations ------------------
+  
+  void Output::finalDisplayAutocorrelationsDPDE()
+  {
+    for (int i = 0; i < nbOfAutocoPts(); i++)
+      {
+	//-- autocoPtsPeriod(): time between successive correlation values; may be different from the timestep if some subsampling is specified
+	outCorrelation() << i * autocoPtsPeriod() << " " << averageKineticEnergy_(i) - pow(averageKineticEnergy_.mean(), 2) << endl;
+      }
   }
 
   void Output::finalDisplayAutocorrelations()

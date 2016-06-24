@@ -117,7 +117,7 @@ namespace simol
   //-- DPDE --
   void simulate(DPDE& dyna, System& syst);
   void writeOutput(DPDE const& dyna, System const& syst, Output& output, int iOfStep);
-
+  void writeFinalOutput(DPDE const& dyna, System const& syst, Output& output);
 
   //--------------- control variates -----------------
 

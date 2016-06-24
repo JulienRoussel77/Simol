@@ -78,5 +78,11 @@ namespace simol
       output.finalDisplayAutocorrelations();
   }
 
+  void writeFinalOutput(DPDE const& /*dyna*/, System const& /*syst*/, Output& output)
+  {
+    if (output.doComputeCorrelations())
+      output.finalDisplayAutocorrelationsDPDE();
+  }
+
 
 }
