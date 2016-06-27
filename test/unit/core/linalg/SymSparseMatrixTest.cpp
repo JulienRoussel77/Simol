@@ -16,11 +16,15 @@ namespace simol
     A.insert(1, 1) = 12;
 
     DenseMatrix<double> B = A.dense();
+    
+    std::size_t si  = A.numberOfRows(); 
+    std::size_t si2 = 3; 
 
     EXPECT_EQ(24, B(1,0));
     EXPECT_EQ(36, B(2,1));
     EXPECT_EQ(12, B(1,1));
     EXPECT_EQ(0, B(0,0));
+    EXPECT_EQ(si2,si);
 
   }
 
