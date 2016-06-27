@@ -41,16 +41,17 @@ namespace simol
     flowProfile_(decorrelationNbOfSteps(), decorrelationTime(), nbOfAutocoPts(), nbOfParticles_),
     averageKineticEnergy_(decorrelationNbOfSteps(), decorrelationTime(), nbOfAutocoPts())
   {
+    
     //-- standard observables in this file --
     outObservables_       = std::make_shared<ofstream>(input.outputFolderName() + "observables.txt");
     outObservables() << "# time kineticEnergy potentialEnergy energy temperature" << endl;
 
     //-- override the standrd observable files for 1D DPDE --
     if ( (input.systemName() == "Isolated") && (input.dynamicsName() == "DPDE") )
-      {
-	outObservables_       = std::make_shared<ofstream>(input.outputFolderName() + "observables.txt");
-	outObservables() << "# time position momentum internalEnergy kineticEnergy potentialEnergy totalEnergy" << endl;
-      }
+    {
+      outObservables_       = std::make_shared<ofstream>(input.outputFolderName() + "observables.txt");
+      outObservables() << "# time position momentum internalEnergy kineticEnergy potentialEnergy totalEnergy" << endl;
+    }
 
     //-- longer outputs if required, e.g. configuration of the system --
     if (printLongPeriodNbOfSteps_ > 0)

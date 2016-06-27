@@ -58,12 +58,16 @@ namespace simol
       {
         if (iOfVec != 0) name += "_";
         name += vecParameters[iOfVec];
-        if (vecParameters[iOfVec] == "dt") name += doubleToString(timeStep());
-        else if (vecParameters[iOfVec] == "N") name += doubleToString(nbOfParticles());
-        else if (vecParameters[iOfVec] == "eta") name += doubleToString(eta());
-        else if (vecParameters[iOfVec] == "xi") name += doubleToString(xi());
-        else if (vecParameters[iOfVec] == "beta") name += doubleToString(beta());
-        else if (vecParameters[iOfVec] == "gamma") name += doubleToString(gamma());
+        if (vecParameters[iOfVec] == "dt")            name += doubleToString(timeStep());
+        else if (vecParameters[iOfVec] == "N")        name += doubleToString(nbOfParticles());
+        else if (vecParameters[iOfVec] == "eta")      name += doubleToString(eta());
+        else if (vecParameters[iOfVec] == "xi")       name += doubleToString(xi());
+        else if (vecParameters[iOfVec] == "beta")     name += doubleToString(beta());
+        else if (vecParameters[iOfVec] == "T")        name += doubleToString(temperature());
+        else if (vecParameters[iOfVec] == "gamma")    name += doubleToString(gamma());
+        else if (vecParameters[iOfVec] == "seed")     name += doubleToString(seed());
+        else if (vecParameters[iOfVec] == "potAlpha") name += doubleToString(potentialAlpha());
+        else if (vecParameters[iOfVec] == "potBeta")  name += doubleToString(potentialBeta());
         else throw std::runtime_error(vecParameters[iOfVec] + " is not a parameter name !");
       }
       name += "/";
