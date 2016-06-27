@@ -42,8 +42,34 @@ namespace simol
 
     if (controlVariateName() != "None")
       name += controlVariateName() + "/";
+    
+    if (data["Output"]["ParametersName"])
+    {
+      //YAML does not seem to detect automatically the type (scalar or array) of the input, so we have to test it manually
+      
+      vector<string> vecParameters;
+      if (data["Output"]["ParametersName"].Type() == YAML::NodeType::Scalar)
+        vecParameters = vector<string>(1, data["Output"]["ParametersName"].as<string>());
+      else if (data["Output"]["ParametersName"].Type() == YAML::NodeType::Sequence)
+      for (int iOfVec = 0; iOfVec < (int)data["Output"]["ParametersName"].size(); iOfVec++)
+        vecParameters = data["Output"]["ParametersName"].as<std::vector<string>>();
+      
+      for (int iOfVec = 0; iOfVec < (int)vecParameters.size(); iOfVec++)
+      {
+        if (iOfVec != 0) name += "_";
+        name += vecParameters[iOfVec];
+        if (vecParameters[iOfVec] == "dt") name += doubleToString(timeStep());
+        else if (vecParameters[iOfVec] == "N") name += doubleToString(nbOfParticles());
+        else if (vecParameters[iOfVec] == "eta") name += doubleToString(eta());
+        else if (vecParameters[iOfVec] == "xi") name += doubleToString(xi());
+        else if (vecParameters[iOfVec] == "beta") name += doubleToString(beta());
+        else if (vecParameters[iOfVec] == "gamma") name += doubleToString(gamma());
+        else throw std::runtime_error(vecParameters[iOfVec] + " is not a parameter name !");
+      }
+      name += "/";
+    }
 
-    if (data["Output"]["ParametersName"]
+    /*if (data["Output"]["ParametersName"]
         && data["Output"]["ParametersName"].as<string>() == "yes")
     {
       if (dynamicsName() == "BoundaryLangevin")
@@ -55,7 +81,7 @@ namespace simol
         name += "_xi" + doubleToString(xi());
 
       name += "/";
-    }
+    }*/
     return name;
   }
 
