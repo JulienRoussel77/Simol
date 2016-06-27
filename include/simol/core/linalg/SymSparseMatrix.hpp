@@ -16,8 +16,6 @@ namespace simol
 
   template<class ScalarType, template<class> class WrappedLibrary = eigen>
   class SymSparseMatrix;
-
-
 }
 
 #include "simol/core/linalg/SymSparseMatrix_eigen.hpp"

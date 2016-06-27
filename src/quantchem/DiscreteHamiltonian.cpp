@@ -10,15 +10,15 @@ namespace simol
       two_electrons_(pathToData + "twoelectron_matrix.txt", basisDimension)
   {}
 
-  SparseMatrix<double> const &
+  SymSparseMatrix<double> const &
   DiscreteHamiltonian::kinetic() const
   { return kinetic_; }
 
-  SparseMatrix<double> const &
+  SymSparseMatrix<double> const &
   DiscreteHamiltonian::overlap() const
   { return overlap_; }
 
-  SparseMatrix<double> const &
+  SymSparseMatrix<double> const &
   DiscreteHamiltonian::potential() const
   { return potential_; }
 
