@@ -158,6 +158,8 @@ namespace simol
       cout << endl;
       cout << " Using the method of cells " << endl;
     }
+    cout << "    Period between light outputs    : " << input.printPeriodTime() << endl;
+    cout << "    Period between heavy outputs    : " << input.printLongPeriodTime() << endl;
     cout << endl;
     cout << "-----------------------------------------------------" << endl << endl;
 
