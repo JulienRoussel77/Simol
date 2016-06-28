@@ -89,7 +89,7 @@ namespace simol
     output.finalChainDisplay(syst.configuration(), syst.externalForce());
     if (output.doComputeCorrelations())
       output.finalDisplayAutocorrelations();
-    output.displayFinalFlow(dyna.temperature(), dyna.deltaTemperature());
+    output.displayFinalFlow(dyna.temperature(), dyna.deltaTemperature(), syst.potParameter1(), syst.potParameter2());
   }
 
   // ------------ TriChain -----------------

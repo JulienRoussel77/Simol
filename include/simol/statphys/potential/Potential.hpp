@@ -20,7 +20,9 @@ namespace simol
       Vector<double> const& externalForce() const;
       double& externalForce(const int& i);
       double const& externalForce(const int& i) const;
-
+      virtual double const& parameter1() const;
+      virtual double const& parameter2() const;
+ 
       virtual double operator()(Vector<double> const & position) const;
       virtual double operator()(double position) const;
       double value(Vector<double> const& position) const;

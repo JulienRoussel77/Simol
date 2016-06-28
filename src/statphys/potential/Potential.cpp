@@ -45,6 +45,16 @@ namespace simol
   {
     return externalForce_(i);
   }
+  
+  double const& Potential::parameter1() const
+  {
+    throw std::runtime_error("parameter1 not defined for this potential");
+  }
+  
+  double const& Potential::parameter2() const
+  {
+    throw std::runtime_error("parameter2 not defined for this potential");
+  }
 
   double Potential::operator()(Vector<double> const& position) const
   {

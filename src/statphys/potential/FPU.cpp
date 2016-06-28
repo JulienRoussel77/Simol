@@ -36,6 +36,16 @@ namespace simol
     else
       return 0;
   }
+  
+  double const& FPU::parameter1() const
+  {
+    return alpha_;
+  }
+  
+  double const& FPU::parameter2() const
+  {
+    return beta_;
+  }
 
   /*double FPU::drawLaw(double localBeta, std::shared_ptr<RNG>& rng) const
   {
