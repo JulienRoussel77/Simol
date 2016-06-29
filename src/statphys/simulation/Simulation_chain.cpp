@@ -29,7 +29,6 @@ namespace simol
       output.displayObservables(iOfStep);
       output.displayChainPositions(syst.configuration(), iOfStep);
       output.displayChainMomenta(syst.configuration(), iOfStep);
-      output.displayParticles(syst.configuration(), iOfStep);
 
       output.midFlowCV_->display(output.outMidFlowCV(), iOfStep * dyna.timeStep() );
       output.sumFlowCV_->display(output.outSumFlowCV(), iOfStep * dyna.timeStep() );
@@ -89,7 +88,7 @@ namespace simol
     output.finalChainDisplay(syst.configuration(), syst.externalForce());
     if (output.doComputeCorrelations())
       output.finalDisplayAutocorrelations();
-    output.displayFinalFlow(dyna.temperature(), dyna.deltaTemperature());
+    output.displayFinalFlow(dyna.temperature(), dyna.deltaTemperature(), syst.potParameter1(), syst.potParameter2());
   }
 
   // ------------ TriChain -----------------

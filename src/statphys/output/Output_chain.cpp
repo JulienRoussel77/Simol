@@ -102,15 +102,15 @@ namespace simol
     sumFlowCV_->postTreat(outSumFlowPT(), timeStep());
   }
 
-  void Output::displayFinalFlow(double temperature, double delta_temperature, double tau, double xi)
+  void Output::displayFinalFlow(double temperature, double delta_temperature, double parameter1, double parameter2)
   {
     cout << "outFinalFlow_ : " <<  std::left << setw(10) << finalTime()
          << " " << setw(5) << timeStep()
          << " " << setw(6) << nbOfParticles()
          << " " << setw(4) << temperature
          << " " << setw(4) << delta_temperature
-         << " " << setw(4) << tau
-         << " " << setw(6) << xi
+         << " " << setw(4) << parameter1
+         << " " << setw(6) << parameter2
          << " " << setw(12) << midFlowCV_->meanObservable()
          << " " << setw(12) << midFlowCV_->stdDeviationObservable()
          << " " << setw(12) << sumFlowCV_->meanObservable()
@@ -126,8 +126,8 @@ namespace simol
                      << " " << setw(6) << nbOfParticles()
                      << " " << setw(4) << temperature
                      << " " << setw(4) << delta_temperature
-                     << " " << setw(4) << tau
-                     << " " << setw(6) << xi
+                     << " " << setw(4) << parameter1
+                     << " " << setw(6) << parameter2
                      << " " << setw(12) << midFlowCV_->meanObservable()
                      << " " << setw(12) << midFlowCV_->stdDeviationObservable()
                      << " " << setw(12) << sumFlowCV_->meanObservable()

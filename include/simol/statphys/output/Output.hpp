@@ -100,7 +100,7 @@ namespace simol
       void displayChainPositions(vector<Particle> const& configuration, int iOfStep);
       void displayProfile(int iOfStep);
       void finalChainDisplay(vector<Particle> const& configuration, Vector<double> const& externalForce);
-      void displayFinalFlow(double temperature, double delta_temperature, double tau = nan(""), double xi = 0);
+      void displayFinalFlow(double temperature, double delta_temperature, double parameter1 = 0, double parameter2 = 0);
 
       //------------- pour DPDE ---------------
     void displayObservablesDPDE(vector<Particle> const& configuration, int iOfStep);

@@ -113,6 +113,14 @@ namespace simol
   ///
   ///Write-read accessor for the i-th component of the external force
   double& System::externalForce(int const& i) {return potential_->externalForce(i);}
+  
+  ///
+  ///Read-only accessor for the first parameter of the potential
+  double const& System::potParameter1() const {return potential_->parameter1();}
+  
+  ///
+  ///Read-only accessor for the first parameter of the potential
+  double const& System::potParameter2() const {return potential_->parameter2();}
 
   ///
   ///Draw a momentum under the invariant measure at inverse temperature "localBeta"

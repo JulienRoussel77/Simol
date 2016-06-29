@@ -58,12 +58,16 @@ namespace simol
       {
         if (iOfVec != 0) name += "_";
         name += vecParameters[iOfVec];
-        if (vecParameters[iOfVec] == "dt") name += doubleToString(timeStep());
-        else if (vecParameters[iOfVec] == "N") name += doubleToString(nbOfParticles());
-        else if (vecParameters[iOfVec] == "eta") name += doubleToString(eta());
-        else if (vecParameters[iOfVec] == "xi") name += doubleToString(xi());
-        else if (vecParameters[iOfVec] == "beta") name += doubleToString(beta());
-        else if (vecParameters[iOfVec] == "gamma") name += doubleToString(gamma());
+        if (vecParameters[iOfVec] == "dt")            name += doubleToString(timeStep());
+        else if (vecParameters[iOfVec] == "N")        name += doubleToString(nbOfParticles());
+        else if (vecParameters[iOfVec] == "eta")      name += doubleToString(eta());
+        else if (vecParameters[iOfVec] == "xi")       name += doubleToString(xi());
+        else if (vecParameters[iOfVec] == "beta")     name += doubleToString(beta());
+        else if (vecParameters[iOfVec] == "T")        name += doubleToString(temperature());
+        else if (vecParameters[iOfVec] == "gamma")    name += doubleToString(gamma());
+        else if (vecParameters[iOfVec] == "seed")     name += doubleToString(seed());
+        else if (vecParameters[iOfVec] == "potAlpha") name += doubleToString(potentialAlpha());
+        else if (vecParameters[iOfVec] == "potBeta")  name += doubleToString(potentialBeta());
         else throw std::runtime_error(vecParameters[iOfVec] + " is not a parameter name !");
       }
       name += "/";
@@ -99,22 +103,19 @@ namespace simol
   ///Returns the a number of steps
   int Input::decorrelationNbOfSteps() const
   {
+    // This static bools prevents from giving several times the same warning
     static bool warningGiven = false;
-    if (data["Output"]["DecorrelationTime"])
+    double decoTime;
+    if (data["Output"]["DecorrelationTime"]) decoTime = data["Output"]["DecorrelationTime"].as<double>();  // decorrelation time not truncated
+    else decoTime = defaultDecorrelationTime;
+    int decoNb = (int)(decoTime / timeStep());
+    double decoTrunc = decoNb * timeStep();                 // decorrelation time truncated
+    if (!warningGiven && (decoTime != decoTrunc))           //sends a warning the first time the function is called
     {
-      double decoTime = data["Output"]["DecorrelationTime"].as<double>();  // decorrelation time not truncated
-      int decoNb = (int)(decoTime / timeStep());
-      double decoTrunc = decoNb * timeStep();                 // decorrelation time truncated
-      if (!warningGiven && (decoTime != decoTrunc))           //sends a warning the first time the function is called
-      {
-        warningGiven = true;
-        cout << "#### /!\\ DecorrelationTime truncated to " << decoTrunc << " ####" << endl;
-      }
-      return decoNb;
+      warningGiven = true;
+      cout << "#### /!\\ DecorrelationTime truncated to " << decoTrunc << " ####" << endl;
     }
-    else
-      return (int)(defaultDecorrelationTime / timeStep());
-
+    return decoNb;
   }
   ///
   ///Returns the truncated decorrelation time, which is a multiple of the one given in input
@@ -125,23 +126,22 @@ namespace simol
 
   int Input::printPeriodNbOfSteps() const
   {
+    // This static bools prevents from giving several times the same warning
     static bool warningGiven = false;
     if (data["Output"]["PrintPeriodNbOfSteps"])
       return data["Output"]["PrintPeriodNbOfSteps"].as<int>();
-    else if (data["Output"]["PrintPeriod"])
+    
+    double periodTime;
+    if (data["Output"]["PrintPeriod"]) periodTime = data["Output"]["PrintPeriod"].as<double>();
+    else periodTime = defaultPrintPeriod;
+    int periodNb = (int)( periodTime / timeStep());
+    double periodTrunc = periodNb * timeStep();
+    if (!warningGiven && (periodTime != periodTrunc))
     {
-      double periodTime = data["Output"]["PrintPeriod"].as<double>();
-      int periodNb = (int)( periodTime / timeStep());
-      double periodTrunc = periodNb * timeStep();
-      if (!warningGiven && (periodTime != periodTrunc))
-      {
-        warningGiven = true;
-        cout << "#### /!\\ PrintPeriod truncated to " << periodTrunc << " ####" << endl;
-      }
-      return periodNb;
+      warningGiven = true;
+      cout << "#### /!\\ PrintPeriod truncated to " << periodTrunc << " ####" << endl;
     }
-    else
-      return defaultPrintPeriod / timeStep();
+    return periodNb;
   }
 
   double Input::printPeriodTime() const
@@ -151,23 +151,22 @@ namespace simol
 
   int Input::printLongPeriodNbOfSteps() const
   {
+    // This static bools prevents from giving several times the same warning
     static bool warningGiven = false;
     if (data["Output"]["LongPrintPeriodNbOfSteps"])
       return data["Output"]["LongPrintPeriodNbOfSteps"].as<int>();
-    if (data["Output"]["LongPrintPeriod"])
+    
+    double periodTime;
+    if (data["Output"]["LongPrintPeriod"]) periodTime = data["Output"]["LongPrintPeriod"].as<double>();
+    else periodTime = defaultLongPrintPeriod;
+    int periodNb = (int)( periodTime / timeStep());
+    double periodTrunc = periodNb * timeStep();
+    if (!warningGiven && (periodTime != periodTrunc))
     {
-      double periodTime = data["Output"]["LongPrintPeriod"].as<double>();
-      int periodNb = (int)( periodTime / timeStep());
-      double periodTrunc = periodNb * timeStep();
-      if (!warningGiven && (periodTime != periodTrunc))
-      {
-        warningGiven = true;
-        cout << "#### /!\\ LongPrintPeriod truncated to " << periodTrunc << " ####" << endl;
-      }
-      return periodTrunc;
+      warningGiven = true;
+      cout << "#### /!\\ LongPrintPeriod truncated to " << periodTrunc << " ####" << endl;
     }
-    else
-      return defaultLongPrintPeriod / timeStep();
+    return periodNb;
   }
 
   double Input::printLongPeriodTime() const

@@ -49,6 +49,8 @@ namespace simol
       Vector<double> const& externalForce() const;
       double& externalForce(const int& i);
       double const& externalForce(const int& i) const;
+      double const& potParameter1() const;
+      double const& potParameter2() const;
 
       //-- sampling of initial configurations --
       virtual void thermalize(Dynamics& /*model*/);
