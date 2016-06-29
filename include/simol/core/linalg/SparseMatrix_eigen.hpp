@@ -25,9 +25,9 @@ namespace simol
       std::size_t numberOfColumns() const;
       std::size_t nonZeros() const;
 
-      ScalarType const operator()(std::size_t const rowIndex, std::size_t const columnIndex) const;
-      ScalarType & operator()(std::size_t const rowIndex, std::size_t const columnIndex);
-      ScalarType& insert(std::size_t const rowIndex, std::size_t const columnIndex);
+      virtual ScalarType const operator()(std::size_t const rowIndex, std::size_t const columnIndex) const;
+      virtual ScalarType & operator()(std::size_t const rowIndex, std::size_t const columnIndex);
+      virtual ScalarType& insert(std::size_t const rowIndex, std::size_t const columnIndex);
 
       SparseMatrix<ScalarType, eigen>& operator+=(SparseMatrix<ScalarType, eigen> const& A);
       SparseMatrix<ScalarType, eigen>& operator-=(SparseMatrix<ScalarType, eigen> const& A);
@@ -193,7 +193,7 @@ namespace simol
     return fileToRead;
   }
 
-  // Does a matrix by vector product
+  //! Does a matrix by vector product
   template<class ScalarType>
   Vector<ScalarType, eigen> operator*(SparseMatrix<ScalarType, eigen> matrix, Vector<ScalarType, eigen> const & vector)
   {
@@ -239,7 +239,7 @@ namespace simol
   template<class ScalarType> inline
   SparseMatrix<ScalarType> SparseMatrix<ScalarType>::operator*(ScalarType const& scalar) const
   {
-    Vector<ScalarType> A(*this);
+    SparseMatrix<ScalarType> A(*this);
     A.wrapped_ *= scalar;
     return A;
   }
@@ -247,7 +247,7 @@ namespace simol
   template<class ScalarType> inline
   SparseMatrix<ScalarType> SparseMatrix<ScalarType>::operator/(ScalarType const& scalar) const
   {
-    Vector<ScalarType> A(*this);
+    SparseMatrix<ScalarType> A(*this);
     A.wrapped_ /= scalar;
     return A;
   }
@@ -255,7 +255,7 @@ namespace simol
   template<class ScalarType> inline
   SparseMatrix<ScalarType> SparseMatrix<ScalarType>::operator-() const
   {
-    Vector<ScalarType> A(*this);
+    SparseMatrix<ScalarType> A(*this);
     A.wrapped_ *= -1;
     return A;
   }
