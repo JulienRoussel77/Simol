@@ -20,6 +20,8 @@ namespace simol
       virtual ScalarType const operator()(std::size_t const rowIndex, std::size_t const columnIndex) const;
       virtual ScalarType & operator()(std::size_t const rowIndex, std::size_t const columnIndex);
       virtual ScalarType& insert(std::size_t const rowIndex, std::size_t const columnIndex);
+      
+      virtual Vector<ScalarType, eigen> operator*(Vector<ScalarType, eigen> const & vector) const;
         
   };
 
@@ -104,13 +106,13 @@ namespace simol
   }
     
   //! Does a matrix by vector product
-  /*template<class ScalarType>
-  virtual Vector<ScalarType, eigen> operator*(SymSparseMatrix<ScalarType, eigen> matrix, Vector<ScalarType, eigen> const & vector)
+  template<class ScalarType>
+  Vector<ScalarType, eigen> SymSparseMatrix<ScalarType, eigen>::operator*(Vector<ScalarType,eigen> const & vector) const
   {
-    Vector<ScalarType, eigen> prod(matrix.wrapped_.rows());
-    prod.wrapped_ = (matrix.wrapped_.selfadjointView<Upper>()) * vector.wrapped_;
+    Vector<ScalarType, eigen> prod(this->wrapped_.rows());
+    prod.wrapped_ = (this->wrapped_.template selfadjointView<Eigen::Upper>()) * vector.wrapped_;
     return prod;
-  }*/
+  }
     
 }
 

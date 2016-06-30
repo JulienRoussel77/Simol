@@ -15,12 +15,14 @@ namespace simol
     std::cout << it.col() << "\t";
     std::cout << it.value() << std::endl;
     SparseMatrix<double> C = B*(2.0); 
+    SparseMatrix<double> D = 2.0*B; 
     std::cout << B(0,1) << std::endl;
     std::cout << C(0,1) << std::endl;
     B += C; 
     std::cout << B(0,1) << std::endl; 
     EXPECT_EQ(0, it.row());
     EXPECT_EQ(72, B(0,1));
+    EXPECT_EQ(48, D(0,1));
   }
 
 }

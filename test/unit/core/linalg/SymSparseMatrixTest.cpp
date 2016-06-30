@@ -2,6 +2,7 @@
 
 #include "simol/core/linalg/SymSparseMatrix.hpp"
 #include "simol/core/linalg/DenseMatrix.hpp"
+#include "simol/core/linalg/Vector.hpp"
 
 namespace simol
 {
@@ -15,6 +16,13 @@ namespace simol
     A.insert(1, 2) = 36;
     A.insert(1, 1) = 12;
 
+    Vector<double> V(3); 
+    
+    V(0) = 1; 
+    V(1) = 1; 
+    
+    V = A*V; 
+    
     DenseMatrix<double> B = A.dense();
     
     std::size_t si  = A.numberOfRows(); 
@@ -25,6 +33,7 @@ namespace simol
     EXPECT_EQ(12, B(1,1));
     EXPECT_EQ(0, B(0,0));
     EXPECT_EQ(si2,si);
+    EXPECT_EQ(V(1),36);
 
   }
 

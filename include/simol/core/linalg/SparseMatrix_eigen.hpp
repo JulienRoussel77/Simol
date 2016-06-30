@@ -2,6 +2,7 @@
 #define SIMOL_SPARSEMATRIX_EIGEN_HPP
 
 #include "DenseMatrix.hpp"
+#include "Vector_eigen.hpp"
 
 namespace simol
 {
@@ -39,6 +40,8 @@ namespace simol
       SparseMatrix<ScalarType, eigen> operator+(SparseMatrix<ScalarType, eigen> const& A) const;
       SparseMatrix<ScalarType, eigen> operator-(SparseMatrix<ScalarType, eigen> const& A) const;
 
+      virtual Vector<ScalarType, eigen> operator*(Vector<ScalarType, eigen> const & vector) const;
+      
       SparseMatrix adjoint() const;
 
       typename eigen<ScalarType>::SparseMatrixType const & wrapped() const;
@@ -90,9 +93,6 @@ namespace simol
        M.wrapped_ += wrapped_.template triangularView<Eigen::StrictlyLower>();
         return M;
     }
-
-
-
 
 
   //! Construction from a file
@@ -193,21 +193,23 @@ namespace simol
     return fileToRead;
   }
 
-  //! Does a matrix by vector product
-  template<class ScalarType>
-  Vector<ScalarType, eigen> operator*(SparseMatrix<ScalarType, eigen> matrix, Vector<ScalarType, eigen> const & vector)
-  {
-    Vector<ScalarType, eigen> prod(matrix.wrapped_.rows());
-    prod.wrapped_ = matrix.wrapped_ * vector.wrapped_;
-    return prod;
-  }
 
 
   //======================
   // Operators
   //======================
 
-
+  //! Does a matrix by vector product
+  template<class ScalarType>
+  Vector<ScalarType, eigen> SparseMatrix<ScalarType, eigen>::operator*(Vector<ScalarType, eigen> const & vector) const
+  {
+    Vector<ScalarType, eigen> prod(wrapped_.rows());
+    prod.wrapped_ = wrapped_ * vector.wrapped_;
+    return prod;
+  }
+  
+  
+  
   template<class ScalarType> inline
   SparseMatrix<ScalarType>& SparseMatrix<ScalarType>::operator+=(SparseMatrix<ScalarType> const& A)
   {
@@ -288,7 +290,11 @@ namespace simol
 
   template<class ScalarType>
   SparseMatrix<ScalarType, eigen> operator*(ScalarType const& scalar, SparseMatrix<ScalarType, eigen> const& A)
-  { return SparseMatrix<ScalarType, eigen>(typename eigen<ScalarType>::SparseMatrixType(scalar * A.wrapped_)); }
+  { 
+      SparseMatrix<ScalarType, eigen> B(A.numberOfRows(), A.numberOfColumns());
+      B.wrapped_ = scalar * A.wrapped_; 
+      return B; 
+  }
 
 }
 

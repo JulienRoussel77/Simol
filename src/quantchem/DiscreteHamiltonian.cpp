@@ -1,4 +1,3 @@
-
 #include "simol/quantchem/DiscreteHamiltonian.hpp"
 
 namespace simol
