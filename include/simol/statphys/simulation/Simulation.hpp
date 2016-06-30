@@ -234,7 +234,7 @@ namespace simol
     sampleSystem(dyna, syst);
 
     //---- actual steps -----
-    for (int iOfStep  = 0; iOfStep < dyna.nbOfSteps(); ++iOfStep)
+    for (long int iOfStep  = 0; iOfStep < dyna.nbOfSteps(); ++iOfStep)
     {
       //--- display progress every time 10% of simulation elapsed ---
       if ((10 * iOfStep) % dyna.nbOfSteps() == 0)
