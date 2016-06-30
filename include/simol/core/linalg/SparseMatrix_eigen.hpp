@@ -41,6 +41,7 @@ namespace simol
       SparseMatrix<ScalarType, eigen> operator-(SparseMatrix<ScalarType, eigen> const& A) const;
 
       virtual Vector<ScalarType, eigen> operator*(Vector<ScalarType, eigen> const & vector) const;
+      virtual DenseMatrix<ScalarType, eigen> operator*(DenseMatrix<ScalarType, eigen> const & mat) const;
       
       SparseMatrix adjoint() const;
 
@@ -208,6 +209,14 @@ namespace simol
     return prod;
   }
   
+    //! Does a matrix by matrix product
+  template<class ScalarType>
+  DenseMatrix<ScalarType, eigen> SparseMatrix<ScalarType, eigen>::operator*(DenseMatrix<ScalarType, eigen> const & mat) const
+  {
+    DenseMatrix<ScalarType, eigen> prod(wrapped_.rows(), mat.wrapped_.cols());
+    prod.wrapped_ = wrapped_ * mat.wrapped_;
+    return prod;
+  }
   
   
   template<class ScalarType> inline

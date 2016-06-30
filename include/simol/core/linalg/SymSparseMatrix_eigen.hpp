@@ -22,6 +22,7 @@ namespace simol
       virtual ScalarType& insert(std::size_t const rowIndex, std::size_t const columnIndex);
       
       virtual Vector<ScalarType, eigen> operator*(Vector<ScalarType, eigen> const & vector) const;
+      virtual DenseMatrix<ScalarType, eigen> operator*(DenseMatrix<ScalarType, eigen> const & mat) const;
         
   };
 
@@ -55,14 +56,15 @@ namespace simol
        return M;
     }
     
-    //! Do a matrix by vector product: symmetric version 
+   /* //! Do a matrix by vector product: symmetric version 
     template<class ScalarType>
     Vector<ScalarType, eigen> operator*(SymSparseMatrix<ScalarType, eigen> matrix, Vector<ScalarType, eigen> const & vector)
     {
         Vector<ScalarType, eigen> prod(matrix.wrapped_.rows());
         prod.wrapped_ = matrix.wrapped_.template selfadjointView<Eigen::Upper>() * vector.wrapped_;
         return prod;
-     }
+     }*/
+   
     
     
     //! Returns coefficient
@@ -111,6 +113,15 @@ namespace simol
   {
     Vector<ScalarType, eigen> prod(this->wrapped_.rows());
     prod.wrapped_ = (this->wrapped_.template selfadjointView<Eigen::Upper>()) * vector.wrapped_;
+    return prod;
+  }
+  
+    //! Does a matrix by matrix product
+  template<class ScalarType>
+  DenseMatrix<ScalarType, eigen> SymSparseMatrix<ScalarType, eigen>::operator*(DenseMatrix<ScalarType,eigen> const & mat) const
+  {
+    DenseMatrix<ScalarType, eigen> prod(this->wrapped_.rows(), mat.wrapped_.cols());
+    prod.wrapped_ = (this->wrapped_.template selfadjointView<Eigen::Upper>()) * mat.wrapped_;
     return prod;
   }
     
