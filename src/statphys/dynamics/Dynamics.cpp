@@ -39,25 +39,25 @@ namespace simol
   double const& Dynamics::timeStep() const {return timeStep_;}
   ///
   ///Read-write accessor for the number of steps of the simulation
-  int& Dynamics::nbOfSteps() {return nbOfSteps_;}
+  long int& Dynamics::nbOfSteps() {return nbOfSteps_;}
   ///
   ///Read-only accessor for the number of steps of the simulation
-  int const& Dynamics::nbOfSteps() const {return nbOfSteps_;}
+  long int const& Dynamics::nbOfSteps() const {return nbOfSteps_;}
   ///
   ///Returns the total time "t_f" of the simulation
   double Dynamics::finalTime() const {return timeStep_ * nbOfSteps_;}
   ///
   ///Read-write accessor for the number of steps of the thermalization
-  int& Dynamics::thermalizationNbOfSteps() {return thermalizationNbOfSteps_;}
+  long int& Dynamics::thermalizationNbOfSteps() {return thermalizationNbOfSteps_;}
   ///
   ///Read-only accessor for the number of steps of the thermalization
-  int const& Dynamics::thermalizationNbOfSteps() const {return thermalizationNbOfSteps_;}
+  long int const& Dynamics::thermalizationNbOfSteps() const {return thermalizationNbOfSteps_;}
   ///
   ///Read-write accessor for the number of steps of the burnIn
-  int& Dynamics::burninNbOfSteps() {return burninNbOfSteps_;}
+  long int& Dynamics::burninNbOfSteps() {return burninNbOfSteps_;}
   ///
   ///Read-only accessor for the number of steps of the burnIn
-  int const& Dynamics::burninNbOfSteps() const {return burninNbOfSteps_;}
+  long int const& Dynamics::burninNbOfSteps() const {return burninNbOfSteps_;}
 
   const std::shared_ptr<RNG>& Dynamics::rng() const {return rng_;}
 

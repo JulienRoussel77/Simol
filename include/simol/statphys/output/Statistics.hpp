@@ -44,9 +44,9 @@ namespace simol
     public:
       AutocorrelationStats();
       AutocorrelationStats(int decorrelationNbOfSteps, double decorrelationTime, int nbOfAutocoPts0, int nbOfObservables = 1);
-      void append(double const& newValue, int iOfStep, int iOfObservable = 0);
-      void append(double const& newValue, int iOfStep, int iOfObservable, double const& newRefValue);
-      double operator()(int iOfStep, int iOfObservable = 0) const;
+      void append(double const& newValue, long int iOfStep, int iOfObservable = 0);
+      void append(double const& newValue, long int iOfStep, int iOfObservable, double const& newRefValue);
+      double operator()(long int iOfStep, int iOfObservable = 0) const;
       const double& lastValue(int iOfObservable = 0) const;
       double mean(int iOfObservable = 0) const;
       int statisticsMeanCorrelationNbValues(int iOfObservable = 0) const;

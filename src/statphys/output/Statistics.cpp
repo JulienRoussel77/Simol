@@ -111,13 +111,13 @@ namespace simol
   }
 
 
-  void AutocorrelationStats::append(double const& newValue, int iOfStep, int iOfObservable)
+  void AutocorrelationStats::append(double const& newValue, long int iOfStep, int iOfObservable)
   {
     append(newValue, iOfStep, iOfObservable, newValue);
   }
 
 
-  double AutocorrelationStats::operator()(int iOfStep, int iOfObservable) const
+  double AutocorrelationStats::operator()(long int iOfStep, int iOfObservable) const
   {
     return statisticsCorrelation_.mean(iOfStep, iOfObservable);
   }
@@ -166,7 +166,7 @@ namespace simol
     return sqrt(variance(iOfObservable));
   }
 
-  void AutocorrelationStats::append(const double& newValue, int iOfStep, int iOfObservable, const double& newRefValue)
+  void AutocorrelationStats::append(const double& newValue, long int iOfStep, int iOfObservable, const double& newRefValue)
   {
     //-- update the average --
     statisticsValues_.append(newValue, iOfObservable);

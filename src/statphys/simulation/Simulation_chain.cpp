@@ -22,7 +22,7 @@ namespace simol
     throw std::invalid_argument("samplePositions(BoundaryLangevin& dyna, Chain& syst) not defined");
   }
 
-  void writeOutput(BoundaryLangevin const& dyna, Chain const& syst, Output& output, int iOfStep)
+  void writeOutput(BoundaryLangevin const& dyna, Chain const& syst, Output& output, long int iOfStep)
   {
     if (output.doOutput(iOfStep))// && iOfStep >= 100)
     {

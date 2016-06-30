@@ -50,7 +50,7 @@ namespace simol
   }
 
   template <>
-  void computeOutput(Hamiltonian const& /*dyna*/, NBody const& syst, Output& output, int /*iOfStep*/)
+  void computeOutput(Hamiltonian const& /*dyna*/, NBody const& syst, Output& output, long int /*iOfStep*/)
   {
     output.kineticEnergy() = 0;
     output.potentialEnergy() = 0;
@@ -64,7 +64,7 @@ namespace simol
     }
   }
 
-  void writeOutput(Hamiltonian const& /*dyna*/, NBody const& syst, Output& output, int iOfStep)
+  void writeOutput(Hamiltonian const& /*dyna*/, NBody const& syst, Output& output, long int iOfStep)
   {
     if (output.doOutput(iOfStep))
       output.displayObservables(iOfStep);

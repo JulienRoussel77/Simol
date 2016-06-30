@@ -206,7 +206,7 @@ namespace simol
   const int& Output::nbOfParticles() const
   {return nbOfParticles_;}
 
-  const int& Output::nbOfSteps() const
+  const long int& Output::nbOfSteps() const
   {return nbOfSteps_;}
 
   double Output::finalTime() const
@@ -280,19 +280,19 @@ namespace simol
 
   //---------------- check whether outputs should be performed --------------------
 
-  bool Output::doOutput(int iOfStep) const
+  bool Output::doOutput(long int iOfStep) const
   {
     return (printPeriodNbOfSteps() > 0 && iOfStep % printPeriodNbOfSteps() == 0);
   }
 
-  bool Output::doLongPeriodOutput(int iOfStep) const
+  bool Output::doLongPeriodOutput(long int iOfStep) const
   {
     return (printLongPeriodNbOfSteps() > 0 && iOfStep % printLongPeriodNbOfSteps() == 0);
   }
 
   //----------------- display functions --------------------------
 
-  void Output::displayObservables(int iOfStep)
+  void Output::displayObservables(long int iOfStep)
   {
     outObservables() << iOfStep * timeStep()
                      << " " << kineticEnergy()
@@ -303,17 +303,17 @@ namespace simol
                      << std::endl;
   }
 
-  void Output::displayParticles(vector<Particle> const& configuration, int iOfStep)
+  void Output::displayParticles(vector<Particle> const& configuration, long int iOfStep)
   {
-    for (int i = 0; i < nbOfParticles_; i++)
+    for (int iOfParticle = 0; iOfParticle < nbOfParticles_; iOfParticle++)
       outParticles() << iOfStep * timeStep()
-                     << " " << i
-                     << " " << configuration[i].position()
-                     << " " << configuration[i].momentum()
-                     << " " << configuration[i].kineticEnergy()
-                     << " " << configuration[i].potentialEnergy()
-                     << " " << configuration[i].energy()
-                     << " " << configuration[i].force()
+                     << " " << iOfParticle
+                     << " " << configuration[iOfParticle].position()
+                     << " " << configuration[iOfParticle].momentum()
+                     << " " << configuration[iOfParticle].kineticEnergy()
+                     << " " << configuration[iOfParticle].potentialEnergy()
+                     << " " << configuration[iOfParticle].energy()
+                     << " " << configuration[iOfParticle].force()
                      << endl;
   }
 
@@ -337,12 +337,12 @@ namespace simol
     }
   }
   
-  void Output::appendKineticEnergy(double value, int iOfStep)
+  void Output::appendKineticEnergy(double value, long int iOfStep)
   {
     averageKineticEnergy_.append(value, iOfStep);
   }
 
-  void Output::displayObservablesDPDE(vector<Particle> const& configuration, int iOfStep)
+  void Output::displayObservablesDPDE(vector<Particle> const& configuration, long int iOfStep)
   {
     double totalEnergy = kineticEnergy() + potentialEnergy() + internalEnergy();
     outObservables() << iOfStep * timeStep()

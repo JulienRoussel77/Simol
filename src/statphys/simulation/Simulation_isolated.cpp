@@ -26,7 +26,7 @@ namespace simol
   //------------- DPDE --------------------
 
   template <>
-  void computeOutput(DPDE const& /*dyna*/, Isolated const& syst, Output& output, int iOfStep)
+  void computeOutput(DPDE const& /*dyna*/, Isolated const& syst, Output& output, long int iOfStep)
   {
     //-- instantaneous values --
     output.kineticEnergy() = syst.getParticle(0).kineticEnergy();
@@ -51,8 +51,8 @@ namespace simol
     for (auto && particle : syst.configuration())
       dyna.verletSecondPart(particle);
     //-- fluctuation/dissipation --
-    for (int i = 0; i < syst.nbOfParticles(); i++)
-      dyna.energyReinjection(syst.getParticle(i));  // integration of p at fixed gamma + energy reinjection
+    for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
+      dyna.energyReinjection(syst.getParticle(iOfParticle));  // integration of p at fixed gamma + energy reinjection
   }
 
 }

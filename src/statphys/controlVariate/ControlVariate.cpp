@@ -12,6 +12,7 @@ namespace simol
 
   ControlVariate* createControlVariate(Input const& input, Potential& potential, Galerkin* galerkin)
   {
+    cout << "createControlVariate" << endl;
     if (input.controlVariateName() == "None")
       return new NoControlVariate(input, potential);
     if (input.controlVariateName() == "Sinus")
@@ -59,8 +60,8 @@ namespace simol
     lastA_(nbOfFunctions_),
     statsPostObservable_(decorrelationNbOfSteps(), decorrelationTime(), nbOfAutocoPts()),
     statsPostBetterObservable_(decorrelationNbOfSteps(), decorrelationTime(), nbOfAutocoPts()),
-    historyObservable_(input.nbOfSteps()),
-    historyGeneratorOnBasis_(input.nbOfSteps(), nbOfFunctions_),
+    //historyObservable_(input.nbOfSteps()),
+    //historyGeneratorOnBasis_(input.nbOfSteps(), nbOfFunctions_),
     potential_(&potential)
   {}
 
@@ -74,7 +75,7 @@ namespace simol
     return nbOfFunctionPairs_;
   }
 
-  bool ControlVariate::doOutput(int iOfStep) const
+  bool ControlVariate::doOutput(long int iOfStep) const
   {
     return (printPeriodNbOfSteps_ > 0 && iOfStep % printPeriodNbOfSteps_ == 0);
   }
@@ -166,9 +167,9 @@ namespace simol
     return statsB2_.integratedAutocorrelation(iOfFunction);
   }
 
-  void ControlVariate::appendToObservable(double observable, int iOfStep)
+  void ControlVariate::appendToObservable(double observable, long int iOfStep)
   {
-    historyObservable_(iOfStep) = observable;
+    //historyObservable_(iOfStep) = observable;
     statsObservable_.append(observable, iOfStep);
   }
 
@@ -183,7 +184,7 @@ namespace simol
       statsB1_.append((observable - statsObservable_.mean()) * valueBasisFunction(iOfFunction), iOfFunction);
   }
 
-  void ControlVariate::appendToB2(double observable, Vector<double>& generatorOnBasisFunction, int iOfStep)
+  void ControlVariate::appendToB2(double observable, Vector<double>& generatorOnBasisFunction, long int iOfStep)
   {
     for (int iOfFunction = 0; iOfFunction < nbOfFunctions_; iOfFunction++)
       statsB2_.append((observable - statsObservable_.mean()), iOfStep, iOfFunction, generatorOnBasisFunction(iOfFunction));
@@ -206,7 +207,7 @@ namespace simol
 
 
 
-  void ControlVariate::appendToBetterObservable(double observable, Vector<double>& generatorOnBasisFunction, int iOfStep)
+  void ControlVariate::appendToBetterObservable(double observable, Vector<double>& generatorOnBasisFunction, long int iOfStep)
   {
     //double betterObservableTerm = dot((statsB_.meanMat() - statsB2_.integratedAutocorrelationMat()), statsD_.meanMat().llt().solve(generatorOnBasisFunction));
     /*DenseMatrix<double> Dinv = statsD_.meanMat().llt().solve(generatorOnBasisFunction);
@@ -231,7 +232,7 @@ namespace simol
 
     for (int iOfFunction = 0; iOfFunction < nbOfFunctions_; iOfFunction++)
     {
-      historyGeneratorOnBasis_(iOfStep, iOfFunction) = generatorOnBasisFunction(iOfFunction);
+      //historyGeneratorOnBasis_(iOfStep, iOfFunction) = generatorOnBasisFunction(iOfFunction);
       statsGeneratorOnBasis_.append(generatorOnBasisFunction(iOfFunction), iOfFunction);
     }
   }
@@ -294,7 +295,7 @@ namespace simol
   }
 
 
-  void ControlVariate::update(double observable, Vector<double>& generatorOnBasisFunction, vector<Particle> const& configuration, int iOfStep)
+  void ControlVariate::update(double observable, Vector<double>& generatorOnBasisFunction, vector<Particle> const& configuration, long int iOfStep)
   {
     //cout << "ControlVariate::update" << endl;
     Vector<double> valueBasisFunction(nbOfFunctions_);
@@ -415,7 +416,7 @@ namespace simol
   void ControlVariate::postTreat(std::ofstream& /*out*/, double /*timeStep*/)
   {
     /*cout << "Post-treatment of the output" << endl;
-    for (int iOfStep = 0; iOfStep < (int) historyObservable_.size(); iOfStep++)
+    for (long int iOfStep = 0; iOfStep < (int) historyObservable_.size(); iOfStep++)
     {
       statsPostBetterObservable_.append(historyObservable_(iOfStep) - dot(lastA_, historyGeneratorOnBasis_.row(iOfStep)), iOfStep);
       statsPostObservable_.append(historyObservable_(iOfStep), iOfStep);
@@ -499,15 +500,15 @@ namespace simol
     return Vector<double>(dimension_);
   }
 
-  void NoControlVariate::update(double observable, Vector<double>& /*generatorOnBasisFunction*/, vector<Particle> const& /*configuration*/, int iOfStep)
+  void NoControlVariate::update(double observable, Vector<double>& /*generatorOnBasisFunction*/, vector<Particle> const& /*configuration*/, long int iOfStep)
   {
     appendToObservable(observable, iOfStep);
   }
 
-  void NoControlVariate::postTreat(std::ofstream& out, double timeStep)
+  void NoControlVariate::postTreat(std::ofstream& /*out*/, double /*timeStep*/)
   {
-    std::cout << "Post-treatment of the output" << endl;
-    for (int iOfStep = 0; iOfStep < (int) historyObservable_.size(); iOfStep++)
+    /*std::cout << "Post-treatment of the output" << endl;
+    for (long int iOfStep = 0; iOfStep < (int) historyObservable_.size(); iOfStep++)
     {
       statsPostObservable_.append(historyObservable_(iOfStep), iOfStep);
       if (doOutput(iOfStep))
@@ -518,7 +519,7 @@ namespace simol
             << " " << statsPostObservable_.standardDeviation()
             << endl;
       }
-    }
+    }*/
   }
 
 

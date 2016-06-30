@@ -10,7 +10,7 @@ namespace simol
 
   ///
   ///-- display the current configuration in XMakemol format ; specific for NBody systems ---
-  void Output::displayParticlesXMakeMol(vector<Particle> const& configuration, int iOfStep, double domainSize)
+  void Output::displayParticlesXMakeMol(vector<Particle> const& configuration, long int iOfStep, double domainSize)
   {
     outParticlesXMakeMol() << nbOfParticles_ << endl;
     outParticlesXMakeMol() << "Time = " << iOfStep * timeStep() << endl;

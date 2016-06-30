@@ -51,7 +51,7 @@ namespace simol
   ControlVariate& Output::modiFlowCV()
   {return *modiFlowCV_;}
 
-  void Output::displayChainPositions(vector<Particle> const& configuration, int iOfStep)
+  void Output::displayChainPositions(vector<Particle> const& configuration, long int iOfStep)
   {
     outBeam() << iOfStep * timeStep()
               << " " << configuration[0].position() - 2 * configuration[1].position() + configuration[2].position()
@@ -63,7 +63,7 @@ namespace simol
               << endl;
   }
 
-  void Output::displayChainMomenta(vector<Particle> const& configuration, int iOfStep)
+  void Output::displayChainMomenta(vector<Particle> const& configuration, long int iOfStep)
   {
     outChainVelocities() << iOfStep * timeStep()
                          << " " << configuration[0].momentum()
@@ -74,12 +74,12 @@ namespace simol
                          << endl;
   }
 
-  void Output::displayProfile(int iOfStep)
+  void Output::displayProfile(long int iOfStep)
   {
     writeProfile(outProfile(), iOfStep);
   }
 
-  void Output::writeProfile(ofstream & out_, int iOfStep)
+  void Output::writeProfile(ofstream & out_, long int iOfStep)
   {
     assert(out_ && out_.is_open());
     for (int iOfParticle = 0; iOfParticle < nbOfParticles_; iOfParticle++)
@@ -138,27 +138,27 @@ namespace simol
     }
   }
 
-  void Output::appendKinTempProfile(double value, int iOfStep, int iOfParticle)
+  void Output::appendKinTempProfile(double value, long int iOfStep, int iOfParticle)
   {
     kinTempProfile_.append(value, iOfStep, iOfParticle);
   }
 
-  void Output::appendPotTempTopProfile(double value, int iOfStep, int iOfParticle)
+  void Output::appendPotTempTopProfile(double value, long int iOfStep, int iOfParticle)
   {
     potTempTopProfile_.append(value, iOfStep, iOfParticle);
   }
 
-  void Output::appendPotTempBotProfile(double value, int iOfStep, int iOfParticle)
+  void Output::appendPotTempBotProfile(double value, long int iOfStep, int iOfParticle)
   {
     potTempBotProfile_.append(value, iOfStep, iOfParticle);
   }
 
-  void Output::appendBendistProfile(double value, int iOfStep, int iOfParticle)
+  void Output::appendBendistProfile(double value, long int iOfStep, int iOfParticle)
   {
     bendistProfile_.append(value, iOfStep, iOfParticle);
   }
 
-  void Output::appendFlowProfile(double value, int iOfStep, int iOfParticle)
+  void Output::appendFlowProfile(double value, long int iOfStep, int iOfParticle)
   {
     flowProfile_.append(value, iOfStep, iOfParticle);
   }

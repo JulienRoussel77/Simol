@@ -5,7 +5,7 @@ namespace simol
 
   ///
   ///Computes the quantities needed by the control variates (coefficients a, b, D) and {L \Phi}
-  void updateAllControlVariates(Dynamics const& /*dyna*/, System const& /*syst*/, Output& /*output*/, int /*iOfStep*/)
+  void updateAllControlVariates(Dynamics const& /*dyna*/, System const& /*syst*/, Output& /*output*/, long int /*iOfStep*/)
   {throw std::invalid_argument("updateAllControlVariates: Function undefined");}
 
   /*Vector<double> q = syst.getParticle(0).position();
@@ -24,14 +24,14 @@ namespace simol
   output.sumFlowCV().update(output.energySumFlow(), generatorOnBasis, syst.configuration(), iOfStep);
   }*/
 
-  void updateAllControlVariates(const Hamiltonian& /*dyna*/, System const& /*syst*/, Output& /*output*/, int /*iOfStep*/)
+  void updateAllControlVariates(const Hamiltonian& /*dyna*/, System const& /*syst*/, Output& /*output*/, long int /*iOfStep*/)
   {}
 
   ///
   ///Computes the quantities needed by the control variates (coefficients a, b, D) and {L \Phi}
-  void updateAllControlVariates(const Langevin& dyna, System const& syst, Output& output, int iOfStep)
+  void updateAllControlVariates(const Langevin& dyna, System const& syst, Output& output, long int iOfStep)
   {
-    //cout << "updateAllControlVariates(const Langevin& dyna, S const& syst, Output& output, int iOfStep)" << endl;
+    //cout << "updateAllControlVariates(const Langevin& dyna, S const& syst, Output& output, long int iOfStep)" << endl;
     Vector<double> q = syst.getParticle(0).position();
     Vector<double> p = syst.getParticle(0).momentum();
     Vector<double> generatorOnBasis;
@@ -44,7 +44,7 @@ namespace simol
 
   ///
   ///Computes the quantities needed by the control variates (coefficients a, b, D) and {L \Phi}
-  void updateAllControlVariates(const BoundaryLangevin& dyna, System const& syst, Output& output, int iOfStep)
+  void updateAllControlVariates(const BoundaryLangevin& dyna, System const& syst, Output& output, long int iOfStep)
   {
     Vector<double> generatorOnBasis;
 
