@@ -47,10 +47,10 @@ namespace simol
       const int& printPeriodNbOfSteps() const;
       double printLongPeriodTime() const;
       const int& printLongPeriodNbOfSteps() const;
-      bool doOutput(int iOfStep) const;
-      bool doLongPeriodOutput(int iOfStep) const;
+      bool doOutput(long int iOfStep) const;
+      bool doLongPeriodOutput(long int iOfStep) const;
       const int& nbOfParticles() const;
-      const int& nbOfSteps() const;
+      const long int& nbOfSteps() const;
       double finalTime() const;
 
       //-- fields to output --
@@ -81,30 +81,30 @@ namespace simol
       double decorrelationTime() const;
 
       //-- actual outputing functions --
-      void displayObservables(int iOfStep);
-      void displayParticles(vector<Particle> const& configuration, int iOfStep);
+      void displayObservables(long int iOfStep);
+      void displayParticles(vector<Particle> const& configuration, long int iOfStep);
       void finalDisplayAutocorrelations();
       void displayFinalVelocity(double temperature, double externalForce, int nbOfFourier = 0, int nbOfHermite = 0);
 
       //-- for NBody systems --
-      void displayParticlesXMakeMol(vector<Particle> const& configuration, int iOfStep, double domainSize = 0);
+      void displayParticlesXMakeMol(vector<Particle> const& configuration, long int iOfStep, double domainSize = 0);
 
       //------------ profiles for chains --------------
-      void appendKinTempProfile(double value, int iOfStep, int iOfParticle);
-      void appendPotTempTopProfile(double value, int iOfStep, int iOfParticle);
-      void appendPotTempBotProfile(double value, int iOfStep, int iOfParticle);
-      void appendBendistProfile(double value, int iOfStep, int iOfParticle);
-      void appendFlowProfile(double value, int iOfStep, int iOfParticle);
-      void writeProfile(ofstream & out_, int iOfStep);
-      void displayChainMomenta(vector<Particle> const& configuration, int iOfStep);
-      void displayChainPositions(vector<Particle> const& configuration, int iOfStep);
-      void displayProfile(int iOfStep);
+      void appendKinTempProfile(double value, long int iOfStep, int iOfParticle);
+      void appendPotTempTopProfile(double value, long int iOfStep, int iOfParticle);
+      void appendPotTempBotProfile(double value, long int iOfStep, int iOfParticle);
+      void appendBendistProfile(double value, long int iOfStep, int iOfParticle);
+      void appendFlowProfile(double value, long int iOfStep, int iOfParticle);
+      void writeProfile(ofstream & out_, long int iOfStep);
+      void displayChainMomenta(vector<Particle> const& configuration, long int iOfStep);
+      void displayChainPositions(vector<Particle> const& configuration, long int iOfStep);
+      void displayProfile(long int iOfStep);
       void finalChainDisplay(vector<Particle> const& configuration, Vector<double> const& externalForce);
       void displayFinalFlow(double temperature, double delta_temperature, double parameter1 = 0, double parameter2 = 0);
 
       //------------- pour DPDE ---------------
-    void displayObservablesDPDE(vector<Particle> const& configuration, int iOfStep);
-    void appendKineticEnergy(double value, int iOfStep);
+    void displayObservablesDPDE(vector<Particle> const& configuration, long int iOfStep);
+    void appendKineticEnergy(double value, long int iOfStep);
     void finalDisplayAutocorrelationsDPDE();
 
       //------------- for Galerkin ----------------------
@@ -152,7 +152,7 @@ namespace simol
       double timeStep_;
       int dimension_;
       int nbOfParticles_;
-      int nbOfSteps_;
+      long int nbOfSteps_;
       double latticeParameter_;
 
       //-- fields to output --

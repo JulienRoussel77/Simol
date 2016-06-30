@@ -181,7 +181,7 @@ namespace simol
     return qInteg / repFunc;
   }
 
-  void System::computeProfile(Output& /*output*/, Dynamics const& /*model*/, int /*iOfStep*/) const
+  void System::computeProfile(Output& /*output*/, Dynamics const& /*model*/, long int /*iOfStep*/) const
   {
     throw std::invalid_argument("System::computeProfile : Function undefined");
   }

@@ -38,8 +38,8 @@ namespace simol
 
       AutocorrelationStats statsPostObservable_;
       AutocorrelationStats statsPostBetterObservable_;
-      Vector<double> historyObservable_;
-      DenseMatrix<double> historyGeneratorOnBasis_;
+      //Vector<double> historyObservable_;
+      //DenseMatrix<double> historyGeneratorOnBasis_;
 
       Potential* potential_;
     public:
@@ -54,7 +54,7 @@ namespace simol
       double decorrelationTime() const;
       virtual int nbOfFunctions() const;
       virtual int nbOfFunctionPairs() const;
-      bool doOutput(int iOfStep) const;
+      bool doOutput(long int iOfStep) const;
       int const& nbOfAutocoPts() const;
       virtual int nbOfFourier() const;
       virtual int nbOfHermite() const;
@@ -86,13 +86,13 @@ namespace simol
 
       // APPEND
 
-      void appendToObservable(double observable, int iOfStep);
+      void appendToObservable(double observable, long int iOfStep);
       void appendToB1(double observable, Vector<double>& basisFunction);
-      void appendToB2(double observable, Vector<double>& generatorOnBasisFunction, int iOfStep);
+      void appendToB2(double observable, Vector<double>& generatorOnBasisFunction, long int iOfStep);
       void appendToD(Vector<double>& generatorOnBasisFunction, Vector<double>& basisFunction);
-      void appendToBetterObservable(double observable, Vector<double>& generatorOnBasisFunction, int iOfStep);
+      void appendToBetterObservable(double observable, Vector<double>& generatorOnBasisFunction, long int iOfStep);
 
-      virtual void update(double observable, Vector<double>& generatorOnBasisFunction, vector<Particle> const& configuration, int iOfStep);
+      virtual void update(double observable, Vector<double>& generatorOnBasisFunction, vector<Particle> const& configuration, long int iOfStep);
 
       // FUNCTION CARACTERIZATION
 
@@ -134,7 +134,7 @@ namespace simol
       virtual Vector<double> gradientQ(vector<Particle> const& configuration, int iOfParticle = 0, int iOfFunction = 0) const;
       virtual double laplacianP(vector<Particle> const& configuration, int iOfParticle = 0, int iOfFunction = 0) const;
       virtual Vector<double> gradientP(vector<Particle> const& configuration, int iOfParticle = 0, int iOfFunction = 0) const;
-      void update(double observable, Vector<double>& generatorOnBasisFunction, vector<Particle> const& configuration, int iOfStep);
+      void update(double observable, Vector<double>& generatorOnBasisFunction, vector<Particle> const& configuration, long int iOfStep);
       virtual void postTreat(std::ofstream& out, double timeStep);
   };
 

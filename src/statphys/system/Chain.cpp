@@ -75,10 +75,10 @@ namespace simol
     }
   }
 
-  void BiChain::computeProfile(Output& /*output*/, Dynamics const& /*dyna*/, int /*iOfStep*/) const
+  void BiChain::computeProfile(Output& /*output*/, Dynamics const& /*dyna*/, long int /*iOfStep*/) const
   {}
 
-  void BiChain::computeProfile(Output& output, LangevinBase const& dyna, int iOfStep) const
+  void BiChain::computeProfile(Output& output, LangevinBase const& dyna, long int iOfStep) const
   {
     output.energySumFlow() = 0;
     output.energyModiFlow() = dyna.gamma() * dyna.deltaTemperature() / 2;
@@ -214,10 +214,10 @@ namespace simol
   double TriChain::boundaryPotEnergy() const
   {return ancorParticle1_.potentialEnergy() + ancorParticle2_.potentialEnergy();}
 
-  void TriChain::computeProfile(Output& /*output*/, Dynamics const& /*dyna*/, int /*iOfStep*/) const
+  void TriChain::computeProfile(Output& /*output*/, Dynamics const& /*dyna*/, long int /*iOfStep*/) const
   {}
 
-  void TriChain::computeProfile(Output& output, LangevinBase const& dyna, int iOfStep) const
+  void TriChain::computeProfile(Output& output, LangevinBase const& dyna, long int iOfStep) const
   {
     output.energySumFlow() = 0;
     

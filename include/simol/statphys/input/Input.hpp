@@ -44,9 +44,9 @@ namespace simol
 
       //-- Time --
       double timeStep() const;
-      int nbOfSteps() const;
-      int thermalizationNbOfSteps() const;
-      int burninNbOfSteps() const;
+      long int nbOfSteps() const;
+      long int thermalizationNbOfSteps() const;
+      long int burninNbOfSteps() const;
 
       //-- Potential --
       string potentialName() const;
