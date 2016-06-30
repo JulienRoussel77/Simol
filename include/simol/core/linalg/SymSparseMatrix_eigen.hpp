@@ -15,7 +15,12 @@ namespace simol
       //explicit SymSparseMatrix(Vector<double, eigen> u, std::size_t numberOfRows, std::size_t numberOfColumns);
 	
         
-        virtual DenseMatrix<ScalarType, eigen> dense() const;
+      virtual DenseMatrix<ScalarType, eigen> dense() const;
+        
+      virtual ScalarType const operator()(std::size_t const rowIndex, std::size_t const columnIndex) const;
+      virtual ScalarType & operator()(std::size_t const rowIndex, std::size_t const columnIndex);
+      virtual ScalarType& insert(std::size_t const rowIndex, std::size_t const columnIndex);
+        
   };
 
     //! Construction from a given size
@@ -56,6 +61,57 @@ namespace simol
         prod.wrapped_ = matrix.wrapped_.template selfadjointView<Eigen::Upper>() * vector.wrapped_;
         return prod;
      }
+    
+    
+    //! Returns coefficient
+    template<class ScalarType> inline
+    ScalarType const SymSparseMatrix<ScalarType, eigen>::operator()(std::size_t const rowIndex, std::size_t const columnIndex) const
+    { 
+        ScalarType coeff = this->wrapped_.coeff(rowIndex, columnIndex); 
+        if (columnIndex < rowIndex)
+        {
+            coeff =  this->wrapped_.coeff(columnIndex, rowIndex); 
+        }
+       return coeff; 
+    }
+
+  //! Modify coefficient
+  template<class ScalarType> inline
+  ScalarType& SymSparseMatrix<ScalarType, eigen>::operator()(std::size_t const rowIndex, std::size_t const columnIndex)
+  { 
+      std::size_t rowInd = rowIndex; 
+      std::size_t colInd = columnIndex; 
+      if (columnIndex < rowIndex)
+      {
+          rowInd = columnIndex; 
+          colInd = rowIndex; 
+      }
+      return this->wrapped_.coeffRef(rowInd, colInd); 
+  }
+
+  //! Create coefficient
+  template<class ScalarType> inline
+  ScalarType& SymSparseMatrix<ScalarType, eigen>::insert(std::size_t const rowIndex, std::size_t const columnIndex)
+  { 
+      std::size_t rowInd = rowIndex; 
+      std::size_t colInd = columnIndex; 
+      if (columnIndex < rowIndex)
+      {
+          rowInd = columnIndex; 
+          colInd = rowIndex; 
+      }
+      return this->wrapped_.insert(rowInd, colInd); 
+  }
+    
+  //! Does a matrix by vector product
+  /*template<class ScalarType>
+  virtual Vector<ScalarType, eigen> operator*(SymSparseMatrix<ScalarType, eigen> matrix, Vector<ScalarType, eigen> const & vector)
+  {
+    Vector<ScalarType, eigen> prod(matrix.wrapped_.rows());
+    prod.wrapped_ = (matrix.wrapped_.selfadjointView<Upper>()) * vector.wrapped_;
+    return prod;
+  }*/
+    
 }
 
 
