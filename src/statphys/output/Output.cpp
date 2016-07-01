@@ -374,6 +374,7 @@ namespace simol
     double integralQ = 0;
     double midFlowQ = 0;
     double sumFlowQ = 0;
+    double modiFlowQ = 0;
     int midNb = nbOfParticles_ / 2;
     for (int i = 0; i < nbOfAutocoPts(); i++)
     {
@@ -387,8 +388,10 @@ namespace simol
                        << " " << midFlowCV_->autocorrelation(i) - pow(midFlowCV_->meanObservable(), 2)
                        << " " << (midFlowQ += midFlowCV_->autocorrelation(i) * autocoPtsPeriod())
                        << " " << sumFlowCV_->autocorrelation(i) - pow(sumFlowCV_->meanObservable(), 2)
-                       << " " << (sumFlowQ += sumFlowCV_->autocorrelation(i) * autocoPtsPeriod());
-      outCorrelation() << " " << bendistProfile_(i, midNb) - pow(bendistProfile_.mean(midNb), 2)
+                       << " " << (sumFlowQ += sumFlowCV_->autocorrelation(i) * autocoPtsPeriod())
+                       << " " << modiFlowCV_->autocorrelation(i) - pow(modiFlowCV_->meanObservable(), 2)
+                       << " " << (modiFlowQ += modiFlowCV_->autocorrelation(i) * autocoPtsPeriod())
+                       << " " << bendistProfile_(i, midNb) - pow(bendistProfile_.mean(midNb), 2)
                        << std::endl;
     }
   }

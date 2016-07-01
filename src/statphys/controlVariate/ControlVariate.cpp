@@ -12,7 +12,6 @@ namespace simol
 
   ControlVariate* createControlVariate(Input const& input, Potential& potential, Galerkin* galerkin)
   {
-    cout << "createControlVariate" << endl;
     if (input.controlVariateName() == "None")
       return new NoControlVariate(input, potential);
     if (input.controlVariateName() == "Sinus")

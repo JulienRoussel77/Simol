@@ -238,7 +238,7 @@ namespace simol
     {
       //--- display progress every time 10% of simulation elapsed ---
       if ((10 * iOfStep) % dyna.nbOfSteps() == 0)
-        cout << "---- Run " << (100 * iOfStep) / dyna.nbOfSteps() << " % completed ----" << endl;
+        cout << "---- Run " << (10 * iOfStep) / dyna.nbOfSteps() << " % completed ----" << endl;
 
       //--- write outputs if required ----
       computeOutput(dyna, syst, output, iOfStep);
