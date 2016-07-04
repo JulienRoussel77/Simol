@@ -133,7 +133,7 @@ namespace simol
       std::shared_ptr<ofstream> outFinalVelocity_;
 
     //-- mean observables for DPDE --
-    //DPDE std::shared_ptr<ofstream> meanValueObservables_;
+    std::shared_ptr<ofstream> meanValueObservables_;
 
       //-- control variate outputs --
       std::shared_ptr<ofstream> outVelocitiesGenerator_;
@@ -194,9 +194,8 @@ namespace simol
     
     //-- DPDE --
     AutocorrelationStats averageKineticEnergy_;
-    //DPDE 
     AutocorrelationStats averagePotentialEnergy_;
-    //DPDE AutocorrelationStats averageInternalEnergy_;
+    AutocorrelationStats averageInternalEnergy_;
     
   };
   
