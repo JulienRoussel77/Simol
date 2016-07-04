@@ -5,7 +5,9 @@
 
 namespace simol
 {
-
+  ///
+  /// Potential V(x) = stiffness x^2 / 2 + alpha x^3 / 3 + beta x^4 / 4
+  /// Is convex if and only if alpha^2 < 3 beta
   class FPU : public Potential
   {
     public:

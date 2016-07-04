@@ -179,7 +179,7 @@ namespace simol
         indexRef_ = iOfStep;
       }
       //-- update the correlation function --
-      // TO DO: comment more precisely!
+      // decorrelationNbOfSteps_ / nbOfAutocoPts_ is the time intervale between two correlation estimations: can be bigger than the time step
       statisticsCorrelation_.append(statisticsRefValues_.lastValue(iOfObservable) * newValue, ((iOfStep - indexRef_)*nbOfAutocoPts_) / decorrelationNbOfSteps_, iOfObservable);
       //-- integration of the correlation function with a trapezoidal rule --
       statisticsMeanCorrelation_.append(((indexRef_ == iOfStep) ? .5 : 1) * statisticsRefValues_.lastValue(iOfObservable) * newValue, iOfObservable);

@@ -40,7 +40,7 @@ namespace simol
       Statistics statisticsRefValues_;         //calcule la moyenne de l'observable B
       Statistics statisticsMeanCorrelation_;   //calcule la moyenne de tous les A(x_i)B(x_0)
       Statistics statisticsCorrelation_;   //calcule la moyenne de A(t)B(0) pour t < decorrelationTime_
-      double indexRef_;
+      long int indexRef_;
     public:
       AutocorrelationStats();
       AutocorrelationStats(int decorrelationNbOfSteps, double decorrelationTime, int nbOfAutocoPts0, int nbOfObservables = 1);

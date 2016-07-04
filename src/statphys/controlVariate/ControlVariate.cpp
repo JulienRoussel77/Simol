@@ -176,6 +176,11 @@ namespace simol
   {
     return statsObservable_(indexDifference);
   }
+  
+  double ControlVariate::unbiasedAutocorrelation(int indexDifference) const
+  {
+    return statsObservable_(indexDifference) - pow(meanObservable(), 2);
+  }
 
   void ControlVariate::appendToB1(double observable, Vector<double>& valueBasisFunction)
   {

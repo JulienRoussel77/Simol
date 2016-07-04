@@ -76,6 +76,7 @@ namespace simol
       virtual Vector<double> meanGeneratorOnBasis() const;
 
       virtual double autocorrelation(int indexDifference) const;
+      virtual double unbiasedAutocorrelation(int indexDifference) const;
       virtual double autocorrelationB2(int indexDifference, int iOfFunction = 0) const;
 
       virtual Vector<double> lastA() const;

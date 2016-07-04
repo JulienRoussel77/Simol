@@ -379,6 +379,22 @@ namespace simol
     for (int i = 0; i < nbOfAutocoPts(); i++)
     {
       outCorrelation() << i * autocoPtsPeriod()
+                       << " " << velocityCV_->unbiasedAutocorrelation(i)
+                       << " " << (integralV += velocityCV_->unbiasedAutocorrelation(i) * autocoPtsPeriod())
+                       << " " << forceCV_->unbiasedAutocorrelation(i)
+                       << " " << (integralF += forceCV_->unbiasedAutocorrelation(i) * autocoPtsPeriod())
+                       << " " << lengthCV_->unbiasedAutocorrelation(i)
+                       << " " << (integralQ += lengthCV_->unbiasedAutocorrelation(i) * autocoPtsPeriod())
+                       << " " << midFlowCV_->unbiasedAutocorrelation(i)
+                       << " " << (midFlowQ += midFlowCV_->unbiasedAutocorrelation(i) * autocoPtsPeriod())
+                       << " " << sumFlowCV_->unbiasedAutocorrelation(i)
+                       << " " << (sumFlowQ += sumFlowCV_->unbiasedAutocorrelation(i) * autocoPtsPeriod())
+                       << " " << modiFlowCV_->unbiasedAutocorrelation(i)
+                       << " " << (modiFlowQ += modiFlowCV_->unbiasedAutocorrelation(i) * autocoPtsPeriod())
+                       << " " << bendistProfile_(i, midNb) - pow(bendistProfile_.mean(midNb), 2)
+                       << std::endl;
+                       
+      /*outCorrelation() << i * autocoPtsPeriod()
                        << " " << velocityCV_->autocorrelation(i) - pow(velocityCV_->meanObservable(), 2)
                        << " " << (integralV += velocityCV_->autocorrelation(i) * autocoPtsPeriod())
                        << " " << forceCV_->autocorrelation(i) - pow(forceCV_->meanObservable(), 2)
@@ -392,7 +408,7 @@ namespace simol
                        << " " << modiFlowCV_->autocorrelation(i) - pow(modiFlowCV_->meanObservable(), 2)
                        << " " << (modiFlowQ += modiFlowCV_->autocorrelation(i) * autocoPtsPeriod())
                        << " " << bendistProfile_(i, midNb) - pow(bendistProfile_.mean(midNb), 2)
-                       << std::endl;
+                       << std::endl;*/
     }
   }
 
