@@ -183,16 +183,16 @@ namespace simol
 
   bool Input::doFinalFlow() const
   {
-    if (data["Output"]["doFinalFlow"])
-      if (data["Output"]["doFinalFlow"].as<string>() == "yes")
+    if (data["Output"]["DoFinalFlow"])
+      if (data["Output"]["DoFinalFlow"].as<string>() == "yes")
         return true;
     return false;
   }
 
   bool Input::doFinalVelocity() const
   {
-    if (data["Output"]["doFinalVelocity"])
-      if (data["Output"]["doFinalVelocity"].as<string>() == "yes")
+    if (data["Output"]["DoFinalVelocity"])
+      if (data["Output"]["DoFinalVelocity"].as<string>() == "yes")
         return true;
     return false;
   }

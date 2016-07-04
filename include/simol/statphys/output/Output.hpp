@@ -83,7 +83,7 @@ namespace simol
       //-- actual outputing functions --
       void displayObservables(long int iOfStep);
       void displayParticles(vector<Particle> const& configuration, long int iOfStep);
-      void finalDisplayAutocorrelations();
+      void finalDisplayCorrelations();
       void displayFinalVelocity(double temperature, double externalForce, int nbOfFourier = 0, int nbOfHermite = 0);
 
       //-- for NBody systems --
@@ -105,7 +105,7 @@ namespace simol
       //------------- pour DPDE ---------------
     void displayObservablesDPDE(vector<Particle> const& configuration, long int iOfStep);
     void appendKineticEnergy(double value, long int iOfStep);
-    void finalDisplayAutocorrelationsDPDE();
+    void finalDisplayCorrelationsDPDE();
 
       //------------- for Galerkin ----------------------
       ControlVariate& velocityCV();

@@ -21,7 +21,7 @@ namespace simol
     protected:
       int dimension_;
       int decorrelationNbOfSteps_;
-      double decorrelationTime_;
+      double timeStep_;
       int nbOfFunctions_;
       int nbOfFunctionPairs_;
       int printPeriodNbOfSteps_;
@@ -32,7 +32,7 @@ namespace simol
       Statistics statsGeneratorOnBasis_;
 
       Statistics statsB1_;
-      AutocorrelationStats statsB2_;
+      CorrelationStats statsB2_;
       Statistics statsD_;
       Vector<double> lastA_;
 
@@ -50,7 +50,8 @@ namespace simol
       double potential(Vector<double> const& position) const;
       Vector<double> potentialDerivative(Vector<double> const& position) const;
       double potentialLaplacian(Vector<double> const& position) const;
-      int decorrelationNbOfSteps() const;
+      const double& timeStep() const;
+      const int& decorrelationNbOfSteps() const;
       double decorrelationTime() const;
       virtual int nbOfFunctions() const;
       virtual int nbOfFunctionPairs() const;
@@ -68,6 +69,9 @@ namespace simol
       virtual double lastObservable() const;
       virtual double meanObservable() const;
       virtual double stdDeviationObservable() const;
+      virtual double stdDevOfVarObservable() const;
+      virtual double stdErrorOfVarObservable() const;
+      
       virtual double lastBetterObservable() const;
       virtual double meanBetterObservable() const;
       virtual double stdDeviationBetterObservable() const;
@@ -76,7 +80,10 @@ namespace simol
       virtual Vector<double> meanGeneratorOnBasis() const;
 
       virtual double autocorrelation(int indexDifference) const;
-      virtual double unbiasedAutocorrelation(int indexDifference) const;
+      virtual double unbiasedCorrelation(int indexDifference) const;
+      virtual double stdDeviationCorrelation(int indexDifference) const;
+      virtual double stdErrorCorrelation(int indexDifference) const;
+      
       virtual double autocorrelationB2(int indexDifference, int iOfFunction = 0) const;
 
       virtual Vector<double> lastA() const;

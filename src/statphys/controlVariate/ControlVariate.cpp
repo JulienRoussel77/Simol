@@ -45,20 +45,20 @@ namespace simol
   ControlVariate::ControlVariate(Input const& input, Potential& potential, int nbOfFunctions):
     dimension_(input.dimension()),
     decorrelationNbOfSteps_(input.decorrelationNbOfSteps()),
-    decorrelationTime_(input.decorrelationTime()),
+    timeStep_(input.timeStep()),
     nbOfFunctions_(nbOfFunctions),
     nbOfFunctionPairs_(pow(nbOfFunctions_, 2)),
     printPeriodNbOfSteps_(input.printPeriodNbOfSteps()),
     nbOfAutocoPts_(input.nbOfAutocoPts()),
-    statsObservable_(decorrelationNbOfSteps(), decorrelationTime(), nbOfAutocoPts()),
-    statsBetterObservable_(decorrelationNbOfSteps(), decorrelationTime(), nbOfAutocoPts()),
+    statsObservable_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts()),
+    statsBetterObservable_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts()),
     statsGeneratorOnBasis_(nbOfFunctions_),
     statsB1_(nbOfFunctions_),
-    statsB2_(decorrelationNbOfSteps(), decorrelationTime(), nbOfAutocoPts(), nbOfFunctions_),
+    statsB2_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts(), nbOfFunctions_),
     statsD_(nbOfFunctions_, nbOfFunctions_),
     lastA_(nbOfFunctions_),
-    statsPostObservable_(decorrelationNbOfSteps(), decorrelationTime(), nbOfAutocoPts()),
-    statsPostBetterObservable_(decorrelationNbOfSteps(), decorrelationTime(), nbOfAutocoPts()),
+    statsPostObservable_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts()),
+    statsPostBetterObservable_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts()),
     //historyObservable_(input.nbOfSteps()),
     //historyGeneratorOnBasis_(input.nbOfSteps(), nbOfFunctions_),
     potential_(&potential)
@@ -99,16 +99,19 @@ namespace simol
     return potential_->laplacian(position);
   }
 
-
-
-  int ControlVariate::decorrelationNbOfSteps() const
+  const int& ControlVariate::decorrelationNbOfSteps() const
   {
     return decorrelationNbOfSteps_;
+  }
+  
+  const double& ControlVariate::timeStep() const
+  {
+    return timeStep_;
   }
 
   double ControlVariate::decorrelationTime() const
   {
-    return decorrelationTime_;
+    return decorrelationNbOfSteps() * timeStep();
   }
 
   int const& ControlVariate::nbOfAutocoPts() const
@@ -140,6 +143,16 @@ namespace simol
   {
     return statsObservable_.standardDeviation();
   }
+  
+  double ControlVariate::stdDevOfVarObservable() const
+  {
+    return statsObservable_.stdDevOfVariance();
+  }
+  
+  double ControlVariate::stdErrorOfVarObservable() const
+  {
+    return statsObservable_.stdErrorOfVariance();
+  }
 
   double ControlVariate::lastBetterObservable() const
   {
@@ -158,12 +171,12 @@ namespace simol
 
   Vector<double> ControlVariate::correlationB2() const
   {
-    return statsB2_.integratedAutocorrelationVec();
+    return statsB2_.integratedCorrelationVec();
   }
 
   double ControlVariate::correlationB2(int iOfFunction) const
   {
-    return statsB2_.integratedAutocorrelation(iOfFunction);
+    return statsB2_.integratedCorrelation(iOfFunction);
   }
 
   void ControlVariate::appendToObservable(double observable, long int iOfStep)
@@ -177,9 +190,19 @@ namespace simol
     return statsObservable_(indexDifference);
   }
   
-  double ControlVariate::unbiasedAutocorrelation(int indexDifference) const
+  double ControlVariate::unbiasedCorrelation(int indexDifference) const
   {
     return statsObservable_(indexDifference) - pow(meanObservable(), 2);
+  }
+  
+  double ControlVariate::stdDeviationCorrelation(int indexDifference) const
+  {
+    return statsObservable_.stdDeviationCorrelation(indexDifference);
+  }
+  
+  double ControlVariate::stdErrorCorrelation(int indexDifference) const
+  {
+    return statsObservable_.stdErrorCorrelation(indexDifference);
   }
 
   void ControlVariate::appendToB1(double observable, Vector<double>& valueBasisFunction)
@@ -196,7 +219,7 @@ namespace simol
 
   void ControlVariate::appendToD(Vector<double>& generatorOnBasisFunction, Vector<double>& valueBasisFunction)
   {
-    //Eigen::Matrix<AutocorrelationStats<double>, Eigen::Dynamic, Eigen::Dynamic> A(nbOfFunctions_, nbOfFunctions_, AutocorrelationStats<double>(decorrelationNbOfSteps(), decorrelationTime()));
+    //Eigen::Matrix<CorrelationStats<double>, Eigen::Dynamic, Eigen::Dynamic> A(nbOfFunctions_, nbOfFunctions_, CorrelationStats<double>(decorrelationNbOfSteps(), decorrelationTime()));
 
     for (int iOfFunction = 0; iOfFunction < nbOfFunctions_; iOfFunction++)
       for (int iOfFunction2 = 0; iOfFunction2 <= iOfFunction; iOfFunction2++)
@@ -213,12 +236,12 @@ namespace simol
 
   void ControlVariate::appendToBetterObservable(double observable, Vector<double>& generatorOnBasisFunction, long int iOfStep)
   {
-    //double betterObservableTerm = dot((statsB_.meanMat() - statsB2_.integratedAutocorrelationMat()), statsD_.meanMat().llt().solve(generatorOnBasisFunction));
+    //double betterObservableTerm = dot((statsB_.meanMat() - statsB2_.integratedCorrelationMat()), statsD_.meanMat().llt().solve(generatorOnBasisFunction));
     /*DenseMatrix<double> Dinv = statsD_.meanMat().llt().solve(generatorOnBasisFunction);
-    Vector<double> B = statsB_.meanMat() - statsB2_.integratedAutocorrelationMat();
+    Vector<double> B = statsB_.meanMat() - statsB2_.integratedCorrelationMat();
     std::cout << B.transpose() * Dinv << endl;*/
-    //cout << (statsB_.meanMat() - statsB2_.integratedAutocorrelationMat()).transpose().size() << "  " << statsD_.meanMat().inverse().size() << endl;
-    //lastA_ = (statsB_.meanMat() - statsB2_.integratedAutocorrelationMat()).transpose() * statsD_.meanMat().llt().solve(generatorOnBasisFunction);
+    //cout << (statsB_.meanMat() - statsB2_.integratedCorrelationMat()).transpose().size() << "  " << statsD_.meanMat().inverse().size() << endl;
+    //lastA_ = (statsB_.meanMat() - statsB2_.integratedCorrelationMat()).transpose() * statsD_.meanMat().llt().solve(generatorOnBasisFunction);
     //cout << lastA_.size() << "   " << generatorOnBasisFunction.size() << endl;
 
     if (statsD_.meanMat().determinant() != 0)
@@ -260,7 +283,7 @@ namespace simol
 
   Vector<double> ControlVariate::meanB() const
   {
-    return statsB1_.meanVec() - statsB2_.integratedAutocorrelationVec();
+    return statsB1_.meanVec() - statsB2_.integratedCorrelationVec();
   }
 
   DenseMatrix<double> ControlVariate::lastD() const

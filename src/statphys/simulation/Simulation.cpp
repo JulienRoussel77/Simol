@@ -75,13 +75,13 @@ namespace simol
   void writeFinalOutput(Dynamics const& /*dyna*/, System const& /*syst*/, Output& output)
   {
     if (output.doComputeCorrelations())
-      output.finalDisplayAutocorrelations();
+      output.finalDisplayCorrelations();
   }
 
   void writeFinalOutput(DPDE const& /*dyna*/, System const& /*syst*/, Output& output)
   {
     if (output.doComputeCorrelations())
-      output.finalDisplayAutocorrelationsDPDE();
+      output.finalDisplayCorrelationsDPDE();
   }
 
 

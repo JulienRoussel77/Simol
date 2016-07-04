@@ -34,12 +34,12 @@ namespace simol
     lengthCV_(nullptr),
     midFlowCV_(nullptr),
     sumFlowCV_(nullptr),
-    kinTempProfile_(decorrelationNbOfSteps(), decorrelationTime(), nbOfAutocoPts(), nbOfParticles_),
-    potTempTopProfile_(decorrelationNbOfSteps(), decorrelationTime(), nbOfAutocoPts(), nbOfParticles_),
-    potTempBotProfile_(decorrelationNbOfSteps(), decorrelationTime(), nbOfAutocoPts(), nbOfParticles_),
-    bendistProfile_(decorrelationNbOfSteps(), decorrelationTime(), nbOfAutocoPts(), nbOfParticles_),
-    flowProfile_(decorrelationNbOfSteps(), decorrelationTime(), nbOfAutocoPts(), nbOfParticles_),
-    averageKineticEnergy_(decorrelationNbOfSteps(), decorrelationTime(), nbOfAutocoPts())
+    kinTempProfile_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts(), nbOfParticles_),
+    potTempTopProfile_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts(), nbOfParticles_),
+    potTempBotProfile_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts(), nbOfParticles_),
+    bendistProfile_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts(), nbOfParticles_),
+    flowProfile_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts(), nbOfParticles_),
+    averageKineticEnergy_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts())
   {
     
     //-- standard observables in this file --
@@ -358,7 +358,7 @@ namespace simol
 
   //------------ autocorrelations ------------------
   
-  void Output::finalDisplayAutocorrelationsDPDE()
+  void Output::finalDisplayCorrelationsDPDE()
   {
     for (int i = 0; i < nbOfAutocoPts(); i++)
       {
@@ -367,34 +367,35 @@ namespace simol
       }
   }
 
-  void Output::finalDisplayAutocorrelations()
+  void Output::finalDisplayCorrelations()
   {
-    double integralV = 0;
+    
+    int midNb = nbOfParticles_ / 2;
+    for (int i = 0; i < nbOfAutocoPts(); i++)
+    {
+      outCorrelation() << i * autocoPtsPeriod()
+                       << " " << velocityCV_->unbiasedCorrelation(i)
+                       << " " << velocityCV_->stdErrorCorrelation(i)
+                       << " " << forceCV_->unbiasedCorrelation(i)
+                       << " " << forceCV_->stdErrorCorrelation(i)
+                       << " " << lengthCV_->unbiasedCorrelation(i)
+                       << " " << lengthCV_->stdErrorCorrelation(i)
+                       << " " << midFlowCV_->unbiasedCorrelation(i)
+                       << " " << midFlowCV_->stdErrorCorrelation(i)
+                       << " " << sumFlowCV_->unbiasedCorrelation(i)
+                       << " " << sumFlowCV_->stdErrorCorrelation(i)  //#11
+                       << " " << modiFlowCV_->unbiasedCorrelation(i)
+                       << " " << modiFlowCV_->stdErrorCorrelation(i)
+                       << " " << bendistProfile_(i, midNb) - pow(bendistProfile_.mean(midNb), 2)
+                       << std::endl;
+                       
+      /*double integralV = 0;
     double integralF = 0;
     double integralQ = 0;
     double midFlowQ = 0;
     double sumFlowQ = 0;
     double modiFlowQ = 0;
-    int midNb = nbOfParticles_ / 2;
-    for (int i = 0; i < nbOfAutocoPts(); i++)
-    {
       outCorrelation() << i * autocoPtsPeriod()
-                       << " " << velocityCV_->unbiasedAutocorrelation(i)
-                       << " " << (integralV += velocityCV_->unbiasedAutocorrelation(i) * autocoPtsPeriod())
-                       << " " << forceCV_->unbiasedAutocorrelation(i)
-                       << " " << (integralF += forceCV_->unbiasedAutocorrelation(i) * autocoPtsPeriod())
-                       << " " << lengthCV_->unbiasedAutocorrelation(i)
-                       << " " << (integralQ += lengthCV_->unbiasedAutocorrelation(i) * autocoPtsPeriod())
-                       << " " << midFlowCV_->unbiasedAutocorrelation(i)
-                       << " " << (midFlowQ += midFlowCV_->unbiasedAutocorrelation(i) * autocoPtsPeriod())
-                       << " " << sumFlowCV_->unbiasedAutocorrelation(i)
-                       << " " << (sumFlowQ += sumFlowCV_->unbiasedAutocorrelation(i) * autocoPtsPeriod())
-                       << " " << modiFlowCV_->unbiasedAutocorrelation(i)
-                       << " " << (modiFlowQ += modiFlowCV_->unbiasedAutocorrelation(i) * autocoPtsPeriod())
-                       << " " << bendistProfile_(i, midNb) - pow(bendistProfile_.mean(midNb), 2)
-                       << std::endl;
-                       
-      /*outCorrelation() << i * autocoPtsPeriod()
                        << " " << velocityCV_->autocorrelation(i) - pow(velocityCV_->meanObservable(), 2)
                        << " " << (integralV += velocityCV_->autocorrelation(i) * autocoPtsPeriod())
                        << " " << forceCV_->autocorrelation(i) - pow(forceCV_->meanObservable(), 2)

@@ -130,10 +130,13 @@ namespace simol
                      << " " << setw(6) << parameter2
                      << " " << setw(12) << midFlowCV_->meanObservable()
                      << " " << setw(12) << midFlowCV_->stdDeviationObservable()
+                     << " " << setw(12) << midFlowCV_->stdErrorOfVarObservable()
                      << " " << setw(12) << sumFlowCV_->meanObservable()
                      << " " << setw(12) << sumFlowCV_->stdDeviationObservable()
+                     << " " << setw(12) << sumFlowCV_->stdErrorOfVarObservable()
                      << " " << setw(12) << modiFlowCV_->meanObservable()
                      << " " << setw(12) << modiFlowCV_->stdDeviationObservable()
+                     << " " << setw(12) << modiFlowCV_->stdErrorOfVarObservable()
                      << std::endl;
     }
   }

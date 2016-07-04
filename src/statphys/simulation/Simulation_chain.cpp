@@ -87,7 +87,7 @@ namespace simol
   {
     output.finalChainDisplay(syst.configuration(), syst.externalForce());
     if (output.doComputeCorrelations())
-      output.finalDisplayAutocorrelations();
+      output.finalDisplayCorrelations();
     output.displayFinalFlow(dyna.temperature(), dyna.deltaTemperature(), syst.potParameter1(), syst.potParameter2());
   }
 
@@ -123,7 +123,7 @@ namespace simol
   {
     output.finalChainDisplay(syst.configuration(), syst.externalForce());
     if (output.doComputeCorrelations())
-      output.finalDisplayAutocorrelations();
+      output.finalDisplayCorrelations();
     output.displayFinalFlow(dyna.temperature(), dyna.deltaTemperature(), dyna.tauBending(), dyna.xi());
   }
 

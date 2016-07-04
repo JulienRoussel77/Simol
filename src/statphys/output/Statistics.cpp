@@ -5,23 +5,25 @@ using std::max;
 
 namespace simol
 {
+  
+  //###### Statistics ######
+  
   Statistics::Statistics(int nbRows, int nbCols):
     sumValues_(nbRows, nbCols),
     lastValue_(nbRows, nbCols),
-    nbValues_(nbRows, nbCols)
+    nbValues_(nbRows, nbCols),
+    iidVar_(nbRows, nbCols)
   {
     sumValues_.fill(0);
     lastValue_.fill(0);
     nbValues_.fill(0);
+    iidVar_.fill(0);
   };
 
   void Statistics::append(double value, int i, int j)
   {
     lastValue_(i, j) = value;
-    if (nbValues_(i, j) == 0)
-      sumValues_(i, j) = value;
-    else
-      sumValues_(i, j) += value;
+    sumValues_(i, j) += value;
     nbValues_(i, j)++;
   }
 
@@ -74,121 +76,218 @@ namespace simol
   const DenseMatrix<double>& Statistics::lastValueMat() const
   {
     return lastValue_;
+  }  
+  
+  
+  //###### IIDStats ######
+  
+  IIDStats::IIDStats(int nbRows, int nbCols):
+    Statistics(nbRows, nbCols),
+    iidVar_(nbRows, nbCols)
+  {
+    iidVar_.fill(0);
+  };
+  
+  void IIDStats::append(double value, int i, int j)
+  {
+    lastValue_(i, j) = value;
+    double tempTerm = iidVar_(i,j) + pow(mean(), 2);
+    nbValues_(i, j)++;
+    sumValues_(i, j) += value;
+    iidVar_(i,j) = tempTerm - pow(mean(), 2) + (pow(value, 2) - tempTerm) / nbValues_(i, j);
   }
+  
+  const double& IIDStats::variance(int i, int j) const
+  {
+    return iidVar_(i, j);
+  }
+  
+  double IIDStats::stdDeviation(int i, int j) const
+  {
+    return sqrt(variance(i,j));
+  }
+  
+  //###### CorrelationStats ######
 
 
-  AutocorrelationStats::AutocorrelationStats():
+  CorrelationStats::CorrelationStats():
     decorrelationNbOfSteps_(0),
-    decorrelationTime_(0),
+    timeStep_(0),
     nbOfAutocoPts_(0),
     nbOfObservables_(0),
     //timeStep_(timeStep),
-    statisticsValues_(0),
-    statisticsRefValues_(0),
-    statisticsMeanCorrelation_(0),
-    //statisticsMeanCorrelationTemp_(),
-    statisticsCorrelation_(0, 0),
+    statsValues_(0),
+    statsRefValues_(0),
+    statsIntegratedCorrelation_(0),
+    //statsIntegratedCorrelationTemp_(),
+    statsCorrelation_(0, 0),
     indexRef_(0)
   {
-    //cout << "AutocorrelationStats()" << endl;
+    //cout << "CorrelationStats()" << endl;
   }
 
 
-  AutocorrelationStats::AutocorrelationStats(int decorrelationNbOfSteps0, double decorrelationTime, int nbOfAutocoPts0, int nbOfObservables):
+  CorrelationStats::CorrelationStats(int decorrelationNbOfSteps0, double timeStep0, int nbOfAutocoPts0, int nbOfObservables):
     decorrelationNbOfSteps_(decorrelationNbOfSteps0),
-    decorrelationTime_(decorrelationTime),
+    timeStep_(timeStep0),
     nbOfAutocoPts_(nbOfAutocoPts0),
     nbOfObservables_(nbOfObservables),
     //timeStep_(timeStep),
-    statisticsValues_(nbOfObservables),
-    statisticsRefValues_(nbOfObservables),
-    statisticsMeanCorrelation_(nbOfObservables),
-    //statisticsMeanCorrelationTemp_(),
-    statisticsCorrelation_(nbOfAutocoPts_, nbOfObservables),
-    indexRef_(0)
+    statsValues_(nbOfObservables),
+    statsRefValues_(nbOfObservables),
+    statsIntegratedCorrelation_(nbOfObservables),
+    //statsIntegratedCorrelationTemp_(),
+    statsCorrelation_(nbOfAutocoPts_, nbOfObservables),
+    indexRef_(0),
+    currentCorrelationIntegral_(0)
   {
-    //cout << "AutocorrelationStats(int decorrelation : nbObs = " << decorrelationTime << endl;
+    //cout << "CorrelationStats(int decorrelation : nbObs = " << decorrelationTime << endl;
   }
-
-
-  void AutocorrelationStats::append(double const& newValue, long int iOfStep, int iOfObservable)
+  
+  const int& CorrelationStats::decorrelationNbOfSteps() const
   {
-    append(newValue, iOfStep, iOfObservable, newValue);
+    return decorrelationNbOfSteps_;
   }
-
-
-  double AutocorrelationStats::operator()(long int iOfStep, int iOfObservable) const
+  
+  double CorrelationStats::decorrelationTime() const
   {
-    return statisticsCorrelation_.mean(iOfStep, iOfObservable);
+    return decorrelationNbOfSteps() * timeStep();
   }
-
-
-  const double& AutocorrelationStats::lastValue(int iOfObservable) const
+  
+  const double& CorrelationStats::timeStep() const
   {
-    return statisticsValues_.lastValue(iOfObservable);
+    return timeStep_;
   }
-
-
-  double AutocorrelationStats::mean(int iOfObservable) const
-  {
-    return statisticsValues_.mean(iOfObservable);
-  }
-
-
-  int AutocorrelationStats::statisticsMeanCorrelationNbValues(int iOfObservable) const
-  {
-    return statisticsMeanCorrelation_.nbValues(iOfObservable);
-  }
-
-
-  double AutocorrelationStats::integratedAutocorrelation(int iOfObservable) const
-  {
-    return statisticsMeanCorrelation_.mean(iOfObservable) * decorrelationTime_;
-  }
-
-
-  Vector<double> AutocorrelationStats::integratedAutocorrelationVec() const
-  {
-    return statisticsMeanCorrelation_.meanMat().column(0) * decorrelationTime_;
-  }
-
-
-
-
-  double AutocorrelationStats::variance(int iOfObservable) const
-  {
-    return 2 * integratedAutocorrelationUnbiased(iOfObservable);
-  }
-
-
-  double AutocorrelationStats::standardDeviation(int iOfObservable) const
-  {
-    return sqrt(variance(iOfObservable));
-  }
-
-  void AutocorrelationStats::append(const double& newValue, long int iOfStep, int iOfObservable, const double& newRefValue)
+  
+  void CorrelationStats::append(const double& newValue, long int iOfStep, int iOfObservable, const double& newRefValue)
   {
     //-- update the average --
-    statisticsValues_.append(newValue, iOfObservable);
+    statsValues_.append(newValue, iOfObservable);
     //-- update the autocorrelations --
     if (decorrelationNbOfSteps_ != 0)
     {
       if (iOfStep % decorrelationNbOfSteps_ == 0)
       {
-        statisticsRefValues_.append(newRefValue, iOfObservable);
+        statsRefValues_.append(newRefValue, iOfObservable);
         indexRef_ = iOfStep;
       }
       //-- update the correlation function --
       // decorrelationNbOfSteps_ / nbOfAutocoPts_ is the time intervale between two correlation estimations: can be bigger than the time step
-      statisticsCorrelation_.append(statisticsRefValues_.lastValue(iOfObservable) * newValue, ((iOfStep - indexRef_)*nbOfAutocoPts_) / decorrelationNbOfSteps_, iOfObservable);
+      statsCorrelation_.append(statsRefValues_.lastValue(iOfObservable) * newValue, ((iOfStep - indexRef_)*nbOfAutocoPts_) / decorrelationNbOfSteps_, iOfObservable);
       //-- integration of the correlation function with a trapezoidal rule --
-      statisticsMeanCorrelation_.append(((indexRef_ == iOfStep) ? .5 : 1) * statisticsRefValues_.lastValue(iOfObservable) * newValue, iOfObservable);
+      currentCorrelationIntegral_ += ((indexRef_ == iOfStep) ? .5 : 1) * statsRefValues_.lastValue(iOfObservable) * newValue;
+      if ((iOfStep+1) % decorrelationNbOfSteps_ == 0)    
+      {
+        statsIntegratedCorrelation_.append(timeStep() * currentCorrelationIntegral_, iOfObservable);
+        currentCorrelationIntegral_ = 0;
+      }
     }
   }
 
-  double AutocorrelationStats::integratedAutocorrelationUnbiased(int iOfObservable) const
+  double CorrelationStats::operator()(long int iOfStep, int iOfObservable) const
   {
-    return max(0., integratedAutocorrelation(iOfObservable) - mean(iOfObservable) * statisticsRefValues_.mean(iOfObservable) * decorrelationTime_);
+    return statsCorrelation_.mean(iOfStep, iOfObservable);
   }
 
+
+  const double& CorrelationStats::lastValue(int iOfObservable) const
+  {
+    return statsValues_.lastValue(iOfObservable);
+  }
+
+
+  double CorrelationStats::mean(int iOfObservable) const
+  {
+    return statsValues_.mean(iOfObservable);
+  }
+
+
+  int CorrelationStats::statsIntegratedCorrelationNbValues(int iOfObservable) const
+  {
+    return statsIntegratedCorrelation_.nbValues(iOfObservable);
+  }
+
+
+  double CorrelationStats::integratedCorrelation(int iOfObservable) const
+  {
+    return statsIntegratedCorrelation_.mean(iOfObservable);
+  }
+
+  Vector<double> CorrelationStats::integratedCorrelationVec() const
+  {
+    return statsIntegratedCorrelation_.meanMat().column(0);
+  }
+
+  double CorrelationStats::integratedCorrelationUnbiased(int iOfObservable) const
+  {
+    return integratedCorrelation(iOfObservable) - mean(iOfObservable) * statsRefValues_.mean(iOfObservable) * decorrelationTime();
+  }
+  
+  double CorrelationStats::varIntegratedCorrelation(int iOfObservable) const
+  {
+    return statsIntegratedCorrelation_.variance(iOfObservable);
+  }
+  
+  double CorrelationStats::varCorrelation(int indexDifference, int iOfObservable) const
+  {
+    return statsCorrelation_.variance(indexDifference, iOfObservable);
+  }
+  
+  double CorrelationStats::stdDeviationCorrelation(int indexDifference, int iOfObservable) const
+  {
+    return sqrt(varCorrelation(indexDifference, iOfObservable));
+  }
+  
+  double CorrelationStats::stdErrorCorrelation(int indexDifference, int iOfObservable) const
+  {
+    return stdDeviationCorrelation(indexDifference, iOfObservable) / sqrt(statsCorrelation_.nbValues(iOfObservable));
+  }
+  
+  //###### AutocorrelationStats ######
+  
+  AutocorrelationStats::AutocorrelationStats():
+    CorrelationStats()
+  {}
+
+
+  AutocorrelationStats::AutocorrelationStats(int decorrelationNbOfSteps0, double timeStep0, int nbOfAutocoPts0, int nbOfObservables):
+    CorrelationStats(decorrelationNbOfSteps0, timeStep0, nbOfAutocoPts0, nbOfObservables)
+  {}
+  
+  void AutocorrelationStats::append(double const& newValue, long int iOfStep, int iOfObservable)
+  {
+    CorrelationStats::append(newValue, iOfStep, iOfObservable, newValue);
+  }
+
+  double AutocorrelationStats::variance(int iOfObservable) const
+  {
+    return 2 * max(0., integratedCorrelationUnbiased(iOfObservable));
+  }
+
+  double AutocorrelationStats::standardDeviation(int iOfObservable) const
+  {
+    return sqrt(variance(iOfObservable));
+  }
+  
+  ///
+  ///Returns the variance of the estimator of the variance
+  double AutocorrelationStats::varianceOfVariance(int iOfObservable) const
+  {
+    return 4 * varIntegratedCorrelation(iOfObservable);
+  }
+  
+  ///
+  ///Returns the variance of the estimator of the variance
+  double AutocorrelationStats::stdDevOfVariance(int iOfObservable) const
+  {
+    return 2 * sqrt(varIntegratedCorrelation(iOfObservable));
+  }
+  
+      ///
+  ///Returns the variance of the estimator of the variance
+  double AutocorrelationStats::stdErrorOfVariance(int iOfObservable) const
+  {
+    return stdDevOfVariance(iOfObservable) / sqrt(statsCorrelation_.nbValues(iOfObservable));
+  }
+  
 }

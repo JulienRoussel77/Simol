@@ -14,7 +14,7 @@ namespace simol
   void writeFinalOutput(Hamiltonian const& /*dyna*/, Isolated const& syst, Output& output)
   {
     if (output.doComputeCorrelations())
-      output.finalDisplayAutocorrelations();
+      output.finalDisplayCorrelations();
     output.displayFinalVelocity(0, syst.externalForce(0), output.velocityCV_->nbOfFourier(), output.velocityCV_->nbOfHermite());
   }
 
