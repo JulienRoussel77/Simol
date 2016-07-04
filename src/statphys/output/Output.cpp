@@ -40,6 +40,8 @@ namespace simol
     bendistProfile_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts(), nbOfParticles_),
     flowProfile_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts(), nbOfParticles_),
     averageKineticEnergy_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts())
+  //DPDE averagePotentialEnergy_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts()),
+  //DPDE averageInternalEnergy_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts())
   {
     
     //-- standard observables in this file --
@@ -51,6 +53,8 @@ namespace simol
     {
       outObservables_       = std::make_shared<ofstream>(input.outputFolderName() + "observables.txt");
       outObservables() << "# time position momentum internalEnergy kineticEnergy potentialEnergy totalEnergy" << endl;
+      //DPDE meanValueObservables_       = std::make_shared<ofstream>(input.outputFolderName() + "mean_observables.txt");
+      //DPDE meanValueObservables() << "# tim kineticEnergy potentialEnergy internalEnergy" << endl;
     }
 
     //-- longer outputs if required, e.g. configuration of the system --
@@ -178,6 +182,11 @@ namespace simol
 
   ofstream & Output::outCorrelation()
   {return *outCorrelation_;}
+
+  ofstream & Output::meanValueObservables()
+  {
+    //DPDE return *meanValueObservables_;
+  }
 
   ofstream & Output::outVelocitiesCV()
   {return *outVelocitiesCV_;}
@@ -342,6 +351,16 @@ namespace simol
     averageKineticEnergy_.append(value, iOfStep);
   }
 
+  void Output::appendPotentialEnergy(double value, long int iOfStep)
+  {
+    //DPDE   averagePotentialEnergy_.append(value, iOfStep);
+  }
+  
+  void Output::appendInternalEnergy(double value, long int iOfStep)
+  {
+    //DPDE   averageInternalEnergy_.append(value, iOfStep);
+  }
+
   void Output::displayObservablesDPDE(vector<Particle> const& configuration, long int iOfStep)
   {
     double totalEnergy = kineticEnergy() + potentialEnergy() + internalEnergy();
@@ -352,7 +371,11 @@ namespace simol
                      << " " << kineticEnergy()
                      << " " << potentialEnergy()
 		     << " " << totalEnergy
-		     << " " << averageKineticEnergy_.mean()
+      //DPDE << std::endl;
+      //DPDE meanValueObservables() << iOfStep * timeStep()
+		      << " " << averageKineticEnergy_.mean() 
+      //DPDE << " " << averagePotentialEnergy_.mean() 
+      //DPDE		      << " " << averageInternalEnergy_.mean() 
 		     << std::endl;
   }
 
@@ -363,7 +386,11 @@ namespace simol
     for (int i = 0; i < nbOfAutocoPts(); i++)
       {
 	//-- autocoPtsPeriod(): time between successive correlation values; may be different from the timestep if some subsampling is specified
-	outCorrelation() << i * autocoPtsPeriod() << " " << averageKineticEnergy_(i) - pow(averageKineticEnergy_.mean(), 2) << endl;
+	outCorrelation() << i * autocoPtsPeriod() 
+			 << " " << averageKineticEnergy_(i) - pow(averageKineticEnergy_.mean(), 2) 
+	  //DPDE << " " << averagePotentialEnergy_(i) - pow(averagePotentialEnergy_.mean(), 2) 
+	  //DPDE << " " << averageInternalEnergy_(i) - pow(averageInternalEnergy_.mean(), 2) 
+			 << endl;
       }
   }
 

@@ -34,6 +34,8 @@ namespace simol
     output.internalEnergy() = syst.getParticle(0).internalEnergy();
     // -- averages --
     output.appendKineticEnergy(syst.getParticle(0).kineticEnergy(), iOfStep);
+    output.appendPotentialEnergy(syst.getParticle(0).potentialEnergy(), iOfStep);
+    output.appendInternalEnergy(syst.getParticle(0).internalEnergy(), iOfStep);
   }
 
   void samplePositions(DPDE& /*dyna*/, Isolated& syst)

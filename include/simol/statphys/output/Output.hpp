@@ -20,12 +20,13 @@ namespace simol
       Output(Input const& input);
       void setControlVariates(Input& input, Potential& potential, Galerkin* galerkin);
 
-      ofstream & outObservables();
+    ofstream & outObservables();
       ofstream & outParticles();
       ofstream & outParticlesXMakeMol();
       ofstream & outFinalFlow();
       ofstream & outFinalVelocity();
-      ofstream & outCorrelation();
+    ofstream & meanValueObservables();
+    ofstream & outCorrelation();
       ofstream & outChainVelocities();
       ofstream & outBeam();
       ofstream & outVelocitiesCV();
@@ -105,6 +106,8 @@ namespace simol
       //------------- pour DPDE ---------------
     void displayObservablesDPDE(vector<Particle> const& configuration, long int iOfStep);
     void appendKineticEnergy(double value, long int iOfStep);
+    void appendPotentialEnergy(double value, long int iOfStep);
+    void appendInternalEnergy(double value, long int iOfStep);
     void finalDisplayCorrelationsDPDE();
 
       //------------- for Galerkin ----------------------
@@ -118,8 +121,8 @@ namespace simol
       void updateControlVariate(vector<Particle> const& configuration);
 
     protected:
-      string outputFolderName_;
-      std::shared_ptr<ofstream> outObservables_;
+    string outputFolderName_;
+    std::shared_ptr<ofstream> outObservables_;
       std::shared_ptr<ofstream> outParticles_;
       std::shared_ptr<ofstream> outCorrelation_;
 
@@ -128,6 +131,9 @@ namespace simol
 
       //-- average velocity for Isolated --
       std::shared_ptr<ofstream> outFinalVelocity_;
+
+    //-- mean observables for DPDE --
+    //DPDE std::shared_ptr<ofstream> meanValueObservables_;
 
       //-- control variate outputs --
       std::shared_ptr<ofstream> outVelocitiesGenerator_;
@@ -188,6 +194,9 @@ namespace simol
     
     //-- DPDE --
     AutocorrelationStats averageKineticEnergy_;
+    //DPDE 
+    AutocorrelationStats averagePotentialEnergy_;
+    //DPDE AutocorrelationStats averageInternalEnergy_;
     
   };
   
