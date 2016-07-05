@@ -72,7 +72,8 @@ namespace simol
     double E0 = old_kin_energy + particle.internalEnergy(); 
     //-- propose a new move --
     Vector<double> G = rng_->gaussian();
-    particle.momentum() += effectiveDrift(particle)*timeStep_ + sigma()*sqrt(timeStep_)*G;
+    Vector<double> b = effectiveDrift(particle);
+    particle.momentum() += b*timeStep_ + sigma()*sqrt(timeStep_)*G;
     //-- compute the Metropolis rate --
     double new_kin_energy = particle.kineticEnergy();
     double rate = 0; 
@@ -90,7 +91,7 @@ namespace simol
 	//-- reject the move --
 	incrementRejection();
 	//cout << rate << "  " << rejectionCount() << endl;
-	//cout << E0 << " " << particle.momentum() << ", previously " << old_momentum << ", internal = " << particle.internalEnergy() << endl;
+	//cout << rate << " ; " << E0 << " " << particle.momentum() << " , drift " << b(0) << ", previously " << old_momentum << ", internal = " << particle.internalEnergy() << endl;
 	particle.momentum() = old_momentum;
       }
     else 
