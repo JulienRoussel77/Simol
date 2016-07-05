@@ -52,7 +52,7 @@ namespace simol
     if ( (input.systemName() == "Isolated") && (input.dynamicsName() == "DPDE") )
     {
       outObservables_       = std::make_shared<ofstream>(input.outputFolderName() + "observables.txt");
-      outObservables() << "# time position momentum internalEnergy kineticEnergy potentialEnergy totalEnergy" << endl;
+      outObservables() << "# time position momentum internalEnergy kineticEnergy potentialEnergy totalEnergy averageRejection" << endl;
       meanValueObservables_       = std::make_shared<ofstream>(input.outputFolderName() + "mean_observables.txt");
       meanValueObservables() << "# tim kineticEnergy potentialEnergy internalEnergy" << endl;
     }
@@ -237,6 +237,12 @@ namespace simol
   double& Output::internalEnergy()
   {return internalEnergy_;}
 
+  const double& Output::rejectionCount() const 
+  {return rejectionCount_;}
+
+  double& Output::rejectionCount() 
+  {return rejectionCount_;}
+
   const double& Output::totalVirial() const
   {return totalVirial_;}
 
@@ -369,6 +375,7 @@ namespace simol
                      << " " << kineticEnergy()
                      << " " << potentialEnergy()
 		     << " " << totalEnergy
+		     << " " << rejectionCount()/iOfStep 
 		     << std::endl;
     meanValueObservables() << iOfStep * timeStep()
 			   << " " << averageKineticEnergy_.mean() 

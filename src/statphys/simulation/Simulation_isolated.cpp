@@ -26,23 +26,26 @@ namespace simol
   //------------- DPDE --------------------
 
   template <>
-  void computeOutput(DPDE const& /*dyna*/, Isolated const& syst, Output& output, long int iOfStep)
+  void computeOutput(DPDE const& dyna, Isolated const& syst, Output& output, long int iOfStep)
   {
     //-- instantaneous values --
     output.kineticEnergy() = syst.getParticle(0).kineticEnergy();
     output.potentialEnergy() = syst.getParticle(0).potentialEnergy();
     output.internalEnergy() = syst.getParticle(0).internalEnergy();
-    // -- averages --
+    // -- averages of observables --
     output.appendKineticEnergy(syst.getParticle(0).kineticEnergy(), iOfStep);
     output.appendPotentialEnergy(syst.getParticle(0).potentialEnergy(), iOfStep);
     output.appendInternalEnergy(syst.getParticle(0).internalEnergy(), iOfStep);
+    //-- rejection rate --
+    output.rejectionCount() = dyna.rejectionCount();
   }
 
-  void samplePositions(DPDE& /*dyna*/, Isolated& syst)
+  void samplePositions(DPDE& dyna, Isolated& syst)
   {
     cout << " - Sampling the positions..." << endl;
     syst.getParticle(0).position(0) = 0;
     syst.getParticle(0).internalEnergy() = 1;  // TO DO : sample according to equilibrium law?
+    dyna.rejectionCount() = 0;
   }
 
   void simulate(DPDE& dyna, System& syst)

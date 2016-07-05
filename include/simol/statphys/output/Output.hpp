@@ -72,6 +72,8 @@ namespace simol
       double& energySumFlow();
       const double& energyModiFlow() const;
       double& energyModiFlow();
+    const double& rejectionCount() const;
+    double& rejectionCount();
 
       //-- parametrization of outputs --
       bool doComputeCorrelations() const;
@@ -169,6 +171,7 @@ namespace simol
       double energyMidFlow_;
       double energySumFlow_;
       double energyModiFlow_;
+    double rejectionCount_;
 
       //-- parametrization of outputs --
       int decorrelationNbOfSteps_;
