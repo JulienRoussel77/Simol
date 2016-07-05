@@ -36,7 +36,7 @@ namespace simol
   {
     if (data["Galerkin"])
       if (data["Galerkin"]["Resolve"])
-        if (data["Galerkin"]["Resolve"].as<string>() == "yes")
+        if (sameLetters(data["Galerkin"]["Resolve"].as<string>(), "yes"))
           return true;
 
     return false;

@@ -8,6 +8,13 @@ using std::min;
 
 namespace simol
 {
+  bool sameLetters(const string& x, const string& y)
+  {
+    if (x.size() != y.size()) return false;
+    for (int i=0; i < (int)x.size(); i++)
+      if (tolower(x[i]) != tolower(y[i])) return false;
+    return true;
+  }
 
   ///
   ///Reads the next element in the file read

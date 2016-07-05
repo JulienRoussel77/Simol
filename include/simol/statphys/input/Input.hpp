@@ -13,6 +13,7 @@
 
 namespace simol
 {
+  bool sameLetters(const string& x, const string& y);
 
   class Input
   {

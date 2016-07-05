@@ -113,7 +113,7 @@ namespace simol
 
   double Input::eta() const
   {
-    if (dynamicsName() == "BoundaryLangevin")
+    if (sameLetters(dynamicsName(), "BoundaryLangevin"))
       return deltaTemperature();
     else
       return externalForce();

@@ -125,7 +125,7 @@ namespace simol
   bool Input::isOfFixedVolum() const
   {
     if (data["System"]["Volum"]
-        && data["System"]["Volum"].as<string>() == "fixed")
+        && sameLetters(data["System"]["Volum"].as<string>(), "fixed"))
       return true;
 
     return false;

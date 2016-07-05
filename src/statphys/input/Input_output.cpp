@@ -28,7 +28,7 @@ namespace simol
   string Input::simuTypeName() const
   {
     if (data["Output"]["SimuTypeName"]
-        && data["Output"]["SimuTypeName"].as<string>() == "yes")
+        && sameLetters(data["Output"]["SimuTypeName"].as<string>(), "yes"))
       //return "../../../output/" + dynamicsName() + "/" + systemName() + "/" + potentialName() + "/";
       return "output/" + dynamicsName() + "/" + systemName() + "/" + potentialName() + "/";
     else
@@ -184,7 +184,7 @@ namespace simol
   bool Input::doFinalFlow() const
   {
     if (data["Output"]["DoFinalFlow"])
-      if (data["Output"]["DoFinalFlow"].as<string>() == "yes")
+      if (sameLetters(data["Output"]["DoFinalFlow"].as<string>(), "yes"))
         return true;
     return false;
   }
@@ -192,7 +192,7 @@ namespace simol
   bool Input::doFinalVelocity() const
   {
     if (data["Output"]["DoFinalVelocity"])
-      if (data["Output"]["DoFinalVelocity"].as<string>() == "yes")
+      if (sameLetters(data["Output"]["DoFinalVelocity"].as<string>(), "yes"))
         return true;
     return false;
   }
