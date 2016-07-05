@@ -54,7 +54,8 @@ namespace simol
       dyna.verletSecondPart(particle);
     //-- fluctuation/dissipation --
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
-      dyna.energyReinjection(syst.getParticle(iOfParticle));  // integration of p at fixed gamma + energy reinjection
+      //dyna.energyReinjection(syst.getParticle(iOfParticle));  // integration of p at fixed gamma + energy reinjection
+      dyna.metropolizedEnergyReinjection(syst.getParticle(iOfParticle));  // Metropolis correction of effective dynamics on p 
   }
 
 }

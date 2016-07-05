@@ -91,7 +91,7 @@ namespace simol
     return pow(momentum_.norm(), 2) / 2 / mass_;
   }
 
-  const double& Particle::potentialEnergy() const
+  double const & Particle::potentialEnergy() const
   { return potentialEnergy_; }
 
   double& Particle::potentialEnergy()
@@ -99,6 +99,9 @@ namespace simol
 
   double Particle::energy() const
   { return kineticEnergy() + potentialEnergy_; }
+
+  double Particle::totalEnergyDPDE() const
+  { return kineticEnergy() + potentialEnergy_ + internalEnergy_; }
 
   Vector<double> const& Particle::force() const
   { return force_; }

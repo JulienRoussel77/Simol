@@ -42,17 +42,30 @@ namespace simol
     particle.internalEnergy() += old_kin_energy - new_kin_energy;
   }
 
+  Vector<double> DPDE::effectiveDrift(Particle& particle)
+  {
+    double e0 = particle.totalEnergyDPDE(); 
+    Vector<double> drift = -pow(sigma(),2)/(2*particle.mass())*particle.momentum()/(e0-particle.kineticEnergy());
+    return drift;
+  }
+
   void DPDE::metropolizedEnergyReinjection(Particle& particle)
   {
     //-- keep previous configuration --
     Vector<double> old_momentum = particle.momentum();
-    double old_kin_energy = particle.kineticEnergy();
+    double E0 = particle.totalEnergyDPDE(); 
     //-- propose a new move --
-    particle.momentum() += rng_->gaussian();
+    Vector<double> G = rng_->gaussian();
+    particle.momentum() += effectiveDrift(particle)*timeStep_ + sigma()*sqrt(timeStep_)*G;
     //-- compute the Metropolis rate --
-    double rate = particle.kineticEnergy() - old_kin_energy;
+    double new_kin_energy = particle.kineticEnergy();
+    double rate = 0; 
+    if (new_kin_energy < E0)
+      {
+	rate = 1; //pow(G.norm(), 2); 
+      }
     //-- acceptance/rejection procedure --
-    if (rng_->scalarUniform() > rate)
+    if (rng_->scalarUniform() < rate)
       particle.momentum() = old_momentum;
   }
 
