@@ -42,4 +42,18 @@ namespace simol
     particle.internalEnergy() += old_kin_energy - new_kin_energy;
   }
 
+  void DPDE::metropolizedEnergyReinjection(Particle& particle)
+  {
+    //-- keep previous configuration --
+    Vector<double> old_momentum = particle.momentum();
+    double old_kin_energy = particle.kineticEnergy();
+    //-- propose a new move --
+    particle.momentum() += rng_->gaussian();
+    //-- compute the Metropolis rate --
+    double rate = particle.kineticEnergy() - old_kin_energy;
+    //-- acceptance/rejection procedure --
+    if (rng_->scalarUniform() > rate)
+      particle.momentum() = old_momentum;
+  }
+
 }

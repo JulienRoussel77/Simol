@@ -16,6 +16,7 @@ namespace simol
     virtual double& heatCapacity();
     double sigma() const;
     void energyReinjection(Particle& particle);
+    void metropolizedEnergyReinjection(Particle& particle);
   };
   
 }
