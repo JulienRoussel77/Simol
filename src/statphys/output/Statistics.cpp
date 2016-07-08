@@ -47,17 +47,17 @@ namespace simol
   }
 
 
-  const int& Statistics::nbValues(int i, int j) const
+  const long int& Statistics::nbValues(int i, int j) const
   {
     return nbValues_(i, j);
   }
 
-  const Vector<int> Statistics::nbValuesVec(int i) const
+  const Vector<long int> Statistics::nbValuesVec(int i) const
   {
     return nbValues_.column(i);
   }
 
-  const DenseMatrix<int>& Statistics::nbValuesMat() const
+  const DenseMatrix<long int>& Statistics::nbValuesMat() const
   {
     return nbValues_;
   }

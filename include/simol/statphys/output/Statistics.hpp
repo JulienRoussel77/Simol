@@ -13,7 +13,7 @@ namespace simol
   protected:
     DenseMatrix<double> sumValues_;
     DenseMatrix<double> lastValue_;
-    DenseMatrix<int> nbValues_;
+    DenseMatrix<long int> nbValues_;
     DenseMatrix<double> iidVar_;
   public:
     Statistics(int nbRows = 1, int nbCols = 1);
@@ -22,9 +22,9 @@ namespace simol
     double mean(int i = 0, int j = 0) const;
     Vector<double> meanVec(int i = 0) const;
     DenseMatrix<double> meanMat() const;
-    const int& nbValues(int i = 0, int j = 0) const;
-    const Vector<int> nbValuesVec(int i = 0) const;
-    const DenseMatrix<int>& nbValuesMat() const;
+    const long int& nbValues(int i = 0, int j = 0) const;
+    const Vector<long int> nbValuesVec(int i = 0) const;
+    const DenseMatrix<long int>& nbValuesMat() const;
     const double& lastValue(int i = 0, int j = 0) const;
     const Vector<double> lastValueVec(int i = 0) const;
     const DenseMatrix<double>& lastValueMat() const;      
