@@ -57,6 +57,8 @@ namespace simol
     
     generatorOnBasis = output.modiFlowCV().generatorBoundarylangevin(syst.configuration(), dyna.betaLeft(), dyna.betaRight(), dyna.gamma());
     output.modiFlowCV().update(output.energyModiFlow(), generatorOnBasis, syst.configuration(), iOfStep);
+    
+    *(output.outTest_) << iOfStep << " " << output.modiFlowCV().statsObservable_.statsValues_.lastValue() * output.modiFlowCV().statsObservable_.statsRefValues_.lastValue() << endl;
   }
 
 }

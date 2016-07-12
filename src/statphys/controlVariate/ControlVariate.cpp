@@ -185,24 +185,25 @@ namespace simol
     statsObservable_.append(observable, iOfStep);
   }
 
-  double ControlVariate::autocorrelation(int indexDifference) const
+  double ControlVariate::correlationAtSpan(int iOfSpan) const
   {
-    return statsObservable_(indexDifference);
+    return statsObservable_.correlationAtSpan(iOfSpan);
   }
   
-  double ControlVariate::unbiasedCorrelation(int indexDifference) const
+  double ControlVariate::unbiasedCorrelationAtSpan(int iOfSpan) const
   {
-    return statsObservable_(indexDifference) - pow(meanObservable(), 2);
+    //return statsObservable_(iOfSpan) - pow(meanObservable(), 2);
+    return statsObservable_.unbiasedCorrelationAtSpan(iOfSpan);
   }
   
-  double ControlVariate::stdDeviationCorrelation(int indexDifference) const
+  double ControlVariate::stdDeviationCorrelationAtSpan(int iOfSpan) const
   {
-    return statsObservable_.stdDeviationCorrelation(indexDifference);
+    return statsObservable_.stdDeviationCorrelationAtSpan(iOfSpan);
   }
   
-  double ControlVariate::stdErrorCorrelation(int indexDifference) const
+  double ControlVariate::stdErrorCorrelationAtSpan(int iOfSpan) const
   {
-    return statsObservable_.stdErrorCorrelation(indexDifference);
+    return statsObservable_.stdErrorCorrelationAtSpan(iOfSpan);
   }
 
   void ControlVariate::appendToB1(double observable, Vector<double>& valueBasisFunction)
@@ -306,9 +307,9 @@ namespace simol
     return statsGeneratorOnBasis_.meanVec();
   }
 
-  double ControlVariate::autocorrelationB2(int indexDifference, int iOfFunction) const
+  double ControlVariate::autocorrelationB2(int iOfSpan, int iOfFunction) const
   {
-    return statsB2_(indexDifference, iOfFunction);
+    return statsB2_.correlationAtSpan(iOfSpan, iOfFunction);
   }
 
   Vector<double> ControlVariate::lastA() const

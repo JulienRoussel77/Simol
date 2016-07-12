@@ -48,7 +48,8 @@ namespace simol
   //template <typename T>
   class CorrelationStats
   {
-  protected:
+  //protected:
+  public:
     int decorrelationNbOfSteps_;
     double timeStep_;
     int nbOfAutocoPts_;
@@ -66,8 +67,10 @@ namespace simol
     const double& timeStep() const;
     double decorrelationTime() const;
     //void append(double const& newValue, long int iOfStep, int iOfObservable = 0);
-    void append(double const& newValue, long int iOfStep, int iOfObservable, double const& newRefValue);
-    double operator()(long int iOfStep, int iOfObservable = 0) const;
+    virtual void append(double const& newValue, long int iOfStep, int iOfObservable, double const& newRefValue);
+    //double operator()(long int iOfStep, int iOfObservable = 0) const;
+    virtual double correlationAtSpan(long int iOfSpan, int iOfObservable = 0) const;
+    virtual double unbiasedCorrelationAtSpan(long int iOfSpan, int iOfObservable = 0) const;
     const double& lastValue(int iOfObservable = 0) const;
     double mean(int iOfObservable = 0) const;
     int statsIntegratedCorrelationNbValues(int iOfObservable = 0) const;
@@ -75,9 +78,9 @@ namespace simol
     Vector<double> integratedCorrelationVec() const;
     double integratedCorrelationUnbiased(int iOfObservable = 0) const;
     double varIntegratedCorrelation(int iOfObservable = 0) const;
-    double varCorrelation(int indexDifference, int iOfObservable = 0) const;
-    double stdDeviationCorrelation(int indexDifference, int iOfObservable = 0) const;
-    double stdErrorCorrelation(int indexDifference, int iOfObservable = 0) const;
+    double varCorrelationAtSpan(int iOfSpan, int iOfObservable = 0) const;
+    double stdDeviationCorrelationAtSpan(int iOfSpan, int iOfObservable = 0) const;
+    double stdErrorCorrelationAtSpan(int iOfSpan, int iOfObservable = 0) const;
   };
   
   ///
@@ -88,6 +91,8 @@ namespace simol
     AutocorrelationStats();
     AutocorrelationStats(int decorrelationNbOfSteps, double timeStep0, int nbOfAutocoPts0, int nbOfObservables = 1);
     void append(double const& newValue, long int iOfStep, int iOfObservable=0);
+    double unbiasedCorrelationAtSpan(long int iOfStep, int iOfObservable = 0) const;
+    double integratedCorrelationUnbiased(int iOfObservable) const;
     double variance(int iOfObservable = 0) const;
     double standardDeviation(int iOfObservable = 0) const;
     double varianceOfVariance(int iOfObservable = 0) const;

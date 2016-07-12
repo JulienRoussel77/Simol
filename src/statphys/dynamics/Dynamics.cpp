@@ -132,7 +132,7 @@ namespace simol
     particle.momentum() += timeStep_ * particle.force() / 2;
   }
 
-  ///
+ /* ///
   ///Standard first part of the numerical integration : half upadate on "p" and update on "q"
   void Dynamics::updateBefore(Particle& particle)
   {
@@ -145,7 +145,7 @@ namespace simol
   void Dynamics::updateAfter(Particle& particle)
   {
     particle.momentum() += timeStep_ * particle.force() / 2;
-  }
+  }*/
 
 
 

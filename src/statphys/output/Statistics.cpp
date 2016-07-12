@@ -184,9 +184,19 @@ namespace simol
     }
   }
 
-  double CorrelationStats::operator()(long int iOfStep, int iOfObservable) const
+  /*double CorrelationStats::operator()(long int iOfStep, int iOfObservable) const
   {
     return statsCorrelation_.mean(iOfStep, iOfObservable);
+  }*/
+  
+  double CorrelationStats::correlationAtSpan(long int iOfSpan, int iOfObservable) const
+  {
+    return statsCorrelation_.mean(iOfSpan, iOfObservable);
+  }
+  
+  double CorrelationStats::unbiasedCorrelationAtSpan(long int iOfSpan, int iOfObservable) const
+  {
+    return statsCorrelation_.mean(iOfSpan, iOfObservable) - mean(iOfObservable) * statsRefValues_.mean(iOfObservable);
   }
 
 
@@ -228,19 +238,19 @@ namespace simol
     return statsIntegratedCorrelation_.variance(iOfObservable);
   }
   
-  double CorrelationStats::varCorrelation(int indexDifference, int iOfObservable) const
+  double CorrelationStats::varCorrelationAtSpan(int iOfSpan, int iOfObservable) const
   {
-    return statsCorrelation_.variance(indexDifference, iOfObservable);
+    return statsCorrelation_.variance(iOfSpan, iOfObservable);
   }
   
-  double CorrelationStats::stdDeviationCorrelation(int indexDifference, int iOfObservable) const
+  double CorrelationStats::stdDeviationCorrelationAtSpan(int iOfSpan, int iOfObservable) const
   {
-    return sqrt(varCorrelation(indexDifference, iOfObservable));
+    return sqrt(varCorrelationAtSpan(iOfSpan, iOfObservable));
   }
   
-  double CorrelationStats::stdErrorCorrelation(int indexDifference, int iOfObservable) const
+  double CorrelationStats::stdErrorCorrelationAtSpan(int iOfSpan, int iOfObservable) const
   {
-    return stdDeviationCorrelation(indexDifference, iOfObservable) / sqrt(statsCorrelation_.nbValues(iOfObservable));
+    return stdDeviationCorrelationAtSpan(iOfSpan, iOfObservable) / sqrt(statsCorrelation_.nbValues(iOfObservable));
   }
   
   //###### AutocorrelationStats ######
@@ -257,6 +267,16 @@ namespace simol
   void AutocorrelationStats::append(double const& newValue, long int iOfStep, int iOfObservable)
   {
     CorrelationStats::append(newValue, iOfStep, iOfObservable, newValue);
+  }
+  
+  double AutocorrelationStats::unbiasedCorrelationAtSpan(long int iOfSpan, int iOfObservable) const
+  {
+    return statsCorrelation_.mean(iOfSpan, iOfObservable) - pow(mean(iOfObservable), 2);
+  }
+  
+  double AutocorrelationStats::integratedCorrelationUnbiased(int iOfObservable) const
+  {
+    return integratedCorrelation(iOfObservable) - pow(mean(iOfObservable),2) * decorrelationTime();
   }
 
   double AutocorrelationStats::variance(int iOfObservable) const

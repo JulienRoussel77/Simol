@@ -46,8 +46,7 @@ namespace simol
 
     //-- when using control variates --
     output_.setControlVariates(input, system_.potential(), dynamics_.galerkin());
-  }
-
+qq  }
   template<class D, class S>
   void Simulation<D, S>::launch()
   {

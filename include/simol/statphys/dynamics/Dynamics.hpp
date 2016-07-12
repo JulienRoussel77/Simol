@@ -53,8 +53,8 @@ namespace simol
       //-- for numerical integration --
       void verletFirstPart(Particle& particle);
       void verletSecondPart(Particle& particle);
-      virtual void updateBefore(Particle& particle);
-      virtual void updateAfter(Particle& particle);
+      //virtual void updateBefore(Particle& particle);
+      //virtual void updateAfter(Particle& particle);
       virtual bool doMomentaExchange() const {return false;};
       virtual void updateMomentaExchange(Particle& /*particle1*/, Particle& /*particle2*/) {assert(false);};
       virtual void bending(Particle& /*particle1*/, Particle& /*particle2*/) const {};

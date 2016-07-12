@@ -17,8 +17,9 @@ namespace simol
 
   class ControlVariate
   {
-      friend ControlVariate* createControlVariate(Input const& input, Potential& potential);
-    protected:
+  friend ControlVariate* createControlVariate(Input const& input, Potential& potential);
+  //protected:
+  public:
       int dimension_;
       int decorrelationNbOfSteps_;
       double timeStep_;
@@ -79,12 +80,12 @@ namespace simol
       virtual Vector<double> lastGeneratorOnBasis() const;
       virtual Vector<double> meanGeneratorOnBasis() const;
 
-      virtual double autocorrelation(int indexDifference) const;
-      virtual double unbiasedCorrelation(int indexDifference) const;
-      virtual double stdDeviationCorrelation(int indexDifference) const;
-      virtual double stdErrorCorrelation(int indexDifference) const;
+      virtual double correlationAtSpan(int iOfSpan) const;
+      virtual double unbiasedCorrelationAtSpan(int iOfSpan) const;
+      virtual double stdDeviationCorrelationAtSpan(int iOfSpan) const;
+      virtual double stdErrorCorrelationAtSpan(int iOfSpan) const;
       
-      virtual double autocorrelationB2(int indexDifference, int iOfFunction = 0) const;
+      virtual double autocorrelationB2(int iOfSpan, int iOfFunction = 0) const;
 
       virtual Vector<double> lastA() const;
       virtual double lastA(int iOfFunction = 0) const;

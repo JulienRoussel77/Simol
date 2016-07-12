@@ -31,14 +31,14 @@ namespace simol
   }
 
 
-  void simulate(Dynamics& dyna, System& syst)
+  /*void simulate(Dynamics& dyna, System& syst)
   {
   for (auto && particle : syst.configuration())
       dyna.updateBefore(particle);
     syst.computeAllForces();
   for (auto && particle : syst.configuration())
       dyna.updateAfter(particle);
-  }
+  }*/
 
   //------------------- writeOutput and its specifications by dynamics ---------------------------
 

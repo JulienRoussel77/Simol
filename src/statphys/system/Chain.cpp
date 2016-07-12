@@ -27,12 +27,12 @@ namespace simol
     //for (auto&& particle : configuration_)
     //dyna.updateBefore(particle);
     for (int i = 0; i < nbOfParticles(); i++)
-      dyna.updateBefore(getParticle(i));
+      dyna.verletFirstPart(getParticle(i));
 
     computeAllForces();
 
     for (int i = 0; i < nbOfParticles(); i++)
-      dyna.updateAfter(getParticle(i));
+      dyna.verletSecondPart(getParticle(i));
 
     for (int i = 0; i < nbOfParticles(); i++)
     {

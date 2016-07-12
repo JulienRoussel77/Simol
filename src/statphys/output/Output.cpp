@@ -122,6 +122,8 @@ namespace simol
       outModiFlowCV() << "# time b <b> <b2> D <D> >D2> observable <observable> >observable2> LPhi <LPhi> <LPhi2>" << endl;
       
       outProfile_           = std::make_shared<ofstream>(input.outputFolderName() + "profile.txt");
+      
+      outTest_           = std::make_shared<ofstream>(input.outputFolderName() + "test.txt");
 
       if (doFinalFlow_)
         outFinalFlow_         = std::make_shared<ofstream>(input.simuTypeName() + "finalFlow.txt", std::ofstream::app);
@@ -388,13 +390,13 @@ namespace simol
   
   void Output::finalDisplayCorrelationsDPDE()
   {
-    for (int i = 0; i < nbOfAutocoPts(); i++)
+    for (int iOfSpan = 0; iOfSpan < nbOfAutocoPts(); iOfSpan++)
       {
 	//-- autocoPtsPeriod(): time between successive correlation values; may be different from the timestep if some subsampling is specified
-	outCorrelation() << i * autocoPtsPeriod() 
-			 << " " << averageKineticEnergy_(i) - pow(averageKineticEnergy_.mean(), 2) 
-			 << " " << averagePotentialEnergy_(i) - pow(averagePotentialEnergy_.mean(), 2) 
-			 << " " << averageInternalEnergy_(i) - pow(averageInternalEnergy_.mean(), 2) 
+	outCorrelation() << iOfSpan * autocoPtsPeriod() 
+			 << " " << averageKineticEnergy_.unbiasedCorrelationAtSpan(iOfSpan)
+			 << " " << averagePotentialEnergy_.unbiasedCorrelationAtSpan(iOfSpan)
+			 << " " << averageInternalEnergy_.unbiasedCorrelationAtSpan(iOfSpan)
 			 << endl;
       }
   }
@@ -403,22 +405,22 @@ namespace simol
   {
     
     int midNb = nbOfParticles_ / 2;
-    for (int i = 0; i < nbOfAutocoPts(); i++)
+    for (int iOfSpan = 0; iOfSpan < nbOfAutocoPts(); iOfSpan++)
     {
-      outCorrelation() << i * autocoPtsPeriod()
-                       << " " << velocityCV_->unbiasedCorrelation(i)
-                       << " " << velocityCV_->stdErrorCorrelation(i)
-                       << " " << forceCV_->unbiasedCorrelation(i)
-                       << " " << forceCV_->stdErrorCorrelation(i)
-                       << " " << lengthCV_->unbiasedCorrelation(i)
-                       << " " << lengthCV_->stdErrorCorrelation(i)
-                       << " " << midFlowCV_->unbiasedCorrelation(i)
-                       << " " << midFlowCV_->stdErrorCorrelation(i)
-                       << " " << sumFlowCV_->unbiasedCorrelation(i)
-                       << " " << sumFlowCV_->stdErrorCorrelation(i)  //#11
-                       << " " << modiFlowCV_->unbiasedCorrelation(i)
-                       << " " << modiFlowCV_->stdErrorCorrelation(i)
-                       << " " << bendistProfile_(i, midNb) - pow(bendistProfile_.mean(midNb), 2)
+      outCorrelation() << iOfSpan * autocoPtsPeriod()
+                       << " " << velocityCV_->unbiasedCorrelationAtSpan(iOfSpan)
+                       << " " << velocityCV_->stdErrorCorrelationAtSpan(iOfSpan)
+                       << " " << forceCV_->unbiasedCorrelationAtSpan(iOfSpan)
+                       << " " << forceCV_->stdErrorCorrelationAtSpan(iOfSpan)
+                       << " " << lengthCV_->unbiasedCorrelationAtSpan(iOfSpan)
+                       << " " << lengthCV_->stdErrorCorrelationAtSpan(iOfSpan)
+                       << " " << midFlowCV_->unbiasedCorrelationAtSpan(iOfSpan)
+                       << " " << midFlowCV_->stdErrorCorrelationAtSpan(iOfSpan)
+                       << " " << sumFlowCV_->unbiasedCorrelationAtSpan(iOfSpan)
+                       << " " << sumFlowCV_->stdErrorCorrelationAtSpan(iOfSpan)  //#11
+                       << " " << modiFlowCV_->unbiasedCorrelationAtSpan(iOfSpan)
+                       << " " << modiFlowCV_->stdErrorCorrelationAtSpan(iOfSpan)
+                       << " " << bendistProfile_.unbiasedCorrelationAtSpan(iOfSpan, midNb)
                        << std::endl;
                        
       /*double integralV = 0;
