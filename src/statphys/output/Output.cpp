@@ -379,6 +379,8 @@ namespace simol
 		     << std::endl;
     meanValueObservables() << iOfStep * timeStep()
 			   << " " << averageKineticEnergy_.mean() 
+      //<< " " << averageKineticEnergy_.statsValues_.nbValues()
+      // for debugging... CHANGE HERE
 			   << " " << averagePotentialEnergy_.mean() 
 			   << " " << averageInternalEnergy_.mean() 
 			   << std::endl;

@@ -48,7 +48,7 @@ namespace simol
   //template <typename T>
   class CorrelationStats
   {
-  protected:
+  protected: 
     int decorrelationNbOfSteps_;
     double timeStep_;
     int nbOfAutocoPts_;
