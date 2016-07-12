@@ -46,15 +46,15 @@ namespace simol
     
     //-- standard observables in this file --
     outObservables_       = std::make_shared<ofstream>(input.outputFolderName() + "observables.txt");
-    outObservables() << "# time kineticEnergy potentialEnergy energy temperature" << endl;
+    outObservables() << "# time kineticEnergy potentialEnergy energy temperature pressure" << endl;
 
-    //-- override the standrd observable files for 1D DPDE --
-    if ( (input.systemName() == "Isolated") && (input.dynamicsName() == "DPDE") )
+    //-- override the standrd observable files for DPDE --
+    if (input.dynamicsName() == "DPDE") 
     {
       outObservables_       = std::make_shared<ofstream>(input.outputFolderName() + "observables.txt");
-      outObservables() << "# time position momentum internalEnergy kineticEnergy potentialEnergy totalEnergy averageRejection" << endl;
+      outObservables() << "# time position momentum internalEnergy kineticEnergy potentialEnergy totalEnergy pressure averageRejection" << endl;
       meanValueObservables_       = std::make_shared<ofstream>(input.outputFolderName() + "mean_observables.txt");
-      meanValueObservables() << "# tim kineticEnergy potentialEnergy internalEnergy" << endl;
+      meanValueObservables() << "# time kineticEnergy potentialEnergy internalEnergy" << endl;
     }
 
     //-- longer outputs if required, e.g. configuration of the system --
@@ -377,10 +377,13 @@ namespace simol
                      << " " << kineticEnergy()
                      << " " << potentialEnergy()
 		     << " " << totalEnergy
+		     << " " << pressure()
 		     << " " << rejectionCount()/iOfStep 
 		     << std::endl;
     meanValueObservables() << iOfStep * timeStep()
 			   << " " << averageKineticEnergy_.mean() 
+      //<< " " << averageKineticEnergy_.statsValues_.nbValues()
+      // for debugging... CHANGE HERE
 			   << " " << averagePotentialEnergy_.mean() 
 			   << " " << averageInternalEnergy_.mean() 
 			   << std::endl;

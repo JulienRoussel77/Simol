@@ -49,6 +49,28 @@ namespace simol
       dyna.verletSecondPart(particle);
   }
 
+  void simulate(Langevin& dyna, NBody& syst)
+  {
+  for (auto && particle : syst.configuration())
+      dyna.verletFirstPart(particle);
+    syst.computeAllForces();
+  for (auto && particle : syst.configuration())
+      dyna.updateAfter(particle);
+  }
+
+  //--- DPDE dynamics ---
+  void simulate(DPDE& dyna, NBody& syst)
+  {
+    //-- Verlet part --
+    for (auto && particle : syst.configuration())
+      dyna.verletFirstPart(particle);
+    syst.computeAllForces();
+    for (auto && particle : syst.configuration())
+      dyna.verletSecondPart(particle);
+    //-- fluctuation/dissipation --
+    // A FAIRE
+  }
+
   template <>
   void computeOutput(Hamiltonian const& /*dyna*/, NBody const& syst, Output& output, long int /*iOfStep*/)
   {
@@ -64,10 +86,58 @@ namespace simol
     }
   }
 
+  template <>
+  void computeOutput(Langevin const& /*dyna*/, NBody const& syst, Output& output, long int /*iOfStep*/)
+  {
+    output.kineticEnergy() = 0;
+    output.potentialEnergy() = 0;
+    output.totalVirial() = 0;
+    //Calcul de la température et de l'énergie
+  for (const auto & particle : syst.configuration())
+    {
+      output.kineticEnergy() += particle.kineticEnergy();
+      output.potentialEnergy() += particle.potentialEnergy();
+      output.totalVirial() += particle.virial();
+    }
+  }
+
+  template <>
+  void computeOutput(DPDE const& /*dyna*/, NBody const& syst, Output& output, long int /*iOfStep*/)
+  {
+    output.kineticEnergy() = 0;
+    output.potentialEnergy() = 0;
+    output.totalVirial() = 0;
+    output.internalEnergy() = 0; 
+    //Calcul de la température et de l'énergie
+  for (const auto & particle : syst.configuration())
+    {
+      output.kineticEnergy() += particle.kineticEnergy();
+      output.potentialEnergy() += particle.potentialEnergy();
+      output.totalVirial() += particle.virial();
+      output.internalEnergy() += particle.internalEnergy();
+    }
+  }
+
   void writeOutput(Hamiltonian const& /*dyna*/, NBody const& syst, Output& output, long int iOfStep)
   {
     if (output.doOutput(iOfStep))
       output.displayObservables(iOfStep);
+    if (output.doLongPeriodOutput(iOfStep))
+      output.displayParticlesXMakeMol(syst.configuration(), iOfStep, syst.latticeParameter()*syst.nbOfParticlesPerDimension());
+  }
+
+  void writeOutput(Langevin const& /*dyna*/, NBody const& syst, Output& output, long int iOfStep)
+  {
+    if (output.doOutput(iOfStep))
+      output.displayObservables(iOfStep);
+    if (output.doLongPeriodOutput(iOfStep))
+      output.displayParticlesXMakeMol(syst.configuration(), iOfStep, syst.latticeParameter()*syst.nbOfParticlesPerDimension());
+  }
+
+  void writeOutput(DPDE const& /*dyna*/, NBody const& syst, Output& output, long int iOfStep)
+  {
+    if (output.doOutput(iOfStep))
+      output.displayObservablesDPDE(syst.configuration(),iOfStep);
     if (output.doLongPeriodOutput(iOfStep))
       output.displayParticlesXMakeMol(syst.configuration(), iOfStep, syst.latticeParameter()*syst.nbOfParticlesPerDimension());
   }

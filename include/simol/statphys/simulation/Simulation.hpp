@@ -104,11 +104,18 @@ namespace simol
   //-- specializations for NBody --
   void samplePositions(Dynamics& dyna, NBody& syst);
   void simulate(Hamiltonian& dyna, NBody& syst);
+  void simulate(Langevin& dyna, NBody& syst);
   template <class D>
   void computeOutput(D const& /*dyna*/, NBody const& syst, Output& output, long int /*iOfStep*/);
   template <>
   void computeOutput(Hamiltonian const& /*dyna*/, NBody const& syst, Output& output, long int /*iOfStep*/);
+  template <>
+  void computeOutput(Langevin const& /*dyna*/, NBody const& syst, Output& output, long int /*iOfStep*/);
+  template <>
+  void computeOutput(DPDE const& /*dyna*/, NBody const& syst, Output& output, long int /*iOfStep*/);
   void writeOutput(Hamiltonian const& /*dyna*/, NBody const& syst, Output& output, long int iOfStep);
+  void writeOutput(Langevin const& /*dyna*/, NBody const& syst, Output& output, long int iOfStep);
+  void writeOutput(DPDE const& /*dyna*/, NBody const& syst, Output& output, long int iOfStep);
   void writeFinalOutput(Hamiltonian const& dyna, NBody const& syst, Output& output);
 
 
