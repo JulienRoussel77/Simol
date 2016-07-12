@@ -52,7 +52,7 @@ namespace simol
     if (input.dynamicsName() == "DPDE") 
     {
       outObservables_       = std::make_shared<ofstream>(input.outputFolderName() + "observables.txt");
-      outObservables() << "# time position momentum internalEnergy kineticEnergy potentialEnergy totalEnergy averageRejection" << endl;
+      outObservables() << "# time position momentum internalEnergy kineticEnergy potentialEnergy totalEnergy pressure averageRejection" << endl;
       meanValueObservables_       = std::make_shared<ofstream>(input.outputFolderName() + "mean_observables.txt");
       meanValueObservables() << "# time kineticEnergy potentialEnergy internalEnergy" << endl;
     }
@@ -375,6 +375,7 @@ namespace simol
                      << " " << kineticEnergy()
                      << " " << potentialEnergy()
 		     << " " << totalEnergy
+		     << " " << pressure()
 		     << " " << rejectionCount()/iOfStep 
 		     << std::endl;
     meanValueObservables() << iOfStep * timeStep()

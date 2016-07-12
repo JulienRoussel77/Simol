@@ -58,6 +58,19 @@ namespace simol
       dyna.updateAfter(particle);
   }
 
+  //--- DPDE dynamics ---
+  void simulate(DPDE& dyna, NBody& syst)
+  {
+    //-- Verlet part --
+    for (auto && particle : syst.configuration())
+      dyna.verletFirstPart(particle);
+    syst.computeAllForces();
+    for (auto && particle : syst.configuration())
+      dyna.verletSecondPart(particle);
+    //-- fluctuation/dissipation --
+    // A FAIRE
+  }
+
   template <>
   void computeOutput(Hamiltonian const& /*dyna*/, NBody const& syst, Output& output, long int /*iOfStep*/)
   {
@@ -94,12 +107,14 @@ namespace simol
     output.kineticEnergy() = 0;
     output.potentialEnergy() = 0;
     output.totalVirial() = 0;
+    output.internalEnergy() = 0; 
     //Calcul de la température et de l'énergie
   for (const auto & particle : syst.configuration())
     {
       output.kineticEnergy() += particle.kineticEnergy();
       output.potentialEnergy() += particle.potentialEnergy();
       output.totalVirial() += particle.virial();
+      output.internalEnergy() += particle.internalEnergy();
     }
   }
 
