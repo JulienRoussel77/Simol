@@ -39,6 +39,15 @@ namespace simol
   for (auto && particle : syst.configuration())
       dyna.updateAfter(particle);
   }*/
+  
+  void simulate(LangevinBase& dyna, System& syst)
+  {
+  for (auto && particle : syst.configuration())
+      dyna.verletFirstPart(particle);
+    syst.computeAllForces();
+  for (auto && particle : syst.configuration())
+      dyna.verletSecondPart(particle);
+  }
 
   //------------------- writeOutput and its specifications by dynamics ---------------------------
 

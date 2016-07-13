@@ -138,10 +138,20 @@ namespace simol
   {
     return statsObservable_.mean();
   }
+  
+  double ControlVariate::varObservable() const
+  {
+    return statsObservable_.variance();
+  }
 
   double ControlVariate::stdDeviationObservable() const
   {
     return statsObservable_.standardDeviation();
+  }
+  
+  double ControlVariate::varOfVarObservable() const
+  {
+    return statsObservable_.varianceOfVariance();
   }
   
   double ControlVariate::stdDevOfVarObservable() const
@@ -149,10 +159,10 @@ namespace simol
     return statsObservable_.stdDevOfVariance();
   }
   
-  double ControlVariate::stdErrorOfVarObservable() const
+  /*double ControlVariate::stdErrorOfVarObservable() const
   {
     return statsObservable_.stdErrorOfVariance();
-  }
+  }*/
 
   double ControlVariate::lastBetterObservable() const
   {
@@ -163,10 +173,20 @@ namespace simol
   {
     return statsBetterObservable_.mean();
   }
+  
+  double ControlVariate::varBetterObservable() const
+  {
+    return statsBetterObservable_.variance();
+  }
 
   double ControlVariate::stdDeviationBetterObservable() const
   {
     return statsBetterObservable_.standardDeviation();
+  }
+  
+  double ControlVariate::varOfVarBetterObservable() const
+  {
+    return statsBetterObservable_.varianceOfVariance();
   }
 
   Vector<double> ControlVariate::correlationB2() const
@@ -201,10 +221,15 @@ namespace simol
     return statsObservable_.stdDeviationCorrelationAtSpan(iOfSpan);
   }
   
-  double ControlVariate::stdErrorCorrelationAtSpan(int iOfSpan) const
+  double ControlVariate::varCorrelationAtSpan(int iOfSpan) const
+  {
+    return statsObservable_.varCorrelationAtSpan(iOfSpan);
+  }
+  
+  /*double ControlVariate::stdErrorCorrelationAtSpan(int iOfSpan) const
   {
     return statsObservable_.stdErrorCorrelationAtSpan(iOfSpan);
-  }
+  }*/
 
   void ControlVariate::appendToB1(double observable, Vector<double>& valueBasisFunction)
   {
@@ -423,10 +448,11 @@ namespace simol
 
     out << " " << lastObservable()
         << " " << meanObservable()   //13
-        << " " << stdDeviationObservable()
+        << " " << varObservable()
+        << " " << varOfVarObservable()
         << " " << lastBetterObservable()
         << " " << meanBetterObservable()
-        << " " << stdDeviationBetterObservable();
+        << " " << varOfVarBetterObservable();
     for (int iOfFunction = 0; iOfFunction < nbOfFunctions(); iOfFunction++)
       out << " " << lastGeneratorOnBasis()(iOfFunction);
     for (int iOfFunction = 0; iOfFunction < nbOfFunctions(); iOfFunction++)

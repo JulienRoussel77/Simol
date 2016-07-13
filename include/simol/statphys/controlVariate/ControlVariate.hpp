@@ -69,21 +69,26 @@ namespace simol
 
       virtual double lastObservable() const;
       virtual double meanObservable() const;
+      virtual double varObservable() const;
       virtual double stdDeviationObservable() const;
+      virtual double varOfVarObservable() const;
       virtual double stdDevOfVarObservable() const;
-      virtual double stdErrorOfVarObservable() const;
+      //virtual double stdErrorOfVarObservable() const;
       
       virtual double lastBetterObservable() const;
       virtual double meanBetterObservable() const;
+      virtual double varBetterObservable() const;
       virtual double stdDeviationBetterObservable() const;
-
+      virtual double varOfVarBetterObservable() const;
+ 
       virtual Vector<double> lastGeneratorOnBasis() const;
       virtual Vector<double> meanGeneratorOnBasis() const;
 
       virtual double correlationAtSpan(int iOfSpan) const;
       virtual double unbiasedCorrelationAtSpan(int iOfSpan) const;
       virtual double stdDeviationCorrelationAtSpan(int iOfSpan) const;
-      virtual double stdErrorCorrelationAtSpan(int iOfSpan) const;
+      virtual double varCorrelationAtSpan(int iOfSpan) const;
+      //virtual double stdErrorCorrelationAtSpan(int iOfSpan) const;
       
       virtual double autocorrelationB2(int iOfSpan, int iOfFunction = 0) const;
 

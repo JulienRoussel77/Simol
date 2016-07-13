@@ -412,17 +412,17 @@ namespace simol
     {
       outCorrelation() << iOfSpan * autocoPtsPeriod()
                        << " " << velocityCV_->unbiasedCorrelationAtSpan(iOfSpan)
-                       << " " << velocityCV_->stdErrorCorrelationAtSpan(iOfSpan)
+                       << " " << velocityCV_->varCorrelationAtSpan(iOfSpan) / finalTime()
                        << " " << forceCV_->unbiasedCorrelationAtSpan(iOfSpan)
-                       << " " << forceCV_->stdErrorCorrelationAtSpan(iOfSpan)
+                       << " " << forceCV_->varCorrelationAtSpan(iOfSpan) / finalTime()
                        << " " << lengthCV_->unbiasedCorrelationAtSpan(iOfSpan)
-                       << " " << lengthCV_->stdErrorCorrelationAtSpan(iOfSpan)
+                       << " " << lengthCV_->varCorrelationAtSpan(iOfSpan) / finalTime()
                        << " " << midFlowCV_->unbiasedCorrelationAtSpan(iOfSpan)
-                       << " " << midFlowCV_->stdErrorCorrelationAtSpan(iOfSpan)
+                       << " " << midFlowCV_->varCorrelationAtSpan(iOfSpan) / finalTime()
                        << " " << sumFlowCV_->unbiasedCorrelationAtSpan(iOfSpan)
-                       << " " << sumFlowCV_->stdErrorCorrelationAtSpan(iOfSpan)  //#11
+                       << " " << sumFlowCV_->varCorrelationAtSpan(iOfSpan) / finalTime()  //#11
                        << " " << modiFlowCV_->unbiasedCorrelationAtSpan(iOfSpan)
-                       << " " << modiFlowCV_->stdErrorCorrelationAtSpan(iOfSpan)
+                       << " " << modiFlowCV_->varCorrelationAtSpan(iOfSpan) / finalTime()
                        << " " << bendistProfile_.unbiasedCorrelationAtSpan(iOfSpan, midNb)
                        << std::endl;
                        

@@ -86,11 +86,11 @@ namespace simol
       out_ << iOfStep * timeStep() << " "
            << iOfParticle << " "
            << bendistProfile_.mean(iOfParticle) << " "
-           << bendistProfile_.standardDeviation(iOfParticle) / sqrt(iOfStep * timeStep()) << " "
+           << bendistProfile_.variance(iOfParticle) / sqrt(iOfStep * timeStep()) << " "
            << flowProfile_.mean(iOfParticle) << " "
-           << flowProfile_.standardDeviation(iOfParticle) / sqrt(iOfStep * timeStep()) << " "
+           << flowProfile_.variance(iOfParticle) / sqrt(iOfStep * timeStep()) << " "
            << kinTempProfile_.mean(iOfParticle) << " "
-           << kinTempProfile_.standardDeviation(iOfParticle) / sqrt(iOfStep * timeStep()) << " "
+           << kinTempProfile_.variance(iOfParticle) / sqrt(iOfStep * timeStep()) << " "
            << potTempTopProfile_.mean(iOfParticle) / potTempBotProfile_.mean(iOfParticle) << " "
            << endl;
   }
@@ -105,16 +105,21 @@ namespace simol
   void Output::displayFinalFlow(double temperature, double delta_temperature, double parameter1, double parameter2)
   {
     cout << "outFinalFlow_ : " <<  std::left << setw(10) << finalTime()
-         << " " << setw(5) << timeStep()
-         << " " << setw(6) << nbOfParticles()
-         << " " << setw(4) << temperature
-         << " " << setw(4) << delta_temperature
-         << " " << setw(4) << parameter1
-         << " " << setw(6) << parameter2
-         << " " << setw(12) << midFlowCV_->meanObservable()
-         << " " << setw(12) << midFlowCV_->stdDeviationObservable()
-         << " " << setw(12) << sumFlowCV_->meanObservable()
-         << " " << setw(12) << sumFlowCV_->stdDeviationObservable()
+                     << " " << setw(5) << timeStep()
+                     << " " << setw(6) << nbOfParticles()
+                     << " " << setw(4) << temperature
+                     << " " << setw(4) << delta_temperature
+                     << " " << setw(4) << parameter1
+                     << " " << setw(6) << parameter2
+                     << " " << setw(12) << midFlowCV_->meanObservable()
+                     << " " << setw(12) << midFlowCV_->varObservable()
+                     << " " << setw(12) << midFlowCV_->varOfVarObservable()
+                     << " " << setw(12) << sumFlowCV_->meanObservable()
+                     << " " << setw(12) << sumFlowCV_->varObservable()     //#12
+                     << " " << setw(12) << sumFlowCV_->varOfVarObservable()
+                     << " " << setw(12) << modiFlowCV_->meanObservable()
+                     << " " << setw(12) << modiFlowCV_->varObservable()
+                     << " " << setw(12) << modiFlowCV_->varOfVarObservable()
          << std::endl;
 
     //cout << "displayFinalFlow(double temperature, double delta_temperature, double tau)";
@@ -129,14 +134,14 @@ namespace simol
                      << " " << setw(4) << parameter1
                      << " " << setw(6) << parameter2
                      << " " << setw(12) << midFlowCV_->meanObservable()
-                     << " " << setw(12) << midFlowCV_->stdDeviationObservable()
-                     << " " << setw(12) << midFlowCV_->stdErrorOfVarObservable()
+                     << " " << setw(12) << midFlowCV_->varObservable()
+                     << " " << setw(12) << midFlowCV_->varOfVarObservable()
                      << " " << setw(12) << sumFlowCV_->meanObservable()
-                     << " " << setw(12) << sumFlowCV_->stdDeviationObservable()     //#12
-                     << " " << setw(12) << sumFlowCV_->stdErrorOfVarObservable()
+                     << " " << setw(12) << sumFlowCV_->varObservable()     //#12
+                     << " " << setw(12) << sumFlowCV_->varOfVarObservable()
                      << " " << setw(12) << modiFlowCV_->meanObservable()
-                     << " " << setw(12) << modiFlowCV_->stdDeviationObservable()
-                     << " " << setw(12) << modiFlowCV_->stdErrorOfVarObservable()
+                     << " " << setw(12) << modiFlowCV_->varObservable()
+                     << " " << setw(12) << modiFlowCV_->varOfVarObservable()
                      << std::endl;
     }
   }

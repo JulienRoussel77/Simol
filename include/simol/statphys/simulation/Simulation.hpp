@@ -65,7 +65,7 @@ namespace simol
   template<class D, class S>
   void launchSimu(D& dyna, S& syst, Output& output);
 
-  void simulate(Dynamics& dyna, System& syst);
+  //void simulate(Dynamics& dyna, System& syst);
 
   template <class D, class S>
   void computeOutput(D const& dyna, S const& syst, Output& output, long int iOfStep);
@@ -120,11 +120,16 @@ namespace simol
 
 
   // ------------------------ specializations for various dynamics ---------------------------------
+  
+  //--- LangevinBase ---
+  void simulate(LangevinBase& dyna, System& syst);
 
   //-- DPDE --
   void simulate(DPDE& dyna, System& syst);
   void writeOutput(DPDE const& dyna, System const& syst, Output& output, long int iOfStep);
   void writeFinalOutput(DPDE const& dyna, System const& syst, Output& output);
+  
+
 
   //--------------- control variates -----------------
 

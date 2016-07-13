@@ -238,9 +238,11 @@ namespace simol
     return statsIntegratedCorrelation_.variance(iOfObservable);
   }
   
+  ///
+  /// Returns an asymptotic variance: should be divided by the simulation time to obtain an error bar
   double CorrelationStats::varCorrelationAtSpan(int iOfSpan, int iOfObservable) const
   {
-    return statsCorrelation_.variance(iOfSpan, iOfObservable);
+    return statsCorrelation_.variance(iOfSpan, iOfObservable) * decorrelationTime();
   }
   
   double CorrelationStats::stdDeviationCorrelationAtSpan(int iOfSpan, int iOfObservable) const
@@ -248,10 +250,10 @@ namespace simol
     return sqrt(varCorrelationAtSpan(iOfSpan, iOfObservable));
   }
   
-  double CorrelationStats::stdErrorCorrelationAtSpan(int iOfSpan, int iOfObservable) const
+  /*double CorrelationStats::stdErrorCorrelationAtSpan(int iOfSpan, int iOfObservable) const
   {
     return stdDeviationCorrelationAtSpan(iOfSpan, iOfObservable) / sqrt(statsCorrelation_.nbValues(iOfObservable));
-  }
+  }*/
   
   //###### AutocorrelationStats ######
   
@@ -293,21 +295,21 @@ namespace simol
   ///Returns the variance of the estimator of the variance
   double AutocorrelationStats::varianceOfVariance(int iOfObservable) const
   {
-    return 4 * varIntegratedCorrelation(iOfObservable);
+    return 4 * varIntegratedCorrelation(iOfObservable) * decorrelationTime();
   }
   
   ///
   ///Returns the variance of the estimator of the variance
   double AutocorrelationStats::stdDevOfVariance(int iOfObservable) const
   {
-    return 2 * sqrt(varIntegratedCorrelation(iOfObservable));
+    return sqrt(varianceOfVariance(iOfObservable));
   }
   
-      ///
+  /*///
   ///Returns the variance of the estimator of the variance
   double AutocorrelationStats::stdErrorOfVariance(int iOfObservable) const
   {
     return stdDevOfVariance(iOfObservable) / sqrt(statsCorrelation_.nbValues(iOfObservable));
-  }
+  }*/
   
 }
