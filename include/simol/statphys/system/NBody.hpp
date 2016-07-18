@@ -1,6 +1,7 @@
 #ifndef SIMOL_NBODY_HPP
 #define SIMOL_NBODY_HPP
-#include "System.hpp"
+#include "simol/statphys/system/System.hpp"
+#include "simol/statphys/dynamics/DPDE.hpp"
 
 namespace simol
 {
@@ -36,9 +37,11 @@ namespace simol
       NBody(Input const& input);
       void printName() const;
       void computeAllForces();
+    void fluctuationDissipationDPDE(DPDE& dyna);
       int nbOfParticlesPerDimension() const;
       double latticeParameter() const;
-      void interaction(Particle& particle1, Particle& particle2) const;
+    void interaction(Particle& particle1, Particle& particle2) const;
+    void elementaryFluctuationDissipationDPDE(DPDE& dyna, Particle& particle1, Particle& particle2) const;
 
       //--- for cell method ---
       void reinitializeCells();

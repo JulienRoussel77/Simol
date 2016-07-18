@@ -84,8 +84,7 @@ namespace simol
   void computeOutput(const DPDE& dyna, Isolated const& syst, Output& output, long int iOfStep);
   void samplePositions(DPDE& dyna, Isolated& syst);
   void simulate(DPDE& dyna, System& syst);
-
-
+  
   //-- specializations for Chain --
   void sampleMomenta(BoundaryLangevin& dyna, Chain& syst);
   void samplePositions(BoundaryLangevin& dyna, Chain& syst);
@@ -101,10 +100,16 @@ namespace simol
   //TriChain
   void samplePositions(BoundaryLangevin& dyna, TriChain& syst);
   void writeFinalOutput(BoundaryLangevin const& dyna, TriChain const& syst, Output& output);
+  
   //-- specializations for NBody --
+  template <>
+  void sampleSystem(DPDE& dyna, NBody& syst);
   void samplePositions(Dynamics& dyna, NBody& syst);
+  void sampleInternalEnergies(DPDE const& /*dyna*/, NBody& syst);
   void simulate(Hamiltonian& dyna, NBody& syst);
   void simulate(Langevin& dyna, NBody& syst);
+  void simulate(DPDE& dyna, NBody& syst);
+  void thermalize(DPDE& dyna, NBody& syst);
   template <class D>
   void computeOutput(D const& /*dyna*/, NBody const& syst, Output& output, long int /*iOfStep*/);
   template <>
@@ -112,13 +117,11 @@ namespace simol
   template <>
   void computeOutput(Langevin const& /*dyna*/, NBody const& syst, Output& output, long int /*iOfStep*/);
   template <>
-  void computeOutput(DPDE const& /*dyna*/, NBody const& syst, Output& output, long int /*iOfStep*/);
+  void computeOutput(DPDE const& dyna, NBody const& syst, Output& output, long int iOfStep);
   void writeOutput(Hamiltonian const& /*dyna*/, NBody const& syst, Output& output, long int iOfStep);
   void writeOutput(Langevin const& /*dyna*/, NBody const& syst, Output& output, long int iOfStep);
   void writeOutput(DPDE const& /*dyna*/, NBody const& syst, Output& output, long int iOfStep);
-  void writeFinalOutput(Hamiltonian const& dyna, NBody const& syst, Output& output);
-
-
+  
   // ------------------------ specializations for various dynamics ---------------------------------
   
   //--- LangevinBase ---

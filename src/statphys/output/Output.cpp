@@ -25,6 +25,7 @@ namespace simol
     totalVirial_(0),
     energyMidFlow_(0),
     energySumFlow_(0),
+    internalTemperature_(0),
     decorrelationNbOfSteps_(input.decorrelationNbOfSteps()),
     nbOfAutocoPts_(input.nbOfAutocoPts()),
     doFinalFlow_(input.doFinalFlow()),
@@ -41,7 +42,8 @@ namespace simol
     flowProfile_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts(), nbOfParticles_),
     averageKineticEnergy_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts()),
     averagePotentialEnergy_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts()),
-    averageInternalEnergy_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts())
+    averageInternalEnergy_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts()),
+    averageInternalTemperature_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts())
   {
     
     //-- standard observables in this file --
@@ -52,9 +54,9 @@ namespace simol
     if (input.dynamicsName() == "DPDE") 
     {
       outObservables_       = std::make_shared<ofstream>(input.outputFolderName() + "observables.txt");
-      outObservables() << "# time position momentum internalEnergy kineticEnergy potentialEnergy totalEnergy pressure averageRejection" << endl;
+      outObservables() << "# 1:time  2:position  3:momentum  4:internalEnergy  5:kineticEnergy  6:potentialEnergy  7:totalEnergy  8:kineticTemperature  9:internalTemperature  10:pressure  11:averageRejection" << endl;
       meanValueObservables_       = std::make_shared<ofstream>(input.outputFolderName() + "mean_observables.txt");
-      meanValueObservables() << "# time kineticEnergy potentialEnergy internalEnergy" << endl;
+      meanValueObservables() << "# 1:time  2:kineticEnergy  3:potentialEnergy  4:internalEnergy  5:kineticTemperature  6:internalTemperature" << endl;
     }
 
     //-- longer outputs if required, e.g. configuration of the system --
@@ -245,6 +247,12 @@ namespace simol
   double& Output::rejectionCount() 
   {return rejectionCount_;}
 
+  const double& Output::internalTemperature() const
+  {return internalTemperature_;}
+
+  double& Output::internalTemperature()
+  {return internalTemperature_;}
+
   const double& Output::totalVirial() const
   {return totalVirial_;}
 
@@ -367,25 +375,32 @@ namespace simol
     averageInternalEnergy_.append(value, iOfStep);
   }
 
+  void Output::appendInternalTemperature(double value, long int iOfStep)
+  {
+    averageInternalTemperature_.append(value, iOfStep);
+  }
+
   void Output::displayObservablesDPDE(vector<Particle> const& configuration, long int iOfStep)
   {
     double totalEnergy = kineticEnergy() + potentialEnergy() + internalEnergy();
     outObservables() << iOfStep * timeStep()
-		     << " " << configuration[0].position() 
-		     << " " << configuration[0].momentum() 
+		     << " " << configuration[0].position(0) 
+		     << " " << configuration[0].momentum(0) 
 		     << " " << internalEnergy() 
                      << " " << kineticEnergy()
                      << " " << potentialEnergy()
 		     << " " << totalEnergy
+		     << " " << temperature()
+		     << " " << internalTemperature()
 		     << " " << pressure()
-		     << " " << rejectionCount()/iOfStep 
+		     << " " << rejectionCount()
 		     << std::endl;
     meanValueObservables() << iOfStep * timeStep()
 			   << " " << averageKineticEnergy_.mean() 
-      //<< " " << averageKineticEnergy_.statsValues_.nbValues()
-      // for debugging... CHANGE HERE
-			   << " " << averagePotentialEnergy_.mean() 
+      			   << " " << averagePotentialEnergy_.mean() 
 			   << " " << averageInternalEnergy_.mean() 
+			   << " " << 2*averageKineticEnergy_.mean()/(dimension_ * nbOfParticles_)
+			   << " " << 1./averageInternalTemperature_.mean() 
 			   << std::endl;
   }
 
@@ -400,6 +415,7 @@ namespace simol
 			 << " " << averageKineticEnergy_.unbiasedCorrelationAtSpan(iOfSpan)
 			 << " " << averagePotentialEnergy_.unbiasedCorrelationAtSpan(iOfSpan)
 			 << " " << averageInternalEnergy_.unbiasedCorrelationAtSpan(iOfSpan)
+			 << " " << averageInternalTemperature_.unbiasedCorrelationAtSpan(iOfSpan)
 			 << endl;
       }
   }

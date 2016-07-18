@@ -271,4 +271,93 @@ namespace simol
     particle2.virial() += 0.5 * force12 * distance;
   }
 
+  ///
+  /// compute the fluctuation/dissipation in DPDE using SSA
+  void NBody::fluctuationDissipationDPDE(DPDE& dyna)
+  {
+    if (doCells_)
+      {
+	//-- reinitialize cells before looping on the pair interactions --
+	reinitializeCells();
+	//-- compute the interactions --
+	int neighborIndex = 1;
+	for (int k = 0; k < nbOfCells_; k++)
+	  {
+	    //-- interaction within cells: avoid double counting by setting i1 \leq i2 + 1 --
+	    for (list<int>::iterator it1 = cells_[k].members().begin(); it1 != cells_[k].members().end(); it1++)
+	      for (list<int>::iterator it2 = std::next(it1, 1); it2 != cells_[k].members().end(); it2++)
+		elementaryFluctuationDissipationDPDE(dyna, configuration_[*it1], configuration_[*it2]);
+	    //-- interactions between neighboring cells: full double loops --
+	    for (int l = 0; l < nbOfNeighbors_; l++)
+	      {
+		// index of neighboring cell
+		neighborIndex = cells_[k].indexNeighbors()[l];
+		// complete double loop between the elements of cells_[k] and its neighbor cells_[neighborIndex]
+		for (list<int>::iterator it1 = cells_[k].members().begin(); it1 != cells_[k].members().end(); it1++)
+		  for (list<int>::iterator it2 = cells_[neighborIndex].members().begin(); it2 != cells_[neighborIndex].members().end(); it2++)
+		    elementaryFluctuationDissipationDPDE(dyna, configuration_[*it1], configuration_[*it2]);
+	      }
+	  }
+      }
+    else
+      {
+	//-- no cell method: standard double loop --
+	for (int i = 0; i < nbOfParticles(); i++)
+	  for (int j = i + 1; j < nbOfParticles(); j++)
+	    elementaryFluctuationDissipationDPDE(dyna, configuration_[i], configuration_[j]);
+      }
+  }
+
+  ///
+  /// elementary interaction between two particles
+  //----------- !!!! UPDATE FORMULAS FOR PARTICLES WITH DIFFERENT MASSES !!!! ------------
+  void NBody::elementaryFluctuationDissipationDPDE(DPDE& dyna, Particle& particle1, Particle& particle2) const
+  {
+    // keep previous configuration
+    Vector<double> old_momentum_1 = particle1.momentum();
+    Vector<double> old_momentum_2 = particle2.momentum();
+    // compute the unit vector e12 of line of centers and the distance (as above) 
+    Vector<double> r12 = particle1.position() - particle2.position();
+    double distance = 0.;
+    for (int d = 0; d < (int)dimension_; d++)
+    {
+      r12(d) -= rint(r12(d) / domainSize_) * domainSize_;
+      distance += r12(d) * r12(d);
+    }
+    distance = sqrt(distance);
+    Vector<double> e12 = r12/distance;
+    // compute the variation of the relative velocity
+    double old_kin_energy = particle1.kineticEnergy() + particle2.kineticEnergy();
+    //dyna.printName(); 
+    Vector<double> vect12 = particle1.momentum() - particle2.momentum();  
+    double v12 = dyna.pairwiseFluctuationDissipation(dot(vect12,e12),distance,particle1.internalEnergy(),particle2.internalEnergy()); 
+    // update the momenta
+    Vector<double> totalMomentum = particle1.momentum() + particle2.momentum();
+    Vector<double> v12_perp = vect12 - dot(vect12,e12)*e12;
+    //cout << vect12 << ", " << e12 << " : dot = " << dot(vect12,e12) << endl;
+    particle1.momentum() = 0.5*( totalMomentum + v12_perp + v12*e12);
+    particle2.momentum() = 0.5*( totalMomentum - v12_perp - v12*e12);
+    // accept/reject step
+    dyna.incrementTotalCountForRejection();
+    double v12_0 = dot(vect12,e12);
+    dyna.acceptRejectRate(v12,v12_0,particle1.internalEnergy(),particle2.internalEnergy(),particle1.mass());
+    double U = rng_->scalarUniform();
+    if (U > dyna.rejectionRate())
+      {
+    	//-- reject the move --
+    	dyna.incrementRejection();
+	particle1.momentum() = old_momentum_1;
+	particle2.momentum() = old_momentum_2;
+      }
+    else 
+      {
+	//-- update internal energies --
+	double new_kin_energy = particle1.kineticEnergy() + particle2.kineticEnergy();
+	double internal_energy_variation = 0.5*(new_kin_energy-old_kin_energy);
+	//cout << particle1.mass()*( pow(v12,2)-pow(v12_0,2) )/8 - internal_energy_variation << endl;
+	particle1.internalEnergy() -= internal_energy_variation;
+	particle2.internalEnergy() -= internal_energy_variation;
+      }
+  }
+
 }

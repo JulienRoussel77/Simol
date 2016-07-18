@@ -61,6 +61,8 @@ namespace simol
     double& potentialEnergy();
     const double& internalEnergy() const;
     double& internalEnergy();
+    const double& internalTemperature() const;
+    double& internalTemperature();
     const double& totalVirial() const;
     double& totalVirial();
     double energy() const;
@@ -110,6 +112,7 @@ namespace simol
     void appendKineticEnergy(double value, long int iOfStep);
     void appendPotentialEnergy(double value, long int iOfStep);
     void appendInternalEnergy(double value, long int iOfStep);
+    void appendInternalTemperature(double value, long int iOfStep);
     void finalDisplayCorrelationsDPDE();
 
     //------------- for Galerkin ----------------------
@@ -172,6 +175,7 @@ namespace simol
     double energySumFlow_;
     double energyModiFlow_;
     double rejectionCount_;
+    double internalTemperature_;
 
     //-- parametrization of outputs --
     int decorrelationNbOfSteps_;
@@ -200,6 +204,7 @@ namespace simol
     AutocorrelationStats averageKineticEnergy_;
     AutocorrelationStats averagePotentialEnergy_;
     AutocorrelationStats averageInternalEnergy_;
+    AutocorrelationStats averageInternalTemperature_;
     
   };
   

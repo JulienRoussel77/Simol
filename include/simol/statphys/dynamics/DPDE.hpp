@@ -9,23 +9,42 @@ namespace simol
   class DPDE: public LangevinBase
   {
     double heatCapacity_;
+    double cutOff_;
     double rejectionCount_;
+    double totalCountForRejection_;
+    double rejectionRate_;
   public:
     DPDE(Input const&  input);
     virtual void printName() const;
-    virtual double gamma_DPDE(double intEnergy);  // friction depending on internal energies
-    virtual double& heatCapacity();
+    virtual double& cutOff();
     double sigma() const;
     const double& rejectionCount() const;
     double& rejectionCount();
+    const double& totalCountForRejection() const;
+    double& totalCountForRejection();
+    const double& rejectionRate() const;
+    double& rejectionRate();
 
-    //-- functions pour integration of the fluctuation/dissipation --
+    //-- microscopic EOS --
+    virtual double gamma_DPDE(double intEnergy);  
+    virtual double internalTemperature(double intEnergy) const;
+    double& heatCapacity();
+    const double& heatCapacity() const;
+    
+    //-- functions pour integration of the fluctuation/dissipation (isolated systems) --
     void energyReinjection(Particle& particle);
     void metropolizedEnergyReinjection(Particle& particle);
+
+     //-- functions for integration of the fluctuation/dissipation (NBody systems) --
+    double pairwiseFluctuationDissipation(double v12, double dist, double internalEnergy1, double internalEnergy2);
+    void secondPartThermalization(Particle& particle);
 
     //-- auxiliary functions --
     Vector<double> effectiveDrift(Particle& particle);
     void incrementRejection();
+    void incrementTotalCountForRejection();
+    double chi(double dist);
+    void acceptRejectRate(double v12_current, double v12_init, double internalEnergy1, double internalEnergy2, double mass);
   };
   
 }
