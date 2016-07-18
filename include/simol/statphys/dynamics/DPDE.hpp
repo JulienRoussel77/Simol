@@ -44,7 +44,7 @@ namespace simol
     void incrementRejection();
     void incrementTotalCountForRejection();
     double chi(double dist);
-    void acceptRejectRate(double v12_current, double v12_init, double internalEnergy1, double internalEnergy2, double mass);
+    void acceptRejectRate(double v12_current, double v12_init, double internalEnergy1, double internalEnergy2, double mass, double dist);
   };
   
 }

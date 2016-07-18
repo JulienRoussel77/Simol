@@ -340,7 +340,7 @@ namespace simol
     // accept/reject step
     dyna.incrementTotalCountForRejection();
     double v12_0 = dot(vect12,e12);
-    dyna.acceptRejectRate(v12,v12_0,particle1.internalEnergy(),particle2.internalEnergy(),particle1.mass());
+    dyna.acceptRejectRate(v12,v12_0,particle1.internalEnergy(),particle2.internalEnergy(),particle1.mass(),distance);
     double U = rng_->scalarUniform();
     if (U > dyna.rejectionRate())
       {
