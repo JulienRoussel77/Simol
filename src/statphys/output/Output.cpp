@@ -64,7 +64,8 @@ namespace simol
     {
       if (input.systemName() == "NBody")
       {
-        outParticlesXMakeMol_ = std::make_shared<ofstream>(input.outputFolderName() + "xmakemol.xyz");
+	outParticlesXMakeMol_ = std::make_shared<ofstream>(input.outputFolderName() + "xmakemol.xyz");
+	outParticlesFullConfiguration_ = std::make_shared<ofstream>(input.outputFolderName() + "FullConfiguration.txt");
       }
       else
       {
@@ -391,7 +392,7 @@ namespace simol
                      << " " << potentialEnergy()
 		     << " " << totalEnergy
 		     << " " << temperature()
-		     << " " << internalTemperature()
+		     << " " << 1./internalTemperature()
 		     << " " << pressure()
 		     << " " << rejectionCount()
 		     << std::endl;

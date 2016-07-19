@@ -36,7 +36,7 @@ namespace simol
     void metropolizedEnergyReinjection(Particle& particle);
 
      //-- functions for integration of the fluctuation/dissipation (NBody systems) --
-    double pairwiseFluctuationDissipation(double v12, double dist, double internalEnergy1, double internalEnergy2);
+    double pairwiseFluctuationDissipation(double v12, double dist, double internalEnergy1, double internalEnergy2, double reduced_mass);
     void secondPartThermalization(Particle& particle);
 
     //-- auxiliary functions --
@@ -44,7 +44,7 @@ namespace simol
     void incrementRejection();
     void incrementTotalCountForRejection();
     double chi(double dist);
-    void acceptRejectRate(double v12_current, double v12_init, double internalEnergy1, double internalEnergy2, double mass, double dist);
+    void acceptRejectRate(double v12_current, double v12_init, double internalEnergy1, double internalEnergy2, double reduced_mass, double dist);
   };
   
 }

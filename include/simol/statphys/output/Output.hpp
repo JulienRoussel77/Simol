@@ -23,6 +23,7 @@ namespace simol
     ofstream & outObservables();
     ofstream & outParticles();
     ofstream & outParticlesXMakeMol();
+    ofstream & outParticlesFullConfiguration();
     ofstream & outFinalFlow();
     ofstream & outFinalVelocity();
     ofstream & meanValueObservables();
@@ -93,6 +94,7 @@ namespace simol
 
     //-- for NBody systems --
     void displayParticlesXMakeMol(vector<Particle> const& configuration, long int iOfStep, double domainSize = 0);
+    void displayParticlesFullConfiguration(vector<Particle> const& configuration, long int iOfStep); 
 
     //------------ profiles for chains --------------
     void appendKinTempProfile(double value, long int iOfStep, int iOfParticle);
@@ -131,8 +133,9 @@ namespace simol
     std::shared_ptr<ofstream> outParticles_;
     std::shared_ptr<ofstream> outCorrelation_;
 
-    //-- xmakemol outputs for NBody --
+    //-- configuration outputs for NBody --
     std::shared_ptr<ofstream> outParticlesXMakeMol_;
+    std::shared_ptr<ofstream> outParticlesFullConfiguration_;
 
     //-- average velocity for Isolated --
     std::shared_ptr<ofstream> outFinalVelocity_;

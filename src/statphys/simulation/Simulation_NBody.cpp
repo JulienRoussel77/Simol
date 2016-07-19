@@ -2,19 +2,38 @@
 
 namespace simol
 {
+
   template <>
   void sampleSystem(DPDE& dyna, NBody& syst)
   {
     cout << " Initialization of the system (NBody, DPDE)..." << endl;
-    sampleMomenta(dyna, syst);
-    samplePositions(dyna, syst);
-    sampleInternalEnergies(dyna, syst);
-    dyna.rejectionCount() = 0; // rejection rate for Metropolis
-    syst.computeAllForces();
-    //--- thermalization ---
-    cout << " - Thermalization (" << dyna.thermalizationNbOfSteps() << " steps)..." << endl;
-    for (long int iOfStep  = 0; iOfStep < dyna.thermalizationNbOfSteps(); ++iOfStep)
-      thermalize(dyna,syst);
+    if (syst.restart())
+      {
+    	cout << " - reading from restart file " << syst.restartFileName() << endl;
+	ifstream initialConditions(syst.restartFileName());
+	assert(initialConditions.is_open());
+	int Dim = syst.dimension();
+	for (int i = 0; i < syst.nbOfParticles(); i++)
+	  {
+	    for (int dim = 0; dim < Dim; dim++)
+	      initialConditions >> syst.getParticle(i).position(dim) >> std::ws; 
+	    for (int dim = 0; dim < Dim; dim++)
+	      initialConditions >> syst.getParticle(i).momentum(dim) >> std::ws;
+	    initialConditions >> syst.getParticle(i).internalEnergy() >> std::ws;
+	  }
+      }
+    else
+      {
+	sampleMomenta(dyna, syst);
+	samplePositions(dyna, syst);
+	sampleInternalEnergies(dyna, syst);
+	dyna.rejectionCount() = 0; // rejection rate for Metropolis
+	syst.computeAllForces();
+	//--- thermalization ---
+	cout << " - Thermalization (" << dyna.thermalizationNbOfSteps() << " steps)..." << endl;
+	for (long int iOfStep  = 0; iOfStep < dyna.thermalizationNbOfSteps(); ++iOfStep)
+	  thermalize(dyna,syst);
+      }
     //--- end of initialization ---
     cout << endl;
     cout << " Starting production mode" << endl;
@@ -186,7 +205,10 @@ namespace simol
     if (output.doOutput(iOfStep))
       output.displayObservablesDPDE(syst.configuration(),iOfStep);
     if (output.doLongPeriodOutput(iOfStep))
-      output.displayParticlesXMakeMol(syst.configuration(), iOfStep, syst.latticeParameter()*syst.nbOfParticlesPerDimension());
+      {
+	output.displayParticlesXMakeMol(syst.configuration(), iOfStep, syst.latticeParameter()*syst.nbOfParticlesPerDimension());
+	output.displayParticlesFullConfiguration(syst.configuration(), iOfStep); 
+      }
   }
 
   

@@ -9,25 +9,25 @@ namespace simol
   //----- when the cell method is used -----
   class Cell
   {
-
-    public:
-
-      Cell();
-      int size() const;
-      void clear();
-      void push_back(int ind);
-      vector<int> const& indexNeighbors() const;
-      vector<int>& indexNeighbors();
-      list<int> const& members() const;
-      list<int>& members();
-
-    protected:
-
-      list<int> members_;
-      vector<int> indexNeighbors_;
-
+    
+  public:
+    
+    Cell();
+    int size() const;
+    void clear();
+    void push_back(int ind);
+    vector<int> const& indexNeighbors() const;
+    vector<int>& indexNeighbors();
+    list<int> const& members() const;
+    list<int>& members();
+    
+  protected:
+    
+    list<int> members_;
+    vector<int> indexNeighbors_;
+    
   };
-
+  
   //------------------ class for multiparticle systems in 2D/3D ------------------------
   class NBody : public System
   {
@@ -43,6 +43,10 @@ namespace simol
     void interaction(Particle& particle1, Particle& particle2) const;
     void elementaryFluctuationDissipationDPDE(DPDE& dyna, Particle& particle1, Particle& particle2) const;
 
+    //--- for initial conditions (restart) --
+    bool restart() const;
+    string restartFileName() const;
+  
       //--- for cell method ---
       void reinitializeCells();
       void findNeighboringCells();
@@ -56,6 +60,10 @@ namespace simol
       int nbOfParticlesPerDimension_;
       double latticeParameter_;
       double domainSize_;
+
+    //--- if restarting from a given file ---
+    bool restart_;
+    string restartFileName_;
 
       //--- for cell method ---
       bool doCells_;

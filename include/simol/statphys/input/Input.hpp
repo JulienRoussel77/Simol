@@ -41,7 +41,10 @@ namespace simol
       Vector<double> initialPosition(int const& i = 0) const;
       Vector<double> initialMomentum(int const& i = 0) const;
       //Chain
-      bool isOfFixedVolum() const;
+    bool isOfFixedVolum() const;
+    // NBody
+    bool restart() const;
+    string restartFileName() const;
 
       //-- Time --
       double timeStep() const;

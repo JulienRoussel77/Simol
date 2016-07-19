@@ -51,12 +51,19 @@ namespace simol
     latticeParameter_(input.latticeParameter()),
     domainSize_(input.latticeParameter()*input.nbOfParticlesPerDimension()),
     doCells_(input.doCellMethod()),
-    Rcut_(input.cutOffRatio()*input.potentialSigma())
+    Rcut_(input.cutOffRatio()*input.potentialSigma()),
+    restart_(input.restart())
   {
     //-- initialise the configuration by initializing the particles --
     assert(configuration_.size() > 1);
     for (int i = 0; i < input.nbOfParticles(); i++)
       configuration_[i] = Particle(input.mass(), input.initialPosition(i), input.initialMomentum(i));
+
+    //-- check whether the initial configuration should be re-read from a file --
+    if (restart_)
+      {
+	restartFileName_ = input.restartFileName();
+      }
 
     //-- initialize the cells --
     if (doCells_)
@@ -92,6 +99,16 @@ namespace simol
   double NBody::latticeParameter() const
   {
     return latticeParameter_;
+  }
+
+  bool NBody::restart() const
+  {
+    return restart_;
+  }
+  
+  string NBody::restartFileName() const
+  {
+    return restartFileName_;
   }
 
   ///
@@ -327,20 +344,23 @@ namespace simol
     distance = sqrt(distance);
     Vector<double> e12 = r12/distance;
     // compute the variation of the relative velocity
-    double old_kin_energy = particle1.kineticEnergy() + particle2.kineticEnergy();
+    //double old_kin_energy = particle1.kineticEnergy() + particle2.kineticEnergy();
     //dyna.printName(); 
-    Vector<double> vect12 = particle1.momentum() - particle2.momentum();  
-    double v12 = dyna.pairwiseFluctuationDissipation(dot(vect12,e12),distance,particle1.internalEnergy(),particle2.internalEnergy()); 
+    double mu12 = 1./( 1./particle1.mass() + 1./particle2.mass() ); // reduced mass
+    Vector<double> vect12 = particle1.momentum()/particle1.mass() - particle2.momentum()/particle2.mass();  
+    double v12_0 = dot(vect12,e12);
+    double v12 = dyna.pairwiseFluctuationDissipation(v12_0,distance,particle1.internalEnergy(),particle2.internalEnergy(),mu12); 
     // update the momenta
     Vector<double> totalMomentum = particle1.momentum() + particle2.momentum();
     Vector<double> v12_perp = vect12 - dot(vect12,e12)*e12;
     //cout << vect12 << ", " << e12 << " : dot = " << dot(vect12,e12) << endl;
-    particle1.momentum() = 0.5*( totalMomentum + v12_perp + v12*e12);
-    particle2.momentum() = 0.5*( totalMomentum - v12_perp - v12*e12);
+    particle1.momentum() += mu12*(v12-v12_0)*e12;
+    particle2.momentum() -= mu12*(v12-v12_0)*e12;
+    //mu12*( totalMomentum/particle2.mass() + v12_perp + v12*e12);
+    //particle2.momentum() = mu12*( totalMomentum/particle1.mass() - v12_perp - v12*e12);
     // accept/reject step
     dyna.incrementTotalCountForRejection();
-    double v12_0 = dot(vect12,e12);
-    dyna.acceptRejectRate(v12,v12_0,particle1.internalEnergy(),particle2.internalEnergy(),particle1.mass(),distance);
+    dyna.acceptRejectRate(v12,v12_0,particle1.internalEnergy(),particle2.internalEnergy(),mu12,distance);
     double U = rng_->scalarUniform();
     if (U > dyna.rejectionRate())
       {
@@ -352,9 +372,10 @@ namespace simol
     else 
       {
 	//-- update internal energies --
-	double new_kin_energy = particle1.kineticEnergy() + particle2.kineticEnergy();
-	double internal_energy_variation = 0.5*(new_kin_energy-old_kin_energy);
-	//cout << particle1.mass()*( pow(v12,2)-pow(v12_0,2) )/8 - internal_energy_variation << endl;
+	//double new_kin_energy = particle1.kineticEnergy() + particle2.kineticEnergy();
+	//double internal_energy_variation = 0.5*(new_kin_energy-old_kin_energy);
+	double internal_energy_variation = mu12*( pow(v12,2)-pow(v12_0,2) )/4;
+	//cout << mu12*( pow(v12,2)-pow(v12_0,2) )/4 - internal_energy_variation << endl;
 	particle1.internalEnergy() -= internal_energy_variation;
 	particle2.internalEnergy() -= internal_energy_variation;
       }

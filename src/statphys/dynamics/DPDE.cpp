@@ -144,8 +144,7 @@ namespace simol
     double rate = 0; 
     if (new_kin_energy < E0)
       {
-	// BIZARRE QUE LA MASSE APPARAISSE ICI !!!
-     	rate = particle.mass()*heatCapacity()*(log(E0-new_kin_energy)-log(E0-old_kin_energy)) + 0.5*pow(G.norm(), 2); 
+	rate = heatCapacity()*(log(E0-new_kin_energy)-log(E0-old_kin_energy)) + 0.5*pow(G.norm(), 2); 
     	double gamma_reverse = gamma_DPDE(E0-new_kin_energy);
     	double alpha_reverse = exp(-gamma_reverse / particle.mass() * timeStep_);
     	double sigma2_reverse = (1 - pow(alpha_reverse,2)) * particle.mass() * temperature() * gamma() / gamma_reverse; 
@@ -176,7 +175,7 @@ namespace simol
     return 1-dist/cutOff_;
   }
 
-  double DPDE::pairwiseFluctuationDissipation(double v12, double dist, double internalEnergy1, double internalEnergy2)
+  double DPDE::pairwiseFluctuationDissipation(double v12, double dist, double internalEnergy1, double internalEnergy2, double reduced_mass)
   {
     // if the distance is beyond the cut off, no update
     if (dist > cutOff_)
@@ -185,10 +184,10 @@ namespace simol
     else 
       {
 	double chi_n = chi(dist);
-	double gamma_n = gamma_DPDE(internalEnergy1) + gamma_DPDE(internalEnergy2);
-	double alpha_n = exp(- gamma_n * pow(chi_n,2) * timeStep_);
+	double gamma_n = (gamma_DPDE(internalEnergy1) + gamma_DPDE(internalEnergy2)) / 2;
+	double alpha_n = exp(- gamma_n * pow(chi_n,2)/reduced_mass * timeStep_);
 	double G = rng_->scalarGaussian();
-	double sigma_n = 2*sqrt((1 - pow(alpha_n, 2)) * temperature() * gamma() / gamma_n);
+	double sigma_n = sqrt((1 - pow(alpha_n, 2)) * temperature() * gamma() / (gamma_n * reduced_mass ) );
 	double new_v12 = alpha_n * v12 +  sigma_n * G;
 	// update the rate for accept/reject correction
 	rejectionRate() = 0.5*pow(G, 2) + log(sigma_n);
@@ -197,21 +196,22 @@ namespace simol
       }
   }
 
-  void DPDE::acceptRejectRate(double v12_current, double v12_init, double internalEnergy1, double internalEnergy2, double mass, double dist)
+  void DPDE::acceptRejectRate(double v12_current, double v12_init, double internalEnergy1, double internalEnergy2, double reduced_mass, double dist)
   {
     // Note that the rate is initialized in the function 'pairwiseFluctuationDissipation'
     //cout << min(internalEnergy1,internalEnergy2) << " : " << internalEnergy1 << " and " << internalEnergy2 << endl;
-    double Delta_v2 = (pow(v12_current,2) - pow(v12_init,2))*mass/8;
+    double Delta_v2 = (pow(v12_current,2) - pow(v12_init,2))*reduced_mass/4;
     if (Delta_v2 < min(internalEnergy1,internalEnergy2))
       {
-	//rejectionRate() = 1; // always accept -- for debugging
+	// rejectionRate() = 1; // always accept -- for debugging
+	// compute the new energies
 	double E1 = internalEnergy1 - Delta_v2;
 	double E2 = internalEnergy2 - Delta_v2;
 	rejectionRate() += heatCapacity()*(log(E1) + log(E2) - log(internalEnergy1) - log(internalEnergy2));
 	double chi_n = chi(dist);
-	double gamma_reverse = gamma_DPDE(E1) + gamma_DPDE(E2);
-	double alpha_reverse = exp(- gamma_reverse * pow(chi_n,2) * timeStep_);
-	double sigma_reverse = 2*sqrt((1 - pow(alpha_reverse, 2)) * temperature() * gamma() / gamma_reverse);
+	double gamma_reverse = ( gamma_DPDE(E1) + gamma_DPDE(E2) ) / 2;
+	double alpha_reverse = exp(- gamma_reverse * pow(chi_n,2)/reduced_mass * timeStep_);
+	double sigma_reverse = sqrt((1 - pow(alpha_reverse, 2)) * temperature() * gamma() / (gamma_reverse*reduced_mass) );
 	double GG = (alpha_reverse*v12_current - v12_init)/sigma_reverse;
 	rejectionRate() -= 0.5*pow(GG, 2) + log(sigma_reverse);
 	rejectionRate() = exp(rejectionRate());
