@@ -34,6 +34,11 @@ namespace simol
 	for (long int iOfStep  = 0; iOfStep < dyna.thermalizationNbOfSteps(); ++iOfStep)
 	  thermalize(dyna,syst);
       }
+    //--- burn-in ---
+    cout << " - Burn-in (" << dyna.burninNbOfSteps() << " steps)..." << endl;
+    for (long int iOfStep  = 0; iOfStep < dyna.burninNbOfSteps(); ++iOfStep)
+      simulate(dyna,syst);
+    // note that at the end of that, some non zero average rejection rate is already obtained
     //--- end of initialization ---
     cout << endl;
     cout << " Starting production mode" << endl;
@@ -180,6 +185,7 @@ namespace simol
     output.appendPotentialEnergy(output.potentialEnergy(), iOfStep);
     output.appendInternalEnergy(output.internalEnergy(), iOfStep);
     output.appendInternalTemperature(output.internalTemperature(), iOfStep);
+    output.appendPressure(output.totalVirial(), iOfStep);
     //-- rejection rate --
     output.rejectionCount() = dyna.rejectionCount()/dyna.totalCountForRejection();
   }

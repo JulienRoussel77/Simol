@@ -115,6 +115,7 @@ namespace simol
     void appendPotentialEnergy(double value, long int iOfStep);
     void appendInternalEnergy(double value, long int iOfStep);
     void appendInternalTemperature(double value, long int iOfStep);
+    void appendPressure(double value, long int iOfStep);
     void finalDisplayCorrelationsDPDE();
 
     //------------- for Galerkin ----------------------
@@ -208,6 +209,7 @@ namespace simol
     AutocorrelationStats averagePotentialEnergy_;
     AutocorrelationStats averageInternalEnergy_;
     AutocorrelationStats averageInternalTemperature_;
+    AutocorrelationStats averagePressure_;
     
   };
   

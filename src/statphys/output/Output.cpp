@@ -43,7 +43,8 @@ namespace simol
     averageKineticEnergy_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts()),
     averagePotentialEnergy_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts()),
     averageInternalEnergy_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts()),
-    averageInternalTemperature_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts())
+    averageInternalTemperature_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts()),
+    averagePressure_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts())
   {
     
     //-- standard observables in this file --
@@ -56,7 +57,7 @@ namespace simol
       outObservables_       = std::make_shared<ofstream>(input.outputFolderName() + "observables.txt");
       outObservables() << "# 1:time  2:position  3:momentum  4:internalEnergy  5:kineticEnergy  6:potentialEnergy  7:totalEnergy  8:kineticTemperature  9:internalTemperature  10:pressure  11:averageRejection" << endl;
       meanValueObservables_       = std::make_shared<ofstream>(input.outputFolderName() + "mean_observables.txt");
-      meanValueObservables() << "# 1:time  2:kineticEnergy  3:potentialEnergy  4:internalEnergy  5:kineticTemperature  6:internalTemperature" << endl;
+      meanValueObservables() << "# 1:time  2:kineticEnergy  3:potentialEnergy  4:internalEnergy  5:kineticTemperature  6:internalTemperature  7:pressure" << endl;
     }
 
     //-- longer outputs if required, e.g. configuration of the system --
@@ -381,6 +382,11 @@ namespace simol
     averageInternalTemperature_.append(value, iOfStep);
   }
 
+  void Output::appendPressure(double value, long int iOfStep)
+  {
+    averagePressure_.append(value, iOfStep);
+  }
+
   void Output::displayObservablesDPDE(vector<Particle> const& configuration, long int iOfStep)
   {
     double totalEnergy = kineticEnergy() + potentialEnergy() + internalEnergy();
@@ -402,6 +408,7 @@ namespace simol
 			   << " " << averageInternalEnergy_.mean() 
 			   << " " << 2*averageKineticEnergy_.mean()/(dimension_ * nbOfParticles_)
 			   << " " << 1./averageInternalTemperature_.mean() 
+			   << " " << (2*averageKineticEnergy_.mean()+averagePressure_.mean())/(dimension_*nbOfParticles_*pow(latticeParameter_, dimension_))
 			   << std::endl;
   }
 
