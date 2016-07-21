@@ -1,6 +1,7 @@
 #ifndef SIMOL_NBODY_HPP
 #define SIMOL_NBODY_HPP
-#include "System.hpp"
+#include "simol/statphys/system/System.hpp"
+#include "simol/statphys/dynamics/DPDE.hpp"
 
 namespace simol
 {
@@ -8,25 +9,25 @@ namespace simol
   //----- when the cell method is used -----
   class Cell
   {
-
-    public:
-
-      Cell();
-      int size() const;
-      void clear();
-      void push_back(int ind);
-      vector<int> const& indexNeighbors() const;
-      vector<int>& indexNeighbors();
-      list<int> const& members() const;
-      list<int>& members();
-
-    protected:
-
-      list<int> members_;
-      vector<int> indexNeighbors_;
-
+    
+  public:
+    
+    Cell();
+    int size() const;
+    void clear();
+    void push_back(int ind);
+    vector<int> const& indexNeighbors() const;
+    vector<int>& indexNeighbors();
+    list<int> const& members() const;
+    list<int>& members();
+    
+  protected:
+    
+    list<int> members_;
+    vector<int> indexNeighbors_;
+    
   };
-
+  
   //------------------ class for multiparticle systems in 2D/3D ------------------------
   class NBody : public System
   {
@@ -36,10 +37,16 @@ namespace simol
       NBody(Input const& input);
       void printName() const;
       void computeAllForces();
+    void fluctuationDissipationDPDE(DPDE& dyna);
       int nbOfParticlesPerDimension() const;
       double latticeParameter() const;
-      void interaction(Particle& particle1, Particle& particle2) const;
+    void interaction(Particle& particle1, Particle& particle2) const;
+    void elementaryFluctuationDissipationDPDE(DPDE& dyna, Particle& particle1, Particle& particle2) const;
 
+    //--- for initial conditions (restart) --
+    bool restart() const;
+    string restartFileName() const;
+  
       //--- for cell method ---
       void reinitializeCells();
       void findNeighboringCells();
@@ -53,6 +60,10 @@ namespace simol
       int nbOfParticlesPerDimension_;
       double latticeParameter_;
       double domainSize_;
+
+    //--- if restarting from a given file ---
+    bool restart_;
+    string restartFileName_;
 
       //--- for cell method ---
       bool doCells_;

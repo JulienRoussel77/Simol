@@ -140,4 +140,18 @@ namespace simol
       return defaultHeatCapacity;
   }
 
+  bool Input::restart() const
+  {
+    if (data["System"]["InitialConditions"])
+      return true;
+    else 
+      return false;
+  }
+
+  string Input::restartFileName() const
+  {
+    string name = data["System"]["InitialConditions"].as<string>();
+    return name;
+  }
+
 }

@@ -23,6 +23,7 @@ namespace simol
     ofstream & outObservables();
     ofstream & outParticles();
     ofstream & outParticlesXMakeMol();
+    ofstream & outParticlesFullConfiguration();
     ofstream & outFinalFlow();
     ofstream & outFinalVelocity();
     ofstream & meanValueObservables();
@@ -61,6 +62,8 @@ namespace simol
     double& potentialEnergy();
     const double& internalEnergy() const;
     double& internalEnergy();
+    const double& internalTemperature() const;
+    double& internalTemperature();
     const double& totalVirial() const;
     double& totalVirial();
     double energy() const;
@@ -91,6 +94,7 @@ namespace simol
 
     //-- for NBody systems --
     void displayParticlesXMakeMol(vector<Particle> const& configuration, long int iOfStep, double domainSize = 0);
+    void displayParticlesFullConfiguration(vector<Particle> const& configuration, long int iOfStep); 
 
     //------------ profiles for chains --------------
     void appendKinTempProfile(double value, long int iOfStep, int iOfParticle);
@@ -110,6 +114,8 @@ namespace simol
     void appendKineticEnergy(double value, long int iOfStep);
     void appendPotentialEnergy(double value, long int iOfStep);
     void appendInternalEnergy(double value, long int iOfStep);
+    void appendInternalTemperature(double value, long int iOfStep);
+    void appendPressure(double value, long int iOfStep);
     void finalDisplayCorrelationsDPDE();
 
     //------------- for Galerkin ----------------------
@@ -128,8 +134,9 @@ namespace simol
     std::shared_ptr<ofstream> outParticles_;
     std::shared_ptr<ofstream> outCorrelation_;
 
-    //-- xmakemol outputs for NBody --
+    //-- configuration outputs for NBody --
     std::shared_ptr<ofstream> outParticlesXMakeMol_;
+    std::shared_ptr<ofstream> outParticlesFullConfiguration_;
 
     //-- average velocity for Isolated --
     std::shared_ptr<ofstream> outFinalVelocity_;
@@ -172,6 +179,7 @@ namespace simol
     double energySumFlow_;
     double energyModiFlow_;
     double rejectionCount_;
+    double internalTemperature_;
 
     //-- parametrization of outputs --
     int decorrelationNbOfSteps_;
@@ -200,6 +208,8 @@ namespace simol
     AutocorrelationStats averageKineticEnergy_;
     AutocorrelationStats averagePotentialEnergy_;
     AutocorrelationStats averageInternalEnergy_;
+    AutocorrelationStats averageInternalTemperature_;
+    AutocorrelationStats averagePressure_;
     
   };
   

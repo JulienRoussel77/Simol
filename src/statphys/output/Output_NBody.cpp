@@ -8,6 +8,29 @@ namespace simol
     return *outParticlesXMakeMol_;
   }
 
+  ofstream & Output::outParticlesFullConfiguration()
+  {
+    return *outParticlesFullConfiguration_;
+  }
+
+  ///
+  ///-- keep the full current configuration in order to restart from it ---
+  void Output::displayParticlesFullConfiguration(vector<Particle> const& configuration, long int iOfStep)
+  {
+    outParticlesFullConfiguration() << "Time = " << iOfStep * timeStep() << endl;
+    int Dim = dimension_;
+    for (int i = 0; i < nbOfParticles_; i++)
+      {
+	for (int dim = 0; dim < Dim; dim++)
+	  outParticlesFullConfiguration() << configuration[i].position(dim) << " ";
+	for (int dim = 0; dim < Dim; dim++)
+	  outParticlesFullConfiguration() << configuration[i].momentum(dim) << " ";
+	outParticlesFullConfiguration() << configuration[i].internalEnergy() << " ";
+	outParticlesFullConfiguration() << endl;
+      }
+    outParticlesFullConfiguration() << endl;
+  }
+  
   ///
   ///-- display the current configuration in XMakemol format ; specific for NBody systems ---
   void Output::displayParticlesXMakeMol(vector<Particle> const& configuration, long int iOfStep, double domainSize)
