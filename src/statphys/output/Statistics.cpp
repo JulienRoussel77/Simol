@@ -170,12 +170,17 @@ namespace simol
       {
         statsRefValues_.append(newRefValue, iOfObservable);
         indexRef_ = iOfStep;
+        //cout << newValue << endl;
       }
       //-- update the correlation function --
       // decorrelationNbOfSteps_ / nbOfAutocoPts_ is the time intervale between two correlation estimations: can be bigger than the time step
       statsCorrelation_.append(statsRefValues_.lastValue(iOfObservable) * newValue, ((iOfStep - indexRef_)*nbOfAutocoPts_) / decorrelationNbOfSteps_, iOfObservable);
       //-- integration of the correlation function with a trapezoidal rule --
-      currentCorrelationIntegral_ += ((indexRef_ == iOfStep) ? .5 : 1) * statsRefValues_.lastValue(iOfObservable) * newValue;
+      // /!\ When the integral is small due the cancellation, this half factor can change the result up to 30% ! In this case dt is too big...
+      //currentCorrelationIntegral_ += ((indexRef_ == iOfStep) ? .5 : 1) * statsRefValues_.lastValue(iOfObservable) * newValue;
+      currentCorrelationIntegral_ += statsRefValues_.lastValue(iOfObservable) * newValue;
+      //cout << currentCorrelationIntegral_ << endl;
+
       if ((iOfStep+1) % decorrelationNbOfSteps_ == 0)    
       {
         statsIntegratedCorrelation_.append(timeStep() * currentCorrelationIntegral_, iOfObservable);
@@ -269,6 +274,19 @@ namespace simol
   void AutocorrelationStats::append(double const& newValue, long int iOfStep, int iOfObservable)
   {
     CorrelationStats::append(newValue, iOfStep, iOfObservable, newValue);
+      if ((iOfStep+1) % decorrelationNbOfSteps_ == 0)    
+      {        
+        /*cout << "c0 = " << correlationAtSpan(0)<< endl;
+        double test = 0;
+        for (int i=0; i < nbOfAutocoPts_; i++)
+        {
+          test += (i==0?.5:1)*unbiasedCorrelationAtSpan(i) * timeStep() * decorrelationNbOfSteps() / nbOfAutocoPts_;
+          //cout << "+= " << 2 * unbiasedCorrelationAtSpan(i) * timeStep() * decorrelationNbOfSteps() / nbOfAutocoPts_ << endl;
+        }
+        cout << "---->" << integratedCorrelationUnbiased() << " <-> " << test - .5  * unbiasedCorrelationAtSpan(0)* timeStep() * decorrelationNbOfSteps() / nbOfAutocoPts_ << " = " << test << " - " << .5 * unbiasedCorrelationAtSpan(0)* timeStep() * decorrelationNbOfSteps() / nbOfAutocoPts_ <<  endl;
+        //cout << "---->" << variance() << " <-> " << test - .5 * 2 * unbiasedCorrelationAtSpan(0)* timeStep() * decorrelationNbOfSteps() / nbOfAutocoPts_ << " = " << test << " - " << .5 * 2 * unbiasedCorrelationAtSpan(0, 0)* timeStep() * decorrelationNbOfSteps() / nbOfAutocoPts_ <<  endl;
+      */
+      }
   }
   
   double AutocorrelationStats::unbiasedCorrelationAtSpan(long int iOfSpan, int iOfObservable) const
@@ -283,7 +301,8 @@ namespace simol
 
   double AutocorrelationStats::variance(int iOfObservable) const
   {
-    return 2 * max(0., integratedCorrelationUnbiased(iOfObservable));
+    //return 2 * max(0., integratedCorrelationUnbiased(iOfObservable));
+    return 2 * integratedCorrelationUnbiased(iOfObservable);
   }
 
   double AutocorrelationStats::standardDeviation(int iOfObservable) const

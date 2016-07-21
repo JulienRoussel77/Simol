@@ -123,6 +123,9 @@ namespace simol
   
   //--- LangevinBase ---
   void simulate(LangevinBase& dyna, System& syst);
+  
+  //--- Langevin ---
+  void simulate(Langevin& dyna, System& syst);
 
   //-- DPDE --
   void simulate(DPDE& dyna, System& syst);

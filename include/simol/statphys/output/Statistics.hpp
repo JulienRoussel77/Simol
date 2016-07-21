@@ -75,7 +75,7 @@ namespace simol
     int statsIntegratedCorrelationNbValues(int iOfObservable = 0) const;
     double integratedCorrelation(int iOfObservable = 0) const;
     Vector<double> integratedCorrelationVec() const;
-    double integratedCorrelationUnbiased(int iOfObservable = 0) const;
+    virtual double integratedCorrelationUnbiased(int iOfObservable = 0) const;
     double varIntegratedCorrelation(int iOfObservable = 0) const;
     double varCorrelationAtSpan(int iOfSpan, int iOfObservable = 0) const;
     double stdDeviationCorrelationAtSpan(int iOfSpan, int iOfObservable = 0) const;
@@ -91,7 +91,7 @@ namespace simol
     AutocorrelationStats(int decorrelationNbOfSteps, double timeStep0, int nbOfAutocoPts0, int nbOfObservables = 1);
     void append(double const& newValue, long int iOfStep, int iOfObservable=0);
     double unbiasedCorrelationAtSpan(long int iOfStep, int iOfObservable = 0) const;
-    double integratedCorrelationUnbiased(int iOfObservable) const;
+    double integratedCorrelationUnbiased(int iOfObservable=0) const;
     double variance(int iOfObservable = 0) const;
     double standardDeviation(int iOfObservable = 0) const;
     double varianceOfVariance(int iOfObservable = 0) const;

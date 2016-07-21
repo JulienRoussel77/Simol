@@ -48,6 +48,19 @@ namespace simol
   for (auto && particle : syst.configuration())
       dyna.verletSecondPart(particle);
   }
+  
+  //------------- Langevin --------------------
+  
+  void simulate(Langevin& dyna, System& syst)
+  {
+    for (auto && particle : syst.configuration())
+      dyna.verletFirstPart(particle);
+    syst.computeAllForces();
+    for (auto && particle : syst.configuration())
+      dyna.verletSecondPart(particle);
+    for (auto && particle : syst.configuration())
+      dyna.updateOrsteinUhlenbeck(particle, dyna.beta());
+  }
 
   //------------------- writeOutput and its specifications by dynamics ---------------------------
 
@@ -65,10 +78,13 @@ namespace simol
       output.displayParticles(syst.configuration(), iOfStep);
   }
 
-  void writeOutput(Langevin const& /*dyna*/, System const& syst, Output& output, long int iOfStep)
+  void writeOutput(Langevin const& dyna, System const& syst, Output& output, long int iOfStep)
   {
     if (output.doOutput(iOfStep))
+    {
       output.displayObservables(iOfStep);
+      output.velocityCV().display(output.outVelocitiesCV(), iOfStep * dyna.timeStep());
+    }
     if (output.doLongPeriodOutput(iOfStep))
       output.displayParticles(syst.configuration(), iOfStep);
   }

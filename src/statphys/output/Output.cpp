@@ -406,23 +406,26 @@ namespace simol
 
   void Output::finalDisplayCorrelations()
   {
-    
+    cout << "Velocity : The correlation in 0 is " << floor((2 * velocityCV().unbiasedCorrelationAtSpan(0) * decorrelationTime() / nbOfAutocoPts()) / velocityCV().varObservable() * 10000)/100 << "% of the variance" << endl;
+    cout << "SumFlow : The correlation in 0 is " << floor((2 * sumFlowCV().unbiasedCorrelationAtSpan(0) * decorrelationTime() / nbOfAutocoPts()) / sumFlowCV().varObservable() * 10000)/100 << "% of the variance" << endl;
+    cout << "ModiFlow : The correlation in 0 is " << floor((2 * modiFlowCV().unbiasedCorrelationAtSpan(0) * decorrelationTime() / nbOfAutocoPts()) / modiFlowCV().varObservable() * 10000)/100 << "% of the variance" << endl;
+        
     int midNb = nbOfParticles_ / 2;
     for (int iOfSpan = 0; iOfSpan < nbOfAutocoPts(); iOfSpan++)
     {
       outCorrelation() << iOfSpan * autocoPtsPeriod()
                        << " " << velocityCV_->unbiasedCorrelationAtSpan(iOfSpan)
-                       << " " << velocityCV_->varCorrelationAtSpan(iOfSpan) / finalTime()
+                       << " " << sqrt(velocityCV_->varCorrelationAtSpan(iOfSpan) / finalTime())
                        << " " << forceCV_->unbiasedCorrelationAtSpan(iOfSpan)
-                       << " " << forceCV_->varCorrelationAtSpan(iOfSpan) / finalTime()
+                       << " " << sqrt(forceCV_->varCorrelationAtSpan(iOfSpan) / finalTime())
                        << " " << lengthCV_->unbiasedCorrelationAtSpan(iOfSpan)
-                       << " " << lengthCV_->varCorrelationAtSpan(iOfSpan) / finalTime()
+                       << " " << sqrt(lengthCV_->varCorrelationAtSpan(iOfSpan) / finalTime())
                        << " " << midFlowCV_->unbiasedCorrelationAtSpan(iOfSpan)
-                       << " " << midFlowCV_->varCorrelationAtSpan(iOfSpan) / finalTime()
+                       << " " << sqrt(midFlowCV_->varCorrelationAtSpan(iOfSpan) / finalTime())
                        << " " << sumFlowCV_->unbiasedCorrelationAtSpan(iOfSpan)
-                       << " " << sumFlowCV_->varCorrelationAtSpan(iOfSpan) / finalTime()  //#11
+                       << " " << sqrt(sumFlowCV_->varCorrelationAtSpan(iOfSpan) / finalTime())  //#11
                        << " " << modiFlowCV_->unbiasedCorrelationAtSpan(iOfSpan)
-                       << " " << modiFlowCV_->varCorrelationAtSpan(iOfSpan) / finalTime()
+                       << " " << sqrt(modiFlowCV_->varCorrelationAtSpan(iOfSpan) / finalTime())
                        << " " << bendistProfile_.unbiasedCorrelationAtSpan(iOfSpan, midNb)
                        << std::endl;
                        
