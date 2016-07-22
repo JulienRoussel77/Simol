@@ -55,7 +55,7 @@ namespace simol
     if (input.dynamicsName() == "DPDE") 
     {
       outObservables_       = std::make_shared<ofstream>(input.outputFolderName() + "observables.txt");
-      outObservables() << "# 1:time  2:position  3:momentum  4:internalEnergy  5:kineticEnergy  6:potentialEnergy  7:totalEnergy  8:kineticTemperature  9:internalTemperature  10:pressure  11:averageRejection" << endl;
+      outObservables() << "# 1:time  2:position  3:momentum  4:internalEnergy  5:kineticEnergy  6:potentialEnergy  7:totalEnergy  8:kineticTemperature  9:internalTemperature  10:pressure  11:averageRejection  12:negativeEnergiesCount" << endl;
       meanValueObservables_       = std::make_shared<ofstream>(input.outputFolderName() + "mean_observables.txt");
       meanValueObservables() << "# 1:time  2:kineticEnergy  3:potentialEnergy  4:internalEnergy  5:kineticTemperature  6:internalTemperature  7:pressure" << endl;
     }
@@ -237,24 +237,6 @@ namespace simol
   double& Output::potentialEnergy()
   {return potentialEnergy_;}
 
-  const double& Output::internalEnergy() const
-  {return internalEnergy_;}
-
-  double& Output::internalEnergy()
-  {return internalEnergy_;}
-
-  const double& Output::rejectionCount() const 
-  {return rejectionCount_;}
-
-  double& Output::rejectionCount() 
-  {return rejectionCount_;}
-
-  const double& Output::internalTemperature() const
-  {return internalTemperature_;}
-
-  double& Output::internalTemperature()
-  {return internalTemperature_;}
-
   const double& Output::totalVirial() const
   {return totalVirial_;}
 
@@ -302,6 +284,32 @@ namespace simol
 
   double Output::autocoPtsPeriod() const
   {return decorrelationTime() / nbOfAutocoPts();}
+
+  //---- specific for DPDE -----
+  
+  const double& Output::internalEnergy() const
+  {return internalEnergy_;}
+
+  double& Output::internalEnergy()
+  {return internalEnergy_;}
+
+  const double& Output::rejectionCount() const 
+  {return rejectionCount_;}
+
+  double& Output::rejectionCount() 
+  {return rejectionCount_;}
+
+  const double& Output::negativeEnergiesCount() const 
+  {return negativeEnergiesCount_;}
+
+  double& Output::negativeEnergiesCount() 
+  {return negativeEnergiesCount_;}
+
+  const double& Output::internalTemperature() const
+  {return internalTemperature_;}
+
+  double& Output::internalTemperature()
+  {return internalTemperature_;}
 
   //---------------- check whether outputs should be performed --------------------
 
@@ -401,6 +409,7 @@ namespace simol
 		     << " " << 1./internalTemperature()
 		     << " " << pressure()
 		     << " " << rejectionCount()
+		     << " " << negativeEnergiesCount()
 		     << std::endl;
     meanValueObservables() << iOfStep * timeStep()
 			   << " " << averageKineticEnergy_.mean() 

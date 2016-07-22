@@ -13,6 +13,7 @@ namespace simol
     double rejectionCount_;
     double totalCountForRejection_;
     double rejectionRate_;
+    double negativeEnergiesCount_;
   public:
     DPDE(Input const&  input);
     virtual void printName() const;
@@ -24,6 +25,8 @@ namespace simol
     double& totalCountForRejection();
     const double& rejectionRate() const;
     double& rejectionRate();
+    const double& negativeEnergiesCount() const;
+    double& negativeEnergiesCount();
 
     //-- microscopic EOS --
     virtual double gamma_DPDE(double intEnergy);  

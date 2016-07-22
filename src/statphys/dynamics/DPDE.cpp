@@ -53,6 +53,16 @@ namespace simol
     return rejectionCount_;
   }
 
+  const double& DPDE::negativeEnergiesCount() const
+  {
+    return negativeEnergiesCount_;
+  }
+  
+  double& DPDE::negativeEnergiesCount()
+  {
+    return negativeEnergiesCount_;
+  }
+
   const double& DPDE::totalCountForRejection() const
   {
     return totalCountForRejection_;
@@ -218,7 +228,10 @@ namespace simol
       }
     //-- otherwise systematically reject --
     else 
-      rejectionRate() = 0;
+      {
+	rejectionRate() = 0;
+	negativeEnergiesCount() += 1;
+      }
   }
 
 }

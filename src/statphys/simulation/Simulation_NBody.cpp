@@ -7,6 +7,11 @@ namespace simol
   void sampleSystem(DPDE& dyna, NBody& syst)
   {
     cout << " Initialization of the system (NBody, DPDE)..." << endl;
+    //--- counters for rejections in Metropolis ---
+    dyna.rejectionCount() = 0; 
+    dyna.negativeEnergiesCount() = 0;
+    dyna.totalCountForRejection() = 0;
+    //--- configuration ---
     if (syst.restart())
       {
     	cout << " - reading from restart file " << syst.restartFileName() << endl;
@@ -27,7 +32,6 @@ namespace simol
 	sampleMomenta(dyna, syst);
 	samplePositions(dyna, syst);
 	sampleInternalEnergies(dyna, syst);
-	dyna.rejectionCount() = 0; // rejection rate for Metropolis
 	syst.computeAllForces();
 	//--- thermalization ---
 	cout << " - Thermalization (" << dyna.thermalizationNbOfSteps() << " steps)..." << endl;
@@ -188,6 +192,7 @@ namespace simol
     output.appendPressure(output.totalVirial(), iOfStep);
     //-- rejection rate --
     output.rejectionCount() = dyna.rejectionCount()/dyna.totalCountForRejection();
+    output.negativeEnergiesCount() = dyna.negativeEnergiesCount();
   }
 
   void writeOutput(Hamiltonian const& /*dyna*/, NBody const& syst, Output& output, long int iOfStep)
