@@ -32,12 +32,13 @@ namespace simol
 	sampleMomenta(dyna, syst);
 	samplePositions(dyna, syst);
 	sampleInternalEnergies(dyna, syst);
-	syst.computeAllForces();
 	//--- thermalization ---
 	cout << " - Thermalization (" << dyna.thermalizationNbOfSteps() << " steps)..." << endl;
 	for (long int iOfStep  = 0; iOfStep < dyna.thermalizationNbOfSteps(); ++iOfStep)
 	  thermalize(dyna,syst);
       }
+    //--- calcul des forces ---
+    syst.computeAllForces();
     //--- burn-in ---
     cout << " - Burn-in (" << dyna.burninNbOfSteps() << " steps)..." << endl;
     for (long int iOfStep  = 0; iOfStep < dyna.burninNbOfSteps(); ++iOfStep)
