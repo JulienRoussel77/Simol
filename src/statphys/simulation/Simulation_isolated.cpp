@@ -15,7 +15,20 @@ namespace simol
   {
     if (output.doComputeCorrelations())
       output.finalDisplayCorrelations();
-    output.displayFinalVelocity(0, syst.externalForce(0), output.velocityCV_->nbOfFourier(), output.velocityCV_->nbOfHermite());
+    output.displayFinalVelocity(0, syst.externalForce(0), output.obsVelocity().nbOfFourier(), output.obsVelocity().nbOfHermite());
+    //vector<double> parameters = {0, syst.externalForce(0)};//, output.velocity().nbOfFourier(), output.velocity().nbOfHermite()};
+    //output.obsVelocity().finalDisplay(parameters);
+  }
+  
+    //------------- Langevin --------------------
+
+  void writeFinalOutput(Langevin const& /*dyna*/, Isolated const& syst, Output& output)
+  {
+    if (output.doComputeCorrelations())
+      output.finalDisplayCorrelations();
+    output.displayFinalVelocity(0, syst.externalForce(0), output.obsVelocity().nbOfFourier(), output.obsVelocity().nbOfHermite());
+    //vector<double> parameters = {0, syst.externalForce(0)};//, output.velocity().nbOfFourier(), output.velocity().nbOfHermite()};
+    //output.obsVelocity().finalDisplay(parameters);
   }
 
   //------------- Overdamped --------------------

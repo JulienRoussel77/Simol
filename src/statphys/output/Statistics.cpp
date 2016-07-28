@@ -102,7 +102,7 @@ namespace simol
     return iidVar_(i, j);
   }
   
-  double IIDStats::stdDeviation(int i, int j) const
+  double IIDStats::stdDev(int i, int j) const
   {
     return sqrt(variance(i,j));
   }
@@ -215,6 +215,11 @@ namespace simol
   {
     return statsValues_.mean(iOfObservable);
   }
+  
+  const long int& CorrelationStats::nbValues(int i, int j) const
+  {
+    return statsValues_.nbValues(i,j);
+  }
 
 
   int CorrelationStats::statsIntegratedCorrelationNbValues(int iOfObservable) const
@@ -250,14 +255,14 @@ namespace simol
     return statsCorrelation_.variance(iOfSpan, iOfObservable) * decorrelationTime();
   }
   
-  double CorrelationStats::stdDeviationCorrelationAtSpan(int iOfSpan, int iOfObservable) const
+  double CorrelationStats::stdDevCorrelationAtSpan(int iOfSpan, int iOfObservable) const
   {
     return sqrt(varCorrelationAtSpan(iOfSpan, iOfObservable));
   }
   
   /*double CorrelationStats::stdErrorCorrelationAtSpan(int iOfSpan, int iOfObservable) const
   {
-    return stdDeviationCorrelationAtSpan(iOfSpan, iOfObservable) / sqrt(statsCorrelation_.nbValues(iOfObservable));
+    return stdDevCorrelationAtSpan(iOfSpan, iOfObservable) / sqrt(statsCorrelation_.nbValues(iOfObservable));
   }*/
   
   //###### AutocorrelationStats ######
@@ -305,23 +310,23 @@ namespace simol
     return 2 * integratedCorrelationUnbiased(iOfObservable);
   }
 
-  double AutocorrelationStats::standardDeviation(int iOfObservable) const
+  double AutocorrelationStats::stdDev(int iOfObservable) const
   {
     return sqrt(variance(iOfObservable));
   }
   
   ///
   ///Returns the variance of the estimator of the variance
-  double AutocorrelationStats::varianceOfVariance(int iOfObservable) const
+  double AutocorrelationStats::varOfVar(int iOfObservable) const
   {
     return 4 * varIntegratedCorrelation(iOfObservable) * decorrelationTime();
   }
   
   ///
   ///Returns the variance of the estimator of the variance
-  double AutocorrelationStats::stdDevOfVariance(int iOfObservable) const
+  double AutocorrelationStats::stdDevOfVar(int iOfObservable) const
   {
-    return sqrt(varianceOfVariance(iOfObservable));
+    return sqrt(varOfVar(iOfObservable));
   }
   
   /*///

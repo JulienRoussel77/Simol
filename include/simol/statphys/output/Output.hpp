@@ -8,6 +8,7 @@ using std::setw;
 #include "Statistics.hpp"
 #include "simol/statphys/controlVariate/ControlVariate.hpp"
 #include "simol/statphys/controlVariate/Galerkin.hpp"
+#include "simol/statphys/output/Observable.hpp"
 
 namespace simol
 {
@@ -18,9 +19,12 @@ namespace simol
   public:
 
     Output(Input const& input);
+    Observable* addObservable(const Input& input, const string& outPath);
+    Observable* addControlVariate(const Input& input, const string& outPath, Potential& potential, Galerkin* galerkin);
     void setControlVariates(Input& input, Potential& potential, Galerkin* galerkin);
+    
 
-    ofstream & outObservables();
+    ofstream & outThermo();
     ofstream & outParticles();
     ofstream & outParticlesXMakeMol();
     ofstream & outParticlesFullConfiguration();
@@ -30,15 +34,15 @@ namespace simol
     ofstream & outCorrelation();
     ofstream & outChainVelocities();
     ofstream & outBeam();
-    ofstream & outVelocitiesCV();
+    //ofstream & outVelocitiesCV();
     ofstream & outVelocitiesGenerator();
-    ofstream & outForcesCV();
+    /*ofstream & outForcesCV();
     ofstream & outLengthsCV();
     ofstream & outMidFlowCV();
     ofstream & outMidFlowPT();
     ofstream & outSumFlowCV();
     ofstream & outModiFlowCV();
-    ofstream & outSumFlowPT();
+    ofstream & outSumFlowPT();*/
     ofstream & outProfile();
     ofstream & outFinalProfile();
 
@@ -54,6 +58,9 @@ namespace simol
     const int& nbOfParticles() const;
     const long int& nbOfSteps() const;
     double finalTime() const;
+    int nbOfObservables() const;
+    Observable* observables(int iOfObservable);
+
 
     //-- fields to output --
     const double& kineticEnergy() const;
@@ -69,12 +76,12 @@ namespace simol
     double energy() const;
     double temperature() const;
     double pressure() const;
-    const double& energyMidFlow() const;
+    /*const double& energyMidFlow() const;
     double& energyMidFlow();
     const double& energySumFlow() const;
     double& energySumFlow();
     const double& energyModiFlow() const;
-    double& energyModiFlow();
+    double& energyModiFlow();*/
     const double& rejectionCount() const;
     double& rejectionCount();
 
@@ -87,7 +94,7 @@ namespace simol
     double decorrelationTime() const;
 
     //-- actual outputing functions --
-    void displayObservables(long int iOfStep);
+    void displayThermoVariables(long int iOfStep);
     void displayParticles(vector<Particle> const& configuration, long int iOfStep);
     void finalDisplayCorrelations();
     void displayFinalVelocity(double temperature, double externalForce, int nbOfFourier = 0, int nbOfHermite = 0);
@@ -110,27 +117,30 @@ namespace simol
     void displayFinalFlow(double temperature, double delta_temperature, double parameter1 = 0, double parameter2 = 0);
 
       //------------- pour DPDE ---------------
-    void displayObservablesDPDE(vector<Particle> const& configuration, long int iOfStep);
+    void displayThermoVariablesDPDE(vector<Particle> const& configuration, long int iOfStep);
     void appendKineticEnergy(double value, long int iOfStep);
     void appendPotentialEnergy(double value, long int iOfStep);
     void appendInternalEnergy(double value, long int iOfStep);
     void appendInternalTemperature(double value, long int iOfStep);
     void appendPressure(double value, long int iOfStep);
     void finalDisplayCorrelationsDPDE();
-
+    
+    Observable& obsVelocity();
+    Observable& obsForce();
+    Observable& obsLength();
+    Observable& obsMidFlow();
+    Observable& obsSumFlow();
+    Observable& obsModiFlow();
+    
     //------------- for Galerkin ----------------------
-    ControlVariate& velocityCV();
-    ControlVariate& forceCV();
-    ControlVariate& lengthCV();
-    ControlVariate& midFlowCV();
-    ControlVariate& sumFlowCV();
-    ControlVariate& modiFlowCV();
-    void displayGeneratorOnBasis(ofstream& out, vector<Particle> const& configuration, ControlVariate& controlVariate, double time);
+    //void displayGeneratorOnBasis(ofstream& out, vector<Particle> const& configuration, ControlVariate& controlVariate, double time);
+    //void displayGeneratorOnBasis(ofstream& out, vector<Particle> const& configuration, Observable& controlVariate, double time){};
+
     void updateControlVariate(vector<Particle> const& configuration);
 
   protected:
     string outputFolderName_;
-    std::shared_ptr<ofstream> outObservables_;
+    std::shared_ptr<ofstream> outThermo_;
     std::shared_ptr<ofstream> outParticles_;
     std::shared_ptr<ofstream> outCorrelation_;
 
@@ -146,19 +156,19 @@ namespace simol
 
     //-- control variate outputs --
     std::shared_ptr<ofstream> outVelocitiesGenerator_;
-    std::shared_ptr<ofstream> outVelocitiesCV_;
-    std::shared_ptr<ofstream> outForcesCV_;
+    //std::shared_ptr<ofstream> outVelocitiesCV_;
+    //std::shared_ptr<ofstream> outForcesCV_;
 
     //-- for chains --
     std::shared_ptr<ofstream> outFinalFlow_;
     std::shared_ptr<ofstream> outBeam_;
-    std::shared_ptr<ofstream> outLengthsCV_;      
+    //std::shared_ptr<ofstream> outLengthsCV_;      
     std::shared_ptr<ofstream> outChainVelocities_;
-    std::shared_ptr<ofstream> outMidFlowCV_;
+    /*std::shared_ptr<ofstream> outMidFlowCV_;
     std::shared_ptr<ofstream> outMidFlowPT_;
     std::shared_ptr<ofstream> outSumFlowCV_;
     std::shared_ptr<ofstream> outSumFlowPT_;
-    std::shared_ptr<ofstream> outModiFlowCV_;
+    std::shared_ptr<ofstream> outModiFlowCV_;*/
     std::shared_ptr<ofstream> outProfile_;
     std::shared_ptr<ofstream> outFinalProfile_;
 
@@ -175,9 +185,9 @@ namespace simol
     double potentialEnergy_;
     double internalEnergy_;
     double totalVirial_;
-    double energyMidFlow_;
+    /*double energyMidFlow_;
     double energySumFlow_;
-    double energyModiFlow_;
+    double energyModiFlow_;*/
     double rejectionCount_;
     double internalTemperature_;
 
@@ -187,14 +197,23 @@ namespace simol
     bool doFinalFlow_, doFinalVelocity_;
   public:
     std::shared_ptr<ofstream> outTest_;   // for debug purpose only
-
+    
+    Observable* obsVelocity_;
+    Observable* obsForce_;
+    Observable* obsLength_;
+    Observable* obsMidFlow_;
+    Observable* obsSumFlow_;
+    Observable* obsModiFlow_;
+    
+    vector<Observable*> observables_;
+    
     //---------- for control variates ------------
-    ControlVariate* velocityCV_;
+    /*ControlVariate* velocityCV_;
     ControlVariate* forceCV_;
     ControlVariate* lengthCV_;
     ControlVariate* midFlowCV_;
     ControlVariate* sumFlowCV_;
-    ControlVariate* modiFlowCV_;
+    ControlVariate* modiFlowCV_;*/
 
     //----------- for autocorrelations -------------
     //-- chains --

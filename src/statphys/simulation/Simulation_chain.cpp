@@ -22,17 +22,17 @@ namespace simol
     throw std::invalid_argument("samplePositions(BoundaryLangevin& dyna, Chain& syst) not defined");
   }
 
-  void writeOutput(BoundaryLangevin const& dyna, Chain const& syst, Output& output, long int iOfStep)
+  void writeOutput(BoundaryLangevin const& /*dyna*/, Chain const& syst, Output& output, long int iOfStep)
   {
     if (output.doOutput(iOfStep))// && iOfStep >= 100)
     {
-      output.displayObservables(iOfStep);
+      output.displayThermoVariables(iOfStep);
       output.displayChainPositions(syst.configuration(), iOfStep);
       output.displayChainMomenta(syst.configuration(), iOfStep);
 
-      output.midFlowCV_->display(output.outMidFlowCV(), iOfStep * dyna.timeStep() );
-      output.sumFlowCV_->display(output.outSumFlowCV(), iOfStep * dyna.timeStep() );
-      output.modiFlowCV_->display(output.outModiFlowCV(), iOfStep * dyna.timeStep() );
+      output.obsMidFlow().display(iOfStep);
+      output.obsSumFlow().display(iOfStep);
+      output.obsModiFlow().display(iOfStep);
     }
 
     if (output.doLongPeriodOutput(iOfStep))

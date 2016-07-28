@@ -79,6 +79,7 @@ namespace simol
   template <class D>
   void computeOutput(D const& dyna, Isolated const& syst, Output& output, long int iOfStep);
   void writeFinalOutput(Hamiltonian const& dyna, Isolated const& syst, Output& output);
+  void writeFinalOutput(Langevin const& dyna, Isolated const& syst, Output& output);
   void sampleMomenta(Overdamped& /*dyna*/, Isolated& /*syst*/);
   template <>
   void computeOutput(const DPDE& dyna, Isolated const& syst, Output& output, long int iOfStep);

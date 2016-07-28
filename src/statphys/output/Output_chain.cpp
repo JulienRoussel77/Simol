@@ -9,7 +9,7 @@ namespace simol
   {return *outBeam_;}
   ofstream & Output::outFinalFlow()
   {return *outFinalFlow_;}
-  ofstream & Output::outMidFlowCV()
+  /*ofstream & Output::outMidFlowCV()
   {return *outMidFlowCV_;}
   ofstream & Output::outMidFlowPT()
   {return *outMidFlowPT_;}
@@ -18,13 +18,13 @@ namespace simol
   ofstream & Output::outSumFlowPT()
   {return *outSumFlowPT_;}
   ofstream & Output::outModiFlowCV()
-  {return *outModiFlowCV_;}
+  {return *outModiFlowCV_;}*/
   ofstream & Output::outProfile()
   {return *outProfile_;}
   ofstream & Output::outFinalProfile()
   {return *outFinalProfile_;}
 
-  const double& Output::energyMidFlow() const
+  /*const double& Output::energyMidFlow() const
   {return energyMidFlow_;}
 
   double& Output::energyMidFlow()
@@ -40,16 +40,16 @@ namespace simol
   {return energyModiFlow_;}
 
   double& Output::energyModiFlow()
-  {return energyModiFlow_;}
+  {return energyModiFlow_;}*/
 
-  ControlVariate& Output::midFlowCV()
-  {return *midFlowCV_;}
+  Observable& Output::obsMidFlow()
+  {return *obsMidFlow_;}
 
-  ControlVariate& Output::sumFlowCV()
-  {return *sumFlowCV_;}
+  Observable& Output::obsSumFlow()
+  {return *obsSumFlow_;}
   
-  ControlVariate& Output::modiFlowCV()
-  {return *modiFlowCV_;}
+  Observable& Output::obsModiFlow()
+  {return *obsModiFlow_;}
 
   void Output::displayChainPositions(vector<Particle> const& configuration, long int iOfStep)
   {
@@ -98,8 +98,6 @@ namespace simol
   void Output::finalChainDisplay(vector<Particle> const& /*configuration*/, Vector<double> const& /*externalForce*/)
   {
     writeProfile(outFinalProfile(), nbOfSteps());
-    midFlowCV_->postTreat(outMidFlowPT(), timeStep());
-    sumFlowCV_->postTreat(outSumFlowPT(), timeStep());
   }
 
   void Output::displayFinalFlow(double temperature, double delta_temperature, double parameter1, double parameter2)
@@ -111,21 +109,26 @@ namespace simol
                      << " " << setw(4) << delta_temperature
                      << " " << setw(4) << parameter1
                      << " " << setw(6) << parameter2
-                     << " " << setw(12) << midFlowCV_->meanObservable()
-                     << " " << setw(12) << midFlowCV_->varObservable()
-                     << " " << setw(12) << midFlowCV_->varOfVarObservable()
-                     << " " << setw(12) << sumFlowCV_->meanObservable()
-                     << " " << setw(12) << sumFlowCV_->varObservable()     //#12
-                     << " " << setw(12) << sumFlowCV_->varOfVarObservable()
-                     << " " << setw(12) << modiFlowCV_->meanObservable()
-                     << " " << setw(12) << modiFlowCV_->varObservable()
-                     << " " << setw(12) << modiFlowCV_->varOfVarObservable()
+                     << " " << setw(12) << obsMidFlow_->mean()
+                     << " " << setw(12) << obsMidFlow_->variance()
+                     << " " << setw(12) << obsMidFlow_->varOfVar()
+                     << " " << setw(12) << obsSumFlow_->mean()
+                     << " " << setw(12) << obsSumFlow_->variance()     //#12
+                     << " " << setw(12) << obsSumFlow_->varOfVar()
+                     << " " << setw(12) << obsModiFlow_->mean()
+                     << " " << setw(12) << obsModiFlow_->variance()
+                     << " " << setw(12) << obsModiFlow_->varOfVar()
          << std::endl;
 
     //cout << "displayFinalFlow(double temperature, double delta_temperature, double tau)";
     if (doFinalFlow_)
     {
-      assert(outFinalFlow().is_open());
+      //assert(outFinalFlow().is_open());
+      /*vector<double> parameters = {finalTime(), timeStep(), nbOfParticles(), temperature, delta_temperature, parameter1, parameter2};
+      obsMidFlow().finalDisplay(parameters);
+      obsSumFlow().finalDisplay(parameters);
+      obsModiFlow().finalDisplay(parameters);*/
+      
       outFinalFlow() << std::left << setw(10) << finalTime()
                      << " " << setw(5) << timeStep()
                      << " " << setw(6) << nbOfParticles()
@@ -133,15 +136,15 @@ namespace simol
                      << " " << setw(4) << delta_temperature
                      << " " << setw(4) << parameter1
                      << " " << setw(6) << parameter2
-                     << " " << setw(12) << midFlowCV_->meanObservable()
-                     << " " << setw(12) << midFlowCV_->varObservable()
-                     << " " << setw(12) << midFlowCV_->varOfVarObservable()
-                     << " " << setw(12) << sumFlowCV_->meanObservable()
-                     << " " << setw(12) << sumFlowCV_->varObservable()     //#12
-                     << " " << setw(12) << sumFlowCV_->varOfVarObservable()
-                     << " " << setw(12) << modiFlowCV_->meanObservable()
-                     << " " << setw(12) << modiFlowCV_->varObservable()
-                     << " " << setw(12) << modiFlowCV_->varOfVarObservable()
+                     << " " << setw(12) << obsMidFlow_->mean()
+                     << " " << setw(12) << obsMidFlow_->variance()
+                     << " " << setw(12) << obsMidFlow_->varOfVar()
+                     << " " << setw(12) << obsSumFlow_->mean()
+                     << " " << setw(12) << obsSumFlow_->variance()     //#12
+                     << " " << setw(12) << obsSumFlow_->varOfVar()
+                     << " " << setw(12) << obsModiFlow_->mean()
+                     << " " << setw(12) << obsModiFlow_->variance()
+                     << " " << setw(12) << obsModiFlow_->varOfVar()
                      << std::endl;
     }
   }

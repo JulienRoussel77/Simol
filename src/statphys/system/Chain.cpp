@@ -80,8 +80,8 @@ namespace simol
 
   void BiChain::computeProfile(Output& output, LangevinBase const& dyna, long int iOfStep) const
   {
-    output.energySumFlow() = 0;
-    output.energyModiFlow() = dyna.gamma() * dyna.deltaTemperature() / 2;
+    //output.obsSumFlow().currentValue() = 0;
+    output.obsModiFlow().currentValue() = dyna.gamma() * dyna.deltaTemperature() / 2;
     //cout << dyna.gamma() << " " << dyna.deltaTemperature()<< endl;
     assert(nbOfParticles() % 2 == 0);
     int midNb = (nbOfParticles() - 1) / 2;
@@ -101,7 +101,7 @@ namespace simol
         dist = getParticle(0).position(0) - ancorParticle_.position(0);
         flow = dyna.gamma() * (dyna.temperatureLeft() - 2 * getParticle(0).kineticEnergy());
         //distNe = getParticle(1).position(0) - getParticle(0).position(0);
-        //output.energyModiFlow() += (getParticle(0).momentum(0) + distNe) / 4 * (getParticle(0).energyGrad(0) - dist);
+        //output.obsModiFlow().currentValue() += (getParticle(0).momentum(0) + distNe) / 4 * (getParticle(0).energyGrad(0) - dist);
         //cout << iOfParticle << " : " << getParticle(0).energyGrad(0) << " " << dist << endl;
       }
       else
@@ -114,20 +114,20 @@ namespace simol
         flow = - getParticle(iOfParticle).energyGrad(0) * getParticle(iOfParticle - 1).momentum(0);
         if (iOfParticle != nbOfParticles() - 1)
         {
-          output.energySumFlow() += flow;
+          output.obsSumFlow().currentValue() += flow;
           if (iOfParticle == midNb)
-            output.energyMidFlow() = flow;
+            output.obsMidFlow().currentValue() = flow;
           
           distNe = getParticle(iOfParticle+1).position(0) - getParticle(iOfParticle).position(0);
           
           if (iOfParticle == 1)
-            output.energyModiFlow() += (distNe - getParticle(0).momentum(0)) / 4 * (getParticle(iOfParticle).energyGrad(0) - dist);
+            output.obsModiFlow().currentValue() += (distNe - getParticle(0).momentum(0)) / 4 * (getParticle(iOfParticle).energyGrad(0) - dist);
           // iOfParticle != 0, 1, N-1
           else
-            output.energyModiFlow() += (distNe - distPr) / 4 * (getParticle(iOfParticle).energyGrad(0) - dist);
+            output.obsModiFlow().currentValue() += (distNe - distPr) / 4 * (getParticle(iOfParticle).energyGrad(0) - dist);
         }
         else
-          output.energyModiFlow() -= (getParticle(iOfParticle).momentum(0) + distPr) / 4 * (getParticle(iOfParticle).energyGrad(0) - dist);
+          output.obsModiFlow().currentValue() -= (getParticle(iOfParticle).momentum(0) + distPr) / 4 * (getParticle(iOfParticle).energyGrad(0) - dist);
         
         //cout << iOfParticle << " : " << getParticle(iOfParticle).energyGrad(0) << " " << dist << endl;
       }
@@ -151,9 +151,9 @@ namespace simol
       output.appendPotTempBotProfile(potTempBot, iOfStep, iOfParticle);
       output.appendFlowProfile(flow, iOfStep, iOfParticle);
     }
-    output.energySumFlow() /= (nbOfParticles() - 2.);
-    //output.energyModiFlow() /= nbOfParticles();
-    //cout << output.energySumFlow() << endl;
+    output.obsSumFlow().currentValue() /= (nbOfParticles() - 2.);
+    //output.obsModiFlow().currentValue() /= nbOfParticles();
+    //cout << output.obsSumFlow().currentValue() << endl;
   }
 
 
@@ -219,7 +219,7 @@ namespace simol
 
   void TriChain::computeProfile(Output& output, LangevinBase const& dyna, long int iOfStep) const
   {
-    output.energySumFlow() = 0;
+    output.obsSumFlow().currentValue() = 0;
     
     // modiFlow expression is easier for pair nbOfParticles
     
@@ -249,7 +249,7 @@ namespace simol
 
         potTempTop = pow(- getParticle(iOfParticle - 1).energyGrad(0) + 2 * getParticle(iOfParticle).energyGrad(0) - getParticle(iOfParticle + 1).energyGrad(0), 2);
         potTempBot = getParticle(iOfParticle - 1).energyLapla() + 4 * getParticle(iOfParticle).energyLapla() + getParticle(iOfParticle + 1).energyLapla();
-        output.energySumFlow() += flow;
+        output.obsSumFlow().currentValue() += flow;
       }
       else
       {
@@ -263,7 +263,7 @@ namespace simol
 
       int midNb = (nbOfParticles() - 1) / 2;
       if (iOfParticle == midNb)
-        output.energyMidFlow() = flow;
+        output.obsMidFlow().currentValue() = flow;
 
       output.appendBendistProfile(bending , iOfStep, iOfParticle);
       output.appendKinTempProfile(2 * getParticle(iOfParticle).kineticEnergy(), iOfStep, iOfParticle);
@@ -271,8 +271,8 @@ namespace simol
       output.appendPotTempBotProfile(potTempBot, iOfStep, iOfParticle);
       output.appendFlowProfile(flow, iOfStep, iOfParticle);
     }
-    output.energySumFlow() /= (nbOfParticles() - 2.);
-    //cout << output.energySumFlow() << endl;
+    output.obsSumFlow().currentValue() /= (nbOfParticles() - 2.);
+    //cout << output.obsSumFlow().currentValue() << endl;
   }
 
 

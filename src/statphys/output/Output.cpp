@@ -23,18 +23,24 @@ namespace simol
     potentialEnergy_(0),
     internalEnergy_(0),
     totalVirial_(0),
-    energyMidFlow_(0),
-    energySumFlow_(0),
+    //energyMidFlow_(0),
+    //energySumFlow_(0),
     internalTemperature_(0),
     decorrelationNbOfSteps_(input.decorrelationNbOfSteps()),
     nbOfAutocoPts_(input.nbOfAutocoPts()),
     doFinalFlow_(input.doFinalFlow()),
     doFinalVelocity_(input.doFinalVelocity()),
-    velocityCV_(nullptr),
-    forceCV_(nullptr),
-    lengthCV_(nullptr),
-    midFlowCV_(nullptr),
-    sumFlowCV_(nullptr),
+    obsVelocity_(nullptr),
+    obsForce_(nullptr),
+    obsLength_(nullptr),
+    obsMidFlow_(nullptr),
+    obsSumFlow_(nullptr),
+    observables_(),
+    /*velocityCV_(nullptr),
+    obsForce_(nullptr),
+    obsLength_(nullptr),
+    obsMidFlow_(nullptr),
+    obsSumFlow_(nullptr),*/
     kinTempProfile_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts(), nbOfParticles_),
     potTempTopProfile_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts(), nbOfParticles_),
     potTempBotProfile_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts(), nbOfParticles_),
@@ -45,18 +51,19 @@ namespace simol
     averageInternalEnergy_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts()),
     averageInternalTemperature_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts()),
     averagePressure_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts())
+    
   {
     
-    //-- standard observables in this file --
-    outObservables_       = std::make_shared<ofstream>(input.outputFolderName() + "observables.txt");
-    outObservables() << "# time kineticEnergy potentialEnergy energy temperature pressure" << endl;
+    //-- std observables in this file --
+    outThermo_       = std::make_shared<ofstream>(input.outputFolderName() + "thermo.txt");
+    outThermo() << "# time kineticEnergy potentialEnergy energy temperature pressure" << endl;
 
     //-- override the standrd observable files for DPDE --
     if (input.dynamicsName() == "DPDE") 
     {
-      outObservables_       = std::make_shared<ofstream>(input.outputFolderName() + "observables.txt");
-      outObservables() << "# 1:time  2:position  3:momentum  4:internalEnergy  5:kineticEnergy  6:potentialEnergy  7:totalEnergy  8:kineticTemperature  9:internalTemperature  10:pressure  11:averageRejection" << endl;
-      meanValueObservables_       = std::make_shared<ofstream>(input.outputFolderName() + "mean_observables.txt");
+      outThermo_       = std::make_shared<ofstream>(input.outputFolderName() + "thermo.txt");
+      outThermo() << "# 1:time  2:position  3:momentum  4:internalEnergy  5:kineticEnergy  6:potentialEnergy  7:totalEnergy  8:kineticTemperature  9:internalTemperature  10:pressure  11:averageRejection" << endl;
+      meanValueObservables_       = std::make_shared<ofstream>(input.outputFolderName() + "mean_thermo.txt");
       meanValueObservables() << "# 1:time  2:kineticEnergy  3:potentialEnergy  4:internalEnergy  5:kineticTemperature  6:internalTemperature  7:pressure" << endl;
     }
 
@@ -65,8 +72,8 @@ namespace simol
     {
       if (input.systemName() == "NBody")
       {
-	outParticlesXMakeMol_ = std::make_shared<ofstream>(input.outputFolderName() + "xmakemol.xyz");
-	outParticlesFullConfiguration_ = std::make_shared<ofstream>(input.outputFolderName() + "FullConfiguration.txt");
+        outParticlesXMakeMol_ = std::make_shared<ofstream>(input.outputFolderName() + "xmakemol.xyz");
+        outParticlesFullConfiguration_ = std::make_shared<ofstream>(input.outputFolderName() + "FullConfiguration.txt");
       }
       else
       {
@@ -82,15 +89,18 @@ namespace simol
     //-- average velocities for 1D nonequilibrium --
     if ( (input.systemName() == "Isolated") && (input.dynamicsName() == "Langevin") )
     {
-      outVelocitiesCV_      = std::make_shared<ofstream>(input.outputFolderName() + "velocities.txt");
-      outVelocitiesCV() << "# time b <b> <b2> D <D> <D2> observable <observable> <observable2> LPhi <LPhi> <LPhi2>" << endl;
+      //outVelocitiesCV_      = std::make_shared<ofstream>(input.outputFolderName() + "velocities.txt");
+      //outVelocitiesCV() << "# time b <b> <b2> D <D> <D2> observable <observable> <observable2> LPhi <LPhi> <LPhi2>" << endl;
+
+        obsVelocity_ = addObservable(input, "velocity.txt");
     }
 
     //-- average forces for 1D nonequilibrium overdamped --
     if ( (input.systemName() == "Isolated") && (input.dynamicsName() == "Overdamped") )
     {
-      outForcesCV_ = std::make_shared<ofstream>(input.outputFolderName() + "forces.txt");
-      outForcesCV() << "# time b <b> <b2> D <D> >D2> observable <observable> >observable2> LPhi <LPhi> <LPhi2>" << endl;
+      //outForcesCV_ = std::make_shared<ofstream>(input.outputFolderName() + "forces.txt");
+      //outForcesCV() << "# time b <b> <b2> D <D> >D2> observable <observable> >observable2> LPhi <LPhi> <LPhi2>" << endl;
+      obsForce_ = addObservable(input, "force.txt");
     }
 
     //-- used for control variates --
@@ -108,22 +118,29 @@ namespace simol
 
       outBeam_              = std::make_shared<ofstream>(input.outputFolderName() + "beamChain.txt");
       
-      outLengthsCV_         = std::make_shared<ofstream>(input.outputFolderName() + "lengths.txt");
-      outLengthsCV() << "# time b <b> <b2> D <D> >D2> observable <observable> >observable2> LPhi <LPhi> <LPhi2>" << endl;
+      //outLengthsCV_         = std::make_shared<ofstream>(input.outputFolderName() + "lengths.txt");
+      //outLengthsCV() << "# time b <b> <b2> D <D> >D2> observable <observable> >observable2> LPhi <LPhi> <LPhi2>" << endl;
+      obsLength_ = addObservable(input, "length.txt");
 
       outChainVelocities_   = std::make_shared<ofstream>(input.outputFolderName() + "velocitiesChain.txt");
       outChainVelocities() << "# time i=0 i=N/4 i=N/2 i=3N/4 i=N-1" << endl;
 
-      outMidFlowCV_         = std::make_shared<ofstream>(input.outputFolderName() + "midFlow.txt");
+      /*outMidFlowCV_         = std::make_shared<ofstream>(input.outputFolderName() + "midFlow.txt");
       outMidFlowCV() << "# time b <b> <b2> D <D> >D2> observable <observable> >observable2> LPhi <LPhi> <LPhi2>" << endl;
-      outMidFlowPT_         = std::make_shared<ofstream>(input.outputFolderName() + "midFlowPost.txt");
+      outMidFlowPT_         = std::make_shared<ofstream>(input.outputFolderName() + "midFlowPost.txt");*/
+      
+      obsMidFlow_ = addObservable(input, "midFlow.txt");
 
-      outSumFlowCV_         = std::make_shared<ofstream>(input.outputFolderName() + "sumFlow.txt");
+      /*outSumFlowCV_         = std::make_shared<ofstream>(input.outputFolderName() + "sumFlow.txt");
       outSumFlowCV() << "# time b <b> <b2> D <D> >D2> observable <observable> >observable2> LPhi <LPhi> <LPhi2>" << endl;
-      outSumFlowPT_         = std::make_shared<ofstream>(input.outputFolderName() + "sumFlowPost.txt");
+      outSumFlowPT_         = std::make_shared<ofstream>(input.outputFolderName() + "sumFlowPost.txt");*/
+      
+      obsSumFlow_ = addObservable(input, "sumFlow.txt");
 
-      outModiFlowCV_         = std::make_shared<ofstream>(input.outputFolderName() + "modiFlow.txt");
-      outModiFlowCV() << "# time b <b> <b2> D <D> >D2> observable <observable> >observable2> LPhi <LPhi> <LPhi2>" << endl;
+      /*outModiFlowCV_         = std::make_shared<ofstream>(input.outputFolderName() + "modiFlow.txt");
+      outModiFlowCV() << "# time b <b> <b2> D <D> >D2> observable <observable> >observable2> LPhi <LPhi> <LPhi2>" << endl;*/
+      
+      obsModiFlow_ = addObservable(input, "modiFlow.txt");
       
       outProfile_           = std::make_shared<ofstream>(input.outputFolderName() + "profile.txt");
       
@@ -174,11 +191,18 @@ namespace simol
     cout << "-----------------------------------------------------" << endl << endl;
 
   }
+  
+  Observable* Output::addObservable(const Input& input, const string& outPath)
+  {
+    Observable* obsPtr = new Observable(input, outPath);
+    observables_.push_back(obsPtr);
+    return obsPtr;
+  }
 
   //----- various assessors --------
 
-  ofstream & Output::outObservables()
-  {return *outObservables_;}
+  ofstream & Output::outThermo()
+  {return *outThermo_;}
 
   ofstream & Output::outParticles()
   {return *outParticles_;}
@@ -192,17 +216,17 @@ namespace simol
   ofstream & Output::meanValueObservables()
   {return *meanValueObservables_;}
 
-  ofstream & Output::outVelocitiesCV()
-  {return *outVelocitiesCV_;}
+  //ofstream & Output::outVelocitiesCV()
+  //{return *outVelocitiesCV_;}
 
   ofstream & Output::outVelocitiesGenerator()
   {return *outVelocitiesGenerator_;}
 
-  ofstream & Output::outForcesCV()
+  /*ofstream & Output::outForcesCV()
   {return *outForcesCV_;}
 
   ofstream & Output::outLengthsCV()
-  {return *outLengthsCV_;}
+  {return *outLengthsCV_;}*/
 
   double Output::printPeriodTime() const
   {return printPeriodNbOfSteps_ * timeStep();}
@@ -224,6 +248,14 @@ namespace simol
 
   double Output::finalTime() const
   {return nbOfSteps_ * timeStep_;}
+  
+  int Output::nbOfObservables() const
+  {return observables_.size();}
+  
+  Observable* Output::observables(int iOfObservable)
+  {return observables_[iOfObservable];}
+  
+  
 
   const double& Output::kineticEnergy() const
   {return kineticEnergy_;}
@@ -273,14 +305,14 @@ namespace simol
   bool Output::doComputeCorrelations() const
   {return decorrelationNbOfSteps() > 0;}
 
-  ControlVariate& Output::velocityCV()
-  {return *velocityCV_;}
+  Observable& Output::obsVelocity()
+  {return *obsVelocity_;}
 
-  ControlVariate& Output::forceCV()
-  {return *forceCV_;}
+  Observable& Output::obsForce()
+  {return *obsForce_;}
 
-  ControlVariate& Output::lengthCV()
-  {return *lengthCV_;}
+  Observable& Output::obsLength()
+  {return *obsLength_;}
 
   const double& Output::timeStep() const
   {return timeStep_;}
@@ -317,9 +349,9 @@ namespace simol
 
   //----------------- display functions --------------------------
 
-  void Output::displayObservables(long int iOfStep)
+  void Output::displayThermoVariables(long int iOfStep)
   {
-    outObservables() << iOfStep * timeStep()
+    outThermo() << iOfStep * timeStep()
                      << " " << kineticEnergy()
                      << " " << potentialEnergy()
                      << " " << energy()
@@ -354,10 +386,8 @@ namespace simol
                          << " " << setw(6) << externalForce
                          << " " << setw(3) << nbOfFourier
                          << " " << setw(3) << nbOfHermite
-                         << " " << setw(12) << velocityCV_->meanObservable()
-                         << " " << setw(12) << velocityCV_->stdDeviationObservable()
-                         << " " << setw(12) << velocityCV_->meanBetterObservable()
-                         << " " << setw(12) << velocityCV_->stdDeviationBetterObservable()
+                         << " " << setw(12) << obsVelocity().mean()
+                         << " " << setw(12) << obsVelocity().variance()
                          << std::endl;
     }
   }
@@ -387,10 +417,10 @@ namespace simol
     averagePressure_.append(value, iOfStep);
   }
 
-  void Output::displayObservablesDPDE(vector<Particle> const& configuration, long int iOfStep)
+  void Output::displayThermoVariablesDPDE(vector<Particle> const& configuration, long int iOfStep)
   {
     double totalEnergy = kineticEnergy() + potentialEnergy() + internalEnergy();
-    outObservables() << iOfStep * timeStep()
+    outThermo() << iOfStep * timeStep()
 		     << " " << configuration[0].position(0) 
 		     << " " << configuration[0].momentum(0) 
 		     << " " << internalEnergy() 
@@ -418,63 +448,45 @@ namespace simol
   {
     for (int iOfSpan = 0; iOfSpan < nbOfAutocoPts(); iOfSpan++)
       {
-	//-- autocoPtsPeriod(): time between successive correlation values; may be different from the timestep if some subsampling is specified
-	outCorrelation() << iOfSpan * autocoPtsPeriod() 
-			 << " " << averageKineticEnergy_.unbiasedCorrelationAtSpan(iOfSpan)
-			 << " " << averagePotentialEnergy_.unbiasedCorrelationAtSpan(iOfSpan)
-			 << " " << averageInternalEnergy_.unbiasedCorrelationAtSpan(iOfSpan)
-			 << " " << averageInternalTemperature_.unbiasedCorrelationAtSpan(iOfSpan)
-			 << endl;
+        //-- autocoPtsPeriod(): time between successive correlation values; may be different from the timestep if some subsampling is specified
+        outCorrelation() << iOfSpan * autocoPtsPeriod() 
+            << " " << averageKineticEnergy_.unbiasedCorrelationAtSpan(iOfSpan)
+            << " " << averagePotentialEnergy_.unbiasedCorrelationAtSpan(iOfSpan)
+            << " " << averageInternalEnergy_.unbiasedCorrelationAtSpan(iOfSpan)
+            << " " << averageInternalTemperature_.unbiasedCorrelationAtSpan(iOfSpan)
+            << endl;
       }
   }
 
   void Output::finalDisplayCorrelations()
   {
-    cout << "Velocity : The correlation in 0 is " << floor((2 * velocityCV().unbiasedCorrelationAtSpan(0) * decorrelationTime() / nbOfAutocoPts()) / velocityCV().varObservable() * 10000)/100 << "% of the variance" << endl;
-    cout << "SumFlow : The correlation in 0 is " << floor((2 * sumFlowCV().unbiasedCorrelationAtSpan(0) * decorrelationTime() / nbOfAutocoPts()) / sumFlowCV().varObservable() * 10000)/100 << "% of the variance" << endl;
-    cout << "ModiFlow : The correlation in 0 is " << floor((2 * modiFlowCV().unbiasedCorrelationAtSpan(0) * decorrelationTime() / nbOfAutocoPts()) / modiFlowCV().varObservable() * 10000)/100 << "% of the variance" << endl;
+    //cout << "Velocity : The correlation in 0 is " << floor((2 * obsVelocity().unbiasedCorrelationAtSpan(0) * decorrelationTime() / nbOfAutocoPts()) / obsVelocity().variance() * 10000)/100 << "% of the variance" << endl;
+    //cout << "SumFlow : The correlation in 0 is " << floor((2 * obsSumFlow().unbiasedCorrelationAtSpan(0) * decorrelationTime() / nbOfAutocoPts()) / obsSumFlow().variance() * 10000)/100 << "% of the variance" << endl;
+    //cout << "ModiFlow : The correlation in 0 is " << floor((2 * obsModiFlow().unbiasedCorrelationAtSpan(0) * decorrelationTime() / nbOfAutocoPts()) / obsModiFlow().variance() * 10000)/100 << "% of the variance" << endl;
         
-    int midNb = nbOfParticles_ / 2;
+    if (doComputeCorrelations())
+      for (int iOfObservable=0; iOfObservable < nbOfObservables(); iOfObservable++)
+        observables(iOfObservable)->displayCorrelations(nbOfSteps());
+    
+    /*int midNb = nbOfParticles_ / 2;
     for (int iOfSpan = 0; iOfSpan < nbOfAutocoPts(); iOfSpan++)
     {
       outCorrelation() << iOfSpan * autocoPtsPeriod()
-                       << " " << velocityCV_->unbiasedCorrelationAtSpan(iOfSpan)
-                       << " " << sqrt(velocityCV_->varCorrelationAtSpan(iOfSpan) / finalTime())
-                       << " " << forceCV_->unbiasedCorrelationAtSpan(iOfSpan)
-                       << " " << sqrt(forceCV_->varCorrelationAtSpan(iOfSpan) / finalTime())
-                       << " " << lengthCV_->unbiasedCorrelationAtSpan(iOfSpan)
-                       << " " << sqrt(lengthCV_->varCorrelationAtSpan(iOfSpan) / finalTime())
-                       << " " << midFlowCV_->unbiasedCorrelationAtSpan(iOfSpan)
-                       << " " << sqrt(midFlowCV_->varCorrelationAtSpan(iOfSpan) / finalTime())
-                       << " " << sumFlowCV_->unbiasedCorrelationAtSpan(iOfSpan)
-                       << " " << sqrt(sumFlowCV_->varCorrelationAtSpan(iOfSpan) / finalTime())  //#11
-                       << " " << modiFlowCV_->unbiasedCorrelationAtSpan(iOfSpan)
-                       << " " << sqrt(modiFlowCV_->varCorrelationAtSpan(iOfSpan) / finalTime())
+                       << " " << obsVelocity().unbiasedCorrelationAtSpan(iOfSpan)
+                       << " " << sqrt(obsVelocity().varCorrelationAtSpan(iOfSpan) / finalTime())
+                       << " " << obsForce_->unbiasedCorrelationAtSpan(iOfSpan)
+                       << " " << sqrt(obsForce_->varCorrelationAtSpan(iOfSpan) / finalTime())
+                       << " " << obsLength_->unbiasedCorrelationAtSpan(iOfSpan)
+                       << " " << sqrt(obsLength_->varCorrelationAtSpan(iOfSpan) / finalTime())
+                       << " " << obsMidFlow_->unbiasedCorrelationAtSpan(iOfSpan)
+                       << " " << sqrt(obsMidFlow_->varCorrelationAtSpan(iOfSpan) / finalTime())
+                       << " " << obsSumFlow_->unbiasedCorrelationAtSpan(iOfSpan)
+                       << " " << sqrt(obsSumFlow_->varCorrelationAtSpan(iOfSpan) / finalTime())  //#11
+                       << " " << obsModiFlow_->unbiasedCorrelationAtSpan(iOfSpan)
+                       << " " << sqrt(obsModiFlow_->varCorrelationAtSpan(iOfSpan) / finalTime())
                        << " " << bendistProfile_.unbiasedCorrelationAtSpan(iOfSpan, midNb)
                        << std::endl;
-                       
-      /*double integralV = 0;
-    double integralF = 0;
-    double integralQ = 0;
-    double midFlowQ = 0;
-    double sumFlowQ = 0;
-    double modiFlowQ = 0;
-      outCorrelation() << i * autocoPtsPeriod()
-                       << " " << velocityCV_->autocorrelation(i) - pow(velocityCV_->meanObservable(), 2)
-                       << " " << (integralV += velocityCV_->autocorrelation(i) * autocoPtsPeriod())
-                       << " " << forceCV_->autocorrelation(i) - pow(forceCV_->meanObservable(), 2)
-                       << " " << (integralF += forceCV_->autocorrelation(i) * autocoPtsPeriod())
-                       << " " << lengthCV_->autocorrelation(i) - pow(lengthCV_->meanObservable(), 2)
-                       << " " << (integralQ += lengthCV_->autocorrelation(i) * autocoPtsPeriod())
-                       << " " << midFlowCV_->autocorrelation(i) - pow(midFlowCV_->meanObservable(), 2)
-                       << " " << (midFlowQ += midFlowCV_->autocorrelation(i) * autocoPtsPeriod())
-                       << " " << sumFlowCV_->autocorrelation(i) - pow(sumFlowCV_->meanObservable(), 2)
-                       << " " << (sumFlowQ += sumFlowCV_->autocorrelation(i) * autocoPtsPeriod())
-                       << " " << modiFlowCV_->autocorrelation(i) - pow(modiFlowCV_->meanObservable(), 2)
-                       << " " << (modiFlowQ += modiFlowCV_->autocorrelation(i) * autocoPtsPeriod())
-                       << " " << bendistProfile_(i, midNb) - pow(bendistProfile_.mean(midNb), 2)
-                       << std::endl;*/
-    }
+    }*/
   }
 
 

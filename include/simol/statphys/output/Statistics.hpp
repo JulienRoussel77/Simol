@@ -39,7 +39,7 @@ namespace simol
     IIDStats(int nbRows = 1, int nbCols = 1);
     void append(double value, int i = 0, int j = 0);
     const double& variance(int i = 0, int j = 0 ) const;
-    double stdDeviation(int i = 0, int j = 0) const;
+    double stdDev(int i = 0, int j = 0) const;
   };
   
   //
@@ -72,13 +72,14 @@ namespace simol
     virtual double unbiasedCorrelationAtSpan(long int iOfSpan, int iOfObservable = 0) const;
     const double& lastValue(int iOfObservable = 0) const;
     double mean(int iOfObservable = 0) const;
+    const long int& nbValues(int i = 0, int j = 0) const;
     int statsIntegratedCorrelationNbValues(int iOfObservable = 0) const;
     double integratedCorrelation(int iOfObservable = 0) const;
     Vector<double> integratedCorrelationVec() const;
     virtual double integratedCorrelationUnbiased(int iOfObservable = 0) const;
     double varIntegratedCorrelation(int iOfObservable = 0) const;
     double varCorrelationAtSpan(int iOfSpan, int iOfObservable = 0) const;
-    double stdDeviationCorrelationAtSpan(int iOfSpan, int iOfObservable = 0) const;
+    double stdDevCorrelationAtSpan(int iOfSpan, int iOfObservable = 0) const;
     double stdErrorCorrelationAtSpan(int iOfSpan, int iOfObservable = 0) const;
   };
   
@@ -93,10 +94,10 @@ namespace simol
     double unbiasedCorrelationAtSpan(long int iOfStep, int iOfObservable = 0) const;
     double integratedCorrelationUnbiased(int iOfObservable=0) const;
     double variance(int iOfObservable = 0) const;
-    double standardDeviation(int iOfObservable = 0) const;
-    double varianceOfVariance(int iOfObservable = 0) const;
-    double stdDevOfVariance(int iOfObservable = 0) const;
-    double stdErrorOfVariance(int iOfObservable = 0) const;
+    double stdDev(int iOfObservable = 0) const;
+    double varOfVar(int iOfObservable = 0) const;
+    double stdDevOfVar(int iOfObservable = 0) const;
+    //double stdErrorOfVar(int iOfObservable = 0) const;
   };
 }
 

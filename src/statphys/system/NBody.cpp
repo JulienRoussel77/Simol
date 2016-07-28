@@ -50,9 +50,9 @@ namespace simol
     nbOfParticlesPerDimension_(input.nbOfParticlesPerDimension()),
     latticeParameter_(input.latticeParameter()),
     domainSize_(input.latticeParameter()*input.nbOfParticlesPerDimension()),
+    restart_(input.restart()),
     doCells_(input.doCellMethod()),
-    Rcut_(input.cutOffRatio()*input.potentialSigma()),
-    restart_(input.restart())
+    Rcut_(input.cutOffRatio()*input.potentialSigma())
   {
     //-- initialise the configuration by initializing the particles --
     assert(configuration_.size() > 1);
@@ -254,7 +254,7 @@ namespace simol
     }
     else
     {
-      //-- no cell method: standard double loop --
+      //-- no cell method: std double loop --
       for (int i = 0; i < nbOfParticles(); i++)
         for (int j = i + 1; j < nbOfParticles(); j++)
           interaction(configuration_[i], configuration_[j]);
@@ -318,7 +318,7 @@ namespace simol
       }
     else
       {
-	//-- no cell method: standard double loop --
+	//-- no cell method: std double loop --
 	for (int i = 0; i < nbOfParticles(); i++)
 	  for (int j = i + 1; j < nbOfParticles(); j++)
 	    elementaryFluctuationDissipationDPDE(dyna, configuration_[i], configuration_[j]);

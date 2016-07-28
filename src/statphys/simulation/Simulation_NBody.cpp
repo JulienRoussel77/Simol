@@ -172,13 +172,13 @@ namespace simol
     output.internalTemperature() = 0;
     //-- computation of instantaneous energies --
     for (const auto & particle : syst.configuration())
-      {
-	output.kineticEnergy() += particle.kineticEnergy();
-	output.potentialEnergy() += particle.potentialEnergy();
-	output.totalVirial() += particle.virial();
-	output.internalEnergy() += particle.internalEnergy();
-	output.internalTemperature() += 1/dyna.internalTemperature(particle.internalEnergy());
-      }
+    {
+      output.kineticEnergy() += particle.kineticEnergy();
+      output.potentialEnergy() += particle.potentialEnergy();
+      output.totalVirial() += particle.virial();
+      output.internalEnergy() += particle.internalEnergy();
+      output.internalTemperature() += 1/dyna.internalTemperature(particle.internalEnergy());
+    }
     output.internalTemperature() /= syst.nbOfParticles(); 
     //-- averages of observables --
     output.appendKineticEnergy(output.kineticEnergy(), iOfStep);
@@ -193,7 +193,7 @@ namespace simol
   void writeOutput(Hamiltonian const& /*dyna*/, NBody const& syst, Output& output, long int iOfStep)
   {
     if (output.doOutput(iOfStep))
-      output.displayObservables(iOfStep);
+      output.displayThermoVariables(iOfStep);
     if (output.doLongPeriodOutput(iOfStep))
       output.displayParticlesXMakeMol(syst.configuration(), iOfStep, syst.latticeParameter()*syst.nbOfParticlesPerDimension());
   }
@@ -201,7 +201,7 @@ namespace simol
   void writeOutput(Langevin const& /*dyna*/, NBody const& syst, Output& output, long int iOfStep)
   {
     if (output.doOutput(iOfStep))
-      output.displayObservables(iOfStep);
+      output.displayThermoVariables(iOfStep);
     if (output.doLongPeriodOutput(iOfStep))
       output.displayParticlesXMakeMol(syst.configuration(), iOfStep, syst.latticeParameter()*syst.nbOfParticlesPerDimension());
   }
@@ -209,12 +209,12 @@ namespace simol
   void writeOutput(DPDE const& /*dyna*/, NBody const& syst, Output& output, long int iOfStep)
   {
     if (output.doOutput(iOfStep))
-      output.displayObservablesDPDE(syst.configuration(),iOfStep);
+      output.displayThermoVariablesDPDE(syst.configuration(),iOfStep);
     if (output.doLongPeriodOutput(iOfStep))
-      {
-	output.displayParticlesXMakeMol(syst.configuration(), iOfStep, syst.latticeParameter()*syst.nbOfParticlesPerDimension());
-	output.displayParticlesFullConfiguration(syst.configuration(), iOfStep); 
-      }
+    {
+      output.displayParticlesXMakeMol(syst.configuration(), iOfStep, syst.latticeParameter()*syst.nbOfParticlesPerDimension());
+      output.displayParticlesFullConfiguration(syst.configuration(), iOfStep); 
+    }
   }
 
   

@@ -27,7 +27,7 @@ namespace simol
         exponentialDistribution_(1)
       {}
 
-      //Vector<double> gaussian(double const & mean, double const & standardDeviation)
+      //Vector<double> gaussian(double const & mean, double const & stdDev)
       Vector<double> gaussian()
       {
         Vector<double> g(dimension_);

@@ -72,7 +72,7 @@ namespace simol
   void writeOutput(Hamiltonian const& /*dyna*/, System const& syst, Output& output, long int iOfStep)
   {
     if (output.doOutput(iOfStep))
-      output.displayObservables(iOfStep);
+      output.displayThermoVariables(iOfStep);
 
     if (output.doLongPeriodOutput(iOfStep))
       output.displayParticles(syst.configuration(), iOfStep);
@@ -82,8 +82,8 @@ namespace simol
   {
     if (output.doOutput(iOfStep))
     {
-      output.displayObservables(iOfStep);
-      output.velocityCV().display(output.outVelocitiesCV(), iOfStep * dyna.timeStep());
+      output.displayThermoVariables(iOfStep);
+      output.obsVelocity().display(iOfStep);
     }
     if (output.doLongPeriodOutput(iOfStep))
       output.displayParticles(syst.configuration(), iOfStep);
@@ -92,15 +92,16 @@ namespace simol
   void writeOutput(DPDE const& /*dyna*/, System const& syst, Output& output, long int iOfStep)
   {
     if (output.doOutput(iOfStep))
-      output.displayObservablesDPDE(syst.configuration(), iOfStep);
+      output.displayThermoVariablesDPDE(syst.configuration(), iOfStep);
   }
 
   //--------------------------- final output ------------------------------------
 
-  void writeFinalOutput(Dynamics const& /*dyna*/, System const& /*syst*/, Output& output)
+  void writeFinalOutput(Dynamics const& /*dyna*/, System const& syst, Output& output)
   {
     if (output.doComputeCorrelations())
       output.finalDisplayCorrelations();
+      
   }
 
   void writeFinalOutput(DPDE const& /*dyna*/, System const& /*syst*/, Output& output)

@@ -10,58 +10,59 @@ using std::ofstream;
 namespace simol
 {
 
-  ControlVariate* createControlVariate(Input const& input, Potential& potential, Galerkin* galerkin)
+  Observable* createControlVariate(Input const& input, const string& outPath, Potential& potential, Galerkin* galerkin)
   {
     if (input.controlVariateName() == "None")
-      return new NoControlVariate(input, potential);
+      return new Observable(input, outPath);
     if (input.controlVariateName() == "Sinus")
-      return new SinusControlVariate(input, potential);
+      return new SinusControlVariate(input, outPath, potential);
     if (input.controlVariateName() == "Cosine")
-      return new CosControlVariate(input, potential);
+      return new CosControlVariate(input, outPath, potential);
     else if (input.controlVariateName() == "SinExp")
-      return new SinExpControlVariate(input, potential);
+      return new SinExpControlVariate(input, outPath, potential);
     else if (input.controlVariateName() == "CosExp")
-      return new CosExpControlVariate(input, potential);
+      return new CosExpControlVariate(input, outPath, potential);
     else if (input.controlVariateName() == "Langevin")
-      return new LangevinControlVariate(input, potential);
+      return new LangevinControlVariate(input, outPath, potential);
     else if (input.controlVariateName() == "SumEnergy")
-      return new SumEnergyControlVariate(input, potential);
+      return new SumEnergyControlVariate(input, outPath, potential);
     else if (input.controlVariateName() == "Energy")
-      return new EnergyControlVariate(input, potential);
+      return new EnergyControlVariate(input, outPath, potential);
     else if (input.controlVariateName() == "Local")
-      return new LocalControlVariate(input, potential);
+      return new LocalControlVariate(input, outPath, potential);
     else if (input.controlVariateName() == "Kinetic")
-      return new KineticControlVariate(input, potential);
+      return new KineticControlVariate(input, outPath, potential);
     else if (input.controlVariateName() == "Two")
-      return new TwoControlVariate(input, potential);
+      return new TwoControlVariate(input, outPath, potential);
     else if (input.controlVariateName() == "ExpFourierHermite")
-      return new ExpFourierHermiteControlVariate(input, potential, galerkin);
+      return new ExpFourierHermiteControlVariate(input, outPath, potential, galerkin);
     else
       std::cout << input.controlVariateName() << " is not a valid control variate !" << std::endl;
     return 0;
   }
 
 
-  ControlVariate::ControlVariate(Input const& input, Potential& potential, int nbOfFunctions):
+  ControlVariate::ControlVariate(Input const& input, const string& outPath, Potential& potential, int nbOfFunctions):
+    Observable(input, outPath),
     dimension_(input.dimension()),
-    decorrelationNbOfSteps_(input.decorrelationNbOfSteps()),
-    timeStep_(input.timeStep()),
+    //decorrelationNbOfSteps_(input.decorrelationNbOfSteps()),
+    //timeStep_(input.timeStep()),
     nbOfFunctions_(nbOfFunctions),
     nbOfFunctionPairs_(pow(nbOfFunctions_, 2)),
-    printPeriodNbOfSteps_(input.printPeriodNbOfSteps()),
-    nbOfAutocoPts_(input.nbOfAutocoPts()),
-    statsObservable_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts()),
-    statsBetterObservable_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts()),
+    //printPeriodNbOfSteps_(input.printPeriodNbOfSteps()),
+    //nbOfAutocoPts_(input.nbOfAutocoPts()),
+    //autocoStats_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts()),
+    autocoStatsBetter_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts()),
     statsGeneratorOnBasis_(nbOfFunctions_),
     statsB1_(nbOfFunctions_),
     statsB2_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts(), nbOfFunctions_),
     statsD_(nbOfFunctions_, nbOfFunctions_),
     lastA_(nbOfFunctions_),
-    statsPostObservable_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts()),
-    statsPostBetterObservable_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts()),
     //historyObservable_(input.nbOfSteps()),
     //historyGeneratorOnBasis_(input.nbOfSteps(), nbOfFunctions_),
-    potential_(&potential)
+    potential_(&potential),
+    valueBasis_(nbOfFunctions_),
+    valueGeneratorOnBasis_(nbOfFunctions_)
   {}
 
   int ControlVariate::nbOfFunctions() const
@@ -74,10 +75,10 @@ namespace simol
     return nbOfFunctionPairs_;
   }
 
-  bool ControlVariate::doOutput(long int iOfStep) const
+  /*bool ControlVariate::doOutput(long int iOfStep) const
   {
     return (printPeriodNbOfSteps_ > 0 && iOfStep % printPeriodNbOfSteps_ == 0);
-  }
+  }*/
 
   bool ControlVariate::isNone() const
   {
@@ -99,7 +100,7 @@ namespace simol
     return potential_->laplacian(position);
   }
 
-  const int& ControlVariate::decorrelationNbOfSteps() const
+  /*const int& ControlVariate::decorrelationNbOfSteps() const
   {
     return decorrelationNbOfSteps_;
   }
@@ -117,7 +118,7 @@ namespace simol
   int const& ControlVariate::nbOfAutocoPts() const
   {
     return nbOfAutocoPts_;
-  }
+  }*/
 
   int ControlVariate::nbOfFourier() const
   {return 0;}
@@ -128,65 +129,60 @@ namespace simol
 
 
 
-  double ControlVariate::lastObservable() const
+  /*double ControlVariate::lastObservable() const
   {
-    return statsObservable_.lastValue();
+    return autocoStats_.lastValue();
   }
 
 
   double ControlVariate::meanObservable() const
   {
-    return statsObservable_.mean();
+    return autocoStats_.mean();
   }
   
   double ControlVariate::varObservable() const
   {
-    return statsObservable_.variance();
+    return autocoStats_.variance();
   }
 
-  double ControlVariate::stdDeviationObservable() const
+  double ControlVariate::stdDevObservable() const
   {
-    return statsObservable_.standardDeviation();
+    return autocoStats_.stdDev();
   }
   
   double ControlVariate::varOfVarObservable() const
   {
-    return statsObservable_.varianceOfVariance();
+    return autocoStats_.varOfVar();
   }
   
   double ControlVariate::stdDevOfVarObservable() const
   {
-    return statsObservable_.stdDevOfVariance();
-  }
-  
-  /*double ControlVariate::stdErrorOfVarObservable() const
-  {
-    return statsObservable_.stdErrorOfVariance();
+    return autocoStats_.stdDevOfVar();
   }*/
 
-  double ControlVariate::lastBetterObservable() const
+  double ControlVariate::lastValueBetter() const
   {
-    return statsBetterObservable_.lastValue();
+    return autocoStatsBetter_.lastValue();
   }
 
-  double ControlVariate::meanBetterObservable() const
+  double ControlVariate::meanBetter() const
   {
-    return statsBetterObservable_.mean();
+    return autocoStatsBetter_.mean();
   }
   
-  double ControlVariate::varBetterObservable() const
+  double ControlVariate::varBetter() const
   {
-    return statsBetterObservable_.variance();
+    return autocoStatsBetter_.variance();
   }
 
-  double ControlVariate::stdDeviationBetterObservable() const
+  double ControlVariate::stdDevBetter() const
   {
-    return statsBetterObservable_.standardDeviation();
+    return autocoStatsBetter_.stdDev();
   }
   
-  double ControlVariate::varOfVarBetterObservable() const
+  double ControlVariate::varOfVarBetter() const
   {
-    return statsBetterObservable_.varianceOfVariance();
+    return autocoStatsBetter_.varOfVar();
   }
 
   Vector<double> ControlVariate::correlationB2() const
@@ -202,56 +198,56 @@ namespace simol
   void ControlVariate::appendToObservable(double observable, long int iOfStep)
   {
     //historyObservable_(iOfStep) = observable;
-    statsObservable_.append(observable, iOfStep);
+    autocoStats_.append(observable, iOfStep);
   }
 
-  double ControlVariate::correlationAtSpan(int iOfSpan) const
+  /*double ControlVariate::correlationAtSpan(int iOfSpan) const
   {
-    return statsObservable_.correlationAtSpan(iOfSpan);
+    return autocoStats_.correlationAtSpan(iOfSpan);
   }
   
   double ControlVariate::unbiasedCorrelationAtSpan(int iOfSpan) const
   {
-    //return statsObservable_(iOfSpan) - pow(meanObservable(), 2);
-    return statsObservable_.unbiasedCorrelationAtSpan(iOfSpan);
+    //return autocoStats_(iOfSpan) - pow(meanObservable(), 2);
+    return autocoStats_.unbiasedCorrelationAtSpan(iOfSpan);
   }
   
-  double ControlVariate::stdDeviationCorrelationAtSpan(int iOfSpan) const
+  double ControlVariate::stdDevCorrelationAtSpan(int iOfSpan) const
   {
-    return statsObservable_.stdDeviationCorrelationAtSpan(iOfSpan);
+    return autocoStats_.stdDevCorrelationAtSpan(iOfSpan);
   }
   
   double ControlVariate::varCorrelationAtSpan(int iOfSpan) const
   {
-    return statsObservable_.varCorrelationAtSpan(iOfSpan);
-  }
+    return autocoStats_.varCorrelationAtSpan(iOfSpan);
+  }*/
   
   /*double ControlVariate::stdErrorCorrelationAtSpan(int iOfSpan) const
   {
-    return statsObservable_.stdErrorCorrelationAtSpan(iOfSpan);
+    return autocoStats_.stdErrorCorrelationAtSpan(iOfSpan);
   }*/
 
-  void ControlVariate::appendToB1(double observable, Vector<double>& valueBasisFunction)
+  void ControlVariate::appendToB1(double observable)
   {
     for (int iOfFunction = 0; iOfFunction < nbOfFunctions_; iOfFunction++)
-      statsB1_.append((observable - statsObservable_.mean()) * valueBasisFunction(iOfFunction), iOfFunction);
+      statsB1_.append((observable - autocoStats_.mean()) * valueBasis_(iOfFunction), iOfFunction);
   }
 
-  void ControlVariate::appendToB2(double observable, Vector<double>& generatorOnBasisFunction, long int iOfStep)
+  void ControlVariate::appendToB2(double observable, long int iOfStep)
   {
     for (int iOfFunction = 0; iOfFunction < nbOfFunctions_; iOfFunction++)
-      statsB2_.append((observable - statsObservable_.mean()), iOfStep, iOfFunction, generatorOnBasisFunction(iOfFunction));
+      statsB2_.append((observable - autocoStats_.mean()), iOfStep, iOfFunction, valueGeneratorOnBasis_(iOfFunction));
   }
 
-  void ControlVariate::appendToD(Vector<double>& generatorOnBasisFunction, Vector<double>& valueBasisFunction)
+  void ControlVariate::appendToD()
   {
     //Eigen::Matrix<CorrelationStats<double>, Eigen::Dynamic, Eigen::Dynamic> A(nbOfFunctions_, nbOfFunctions_, CorrelationStats<double>(decorrelationNbOfSteps(), decorrelationTime()));
 
     for (int iOfFunction = 0; iOfFunction < nbOfFunctions_; iOfFunction++)
       for (int iOfFunction2 = 0; iOfFunction2 <= iOfFunction; iOfFunction2++)
       {
-        double valueSym = (- valueBasisFunction(iOfFunction) * generatorOnBasisFunction(iOfFunction2)
-                           - valueBasisFunction(iOfFunction2) * generatorOnBasisFunction(iOfFunction)) / 2.;
+        double valueSym = (- valueBasis_(iOfFunction) * valueGeneratorOnBasis_(iOfFunction2)
+                           - valueBasis_(iOfFunction2) * valueGeneratorOnBasis_(iOfFunction)) / 2.;
         statsD_.append(valueSym, iOfFunction, iOfFunction2);
         if (iOfFunction != iOfFunction2)
           statsD_.append(valueSym, iOfFunction2, iOfFunction);
@@ -260,7 +256,7 @@ namespace simol
 
 
 
-  void ControlVariate::appendToBetterObservable(double observable, Vector<double>& generatorOnBasisFunction, long int iOfStep)
+  void ControlVariate::appendToBetter(double observable, long int iOfStep)
   {
     //double betterObservableTerm = dot((statsB_.meanMat() - statsB2_.integratedCorrelationMat()), statsD_.meanMat().llt().solve(generatorOnBasisFunction));
     /*DenseMatrix<double> Dinv = statsD_.meanMat().llt().solve(generatorOnBasisFunction);
@@ -275,18 +271,18 @@ namespace simol
       //lastA_ = - .5 * statsD_.meanMat().llt().solve(meanB());
       //lastA_ = Vector<double>(1,1);
       lastA_.fill(1);
-      statsBetterObservable_.append(observable - dot(lastA_, generatorOnBasisFunction), iOfStep);
+      autocoStatsBetter_.append(observable - dot(lastA_, valueGeneratorOnBasis_), iOfStep);
     }
     else
     {
       lastA_.fill(0);
-      statsBetterObservable_.append(observable, iOfStep);
+      autocoStatsBetter_.append(observable, iOfStep);
     }
 
     for (int iOfFunction = 0; iOfFunction < nbOfFunctions_; iOfFunction++)
     {
       //historyGeneratorOnBasis_(iOfStep, iOfFunction) = generatorOnBasisFunction(iOfFunction);
-      statsGeneratorOnBasis_.append(generatorOnBasisFunction(iOfFunction), iOfFunction);
+      statsGeneratorOnBasis_.append(valueGeneratorOnBasis_(iOfFunction), iOfFunction);
     }
   }
 
@@ -347,84 +343,109 @@ namespace simol
     return lastA_(iOfFunction);
   }
 
-
-  void ControlVariate::update(double observable, Vector<double>& generatorOnBasisFunction, vector<Particle> const& configuration, long int iOfStep)
+  ///
+  ///Feed a new value to the Observable
+  /// /!\ an update*** method must be called beforehand
+  void ControlVariate::append(double observable, long int iOfStep)
   {
-    //cout << "ControlVariate::update" << endl;
-    Vector<double> valueBasisFunction(nbOfFunctions_);
-    for (int iOfFunction = 0; iOfFunction < nbOfFunctions_; iOfFunction++)
-      valueBasisFunction(iOfFunction) = basisFunction(configuration, iOfFunction);
-    appendToB1(observable, valueBasisFunction);
-    appendToB2(observable, generatorOnBasisFunction, iOfStep);
-    appendToD(generatorOnBasisFunction, valueBasisFunction);
+    appendToB1(observable);
+    appendToB2(observable, iOfStep);
+    appendToD();
     appendToObservable(observable, iOfStep);
-    appendToBetterObservable(observable, generatorOnBasisFunction, iOfStep);
+    appendToBetter(observable, iOfStep);
     //cout << "end ControlVariate::update" << endl;
   }
-
+  
+  void ControlVariate::updateHamiltonian(vector<Particle> const& configuration)
+  {
+    computeValueBasis(configuration);
+    computeGeneratorHamiltonian(configuration);
+  }
+  
+  void ControlVariate::updateOverdamped(vector<Particle> const& configuration, double beta)
+  {
+    computeValueBasis(configuration);
+    computeGeneratorOverdamped(configuration, beta);
+  }
+  
+  void ControlVariate::updateLangevin(vector<Particle> const& configuration, double beta, double gamma)
+  {
+    computeValueBasis(configuration);
+    computeGeneratorLangevin(configuration, beta, gamma);
+  }
+  
+  void ControlVariate::updateBoundaryLangevin(vector<Particle> const& configuration, double betaLeft, double betaRight, double gamma)
+  {
+    computeValueBasis(configuration);
+    computeGeneratorBoundaryLangevin(configuration, betaLeft, betaRight, gamma);
+  }
+  
+  ///
+  ///Evaluates each function of the basis at "configuration" and updates the attribute
+  void ControlVariate::computeValueBasis(vector<Particle> const& configuration)
+  {
+    for (int iOfFunction = 0; iOfFunction < nbOfFunctions_; iOfFunction++)
+      valueBasis_(iOfFunction) = basisFunction(configuration, iOfFunction);
+  }
 
   ///
   ///Applies the generator of this dynamics to the basis functions of the CV
-  Vector<double> ControlVariate::generatorHamiltonian(vector<Particle> const& configuration)
+  void ControlVariate::computeGeneratorHamiltonian(vector<Particle> const& configuration)
   {
     int nbOfParticles = (int)configuration.size();
-    Vector<double> result = Vector<double>::Zero(nbOfFunctions());
+    //Vector<double> result = Vector<double>::Zero(nbOfFunctions());
     for (int iOfFunction = 0; iOfFunction < nbOfFunctions(); iOfFunction++)
       for (int iOfParticle = 0; iOfParticle < nbOfParticles; iOfParticle++)
-        result(iOfFunction) += dot( configuration[iOfParticle].momentum() , gradientQ(configuration, iOfParticle, iOfFunction))
+        valueGeneratorOnBasis_(iOfFunction) += dot( configuration[iOfParticle].momentum() , gradientQ(configuration, iOfParticle, iOfFunction))
                                + dot( configuration[iOfParticle].force() , gradientP(configuration, iOfParticle, iOfFunction));
-    return result;
   }
 
   ///Applies the generator of this dynamics to the basis functions of the CV
   ///Evaluate at the current state of "conifguration"
-  Vector<double> ControlVariate::generatorOverdamped(vector<Particle> const& configuration, double beta)
+  void ControlVariate::computeGeneratorOverdamped(vector<Particle> const& configuration, double beta)
   {
     int nbOfParticles = (int)configuration.size();
-    Vector<double> result = Vector<double>::Zero(nbOfFunctions());
+    //Vector<double> result = Vector<double>::Zero(nbOfFunctions());
     for (int iOfFunction = 0; iOfFunction < nbOfFunctions(); iOfFunction++)
       for (int iOfParticle = 0; iOfParticle < nbOfParticles; iOfParticle++)
-        result(iOfFunction) += laplacianQ(configuration, iOfParticle, iOfFunction) / beta
+        valueGeneratorOnBasis_(iOfFunction) += laplacianQ(configuration, iOfParticle, iOfFunction) / beta
                                + dot(configuration[iOfParticle].force(), gradientQ(configuration, iOfParticle, iOfFunction));
-    return result;
   }
 
   ///Applies the generator of this dynamics to the basis functions of the CV
   ///Evaluate at the current state of "conifguration"
-  Vector<double> ControlVariate::generatorLangevin(vector<Particle> const& configuration, double beta, double gamma)
+  void ControlVariate::computeGeneratorLangevin(vector<Particle> const& configuration, double beta, double gamma)
   {
     int nbOfParticles = (int)configuration.size();
     //cout << "generatorOn(const Langevin& dyna, S const& syst, const ControlVariate& controlVariate)" << endl;
-    Vector<double> result = Vector<double>::Zero(nbOfFunctions());
+    //Vector<double> result = Vector<double>::Zero(nbOfFunctions());
     for (int iOfFunction = 0; iOfFunction < nbOfFunctions(); iOfFunction++)
       for (int iOfParticle = 0; iOfParticle < nbOfParticles; iOfParticle++)
       {
-        result(iOfFunction) += dot(configuration[iOfParticle].momentum() , gradientQ(configuration, iOfParticle, iOfFunction))
+        valueGeneratorOnBasis_(iOfFunction) += dot(configuration[iOfParticle].momentum() , gradientQ(configuration, iOfParticle, iOfFunction))
                                + dot(configuration[iOfParticle].force() , gradientP(configuration, iOfParticle, iOfFunction))
                                + gamma * (- dot(configuration[iOfParticle].momentum() , gradientP(configuration, iOfParticle, iOfFunction))
                                           + laplacianP(configuration, iOfParticle, iOfFunction) / beta );
       }
-    return result;
   }
 
   ///Applies the generator of this dynamics to the basis functions of the CV
   ///Evaluate at the current state of "conifguration"
-  Vector<double> ControlVariate::generatorBoundarylangevin(vector<Particle> const& configuration, double betaLeft, double betaRight, double gamma)
+  void ControlVariate::computeGeneratorBoundaryLangevin(vector<Particle> const& configuration, double betaLeft, double betaRight, double gamma)
   {
     int nbOfParticles = (int)configuration.size();
-    Vector<double> result = Vector<double>::Zero(nbOfFunctions());
+    //Vector<double> result = Vector<double>::Zero(nbOfFunctions());
     for (int iOfFunction = 0; iOfFunction < nbOfFunctions(); iOfFunction++)
     {
       for (int iOfParticle = 0; iOfParticle < nbOfParticles; iOfParticle++)
-        result(iOfFunction) += dot(configuration[iOfParticle].momentum(), gradientQ(configuration, iOfParticle, iOfFunction))
+        valueGeneratorOnBasis_(iOfFunction) += dot(configuration[iOfParticle].momentum(), gradientQ(configuration, iOfParticle, iOfFunction))
                                + dot(configuration[iOfParticle].force(), gradientP(configuration, iOfParticle, iOfFunction));
       //if(false)
-      result(iOfFunction) += gamma * (- dot(configuration[0].momentum(), gradientP(configuration, 0, iOfFunction))
+      valueGeneratorOnBasis_(iOfFunction) += gamma * (- dot(configuration[0].momentum(), gradientP(configuration, 0, iOfFunction))
                                       + laplacianP(configuration, 0, iOfFunction) / betaLeft
                                       - dot(configuration[nbOfParticles - 1].momentum(), gradientP(configuration, nbOfParticles - 1, iOfFunction))
                                       + laplacianP(configuration, nbOfParticles - 1, iOfFunction) / betaRight);
     }
-    return result;
   }
 
 
@@ -446,13 +467,13 @@ namespace simol
       for (int iOfFunction2 = 0; iOfFunction2 < nbOfFunctions(); iOfFunction2++)
         out << " " << meanD()(iOfFunction, iOfFunction2);  //8-11
 
-    out << " " << lastObservable()
-        << " " << meanObservable()   //13
-        << " " << varObservable()
-        << " " << varOfVarObservable()
-        << " " << lastBetterObservable()
-        << " " << meanBetterObservable()
-        << " " << varOfVarBetterObservable();
+    out << " " << lastValue()
+        << " " << mean()   //13
+        << " " << variance()
+        << " " << varOfVar()
+        << " " << lastValueBetter()
+        << " " << meanBetter()
+        << " " << varOfVarBetter();
     for (int iOfFunction = 0; iOfFunction < nbOfFunctions(); iOfFunction++)
       out << " " << lastGeneratorOnBasis()(iOfFunction);
     for (int iOfFunction = 0; iOfFunction < nbOfFunctions(); iOfFunction++)
@@ -467,123 +488,12 @@ namespace simol
     out << endl;
   }
 
-  void ControlVariate::postTreat(std::ofstream& /*out*/, double /*timeStep*/)
-  {
-    /*cout << "Post-treatment of the output" << endl;
-    for (long int iOfStep = 0; iOfStep < (int) historyObservable_.size(); iOfStep++)
-    {
-      statsPostBetterObservable_.append(historyObservable_(iOfStep) - dot(lastA_, historyGeneratorOnBasis_.row(iOfStep)), iOfStep);
-      statsPostObservable_.append(historyObservable_(iOfStep), iOfStep);
-      if (doOutput(iOfStep))
-      {
-        out << iOfStep * timeStep
-            << " " << statsPostObservable_.lastValue()
-            << " " << statsPostObservable_.mean()
-            << " " << statsPostObservable_.standardDeviation()
-            << " " << statsPostBetterObservable_.lastValue()
-            << " " << statsPostBetterObservable_.mean()
-            << " " << statsPostBetterObservable_.standardDeviation();
-        for (int iOfFunction = 0; iOfFunction < nbOfFunctions(); iOfFunction++)
-          out << " " << lastA_(iOfFunction);
-        out << endl;
-      }
-    }
-
-    std::cout << "(D + Dt)/2 = " << endl << meanD() << endl;
-    std::cout << "b = " << endl << meanB() << endl;
-    std::cout << "a = " << endl << lastA_ << endl << endl;
-
-    std::cout << "-<Linv j, j> = " << .5 * pow(statsPostObservable_.standardDeviation(), 2) << endl;
-    */
-  }
 
 
+ 
 
-  //############NoControlVariate###############"
-
-
-
-
-
-  NoControlVariate::NoControlVariate(Input const& input, Potential& potential):
-    ControlVariate(input, potential, 1) {}
-
-  int NoControlVariate::nbOfFunctions() const
-  {
-    return 0;
-  }
-
-  int NoControlVariate::nbOfFunctionPairs() const
-  {
-    return 0;
-  }
-
-  bool NoControlVariate::isNone() const
-  {
-    return true;
-  }
-
-  Vector<double> NoControlVariate::lastGeneratorOnBasis() const
-  {
-    return Vector<double>(dimension_, 0 );
-  }
-
-  double NoControlVariate::basisFunction(vector<Particle> const& /*configuration*/, int /*iOfFunction*/) const
-  {
-    return 0;
-  }
-
-  //double generatorOnBasisFunction(vector<Particle> const& configuration) const;
-  double NoControlVariate::laplacianQ(vector<Particle> const& /*configuration*/, int /*iOfParticle*/, int /*iOfFunction*/) const
-  {
-    return 0;
-  }
-
-  Vector<double> NoControlVariate::gradientQ(vector<Particle> const& /*configuration*/, int /*iOfParticle*/, int /*iOfFunction*/) const
-  {
-    return Vector<double>(dimension_);
-  }
-
-  double NoControlVariate::laplacianP(vector<Particle> const& /*configuration*/, int /*iOfParticle*/, int /*iOfFunction*/) const
-  {
-    return 0;
-  }
-
-  Vector<double> NoControlVariate::gradientP(vector<Particle> const& /*configuration*/, int /*iOfParticle*/, int /*iOfFunction*/) const
-  {
-    return Vector<double>(dimension_);
-  }
-
-  void NoControlVariate::update(double observable, Vector<double>& /*generatorOnBasisFunction*/, vector<Particle> const& /*configuration*/, long int iOfStep)
-  {
-    appendToObservable(observable, iOfStep);
-  }
-
-  void NoControlVariate::postTreat(std::ofstream& /*out*/, double /*timeStep*/)
-  {
-    /*std::cout << "Post-treatment of the output" << endl;
-    for (long int iOfStep = 0; iOfStep < (int) historyObservable_.size(); iOfStep++)
-    {
-      statsPostObservable_.append(historyObservable_(iOfStep), iOfStep);
-      if (doOutput(iOfStep))
-      {
-        out << iOfStep * timeStep
-            << " " << statsPostObservable_.lastValue()
-            << " " << statsPostObservable_.mean()
-            << " " << statsPostObservable_.standardDeviation()
-            << endl;
-      }
-    }*/
-  }
-
-
-
-
-
-
-
-  SinusControlVariate::SinusControlVariate(Input const& input, Potential& potential):
-    ControlVariate(input, potential, 1)
+  SinusControlVariate::SinusControlVariate(Input const& input, const string& outPath, Potential& potential):
+    ControlVariate(input, outPath, potential, 1)
   {}
 
   double SinusControlVariate::basisFunction(vector<Particle> const& configuration, int /*iOfFunction*/) const
@@ -620,8 +530,8 @@ namespace simol
 
 
 
-  CosControlVariate::CosControlVariate(Input const& input, Potential& potential):
-    ControlVariate(input, potential, 1)
+  CosControlVariate::CosControlVariate(Input const& input, const string& outPath, Potential& potential):
+    ControlVariate(input, outPath, potential, 1)
   {}
 
   double CosControlVariate::basisFunction(vector<Particle> const& configuration, int /*iOfFunction*/) const
@@ -661,8 +571,8 @@ namespace simol
 
 
 
-  SinExpControlVariate::SinExpControlVariate(Input const& input, Potential& potential):
-    ControlVariate(input, potential, 1)
+  SinExpControlVariate::SinExpControlVariate(Input const& input, const string& outPath, Potential& potential):
+    ControlVariate(input, outPath, potential, 1)
   {}
 
   double SinExpControlVariate::basisFunction(vector<Particle> const& configuration, int /*iOfFunction*/) const
@@ -708,8 +618,8 @@ namespace simol
 
 
 
-  CosExpControlVariate::CosExpControlVariate(Input const& input, Potential& potential):
-    ControlVariate(input, potential, 1)
+  CosExpControlVariate::CosExpControlVariate(Input const& input, const string& outPath, Potential& potential):
+    ControlVariate(input, outPath, potential, 1)
   {}
 
   double CosExpControlVariate::basisFunction(vector<Particle> const& configuration, int /*iOfFunction*/) const
@@ -755,8 +665,8 @@ namespace simol
 
 
 
-  LangevinControlVariate::LangevinControlVariate(Input const& input, Potential& potential):
-    ControlVariate(input, potential, 1)
+  LangevinControlVariate::LangevinControlVariate(Input const& input, const string& outPath, Potential& potential):
+    ControlVariate(input, outPath, potential, 1)
   {}
 
   double LangevinControlVariate::basisFunction(vector<Particle> const& configuration, int /*iOfFunction*/) const
@@ -796,8 +706,8 @@ namespace simol
 
 
 
-  SumEnergyControlVariate::SumEnergyControlVariate(Input const& input, Potential& potential):
-    ControlVariate(input, potential, 1), i0_(0)
+  SumEnergyControlVariate::SumEnergyControlVariate(Input const& input, const string& outPath, Potential& potential):
+    ControlVariate(input, outPath, potential, 1), i0_(0)
   {}
 
   double SumEnergyControlVariate::basisFunction(vector<Particle> const& configuration, int /*iOfFunction*/) const
@@ -834,8 +744,8 @@ namespace simol
 
 
 
-  EnergyControlVariate::EnergyControlVariate(Input const& input, Potential& potential):
-    ControlVariate(input, potential, 1), i0_(0)
+  EnergyControlVariate::EnergyControlVariate(Input const& input, const string& outPath, Potential& potential):
+    ControlVariate(input, outPath, potential, 1), i0_(0)
   {}
 
   double EnergyControlVariate::basisFunction(vector<Particle> const& configuration, int /*iOfFunction*/) const
@@ -870,8 +780,8 @@ namespace simol
 
 
 
-  LocalControlVariate::LocalControlVariate(Input const& input, Potential& potential):
-    ControlVariate(input, potential, 1)
+  LocalControlVariate::LocalControlVariate(Input const& input, const string& outPath, Potential& potential):
+    ControlVariate(input, outPath, potential, 1)
   {}
 
   double LocalControlVariate::basisFunction(vector<Particle> const& configuration, int /*iOfFunction*/) const
@@ -915,8 +825,8 @@ namespace simol
 
 
 
-  KineticControlVariate::KineticControlVariate(Input const& input, Potential& potential):
-    ControlVariate(input, potential, 1)
+  KineticControlVariate::KineticControlVariate(Input const& input, const string& outPath, Potential& potential):
+    ControlVariate(input, outPath, potential, 1)
   {}
 
   double KineticControlVariate::basisFunction(vector<Particle> const& configuration, int /*iOfFunction*/) const
@@ -965,8 +875,8 @@ namespace simol
 
   //#####TwoControlVariate#####
 
-  TwoControlVariate::TwoControlVariate(Input const& input, Potential& potential):
-    ControlVariate(input, potential, 2)
+  TwoControlVariate::TwoControlVariate(Input const& input, const string& outPath, Potential& potential):
+    ControlVariate(input, outPath, potential, 2)
   {}
 
   double TwoControlVariate::basisFunction(vector<Particle> const& configuration, int iOfFunction) const
@@ -1028,8 +938,8 @@ namespace simol
 
   //#####BasisControlVariate#####
 
-  BasisControlVariate::BasisControlVariate(Input const& input, Potential& potential, Galerkin* galerkin):
-    ControlVariate(input, potential, 1),
+  BasisControlVariate::BasisControlVariate(Input const& input, const string& outPath, Potential& potential, Galerkin* galerkin):
+    ControlVariate(input, outPath, potential, 1),
     coeffsVec_(input.nbOfFourier() * input.nbOfHermite(), 1)
   {
     if (galerkin)
@@ -1131,8 +1041,8 @@ namespace simol
 
 
 
-  ExpFourierHermiteControlVariate::ExpFourierHermiteControlVariate(Input const& input, Potential& potential, Galerkin* galerkin):
-    BasisControlVariate(input, potential, galerkin)
+  ExpFourierHermiteControlVariate::ExpFourierHermiteControlVariate(Input const& input, const string& outPath, Potential& potential, Galerkin* galerkin):
+    BasisControlVariate(input, outPath, potential, galerkin)
   {
     basis_ = new ExpFourierHermiteBasis(input, potential);
     nbQ_ = 100;  // rafinement du maillage de l'output map
