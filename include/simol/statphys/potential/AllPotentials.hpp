@@ -10,6 +10,7 @@
 #include "Sinusoidal.hpp"
 #include "SpaceSinus.hpp"
 #include "SumSinusoidal.hpp"
+#include "SoftDPD.hpp"
 
 namespace simol
 {
