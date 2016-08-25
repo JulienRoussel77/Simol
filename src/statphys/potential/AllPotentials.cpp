@@ -23,6 +23,8 @@ namespace simol
       return new SpaceSinus(input);
     else if (input.potentialName() == "LennardJones")
       return new LennardJones(input);
+    else if (input.potentialName() == "SoftDPD")
+      return new SoftDPD(input);
     else
       std::cout << input.potentialName() << " is not a valid potential !" << std::endl;
 
