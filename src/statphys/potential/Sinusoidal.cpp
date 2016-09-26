@@ -8,6 +8,11 @@ namespace simol
     amplitude_(input.amplitude()),
     pulsation_(2 * M_PI / input.length())
   {}
+  
+  const double& Sinusoidal::parameter1() const
+  {
+    return amplitude_;
+  }
 
   double Sinusoidal::drawLaw(double localBeta, std::shared_ptr<RNG>& rng) const
   {

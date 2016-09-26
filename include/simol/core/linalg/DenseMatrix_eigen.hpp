@@ -21,7 +21,7 @@ namespace simol
       DenseMatrix(typename eigen<ScalarType>::DenseBlock_const const & block);
       DenseMatrix(Vector<double, eigen> u, std::size_t numberOfRows, std::size_t numberOfColumns);
 
-      Vector<ScalarType> solve(Vector<ScalarType> const & rhs)
+      Vector<ScalarType> solve(Vector<ScalarType> const & rhs) const
       {
         Vector<ScalarType> sol(numberOfRows());
         sol.wrapped_ = wrapped_.partialPivLu().solve(rhs.wrapped_);
@@ -62,6 +62,10 @@ namespace simol
 
       static DenseMatrix Identity(std::size_t n)
       { return DenseMatrix(WrappedType::Identity(n)); }
+      
+      static DenseMatrix Random(std::size_t numberOfRows, size_t numberOfColumns)
+      { return DenseMatrix(WrappedType::Random(numberOfRows, numberOfColumns)); }
+      
 
       // TODO: write a non-pessimized version
       // with CwiseBinaryOp from Eigen
@@ -98,6 +102,9 @@ namespace simol
         wrapped_ *= scalar;
         return *this;
       }
+      
+      ScalarType norm() const
+      { return wrapped_.norm(); }
 
     public:
       typedef typename eigen<ScalarType>::DenseMatrixType WrappedType;
@@ -261,6 +268,10 @@ namespace simol
   template<class ScalarType>
   DenseMatrix<ScalarType, eigen> operator*(ScalarType const& scalar, DenseMatrix<ScalarType, eigen> const& A)
   {return A * scalar;}
+  
+  template<class ScalarType>
+  DenseMatrix<ScalarType, eigen> extProduct(Vector<ScalarType, eigen> const& u, Vector<ScalarType, eigen> const& v)
+  { return DenseMatrix<ScalarType, eigen> (u.wrapped_.transpose()*v.wrapped_); }
 
 
 }

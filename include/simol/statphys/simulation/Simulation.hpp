@@ -69,7 +69,7 @@ namespace simol
 
   template <class D, class S>
   void computeOutput(D const& dyna, S const& syst, Output& output, long int iOfStep);
-  void writeOutput(System const& syst, Output& output, long int iOfStep);
+  //void writeOutput(System const& syst, Output& output, long int iOfStep);
   void writeFinalOutput(Dynamics const& dyna, System const& syst, Output& output);
 
   //-------------------- specializations for various systems -------------------------
@@ -92,6 +92,8 @@ namespace simol
   void writeOutput(BoundaryLangevin const& dyna, Chain const& syst, Output& output, long int iOfStep);
   //template <class D>
   //void computeOutput(D const& dyna, Chain const& syst, Output& output, long int iOfStep);
+  template <>
+  void computeOutput(Overdamped const& dyna, Isolated const& syst, Output& output, long int iOfStep);
   template <class S>
   void computeOutput(BoundaryLangevin const& dyna, S const& syst, Output& output, long int iOfStep);
   void simulate(BoundaryLangevin& dyna, Chain& syst);
@@ -108,6 +110,7 @@ namespace simol
   void samplePositions(Dynamics& dyna, NBody& syst);
   void sampleInternalEnergies(DPDE const& /*dyna*/, NBody& syst);
   void simulate(Hamiltonian& dyna, NBody& syst);
+  void simulate(Overdamped& dyna, NBody& syst);
   void simulate(Langevin& dyna, NBody& syst);
   void simulate(DPDE& dyna, NBody& syst);
   void thermalize(DPDE& dyna, NBody& syst);
@@ -116,14 +119,20 @@ namespace simol
   template <>
   void computeOutput(Hamiltonian const& /*dyna*/, NBody const& syst, Output& output, long int /*iOfStep*/);
   template <>
+  void computeOutput(Overdamped const& /*dyna*/, NBody const& syst, Output& output, long int /*iOfStep*/);
+  template <>
   void computeOutput(Langevin const& /*dyna*/, NBody const& syst, Output& output, long int /*iOfStep*/);
   template <>
   void computeOutput(DPDE const& dyna, NBody const& syst, Output& output, long int iOfStep);
   void writeOutput(Hamiltonian const& /*dyna*/, NBody const& syst, Output& output, long int iOfStep);
+  void writeOutput(Overdamped const& /*dyna*/, NBody const& syst, Output& output, long int iOfStep);
   void writeOutput(Langevin const& /*dyna*/, NBody const& syst, Output& output, long int iOfStep);
   void writeOutput(DPDE const& /*dyna*/, NBody const& syst, Output& output, long int iOfStep);
   
   // ------------------------ specializations for various dynamics ---------------------------------
+  
+  //--- Overdamped ---
+  void simulate(Overdamped& dyna, System& syst);
   
   //--- LangevinBase ---
   void simulate(LangevinBase& dyna, System& syst);
@@ -143,15 +152,19 @@ namespace simol
   void updateAllControlVariates(Dynamics const& dyna, System const& syst, Output& output, long int iOfStep);
 
   // Hamiltonian
-  void updateAllControlVariates(const Hamiltonian& dyna, System const& syst, Output& output, long int iOfStep);
+  void updateAllControlVariates(Hamiltonian const& dyna, System const& syst, Output& output, long int iOfStep);
   void writeOutput(Hamiltonian const& /*dyna*/, System const& syst, Output& output, long int iOfStep);
 
+  // Overdamped
+  void updateAllControlVariates(Overdamped const& dyna, System const& syst, Output& output, long int iOfStep);
+  void writeOutput(Overdamped const& /*dyna*/, System const& syst, Output& output, long int iOfStep);
+  
   // Langevin
-  void updateAllControlVariates(const Langevin& dyna, System const& syst, Output& output, long int iOfStep);
+  void updateAllControlVariates(Langevin const& dyna, System const& syst, Output& output, long int iOfStep);
   void writeOutput(Langevin const& /*dyna*/, System const& syst, Output& output, long int iOfStep);
 
   // Overdamped
-  Vector<double> generatorOn(const Overdamped& dyna, const System& syst, const ControlVariate& controlVariate);
+  Vector<double> generatorOn(Overdamped const& dyna, const System& syst, const ControlVariate& controlVariate);
 
   // Chain
   void updateAllControlVariates(const BoundaryLangevin& dyna, System const& syst, Output& output, long int iOfStep);
@@ -214,6 +227,21 @@ namespace simol
     output.potentialEnergy() = syst.getParticle(0).potentialEnergy();
     updateAllControlVariates(dyna, syst, output, iOfStep);
   }
+
+  
+  /*template <>
+  void computeOutput(Overdamped const& dyna, S const& syst, Output& output, long int iOfStep)
+  {
+    output.potentialEnergy() = 0;
+    //Calcul de la température et de l'énergie
+    for (const auto & particle : syst.configuration())
+    {
+      output.potentialEnergy() += particle.potentialEnergy();
+    }
+    // In the case of the trichain we add the potential of the wall interaction
+    output.potentialEnergy() += syst.boundaryPotEnergy();
+    updateAllControlVariates(dyna, syst, output, iOfStep);
+  }*/
 
   // Chain
   template <class S>

@@ -53,12 +53,17 @@ namespace simol
       
       const double& gamma() const;
 
-      const double& expFourierCoeffs(int iOfElt) const;
+      const double& expFourierMeans(int iOfElt) const;
+      Vector<double> const& gVector() const;
+      const double& norm2gVector() const;
       int iTens(int iOfFourier2, int iOfHermite) const;
       DenseMatrix<double> shapeSaddle(const DenseMatrix<double>& A) const;
+      DenseMatrix<double> shapePrec(const DenseMatrix<double>& A) const;
       DenseMatrix<double> unshapeSaddle(const DenseMatrix<double>& Asad) const;
       DVec shapeSaddle(const DVec& X) const;
       DVec unshapeSaddle(const DVec& Xsad) const;
+      DVec solve(const DenseMatrix<double>& A, const DVec& X) const;
+      DVec solve(const SMat& A, const DVec& X) const;
       DVec solveWithSaddle(const DenseMatrix<double>& A, const DVec& X) const;
       DVec solveWithSaddle(const SMat& A, const DVec& X) const;
       DenseMatrix<double> invWithSaddle(const SparseMatrix<double>& A) const;
@@ -71,8 +76,6 @@ namespace simol
       DenseMatrix<double> convertToTrigBasis(const DenseMatrix<double>& X);
       void createQ();
       void createP();
-      void createLthm0();
-      virtual void createLthm() = 0;
       virtual void compute();
 
       DVec gettGiHj(int i, int j) const;
@@ -82,6 +85,18 @@ namespace simol
       DVec getLinvtGiHj(int i, int j) const;
       DVec getLinvtGiHjTrig(int i, int j) const;
       SMat CVcoeffs() const;
+      
+      void computeEigen() const;
+  };
+  
+  class OverdampedGalerkin : public Galerkin
+  {
+    public:
+      OverdampedGalerkin(Input const& input);
+      void createLeq();
+      virtual void computeExpToTrigTens();
+      virtual void compute();
+      DVec getGradV() const;
   };
 
   class LangevinGalerkin : public Galerkin
@@ -90,6 +105,7 @@ namespace simol
       LangevinGalerkin(Input const& input);
 
       virtual void computeExpToTrigTens();
+      virtual void createLthm0();
       virtual void createLthm();
   };
 
@@ -103,6 +119,7 @@ namespace simol
       SMat doubleMatToTens(SMat const& QMat, SMat const& PMat, int iOfParticleQ, int iOfParticleP);
       virtual void computeExpToTrigTens();
       void createLham();
+      virtual void createLthm0();
       virtual void createLthm();
 
       virtual void compute();

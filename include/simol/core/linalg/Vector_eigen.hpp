@@ -28,6 +28,7 @@ namespace simol
 
       ScalarType & operator()(size_t const index);
       ScalarType const & operator()(size_t const index) const;
+      
 
       ScalarType norm() const;
       Vector<ScalarType, eigen>& fill(ScalarType const& lambda);
@@ -35,6 +36,7 @@ namespace simol
       Vector<ScalarType, eigen> sort() const;
       std::vector<size_t> indices_of_smallest(size_t const number_of_indices);
       static Vector Zero(std::size_t length);
+      static Vector Random(std::size_t length);
 
       ScalarType min() const;
 
@@ -52,6 +54,7 @@ namespace simol
       Vector<ScalarType, eigen> operator+(Vector<ScalarType, eigen> const& v) const;
       Vector<ScalarType, eigen> operator-(Vector<ScalarType, eigen> const& v) const;
 
+      Vector transpose() const;
       Vector<ScalarType, eigen> subvec(std::size_t start, std::size_t length) const;
 
     public:
@@ -61,7 +64,6 @@ namespace simol
   };
 
   Vector<double, eigen> operator*(double const& lambda, Vector<double, eigen> const& v);
-  double dot(Vector<double, eigen> const& u, Vector<double, eigen> const& v);
   Vector<double, eigen> piecewiseDivision(Vector<double, eigen> const& u, Vector<double, eigen> const& v);
   Vector<double, eigen> piecewiseDivision(Vector<double, eigen> const& u, Vector<size_t, eigen> const& v);
 
@@ -71,6 +73,10 @@ namespace simol
   template<typename ScalarType>
   Vector<ScalarType, eigen> Vector<ScalarType, eigen>::Zero(std::size_t length)
   { return WrappedType(WrappedType::Zero(length)); }
+  
+  template<typename ScalarType>
+  Vector<ScalarType, eigen> Vector<ScalarType, eigen>::Random(std::size_t length)
+  { return WrappedType(WrappedType::Random(length)); }
 
 
   //=============
@@ -295,6 +301,9 @@ namespace simol
   Vector<ScalarType, eigen> Vector<ScalarType, eigen>::operator-(Vector<ScalarType, eigen> const& u) const
   { return Vector<ScalarType, eigen>(*this) -= u; }
 
+  template<class ScalarType> inline
+  ScalarType dot(Vector<ScalarType, eigen> const& u, Vector<ScalarType, eigen> const& v) 
+  { return u.wrapped_.dot(v.wrapped_); }
 
   template<class ScalarType>
   Vector<double, eigen> piecewiseDivision(Vector<double, eigen> const& u, Vector<ScalarType, eigen> const& v)

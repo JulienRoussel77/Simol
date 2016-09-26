@@ -48,6 +48,8 @@ namespace simol
       typename eigen<ScalarType>::SparseMatrixType const & wrapped() const;
 
       virtual DenseMatrix<ScalarType, eigen> dense() const; 
+      
+      virtual double norm() const;
 
     public:
       typename eigen<ScalarType>::SparseMatrixType wrapped_;
@@ -304,6 +306,15 @@ namespace simol
       B.wrapped_ = scalar * A.wrapped_; 
       return B; 
   }
+  
+  template<class ScalarType> inline double
+  SparseMatrix<ScalarType, eigen>::norm() const
+  { return wrapped_.norm(); }
+  
+  
+  
+
+  
 
 }
 

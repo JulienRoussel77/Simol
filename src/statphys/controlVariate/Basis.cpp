@@ -107,10 +107,34 @@ namespace simol
     return nbOfElts_;
   }
 
-  double const& Basis::expFourierCoeffs(int /*iOfElt*/) const
+  double const& Basis::expFourierMeans(int /*iOfElt*/) const
   {
-    throw std::runtime_error("Basis::expFourierCoeffs is not implemented");
+    throw std::runtime_error("Basis::expFourierMeans is not implemented");
   };
+  
+  Vector<double> const& Basis::gVector() const
+  {
+    throw std::runtime_error("Basis::expFourierMeans is not implemented");
+  };
+  
+  double const& Basis::norm2gVector() const
+  {
+    throw std::runtime_error("Basis::sumExpFourierMeans is not implemented");
+  };
+  
+  
+  // Compute <H_n, \partial_p^* \partial_p H_m>
+  double Basis::xGradStarY(const int iOfEltLeft, const int iOfEltRight) const
+  {
+    return xGradY(iOfEltRight, iOfEltLeft);
+  }
+  
+  void Basis::gradStarMatrix(SMat& A) const
+  {
+    gradMatrix(A);
+    A = A.adjoint();
+  }
+  
 
 
   FourierBasis::FourierBasis(const int nbOfElts):
@@ -119,10 +143,10 @@ namespace simol
     assert(nbOfElts % 2 == 1);
   }
 
-  int FourierBasis::nbOfFreq() const
+  /*int FourierBasis::nbOfFreq() const
   {
     return (nbOfElts_ - 1) / 2;
-  }
+  }*/
 
   double FourierBasis::value(double variable, const int iOfElt) const
   {
@@ -156,55 +180,70 @@ namespace simol
     else
       return - sqrt(2.) * pow(iOfFreq, 2) * cos(iOfFreq * variable);
   }
+  
+       // Compute <G_k, \partial_q G_l>
+  double FourierBasis::xGradY(const int iOfEltLeft, const int iOfEltRight) const
+  {
+    return 0;
+  }
+  
+  void FourierBasis::gradMatrix(SMat& A) const
+  {}
+  
+  // Compute <G_k, \partial_q^* \partial_q G_l>
+  double FourierBasis::xLaplacianY(const int iOfEltLeft, const int iOfEltRight) const
+  {
+    return 0;
+  }
+  
+  void FourierBasis::laplacianMatrix(SMat& A) const{}
+  
+  
+  
+  
 
   ExpFourierBasis::ExpFourierBasis(const int nbOfElts0, double beta0, Potential& potential0):
     Basis(nbOfElts0),
     beta_(beta0),
     potential_(&potential0),
-    nbOfIntegrationNodes_(10000),
+    nbOfIntegrationNodes_(1000*nbOfElts()),
+    //nbOfIntegrationNodes_(10),
     qRepartitionFct_(0),
-    expFourierCoeffs_(2 * nbOfElts0)
+    expFourierMeans_(2 * nbOfElts0, 0),
+    gVector_(nbOfElts0, 0),
+    norm2gVector_(0)
   {
     //cout << "ExpFourierBasis(const int nbOfElts0, double beta0, Potential& potential0)" << endl;
-    assert(nbOfElts0 % 2 == 1);
-
-    //We compute the real Fourier coefficients of the function C^-1 exp(-\beta V(q)/2)
-    //where C = ExpFourierBasis::basisCoefficient_
-    double step = 2 * M_PI / (double)nbOfIntegrationNodes_;
-    for (int iOfNode = 0; iOfNode < nbOfIntegrationNodes_; iOfNode++)
-    {
-      double q = - M_PI + iOfNode * step;
-      qRepartitionFct_ += exp(-beta_ * potential(q));
-      expFourierCoeffs_[0] += sqrt(2) * exp(-beta_ * potential(q) / 2);
-      for (int iOfFourier = 1; iOfFourier <= 2 * nbOfFreq(); iOfFourier++)
-      {
-        //cout << q << " -> " << potential(q) << endl;
-        expFourierCoeffs_[2 * iOfFourier] += sqrt(2) * cos(iOfFourier * q) * exp(-beta_ * potential(q) / 2);
-        //if (iOfFourier == 1)
-        //cout << q << " " << expFourierCoeffs_[2 * iOfFourier] << endl;
-      }
-      for (int iOfFourier = 1; iOfFourier <= 2 * nbOfFreq(); iOfFourier++)
-        expFourierCoeffs_[2 * iOfFourier - 1] += sqrt(2) * sin(iOfFourier * q) * exp(-beta_ * potential(q) / 2);
-    }
-    qRepartitionFct_ *= step / (2 * M_PI);
-    basisCoefficient_ = sqrt(qRepartitionFct_);
-    for (int iOfFourier2 = 0; iOfFourier2 <= 4 * nbOfFreq(); iOfFourier2++)
-    {
-      expFourierCoeffs_[iOfFourier2] *= step / (2 * M_PI * basisCoefficient_);
-      //cout << "coeff n°"<< iOfFourier2 << " = " << expFourierCoeffs_[iOfFourier2] << endl;
-    }
-    //cout << "qRepartitionFct_ = " << qRepartitionFct_ << endl;
-    //cout << "basisCoefficient_ = " << basisCoefficient_ << endl;
+    //assert(nbOfElts0 % 2 == 1);
+    //cout << "ExpFourierBasis : nbOfElts = " << nbOfElts0 << " and " <<  nbOfElts0 % 2 << endl << endl;
+    
+    computeExpFourierMeans();
   }
 
-  int ExpFourierBasis::nbOfFreq() const
+  /*int ExpFourierBasis::nbOfFreq() const
   {
     return (nbOfElts_ - 1) / 2;
-  }
-
-  double const& ExpFourierBasis::expFourierCoeffs(int iOfElt) const
+  }*/
+  
+  const double& ExpFourierBasis::amplitude() const
   {
-    return expFourierCoeffs_[iOfElt];
+    return potential_->parameter1();
+  }
+  
+
+  double const& ExpFourierBasis::expFourierMeans(int iOfElt) const
+  {
+    return expFourierMeans_(iOfElt);
+  }
+  
+  Vector<double> const& ExpFourierBasis::gVector() const
+  {
+    return gVector_;
+  }
+  
+  double const& ExpFourierBasis::norm2gVector() const
+  {
+    return norm2gVector_;
   }
 
   double ExpFourierBasis::potential(double variable) const
@@ -221,6 +260,35 @@ namespace simol
   {
     return (potential_->laplacian(variable));
   }
+  
+  //We compute the real Fourier coefficients of the function C^-1 exp(-\beta V(q)/2)
+  //where C = ExpFourierBasis::basisCoefficient_
+  double ExpFourierBasis::computeExpFourierMeans()
+  {
+    double step = 2 * M_PI / (double)nbOfIntegrationNodes_;
+    for (int iOfNode = 0; iOfNode < nbOfIntegrationNodes_; iOfNode++)
+    {
+      double q = - M_PI + iOfNode * step;
+      qRepartitionFct_ += exp(-beta_ * potential(q)) * step;
+      expFourierMeans_(0) += exp(-beta_ * potential(q) / 2);
+      for (int iOfFourier = 1; iOfFourier < 2 * nbOfElts(); iOfFourier++)
+        if (iOfFourier % 2 == 0) expFourierMeans_(iOfFourier) += sqrt(2) * cos(iOfFourier/2 * q) * exp(-beta_ * potential(q) / 2);
+        else expFourierMeans_(iOfFourier) += sqrt(2) * sin((iOfFourier+1)/2 * q) * exp(-beta_ * potential(q) / 2);
+      
+      /*for (int iOfFourier = 1; iOfFourier <= 2 * nbOfFreq(); iOfFourier++)
+        expFourierMeans_(2 * iOfFourier) += sqrt(2) * cos(iOfFourier * q) * exp(-beta_ * potential(q) / 2);
+      for (int iOfFourier = 1; iOfFourier <= 2 * nbOfFreq(); iOfFourier++)
+        expFourierMeans_(2 * iOfFourier - 1) += sqrt(2) * sin(iOfFourier * q) * exp(-beta_ * potential(q) / 2);*/
+    }
+    basisCoefficient_ = sqrt(qRepartitionFct_ / (2 * M_PI));
+    
+    expFourierMeans_ *= step / (2 * M_PI * basisCoefficient_);
+    
+    gVector_ = expFourierMeans_.subvec(0, nbOfElts());
+    norm2gVector_ = pow(gVector_.norm(), 2);
+  }
+  
+  
 
   double ExpFourierBasis::value(double variable, const int iOfElt) const
   {
@@ -260,6 +328,71 @@ namespace simol
       return sqrt(2.) * (- beta_ * iOfFreq * potDeriv(variable) * sin(iOfFreq * variable)
                          + (beta_ / 2 * potLapla(variable) + pow(beta_, 2) / 4 * pow(potDeriv(variable), 2) - pow(iOfFreq, 2)) * cos(iOfFreq * variable)) * expo;
   }
+  
+     // Compute <G_k, \partial_q G_l>
+  double ExpFourierBasis::xGradY(const int iOfEltLeft, const int iOfEltRight) const
+  {
+    if ((iOfEltLeft - iOfEltRight) % 2 == 0 || iOfEltLeft < 0 || iOfEltRight < 0) return 0;
+    double result = 0;
+    if (iOfEltRight % 2 == 1)
+    {
+      if (iOfEltLeft == iOfEltRight-1) result = beta_ / 4;
+      else if (iOfEltLeft == iOfEltRight+1) result = amplitude() * (iOfEltRight+1)/2;
+      else if (iOfEltLeft == iOfEltRight+3) result = -beta_ / 4;
+      else return 0;
+    }
+    else if (iOfEltRight % 2 == 0)
+    {
+      if (iOfEltLeft == iOfEltRight-3) result = -beta_ / 4;
+      else if (iOfEltLeft == iOfEltRight-1) result = -iOfEltRight/2;
+      else if (iOfEltLeft == iOfEltRight+1) result = beta_ / 4;
+      else return 0;
+    }
+    
+    if (iOfEltLeft == 0 || iOfEltRight == 0)
+      return result * sqrt(2.);
+    else return result;
+  }
+  
+  void ExpFourierBasis::gradMatrix(SMat& A) const
+  {
+    for (int iOfFourier = 0; iOfFourier < nbOfElts_; iOfFourier++)
+      for (int jOfFourier = max(0, iOfFourier-3); jOfFourier < min(nbOfElts_, iOfFourier+4); jOfFourier++)
+        A(iOfFourier, jOfFourier) = xGradY(iOfFourier, jOfFourier);
+  }
+  
+  // Compute <G_k, \partial_q^* \partial_q G_l>
+  double ExpFourierBasis::xLaplacianY(const int iOfEltLeft, const int iOfEltRight) const
+  {
+    if ((iOfEltLeft - iOfEltRight) % 2 == 1 || iOfEltLeft < 0 || iOfEltRight < 0) return 0;
+    double result = 0;
+    for (int iOfElt = max(iOfEltLeft, iOfEltRight) - 3; iOfElt < min(iOfEltLeft, iOfEltRight) + 4; iOfElt++)
+    //for (int iOfElt = 0; iOfElt < nbOfElts(); iOfElt++)
+      result += xGradY(iOfElt, iOfEltLeft) * xGradY(iOfElt, iOfEltRight);
+    return result;
+    
+    /*if      (iOfEltLeft == iOfEltRight-4) result = - pow(amplitude() * beta_, 2) / 16;
+    else if (iOfEltLeft == iOfEltRight-2) result = -amplitude() * beta_/4;
+    else if (iOfEltLeft == iOfEltRight)   result = pow(floor((iOfEltRight+1)/2), 2) + pow(beta_, 2) / 8;      
+    else if (iOfEltLeft == iOfEltRight+2) result = -amplitude() * beta_/4;
+    else if (iOfEltLeft == iOfEltRight+4) result = - pow(amplitude() * beta_, 2) / 16;
+    else result = 0;
+    
+    return result * (iOfEltLeft == 0?sqrt(2.):1) * (iOfEltRight == 0?sqrt(2.):1);*/
+  }
+  
+  void ExpFourierBasis::laplacianMatrix(SMat& A) const
+  {
+    for (int iOfFourier = 0; iOfFourier < nbOfElts_; iOfFourier++)
+      for (int jOfFourier = max(0, iOfFourier-4); jOfFourier < min(nbOfElts_, iOfFourier+5); jOfFourier++)
+        A(iOfFourier, jOfFourier) = xLaplacianY(iOfFourier, jOfFourier);
+  }
+    
+ 
+    
+  
+  
+  
 
   HermiteBasis::HermiteBasis(const int nbOfElts0, double beta0)
     : Basis(nbOfElts0),
@@ -307,8 +440,33 @@ namespace simol
       result += iOfCoeff * (iOfCoeff - 1) * polyCoeffs_(iOfElt, iOfCoeff) * pow(variable, iOfCoeff - 2);
     return result;
   }
-
-
+  
+  // Compute <H_n, \partial_p H_m>
+  double HermiteBasis::xGradY(const int iOfEltLeft, const int iOfEltRight) const
+  {
+    return (iOfEltLeft == iOfEltRight+1) * sqrt(beta_*iOfEltRight);
+  }
+  
+  void HermiteBasis::gradMatrix(SMat& A) const
+  {
+    for (int iOfHermite = 0; iOfHermite< nbOfElts_-1; iOfHermite++)
+      A(iOfHermite+1, iOfHermite) = xGradY(iOfHermite+1, iOfHermite);
+  }
+  
+  // Compute <H_n, \partial_p H_m>
+  double HermiteBasis::xLaplacianY(const int iOfEltLeft, const int iOfEltRight) const
+  {
+    return (iOfEltLeft == iOfEltRight) * beta_*iOfEltRight;
+  }
+ 
+  void HermiteBasis::laplacianMatrix(SMat& A) const
+  {
+    for (int iOfHermite = 0; iOfHermite< nbOfElts_; iOfHermite++)
+      A(iOfHermite, iOfHermite) = xLaplacianY(iOfHermite, iOfHermite);
+  }
+  
+  
+ 
 
   TensorBasis::TensorBasis(const int nbOfVariables0):
     bases_(nbOfVariables0)
@@ -344,16 +502,12 @@ namespace simol
     return nbOfElts0;
   }
 
-  /*double TensorBasis::value(double variable, const int iOfElt)
+  const Basis* TensorBasis::operator()(const int iOfBasis) const
   {
-    int iOfFreq = (iOfElt+1)/2;
-    if (iOfElt == 0)
-      return 1;
-    else if (iOfElt % 2 == 1)
-      return sqrt(2.) * sin(iOfFreq * variable);
-    else
-      return sqrt(2.) * cos(iOfFreq * variable);
-  }*/
+    return bases_[iOfBasis];
+  }
+  
+  
 
   QPBasis::QPBasis():
     TensorBasis(2)
@@ -470,6 +624,8 @@ namespace simol
     return laplacianP(configuration, iOfParticle, vecIndex);
   }
 
+  
+  
 
   FourierHermiteBasis::FourierHermiteBasis(Input const& input):
     QPBasis()
@@ -487,10 +643,21 @@ namespace simol
     //cout << "end ExpFourierHermiteBasis(Input const& input)" << endl;
   }
 
-  double const& ExpFourierHermiteBasis::expFourierCoeffs(int iOfElt) const
+  double const& ExpFourierHermiteBasis::expFourierMeans(int iOfElt) const
   {
-    return bases_[0]->expFourierCoeffs(iOfElt);
+    return bases_[0]->expFourierMeans(iOfElt);
   }
+  
+  Vector<double> const& ExpFourierHermiteBasis::gVector() const
+  {
+    return bases_[0]->gVector();
+  }
+  
+  double const& ExpFourierHermiteBasis::norm2gVector() const
+  {
+    return bases_[0]->norm2gVector();
+  }
+    
 }
 
 

@@ -10,6 +10,9 @@ namespace simol
 
   void updateAllControlVariates(const Hamiltonian& /*dyna*/, System const& /*syst*/, Output& /*output*/, long int /*iOfStep*/)
   {}
+  
+  void updateAllControlVariates(const Overdamped& /*dyna*/, System const& /*syst*/, Output& /*output*/, long int /*iOfStep*/)
+  {}
 
   ///
   ///Computes the quantities needed by the control variates (coefficients a, b, D) and {L \Phi}

@@ -34,6 +34,6 @@ double modulo(double variable, double mini, double maxi);
 int intModulo(int variable, int maxi);
 void displayTime(double time);
 int getNbOfLines(ifstream& file);
-bool hasSmallerNorm(const cplx& a, const cplx& b);
-
+//bool hasSmallerNorm(const cplx& a, const cplx& b);
+bool hasSmallerNorm(cplx a, cplx b);
 #endif

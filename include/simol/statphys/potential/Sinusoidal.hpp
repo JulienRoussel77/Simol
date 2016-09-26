@@ -10,6 +10,7 @@ namespace simol
   {
     public:
       Sinusoidal(Input const& input);
+      const double& parameter1() const;
       double drawLaw(double localBeta, std::shared_ptr<RNG>& rng) const;
       double operator()(double position) const;
       Vector<double> gradient(double position) const;

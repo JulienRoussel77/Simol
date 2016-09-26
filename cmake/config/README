@@ -1,0 +1,3 @@
+Le CMakeLists.txt est un template pour compiler un projet utilisant simol.
+Le config.cmake doit être copié dans simol/ pour configurer la librairie avant compilation.
+Tous les deux sont copiés dans Logiciels/simol lors de l'installation.

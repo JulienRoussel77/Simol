@@ -20,6 +20,17 @@ namespace simol
     //output.obsVelocity().finalDisplay(parameters);
   }
   
+  //------------- Overdamped --------------------
+    
+  template <>
+  void computeOutput(Overdamped const& dyna, Isolated const& syst, Output& output, long int iOfStep)
+  {
+    output.potentialEnergy() = syst.getParticle(0).potentialEnergy();
+    // In the case of the trichain we add the potential of the wall interaction
+    output.potentialEnergy() += syst.boundaryPotEnergy();
+    updateAllControlVariates(dyna, syst, output, iOfStep);
+  }
+  
     //------------- Langevin --------------------
 
   void writeFinalOutput(Langevin const& /*dyna*/, Isolated const& syst, Output& output)

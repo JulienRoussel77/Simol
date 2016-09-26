@@ -32,7 +32,12 @@ int getNbOfLines(ifstream& file)
   return nbOfLines;
 }
 
-bool hasSmallerNorm(const cplx& a, const cplx& b)
+/*bool hasSmallerNorm(const cplx& a, const cplx& b)
+{
+  return (norm(a) < norm(b));
+}*/
+
+bool hasSmallerNorm(cplx a, cplx b)
 {
   return (norm(a) < norm(b));
 }

@@ -9,8 +9,8 @@ namespace simol
   {
     public:
       Overdamped(Input const& input);
-      virtual void updateBefore(Particle& particle);
-      virtual void updateAfter(Particle& particle);
+      //virtual void updateBefore(Particle& particle);
+      virtual void updatePosition(Particle& particle);
   };
 
 }

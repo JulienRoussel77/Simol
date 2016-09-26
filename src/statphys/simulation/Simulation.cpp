@@ -40,6 +40,19 @@ namespace simol
       dyna.updateAfter(particle);
   }*/
   
+  //------------- Overdamped --------------------
+  
+  void simulate(Overdamped& dyna, System& syst)
+  {
+    //for (auto && particle : syst.configuration())
+    //  dyna.verletFirstPart(particle);
+    syst.computeAllForces();
+    for (auto && particle : syst.configuration())
+      dyna.updatePosition(particle);
+    //for (auto && particle : syst.configuration())
+    //  dyna.updateOrsteinUhlenbeck(particle, dyna.beta());
+  }
+  
   void simulate(LangevinBase& dyna, System& syst)
   {
   for (auto && particle : syst.configuration())
@@ -71,6 +84,15 @@ namespace simol
 
   void writeOutput(Hamiltonian const& /*dyna*/, System const& syst, Output& output, long int iOfStep)
   {
+    if (output.doOutput(iOfStep))
+      output.displayThermoVariables(iOfStep);
+
+    if (output.doLongPeriodOutput(iOfStep))
+      output.displayParticles(syst.configuration(), iOfStep);
+  }
+  
+  void writeOutput(Overdamped const& /*dyna*/, System const& syst, Output& output, long int iOfStep)
+  {    
     if (output.doOutput(iOfStep))
       output.displayThermoVariables(iOfStep);
 

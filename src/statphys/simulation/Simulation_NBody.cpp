@@ -103,6 +103,16 @@ namespace simol
     for (auto && particle : syst.configuration())
       dyna.verletSecondPart(particle);
   }
+  
+  //--- Overdamped dynamics ---
+  void simulate(Overdamped& dyna, NBody& syst)
+  {
+    //for (auto && particle : syst.configuration())
+    //  dyna.verletFirstPart(particle);
+    syst.computeAllForces();
+    for (auto && particle : syst.configuration())
+      dyna.updatePosition(particle);  
+  }
 
   //--- Langevin dynamics ---
   void simulate(Langevin& dyna, NBody& syst)
@@ -150,6 +160,15 @@ namespace simol
       output.potentialEnergy() += particle.potentialEnergy();
       output.totalVirial() += particle.virial();
     }
+  }
+  
+  template <>
+  void computeOutput(Overdamped const& /*dyna*/, NBody const& syst, Output& output, long int /*iOfStep*/)
+  {
+    output.potentialEnergy() = 0;
+    //Calcul de la température et de l'énergie
+  for (const auto & particle : syst.configuration())
+      output.potentialEnergy() += particle.potentialEnergy();
   }
 
   template <>
@@ -202,6 +221,15 @@ namespace simol
       output.displayThermoVariables(iOfStep);
     if (output.doLongPeriodOutput(iOfStep))
       output.displayParticlesXMakeMol(syst.configuration(), iOfStep, syst.latticeParameter()*syst.nbOfParticlesPerDimension());
+  }
+  
+  void writeOutput(Overdamped const& /*dyna*/, NBody const& syst, Output& output, long int iOfStep)
+  {    
+    if (output.doOutput(iOfStep))
+      output.displayThermoVariables(iOfStep);
+
+    if (output.doLongPeriodOutput(iOfStep))
+      output.displayParticles(syst.configuration(), iOfStep);    
   }
 
   void writeOutput(Langevin const& /*dyna*/, NBody const& syst, Output& output, long int iOfStep)

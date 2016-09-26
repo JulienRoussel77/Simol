@@ -71,16 +71,16 @@ namespace simol
     //-- longer outputs if required, e.g. configuration of the system --
     if (printLongPeriodNbOfSteps_ > 0)
     {
-      if (input.systemName() == "NBody")
-      {
+      //if (input.systemName() == "NBody")
+      //{
         outParticlesXMakeMol_ = std::make_shared<ofstream>(input.outputFolderName() + "xmakemol.xyz");
         outParticlesFullConfiguration_ = std::make_shared<ofstream>(input.outputFolderName() + "FullConfiguration.txt");
-      }
-      else
-      {
+      //}
+      //else
+      //{
         outParticles_ = std::make_shared<ofstream>(input.outputFolderName() + "particles.txt");
         outParticles() << "# time index position momentum kineticEnergy potentialEnergy energy force" << endl;
-      }
+      //}
     }
 
     //-- for autocorrelations --
@@ -90,9 +90,6 @@ namespace simol
     //-- average velocities for 1D nonequilibrium --
     if ( (input.systemName() == "Isolated") && (input.dynamicsName() == "Langevin") )
     {
-      //outVelocitiesCV_      = std::make_shared<ofstream>(input.outputFolderName() + "velocities.txt");
-      //outVelocitiesCV() << "# time b <b> <b2> D <D> <D2> observable <observable> <observable2> LPhi <LPhi> <LPhi2>" << endl;
-
         obsVelocity_ = addObservable(input, "velocity.txt");
     }
 
@@ -370,7 +367,7 @@ namespace simol
   }
 
   void Output::displayParticles(vector<Particle> const& configuration, long int iOfStep)
-  {
+  {                     
     for (int iOfParticle = 0; iOfParticle < nbOfParticles_; iOfParticle++)
       outParticles() << iOfStep * timeStep()
                      << " " << iOfParticle
@@ -380,7 +377,7 @@ namespace simol
                      << " " << configuration[iOfParticle].potentialEnergy()
                      << " " << configuration[iOfParticle].energy()
                      << " " << configuration[iOfParticle].force()
-                     << endl;
+                     << endl; 
   }
 
   void Output::displayFinalVelocity(double temperature, double externalForce, int nbOfFourier, int nbOfHermite)
