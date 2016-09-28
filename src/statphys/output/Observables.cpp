@@ -15,14 +15,15 @@ namespace simol
     return new Observable(input);
   }*/
 
-  Observable::Observable(Input const& input, const string& outPath):
+  Observable::Observable(Input const& input, const string& outPath0):
     decorrelationNbOfSteps_(input.decorrelationNbOfSteps()),
     timeStep_(input.timeStep()),
     printPeriodNbOfSteps_(input.printPeriodNbOfSteps()),
     nbOfAutocoPts_(input.nbOfAutocoPts()),
     currentValue_(0),
     autocoStats_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts()),
-    outFlux_(input.outputFolderName() + outPath)
+    outPath_(outPath0),
+    outFlux_(input.outputFolderName() + outPath0)
   {
     outFlux() << "# time value mean variance" << endl;
     //if (outPathFinal != "")
@@ -31,7 +32,7 @@ namespace simol
     
     if (doComputeCorrelations())
     {
-      outFluxCorrelation_ = new ofstream(input.outputFolderName() + "correlation_" + outPath);
+      outFluxCorrelation_ = new ofstream(input.outputFolderName() + "correlation_" + outPath0);
       outFluxCorrelation() << "# iOfSpan correlation varOfCorrelation" << endl;
     }
   }
@@ -69,6 +70,9 @@ namespace simol
   
   double Observable::time() const
   {return autocoStats_.nbValues() * printPeriodTime();}
+  
+  string const& Observable::outPath() const
+  {return outPath_;}
   
   ofstream& Observable::outFlux()
   {
@@ -154,7 +158,6 @@ namespace simol
   void Observable::appendCurrent(long int iOfStep)
   {
     append(currentValue(), iOfStep);
-    currentValue() = 0;
   }
   
   

@@ -51,5 +51,24 @@ namespace simol
     particle1.force(0) -= tauBending();
     particle2.force(0) += tauBending();
   }
+  
+  ///Applies the generator of this dynamics to the basis functions of the CV
+  ///Evaluate at the current state of "conifguration"
+void BoundaryLangevin::computeGeneratorOnBasis(CVBasis& cvBasis, vector<Particle> const& configuration) const
+  {
+    int nbOfParticles = (int)configuration.size();
+    //Vector<double> result = Vector<double>::Zero(nbOfFunctions());
+    for (int iOfFunction = 0; iOfFunction < cvBasis.nbOfFunctions(); iOfFunction++)
+    {
+      for (int iOfParticle = 0; iOfParticle < nbOfParticles; iOfParticle++)
+        cvBasis.generatorOnBasisValues_(iOfFunction) += dot(configuration[iOfParticle].momentum(), cvBasis.basis_->gradientQ(configuration, iOfParticle, iOfFunction))
+                               + dot(configuration[iOfParticle].force(), cvBasis.basis_->gradientP(configuration, iOfParticle, iOfFunction));
+      //if(false)
+      cvBasis.generatorOnBasisValues_(iOfFunction) += gamma() * (- dot(configuration[0].momentum(), cvBasis.basis_->gradientP(configuration, 0, iOfFunction))
+                                      + cvBasis.basis_->laplacianP(configuration, 0, iOfFunction) / betaLeft()
+                                      - dot(configuration[nbOfParticles - 1].momentum(), cvBasis.basis_->gradientP(configuration, nbOfParticles - 1, iOfFunction))
+                                      + cvBasis.basis_->laplacianP(configuration, nbOfParticles - 1, iOfFunction) / betaRight());
+    }
+  }
 
 }

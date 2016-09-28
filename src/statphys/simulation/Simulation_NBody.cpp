@@ -147,9 +147,9 @@ namespace simol
     syst.fluctuationDissipationDPDE(dyna);
   }
 
-  template <>
-  void computeOutput(Hamiltonian const& /*dyna*/, NBody const& syst, Output& output, long int /*iOfStep*/)
-  {
+  //template <>
+  //void computeOutput(Hamiltonian const& /*dyna*/, NBody const& syst, Output& output, long int /*iOfStep*/)
+  /*{
     output.kineticEnergy() = 0;
     output.potentialEnergy() = 0;
     output.totalVirial() = 0;
@@ -160,20 +160,20 @@ namespace simol
       output.potentialEnergy() += particle.potentialEnergy();
       output.totalVirial() += particle.virial();
     }
-  }
+  }*/
   
-  template <>
-  void computeOutput(Overdamped const& /*dyna*/, NBody const& syst, Output& output, long int /*iOfStep*/)
-  {
+  //template <>
+  //void computeOutput(Overdamped const& /*dyna*/, NBody const& syst, Output& output, long int /*iOfStep*/)
+  /*{
     output.potentialEnergy() = 0;
     //Calcul de la température et de l'énergie
   for (const auto & particle : syst.configuration())
       output.potentialEnergy() += particle.potentialEnergy();
-  }
+  }*/
 
-  template <>
-  void computeOutput(Langevin const& /*dyna*/, NBody const& syst, Output& output, long int /*iOfStep*/)
-  {
+  //template <>
+  //void computeOutput(Langevin const& /*dyna*/, NBody const& syst, Output& output, long int /*iOfStep*/)
+  /*{
     output.kineticEnergy() = 0;
     output.potentialEnergy() = 0;
     output.totalVirial() = 0;
@@ -184,9 +184,9 @@ namespace simol
       output.potentialEnergy() += particle.potentialEnergy();
       output.totalVirial() += particle.virial();
     }
-  }
+  }*/
 
-  template <>
+  /*template <>
   void computeOutput(DPDE const& dyna, NBody const& syst, Output& output, long int iOfStep)
   {
     output.kineticEnergy() = 0;
@@ -213,7 +213,7 @@ namespace simol
     //-- rejection rate --
     output.rejectionCount() = dyna.rejectionCount()/dyna.totalCountForRejection();
     output.negativeEnergiesCount() = dyna.negativeEnergiesCount();
-  }
+  }*/
 
   void writeOutput(Hamiltonian const& /*dyna*/, NBody const& syst, Output& output, long int iOfStep)
   {

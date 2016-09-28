@@ -59,6 +59,11 @@ namespace simol
       virtual double computeMeanPotLaw(double betaLocal) const;
 
       //-- output functions --
+      virtual void computeKineticEnergy(Output& output) const;
+      virtual void computePotentialEnergy(Output& output) const;
+      virtual void computePressure(Output& output) const;
+      virtual void computeInternalEnergy(Output& output) const;
+      virtual void computeInternalTemperature(Output& output, Dynamics const& dyna) const;
       virtual void computeProfile(Output& /*output*/, Dynamics const& /*model*/, long int /*iOfStep*/)const;
 
       // currently specific to chains

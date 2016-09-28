@@ -180,10 +180,51 @@ namespace simol
     }
     return qInteg / repFunc;
   }
+  
+  void System::computeKineticEnergy(Output& output) const
+  {
+    output.obsKineticEnergy().currentValue() = 0;
+    for (auto && particle : configuration())
+      output.obsKineticEnergy().currentValue() += particle.kineticEnergy();
+  }
+  
+  void System::computePotentialEnergy(Output& output) const
+  {
+    output.obsPotentialEnergy().currentValue() = 0;
+    for (auto && particle : configuration())
+      output.obsPotentialEnergy().currentValue() += particle.potentialEnergy();
+    output.obsPotentialEnergy().currentValue() += boundaryPotEnergy();
+  }
+  
+  void System::computePressure(Output& output) const
+  {
+    output.totalVirial() = 0;
+    for (auto && particle : configuration())
+      output.totalVirial() += particle.virial();
+    
+    //output.obsPressure().currentValue() = 2*output.kineticEnergy() + output.totalVirial()/(output.dimension()*nbOfParticles()*pow(output.latticeParameter(), output.dimension()));
+    
+    //Computes the instantaneous pressure, knowing the total virial
+    output.obsPressure().currentValue() = output.pressure();
+  }
+  
+  void System::computeInternalEnergy(Output& output) const
+  {
+    output.obsInternalEnergy().currentValue() = 0;
+    for (auto && particle : configuration())
+      output.obsInternalEnergy().currentValue() += particle.internalEnergy();
+  }
+  
+  void System::computeInternalTemperature(Output& output, Dynamics const& dyna) const
+  {
+    output.obsInternalTemperature().currentValue() = 0;
+    for (auto && particle : configuration())
+      output.obsInternalTemperature().currentValue() += 1/dyna.internalTemperature(particle.internalEnergy());
+  }
 
   void System::computeProfile(Output& /*output*/, Dynamics const& /*model*/, long int /*iOfStep*/) const
   {
-    throw std::invalid_argument("System::computeProfile : Function undefined");
+    //throw std::invalid_argument("System::computeProfile : Function undefined");
   }
 
 }

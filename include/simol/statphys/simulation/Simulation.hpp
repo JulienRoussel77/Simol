@@ -67,8 +67,9 @@ namespace simol
 
   //void simulate(Dynamics& dyna, System& syst);
 
-  template <class D, class S>
-  void computeOutput(D const& dyna, S const& syst, Output& output, long int iOfStep);
+  //template <class D, class S>
+  void computeOutput(Dynamics const& dyna, System const& syst, Output& output, long int iOfStep);
+  void computeControlVariate(Dynamics const& dyna, vector<Particle> const& configuration, Output& output);
   //void writeOutput(System const& syst, Output& output, long int iOfStep);
   void writeFinalOutput(Dynamics const& dyna, System const& syst, Output& output);
 
@@ -76,13 +77,13 @@ namespace simol
 
   //-- specializations for Isolated --
   void samplePositions(Dynamics& dyna, Isolated& syst);
-  template <class D>
-  void computeOutput(D const& dyna, Isolated const& syst, Output& output, long int iOfStep);
+  //template <class D>
+  //void computeOutput(D const& dyna, Isolated const& syst, Output& output, long int iOfStep);
   void writeFinalOutput(Hamiltonian const& dyna, Isolated const& syst, Output& output);
   void writeFinalOutput(Langevin const& dyna, Isolated const& syst, Output& output);
   void sampleMomenta(Overdamped& /*dyna*/, Isolated& /*syst*/);
-  template <>
-  void computeOutput(const DPDE& dyna, Isolated const& syst, Output& output, long int iOfStep);
+  //template <>
+  //void computeOutput(const DPDE& dyna, Isolated const& syst, Output& output, long int iOfStep);
   void samplePositions(DPDE& dyna, Isolated& syst);
   void simulate(DPDE& dyna, System& syst);
   
@@ -92,10 +93,10 @@ namespace simol
   void writeOutput(BoundaryLangevin const& dyna, Chain const& syst, Output& output, long int iOfStep);
   //template <class D>
   //void computeOutput(D const& dyna, Chain const& syst, Output& output, long int iOfStep);
-  template <>
-  void computeOutput(Overdamped const& dyna, Isolated const& syst, Output& output, long int iOfStep);
-  template <class S>
-  void computeOutput(BoundaryLangevin const& dyna, S const& syst, Output& output, long int iOfStep);
+  //template <>
+  //void computeOutput(Overdamped const& dyna, Isolated const& syst, Output& output, long int iOfStep);
+  //template <class S>
+  //void computeOutput(BoundaryLangevin const& dyna, S const& syst, Output& output, long int iOfStep);
   void simulate(BoundaryLangevin& dyna, Chain& syst);
   // Bichain
   void samplePositions(BoundaryLangevin& dyna, BiChain& syst);
@@ -114,16 +115,16 @@ namespace simol
   void simulate(Langevin& dyna, NBody& syst);
   void simulate(DPDE& dyna, NBody& syst);
   void thermalize(DPDE& dyna, NBody& syst);
-  template <class D>
-  void computeOutput(D const& /*dyna*/, NBody const& syst, Output& output, long int /*iOfStep*/);
-  template <>
-  void computeOutput(Hamiltonian const& /*dyna*/, NBody const& syst, Output& output, long int /*iOfStep*/);
-  template <>
-  void computeOutput(Overdamped const& /*dyna*/, NBody const& syst, Output& output, long int /*iOfStep*/);
-  template <>
-  void computeOutput(Langevin const& /*dyna*/, NBody const& syst, Output& output, long int /*iOfStep*/);
-  template <>
-  void computeOutput(DPDE const& dyna, NBody const& syst, Output& output, long int iOfStep);
+  //template <class D>
+  //void computeOutput(D const& /*dyna*/, NBody const& syst, Output& output, long int /*iOfStep*/);
+  //template <>
+  //void computeOutput(Hamiltonian const& /*dyna*/, NBody const& syst, Output& output, long int /*iOfStep*/);
+  //template <>
+  //void computeOutput(Overdamped const& /*dyna*/, NBody const& syst, Output& output, long int /*iOfStep*/);
+  //template <>
+  //void computeOutput(Langevin const& /*dyna*/, NBody const& syst, Output& output, long int /*iOfStep*/);
+  //template <>
+  //void computeOutput(DPDE const& dyna, NBody const& syst, Output& output, long int iOfStep);
   void writeOutput(Hamiltonian const& /*dyna*/, NBody const& syst, Output& output, long int iOfStep);
   void writeOutput(Overdamped const& /*dyna*/, NBody const& syst, Output& output, long int iOfStep);
   void writeOutput(Langevin const& /*dyna*/, NBody const& syst, Output& output, long int iOfStep);
@@ -198,8 +199,10 @@ namespace simol
 
     syst.computeAllForces();
   }
+  
 
-  template <class D, class S>
+
+  /*template <class D, class S>
   void computeOutput(D const& dyna, S const& syst, Output& output, long int iOfStep)
   {
     output.kineticEnergy() = 0;
@@ -215,18 +218,18 @@ namespace simol
     syst.computeProfile(output, dyna, iOfStep);
     // use control variates
     updateAllControlVariates(dyna, syst, output, iOfStep);
-  }
+  }*/
 
   // Isolated
 
-  template <class D>
+  /*template <class D>
   void computeOutput(D const& dyna, Isolated const& syst, Output& output, long int iOfStep)
   {
     //-- compute temperature and kinetic energy --
     output.kineticEnergy() = syst.getParticle(0).kineticEnergy();
     output.potentialEnergy() = syst.getParticle(0).potentialEnergy();
     updateAllControlVariates(dyna, syst, output, iOfStep);
-  }
+  }*/
 
   
   /*template <>
@@ -244,7 +247,7 @@ namespace simol
   }*/
 
   // Chain
-  template <class S>
+  /*template <class S>
   void computeOutput(BoundaryLangevin const& dyna, S const& syst, Output& output, long int iOfStep)
   {
     output.kineticEnergy() = 0;
@@ -259,9 +262,9 @@ namespace simol
     output.potentialEnergy() += syst.boundaryPotEnergy();
     syst.computeProfile(output, dyna, iOfStep);
     updateAllControlVariates(dyna, syst, output, iOfStep);
-  }
+  }*/
 
-  template <class D>
+  /*template <class D>
   void computeOutput(D const& dyna, Chain const& syst, Output& output, long int iOfStep)
   {throw std::invalid_argument("computeOutput(D const& dyna, Chain const& syst, Output& output, long int iOfStep) not defined !");}
 
@@ -269,7 +272,7 @@ namespace simol
   // Nbody
   template <class D>
   void computeOutput(D const& dyna, NBody const& syst, Output& output, long int iOfStep)
-  {throw std::invalid_argument("computeOutput(D const& dyna, NBody const& syst, Output& output, long int iOfStep) not defined !");}
+  {throw std::invalid_argument("computeOutput(D const& dyna, NBody const& syst, Output& output, long int iOfStep) not defined !");}*/
 
 
   // ------------------------------- MAIN Function ----------------------

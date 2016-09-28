@@ -9,47 +9,10 @@ namespace simol
   {return *outBeam_;}
   ofstream & Output::outFinalFlow()
   {return *outFinalFlow_;}
-  /*ofstream & Output::outMidFlowCV()
-  {return *outMidFlowCV_;}
-  ofstream & Output::outMidFlowPT()
-  {return *outMidFlowPT_;}
-  ofstream & Output::outSumFlowCV()
-  {return *outSumFlowCV_;}
-  ofstream & Output::outSumFlowPT()
-  {return *outSumFlowPT_;}
-  ofstream & Output::outModiFlowCV()
-  {return *outModiFlowCV_;}*/
   ofstream & Output::outProfile()
   {return *outProfile_;}
   ofstream & Output::outFinalProfile()
   {return *outFinalProfile_;}
-
-  /*const double& Output::energyMidFlow() const
-  {return energyMidFlow_;}
-
-  double& Output::energyMidFlow()
-  {return energyMidFlow_;}
-
-  const double& Output::energySumFlow() const
-  {return energySumFlow_;}
-
-  double& Output::energySumFlow()
-  {return energySumFlow_;}
-  
-  const double& Output::energyModiFlow() const
-  {return energyModiFlow_;}
-
-  double& Output::energyModiFlow()
-  {return energyModiFlow_;}*/
-
-  Observable& Output::obsMidFlow()
-  {return *obsMidFlow_;}
-
-  Observable& Output::obsSumFlow()
-  {return *obsSumFlow_;}
-  
-  Observable& Output::obsModiFlow()
-  {return *obsModiFlow_;}
 
   void Output::displayChainPositions(vector<Particle> const& configuration, long int iOfStep)
   {

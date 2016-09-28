@@ -9,9 +9,12 @@ using std::setw;
 #include "simol/statphys/controlVariate/ControlVariate.hpp"
 #include "simol/statphys/controlVariate/Galerkin.hpp"
 #include "simol/statphys/output/Observable.hpp"
+#include "simol/statphys/controlVariate/CVBasis.hpp"
 
 namespace simol
 {
+  
+
 
   class Output
   {
@@ -20,7 +23,7 @@ namespace simol
 
     Output(Input const& input);
     Observable* addObservable(const Input& input, const string& outPath);
-    Observable* addControlVariate(const Input& input, const string& outPath, Potential& potential, Galerkin* galerkin);
+    Observable* addControlVariate(const Input& input, const string& outPath, Galerkin* galerkin);
     void setControlVariates(Input& input, Potential& potential, Galerkin* galerkin);
     
 
@@ -34,15 +37,7 @@ namespace simol
     ofstream & outCorrelation();
     ofstream & outChainVelocities();
     ofstream & outBeam();
-    //ofstream & outVelocitiesCV();
     ofstream & outVelocitiesGenerator();
-    /*ofstream & outForcesCV();
-    ofstream & outLengthsCV();
-    ofstream & outMidFlowCV();
-    ofstream & outMidFlowPT();
-    ofstream & outSumFlowCV();
-    ofstream & outModiFlowCV();
-    ofstream & outSumFlowPT();*/
     ofstream & outProfile();
     ofstream & outFinalProfile();
 
@@ -50,15 +45,18 @@ namespace simol
     const double& timeStep() const;
     double& timeStep();
     double printPeriodTime() const;
-    const int& printPeriodNbOfSteps() const;
+    int const& printPeriodNbOfSteps() const;
     double printLongPeriodTime() const;
-    const int& printLongPeriodNbOfSteps() const;
+    int const& printLongPeriodNbOfSteps() const;
     bool doOutput(long int iOfStep) const;
     bool doLongPeriodOutput(long int iOfStep) const;
-    const int& nbOfParticles() const;
+    int const& nbOfParticles() const;
     const long int& nbOfSteps() const;
     double finalTime() const;
+    int const& dimension() const;
+    double const& latticeParameter() const;
     int nbOfObservables() const;
+    vector<Observable*>& observables();
     Observable* observables(int iOfObservable);
 
 
@@ -71,17 +69,13 @@ namespace simol
     double& internalEnergy();
     const double& internalTemperature() const;
     double& internalTemperature();
+    const double& Pressure() const;  
+    double& Pressure();
     const double& totalVirial() const;
     double& totalVirial();
     double energy() const;
     double temperature() const;
     double pressure() const;
-    /*const double& energyMidFlow() const;
-    double& energyMidFlow();
-    const double& energySumFlow() const;
-    double& energySumFlow();
-    const double& energyModiFlow() const;
-    double& energyModiFlow();*/
     const double& rejectionCount() const;
     double& rejectionCount();
     const double& negativeEnergiesCount() const;
@@ -89,9 +83,9 @@ namespace simol
 
     //-- parametrization of outputs --
     bool doComputeCorrelations() const;
-    const int& nbOfAutocoPts() const;
+    int const& nbOfAutocoPts() const;
     double autocoPtsPeriod() const;
-    const int& decorrelationNbOfSteps() const;
+    int const& decorrelationNbOfSteps() const;
     int& decorrelationNbOfSteps();
     double decorrelationTime() const;
 
@@ -120,26 +114,32 @@ namespace simol
 
       //------------- pour DPDE ---------------
     void displayThermoVariablesDPDE(vector<Particle> const& configuration, long int iOfStep);
-    void appendKineticEnergy(double value, long int iOfStep);
-    void appendPotentialEnergy(double value, long int iOfStep);
-    void appendInternalEnergy(double value, long int iOfStep);
-    void appendInternalTemperature(double value, long int iOfStep);
-    void appendPressure(double value, long int iOfStep);
     void finalDisplayCorrelationsDPDE();
     
+    Observable& obsKineticEnergy();
+    Observable const& obsKineticEnergy() const;
+    Observable& obsPotentialEnergy();
+    Observable const& obsPotentialEnergy() const;
+    Observable& obsPressure();
+    Observable const& obsPressure() const;
+    Observable& obsInternalEnergy();
+    Observable const& obsInternalEnergy() const;
+    Observable& obsInternalTemperature();
+    Observable const& obsInternalTemperature() const;
     Observable& obsVelocity();
+    Observable const& obsVelocity() const;
     Observable& obsForce();
+    Observable const& obsForce() const;
     Observable& obsLength();
+    Observable const& obsLength() const;
     Observable& obsMidFlow();
+    Observable const& obsMidFlow() const;
     Observable& obsSumFlow();
+    Observable const& obsSumFlow() const;
     Observable& obsModiFlow();
-    
-    //------------- for Galerkin ----------------------
-    //void displayGeneratorOnBasis(ofstream& out, vector<Particle> const& configuration, ControlVariate& controlVariate, double time);
-    //void displayGeneratorOnBasis(ofstream& out, vector<Particle> const& configuration, Observable& controlVariate, double time){};
+    Observable const& obsModiFlow() const;
 
-    void updateControlVariate(vector<Particle> const& configuration);
-
+    bool hasControlVariate() const;
   protected:
     string outputFolderName_;
     std::shared_ptr<ofstream> outThermo_;
@@ -158,19 +158,11 @@ namespace simol
 
     //-- control variate outputs --
     std::shared_ptr<ofstream> outVelocitiesGenerator_;
-    //std::shared_ptr<ofstream> outVelocitiesCV_;
-    //std::shared_ptr<ofstream> outForcesCV_;
 
     //-- for chains --
     std::shared_ptr<ofstream> outFinalFlow_;
-    std::shared_ptr<ofstream> outBeam_;
-    //std::shared_ptr<ofstream> outLengthsCV_;      
+    std::shared_ptr<ofstream> outBeam_;  
     std::shared_ptr<ofstream> outChainVelocities_;
-    /*std::shared_ptr<ofstream> outMidFlowCV_;
-    std::shared_ptr<ofstream> outMidFlowPT_;
-    std::shared_ptr<ofstream> outSumFlowCV_;
-    std::shared_ptr<ofstream> outSumFlowPT_;
-    std::shared_ptr<ofstream> outModiFlowCV_;*/
     std::shared_ptr<ofstream> outProfile_;
     std::shared_ptr<ofstream> outFinalProfile_;
 
@@ -183,16 +175,9 @@ namespace simol
     double latticeParameter_;
 
     //-- fields to output --
-    double kineticEnergy_;
-    double potentialEnergy_;
-    double internalEnergy_;
     double totalVirial_;
-    /*double energyMidFlow_;
-    double energySumFlow_;
-    double energyModiFlow_;*/
     double rejectionCount_;
     double negativeEnergiesCount_;
-    double internalTemperature_;
 
     //-- parametrization of outputs --
     int decorrelationNbOfSteps_;
@@ -201,6 +186,11 @@ namespace simol
   public:
     std::shared_ptr<ofstream> outTest_;   // for debug purpose only
     
+    Observable* obsKineticEnergy_;
+    Observable* obsPotentialEnergy_;
+    Observable* obsPressure_;
+    Observable* obsInternalEnergy_;
+    Observable* obsInternalTemperature_;
     Observable* obsVelocity_;
     Observable* obsForce_;
     Observable* obsLength_;
@@ -209,14 +199,6 @@ namespace simol
     Observable* obsModiFlow_;
     
     vector<Observable*> observables_;
-    
-    //---------- for control variates ------------
-    /*ControlVariate* velocityCV_;
-    ControlVariate* forceCV_;
-    ControlVariate* lengthCV_;
-    ControlVariate* midFlowCV_;
-    ControlVariate* sumFlowCV_;
-    ControlVariate* modiFlowCV_;*/
 
     //----------- for autocorrelations -------------
     //-- chains --
@@ -226,14 +208,11 @@ namespace simol
     AutocorrelationStats bendistProfile_;
     AutocorrelationStats flowProfile_;
     
-    //-- DPDE --
-    AutocorrelationStats averageKineticEnergy_;
-    AutocorrelationStats averagePotentialEnergy_;
-    AutocorrelationStats averageInternalEnergy_;
-    AutocorrelationStats averageInternalTemperature_;
-    AutocorrelationStats averagePressure_;
+    CVBasis cvBasis_;
     
   };
+  
+
   
 }
 #endif

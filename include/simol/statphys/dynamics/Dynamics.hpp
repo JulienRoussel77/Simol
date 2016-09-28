@@ -7,6 +7,7 @@
 #include "simol/statphys/output/Output.hpp"
 #include "simol/core/random/RNG.hpp"
 #include "simol/statphys/controlVariate/ControlVariate.hpp"
+#include "simol/statphys/controlVariate/CVBasis.hpp"
 # include <iostream>
 #include "simol/statphys/controlVariate/Galerkin.hpp"
 
@@ -45,6 +46,10 @@ namespace simol
       virtual const double& beta() const;
       virtual const double& betaLeft() const;
       virtual const double& betaRight() const;
+      
+      //-- for DPDE --
+      virtual double internalTemperature(double /*intEnergy*/) const {return 0;}
+      virtual void specificComputeOutput(Output& /*output*/) const {}
 
       //-- external forces --
       double& externalForce(const int& i);
@@ -58,9 +63,10 @@ namespace simol
       virtual bool doMomentaExchange() const {return false;};
       virtual void updateMomentaExchange(Particle& /*particle1*/, Particle& /*particle2*/) {assert(false);};
       virtual void bending(Particle& /*particle1*/, Particle& /*particle2*/) const {};
-
+      
       //-- control variates --
       Galerkin* galerkin();
+      virtual void computeGeneratorOnBasis(CVBasis& /*cvBasis*/, vector<Particle> const& /*configuration*/) const {};
 
     protected:
 

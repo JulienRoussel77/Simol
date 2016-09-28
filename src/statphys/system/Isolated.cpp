@@ -23,6 +23,22 @@ namespace simol
     getParticle().force() = totalForce(getParticle().position());
   }
   
+  void Isolated::computeKineticEnergy(Output& output) const
+  {
+    output.kineticEnergy() = getParticle().kineticEnergy();
+  }
+  
+  void Isolated::computePotentialEnergy(Output& output) const
+  {
+    output.potentialEnergy() = getParticle().potentialEnergy();
+  }
+  
+  /*void Isolated::computePressure(Output& output) const
+  {
+    output.totalVirial() = getParticle().virial();
+  }*/
+  
+  
   void Isolated::thermalize(Dynamics& /*model*/)
   {}
 

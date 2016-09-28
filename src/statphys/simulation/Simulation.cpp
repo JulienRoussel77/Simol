@@ -74,7 +74,35 @@ namespace simol
     for (auto && particle : syst.configuration())
       dyna.updateOrsteinUhlenbeck(particle, dyna.beta());
   }
-
+  
+  
+  
+  void computeOutput(Dynamics const& dyna, System const& syst, Output& output, long int iOfStep)
+  {
+    
+    // #### faire un output.obsMidFlow().updateBoundaryLangevin(syst.configuration(), dyna.betaLeft(), dyna.betaRight(), dyna.gamma()); ####
+    if (output.obsKineticEnergy_) syst.computeKineticEnergy(output);
+    if (output.obsPotentialEnergy_) syst.computePotentialEnergy(output);
+    syst.computeProfile(output, dyna, iOfStep);
+    if (output.obsPressure_) syst.computePressure(output);
+    if (output.obsInternalEnergy_) syst.computeInternalEnergy(output);
+    if (output.obsInternalTemperature_) syst.computeInternalTemperature(output, dyna);
+    
+    if (output.hasControlVariate()) computeControlVariate(dyna, syst.configuration(), output);
+    
+    for (auto&& observable : output.observables())
+      observable->appendCurrent(iOfStep);
+    
+    //compute the rejection rate and the negative energies in DPDE
+    dyna.specificComputeOutput(output);
+  }
+  
+  void computeControlVariate(Dynamics const& dyna, vector<Particle> const& configuration, Output& output)
+  {
+    output.cvBasis_.computeValueBasis(configuration);
+    dyna.computeGeneratorOnBasis(output.cvBasis_, configuration);
+  }
+  
   //------------------- writeOutput and its specifications by dynamics ---------------------------
 
   void writeOutput(Dynamics const& /*dyna*/, System const& /*syst*/, Output& /*output*/, long int /*iOfStep*/)

@@ -9,8 +9,6 @@ using std::setw;
 
 namespace simol
 {
-  //class Observable;
-  //Observable* createObservable(const Input& input);
   
  class Observable
   {
@@ -21,9 +19,11 @@ namespace simol
       int printPeriodNbOfSteps_;
       int nbOfAutocoPts_;
 
+      //Contains the value that is being computed, set to zero at each iteration
       double currentValue_;
       AutocorrelationStats autocoStats_;
       
+      string outPath_;
       ofstream outFlux_;      
       ofstream* outFluxCorrelation_;
     public:
@@ -45,6 +45,7 @@ namespace simol
       virtual int nbOfHermite() const
       {return 0;}
       
+      string const& outPath() const;
       ofstream& outFlux();
       ofstream& outFluxCorrelation();
       

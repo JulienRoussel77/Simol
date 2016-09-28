@@ -58,7 +58,8 @@ namespace simol
         if (data["Galerkin"]["Basis"]["Fourier"])
           return data["Galerkin"]["Basis"]["Fourier"].as<int>();
 
-    throw std::invalid_argument("Number of Fourier modes missing");
+    return 0;
+    //throw std::invalid_argument("Number of Fourier modes missing");
   }
 
   int Input::nbOfHermite() const
@@ -68,7 +69,8 @@ namespace simol
         if(data["Galerkin"]["Basis"]["Hermite"])
           return data["Galerkin"]["Basis"]["Hermite"].as<int>();
 
-    throw std::invalid_argument("Number of Hermite modes missing");
+    return 0;
+    //throw std::invalid_argument("Number of Hermite modes missing");
   }
 
 }

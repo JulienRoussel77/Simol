@@ -22,14 +22,14 @@ namespace simol
   
   //------------- Overdamped --------------------
     
-  template <>
+  /*template <>
   void computeOutput(Overdamped const& dyna, Isolated const& syst, Output& output, long int iOfStep)
   {
     output.potentialEnergy() = syst.getParticle(0).potentialEnergy();
     // In the case of the trichain we add the potential of the wall interaction
     output.potentialEnergy() += syst.boundaryPotEnergy();
     updateAllControlVariates(dyna, syst, output, iOfStep);
-  }
+  }*/
   
     //------------- Langevin --------------------
 
@@ -49,7 +49,7 @@ namespace simol
 
   //------------- DPDE --------------------
 
-  template <>
+  /*template <>
   void computeOutput(DPDE const& dyna, Isolated const& syst, Output& output, long int iOfStep)
   {
     //-- instantaneous values --
@@ -62,7 +62,7 @@ namespace simol
     output.appendInternalEnergy(syst.getParticle(0).internalEnergy(), iOfStep);
     //-- rejection rate --
     output.rejectionCount() = dyna.rejectionCount();
-  }
+  }*/
 
   void samplePositions(DPDE& dyna, Isolated& syst)
   {

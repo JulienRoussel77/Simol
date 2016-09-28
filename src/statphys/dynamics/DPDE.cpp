@@ -233,5 +233,11 @@ namespace simol
 	negativeEnergiesCount() += 1;
       }
   }
-
+  
+  void DPDE::specificComputeOutput(Output& output) const
+  {
+    //-- rejection rate --
+    output.rejectionCount() = rejectionCount()/totalCountForRejection();
+    output.negativeEnergiesCount() = negativeEnergiesCount();
+  }
 }

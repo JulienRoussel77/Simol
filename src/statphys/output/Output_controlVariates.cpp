@@ -9,17 +9,13 @@ namespace simol
 
   void Output::setControlVariates(Input& input, Potential& potential, Galerkin* galerkin)
   {
-    /*//velocityCV_ = createControlVariate(input, potential, galerkin);
-    obsForce_ = createControlVariate(input, potential, galerkin);
-    obsLength_ = createControlVariate(input, potential, galerkin);
-    midFlowCV_ = createControlVariate(input, potential, galerkin);
-    sumFlowCV_ = createControlVariate(input, potential, galerkin);
-    modiFlowCV_ = createControlVariate(input, potential, galerkin);*/
+    if (input.controlVariateName() == "ExpFourierHermite")
+      cvBasis_.basis_ = new ExpFourierHermiteBasis(input, potential);
   }
   
-  Observable* Output::addControlVariate(const Input& input, const string& outPath, Potential& potential, Galerkin* galerkin)
+  Observable* Output::addControlVariate(const Input& input, const string& outPath, Galerkin* galerkin)
   {
-    Observable* obsPtr = createControlVariate(input, outPath, potential, galerkin);
+    Observable* obsPtr = createControlVariate(input, outPath, cvBasis_, galerkin);
     observables_.push_back(obsPtr);
     return obsPtr;
   }

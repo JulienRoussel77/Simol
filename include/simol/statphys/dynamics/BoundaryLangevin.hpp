@@ -19,6 +19,8 @@ namespace simol
 
       void initializeMomenta(vector<Particle>& configuration);
       virtual void bending(Particle& particle1, Particle& particle2) const;
+      
+      virtual void computeGeneratorOnBasis(CVBasis& cvBasis, vector<Particle> const& configuration) const;
     protected:
       double deltaTemperature_;
       double temperatureLeft_;
