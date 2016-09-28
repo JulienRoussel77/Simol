@@ -16,6 +16,8 @@ namespace simol
       virtual void initializeCountdown(Particle& particle);
       virtual void updateMomentaExchange(Particle& particle1, Particle& particle2);
       void updateOrsteinUhlenbeck(Particle& particle, double localBeta);
+      virtual void getThermo(Output& output) const;
+      virtual void getPressure(Output& output) const;
     protected:
       LangevinBase(Input const& input);
       double gamma_;

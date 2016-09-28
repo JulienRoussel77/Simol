@@ -9,6 +9,11 @@ namespace simol
   Overdamped::Overdamped(Input const& input):
     Dynamics(input)
   {}
+  
+  void Overdamped::printName() const
+  {
+    std::cout << "DynamicsType = Overdamped" << std::endl;
+  }
 
   // /!\ a changer dans le cas N != 1
   ///After refers to the fact that this step comes after the forces update
@@ -17,6 +22,23 @@ namespace simol
   {
     particle.position() += timeStep_ * particle.force() + sqrt(2 * timeStep_ / beta_) * rng_->gaussian();
   }
+  
+  void Overdamped::getThermo(Output& output) const
+  {    
+    double kineticEnergy = output.dimension() * output.nbOfParticles() / (2 * beta());
+    
+    output.temperature() = 1 / beta();
+    output.totalEnergy() = kineticEnergy + output.potentialEnergy();
+  }
+  
+  ///
+  ///Computes the pressure from the kineticEnergy and the totalVirial, these fields must be updated
+  void Overdamped::getPressure(Output& output) const
+  {
+    double kineticEnergy = output.dimension() * output.nbOfParticles() / (2 * beta());
+    output.pressure() = (2 * kineticEnergy + output.totalVirial()) / (output.dimension() * output.nbOfParticles() * pow(output.latticeParameter(), output.dimension()));
+  }
+
   
   ///Applies the generator of this dynamics to the basis functions of the CV
   ///Evaluate at the current state of "conifguration"

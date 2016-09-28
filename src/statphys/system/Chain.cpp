@@ -17,32 +17,6 @@ namespace simol
     }
   }
 
-  void Chain::thermalize(Dynamics& /*dyna*/) {}
-
-  //void Chain::computeAllForces(Dynamics const& /*model*/)
-  //{throw std::invalid_argument("computeAllForces : Function undefined");};*/
-
-  void Chain::thermalize(LangevinBase& dyna)
-  {
-    //for (auto&& particle : configuration_)
-    //dyna.updateBefore(particle);
-    for (int i = 0; i < nbOfParticles(); i++)
-      dyna.verletFirstPart(getParticle(i));
-
-    computeAllForces();
-
-    for (int i = 0; i < nbOfParticles(); i++)
-      dyna.verletSecondPart(getParticle(i));
-
-    for (int i = 0; i < nbOfParticles(); i++)
-    {
-      double localTemperature = dyna.temperatureLeft() + i * dyna.deltaTemperature() / nbOfParticles();
-      dyna.updateOrsteinUhlenbeck(getParticle(0), 1 / localTemperature);
-    }
-  }
-
-
-
 
 
   //###### BiChain ######

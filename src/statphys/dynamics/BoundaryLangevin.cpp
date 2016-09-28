@@ -54,7 +54,7 @@ namespace simol
   
   ///Applies the generator of this dynamics to the basis functions of the CV
   ///Evaluate at the current state of "conifguration"
-void BoundaryLangevin::computeGeneratorOnBasis(CVBasis& cvBasis, vector<Particle> const& configuration) const
+  void BoundaryLangevin::computeGeneratorOnBasis(CVBasis& cvBasis, vector<Particle> const& configuration) const
   {
     int nbOfParticles = (int)configuration.size();
     //Vector<double> result = Vector<double>::Zero(nbOfFunctions());

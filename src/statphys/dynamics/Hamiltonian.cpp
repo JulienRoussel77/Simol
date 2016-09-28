@@ -13,6 +13,13 @@ namespace simol
     std::cout << "DynamicsType = Hamiltonian" << std::endl;
   }
   
+  void Hamiltonian::computeThermo(Output& output) const
+  {    
+    output.temperature() = 2 * output.kineticEnergy() / (output.dimension() * output.nbOfParticles());
+    output.totalEnergy() = output.kineticEnergy() + output.potentialEnergy();
+    output.pressure() = (2 * output.kineticEnergy() + output.totalVirial()) / (output.dimension() * output.nbOfParticles() * pow(output.latticeParameter(), output.dimension()));
+  }
+  
   ///
   ///Applies the generator of this dynamics to the basis functions of the CV
   void Hamiltonian::computeGeneratorOnBasis(CVBasis& cvBasis, vector<Particle> const& configuration) const

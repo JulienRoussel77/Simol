@@ -57,6 +57,19 @@ namespace simol
     double alpha = exp(- gamma() / particle.mass() * timeStep_);
     particle.momentum() = alpha * particle.momentum() + sqrt((1 - pow(alpha, 2)) / localBeta * particle.mass()) * rng_->gaussian();
   }
+  
+  void LangevinBase::getThermo(Output& output) const
+  {
+    output.temperature() = 2 * output.kineticEnergy() / (output.dimension() * output.nbOfParticles());
+    output.totalEnergy() = output.kineticEnergy() + output.potentialEnergy();
+  }
+  
+  ///
+  ///Computes the pressure from the kineticEnergy and the totalVirial, these fields must be updated
+  void LangevinBase::getPressure(Output& output) const
+  {
+    output.pressure() = (2 * output.kineticEnergy() + output.totalVirial()) / (output.dimension() * output.nbOfParticles() * pow(output.latticeParameter(), output.dimension()));
+  }
 
 
 }

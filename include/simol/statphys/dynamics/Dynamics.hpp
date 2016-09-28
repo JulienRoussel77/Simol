@@ -47,6 +47,10 @@ namespace simol
       virtual const double& betaLeft() const;
       virtual const double& betaRight() const;
       
+      //--for output --
+      virtual void getThermo(Output& output) const = 0;
+      virtual void getPressure(Output& output) const = 0;
+       
       //-- for DPDE --
       virtual double internalTemperature(double /*intEnergy*/) const {return 0;}
       virtual void specificComputeOutput(Output& /*output*/) const {}

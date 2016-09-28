@@ -18,7 +18,9 @@ namespace simol
     nbOfParticles_(input.nbOfParticles()),
     nbOfSteps_(input.nbOfSteps()),
     latticeParameter_(input.latticeParameter()),
+    totalEnergy_(0),
     totalVirial_(0),
+    temperature_(0),
     decorrelationNbOfSteps_(input.decorrelationNbOfSteps()),
     nbOfAutocoPts_(input.nbOfAutocoPts()),
     doFinalFlow_(input.doFinalFlow()),
@@ -33,6 +35,7 @@ namespace simol
     obsLength_(nullptr),
     obsMidFlow_(nullptr),
     obsSumFlow_(nullptr),
+    obsModiFlow_(nullptr),
     observables_(),
     kinTempProfile_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts(), nbOfParticles_),
     potTempTopProfile_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts(), nbOfParticles_),
@@ -41,6 +44,18 @@ namespace simol
     flowProfile_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts(), nbOfParticles_),
     cvBasis_(input)
   {    
+    if (input.doKineticEnergy()) obsKineticEnergy_ = addObservable(input, "kineticEnergy.txt");
+    if (input.doPotentialEnergy()) obsPotentialEnergy_ = addObservable(input, "potentialEnergy.txt");
+    if (input.doPressure()) obsPressure_ = addObservable(input, "pressure.txt");
+    if (input.doInternalEnergy()) obsInternalEnergy_ = addObservable(input, "internalEnergy.txt");
+    if (input.doInternalTemperature()) obsInternalTemperature_ = addObservable(input, "internalTemperature.txt");
+    if (input.doVelocity()) obsVelocity_ = addObservable(input, "velocity.txt");
+    if (input.doForce()) obsForce_ = addObservable(input, "force.txt");
+    if (input.doLength()) obsLength_ = addObservable(input, "length.txt");
+    if (input.doMidFlow())obsMidFlow_  = addObservable(input, "midFlow.txt");
+    if (input.doSumFlow()) obsSumFlow_ = addObservable(input, "sumFlow.txt");
+    if (input.doModiFlow()) obsModiFlow_ = addObservable(input, "modiFlow.txt");
+    
     //-- std observables in this file --
     outThermo_       = std::make_shared<ofstream>(input.outputFolderName() + "thermo.txt");
     outThermo() << "# time kineticEnergy potentialEnergy energy temperature pressure" << endl;
@@ -53,10 +68,6 @@ namespace simol
     if (input.controlVariateName() != "None")
       outVelocitiesGenerator_ = std::make_shared<ofstream>(input.outputFolderName() + "velocitiesGenerator.txt");
     
-    
-    obsPotentialEnergy_ = addObservable(input, "potentialEnergy.txt");
-    if (input.dynamicsName() != "Overdamped") 
-      obsKineticEnergy_ = addObservable(input, "kineticEnergy.txt");
 
     //-- override the standrd observable files for DPDE --
     if (input.dynamicsName() == "DPDE") 
@@ -66,9 +77,6 @@ namespace simol
       meanValueObservables_       = std::make_shared<ofstream>(input.outputFolderName() + "mean_thermo.txt");
 
       meanValueObservables() << "# 1:time  2:kineticEnergy  3:potentialEnergy  4:internalEnergy  5:kineticTemperature  6:internalTemperature  7:pressure" << endl;
-      
-      obsInternalEnergy_ = addObservable(input, "internalEnergy.txt");
-      obsInternalTemperature_ = addObservable(input, "internalTemperature.txt");
     }
 
     //-- longer outputs if required, e.g. configuration of the system --
@@ -88,22 +96,6 @@ namespace simol
 
 
 
-    //-- average velocities for 1D nonequilibrium --
-    if ( (input.systemName() == "Isolated") && (input.dynamicsName() == "Langevin") )
-    {
-      obsVelocity_ = addObservable(input, "velocity.txt");
-      obsLength_ = addObservable(input, "length.txt");
-    }
-
-    //-- average forces for 1D nonequilibrium overdamped --
-    if ( (input.systemName() == "Isolated") && (input.dynamicsName() == "Overdamped") )
-    {
-      obsForce_ = addObservable(input, "force.txt");
-      obsLength_ = addObservable(input, "length.txt");
-    }
-
-
-
     //--- to have a summary of the fina, estimated average velocity ---
     if (doFinalVelocity_)
       outFinalVelocity_     = std::make_shared<ofstream>(input.simuTypeName() + "finalVelocity.txt", std::ofstream::app);
@@ -119,10 +111,6 @@ namespace simol
 
       outChainVelocities_   = std::make_shared<ofstream>(input.outputFolderName() + "velocitiesChain.txt");
       outChainVelocities() << "# time i=0 i=N/4 i=N/2 i=3N/4 i=N-1" << endl;
-      
-      obsMidFlow_ = addObservable(input, "midFlow.txt");      
-      obsSumFlow_ = addObservable(input, "sumFlow.txt");      
-      obsModiFlow_ = addObservable(input, "modiFlow.txt");
       
       outProfile_           = std::make_shared<ofstream>(input.outputFolderName() + "profile.txt");
       
@@ -255,10 +243,10 @@ namespace simol
   double& Output::potentialEnergy()
   {return obsPotentialEnergy().currentValue();}
 
-  const double& Output::Pressure() const
+  const double& Output::pressure() const
   {return obsPressure().currentValue();}
   
-  double& Output::Pressure()
+  double& Output::pressure()
   {return obsPressure().currentValue();}
 
   const double& Output::totalVirial() const
@@ -266,15 +254,27 @@ namespace simol
   
   double& Output::totalVirial()
   {return totalVirial_;}
+  
+  const double& Output::totalEnergy() const
+  {return totalEnergy_;}
+  
+  double& Output::totalEnergy()
+  {return totalEnergy_;}
+  
+  const double& Output::temperature() const
+  {return temperature_;}
+  
+  double& Output::temperature()
+  {return temperature_;}
 
-  double Output::energy() const
-  {return kineticEnergy() + potentialEnergy();}
+  //double Output::energy() const
+  //{return kineticEnergy() + potentialEnergy();}
 
-  double Output::temperature() const
+  /*double Output::temperature() const
   {return 2 * kineticEnergy() / (dimension_ * nbOfParticles_); }
 
   double Output::pressure() const
-  {return (2 * kineticEnergy() + totalVirial()) / (dimension_ * nbOfParticles_ * pow(latticeParameter_, dimension_));}
+  {return (2 * kineticEnergy() + totalVirial()) / (dimension_ * nbOfParticles_ * pow(latticeParameter_, dimension_));}*/
 
   bool Output::doComputeCorrelations() const
   {return decorrelationNbOfSteps() > 0;}
@@ -382,20 +382,21 @@ namespace simol
 
   bool Output::doLongPeriodOutput(long int iOfStep) const
   {
-    return (printLongPeriodNbOfSteps() > 0 && iOfStep % printLongPeriodNbOfSteps() == 0);
+    return (printLongPeriodNbOfSteps() > 0 && iOfStep % printLongPeriodNbOfSteps() == 0);   
   }
 
+  
   //----------------- display functions --------------------------
 
   void Output::displayThermoVariables(long int iOfStep)
   {
-    outThermo() << iOfStep * timeStep()
-                     << " " << kineticEnergy()
-                     << " " << potentialEnergy()
-                     << " " << energy()
-                     << " " << temperature()
-                     << " " << pressure()
-                     << std::endl;
+    outThermo() << iOfStep * timeStep();
+    if (obsKineticEnergy_) outThermo() << " " << kineticEnergy();
+    outThermo() << " " << potentialEnergy()
+                << " " << totalEnergy()
+                << " " << temperature()
+                << " " << pressure()
+                << std::endl;
   }
 
   void Output::displayParticles(vector<Particle> const& configuration, long int iOfStep)
@@ -432,14 +433,14 @@ namespace simol
 
   void Output::displayThermoVariablesDPDE(vector<Particle> const& configuration, long int iOfStep)
   {
-    double totalEnergy = kineticEnergy() + potentialEnergy() + internalEnergy();
+    //double totalEnergy = kineticEnergy() + potentialEnergy() + internalEnergy();
     outThermo() << iOfStep * timeStep()
 		     << " " << configuration[0].position(0) 
 		     << " " << configuration[0].momentum(0) 
 		     << " " << internalEnergy() 
          << " " << kineticEnergy()
          << " " << potentialEnergy()
-		     << " " << totalEnergy
+		     << " " << totalEnergy()
 		     << " " << temperature()
 		     << " " << 1./internalTemperature()
 		     << " " << pressure()

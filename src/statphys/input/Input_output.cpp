@@ -196,5 +196,44 @@ namespace simol
         return true;
     return false;
   }
+  
+  
+  
+    
+  //---------------- check whether observables should be add --------------------
+  bool Input::doKineticEnergy() const
+  {return dynamicsName() != "Overdamped";}
+  
+  bool Input::doPotentialEnergy() const
+  {return true;}
+  
+  bool Input::doPressure() const
+  {return true;}
+  
+  bool Input::doInternalEnergy() const
+  {return dynamicsName() == "DPDE";}
+  
+  bool Input::doInternalTemperature() const
+  {return dynamicsName() == "DPDE";}
+  
+  bool Input::doVelocity() const
+  {return (dynamicsName() != "Overdamped" && systemName() == "Isolated");}
+  
+  bool Input::doForce() const
+  {return (dynamicsName() == "Overdamped" && systemName() == "Isolated");}
+  
+  bool Input::doLength() const
+  {return dynamicsName() == "Isolated";}
+  
+  bool Input::doMidFlow() const
+  {return dynamicsName() == "BoundaryLangevin";}
+  
+  bool Input::doSumFlow() const
+  {return dynamicsName() == "BoundaryLangevin";}
+  
+  bool Input::doModiFlow() const
+  {return dynamicsName() == "BoundaryLangevin";}
+    
+    
 
 }

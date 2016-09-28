@@ -99,6 +99,18 @@ namespace simol
       int nbOfAutocoPts() const;
       bool doFinalFlow() const;
       bool doFinalVelocity() const;
+      
+      bool doKineticEnergy() const;
+      bool doPotentialEnergy() const;
+      bool doPressure() const;
+      bool doInternalEnergy() const;
+      bool doInternalTemperature() const;
+      bool doVelocity() const;
+      bool doForce() const;
+      bool doLength() const;
+      bool doMidFlow() const;
+      bool doSumFlow() const;
+      bool doModiFlow() const;
 
       //-- Controle Variate --
       string controlVariateName() const;

@@ -2,25 +2,10 @@
 
 namespace simol
 {
-
-  void sampleMomenta(BoundaryLangevin& dyna, Chain& syst)
-  {
-    cout << " - Sampling the momenta..." << endl;
-    double alpha, localTemp;
-    for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
-    {
-      alpha = iOfParticle / (double) syst.nbOfParticles();
-      localTemp = (1 - alpha) * dyna.temperatureLeft() + alpha * dyna.temperatureRight();
-      syst.getParticle(iOfParticle).momentum() = syst.drawMomentum(1 / localTemp, syst.getParticle(iOfParticle).mass());
-
-      dyna.initializeCountdown(syst.getParticle(iOfParticle));
-    }
-  }
-
-  void samplePositions(BoundaryLangevin& /*dyna*/, Chain& /*syst*/)
-  {
-    throw std::invalid_argument("samplePositions(BoundaryLangevin& dyna, Chain& syst) not defined");
-  }
+  //void samplePositions(BoundaryLangevin& /*dyna*/, Chain& /*syst*/)
+  //{
+  //  throw std::invalid_argument("samplePositions(BoundaryLangevin& dyna, Chain& syst) not defined");
+  //}
 
   void writeOutput(BoundaryLangevin const& /*dyna*/, Chain const& syst, Output& output, long int iOfStep)
   {
@@ -40,29 +25,6 @@ namespace simol
       output.displayProfile(iOfStep);
       output.displayParticles(syst.configuration(), iOfStep);
     }
-  }
-
-
-
-  void simulate(BoundaryLangevin& dyna, Chain& syst)
-  {
-  for (auto && particle: syst.configuration())
-      dyna.verletFirstPart(particle);
-
-    syst.computeAllForces();
-
-  for (auto && particle: syst.configuration())
-      dyna.verletSecondPart(particle);
-
-    //for (int iOfParticle=0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
-    //  dyna.updateAfter(getParticle(iOfParticle));
-
-    dyna.updateOrsteinUhlenbeck(syst.getParticle(0), dyna.betaLeft());
-    dyna.updateOrsteinUhlenbeck(syst.getParticle(syst.nbOfParticles() - 1), dyna.betaRight());
-
-    if (dyna.doMomentaExchange())
-      for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles() - 1; iOfParticle++)
-        dyna.updateMomentaExchange(syst.getParticle(iOfParticle), syst.getParticle(iOfParticle + 1));
   }
 
 
@@ -119,6 +81,34 @@ namespace simol
       }
     }
   }
+  
+  void thermalize(Dynamics& /*dyna*/, Chain& /*syst*/) {}
+
+  //void Chain::computeAllForces(Dynamics const& /*model*/)
+  //{throw std::invalid_argument("computeAllForces : Function undefined");};*/
+
+  void thermalize(LangevinBase& dyna, Chain& syst)
+  {
+    //for (auto&& particle : configuration_)
+    //dyna.updateBefore(particle);
+    for (int i = 0; i < syst.nbOfParticles(); i++)
+      dyna.verletFirstPart(syst.getParticle(i));
+
+    syst.computeAllForces();
+
+    for (int i = 0; i < syst.nbOfParticles(); i++)
+      dyna.verletSecondPart(syst.getParticle(i));
+
+    for (int i = 0; i < syst.nbOfParticles(); i++)
+    {
+      double localTemperature = dyna.temperatureLeft() + i * dyna.deltaTemperature() / syst.nbOfParticles();
+      dyna.updateOrsteinUhlenbeck(syst.getParticle(0), 1 / localTemperature);
+    }
+  }
+  
+  
+  
+  
   void writeFinalOutput(BoundaryLangevin const& dyna, TriChain const& syst, Output& output)
   {
     output.finalChainDisplay(syst.configuration(), syst.externalForce());

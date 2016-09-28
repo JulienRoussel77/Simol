@@ -11,8 +11,6 @@ namespace simol
   {
     public:
       Chain(Input const& input);
-      virtual void thermalize(Dynamics& model);
-      virtual void thermalize(LangevinBase& dyna);
   };
 
   class BiChain : public Chain

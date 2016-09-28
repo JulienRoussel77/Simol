@@ -39,7 +39,6 @@ namespace simol
   }*/
   
   
-  void Isolated::thermalize(Dynamics& /*model*/)
-  {}
+
 
 }

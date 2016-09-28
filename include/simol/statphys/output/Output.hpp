@@ -69,13 +69,16 @@ namespace simol
     double& internalEnergy();
     const double& internalTemperature() const;
     double& internalTemperature();
-    const double& Pressure() const;  
-    double& Pressure();
+    const double& pressure() const;  
+    double& pressure();
     const double& totalVirial() const;
     double& totalVirial();
-    double energy() const;
-    double temperature() const;
-    double pressure() const;
+    const double& totalEnergy() const;
+    double& totalEnergy();
+    const double& temperature() const;
+    double& temperature();
+    //double temperature() const;
+    //double pressure() const;
     const double& rejectionCount() const;
     double& rejectionCount();
     const double& negativeEnergiesCount() const;
@@ -175,7 +178,10 @@ namespace simol
     double latticeParameter_;
 
     //-- fields to output --
+    double totalEnergy_;
     double totalVirial_;
+    double temperature_;
+    //double pressure_;
     double rejectionCount_;
     double negativeEnergiesCount_;
 

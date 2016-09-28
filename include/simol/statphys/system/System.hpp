@@ -15,6 +15,7 @@ using std::setw;
 namespace simol
 {
 
+
   class System
   {
     public:
@@ -53,7 +54,6 @@ namespace simol
       double const& potParameter2() const;
 
       //-- sampling of initial configurations --
-      virtual void thermalize(Dynamics& /*model*/);
       virtual Vector<double> drawMomentum(double localBeta, double mass);
       virtual double drawPotLaw(double localBeta);
       virtual double computeMeanPotLaw(double betaLocal) const;
@@ -61,7 +61,7 @@ namespace simol
       //-- output functions --
       virtual void computeKineticEnergy(Output& output) const;
       virtual void computePotentialEnergy(Output& output) const;
-      virtual void computePressure(Output& output) const;
+      virtual void computePressure(Output& output, Dynamics const& dyna) const;
       virtual void computeInternalEnergy(Output& output) const;
       virtual void computeInternalTemperature(Output& output, Dynamics const& dyna) const;
       virtual void computeProfile(Output& /*output*/, Dynamics const& /*model*/, long int /*iOfStep*/)const;
@@ -69,6 +69,7 @@ namespace simol
       // currently specific to chains
       virtual double boundaryPotEnergy() const;
       double laplacian(Vector<double> const& position) const;
+      
 
     protected:
       int dimension_;

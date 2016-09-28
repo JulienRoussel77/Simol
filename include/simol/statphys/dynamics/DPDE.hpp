@@ -49,6 +49,7 @@ namespace simol
     double chi(double dist);
     void acceptRejectRate(double v12_current, double v12_init, double internalEnergy1, double internalEnergy2, double reduced_mass, double dist);
     
+    virtual void getThermo(Output& output) const;
     virtual void specificComputeOutput(Output& output) const;
   };
   

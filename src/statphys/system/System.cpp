@@ -135,8 +135,7 @@ namespace simol
     return potential_->drawLaw(localBeta, rng_);
   }
 
-  void System::thermalize(Dynamics& /*model*/)
-  {throw std::invalid_argument("thermalize not defined");}
+
 
   void System::computeAllForces()
   {throw std::invalid_argument("thermalize not defined");}
@@ -196,7 +195,7 @@ namespace simol
     output.obsPotentialEnergy().currentValue() += boundaryPotEnergy();
   }
   
-  void System::computePressure(Output& output) const
+  void System::computePressure(Output& output, Dynamics const& dyna) const
   {
     output.totalVirial() = 0;
     for (auto && particle : configuration())
@@ -205,7 +204,10 @@ namespace simol
     //output.obsPressure().currentValue() = 2*output.kineticEnergy() + output.totalVirial()/(output.dimension()*nbOfParticles()*pow(output.latticeParameter(), output.dimension()));
     
     //Computes the instantaneous pressure, knowing the total virial
-    output.obsPressure().currentValue() = output.pressure();
+    dyna.getPressure(output);
+    
+    //Computes the instantaneous pressure, knowing the total virial
+    //output.obsPressure().currentValue() = output.pressure();
   }
   
   void System::computeInternalEnergy(Output& output) const

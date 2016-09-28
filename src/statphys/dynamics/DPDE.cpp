@@ -234,6 +234,12 @@ namespace simol
       }
   }
   
+  void DPDE::getThermo(Output& output) const
+  {
+    output.temperature() = 2 * output.kineticEnergy() / (output.dimension() * output.nbOfParticles());
+    output.totalEnergy() = output.kineticEnergy() + output.potentialEnergy() + output.internalEnergy();
+  }
+  
   void DPDE::specificComputeOutput(Output& output) const
   {
     //-- rejection rate --

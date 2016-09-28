@@ -88,33 +88,10 @@ namespace simol
   ///Read-only access for the inverse temperature
   double const& Dynamics::betaRight() const {return beta_;}
 
-  /*///
-  ///Read-only accessor for the external force
-  Vector<double> const& Dynamics::externalForce() const {return externalForce_;}
-  ///
-  ///Write-read accessor for the external force
-  Vector<double>& Dynamics::externalForce(){return externalForce_;}*/
-  /*///
-  ///Read-only accessor for the i-th component of the external force
-  double const& Dynamics::externalForce(int const& i) const {return externalForce_(i);}
-  ///
-  ///Write-read accessor for the i-th component of the external force
-  double& Dynamics::externalForce(int const& i) {return externalForce_(i);}*/
   ///
   ///Returns the pointer of the Galerkin instance of *this
   Galerkin* Dynamics::galerkin() {return galerkin_;}
 
-
-
-
-  /*///
-  ///Set the force and the potential energy of a particle to zero
-  void Dynamics::resetForce(Particle& particle) const
-  {
-    particle.potentialEnergy() = 0;
-    particle.force() = externalForce();
-    particle.virial() = 0.;
-  }*/
 
 
   ///
@@ -132,20 +109,6 @@ namespace simol
     particle.momentum() += timeStep_ * particle.force() / 2;
   }
 
- /* ///
-  ///Standard first part of the numerical integration : half upadate on "p" and update on "q"
-  void Dynamics::updateBefore(Particle& particle)
-  {
-    particle.momentum() += timeStep_ * particle.force() / 2;
-    particle.position() += timeStep_ * particle.momentum() / particle.mass();
-  }
-
-  ///
-  ///Standard second part of the numerical integration : half upadate on "p"
-  void Dynamics::updateAfter(Particle& particle)
-  {
-    particle.momentum() += timeStep_ * particle.force() / 2;
-  }*/
 
 
 
