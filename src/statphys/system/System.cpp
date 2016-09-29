@@ -5,7 +5,44 @@
 
 namespace simol
 {
+  
+  ParticleIterator::ParticleIterator(System& syst0):
+    syst_(&syst0),
+    iOfParticle_(0)
+  {}
+  
+  const Particle& ParticleIterator::particle() const 
+  {return syst_->getParticle(iOfParticle_);}
+  
+  Particle& ParticleIterator::particle() 
+  {return syst_->getParticle(iOfParticle_);}
+  
 
+  
+  ///
+  /// Assumes that there are 2 particles in the first box ! Can be improved...
+  ParticlePairIterator::ParticlePairIterator(System& syst0):
+    syst_(&syst0),
+    iOfParticle1_(0),
+    iOfCell1_(0),
+    iOfParticle2_(1),
+    iOfNeighbor2_(0)
+  {}
+  
+  Particle const& ParticlePairIterator::particle1() const 
+  {return syst_->getParticle(iOfParticle1_);}
+  
+  Particle& ParticlePairIterator::particle1() 
+  {return syst_->getParticle(iOfParticle1_);}
+  
+  Particle const& ParticlePairIterator::particle2() const 
+  {return syst_->getParticle(iOfParticle2_);}
+  
+  Particle& ParticlePairIterator::particle2() 
+  {return syst_->getParticle(iOfParticle2_);}
+  
+  
+  
   System::System(Input const& input):
     dimension_(input.dimension()),
     configuration_(input.nbOfParticles(), Particle(dimension_)),
@@ -59,7 +96,45 @@ namespace simol
   const std::shared_ptr<RNG>& System::rng() const {return rng_;}
 
   std::shared_ptr<RNG>& System::rng() {return rng_;}
-
+  
+  //--------------- particle iterators ------------
+    
+  ParticleIterator System::begin()
+  {
+    return ParticleIterator(*this);
+  }
+  
+  bool System::finished(ParticleIterator const& it) const
+  {
+    return it.iOfParticle() == nbOfParticles();
+  }
+  
+  void System::incrementeIterator(ParticleIterator& it)
+  {
+    it.iOfParticle()++;
+  }
+  
+  //--------------- particle pair iterators ------------
+    
+  ParticlePairIterator System::pairBegin()
+  {
+    return ParticlePairIterator(*this);
+  }
+  
+  bool System::pairFinished(ParticlePairIterator const& it) const
+  {
+    return it.iOfParticle1() == nbOfParticles();
+  }
+  
+  void System::incrementePairIterator(ParticlePairIterator& it)
+  {
+    it.iOfParticle2()++;
+    if (it.iOfParticle2() == nbOfParticles())
+    {
+      it.iOfParticle1()++;
+      it.iOfParticle2() = it.iOfParticle1() + 1;
+    }
+  }
 
   //----------------- Potential and forces ---------------
 

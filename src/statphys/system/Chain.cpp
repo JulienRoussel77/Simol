@@ -17,6 +17,19 @@ namespace simol
     }
   }
 
+  //--------------- particle pair iterators ------------
+  
+  void Chain::incrementePairIterator(ParticlePairIterator& it)
+  {
+    it.iOfParticle1()++;
+    it.iOfParticle2()++;
+  }
+
+  bool Chain::pairFinished(ParticlePairIterator const& it) const
+  {
+    return it.iOfParticle1() == nbOfParticles() - 1;
+  }
+  
 
 
   //###### BiChain ######
@@ -38,15 +51,17 @@ namespace simol
   void BiChain::computeAllForces()
   {
     //std::cout << "BiChain::computeAllForces" << std::endl;
-  for (auto && particle : configuration_)
-      particle.resetForce(potential());
-    //for (auto&& particle : configuration_)
-    //  dyna.computeForce(particle);
-    //interaction(ancorParticle_, configuration_[0]);
-    for (int i = 0; i < nbOfParticles() - 1; i++)
-    {
-      interaction(configuration_[i], configuration_[i + 1]);
-    }
+    //for (auto && particle : configuration_)
+    //  particle.resetForce(potential());
+    //for (int i = 0; i < nbOfParticles() - 1; i++)
+    // interaction(configuration_[i], configuration_[i + 1]);
+    
+    for (ParticleIterator it = begin(); !finished(it); incrementeIterator(it))
+      it.particle().resetForce(potential());
+    
+    for (ParticlePairIterator it = pairBegin(); !pairFinished(it); incrementePairIterator(it))
+      interaction(it.particle1(), it.particle2());
+    
   }
 
   void BiChain::computeProfile(Output& /*output*/, Dynamics const& /*dyna*/, long int /*iOfStep*/) const
@@ -63,8 +78,8 @@ namespace simol
     {
       //Particle& particle = configuration_[iOfParticle];
       double dist = 0;
-      double distPr = 0;
-      double distNe = 0;
+      double distPrev = 0;
+      double distNext = 0;
       double flow = 0;
       double potTempTop = 0;
       double potTempBot = 0;
@@ -83,7 +98,7 @@ namespace simol
         // dist is r_iOfParticle
         dist = getParticle(iOfParticle).position(0) - getParticle(iOfParticle - 1).position(0);
         if (iOfParticle != 1)
-          distPr = getParticle(iOfParticle-1).position(0) - getParticle(iOfParticle-2).position(0);
+          distPrev = getParticle(iOfParticle-1).position(0) - getParticle(iOfParticle-2).position(0);
         // flow is j_iOfParticle
         flow = - getParticle(iOfParticle).energyGrad(0) * getParticle(iOfParticle - 1).momentum(0);
         if (iOfParticle != nbOfParticles() - 1)
@@ -92,16 +107,16 @@ namespace simol
           if (iOfParticle == midNb)
             output.obsMidFlow().currentValue() = flow;
           
-          distNe = getParticle(iOfParticle+1).position(0) - getParticle(iOfParticle).position(0);
+          distNext = getParticle(iOfParticle+1).position(0) - getParticle(iOfParticle).position(0);
           
           if (iOfParticle == 1)
-            output.obsModiFlow().currentValue() += (distNe - getParticle(0).momentum(0)) / 4 * (getParticle(iOfParticle).energyGrad(0) - dist);
+            output.obsModiFlow().currentValue() += (distNext - getParticle(0).momentum(0)) / 4 * (getParticle(iOfParticle).energyGrad(0) - dist);
           // iOfParticle != 0, 1, N-1
           else
-            output.obsModiFlow().currentValue() += (distNe - distPr) / 4 * (getParticle(iOfParticle).energyGrad(0) - dist);
+            output.obsModiFlow().currentValue() += (distNext - distPrev) / 4 * (getParticle(iOfParticle).energyGrad(0) - dist);
         }
         else
-          output.obsModiFlow().currentValue() -= (getParticle(iOfParticle).momentum(0) + distPr) / 4 * (getParticle(iOfParticle).energyGrad(0) - dist);
+          output.obsModiFlow().currentValue() -= (getParticle(iOfParticle).momentum(0) + distPrev) / 4 * (getParticle(iOfParticle).energyGrad(0) - dist);
         
         //cout << iOfParticle << " : " << getParticle(iOfParticle).energyGrad(0) << " " << dist << endl;
       }

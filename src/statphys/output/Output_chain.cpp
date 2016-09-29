@@ -85,13 +85,7 @@ namespace simol
 
     //cout << "displayFinalFlow(double temperature, double delta_temperature, double tau)";
     if (doFinalFlow_)
-    {
-      //assert(outFinalFlow().is_open());
-      /*vector<double> parameters = {finalTime(), timeStep(), nbOfParticles(), temperature, delta_temperature, parameter1, parameter2};
-      obsMidFlow().finalDisplay(parameters);
-      obsSumFlow().finalDisplay(parameters);
-      obsModiFlow().finalDisplay(parameters);*/
-      
+    {      
       outFinalFlow() << std::left << setw(10) << finalTime()
                      << " " << setw(5) << timeStep()
                      << " " << setw(6) << nbOfParticles()

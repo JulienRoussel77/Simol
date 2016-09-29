@@ -151,6 +151,8 @@ namespace simol
     
     if (output.hasControlVariate()) computeControlVariate(dyna, syst.configuration(), output);
     
+    cout << "sumFlow = " << output.obsSumFlow().currentValue() << endl;
+    
     for (auto&& observable : output.observables())
       observable->appendCurrent(iOfStep);
     

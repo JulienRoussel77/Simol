@@ -18,8 +18,11 @@ namespace simol
     void push_back(int ind);
     vector<int> const& indexNeighbors() const;
     vector<int>& indexNeighbors();
+    int const& indexNeighbors(const int& iOfNeighbor) const;
+    int& indexNeighbors(const int& iOfNeighbor);
     list<int> const& members() const;
     list<int>& members();
+    int nbOfMembers() const;
     
   protected:
     
@@ -32,14 +35,25 @@ namespace simol
   class NBody : public System
   {
 
-    public:
+  public:
 
-      NBody(Input const& input);
-      void printName() const;
-      void computeAllForces();
+    NBody(Input const& input);
+    void printName() const;
+    
+    //-- pair iterator --
+    bool pairFinished(ParticlePairIterator const& it) const;
+    void incrementePairIterator(ParticlePairIterator& it);
+    
+    // -- accessors --
+    int const& nbOfNeighbors() const {return nbOfNeighbors_;}
+    int const& nbOfCells() const {return nbOfCells_;}
+    Cell const& cell(int const& iOfCell) const {return cells_[iOfCell];}
+    Cell & cell(int const& iOfCell) {return cells_[iOfCell];}
+  
+    void computeAllForces();
     void fluctuationDissipationDPDE(DPDE& dyna);
-      int nbOfParticlesPerDimension() const;
-      double latticeParameter() const;
+    int nbOfParticlesPerDimension() const;
+    double latticeParameter() const;
     void interaction(Particle& particle1, Particle& particle2) const;
     void elementaryFluctuationDissipationDPDE(DPDE& dyna, Particle& particle1, Particle& particle2) const;
 
@@ -47,32 +61,32 @@ namespace simol
     bool restart() const;
     string restartFileName() const;
   
-      //--- for cell method ---
-      void reinitializeCells();
-      void findNeighboringCells();
-      int findIndex(Vector<double> const& pos) const;
-      int returnIndexCell2D(int i1, int i2) const;
-      int returnIndexCell3D(int i1, int i2, int i3) const;
-      double periodicPosition(double x) const;
+    //--- for cell method ---
+    void reinitializeCells();
+    void findNeighboringCells();
+    int findIndex(Vector<double> const& pos) const;
+    int returnIndexCell2D(int i1, int i2) const;
+    int returnIndexCell3D(int i1, int i2, int i3) const;
+    double periodicPosition(double x) const;
 
-    protected:
+  protected:
 
-      int nbOfParticlesPerDimension_;
-      double latticeParameter_;
-      double domainSize_;
+    int nbOfParticlesPerDimension_;
+    double latticeParameter_;
+    double domainSize_;
 
     //--- if restarting from a given file ---
     bool restart_;
     string restartFileName_;
 
-      //--- for cell method ---
-      bool doCells_;
-      double Rcut_;
-      double cellSize_;
-      int nbOfCellsPerDimension_;
-      int nbOfCells_;
-      int nbOfNeighbors_;
-      vector<Cell> cells_;
+    //--- for cell method ---
+    bool doCells_;
+    double Rcut_;
+    double cellSize_;
+    int nbOfCellsPerDimension_;
+    int nbOfCells_;
+    int nbOfNeighbors_;
+    vector<Cell> cells_;
 
   };
 

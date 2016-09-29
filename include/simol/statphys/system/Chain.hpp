@@ -9,14 +9,22 @@ namespace simol
 
   class Chain : public System
   {
-    public:
-      Chain(Input const& input);
+  public:
+    Chain(Input const& input);
+    //virtual ParticleIterator begin();
+    //virtual ParticlePairIterator pairBegin();
+    //virtual bool finished(ParticleIterator const& it) const;
+    //virtual void incrementeIterator(ParticleIterator& it);    
+    
+    virtual void incrementePairIterator(ParticlePairIterator& it);
+    bool pairFinished(ParticlePairIterator const& it) const;
   };
 
   class BiChain : public Chain
   {
     public:
       BiChain(Input const& input);
+      
       void computeAllForces();
       virtual void computeProfile(Output& output, Dynamics const& dyna, long int iOfStep) const;
       virtual void computeProfile(Output& output, LangevinBase const& model, long int iOfStep) const;

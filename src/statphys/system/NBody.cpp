@@ -2,6 +2,62 @@
 
 namespace simol
 {
+  
+  //--------------- particle pair iterators ------------
+  
+  const Cell& ParticlePairIterator::cell1() const 
+  {return syst_->cell(iOfCell1());}
+  
+  Cell& ParticlePairIterator::cell1() 
+  {return syst_->cell(iOfCell1());}
+  
+  const int& ParticlePairIterator::iOfCell2() const 
+  {return syst_->cell(iOfCell1()).indexNeighbors(iOfNeighbor2());}
+  
+  int& ParticlePairIterator::iOfCell2() 
+  {return syst_->cell(iOfCell1()).indexNeighbors(iOfNeighbor2());}
+  
+  const Cell& ParticlePairIterator::cell2() const 
+  {return syst_->cell(iOfCell2());}
+  
+  Cell& ParticlePairIterator::cell2() 
+  {return syst_->cell(iOfCell2());}
+  
+
+  bool NBody::pairFinished(ParticlePairIterator const& it) const
+  {
+    return (it.iOfCell1() == nbOfCells());
+  }
+  
+  void NBody::incrementePairIterator(ParticlePairIterator& it)
+  {
+    it.iOfParticle2()++;
+    //if the neighbor cell is fully visited
+    if (it.iOfParticle2() == it.cell2().nbOfMembers())
+    {
+      //we jump to the next neighbor cell
+      it.iOfNeighbor2()++;
+      it.iOfParticle2() = 0;
+      //if all the neighbor cells has been visited
+      if (it.iOfNeighbor2() == nbOfNeighbors())
+      {
+        //we jump to the next particle
+        it.iOfParticle1()++;
+        it.iOfNeighbor2() = 0;
+        //if the cell is fully visited
+        if (it.iOfParticle1() == it.cell1().nbOfMembers())
+        {
+          //we jump to the next one
+          it.iOfCell1()++;
+          it.iOfParticle1() = 0;        
+        }
+        //in both case this allows to avoid counting twice a pair or a particle with it self
+        it.iOfParticle2() = it.iOfParticle1() + 1;        
+      }
+    }
+  }
+  
+  
   //-------------------- cells ----------------------
 
   Cell::Cell()
@@ -32,7 +88,13 @@ namespace simol
   {
     return indexNeighbors_;
   }
-
+  
+  int const& Cell::indexNeighbors(const int& iOfNeighbor) const
+  {return indexNeighbors_[iOfNeighbor];}
+  
+  int& Cell::indexNeighbors(const int& iOfNeighbor)
+  {return indexNeighbors_[iOfNeighbor];}
+  
   list<int> const& Cell::members() const
   {
     return members_;
@@ -41,6 +103,11 @@ namespace simol
   list<int>& Cell::members()
   {
     return members_;
+  }
+  
+  int Cell::nbOfMembers() const
+  {
+    return members_.size();
   }
 
   // ------------------- NBody ----------------------------
