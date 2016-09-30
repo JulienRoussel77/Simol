@@ -108,6 +108,54 @@ namespace simol
   {
     particle.momentum() += timeStep_ * particle.force() / 2;
   }
+  
+  
+  
+  void Dynamics::computeKineticEnergy(Output& output, System const& syst) const
+  {
+    output.obsKineticEnergy().currentValue() = 0;
+    for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
+      output.obsKineticEnergy().currentValue() += syst(iOfParticle).kineticEnergy();
+  }
+  
+  void Dynamics::computePotentialEnergy(Output& output, System const& syst) const
+  {
+    output.obsPotentialEnergy().currentValue() = 0;
+    for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
+      output.obsPotentialEnergy().currentValue() += syst(iOfParticle).potentialEnergy();
+    output.obsPotentialEnergy().currentValue() += syst.boundaryPotEnergy();
+  }
+  
+  void Dynamics::computePressure(Output& output, System const& syst) const
+  {
+    output.totalVirial() = 0;
+    for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
+      output.totalVirial() += syst(iOfParticle).virial();
+    
+    //output.obsPressure().currentValue() = 2*output.kineticEnergy() + output.totalVirial()/(output.dimension()*nbOfParticles()*pow(output.latticeParameter(), output.dimension()));
+    
+    //Computes the instantaneous pressure, knowing the total virial
+    getPressure(output);
+    
+    //Computes the instantaneous pressure, knowing the total virial
+    //output.obsPressure().currentValue() = output.pressure();
+  }
+  
+  void Dynamics::computeInternalEnergy(Output& output, System const& syst) const
+  {
+    output.obsInternalEnergy().currentValue() = 0;
+    for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
+      output.obsInternalEnergy().currentValue() += syst(iOfParticle).internalEnergy();
+  }
+  
+  void Dynamics::computeInternalTemperature(Output& output, System const& syst) const
+  {
+    output.obsInternalTemperature().currentValue() = 0;
+    for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
+      output.obsInternalTemperature().currentValue() += 1/internalTemperature(syst(iOfParticle).internalEnergy());
+  }
+
+
 
 
 

@@ -116,49 +116,6 @@ namespace simol
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
       dyna.verletSecondPart(syst(iOfParticle));
     //-- fluctuation/dissipation --
-    syst.fluctuationDissipationDPDE(dyna);
+    dyna.fluctuationDissipation(syst);
   }
-
-
-  /*void writeOutput(Hamiltonian const& dyna, NBody const& syst, Output& output, long int iOfStep)
-  {
-    if (output.doOutput(iOfStep))
-      output.displayThermoVariables(iOfStep);
-    if (output.doLongPeriodOutput(iOfStep))
-      output.displayXMakeMol(syst.configuration(), iOfStep, syst.latticeParameter()*syst.nbOfParticlesPerDimension());
-  }
-  
-  void writeOutput(Overdamped const& dyna, NBody const& syst, Output& output, long int iOfStep)
-  {    
-    if (output.doOutput(iOfStep))
-      output.displayThermoVariables(iOfStep);
-
-    if (output.doLongPeriodOutput(iOfStep))
-    {
-      if (output.doOutParticles()) output.displayParticles(syst.configuration(), iOfStep);
-      if (output.doOutXMakeMol()) output.displayXMakeMol(syst.configuration(), iOfStep);   
-      if (output.doOutBackUp()) output.displayBackUp(syst.configuration(), iOfStep);   
-    }
-  }
-
-  void writeOutput(Langevin const& dyna, NBody const& syst, Output& output, long int iOfStep)
-  {
-    if (output.doOutput(iOfStep))
-      output.displayThermoVariables(iOfStep);
-    if (output.doLongPeriodOutput(iOfStep))
-      output.displayXMakeMol(syst.configuration(), iOfStep, syst.latticeParameter()*syst.nbOfParticlesPerDimension());
-  }
-
-  void writeOutput(DPDE const& dyna, NBody const& syst, Output& output, long int iOfStep)
-  {
-    if (output.doOutput(iOfStep))
-      output.displayThermoVariablesDPDE(syst.configuration(),iOfStep);
-    if (output.doLongPeriodOutput(iOfStep))
-    {
-      output.displayXMakeMol(syst.configuration(), iOfStep, syst.latticeParameter()*syst.nbOfParticlesPerDimension());
-      output.displayBackUp(syst.configuration(), iOfStep); 
-    }
-  }*/
-
-  
 }

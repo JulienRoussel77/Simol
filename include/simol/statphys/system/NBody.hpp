@@ -1,7 +1,6 @@
 #ifndef SIMOL_NBODY_HPP
 #define SIMOL_NBODY_HPP
 #include "simol/statphys/system/System.hpp"
-#include "simol/statphys/dynamics/DPDE.hpp"
 
 namespace simol
 {
@@ -55,12 +54,11 @@ namespace simol
     Cell const& cell(int const& iOfCell) const {return cells_[iOfCell];}
     Cell & cell(int const& iOfCell) {return cells_[iOfCell];}
   
+    virtual Vector<double> representant(Vector<double> vecDistance) const;
     void computeAllForces();
-    void fluctuationDissipationDPDE(DPDE& dyna);
     int nbOfParticlesPerDimension() const;
     double latticeParameter() const;
     void interaction(Particle& particle1, Particle& particle2) const;
-    void elementaryFluctuationDissipationDPDE(DPDE& dyna, Particle& particle1, Particle& particle2) const;
 
     //--- for initial conditions (restart) --
     bool restart() const;
@@ -73,8 +71,8 @@ namespace simol
     int returnIndexCell(int i1, int i2 = -1, int i3 = -1) const;
     double periodicPosition(double x) const;
 
-  protected:
-
+  //protected:
+  public:
     int nbOfParticlesPerDimension_;
     double latticeParameter_;
     double domainSize_;

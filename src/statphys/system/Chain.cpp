@@ -68,14 +68,11 @@ namespace simol
     
   }
 
-  void BiChain::computeProfile(Output& /*output*/, Dynamics const& /*dyna*/, long int /*iOfStep*/) const
-  {}
-
-  void BiChain::computeProfile(Output& output, LangevinBase const& dyna, long int iOfStep) const
+  void BiChain::computeProfile(Output& output, long int iOfStep) const
   {
     //output.obsSumFlow().currentValue() = 0;
-    output.obsModiFlow().currentValue() = dyna.gamma() * dyna.deltaTemperature() / 2;
-    //cout << dyna.gamma() << " " << dyna.deltaTemperature()<< endl;
+    output.obsModiFlow().currentValue() = output.constGamma_ * output.constDeltaTemperature_ / 2;
+    //cout << output.constGamma_ << " " << output.constDeltaTemperature_<< endl;
     assert(nbOfParticles() % 2 == 0);
     int midNb = (nbOfParticles() - 1) / 2;
     for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
@@ -92,7 +89,7 @@ namespace simol
       if (iOfParticle == 0)
       {
         dist = getParticle(0).position(0) - ancorParticle_.position(0);
-        flow = dyna.gamma() * (dyna.temperatureLeft() - 2 * getParticle(0).kineticEnergy());
+        flow = output.constGamma_ * (output.constTemperatureLeft_ - 2 * getParticle(0).kineticEnergy());
         //distNe = getParticle(1).position(0) - getParticle(0).position(0);
         //output.obsModiFlow().currentValue() += (getParticle(0).momentum(0) + distNe) / 4 * (getParticle(0).energyGrad(0) - dist);
         //cout << iOfParticle << " : " << getParticle(0).energyGrad(0) << " " << dist << endl;
@@ -207,10 +204,7 @@ namespace simol
   double TriChain::boundaryPotEnergy() const
   {return ancorParticle1_.potentialEnergy() + ancorParticle2_.potentialEnergy();}
 
-  void TriChain::computeProfile(Output& /*output*/, Dynamics const& /*dyna*/, long int /*iOfStep*/) const
-  {}
-
-  void TriChain::computeProfile(Output& output, LangevinBase const& dyna, long int iOfStep) const
+  void TriChain::computeProfile(Output& output, long int iOfStep) const
   {
     output.obsSumFlow().currentValue() = 0;
     
@@ -227,7 +221,7 @@ namespace simol
       if (iOfParticle == 0)
       {
         bending = ancorParticle2_.position(0) - 2 * getParticle(0).position(0) + getParticle(1).position(0);
-        flow = dyna.gamma() * (dyna.temperatureLeft() - 2 * getParticle(0).kineticEnergy())
+        flow = output.constGamma_ * (output.constTemperatureLeft_ - 2 * getParticle(0).kineticEnergy())
                - ancorParticle2_.energyGrad(0) * getParticle(0).momentum(0);
         potTempTop = pow(- ancorParticle2_.energyGrad(0) + 2 * getParticle(0).energyGrad(0) - getParticle(1).energyGrad(0), 2);
         potTempBot = ancorParticle2_.energyLapla() + 4 * getParticle(0).energyLapla() + getParticle(1).energyLapla();

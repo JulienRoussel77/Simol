@@ -2,6 +2,7 @@
 #define SIMOL_DPDE_HPP
 
 #include "LangevinBase.hpp"
+#include "simol/statphys/system/NBody.hpp"
 
 namespace simol
 {
@@ -51,6 +52,9 @@ namespace simol
     
     virtual void getThermo(Output& output) const;
     virtual void specificComputeOutput(Output& output) const;
+    
+    void fluctuationDissipation(NBody& syst);
+    void elementaryFluctuationDissipation(System const& syst, Particle& particle1, Particle& particle2);
   };
   
 }

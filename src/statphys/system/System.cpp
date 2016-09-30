@@ -203,8 +203,6 @@ namespace simol
     return potential_->drawLaw(localBeta, rng_);
   }
 
-
-
   void System::computeAllForces()
   {throw std::invalid_argument("compteAllForces not defined");}
   
@@ -249,59 +247,6 @@ namespace simol
     return qInteg / repFunc;
   }
   
-  void System::computeKineticEnergy(Output& output) const
-  {
-    output.obsKineticEnergy().currentValue() = 0;
-    //for (auto && particle : configuration())
-    for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
-      output.obsKineticEnergy().currentValue() += getParticle(iOfParticle).kineticEnergy();
-  }
-  
-  void System::computePotentialEnergy(Output& output) const
-  {
-    output.obsPotentialEnergy().currentValue() = 0;
-    //for (auto && particle : configuration())
-    for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
-      output.obsPotentialEnergy().currentValue() += getParticle(iOfParticle).potentialEnergy();
-    output.obsPotentialEnergy().currentValue() += boundaryPotEnergy();
-  }
-  
-  void System::computePressure(Output& output, Dynamics const& dyna) const
-  {
-    output.totalVirial() = 0;
-    //for (auto && particle : configuration())
-    for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
-      output.totalVirial() += getParticle(iOfParticle).virial();
-    
-    //output.obsPressure().currentValue() = 2*output.kineticEnergy() + output.totalVirial()/(output.dimension()*nbOfParticles()*pow(output.latticeParameter(), output.dimension()));
-    
-    //Computes the instantaneous pressure, knowing the total virial
-    dyna.getPressure(output);
-    
-    //Computes the instantaneous pressure, knowing the total virial
-    //output.obsPressure().currentValue() = output.pressure();
-  }
-  
-  void System::computeInternalEnergy(Output& output) const
-  {
-    output.obsInternalEnergy().currentValue() = 0;
-    //for (auto && particle : configuration())
-    for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
-      output.obsInternalEnergy().currentValue() += getParticle(iOfParticle).internalEnergy();
-  }
-  
-  void System::computeInternalTemperature(Output& output, Dynamics const& dyna) const
-  {
-    output.obsInternalTemperature().currentValue() = 0;
-    //for (auto && particle : configuration())
-    for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
-      output.obsInternalTemperature().currentValue() += 1/dyna.internalTemperature(getParticle(iOfParticle).internalEnergy());
-  }
-
-  void System::computeProfile(Output& /*output*/, Dynamics const& /*model*/, long int /*iOfStep*/) const
-  {
-    //throw std::invalid_argument("System::computeProfile : Function undefined");
-  }
 
 }
 

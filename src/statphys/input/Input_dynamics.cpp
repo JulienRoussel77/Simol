@@ -20,7 +20,8 @@ namespace simol
   {
     if (data["Dynamics"]["Gamma"])
       return data["Dynamics"]["Gamma"].as<double>();
-    else throw std::runtime_error("No Gamma in the input file !");
+    //else throw std::runtime_error("No Gamma in the input file !");
+    else return defaultGamma;
   }
 
   double Input::temperature() const

@@ -2,7 +2,7 @@
 #define SIMOL_CHAIN_HPP
 
 #include "simol/statphys/system/System.hpp"
-#include "simol/statphys/dynamics/LangevinBase.hpp"
+//#include "simol/statphys/dynamics/LangevinBase.hpp"
 
 namespace simol
 {
@@ -26,8 +26,7 @@ namespace simol
       BiChain(Input const& input);
       
       void computeAllForces();
-      virtual void computeProfile(Output& output, Dynamics const& dyna, long int iOfStep) const;
-      virtual void computeProfile(Output& output, LangevinBase const& model, long int iOfStep) const;
+      virtual void computeProfile(Output& output, long int iOfStep) const;
     protected:
       Particle ancorParticle_;
   };
@@ -40,8 +39,7 @@ namespace simol
       void triInteraction(Particle& particle1, Particle& particle2, Particle& particle3) const;
       void computeAllForces();
       virtual double boundaryPotEnergy() const;
-      virtual void computeProfile(Output& output, Dynamics const& dyna, long int iOfStep) const;
-      virtual void computeProfile(Output& output, LangevinBase const& model, long int iOfStep) const;
+      virtual void computeProfile(Output& output, long int iOfStep) const;
     protected:
       Particle ancorParticle1_;
       Particle ancorParticle2_;

@@ -64,7 +64,7 @@ namespace simol
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
       dyna.verletFirstPart(syst(iOfParticle));
     syst.computeAllForces();
-    //for (ParticleIterator it = syst.begin(); !syst.finished(it); ++it)
+
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
       dyna.verletSecondPart(syst(iOfParticle));
   }
@@ -75,7 +75,6 @@ namespace simol
   {
     syst.computeAllForces();
     
-    //for (ParticleIterator it = syst.begin(); !syst.finished(it); ++it)
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
       dyna.updatePosition(syst(iOfParticle));
   }
@@ -97,14 +96,14 @@ namespace simol
   
   void simulate(Langevin& dyna, System& syst)
   {
-    //for (ParticleIterator it = syst.begin(); !syst.finished(it); ++it)
+
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
       dyna.verletFirstPart(syst(iOfParticle));
     syst.computeAllForces();
-    //for (ParticleIterator it = syst.begin(); !syst.finished(it); ++it)
+
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
       dyna.verletSecondPart(syst(iOfParticle));
-    //for (ParticleIterator it = syst.begin(); !syst.finished(it); ++it)
+
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
       dyna.updateOrsteinUhlenbeck(syst(iOfParticle), dyna.beta());
   }
@@ -113,13 +112,11 @@ namespace simol
   
   void simulate(BoundaryLangevin& dyna, System& syst)
   {
-    //for (ParticleIterator it = syst.begin(); !syst.finished(it); ++it)
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
       dyna.verletFirstPart(syst(iOfParticle));
 
     syst.computeAllForces();
 
-    //for (ParticleIterator it = syst.begin(); !syst.finished(it); ++it)
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
       dyna.verletSecondPart(syst(iOfParticle));
 
@@ -133,13 +130,11 @@ namespace simol
   
   //------------- DPDE --------------------
   
-    void simulate(DPDE& dyna, System& syst)
+  void simulate(DPDE& dyna, System& syst)
   {
-    //for (ParticleIterator it = syst.begin(); !syst.finished(it); ++it)
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
       dyna.verletFirstPart(syst(iOfParticle));
     syst.computeAllForces();
-    //for (ParticleIterator it = syst.begin(); !syst.finished(it); ++it)
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
       dyna.verletSecondPart(syst(iOfParticle));
     //-- fluctuation/dissipation --
@@ -152,14 +147,13 @@ namespace simol
   
   void computeOutput(Dynamics const& dyna, System const& syst, Output& output, long int iOfStep)
   {
-    
     // #### faire un output.obsMidFlow().updateBoundaryLangevin(syst.configuration(), dyna.betaLeft(), dyna.betaRight(), dyna.gamma()); ####
-    if (output.obsKineticEnergy_) syst.computeKineticEnergy(output);
-    if (output.obsPotentialEnergy_) syst.computePotentialEnergy(output);
-    syst.computeProfile(output, dyna, iOfStep);
-    if (output.obsPressure_) syst.computePressure(output, dyna);
-    if (output.obsInternalEnergy_) syst.computeInternalEnergy(output);
-    if (output.obsInternalTemperature_) syst.computeInternalTemperature(output, dyna);
+    if (output.obsKineticEnergy_) dyna.computeKineticEnergy(output, syst);
+    if (output.obsPotentialEnergy_) dyna.computePotentialEnergy(output, syst);
+    syst.computeProfile(output, iOfStep);
+    if (output.obsPressure_) dyna.computePressure(output, syst);
+    if (output.obsInternalEnergy_) dyna.computeInternalEnergy(output, syst);
+    if (output.obsInternalTemperature_) dyna.computeInternalTemperature(output, syst);
     dyna.getThermo(output);
     
     if (output.hasControlVariate()) computeControlVariate(dyna, syst.configuration(), output);
@@ -208,7 +202,7 @@ namespace simol
 
   //--------------------------- final output ------------------------------------
 
-  void writeFinalOutput(Dynamics const& dyna, System const& syst, Output& output)
+  void writeFinalOutput(System const& syst, Output& output)
   {
     output.finalDisplayCorrelations();    
     if (output.doOutChain()) output.finalChainDisplay();

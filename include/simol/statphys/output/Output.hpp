@@ -198,7 +198,10 @@ namespace simol
     bool doFinalFlow_, doFinalVelocity_;
   public:
     double constTemperature_;
+    double constTemperatureLeft_;
+    double constTemperatureRight_;
     double constDeltaTemperature_;
+    double constGamma_;
     double constXi_;
     double constTauBending_;
     double constExternalForce_;

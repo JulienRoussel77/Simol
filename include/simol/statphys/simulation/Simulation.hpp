@@ -72,7 +72,7 @@ namespace simol
     }
 
     //--- write final outputs ----
-    writeFinalOutput(dynamics_, system_, output_);
+    writeFinalOutput(system_, output_);
   }
 
   // --------------- Declaration and implementation of external functions -------------------
@@ -113,14 +113,8 @@ namespace simol
 
   void computeOutput(Dynamics const& dyna, System const& syst, Output& output, long int iOfStep);
   void computeControlVariate(Dynamics const& dyna, vector<Particle*> const& configuration, Output& output);
-  
   void writeOutput(Dynamics const& dyna, System const& syst , Output& output, long int iOfStep);
-
-  void writeFinalOutput(Dynamics const& dyna, System const& syst, Output& output);
-  //void writeFinalOutput(Hamiltonian const& dyna, Isolated const& syst, Output& output);
-  //void writeFinalOutput(Langevin const& dyna, Isolated const& syst, Output& output);
-  //void writeFinalOutput(BoundaryLangevin const& dyna, BiChain const& syst, Output& output);
-  //void writeFinalOutput(BoundaryLangevin const& dyna, TriChain const& syst, Output& output);
+  void writeFinalOutput(System const& syst, Output& output);
   
   
   // -------------------- Template implementation --------------------

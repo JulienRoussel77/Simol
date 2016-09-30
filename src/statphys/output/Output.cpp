@@ -18,13 +18,16 @@ namespace simol
     nbOfParticles_(input.nbOfParticles()),
     nbOfSteps_(input.nbOfSteps()),
     latticeParameter_(input.latticeParameter()),
+    constTemperatureLeft_(input.temperature() + input.deltaTemperature()),
+    constTemperatureRight_(input.temperature() - input.deltaTemperature()),
     constTemperature_(input.temperature()),
+    constGamma_(input.gamma()),
     constDeltaTemperature_(input.deltaTemperature()),
+    constXi_(input.xi()),
     constTauBending_(input.tauBending()),
     constExternalForce_(input.externalForce()),
     constNbOfFourier_(input.nbOfFourier()),
     constNbOfHermite_(input.nbOfHermite()),
-    constXi_(input.xi()),
     totalEnergy_(0),
     totalVirial_(0),
     temperature_(0),
@@ -147,24 +150,6 @@ namespace simol
   }
 
   //----- various assessors --------
-
-  /*ofstream & Output::outThermo()
-  {return *outThermo_;}
-
-  ofstream & Output::outParticles()
-  {return *outParticles_;}
-
-  ofstream & Output::outFinalVelocity()
-  {return *outFinalVelocity_;}
-
-  ofstream & Output::outCorrelation()
-  {return *outCorrelation_;}
-
-  ofstream & Output::outMeanThermo()
-  {return *outMeanThermo_;}
-
-  ofstream & Output::outVelocitiesGenerator()
-  {return *outVelocitiesGenerator_;}*/
 
   double Output::printPeriodTime() const
   {return printPeriodNbOfSteps_ * timeStep();}

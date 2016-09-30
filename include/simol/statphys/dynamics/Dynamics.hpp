@@ -11,6 +11,8 @@
 # include <iostream>
 #include "simol/statphys/controlVariate/Galerkin.hpp"
 
+#include "simol/statphys/system/System.hpp"
+
 namespace simol
 {
 
@@ -71,6 +73,13 @@ namespace simol
       //-- control variates --
       Galerkin* galerkin();
       virtual void computeGeneratorOnBasis(CVBasis& /*cvBasis*/, vector<Particle*> const& /*configuration*/) const {};
+      
+      //-- output functions --
+      virtual void computeKineticEnergy(Output& output, System const& syst) const;
+      virtual void computePotentialEnergy(Output& output, System const& syst) const;
+      virtual void computePressure(Output& output, System const& syst) const;
+      virtual void computeInternalEnergy(Output& output, System const& syst) const;
+      virtual void computeInternalTemperature(Output& output, System const& syst) const;
 
     protected:
 
