@@ -14,7 +14,7 @@ namespace simol
   
   ///
   ///Evaluates each function of the basis at "configuration" and updates the attribute
-  void CVBasis::computeValueBasis(vector<Particle> const& configuration)
+  void CVBasis::computeValueBasis(vector<Particle*> const& configuration)
   {
     for (int iOfFunction = 0; iOfFunction < nbOfFunctions_; iOfFunction++)
       basisValues_(iOfFunction) = basis_->value(configuration, iOfFunction);

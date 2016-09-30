@@ -6,7 +6,7 @@ namespace simol
   Isolated::Isolated(Input const& input):
     System(input)
   {
-    getParticle() = Particle(input.mass(), input.initialPosition(), input.initialMomentum());
+    configuration_[0] = new Particle(input.mass(), input.initialPosition(), input.initialMomentum());
     //cout << getParticle().mass() << endl;
     //cout << getParticle().mass() << "  " << getParticle().position() << "  " << getParticle().momentum() << endl;
   }

@@ -12,7 +12,7 @@ namespace simol
     assert(configuration_.size() > 1);
     for (int i = 0; i < input.nbOfParticles(); i++)
     {
-      configuration_[i] = Particle(input.mass(), input.initialPosition(i), input.initialMomentum(i));
+      configuration_[i] = new Particle(input.mass(), input.initialPosition(i), input.initialMomentum(i));
       //std::cout << configuration_[i].force() << std::endl;
     }
   }
@@ -21,13 +21,16 @@ namespace simol
   
   void Chain::incrementePairIterator(ParticlePairIterator& it)
   {
-    it.iOfParticle1()++;
-    it.iOfParticle2()++;
+    //it.iOfParticle1()++;
+    //it.iOfParticle2()++;
+    it.it1_++;
+    it.it2_++;
   }
 
   bool Chain::pairFinished(ParticlePairIterator const& it) const
   {
-    return it.iOfParticle1() == nbOfParticles() - 1;
+    //return it.iOfParticle1() == nbOfParticles() - 1;
+    return it.it2_ == configuration().end();
   }
   
 
@@ -56,8 +59,9 @@ namespace simol
     //for (int i = 0; i < nbOfParticles() - 1; i++)
     // interaction(configuration_[i], configuration_[i + 1]);
     
-    for (ParticleIterator it = begin(); !finished(it); incrementeIterator(it))
-      it.particle().resetForce(potential());
+    //for (ParticleIterator it = begin(); !finished(it); ++it)
+    for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
+      getParticle(iOfParticle).resetForce(potential());
     
     for (ParticlePairIterator it = pairBegin(); !pairFinished(it); incrementePairIterator(it))
       interaction(it.particle1(), it.particle2());
@@ -187,17 +191,17 @@ namespace simol
   void TriChain::computeAllForces()
   {
     //std::cout << "TriChain::computeAllForces" << std::endl;
-  for (auto && particle : configuration_)
-      particle.resetForce(potential());
+    for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
+      getParticle(iOfParticle).resetForce(potential());
     //for (auto&& particle : configuration_)
     //  dyna.computeForce(particle);
-    triInteraction(ancorParticle1_, ancorParticle2_, configuration_[0]);
-    triInteraction(ancorParticle2_, configuration_[0], configuration_[1]);
-    for (int i = 0; i < nbOfParticles() - 2; i++)
-      triInteraction(configuration_[i], configuration_[i + 1], configuration_[i + 2]);
+    triInteraction(ancorParticle1_, ancorParticle2_, getParticle(0));
+    triInteraction(ancorParticle2_, getParticle(0), getParticle(1));
+    for (int iOfParticle = 0; iOfParticle < nbOfParticles() - 2; iOfParticle++)
+      triInteraction(getParticle(iOfParticle), getParticle(iOfParticle + 1), getParticle(iOfParticle + 2));
     //dyna.bending(configuration_[nbOfParticles() - 2], configuration_[nbOfParticles() - 1]);
     if (isOfFixedVolum_)
-      triInteraction(configuration_[nbOfParticles() - 1], ancorParticle1_, ancorParticle2_);
+      triInteraction(getParticle(nbOfParticles() - 1), ancorParticle1_, ancorParticle2_);
   }
 
   double TriChain::boundaryPotEnergy() const
@@ -231,7 +235,7 @@ namespace simol
       else if (iOfParticle < (int)configuration_.size() - 1)
       {
         // bending is k_iOfParticle
-        bending = getParticle(iOfParticle - 1).position(0) - 2 * getParticle(iOfParticle).position(0) + configuration_[iOfParticle + 1].position(0);
+        bending = getParticle(iOfParticle - 1).position(0) - 2 * getParticle(iOfParticle).position(0) + getParticle(iOfParticle + 1).position(0);
         // flow is j_iOfParticle
         flow = - getParticle(iOfParticle - 1).energyGrad(0) * getParticle(iOfParticle).momentum(0)
                + getParticle(iOfParticle).energyGrad(0) * getParticle(iOfParticle - 1).momentum(0);

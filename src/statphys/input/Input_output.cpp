@@ -7,7 +7,7 @@ using std::min;
 using std::max;
 
 const int defaultPrintPeriod = 0;
-const int defaultLongPrintPeriod = 0;
+const int defaultPrintLongPeriod = 0;
 const int maxNbOfAutocoPts = 1000;
 const int defaultDecorrelationTime = 0;
 
@@ -153,18 +153,18 @@ namespace simol
   {
     // This static bools prevents from giving several times the same warning
     static bool warningGiven = false;
-    if (data["Output"]["LongPrintPeriodNbOfSteps"])
-      return data["Output"]["LongPrintPeriodNbOfSteps"].as<int>();
+    if (data["Output"]["PrintLongPeriodNbOfSteps"])
+      return data["Output"]["PrintLongPeriodNbOfSteps"].as<int>();
     
     double periodTime;
-    if (data["Output"]["LongPrintPeriod"]) periodTime = data["Output"]["LongPrintPeriod"].as<double>();
-    else periodTime = defaultLongPrintPeriod;
+    if (data["Output"]["PrintLongPeriod"]) periodTime = data["Output"]["PrintLongPeriod"].as<double>();
+    else periodTime = defaultPrintLongPeriod;
     int periodNb = (int)( periodTime / timeStep());
     double periodTrunc = periodNb * timeStep();
     if (!warningGiven && (periodTime != periodTrunc))
     {
       warningGiven = true;
-      cout << "#### /!\\ LongPrintPeriod truncated to " << periodTrunc << " ####" << endl;
+      cout << "#### /!\\ PrintLongPeriod truncated to " << periodTrunc << " ####" << endl;
     }
     return periodNb;
   }
@@ -179,22 +179,6 @@ namespace simol
   int Input::nbOfAutocoPts() const
   {
     return min(maxNbOfAutocoPts, (int)decorrelationNbOfSteps());
-  }
-
-  bool Input::doFinalFlow() const
-  {
-    if (data["Output"]["DoFinalFlow"])
-      if (sameLetters(data["Output"]["DoFinalFlow"].as<string>(), "yes"))
-        return true;
-    return false;
-  }
-
-  bool Input::doFinalVelocity() const
-  {
-    if (data["Output"]["DoFinalVelocity"])
-      if (sameLetters(data["Output"]["DoFinalVelocity"].as<string>(), "yes"))
-        return true;
-    return false;
   }
   
   
@@ -233,7 +217,43 @@ namespace simol
   
   bool Input::doModiFlow() const
   {return dynamicsName() == "BoundaryLangevin";}
-    
-    
+  
+  
+  bool Input::doOutThermo() const
+  {return true;}  
+  
+  bool Input::doOutParticles() const
+  {return true;}  
+  
+  bool Input::doOutXMakeMol() const
+  {return systemName() == "NBody";}    
+  
+  bool Input::doOutBackUp() const
+  {return true;}
+  
+  bool Input::doOutChain() const
+  {return dynamicsName() == "BoundaryLangevin";}
+  
+
+  bool Input::doFinalVelocity() const
+  {
+    /*if (data["Output"]["DoFinalVelocity"])
+      if (sameLetters(data["Output"]["DoFinalVelocity"].as<string>(), "yes"))
+        return true;
+    return false;*/
+    return (dynamicsName() != "Overdamped" && systemName() == "Isolated");
+  }  
+  bool Input::doFinalFlow() const
+  {
+    /*if (data["Output"]["DoFinalFlow"])
+      if (sameLetters(data["Output"]["DoFinalFlow"].as<string>(), "yes"))
+        return true;
+    return false;*/
+    return dynamicsName() == "BoundaryLangevin"; 
+  }  
+  
+  
+  bool Input::doOutVelocitiesGenerator() const
+  {return controlVariateName() != "None";}
 
 }

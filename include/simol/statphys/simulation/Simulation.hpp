@@ -102,7 +102,7 @@ namespace simol
   void thermalize(LangevinBase& dyna, Chain& syst);
   void thermalize(DPDE& dyna, NBody& syst);
 
-  //void simulate(DPDE& dyna            , NBody& syst);    // A supprimer ?
+  void simulate(DPDE& dyna            , NBody& syst);    // A supprimer ?
   void simulate(Dynamics& dyna        , System& syst);
   void simulate(Overdamped& dyna      , System& syst);
   void simulate(LangevinBase& dyna    , System& syst);
@@ -112,24 +112,15 @@ namespace simol
   
 
   void computeOutput(Dynamics const& dyna, System const& syst, Output& output, long int iOfStep);
-  void computeControlVariate(Dynamics const& dyna, vector<Particle> const& configuration, Output& output);
+  void computeControlVariate(Dynamics const& dyna, vector<Particle*> const& configuration, Output& output);
   
-  void writeOutput(BoundaryLangevin const& dyna, Chain const& syst , Output& output, long int iOfStep);
-  void writeOutput(Hamiltonian const& /*dyna*/ , NBody const& syst , Output& output, long int iOfStep);
-  void writeOutput(Overdamped const& /*dyna*/  , NBody const& syst , Output& output, long int iOfStep);
-  void writeOutput(Langevin const& /*dyna*/    , NBody const& syst , Output& output, long int iOfStep);
-  void writeOutput(DPDE const& /*dyna*/        , NBody const& syst , Output& output, long int iOfStep);
-  void writeOutput(DPDE const& dyna            , System const& syst, Output& output, long int iOfStep);
-  void writeOutput(Hamiltonian const& /*dyna*/ , System const& syst, Output& output, long int iOfStep);
-  void writeOutput(Overdamped const& /*dyna*/  , System const& syst, Output& output, long int iOfStep);
-  void writeOutput(Langevin const& /*dyna*/    , System const& syst, Output& output, long int iOfStep);
+  void writeOutput(Dynamics const& dyna, System const& syst , Output& output, long int iOfStep);
 
   void writeFinalOutput(Dynamics const& dyna, System const& syst, Output& output);
-  void writeFinalOutput(Hamiltonian const& dyna, Isolated const& syst, Output& output);
-  void writeFinalOutput(Langevin const& dyna, Isolated const& syst, Output& output);
-  void writeFinalOutput(BoundaryLangevin const& dyna, BiChain const& syst, Output& output);
-  void writeFinalOutput(BoundaryLangevin const& dyna, TriChain const& syst, Output& output);
-  void writeFinalOutput(DPDE const& dyna, System const& syst, Output& output);
+  //void writeFinalOutput(Hamiltonian const& dyna, Isolated const& syst, Output& output);
+  //void writeFinalOutput(Langevin const& dyna, Isolated const& syst, Output& output);
+  //void writeFinalOutput(BoundaryLangevin const& dyna, BiChain const& syst, Output& output);
+  //void writeFinalOutput(BoundaryLangevin const& dyna, TriChain const& syst, Output& output);
   
   
   // -------------------- Template implementation --------------------

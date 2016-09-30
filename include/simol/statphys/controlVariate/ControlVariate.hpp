@@ -99,24 +99,24 @@ namespace simol
 
       // FUNCTION CARACTERIZATION
 
-      virtual double basisFunction(vector<Particle> const& configuration, int iOfFunction = 0) const = 0;
+      virtual double basisFunction(vector<Particle*> const& configuration, int iOfFunction = 0) const = 0;
 
 
-      virtual double laplacianQ(vector<Particle> const& configuration, int iOfParticle = 0, int iOfFunction = 0) const = 0;
-      virtual Vector<double> gradientQ(vector<Particle> const& configuration, int iOfParticle = 0, int iOfFunction = 0) const = 0;
-      virtual double laplacianP(vector<Particle> const& configuration, int iOfParticle = 0, int iOfFunction = 0) const = 0;
-      virtual Vector<double> gradientP(vector<Particle> const& configuration, int iOfParticle = 0, int iOfFunction = 0) const = 0;
+      virtual double laplacianQ(vector<Particle*> const& configuration, int iOfParticle = 0, int iOfFunction = 0) const = 0;
+      virtual Vector<double> gradientQ(vector<Particle*> const& configuration, int iOfParticle = 0, int iOfFunction = 0) const = 0;
+      virtual double laplacianP(vector<Particle*> const& configuration, int iOfParticle = 0, int iOfFunction = 0) const = 0;
+      virtual Vector<double> gradientP(vector<Particle*> const& configuration, int iOfParticle = 0, int iOfFunction = 0) const = 0;
       
-      /*void updateHamiltonian(vector<Particle> const& configuration);
-      void updateOverdamped(vector<Particle> const& configuration, double beta);
-      void updateLangevin(vector<Particle> const& configuration, double beta, double gamma);
-      void updateBoundaryLangevin(vector<Particle> const& configuration, double betaLeft, double betaRight, double gamma);*/
+      /*void updateHamiltonian();
+      void updateOverdamped(vector<Particle*> const& configuration, double beta);
+      void updateLangevin(vector<Particle*> const& configuration, double beta, double gamma);
+      void updateBoundaryLangevin(vector<Particle*> const& configuration, double betaLeft, double betaRight, double gamma);*/
 
-      /*void computeValueBasis(vector<Particle> const& configuration);
-      void computeGeneratorHamiltonian(vector<Particle> const& configuration);
-      void computeGeneratorOverdamped(vector<Particle> const& configuration, double beta);
-      void computeGeneratorLangevin(vector<Particle> const& configuration, double beta, double gamma);
-      void computeGeneratorBoundaryLangevin(vector<Particle> const& configuration, double betaLeft, double betaRight, double gamma);*/
+      /*void computeValueBasis();
+      void computeGeneratorHamiltonian();
+      void computeGeneratorOverdamped(vector<Particle*> const& configuration, double beta);
+      void computeGeneratorLangevin(vector<Particle*> const& configuration, double beta, double gamma);
+      void computeGeneratorBoundaryLangevin(vector<Particle*> const& configuration, double betaLeft, double betaRight, double gamma);*/
 
 
 
@@ -137,12 +137,12 @@ namespace simol
       virtual int nbOfFunctionPairs() const;
       bool isNone() const;
       Vector<double> lastGeneratorOnBasis() const;
-      double basisFunction(vector<Particle> const& configuration, int iOfFunction = 0) const;
-      virtual double laplacianQ(vector<Particle> const& configuration, int iOfParticle = 0, int iOfFunction = 0) const;
-      virtual Vector<double> gradientQ(vector<Particle> const& configuration, int iOfParticle = 0, int iOfFunction = 0) const;
-      virtual double laplacianP(vector<Particle> const& configuration, int iOfParticle = 0, int iOfFunction = 0) const;
-      virtual Vector<double> gradientP(vector<Particle> const& configuration, int iOfParticle = 0, int iOfFunction = 0) const;
-      void update(double value, Vector<double>& generatorOnBasisFunction, vector<Particle> const& configuration, long int iOfStep);
+      double basisFunction(vector<Particle*> const& configuration, int iOfFunction = 0) const;
+      virtual double laplacianQ(vector<Particle*> const& configuration, int iOfParticle = 0, int iOfFunction = 0) const;
+      virtual Vector<double> gradientQ(vector<Particle*> const& configuration, int iOfParticle = 0, int iOfFunction = 0) const;
+      virtual double laplacianP(vector<Particle*> const& configuration, int iOfParticle = 0, int iOfFunction = 0) const;
+      virtual Vector<double> gradientP(vector<Particle*> const& configuration, int iOfParticle = 0, int iOfFunction = 0) const;
+      void update(double value, Vector<double>& generatorOnBasisFunction long int iOfStep);
       virtual void postTreat(std::ofstream& out, double timeStep);
   };*/
 
@@ -151,11 +151,11 @@ namespace simol
   {
     public:
       SinusControlVariate(const Input& input, const string& outPath, CVBasis& cvBasis0);
-      double basisFunction(vector<Particle> const& configuration, int iOfFunction = 0) const;
-      virtual double laplacianQ(vector<Particle> const& configuration, int iOfParticle = 0, int iOfFunction = 0) const;
-      virtual Vector<double> gradientQ(vector<Particle> const& configuration, int iOfParticle = 0, int iOfFunction = 0) const;
-      virtual double laplacianP(vector<Particle> const& configuration, int iOfParticle = 0, int iOfFunction = 0) const;
-      virtual Vector<double> gradientP(vector<Particle> const& configuration, int iOfParticle = 0, int iOfFunction = 0) const;
+      double basisFunction(vector<Particle*> const& configuration, int iOfFunction = 0) const;
+      virtual double laplacianQ(vector<Particle*> const& configuration, int iOfParticle = 0, int iOfFunction = 0) const;
+      virtual Vector<double> gradientQ(vector<Particle*> const& configuration, int iOfParticle = 0, int iOfFunction = 0) const;
+      virtual double laplacianP(vector<Particle*> const& configuration, int iOfParticle = 0, int iOfFunction = 0) const;
+      virtual Vector<double> gradientP(vector<Particle*> const& configuration, int iOfParticle = 0, int iOfFunction = 0) const;
   };
 
   class BasisControlVariate : public ControlVariate
@@ -165,11 +165,11 @@ namespace simol
       //TensorBasis* basis_;
     public:
       BasisControlVariate(const Input& input, const string& outPath, CVBasis& cvBasis0, Galerkin* galerkin);
-      double basisFunction(vector<Particle> const& configuration, int iOfFunction = 0) const;
-      virtual double laplacianQ(vector<Particle> const& configuration, int iOfParticle = 0, int iOfFunction = 0) const;
-      virtual Vector<double> gradientQ(vector<Particle> const& configuration, int iOfParticle = 0, int iOfFunction = 0) const;
-      virtual double laplacianP(vector<Particle> const& configuration, int iOfParticle = 0, int iOfFunction = 0) const;
-      virtual Vector<double> gradientP(vector<Particle> const& configuration, int iOfParticle = 0, int iOfFunction = 0) const;
+      double basisFunction(vector<Particle*> const& configuration, int iOfFunction = 0) const;
+      virtual double laplacianQ(vector<Particle*> const& configuration, int iOfParticle = 0, int iOfFunction = 0) const;
+      virtual Vector<double> gradientQ(vector<Particle*> const& configuration, int iOfParticle = 0, int iOfFunction = 0) const;
+      virtual double laplacianP(vector<Particle*> const& configuration, int iOfParticle = 0, int iOfFunction = 0) const;
+      virtual Vector<double> gradientP(vector<Particle*> const& configuration, int iOfParticle = 0, int iOfFunction = 0) const;
   };
 
   class ExpFourierHermiteControlVariate : public BasisControlVariate

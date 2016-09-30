@@ -34,7 +34,7 @@ namespace simol
   
   ///Applies the generator of this dynamics to the basis functions of the CV
   ///Evaluate at the current state of "conifguration"
-  void Langevin::computeGeneratorOnBasis(CVBasis& cvBasis, vector<Particle> const& configuration) const
+  void Langevin::computeGeneratorOnBasis(CVBasis& cvBasis, vector<Particle*> const& configuration) const
   {
     int nbOfParticles = (int)configuration.size();
     //cout << "generatorOn(const Langevin& dyna, S const& syst, const ControlVariate& controlVariate)" << endl;
@@ -42,9 +42,9 @@ namespace simol
     for (int iOfFunction = 0; iOfFunction < cvBasis.nbOfFunctions(); iOfFunction++)
       for (int iOfParticle = 0; iOfParticle < nbOfParticles; iOfParticle++)
       {
-        cvBasis.generatorOnBasisValues_(iOfFunction) += dot(configuration[iOfParticle].momentum() , cvBasis.basis_->gradientQ(configuration, iOfParticle, iOfFunction))
-                               + dot(configuration[iOfParticle].force() , cvBasis.basis_->gradientP(configuration, iOfParticle, iOfFunction))
-                               + gamma() * (- dot(configuration[iOfParticle].momentum() , cvBasis.basis_->gradientP(configuration, iOfParticle, iOfFunction))
+        cvBasis.generatorOnBasisValues_(iOfFunction) += dot(configuration[iOfParticle]->momentum() , cvBasis.basis_->gradientQ(configuration, iOfParticle, iOfFunction))
+                               + dot(configuration[iOfParticle]->force() , cvBasis.basis_->gradientP(configuration, iOfParticle, iOfFunction))
+                               + gamma() * (- dot(configuration[iOfParticle]->momentum() , cvBasis.basis_->gradientP(configuration, iOfParticle, iOfFunction))
                                           + cvBasis.basis_->laplacianP(configuration, iOfParticle, iOfFunction) / beta() );
       }
   }

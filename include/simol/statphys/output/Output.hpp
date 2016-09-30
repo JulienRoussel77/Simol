@@ -27,19 +27,18 @@ namespace simol
     void setControlVariates(Input& input, Potential& potential, Galerkin* galerkin);
     
 
-    ofstream & outThermo();
-    ofstream & outParticles();
-    ofstream & outParticlesXMakeMol();
-    ofstream & outParticlesFullConfiguration();
-    ofstream & outFinalFlow();
-    ofstream & outFinalVelocity();
-    ofstream & meanValueObservables();
-    ofstream & outCorrelation();
-    ofstream & outChainVelocities();
-    ofstream & outBeam();
-    ofstream & outVelocitiesGenerator();
-    ofstream & outProfile();
-    ofstream & outFinalProfile();
+    ofstream & outThermo() {return *outThermo_;}
+    ofstream & outParticles() {return *outParticles_;}
+    ofstream & outXMakeMol() {return *outXMakeMol_;}
+    ofstream & outBackUp() {return *outBackUp_;}
+    ofstream & outFinalFlow() {return *outFinalFlow_;}
+    ofstream & outFinalVelocity() {return *outFinalVelocity_;}
+    ofstream & outMeanThermo() {return *outMeanThermo_;}
+    ofstream & outChainVelocities() {return *outChainVelocities_;}
+    ofstream & outBeam() {return *outBeam_;}
+    ofstream & outVelocitiesGenerator() {return *outVelocitiesGenerator_;}
+    ofstream & outProfile() {return *outProfile_;}
+    ofstream & outFinalProfile() {return *outFinalProfile_;}
 
     //-- input parameters useful for output --
     const double& timeStep() const;
@@ -58,6 +57,15 @@ namespace simol
     int nbOfObservables() const;
     vector<Observable*>& observables();
     Observable* observables(int iOfObservable);
+    
+    //-- test if a feature is activated --
+    bool doOutParticles() const {return (bool)outParticles_;}    
+    bool doOutXMakeMol() const {return (bool)outXMakeMol_;}    
+    bool doOutBackUp() const {return (bool)outBackUp_;}
+    bool doOutChain() const {return (bool)outProfile_;}
+    
+    bool doFinalVelocity() const {return (bool)outFinalVelocity_;}
+    bool doFinalFlow() const {return (bool)outFinalFlow_;}
 
 
     //-- fields to output --
@@ -85,7 +93,6 @@ namespace simol
     double& negativeEnergiesCount();
 
     //-- parametrization of outputs --
-    bool doComputeCorrelations() const;
     int const& nbOfAutocoPts() const;
     double autocoPtsPeriod() const;
     int const& decorrelationNbOfSteps() const;
@@ -94,13 +101,13 @@ namespace simol
 
     //-- actual outputing functions --
     void displayThermoVariables(long int iOfStep);
-    void displayParticles(vector<Particle> const& configuration, long int iOfStep);
+    void displayParticles(vector<Particle*> const& configuration, long int iOfStep);
     void finalDisplayCorrelations();
-    void displayFinalVelocity(double temperature, double externalForce, int nbOfFourier = 0, int nbOfHermite = 0);
+    void displayFinalVelocity();
 
     //-- for NBody systems --
-    void displayParticlesXMakeMol(vector<Particle> const& configuration, long int iOfStep, double domainSize = 0);
-    void displayParticlesFullConfiguration(vector<Particle> const& configuration, long int iOfStep); 
+    void displayXMakeMol(vector<Particle*> const& configuration, long int iOfStep, double domainSize = 0);
+    void displayBackUp(vector<Particle*> const& configuration, long int iOfStep); 
 
     //------------ profiles for chains --------------
     void appendKinTempProfile(double value, long int iOfStep, int iOfParticle);
@@ -109,14 +116,14 @@ namespace simol
     void appendBendistProfile(double value, long int iOfStep, int iOfParticle);
     void appendFlowProfile(double value, long int iOfStep, int iOfParticle);
     void writeProfile(ofstream & out_, long int iOfStep);
-    void displayChainMomenta(vector<Particle> const& configuration, long int iOfStep);
-    void displayChainPositions(vector<Particle> const& configuration, long int iOfStep);
+    void displayChainMomenta(vector<Particle*> const& configuration, long int iOfStep);
+    void displayChainPositions(vector<Particle*> const& configuration, long int iOfStep);
     void displayProfile(long int iOfStep);
-    void finalChainDisplay(vector<Particle> const& configuration, Vector<double> const& externalForce);
-    void displayFinalFlow(double temperature, double delta_temperature, double parameter1 = 0, double parameter2 = 0);
+    void finalChainDisplay();
+    void displayFinalFlow(double parameter1=0, double parameter2=0);
 
       //------------- pour DPDE ---------------
-    void displayThermoVariablesDPDE(vector<Particle> const& configuration, long int iOfStep);
+    void displayThermoVariablesDPDE(vector<Particle*> const& configuration, long int iOfStep);
     void finalDisplayCorrelationsDPDE();
     
     Observable& obsKineticEnergy();
@@ -150,14 +157,14 @@ namespace simol
     std::shared_ptr<ofstream> outCorrelation_;
 
     //-- configuration outputs for NBody --
-    std::shared_ptr<ofstream> outParticlesXMakeMol_;
-    std::shared_ptr<ofstream> outParticlesFullConfiguration_;
+    std::shared_ptr<ofstream> outXMakeMol_;
+    std::shared_ptr<ofstream> outBackUp_;
 
     //-- average velocity for Isolated --
     std::shared_ptr<ofstream> outFinalVelocity_;
 
     //-- mean observables for DPDE --
-    std::shared_ptr<ofstream> meanValueObservables_;
+    std::shared_ptr<ofstream> outMeanThermo_;
 
     //-- control variate outputs --
     std::shared_ptr<ofstream> outVelocitiesGenerator_;
@@ -177,11 +184,11 @@ namespace simol
     long int nbOfSteps_;
     double latticeParameter_;
 
+
     //-- fields to output --
     double totalEnergy_;
     double totalVirial_;
     double temperature_;
-    //double pressure_;
     double rejectionCount_;
     double negativeEnergiesCount_;
 
@@ -190,6 +197,14 @@ namespace simol
     int nbOfAutocoPts_;
     bool doFinalFlow_, doFinalVelocity_;
   public:
+    double constTemperature_;
+    double constDeltaTemperature_;
+    double constXi_;
+    double constTauBending_;
+    double constExternalForce_;
+    int constNbOfFourier_;
+    int constNbOfHermite_;
+    
     std::shared_ptr<ofstream> outTest_;   // for debug purpose only
     
     Observable* obsKineticEnergy_;

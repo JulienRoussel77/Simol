@@ -153,16 +153,16 @@ namespace simol
       virtual int& nbOfElts(const int iOfVariable);
       virtual vector<int> nbOfElts() const;
       const Basis* operator()(const int iOfBasis) const;
-      virtual double value(vector<Particle> const& configuration, const int iOfElt) const = 0;
-      virtual double value(vector<Particle> const& configuration, vector<int>& vecIndex) const = 0;
-      virtual Vector<double> gradientQ(vector<Particle> const& configuration, int iOfParticle, int iOfCoeff) const = 0;
-      virtual Vector<double> gradientQ(vector<Particle> const& configuration, int iOfParticle, vector<int>& vecIndex) const = 0;
-      virtual double laplacianQ(vector<Particle> const& configuration, int iOfParticle, int iOfCoeff) const = 0;
-      virtual double laplacianQ(vector<Particle> const& configuration, int iOfParticle, vector<int>& vecIndex) const = 0;
-      virtual Vector<double> gradientP(vector<Particle> const& configuration, int iOfParticle, int iOfCoeff) const = 0;
-      virtual Vector<double> gradientP(vector<Particle> const& configuration, int iOfParticle, vector<int>& vecIndex) const = 0;
-      virtual double laplacianP(vector<Particle> const& configuration, int iOfParticle, int iOfCoeff) const = 0;
-      virtual double laplacianP(vector<Particle> const& configuration, int iOfParticle, vector<int>& vecIndex) const = 0;
+      virtual double value(vector<Particle*> const& configuration, const int iOfElt) const = 0;
+      virtual double value(vector<Particle*> const& configuration, vector<int>& vecIndex) const = 0;
+      virtual Vector<double> gradientQ(vector<Particle*> const& configuration, int iOfParticle, int iOfCoeff) const = 0;
+      virtual Vector<double> gradientQ(vector<Particle*> const& configuration, int iOfParticle, vector<int>& vecIndex) const = 0;
+      virtual double laplacianQ(vector<Particle*> const& configuration, int iOfParticle, int iOfCoeff) const = 0;
+      virtual double laplacianQ(vector<Particle*> const& configuration, int iOfParticle, vector<int>& vecIndex) const = 0;
+      virtual Vector<double> gradientP(vector<Particle*> const& configuration, int iOfParticle, int iOfCoeff) const = 0;
+      virtual Vector<double> gradientP(vector<Particle*> const& configuration, int iOfParticle, vector<int>& vecIndex) const = 0;
+      virtual double laplacianP(vector<Particle*> const& configuration, int iOfParticle, int iOfCoeff) const = 0;
+      virtual double laplacianP(vector<Particle*> const& configuration, int iOfParticle, vector<int>& vecIndex) const = 0;
   };
 
   class QPBasis : public TensorBasis
@@ -175,16 +175,16 @@ namespace simol
       const int& nbOfHermite() const;
       int iTens(int iOfFourier2, int iOfHermite) const;
       vector<int> vecTens(int iTens0) const;
-      virtual double value(vector<Particle> const& configuration, const int iOfElt) const;
-      virtual double value(vector<Particle> const& configuration, vector<int>& vecIndex) const;
-      virtual Vector<double> gradientQ(vector<Particle> const& configuration, int iOfParticle, int iOfCoeff) const;
-      virtual Vector<double> gradientQ(vector<Particle> const& configuration, int iOfParticle, vector<int>& vecIndex) const;
-      virtual double laplacianQ(vector<Particle> const& configuration, int iOfParticle, int iOfCoeff) const;
-      virtual double laplacianQ(vector<Particle> const& configuration, int iOfParticle, vector<int>& vecIndex) const;
-      virtual Vector<double> gradientP(vector<Particle> const& configuration, int iOfParticle, int iOfCoeff) const;
-      virtual Vector<double> gradientP(vector<Particle> const& configuration, int iOfParticle, vector<int>& vecIndex) const;
-      virtual double laplacianP(vector<Particle> const& configuration, int iOfParticle, int iOfCoeff) const;
-      virtual double laplacianP(vector<Particle> const& configuration, int iOfParticle, vector<int>& vecIndex) const;
+      virtual double value(vector<Particle*> const& configuration, const int iOfElt) const;
+      virtual double value(vector<Particle*> const& configuration, vector<int>& vecIndex) const;
+      virtual Vector<double> gradientQ(vector<Particle*> const& configuration, int iOfParticle, int iOfCoeff) const;
+      virtual Vector<double> gradientQ(vector<Particle*> const& configuration, int iOfParticle, vector<int>& vecIndex) const;
+      virtual double laplacianQ(vector<Particle*> const& configuration, int iOfParticle, int iOfCoeff) const;
+      virtual double laplacianQ(vector<Particle*> const& configuration, int iOfParticle, vector<int>& vecIndex) const;
+      virtual Vector<double> gradientP(vector<Particle*> const& configuration, int iOfParticle, int iOfCoeff) const;
+      virtual Vector<double> gradientP(vector<Particle*> const& configuration, int iOfParticle, vector<int>& vecIndex) const;
+      virtual double laplacianP(vector<Particle*> const& configuration, int iOfParticle, int iOfCoeff) const;
+      virtual double laplacianP(vector<Particle*> const& configuration, int iOfParticle, vector<int>& vecIndex) const;
   };
 
   class FourierHermiteBasis : public QPBasis

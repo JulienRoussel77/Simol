@@ -5,11 +5,13 @@ namespace simol
   
   //--------------- particle pair iterators ------------
   
-  const Cell& ParticlePairIterator::cell1() const 
+  
+  
+  /*const Cell& ParticlePairIterator::cell1() const 
   {return syst_->cell(iOfCell1());}
   
   Cell& ParticlePairIterator::cell1() 
-  {return syst_->cell(iOfCell1());}
+  {return syst_->cell(iOfCell1());}  
   
   const int& ParticlePairIterator::iOfCell2() const 
   {return syst_->cell(iOfCell1()).indexNeighbors(iOfNeighbor2());}
@@ -21,7 +23,22 @@ namespace simol
   {return syst_->cell(iOfCell2());}
   
   Cell& ParticlePairIterator::cell2() 
-  {return syst_->cell(iOfCell2());}
+  {return syst_->cell(iOfCell2());}*/
+  
+  /*Particle const& ParticlePairIterator::particle2() const 
+  {return syst_->getMember(iOfCell2(), iOfParticle2());}
+  
+  Particle& ParticlePairIterator::particle2() 
+  {return syst_->getMember(iOfCell2(), iOfParticle2());}*/
+  
+  ParticlePairIterator NBody::pairBegin()
+  {
+    ParticlePairIterator iter = ParticlePairIterator();
+    iter.it1_ = cell(0).members().begin();
+    iter.it2_ = std::next(iter.it1_, 1);
+    iter.endIt2_ = cell(0).members().end();
+    return iter;
+  }
   
 
   bool NBody::pairFinished(ParticlePairIterator const& it) const
@@ -31,30 +48,56 @@ namespace simol
   
   void NBody::incrementePairIterator(ParticlePairIterator& it)
   {
-    it.iOfParticle2()++;
+    //if (cell(cell(it.iOfCell1()).indexNeighbors(it.iOfNeighbor2())).members().end() != it.endIt2()) cout << "endIt2 is not well defined !" << endl;
+    it.it2_++;
     //if the neighbor cell is fully visited
-    if (it.iOfParticle2() == it.cell2().nbOfMembers())
+    //if (it.it2_ == it.cell2().members().end())
+    while (it.it2_ == it.endIt2())
     {
+      //cout << "Box 2 finished !" << endl;
       //we jump to the next neighbor cell
       it.iOfNeighbor2()++;
-      it.iOfParticle2() = 0;
+      //Cell* cell2 = &(cell(cell(it.iOfCell1()).indexNeighbors(it.iOfNeighbor2())));
+        
+      if (it.iOfNeighbor2() != nbOfNeighbors())
+        it.it2_ = getCell2(it).members().begin();
       //if all the neighbor cells has been visited
-      if (it.iOfNeighbor2() == nbOfNeighbors())
+      else
       {
+        //cout << "Loop over neighbor boxes finished !" << endl;
         //we jump to the next particle
-        it.iOfParticle1()++;
+        it.it1_++;
         it.iOfNeighbor2() = 0;
+        //it.endIt2() = cell2->members().end();
         //if the cell is fully visited
-        if (it.iOfParticle1() == it.cell1().nbOfMembers())
+        while (it.it1_ == cell(it.iOfCell1()).members().end())
         {
+          //cout << "Box 1 finished !" << endl;
           //we jump to the next one
           it.iOfCell1()++;
-          it.iOfParticle1() = 0;        
+          if (it.iOfCell1() != nbOfCells())
+            it.it1_ = cell(it.iOfCell1()).members().begin();
+          else
+            return;
+          //cout << "iOfCell1 / nbOfCells : " << it.iOfCell1() << " / " << nbOfCells() << endl;
         }
         //in both case this allows to avoid counting twice a pair or a particle with it self
-        it.iOfParticle2() = it.iOfParticle1() + 1;        
+        it.it2_ = std::next(it.it1_, 1);        
       }
+      it.endIt2() = getCell2(it).members().end();
     }
+    //if(!*it.it1_) cout << "it1_ is nullptr !" << endl;
+    //if(!*it.it2_) cout << "it2_ is nullptr !" << endl;
+  }
+  
+  Cell const& NBody::getCell2(ParticlePairIterator const& it) const
+  {
+    return cell(cell(it.iOfCell1()).indexNeighbors(it.iOfNeighbor2()));
+  }
+  
+  Cell& NBody::getCell2(ParticlePairIterator const& it)
+  {
+    return cell(cell(it.iOfCell1()).indexNeighbors(it.iOfNeighbor2()));
   }
   
   
@@ -74,9 +117,9 @@ namespace simol
     members_.clear();
   }
 
-  void Cell::push_back(int ind)
+  void Cell::push_back(Particle& particle)
   {
-    members_.push_back(ind);
+    members_.push_back(&particle);
   }
 
   vector<int> const& Cell::indexNeighbors() const
@@ -95,14 +138,24 @@ namespace simol
   int& Cell::indexNeighbors(const int& iOfNeighbor)
   {return indexNeighbors_[iOfNeighbor];}
   
-  list<int> const& Cell::members() const
+  vector<Particle*> const& Cell::members() const
   {
     return members_;
   }
 
-  list<int>& Cell::members()
+  vector<Particle*>& Cell::members()
   {
     return members_;
+  }
+  
+  Particle const& Cell::member(int const& iOfMember) const
+  {
+    return *(members_[iOfMember]);
+  }
+
+  Particle& Cell::member(int const& iOfMember)
+  {
+    return *(members_[iOfMember]);
   }
   
   int Cell::nbOfMembers() const
@@ -124,7 +177,7 @@ namespace simol
     //-- initialise the configuration by initializing the particles --
     assert(configuration_.size() > 1);
     for (int i = 0; i < input.nbOfParticles(); i++)
-      configuration_[i] = Particle(input.mass(), input.initialPosition(i), input.initialMomentum(i));
+      configuration_[i] = new Particle(input.mass(), input.initialPosition(i), input.initialMomentum(i));
 
     //-- check whether the initial configuration should be re-read from a file --
     if (restart_)
@@ -143,9 +196,9 @@ namespace simol
       cells_ = vector<Cell>(nbOfCells_, Cell());
       // number of neighboring cells: depends on the dimension
       if (dimension_ == 2)
-        nbOfNeighbors_ = 4;
+        nbOfNeighbors_ = 4+1;
       if (dimension_ == 3)
-        nbOfNeighbors_ = 13;
+        nbOfNeighbors_ = 13+1;
       // create the array of neighboring cell indices
       findNeighboringCells();
       // create lists of particles in each cell
@@ -177,6 +230,12 @@ namespace simol
   {
     return restartFileName_;
   }
+  
+  /*Particle& NBody::getMember(const int& iOfCell, const int& iOfMember)
+  {return cell(iOfCell).member(iOfMember);}
+  
+  Particle const& NBody::getMember(const int& iOfCell, const int& iOfMember) const
+  {return cell(iOfCell).member(iOfMember);}*/
 
   ///
   /// return position x in the interval [0,domainSize_)
@@ -192,32 +251,27 @@ namespace simol
     int i1 = floor(periodicPosition(pos(0)) / cellSize_);
     int i2 = floor(periodicPosition(pos(1)) / cellSize_);
     if (dimension_ == 2)
-      return returnIndexCell2D(i1, i2);
+      return returnIndexCell(i1, i2);
     else if (dimension_ == 3)
     {
       int i3 = floor(periodicPosition(pos(2)) / cellSize_);
-      return returnIndexCell3D(i1, i2, i3);
+      return returnIndexCell(i1, i2, i3);
     }
     else
       throw std::invalid_argument("NBody::findIndex -- dimension incorrect");
     return 0;
   }
-
+  
   ///
-  /// determine the index of a cell in a 2D setting from the vector of integers characterizing the cell
-  int NBody::returnIndexCell2D(int i1, int i2) const
+  /// determine the index of a cell from the vector of integers characterizing the cell
+  int NBody::returnIndexCell(int i1, int i2, int i3) const
   {
-    return  intModulo(i1, nbOfCellsPerDimension_) + intModulo(i2, nbOfCellsPerDimension_) * nbOfCellsPerDimension_;
+              int indexCell  = intModulo(i1, nbOfCellsPerDimension_);
+    if (i2 != -1) indexCell += intModulo(i2, nbOfCellsPerDimension_) * nbOfCellsPerDimension_;
+    if (i3 != -1) indexCell += intModulo(i3, nbOfCellsPerDimension_) * pow(nbOfCellsPerDimension_, 2);
+    return indexCell;
   }
-
-  ///
-  /// determine the index of a cell in a 3D setting from the vector of integers characterizing the cell
-  int NBody::returnIndexCell3D(int i1, int i2, int i3) const
-  {
-    return  intModulo(i1, nbOfCellsPerDimension_) + nbOfCellsPerDimension_ * intModulo(i2, nbOfCellsPerDimension_)
-            + pow(nbOfCellsPerDimension_, 2) * intModulo(i3, nbOfCellsPerDimension_);
-  }
-
+  
   ///
   /// construct the list of neighboring cells for all cells
   /// only half of the neighbors are considered (in order to avoid double counting of interactions)
@@ -226,19 +280,20 @@ namespace simol
     //-- initialize the vector of indices of neighboring cells --
     for (int j = 0; j < nbOfCells_; j++)
       cells_[j].indexNeighbors() = vector<int>(nbOfNeighbors_, 0);
+    Vector<int> currentVecIndex(dimension_); 
     //-- find the neighboring cells --
-    int currentCellIndex;
     if (dimension_ == 2)
     {
       for (int i1 = 0; i1 < nbOfCellsPerDimension_; i1++)
       {
         for (int i2 = 0; i2 < nbOfCellsPerDimension_; i2++)
         {
-          currentCellIndex = returnIndexCell2D(i1, i2);
-          cells_[currentCellIndex].indexNeighbors()[0] = returnIndexCell2D(i1 + 1, i2);
-          cells_[currentCellIndex].indexNeighbors()[1] = returnIndexCell2D(i1 + 1, i2 + 1);
-          cells_[currentCellIndex].indexNeighbors()[2] = returnIndexCell2D(i1,  i2 + 1);
-          cells_[currentCellIndex].indexNeighbors()[3] = returnIndexCell2D(i1 - 1, i2 + 1);
+          int currentCellIndex = returnIndexCell(i1, i2);
+          cells_[currentCellIndex].indexNeighbors(0) = returnIndexCell(i1    , i2);
+          cells_[currentCellIndex].indexNeighbors(1) = returnIndexCell(i1 + 1, i2);
+          cells_[currentCellIndex].indexNeighbors(2) = returnIndexCell(i1 + 1, i2 + 1);
+          cells_[currentCellIndex].indexNeighbors(3) = returnIndexCell(i1,  i2 + 1);
+          cells_[currentCellIndex].indexNeighbors(4) = returnIndexCell(i1 - 1, i2 + 1);
         }
       }
     }
@@ -250,23 +305,25 @@ namespace simol
         {
           for (int i3 = 0; i3 < nbOfCellsPerDimension_; i3++)
           {
-            currentCellIndex = returnIndexCell3D(i1, i2, i3);
+            int currentCellIndex = returnIndexCell(i1, i2, i3);
+            //-- current cell itself --
+            cells_[currentCellIndex].indexNeighbors(0)  = returnIndexCell(i1      , i2    , i3    );
             //-- 4 vertices out of 8 --
-            cells_[currentCellIndex].indexNeighbors()[0]  = returnIndexCell3D(i1 + 1, i2 + 1, i3 + 1);
-            cells_[currentCellIndex].indexNeighbors()[1]  = returnIndexCell3D(i1 + 1, i2 + 1, i3 - 1);
-            cells_[currentCellIndex].indexNeighbors()[2]  = returnIndexCell3D(i1 + 1, i2 - 1, i3 + 1);
-            cells_[currentCellIndex].indexNeighbors()[3]  = returnIndexCell3D(i1 + 1, i2 - 1, i3 - 1);
+            cells_[currentCellIndex].indexNeighbors(1)  = returnIndexCell(i1 + 1, i2 + 1, i3 + 1);
+            cells_[currentCellIndex].indexNeighbors(2)  = returnIndexCell(i1 + 1, i2 + 1, i3 - 1);
+            cells_[currentCellIndex].indexNeighbors(3)  = returnIndexCell(i1 + 1, i2 - 1, i3 + 1);
+            cells_[currentCellIndex].indexNeighbors(4)  = returnIndexCell(i1 + 1, i2 - 1, i3 - 1);
             //-- 3 faces out of 6 --
-            cells_[currentCellIndex].indexNeighbors()[4]  = returnIndexCell3D(i1 + 1, i2  , i3);
-            cells_[currentCellIndex].indexNeighbors()[5]  = returnIndexCell3D(i1  , i2 + 1, i3);
-            cells_[currentCellIndex].indexNeighbors()[6]  = returnIndexCell3D(i1  , i2  , i3 + 1);
+            cells_[currentCellIndex].indexNeighbors(5)  = returnIndexCell(i1 + 1, i2  , i3);
+            cells_[currentCellIndex].indexNeighbors(6)  = returnIndexCell(i1  , i2 + 1, i3);
+            cells_[currentCellIndex].indexNeighbors(7)  = returnIndexCell(i1  , i2  , i3 + 1);
             //-- 6 edges out of 12 --
-            cells_[currentCellIndex].indexNeighbors()[7]  = returnIndexCell3D(i1  , i2 + 1, i3 + 1);
-            cells_[currentCellIndex].indexNeighbors()[8]  = returnIndexCell3D(i1 + 1, i2  , i3 + 1);
-            cells_[currentCellIndex].indexNeighbors()[9]  = returnIndexCell3D(i1 + 1, i2 + 1, i3);
-            cells_[currentCellIndex].indexNeighbors()[10] = returnIndexCell3D(i1  , i2 + 1, i3 - 1);
-            cells_[currentCellIndex].indexNeighbors()[11] = returnIndexCell3D(i1 + 1, i2  , i3 - 1);
-            cells_[currentCellIndex].indexNeighbors()[12] = returnIndexCell3D(i1 + 1, i2 - 1, i3);
+            cells_[currentCellIndex].indexNeighbors(8)  = returnIndexCell(i1  , i2 + 1, i3 + 1);
+            cells_[currentCellIndex].indexNeighbors(9)  = returnIndexCell(i1 + 1, i2  , i3 + 1);
+            cells_[currentCellIndex].indexNeighbors(10)  = returnIndexCell(i1 + 1, i2 + 1, i3);
+            cells_[currentCellIndex].indexNeighbors(11) = returnIndexCell(i1  , i2 + 1, i3 - 1);
+            cells_[currentCellIndex].indexNeighbors(12) = returnIndexCell(i1 + 1, i2  , i3 - 1);
+            cells_[currentCellIndex].indexNeighbors(13) = returnIndexCell(i1 + 1, i2 - 1, i3);
           }
         }
       }
@@ -281,11 +338,10 @@ namespace simol
     for (int j = 0; j < nbOfCells_; j++)
       cells_[j].clear();
     //-- reaffect the particles --
-    int index = 0;
-    for (int i = 0; i < nbOfParticles(); i++)
+    for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
     {
-      index = findIndex(getParticle(i).position());
-      cells_[index].push_back(i);
+      int cellIndex = findIndex(getParticle(iOfParticle).position());
+      cell(cellIndex).push_back(getParticle(iOfParticle));
     }
   }
 
@@ -293,14 +349,21 @@ namespace simol
   /// compute the forces (with or without cell method)
   void NBody::computeAllForces()
   {
-  for (auto && particle : configuration_)
-      particle.resetForce(potential());
+    //for (auto && particle : configuration_)
+    for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
+      getParticle(iOfParticle).resetForce(potential());
     if (doCells_)
     {
       //-- reinitialize cells before looping on the pair interactions --
       reinitializeCells();
       //-- compute the interactions --
-      int neighborIndex = 1;
+      for (ParticlePairIterator it = pairBegin(); !pairFinished(it); incrementePairIterator(it))
+      {
+        //cout << it.iOfCell1_ << " " << it.iOfNeighbor2_ << endl;
+        interaction(it.particle1(), it.particle2());
+      }
+      
+      /*int neighborIndex = 1;
       for (int k = 0; k < nbOfCells_; k++)
       {
         //-- interaction within cells: avoid double counting by setting i1 \leq i2 + 1 --
@@ -317,14 +380,14 @@ namespace simol
             for (list<int>::iterator it2 = cells_[neighborIndex].members().begin(); it2 != cells_[neighborIndex].members().end(); it2++)
               interaction(configuration_[*it1], configuration_[*it2]);
         }
-      }
+      }*/
     }
     else
     {
       //-- no cell method: std double loop --
       for (int i = 0; i < nbOfParticles(); i++)
         for (int j = i + 1; j < nbOfParticles(); j++)
-          interaction(configuration_[i], configuration_[j]);
+          interaction(getParticle(i), getParticle(j));
     }
   }
 
@@ -364,7 +427,10 @@ namespace simol
       //-- reinitialize cells before looping on the pair interactions --
       reinitializeCells();
       //-- compute the interactions --
-      int neighborIndex = 1;
+      for (ParticlePairIterator it = pairBegin(); !pairFinished(it); incrementePairIterator(it))
+        elementaryFluctuationDissipationDPDE(dyna, it.particle1(), it.particle2());
+      
+      /*int neighborIndex = 1;
       for (int k = 0; k < nbOfCells_; k++)
       {
         //-- interaction within cells: avoid double counting by setting i1 \leq i2 + 1 --
@@ -382,14 +448,14 @@ namespace simol
             for (list<int>::iterator it2 = cells_[neighborIndex].members().begin(); it2 != cells_[neighborIndex].members().end(); it2++)
               elementaryFluctuationDissipationDPDE(dyna, configuration_[*it1], configuration_[*it2]);
         }
-      }
+      }*/
     }
     else
     {
       //-- no cell method: std double loop --
       for (int i = 0; i < nbOfParticles(); i++)
         for (int j = i + 1; j < nbOfParticles(); j++)
-          elementaryFluctuationDissipationDPDE(dyna, configuration_[i], configuration_[j]);
+          elementaryFluctuationDissipationDPDE(dyna, *configuration_[i], *configuration_[j]);
     }
   }
 

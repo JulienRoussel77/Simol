@@ -68,15 +68,15 @@ namespace simol
       virtual void append(double value, long int iOfStep);
       virtual void appendCurrent(long int iOfStep);
       
-      /*void computeGeneratorHamiltonian(vector<Particle> const& configuration){};
-      void computeGeneratorOverdamped(vector<Particle> const& configuration, double beta){};
-      void computeGeneratorLangevin(vector<Particle> const& configuration, double beta, double gamma){};
-      void computeGeneratorBoundarylangevin(vector<Particle> const& configuration, double betaLeft, double betaRight, double gamma){};*/
+      /*void computeGeneratorHamiltonian(){};
+      void computeGeneratorOverdamped(vector<Particle*> const& configuration, double beta){};
+      void computeGeneratorLangevin(vector<Particle*> const& configuration, double beta, double gamma){};
+      void computeGeneratorBoundarylangevin(vector<Particle*> const& configuration, double betaLeft, double betaRight, double gamma){};*/
   
-      virtual void updateHamiltonian(vector<Particle> const& /*configuration*/){};
-      virtual void updateOverdamped(vector<Particle> const& /*configuration*/, double /*beta*/){};
-      virtual void updateLangevin(vector<Particle> const& /*configuration*/, double /*beta*/, double /*gamma*/){};
-      virtual void updateBoundaryLangevin(vector<Particle> const& /*configuration*/, double /*betaLeft*/, double /*betaRight*/, double /*gamma*/){};
+      virtual void updateHamiltonian(vector<Particle*> const& /*configuration*/){};
+      virtual void updateOverdamped(vector<Particle*> const& /*configuration*/, double /*beta*/){};
+      virtual void updateLangevin(vector<Particle*> const& /*configuration*/, double /*beta*/, double /*gamma*/){};
+      virtual void updateBoundaryLangevin(vector<Particle*> const& /*configuration*/, double /*betaLeft*/, double /*betaRight*/, double /*gamma*/){};
 
       bool doOutput(long int iOfStep) const;
       //bool doFinal() const;

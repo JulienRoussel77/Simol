@@ -272,6 +272,7 @@ namespace simol
     appendToBetter(observable, iOfStep);
     //cout << "end ControlVariate::update" << endl;
   }
+  
 
 
   void ControlVariate::display(std::ofstream& out, double time) const
@@ -321,33 +322,33 @@ namespace simol
     ControlVariate(input, outPath, cvBasis, 1)
   {}
 
-  double SinusControlVariate::basisFunction(vector<Particle> const& configuration, int /*iOfFunction*/) const
+  double SinusControlVariate::basisFunction(vector<Particle*> const& configuration, int /*iOfFunction*/) const
   {
-    double q = configuration[0].position(0);
+    double q = configuration[0]->position(0);
     return sin(2 * M_PI * q);
   }
 
-  Vector<double> SinusControlVariate::gradientQ(vector<Particle> const& configuration, int /*iOfParticle*/, int /*iOfFunction*/) const
+  Vector<double> SinusControlVariate::gradientQ(vector<Particle*> const& configuration, int /*iOfParticle*/, int /*iOfFunction*/) const
   {
-    double q = configuration[0].position(0);
+    double q = configuration[0]->position(0);
     Vector<double> grad(dimension_);
     grad(0) = 2 * M_PI * cos(2 * M_PI * q);
     return grad;
   }
 
-  double SinusControlVariate::laplacianQ(vector<Particle> const& configuration, int /*iOfParticle*/, int /*iOfFunction*/) const
+  double SinusControlVariate::laplacianQ(vector<Particle*> const& configuration, int /*iOfParticle*/, int /*iOfFunction*/) const
   {
-    double q = configuration[0].position(0);
+    double q = configuration[0]->position(0);
     return - pow (2 * M_PI, 2) * sin(2 * M_PI * q);
   }
 
 
-  double SinusControlVariate::laplacianP(vector<Particle> const& /*configuration*/, int /*iOfParticle*/, int /*iOfFunction*/) const
+  double SinusControlVariate::laplacianP(vector<Particle*> const& /*configuration*/, int /*iOfParticle*/, int /*iOfFunction*/) const
   {
     return 0;
   }
 
-  Vector<double> SinusControlVariate::gradientP(vector<Particle> const& /*configuration*/, int /*iOfParticle*/, int /*iOfFunction*/) const
+  Vector<double> SinusControlVariate::gradientP(vector<Particle*> const& /*configuration*/, int /*iOfParticle*/, int /*iOfFunction*/) const
   {
     return Vector<double>(dimension_);
   }
@@ -375,7 +376,7 @@ namespace simol
     //cout << coeffsVec_ << endl;
   }
 
-  double BasisControlVariate::basisFunction(vector<Particle> const& configuration, int iOfFunction) const
+  double BasisControlVariate::basisFunction(vector<Particle*> const& configuration, int iOfFunction) const
   {
     assert(iOfFunction == 0);
     double result = 0;
@@ -390,7 +391,7 @@ namespace simol
     return result;
   }
 
-  Vector<double> BasisControlVariate::gradientQ(vector<Particle> const& configuration, int iOfParticle, int iOfFunction) const
+  Vector<double> BasisControlVariate::gradientQ(vector<Particle*> const& configuration, int iOfParticle, int iOfFunction) const
   {
     //cout << "BasisControlVariate::gradientQ" << endl;
     Vector<double> result(1, 0);
@@ -409,7 +410,7 @@ namespace simol
     return result;
   }
 
-  double BasisControlVariate::laplacianQ(vector<Particle> const& configuration, int iOfParticle, int iOfFunction) const
+  double BasisControlVariate::laplacianQ(vector<Particle*> const& configuration, int iOfParticle, int iOfFunction) const
   {
     double result = 0;
     assert(iOfFunction == 0);
@@ -424,7 +425,7 @@ namespace simol
     return result;
   }
 
-  Vector<double> BasisControlVariate::gradientP(vector<Particle> const& configuration, int iOfParticle, int iOfFunction) const
+  Vector<double> BasisControlVariate::gradientP(vector<Particle*> const& configuration, int iOfParticle, int iOfFunction) const
   {
     Vector<double> result(1, 0);
     assert(iOfFunction == 0);
@@ -441,7 +442,7 @@ namespace simol
     return result;
   }
 
-  double BasisControlVariate::laplacianP(vector<Particle> const& configuration, int iOfParticle, int iOfFunction) const
+  double BasisControlVariate::laplacianP(vector<Particle*> const& configuration, int iOfParticle, int iOfFunction) const
   {
     double result = 0;
     assert(iOfFunction == 0);
@@ -478,7 +479,7 @@ namespace simol
   void ExpFourierHermiteControlVariate::displayMap(ofstream& out) const
   {
     cout << "displayMap" << endl;
-    vector<Particle> conf(1, Particle(0, 0, 0));
+    vector<Particle*> conf(1, new Particle(0, 0, 0));
     //conf[0] = Particle(0,0,0);
     out << nbP_ + 1 << " ";
     for (double p = -pMax_; p < pMax_; p += deltaP_)
@@ -489,8 +490,8 @@ namespace simol
       out << q << " ";
       for (double p = -pMax_; p < pMax_; p += deltaP_)
       {
-        conf[0].position() = Vector<double>(1, q);
-        conf[0].momentum() = Vector<double>(1, p);
+        conf[0]->position() = Vector<double>(1, q);
+        conf[0]->momentum() = Vector<double>(1, p);
         out << basisFunction(conf, 0) << " ";
       }
       out << endl;
@@ -501,7 +502,7 @@ namespace simol
   void ExpFourierHermiteControlVariate::displayGradQMap(ofstream& out) const
   {
     cout << "displayGradQMap" << endl;
-    vector<Particle> conf(1, Particle(0, 0, 0));
+    vector<Particle*> conf(1, new Particle(0, 0, 0));
     //conf[0] = Particle(0,0,0);
     out << nbP_ + 1 << " ";
     for (double p = -pMax_; p < pMax_; p += deltaP_)
@@ -512,8 +513,8 @@ namespace simol
       out << q << " ";
       for (double p = -pMax_; p < pMax_; p += deltaP_)
       {
-        conf[0].position() = Vector<double>(1, q);
-        conf[0].momentum() = Vector<double>(1, p);
+        conf[0]->position() = Vector<double>(1, q);
+        conf[0]->momentum() = Vector<double>(1, p);
         out << gradientQ(conf, 0) << " ";
       }
       out << endl;
@@ -524,7 +525,7 @@ namespace simol
   void ExpFourierHermiteControlVariate::displayGradPMap(ofstream& out) const
   {
     cout << "displayGradPMap" << endl;
-    vector<Particle> conf(1, Particle(0, 0, 0));
+    vector<Particle*> conf(1, new Particle(0, 0, 0));
     //nf[0] = Particle(0,0,0);
     out << nbP_ + 1 << " ";
     for (double p = -pMax_; p < pMax_; p += deltaP_)
@@ -535,8 +536,8 @@ namespace simol
       out << q << " ";
       for (double p = -pMax_; p < pMax_; p += deltaP_)
       {
-        conf[0].position() = Vector<double>(1, q);
-        conf[0].momentum() = Vector<double>(1, p);
+        conf[0]->position() = Vector<double>(1, q);
+        conf[0]->momentum() = Vector<double>(1, p);
         out << gradientP(conf, 0) << " ";
       }
       out << endl;

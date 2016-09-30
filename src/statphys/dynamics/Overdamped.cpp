@@ -42,14 +42,14 @@ namespace simol
   
   ///Applies the generator of this dynamics to the basis functions of the CV
   ///Evaluate at the current state of "conifguration"
-  void Overdamped::computeGeneratorOnBasis(CVBasis& cvBasis, vector<Particle> const& configuration) const
+  void Overdamped::computeGeneratorOnBasis(CVBasis& cvBasis, vector<Particle*> const& configuration) const
   {
     int nbOfParticles = (int)configuration.size();
     //Vector<double> result = Vector<double>::Zero(nbOfFunctions());
     for (int iOfFunction = 0; iOfFunction < cvBasis.nbOfFunctions(); iOfFunction++)
       for (int iOfParticle = 0; iOfParticle < nbOfParticles; iOfParticle++)
         cvBasis.generatorOnBasisValues_(iOfFunction) += cvBasis.basis_->laplacianQ(configuration, iOfParticle, iOfFunction) / beta()
-                               + dot(configuration[iOfParticle].force(), cvBasis.basis_->gradientQ(configuration, iOfParticle, iOfFunction));
+                               + dot(configuration[iOfParticle]->force(), cvBasis.basis_->gradientQ(configuration, iOfParticle, iOfFunction));
   }
 
 }

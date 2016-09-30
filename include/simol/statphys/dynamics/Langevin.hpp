@@ -12,7 +12,7 @@ namespace simol
       virtual void printName() const;
       double sigma() const;
       //virtual void updateAfter(Particle& particle);
-      virtual void computeGeneratorOnBasis(CVBasis& cvBasis, vector<Particle> const& configuration) const;
+      virtual void computeGeneratorOnBasis(CVBasis& cvBasis, vector<Particle*> const& configuration) const;
     protected:
       double sigma_;
   };

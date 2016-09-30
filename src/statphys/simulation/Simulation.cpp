@@ -14,7 +14,7 @@ namespace simol
   {
     cout << " - Sampling the momenta..." << endl;
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
-      syst.getParticle(iOfParticle).momentum() = syst.drawMomentum(dyna.beta(), syst.getParticle(iOfParticle).mass());
+      syst(iOfParticle).momentum() = syst.drawMomentum(dyna.beta(), syst(iOfParticle).mass());
   }
   
   //------------- Overdamped --------------------
@@ -26,9 +26,9 @@ namespace simol
     cout << " - Sampling the momenta..." << endl;
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
     {
-      syst.getParticle(iOfParticle).momentum() = syst.drawMomentum(dyna.beta(), syst.getParticle(iOfParticle).mass());
+      syst(iOfParticle).momentum() = syst.drawMomentum(dyna.beta(), syst(iOfParticle).mass());
 
-      dyna.initializeCountdown(syst.getParticle(iOfParticle));
+      dyna.initializeCountdown(syst(iOfParticle));
     }
   }
   
@@ -40,31 +40,33 @@ namespace simol
     {
       alpha = iOfParticle / (double) syst.nbOfParticles();
       localTemp = (1 - alpha) * dyna.temperatureLeft() + alpha * dyna.temperatureRight();
-      syst.getParticle(iOfParticle).momentum() = syst.drawMomentum(1 / localTemp, syst.getParticle(iOfParticle).mass());
+      syst(iOfParticle).momentum() = syst.drawMomentum(1 / localTemp, syst(iOfParticle).mass());
 
-      dyna.initializeCountdown(syst.getParticle(iOfParticle));
+      dyna.initializeCountdown(syst(iOfParticle));
     }
   }
   
   void thermalize(Dynamics& /*model*/, System& /*syst*/)
   {throw std::invalid_argument("thermalize not defined");}
   
-  void thermalize(Dynamics& /*model*/, Isolated& syst)
+  void thermalize(Dynamics& /*model*/, Isolated& /*syst*/)
   {}
   
   
   
   
-  void simulate(Dynamics& dyna, System& syst){}
+  void simulate(Dynamics&, System&){}
   
   //------------- Hamiltonian -------------------
   void simulate(Hamiltonian& dyna, System& syst)
   {
-    for (auto && particle : syst.configuration())
-      dyna.verletFirstPart(particle);
+    //for (ParticleIterator it = syst.begin(); it != syst.end(); ++it)
+    for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
+      dyna.verletFirstPart(syst(iOfParticle));
     syst.computeAllForces();
-    for (auto && particle : syst.configuration())
-      dyna.verletSecondPart(particle);
+    //for (ParticleIterator it = syst.begin(); !syst.finished(it); ++it)
+    for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
+      dyna.verletSecondPart(syst(iOfParticle));
   }
   
   //------------- Overdamped --------------------
@@ -72,67 +74,78 @@ namespace simol
   void simulate(Overdamped& dyna, System& syst)
   {
     syst.computeAllForces();
-    for (auto && particle : syst.configuration())
-      dyna.updatePosition(particle);
+    
+    //for (ParticleIterator it = syst.begin(); !syst.finished(it); ++it)
+    for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
+      dyna.updatePosition(syst(iOfParticle));
   }
   
   //------------- LangevinBase --------------------
   
   void simulate(LangevinBase& dyna, System& syst)
   {
-  for (auto && particle : syst.configuration())
-      dyna.verletFirstPart(particle);
+  //for (ParticleIterator it = syst.begin(); !syst.finished(it); ++it)
+  for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
+      dyna.verletFirstPart(syst(iOfParticle));
     syst.computeAllForces();
-  for (auto && particle : syst.configuration())
-      dyna.verletSecondPart(particle);
+  //for (ParticleIterator it = syst.begin(); !syst.finished(it); ++it)
+  for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
+      dyna.verletSecondPart(syst(iOfParticle));
   }
   
   //------------- Langevin --------------------
   
   void simulate(Langevin& dyna, System& syst)
   {
-    for (auto && particle : syst.configuration())
-      dyna.verletFirstPart(particle);
+    //for (ParticleIterator it = syst.begin(); !syst.finished(it); ++it)
+    for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
+      dyna.verletFirstPart(syst(iOfParticle));
     syst.computeAllForces();
-    for (auto && particle : syst.configuration())
-      dyna.verletSecondPart(particle);
-    for (auto && particle : syst.configuration())
-      dyna.updateOrsteinUhlenbeck(particle, dyna.beta());
+    //for (ParticleIterator it = syst.begin(); !syst.finished(it); ++it)
+    for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
+      dyna.verletSecondPart(syst(iOfParticle));
+    //for (ParticleIterator it = syst.begin(); !syst.finished(it); ++it)
+    for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
+      dyna.updateOrsteinUhlenbeck(syst(iOfParticle), dyna.beta());
   }
   
   //------------ BoundaryLangevin ---------------
   
   void simulate(BoundaryLangevin& dyna, System& syst)
   {
-    for (auto && particle: syst.configuration())
-      dyna.verletFirstPart(particle);
+    //for (ParticleIterator it = syst.begin(); !syst.finished(it); ++it)
+    for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
+      dyna.verletFirstPart(syst(iOfParticle));
 
     syst.computeAllForces();
 
-    for (auto && particle: syst.configuration())
-      dyna.verletSecondPart(particle);
+    //for (ParticleIterator it = syst.begin(); !syst.finished(it); ++it)
+    for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
+      dyna.verletSecondPart(syst(iOfParticle));
 
     dyna.updateOrsteinUhlenbeck(syst.getParticle(0), dyna.betaLeft());
     dyna.updateOrsteinUhlenbeck(syst.getParticle(syst.nbOfParticles() - 1), dyna.betaRight());
 
     if (dyna.doMomentaExchange())
       for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles() - 1; iOfParticle++)
-        dyna.updateMomentaExchange(syst.getParticle(iOfParticle), syst.getParticle(iOfParticle + 1));
+        dyna.updateMomentaExchange(syst(iOfParticle), syst(iOfParticle + 1));
   }
   
   //------------- DPDE --------------------
   
     void simulate(DPDE& dyna, System& syst)
   {
-    for (auto && particle : syst.configuration())
-      dyna.verletFirstPart(particle);
+    //for (ParticleIterator it = syst.begin(); !syst.finished(it); ++it)
+    for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
+      dyna.verletFirstPart(syst(iOfParticle));
     syst.computeAllForces();
-    for (auto && particle : syst.configuration())
-      dyna.verletSecondPart(particle);
+    //for (ParticleIterator it = syst.begin(); !syst.finished(it); ++it)
+    for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
+      dyna.verletSecondPart(syst(iOfParticle));
     //-- fluctuation/dissipation --
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
-      //dyna.energyReinjection(syst.getParticle(iOfParticle));  // integration of p at fixed gamma + energy reinjection
-      dyna.metropolizedEnergyReinjection(syst.getParticle(iOfParticle));  // Metropolis correction of effective dynamics on p 
+      //dyna.energyReinjection(syst(iOfParticle));  // integration of p at fixed gamma + energy reinjection
+      dyna.metropolizedEnergyReinjection(syst(iOfParticle));  // Metropolis correction of effective dynamics on p 
   }
   
   
@@ -151,7 +164,7 @@ namespace simol
     
     if (output.hasControlVariate()) computeControlVariate(dyna, syst.configuration(), output);
     
-    cout << "sumFlow = " << output.obsSumFlow().currentValue() << endl;
+    //cout << "sumFlow = " << output.obsSumFlow().currentValue() << endl;
     
     for (auto&& observable : output.observables())
       observable->appendCurrent(iOfStep);
@@ -160,7 +173,7 @@ namespace simol
     dyna.specificComputeOutput(output);
   }
   
-  void computeControlVariate(Dynamics const& dyna, vector<Particle> const& configuration, Output& output)
+  void computeControlVariate(Dynamics const& dyna, vector<Particle*> const& configuration, Output& output)
   {
     output.cvBasis_.computeValueBasis(configuration);
     dyna.computeGeneratorOnBasis(output.cvBasis_, configuration);
@@ -168,60 +181,39 @@ namespace simol
   
   //------------------- writeOutput and its specifications by dynamics ---------------------------
 
-  void writeOutput(Dynamics const& /*dyna*/, System const& /*syst*/, Output& /*output*/, long int /*iOfStep*/)
+  void writeOutput(Dynamics const&, System const& syst, Output& output, long int iOfStep)
   {
-    throw std::invalid_argument("writeOutput not defined in the general case");
-  }
-
-  void writeOutput(Hamiltonian const& /*dyna*/, System const& syst, Output& output, long int iOfStep)
-  {
-    if (output.doOutput(iOfStep))
-      output.displayThermoVariables(iOfStep);
-
-    if (output.doLongPeriodOutput(iOfStep))
-      output.displayParticles(syst.configuration(), iOfStep);
-  }
-  
-  void writeOutput(Overdamped const& /*dyna*/, System const& syst, Output& output, long int iOfStep)
-  {    
-    if (output.doOutput(iOfStep))
-      output.displayThermoVariables(iOfStep);
-
-    if (output.doLongPeriodOutput(iOfStep))
-      output.displayParticles(syst.configuration(), iOfStep);
-  }
-
-  void writeOutput(Langevin const& dyna, System const& syst, Output& output, long int iOfStep)
-  {
+    //throw std::invalid_argument("writeOutput not defined in the general case");
     if (output.doOutput(iOfStep))
     {
+      for (int iOfObservable=0; iOfObservable < output.nbOfObservables(); iOfObservable++)
+        output.observables(iOfObservable)->display(iOfStep);
       output.displayThermoVariables(iOfStep);
-      output.obsVelocity().display(iOfStep);
+      if (output.doOutChain())
+      {
+        output.displayChainPositions(syst.configuration(), iOfStep);
+        output.displayChainMomenta(syst.configuration(), iOfStep);
+      }
     }
+    
     if (output.doLongPeriodOutput(iOfStep))
-      output.displayParticles(syst.configuration(), iOfStep);
+    {
+      if (output.doOutParticles()) output.displayParticles(syst.configuration(), iOfStep);
+      if (output.doOutXMakeMol()) output.displayXMakeMol(syst.configuration(), iOfStep);   
+      if (output.doOutBackUp()) output.displayBackUp(syst.configuration(), iOfStep);
+      if (output.doOutChain()) output.displayProfile(iOfStep);
+    }
   }
 
-  void writeOutput(DPDE const& /*dyna*/, System const& syst, Output& output, long int iOfStep)
-  {
-    if (output.doOutput(iOfStep))
-      output.displayThermoVariablesDPDE(syst.configuration(), iOfStep);
-  }
 
   //--------------------------- final output ------------------------------------
 
-  void writeFinalOutput(Dynamics const& /*dyna*/, System const& syst, Output& output)
+  void writeFinalOutput(Dynamics const& dyna, System const& syst, Output& output)
   {
-    if (output.doComputeCorrelations())
-      output.finalDisplayCorrelations();
-      
+    output.finalDisplayCorrelations();    
+    if (output.doOutChain()) output.finalChainDisplay();
+    if (output.doFinalFlow()) output.displayFinalFlow(syst.potParameter1(), syst.potParameter2());
+    if (output.doFinalVelocity()) output.displayFinalVelocity();
   }
-
-  void writeFinalOutput(DPDE const& /*dyna*/, System const& /*syst*/, Output& output)
-  {
-    if (output.doComputeCorrelations())
-      output.finalDisplayCorrelationsDPDE();
-  }
-
 
 }

@@ -33,16 +33,16 @@ namespace simol
       Vector<double> & momentum();
       const double& momentum(int i) const;
       double& momentum(int i);
-    double const & internalEnergy() const;
-    double & internalEnergy();
-    
+      double const & internalEnergy() const;
+      double & internalEnergy();
+      
       //-- functions depending on the primary variables --
       double kineticEnergy() const;
       const double& potentialEnergy() const;
       double& potentialEnergy();
       double energy() const;
-    double totalEnergyDPDE() const;
-    Vector<double> const& force() const;
+      double totalEnergyDPDE() const;
+      Vector<double> const& force() const;
       Vector<double>& force();
       const double& force(int i) const;
       double& force(int i);

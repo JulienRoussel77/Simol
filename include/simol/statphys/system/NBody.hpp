@@ -15,18 +15,20 @@ namespace simol
     Cell();
     int size() const;
     void clear();
-    void push_back(int ind);
+    void push_back(Particle& particle);
     vector<int> const& indexNeighbors() const;
     vector<int>& indexNeighbors();
     int const& indexNeighbors(const int& iOfNeighbor) const;
     int& indexNeighbors(const int& iOfNeighbor);
-    list<int> const& members() const;
-    list<int>& members();
+    vector<Particle*> const& members() const;
+    vector<Particle*>& members();
+    Particle const& member(const int& iOfMember) const;
+    Particle& member(const int& iOfMember);
     int nbOfMembers() const;
     
   protected:
     
-    list<int> members_;
+    vector<Particle*> members_;
     vector<int> indexNeighbors_;
     
   };
@@ -41,8 +43,11 @@ namespace simol
     void printName() const;
     
     //-- pair iterator --
+    ParticlePairIterator pairBegin();
     bool pairFinished(ParticlePairIterator const& it) const;
     void incrementePairIterator(ParticlePairIterator& it);
+    Cell const& getCell2(ParticlePairIterator const& it) const;
+    Cell& getCell2(ParticlePairIterator const& it);
     
     // -- accessors --
     int const& nbOfNeighbors() const {return nbOfNeighbors_;}
@@ -65,8 +70,7 @@ namespace simol
     void reinitializeCells();
     void findNeighboringCells();
     int findIndex(Vector<double> const& pos) const;
-    int returnIndexCell2D(int i1, int i2) const;
-    int returnIndexCell3D(int i1, int i2, int i3) const;
+    int returnIndexCell(int i1, int i2 = -1, int i3 = -1) const;
     double periodicPosition(double x) const;
 
   protected:
@@ -78,6 +82,9 @@ namespace simol
     //--- if restarting from a given file ---
     bool restart_;
     string restartFileName_;
+    
+    //Particle& getMember(const int& iOfCell, const int& iOfMember);
+    //Particle const& getMember(const int& iOfCell, const int& iOfMember) const;
 
     //--- for cell method ---
     bool doCells_;
@@ -87,7 +94,6 @@ namespace simol
     int nbOfCells_;
     int nbOfNeighbors_;
     vector<Cell> cells_;
-
   };
 
 }

@@ -70,7 +70,7 @@ namespace simol
       
       //-- control variates --
       Galerkin* galerkin();
-      virtual void computeGeneratorOnBasis(CVBasis& /*cvBasis*/, vector<Particle> const& /*configuration*/) const {};
+      virtual void computeGeneratorOnBasis(CVBasis& /*cvBasis*/, vector<Particle*> const& /*configuration*/) const {};
 
     protected:
 

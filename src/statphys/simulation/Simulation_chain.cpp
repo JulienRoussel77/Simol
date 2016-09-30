@@ -2,30 +2,6 @@
 
 namespace simol
 {
-  //void samplePositions(BoundaryLangevin& /*dyna*/, Chain& /*syst*/)
-  //{
-  //  throw std::invalid_argument("samplePositions(BoundaryLangevin& dyna, Chain& syst) not defined");
-  //}
-
-  void writeOutput(BoundaryLangevin const& /*dyna*/, Chain const& syst, Output& output, long int iOfStep)
-  {
-    if (output.doOutput(iOfStep))// && iOfStep >= 100)
-    {
-      output.displayThermoVariables(iOfStep);
-      output.displayChainPositions(syst.configuration(), iOfStep);
-      output.displayChainMomenta(syst.configuration(), iOfStep);
-
-      output.obsMidFlow().display(iOfStep);
-      output.obsSumFlow().display(iOfStep);
-      output.obsModiFlow().display(iOfStep);
-    }
-
-    if (output.doLongPeriodOutput(iOfStep))
-    {
-      output.displayProfile(iOfStep);
-      output.displayParticles(syst.configuration(), iOfStep);
-    }
-  }
 
 
   //-------------- BiChain -----------------
@@ -45,13 +21,7 @@ namespace simol
     }
   }
 
-  void writeFinalOutput(BoundaryLangevin const& dyna, BiChain const& syst, Output& output)
-  {
-    output.finalChainDisplay(syst.configuration(), syst.externalForce());
-    if (output.doComputeCorrelations())
-      output.finalDisplayCorrelations();
-    output.displayFinalFlow(dyna.temperature(), dyna.deltaTemperature(), syst.potParameter1(), syst.potParameter2());
-  }
+
 
   // ------------ TriChain -----------------
 
@@ -84,9 +54,6 @@ namespace simol
   
   void thermalize(Dynamics& /*dyna*/, Chain& /*syst*/) {}
 
-  //void Chain::computeAllForces(Dynamics const& /*model*/)
-  //{throw std::invalid_argument("computeAllForces : Function undefined");};*/
-
   void thermalize(LangevinBase& dyna, Chain& syst)
   {
     //for (auto&& particle : configuration_)
@@ -109,13 +76,7 @@ namespace simol
   
   
   
-  void writeFinalOutput(BoundaryLangevin const& dyna, TriChain const& syst, Output& output)
-  {
-    output.finalChainDisplay(syst.configuration(), syst.externalForce());
-    if (output.doComputeCorrelations())
-      output.finalDisplayCorrelations();
-    output.displayFinalFlow(dyna.temperature(), dyna.deltaTemperature(), dyna.tauBending(), dyna.xi());
-  }
+
 
 
 

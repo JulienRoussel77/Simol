@@ -20,7 +20,7 @@ namespace simol
     return obsPtr;
   }
 
-  /*void Output::displayGeneratorOnBasis(ofstream& out, vector<Particle> const& configuration, ControlVariate& controlVariate, double time)
+  /*void Output::displayGeneratorOnBasis(ofstream& out ControlVariate& controlVariate, double time)
   {
     out << time << " " << modulo(configuration[0].position(0), -M_PI, M_PI) << " " << configuration[0].momentum(0) << " " << controlVariate.lastGeneratorOnBasis()(0) << " " << controlVariate.basisFunction(configuration) << endl;
   }*/

@@ -2,38 +2,26 @@
 
 namespace simol
 {
-
-  ofstream & Output::outChainVelocities()
-  {return *outChainVelocities_;}
-  ofstream & Output::outBeam()
-  {return *outBeam_;}
-  ofstream & Output::outFinalFlow()
-  {return *outFinalFlow_;}
-  ofstream & Output::outProfile()
-  {return *outProfile_;}
-  ofstream & Output::outFinalProfile()
-  {return *outFinalProfile_;}
-
-  void Output::displayChainPositions(vector<Particle> const& configuration, long int iOfStep)
+  void Output::displayChainPositions(vector<Particle*> const& configuration, long int iOfStep)
   {
     outBeam() << iOfStep * timeStep()
-              << " " << configuration[0].position() - 2 * configuration[1].position() + configuration[2].position()
-              //<< " " << configuration[0].position() - 2*configuration[1].position() + configuration[2].position()
-              << " " << configuration[(nbOfParticles_ - 2) / 4].position() - 2 * configuration[(nbOfParticles_ - 2) / 4 + 1].position() + configuration[(nbOfParticles_ - 2) / 4 + 2].position()
-              << " " << configuration[(nbOfParticles_ - 2) / 2].position() - 2 * configuration[(nbOfParticles_ - 2) / 2 + 1].position() + configuration[(nbOfParticles_ - 2) / 2 + 2].position()
-              << " " << configuration[3 * (nbOfParticles_ - 2) / 4].position() - 2 * configuration[3 * (nbOfParticles_ - 2) / 4 + 1].position() + configuration[3 * (nbOfParticles_ - 2) / 4 + 2].position()
-              << " " << configuration[nbOfParticles_ - 3].position() - 2 * configuration[nbOfParticles_ - 2].position() + configuration[nbOfParticles_ - 1].position()
+              << " " << configuration[0]->position() - 2 * configuration[1]->position() + configuration[2]->position()
+              //<< " " << configuration[0]->position() - 2*configuration[1]->position() + configuration[2]->position()
+              << " " << configuration[(nbOfParticles_ - 2) / 4]->position() - 2 * configuration[(nbOfParticles_ - 2) / 4 + 1]->position() + configuration[(nbOfParticles_ - 2) / 4 + 2]->position()
+              << " " << configuration[(nbOfParticles_ - 2) / 2]->position() - 2 * configuration[(nbOfParticles_ - 2) / 2 + 1]->position() + configuration[(nbOfParticles_ - 2) / 2 + 2]->position()
+              << " " << configuration[3 * (nbOfParticles_ - 2) / 4]->position() - 2 * configuration[3 * (nbOfParticles_ - 2) / 4 + 1]->position() + configuration[3 * (nbOfParticles_ - 2) / 4 + 2]->position()
+              << " " << configuration[nbOfParticles_ - 3]->position() - 2 * configuration[nbOfParticles_ - 2]->position() + configuration[nbOfParticles_ - 1]->position()
               << endl;
   }
 
-  void Output::displayChainMomenta(vector<Particle> const& configuration, long int iOfStep)
+  void Output::displayChainMomenta(vector<Particle*> const& configuration, long int iOfStep)
   {
     outChainVelocities() << iOfStep * timeStep()
-                         << " " << configuration[0].momentum()
-                         << " " << configuration[nbOfParticles_ / 4].momentum()
-                         << " " << configuration[nbOfParticles_ / 2].momentum()
-                         << " " << configuration[3 * nbOfParticles_ / 4].momentum()
-                         << " " << configuration[nbOfParticles_ - 1].momentum()
+                         << " " << configuration[0]->momentum()
+                         << " " << configuration[nbOfParticles_ / 4]->momentum()
+                         << " " << configuration[nbOfParticles_ / 2]->momentum()
+                         << " " << configuration[3 * nbOfParticles_ / 4]->momentum()
+                         << " " << configuration[nbOfParticles_ - 1]->momentum()
                          << endl;
   }
 
@@ -58,18 +46,18 @@ namespace simol
            << endl;
   }
 
-  void Output::finalChainDisplay(vector<Particle> const& /*configuration*/, Vector<double> const& /*externalForce*/)
+  void Output::finalChainDisplay()
   {
     writeProfile(outFinalProfile(), nbOfSteps());
   }
 
-  void Output::displayFinalFlow(double temperature, double delta_temperature, double parameter1, double parameter2)
+  void Output::displayFinalFlow(double parameter1, double parameter2)
   {
     cout << "outFinalFlow_ : " <<  std::left << setw(10) << finalTime()
                      << " " << setw(5) << timeStep()
                      << " " << setw(6) << nbOfParticles()
-                     << " " << setw(4) << temperature
-                     << " " << setw(4) << delta_temperature
+                     << " " << setw(4) << constTemperature_
+                     << " " << setw(4) << constDeltaTemperature_
                      << " " << setw(4) << parameter1
                      << " " << setw(6) << parameter2
                      << " " << setw(12) << obsMidFlow_->mean()
@@ -89,8 +77,8 @@ namespace simol
       outFinalFlow() << std::left << setw(10) << finalTime()
                      << " " << setw(5) << timeStep()
                      << " " << setw(6) << nbOfParticles()
-                     << " " << setw(4) << temperature
-                     << " " << setw(4) << delta_temperature
+                     << " " << setw(4) << constTemperature_
+                     << " " << setw(4) << constDeltaTemperature_
                      << " " << setw(4) << parameter1
                      << " " << setw(6) << parameter2
                      << " " << setw(12) << obsMidFlow_->mean()

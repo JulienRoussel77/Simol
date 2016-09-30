@@ -559,66 +559,66 @@ namespace simol
     return vecIndex;
   }
 
-  double QPBasis::value(vector<Particle> const& configuration, const int iOfElt) const
+  double QPBasis::value(vector<Particle*> const& configuration, const int iOfElt) const
   {
     vector<int> vecIndex = vecTens(iOfElt);
     return value(configuration, vecIndex);
   }
 
-  double QPBasis::value(vector<Particle> const& configuration, vector<int>& vecIndex) const
+  double QPBasis::value(vector<Particle*> const& configuration, vector<int>& vecIndex) const
   {
-    return bases_[0]->value(configuration[0].position(0), vecIndex[0]) * bases_[1]->value(configuration[0].momentum(0), vecIndex[1]);
+    return bases_[0]->value(configuration[0]->position(0), vecIndex[0]) * bases_[1]->value(configuration[0]->momentum(0), vecIndex[1]);
   }
 
-  Vector<double> QPBasis::gradientQ(vector<Particle> const& configuration, int /*iOfParticle*/, vector<int>& vecIndex) const
+  Vector<double> QPBasis::gradientQ(vector<Particle*> const& configuration, int /*iOfParticle*/, vector<int>& vecIndex) const
   {
     //cout << "QPBasis::gradientQ" << endl;
     //cout << vecIndex[0] << " " << vecIndex[1] << endl;
-    //cout << bases_[0]->gradient(configuration[0].position(0), vecIndex[0]) << " X "
-    //    << bases_[1]->value(configuration[0].momentum(0), vecIndex[1]) << endl;
-    return bases_[0]->gradient(configuration[0].position(0), vecIndex[0])
-           * bases_[1]->value(configuration[0].momentum(0), vecIndex[1]);
+    //cout << bases_[0]->gradient(configuration[0]->position(0), vecIndex[0]) << " X "
+    //    << bases_[1]->value(configuration[0]->momentum(0), vecIndex[1]) << endl;
+    return bases_[0]->gradient(configuration[0]->position(0), vecIndex[0])
+           * bases_[1]->value(configuration[0]->momentum(0), vecIndex[1]);
   }
 
-  Vector<double> QPBasis::gradientQ(vector<Particle> const& configuration, int iOfParticle, int iOfCoeff) const
+  Vector<double> QPBasis::gradientQ(vector<Particle*> const& configuration, int iOfParticle, int iOfCoeff) const
   {
     vector<int> vecIndex = vecTens(iOfCoeff);
     return gradientQ(configuration, iOfParticle, vecIndex);
   }
 
-  double QPBasis::laplacianQ(vector<Particle> const& configuration, int /*iOfParticle*/, vector<int>& vecIndex) const
+  double QPBasis::laplacianQ(vector<Particle*> const& configuration, int /*iOfParticle*/, vector<int>& vecIndex) const
   {
-    return bases_[0]->laplacian(configuration[0].position(0), vecIndex[0])
-           * bases_[1]->value(configuration[0].momentum(0), vecIndex[1]);
+    return bases_[0]->laplacian(configuration[0]->position(0), vecIndex[0])
+           * bases_[1]->value(configuration[0]->momentum(0), vecIndex[1]);
   }
 
-  double QPBasis::laplacianQ(vector<Particle> const& configuration, int iOfParticle, int iOfCoeff) const
+  double QPBasis::laplacianQ(vector<Particle*> const& configuration, int iOfParticle, int iOfCoeff) const
   {
     vector<int> vecIndex = vecTens(iOfCoeff);
     return laplacianQ(configuration, iOfParticle, vecIndex);
   }
 
-  Vector<double> QPBasis::gradientP(vector<Particle> const& configuration, int /*iOfParticle*/, vector<int>& vecIndex) const
+  Vector<double> QPBasis::gradientP(vector<Particle*> const& configuration, int /*iOfParticle*/, vector<int>& vecIndex) const
   {
-    //cout << bases_[0]->value(configuration[0].position(0), vecIndex[0]) << " X "
-    //    << bases_[1]->gradient(configuration[0].momentum(0), vecIndex[1]) << endl;
-    return bases_[0]->value(configuration[0].position(0), vecIndex[0])
-           * bases_[1]->gradient(configuration[0].momentum(0), vecIndex[1]);
+    //cout << bases_[0]->value(configuration[0]->position(0), vecIndex[0]) << " X "
+    //    << bases_[1]->gradient(configuration[0]->momentum(0), vecIndex[1]) << endl;
+    return bases_[0]->value(configuration[0]->position(0), vecIndex[0])
+           * bases_[1]->gradient(configuration[0]->momentum(0), vecIndex[1]);
   }
 
-  Vector<double> QPBasis::gradientP(vector<Particle> const& configuration, int iOfParticle, int iOfCoeff) const
+  Vector<double> QPBasis::gradientP(vector<Particle*> const& configuration, int iOfParticle, int iOfCoeff) const
   {
     vector<int> vecIndex = vecTens(iOfCoeff);
     return gradientP(configuration, iOfParticle, vecIndex);
   }
 
-  double QPBasis::laplacianP(vector<Particle> const& configuration, int /*iOfParticle*/, vector<int>& vecIndex) const
+  double QPBasis::laplacianP(vector<Particle*> const& configuration, int /*iOfParticle*/, vector<int>& vecIndex) const
   {
-    return bases_[0]->value(configuration[0].position(0), vecIndex[0])
-           * bases_[1]->laplacian(configuration[0].momentum(0), vecIndex[1]);
+    return bases_[0]->value(configuration[0]->position(0), vecIndex[0])
+           * bases_[1]->laplacian(configuration[0]->momentum(0), vecIndex[1]);
   }
 
-  double QPBasis::laplacianP(vector<Particle> const& configuration, int iOfParticle, int iOfCoeff) const
+  double QPBasis::laplacianP(vector<Particle*> const& configuration, int iOfParticle, int iOfCoeff) const
   {
     vector<int> vecIndex = vecTens(iOfCoeff);
     return laplacianP(configuration, iOfParticle, vecIndex);

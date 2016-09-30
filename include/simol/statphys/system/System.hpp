@@ -15,55 +15,43 @@ using std::setw;
 namespace simol
 {  
   class System;
-  class Cell;
-  
-  class ParticleIterator
-  {
-  public:
-    ParticleIterator(int const& iOfParticle0, Particle* particle0);
-    ParticleIterator(System& syst);
-    int const& iOfParticle() const {return iOfParticle_;}
-    int& iOfParticle() {return iOfParticle_;}
-    const Particle& particle() const;
-    Particle& particle();
-        
-    System* syst_;
-    int iOfParticle_;
-  };
+  class Cell;  
   
   ///
   ///Implementes an iterator on the pairs of particles
   ///Allows to loop on all the particle pairs easily in every system
   class ParticlePairIterator
   {
+  friend class System;
   public:
-    ParticlePairIterator(System& syst);
-    int const& iOfParticle1() const {return iOfParticle1_;}
-    int& iOfParticle1() {return iOfParticle1_;}
+    ParticlePairIterator(); 
     int const& iOfCell1() const {return iOfCell1_;}
     int& iOfCell1() {return iOfCell1_;}
-    Particle const& particle1() const;
-    Particle& particle1();
-    Cell const& cell1() const;
-    Cell& cell1();
-    int const& iOfParticle2() const {return iOfParticle2_;}
-    int& iOfParticle2() {return iOfParticle2_;}
+    Particle const& particle1() const {return **it1_;}
+    Particle& particle1() {return **it1_;}
+    /*Cell const& cell1() const;
+    Cell& cell1();*/
     int const& iOfNeighbor2() const {return iOfNeighbor2_;}
     int& iOfNeighbor2() {return iOfNeighbor2_;}
-    int const& iOfCell2() const;
-    int& iOfCell2();
-    Particle const& particle2() const;
-    Particle& particle2();
-    Cell const& cell2() const;
-    Cell& cell2();
+    /*int const& iOfCell2() const;
+    int& iOfCell2();*/
+    Particle const& particle2() const {return **it2_;}
+    Particle& particle2() {return **it2_;}
+    /*Cell const& cell2() const;
+    Cell& cell2();*/
+    vector<Particle*>::iterator const& endIt2() const {return endIt2_;}
+    vector<Particle*>::iterator& endIt2() {return endIt2_;}
     
-    System* syst_;
-    int iOfParticle1_;
+    //System* syst_;
+    vector<Particle*>::iterator it1_;
+    //int iOfParticle1_;
     //absolute index of the cell containing particle1
     int iOfCell1_;
-    int iOfParticle2_;
+    //int iOfParticle2_;
+    vector<Particle*>::iterator it2_;
     //contains the neighbor index of the cell containing particle2 relatively to cell1
     int iOfNeighbor2_;
+    vector<Particle*>::iterator endIt2_;
   };
 
   class System
@@ -75,29 +63,38 @@ namespace simol
       virtual void printName() const;
 
       //-- fundamental brick: array of particles --
-      const std::vector<Particle> & configuration() const;
-      std::vector<Particle> & configuration();
-      const Particle& getParticle(int index = 0) const;
-      Particle& getParticle(int index = 0);
+      const std::vector<Particle*> & configuration() const;
+      std::vector<Particle*> & configuration();
+      const Particle& operator()(int iOfParticle = 0) const {return *(configuration_[iOfParticle]);}
+      Particle& operator()(int iOfParticle = 0) {return *(configuration_[iOfParticle]);};
+      const Particle& getParticle(int iOfParticle = 0) const;
+      Particle& getParticle(int iOfParticle = 0);
+      //virtual Particle& getMember(const int& iOfCell, const int& iOfMember) {return getParticle(iOfMember);}
+      //virtual Particle const& getMember(const int& iOfCell, const int& iOfMember) const {return getParticle(iOfMember);}
       const int& dimension() const;
       int nbOfParticles() const;
       
-      virtual Cell const& cell(int const& /*iOfCell*/) const {throw std::runtime_error("Cell only exist for NBody !");}
-      virtual Cell & cell(int const& /*iOfCell*/) {throw std::runtime_error("Cell only exist for NBody !");}
+      virtual Cell const& cell(int const&) const {throw std::runtime_error("Cell only exist for NBody !");}
+      virtual Cell & cell(int const&) {throw std::runtime_error("Cell only exist for NBody !");}
 
       //-- random numbers --
       const std::shared_ptr<RNG>& rng() const;
       std::shared_ptr<RNG>& rng();
       
       //-- particle iterators --
-      virtual ParticleIterator begin();
-      virtual bool finished(ParticleIterator const& it) const;
-      virtual void incrementeIterator(ParticleIterator& it);  
+      /*virtual ParticleIterator begin();
+      virtual ConstParticleIterator constBegin();
+      virtual ParticleIterator end();*/
+      //virtual ConstParticleIterator constBegin();
+      /*virtual bool finished(ParticleIteratorBase const& it) const;
+      //virtual void incrementeIterator(ParticleIterator& it);  */
       
       //-- particle pair iterators --
       virtual ParticlePairIterator pairBegin();
       virtual bool pairFinished(ParticlePairIterator const& it) const;
       virtual void incrementePairIterator(ParticlePairIterator& it);
+      virtual Cell const& getCell2(ParticlePairIterator const&) const {return cell(0);}
+      virtual Cell& getCell2(ParticlePairIterator const&) {return cell(0);}
 
       //-- potential and forces --
       virtual void computeAllForces();
@@ -136,7 +133,8 @@ namespace simol
 
     protected:
       int dimension_;
-      std::vector<Particle> configuration_;
+      std::vector<Particle*> configuration_;
+      //list<Particle> configuration_;
       string settingsPath_;
       std::shared_ptr<RNG> rng_;
       Potential* potential_;

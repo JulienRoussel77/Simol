@@ -5,47 +5,53 @@
 
 namespace simol
 {
-  
-  ParticleIterator::ParticleIterator(System& syst0):
-    syst_(&syst0),
-    iOfParticle_(0)
+  /*ParticleIteratorBase::ParticleIteratorBase()
   {}
   
-  const Particle& ParticleIterator::particle() const 
+  ParticleIterator::ParticleIterator(System& syst0):
+    //syst_(&syst0),
+    it_(syst0.configuration().begin())
+  {}
+  
+  ParticleIterator& ParticleIterator::operator++()
+  {
+    it_++;
+    return *this;
+  }
+  
+  ConstParticleIterator::ConstParticleIterator(System const& syst0):
+    //syst_(&syst0),
+    it_(syst0.configuration().begin())
+  {}
+  
+  ConstParticleIterator& ConstParticleIterator::operator++()
+  {
+    it_++;
+    return *this;
+  }*/
+  
+  /*const Particle& ParticleIterator::particle() const 
   {return syst_->getParticle(iOfParticle_);}
   
   Particle& ParticleIterator::particle() 
-  {return syst_->getParticle(iOfParticle_);}
+  {return syst_->getParticle(iOfParticle_);}*/
   
 
   
   ///
   /// Assumes that there are 2 particles in the first box ! Can be improved...
-  ParticlePairIterator::ParticlePairIterator(System& syst0):
-    syst_(&syst0),
-    iOfParticle1_(0),
+  ParticlePairIterator::ParticlePairIterator():
+    //syst_(&syst0),
+    //it1_(syst0.cell(0).members().begin()),
     iOfCell1_(0),
-    iOfParticle2_(1),
+    //it2_(std::next(it1_, 1)),
     iOfNeighbor2_(0)
-  {}
-  
-  Particle const& ParticlePairIterator::particle1() const 
-  {return syst_->getParticle(iOfParticle1_);}
-  
-  Particle& ParticlePairIterator::particle1() 
-  {return syst_->getParticle(iOfParticle1_);}
-  
-  Particle const& ParticlePairIterator::particle2() const 
-  {return syst_->getParticle(iOfParticle2_);}
-  
-  Particle& ParticlePairIterator::particle2() 
-  {return syst_->getParticle(iOfParticle2_);}
-  
+  {} 
   
   
   System::System(Input const& input):
     dimension_(input.dimension()),
-    configuration_(input.nbOfParticles(), Particle(dimension_)),
+    configuration_(input.nbOfParticles(), new Particle(dimension_)),
     settingsPath_(input.settingsPath())
   {
     potential_ = createPotential(input);
@@ -65,12 +71,12 @@ namespace simol
 
   const Particle& System::getParticle(int index) const
   {
-    return configuration_[index];
+    return *configuration_[index];
   }
 
   Particle& System::getParticle(int index)
   {
-    return configuration_[index];
+    return *configuration_[index];
   }
 
   const int& System::dimension() const
@@ -78,12 +84,12 @@ namespace simol
     return dimension_;
   }
 
-  const std::vector< Particle > & System::configuration() const
+  const std::vector<Particle*> & System::configuration() const
   {
     return configuration_;
   }
 
-  std::vector< Particle > & System::configuration()
+  std::vector<Particle*> & System::configuration()
   { return configuration_; }
 
   int System::nbOfParticles() const
@@ -97,42 +103,29 @@ namespace simol
 
   std::shared_ptr<RNG>& System::rng() {return rng_;}
   
-  //--------------- particle iterators ------------
-    
-  ParticleIterator System::begin()
-  {
-    return ParticleIterator(*this);
-  }
-  
-  bool System::finished(ParticleIterator const& it) const
-  {
-    return it.iOfParticle() == nbOfParticles();
-  }
-  
-  void System::incrementeIterator(ParticleIterator& it)
-  {
-    it.iOfParticle()++;
-  }
-  
   //--------------- particle pair iterators ------------
     
   ParticlePairIterator System::pairBegin()
   {
-    return ParticlePairIterator(*this);
+    ParticlePairIterator iter = ParticlePairIterator();
+    iter.it1_ = configuration().begin();
+    iter.it2_ = std::next(iter.it1_, 1);
+    iter.endIt2_ = configuration().end();
+    return iter;
   }
   
   bool System::pairFinished(ParticlePairIterator const& it) const
   {
-    return it.iOfParticle1() == nbOfParticles();
+    return it.it1_ == configuration().end();
   }
   
   void System::incrementePairIterator(ParticlePairIterator& it)
   {
-    it.iOfParticle2()++;
-    if (it.iOfParticle2() == nbOfParticles())
+    it.it2_++;
+    if (it.it2_ == it.endIt2())
     {
-      it.iOfParticle1()++;
-      it.iOfParticle2() = it.iOfParticle1() + 1;
+      it.it1_++;
+      it.it2_ = std::next(it.it1_, 1);
     }
   }
 
@@ -213,7 +206,8 @@ namespace simol
 
 
   void System::computeAllForces()
-  {throw std::invalid_argument("thermalize not defined");}
+  {throw std::invalid_argument("compteAllForces not defined");}
+  
 
   //--------------- move into chain -----------------
 
@@ -258,23 +252,26 @@ namespace simol
   void System::computeKineticEnergy(Output& output) const
   {
     output.obsKineticEnergy().currentValue() = 0;
-    for (auto && particle : configuration())
-      output.obsKineticEnergy().currentValue() += particle.kineticEnergy();
+    //for (auto && particle : configuration())
+    for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
+      output.obsKineticEnergy().currentValue() += getParticle(iOfParticle).kineticEnergy();
   }
   
   void System::computePotentialEnergy(Output& output) const
   {
     output.obsPotentialEnergy().currentValue() = 0;
-    for (auto && particle : configuration())
-      output.obsPotentialEnergy().currentValue() += particle.potentialEnergy();
+    //for (auto && particle : configuration())
+    for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
+      output.obsPotentialEnergy().currentValue() += getParticle(iOfParticle).potentialEnergy();
     output.obsPotentialEnergy().currentValue() += boundaryPotEnergy();
   }
   
   void System::computePressure(Output& output, Dynamics const& dyna) const
   {
     output.totalVirial() = 0;
-    for (auto && particle : configuration())
-      output.totalVirial() += particle.virial();
+    //for (auto && particle : configuration())
+    for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
+      output.totalVirial() += getParticle(iOfParticle).virial();
     
     //output.obsPressure().currentValue() = 2*output.kineticEnergy() + output.totalVirial()/(output.dimension()*nbOfParticles()*pow(output.latticeParameter(), output.dimension()));
     
@@ -288,15 +285,17 @@ namespace simol
   void System::computeInternalEnergy(Output& output) const
   {
     output.obsInternalEnergy().currentValue() = 0;
-    for (auto && particle : configuration())
-      output.obsInternalEnergy().currentValue() += particle.internalEnergy();
+    //for (auto && particle : configuration())
+    for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
+      output.obsInternalEnergy().currentValue() += getParticle(iOfParticle).internalEnergy();
   }
   
   void System::computeInternalTemperature(Output& output, Dynamics const& dyna) const
   {
     output.obsInternalTemperature().currentValue() = 0;
-    for (auto && particle : configuration())
-      output.obsInternalTemperature().currentValue() += 1/dyna.internalTemperature(particle.internalEnergy());
+    //for (auto && particle : configuration())
+    for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
+      output.obsInternalTemperature().currentValue() += 1/dyna.internalTemperature(getParticle(iOfParticle).internalEnergy());
   }
 
   void System::computeProfile(Output& /*output*/, Dynamics const& /*model*/, long int /*iOfStep*/) const
