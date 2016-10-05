@@ -2,57 +2,35 @@
 
 namespace simol
 {
-  void samplePositions(Dynamics& dyna, System& syst)
+  System* createSystem(Input const& input)
   {
-    dyna.printName();
-    syst.printName();
-    throw std::invalid_argument("samplePositions : Function undefined");
-  }
-
-  //-- initialization of the momenta according to a Gaussian distribution --
-  void sampleMomenta(Dynamics& dyna, System& syst)
-  {
-    cout << " - Sampling the momenta..." << endl;
-    for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
-      syst(iOfParticle).momentum() = syst.drawMomentum(dyna.beta(), syst(iOfParticle).mass());
-  }
-  
-  //------------- Overdamped --------------------
-  void sampleMomenta(Overdamped& /*dyna*/, System& /*syst*/) {}
-
-  //-- initialization of the momenta according to a Gaussian distribution --
-  void sampleMomenta(LangevinBase& dyna, System& syst)
-  {
-    cout << " - Sampling the momenta..." << endl;
-    for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
-    {
-      syst(iOfParticle).momentum() = syst.drawMomentum(dyna.beta(), syst(iOfParticle).mass());
-
-      dyna.initializeCountdown(syst(iOfParticle));
-    }
+    if (input.systemName() == "Isolated")
+      return new Isolated(input);
+    else if (input.systemName() == "BiChain")
+      return new BiChain(input);
+    else if (input.systemName() == "TriChain")
+      return new TriChain(input);
+    else if (input.systemName() == "NBody")
+      return new NBody(input);
+    else 
+      throw std::runtime_error(input.systemName() + " is not a valid system name !");
   }
   
-  void sampleMomenta(BoundaryLangevin& dyna, System& syst)
-  {
-    cout << " - Sampling the momenta..." << endl;
-    double alpha, localTemp;
-    for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
-    {
-      alpha = iOfParticle / (double) syst.nbOfParticles();
-      localTemp = (1 - alpha) * dyna.temperatureLeft() + alpha * dyna.temperatureRight();
-      syst(iOfParticle).momentum() = syst.drawMomentum(1 / localTemp, syst(iOfParticle).mass());
 
-      dyna.initializeCountdown(syst(iOfParticle));
-    }
+  
+  void sampleInternalEnergies(Dynamics const&, System&)
+  {}
+  
+  void sampleInternalEnergies(DPDE const&, System& syst)
+  {
+    cout << " - Sampling internal energies..." << endl;
+    for (int i = 0; i < syst.nbOfParticles(); i++)
+      syst.getParticle(i).internalEnergy() = 1;
   }
   
   void thermalize(Dynamics& /*model*/, System& /*syst*/)
   {throw std::invalid_argument("thermalize not defined");}
-  
-  void thermalize(Dynamics& /*model*/, Isolated& /*syst*/)
-  {}
-  
-  
+   
   
   
   void simulate(Dynamics&, System&){}

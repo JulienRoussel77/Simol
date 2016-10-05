@@ -12,9 +12,7 @@ namespace simol
   
   CVBasis::~CVBasis()
   {
-    cout << "Destruction CVBasis" << endl;
     if (basis_) delete basis_;
-    cout << "OK" << endl;
   }
 
   const int& CVBasis::nbOfFunctions() const

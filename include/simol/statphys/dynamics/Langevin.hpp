@@ -9,7 +9,8 @@ namespace simol
   {
     public:
       Langevin(Input const& input);
-      virtual void printName() const;
+      virtual string dynamicsName() const {return "Langevin";}
+      
       double sigma() const;
       //virtual void updateAfter(Particle& particle);
       virtual void computeGeneratorOnBasis(CVBasis& cvBasis, System const& syst) const;

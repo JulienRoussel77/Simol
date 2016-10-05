@@ -26,6 +26,18 @@ namespace simol
     return it.it2_ == configuration().end();
   }
   
+  void Chain::sampleMomenta(DynamicsParameters const& dynaPara)
+  {
+    cout << " - Sampling the momenta..." << endl;
+    double alpha, localTemp;
+    for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
+    {
+      alpha = iOfParticle / (double) nbOfParticles();
+      localTemp = (1 - alpha) * dynaPara.temperatureLeft() + alpha * dynaPara.temperatureRight();
+      getParticle(iOfParticle).momentum() = drawMomentum(1 / localTemp, getParticle(iOfParticle).mass());
+    }
+  }
+  
 
 
   //###### BiChain ######
@@ -43,7 +55,20 @@ namespace simol
 
 
 
+  void BiChain::samplePositions(DynamicsParameters const& dynaPara)
+  {
+    cout << " - Sampling the positions..." << endl;
+    double alpha, localTemp, localDist;
+    for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
+    {
+      alpha = iOfParticle / (double) nbOfParticles();
+      localTemp = (1 - alpha) * dynaPara.temperatureLeft() + alpha * dynaPara.temperatureRight();
+      localDist = drawPotLaw(1 / localTemp);
+      double prevPosition = getParticle(iOfParticle - 1).position(0);
 
+      getParticle(iOfParticle).position(0) = prevPosition + localDist;
+    }
+  }
 
 
 
@@ -61,86 +86,7 @@ namespace simol
     
     for (ParticlePairIterator it = pairBegin(); !pairFinished(it); incrementePairIterator(it))
       interaction(it.particle1(), it.particle2());
-    
   }
-
-  /*void BiChain::computeProfile(Output& output, long int iOfStep) const
-  {
-    //output.obsSumFlow().currentValue() = 0;
-    output.obsModiFlow().currentValue() = output.constGamma_ * output.constDeltaTemperature_ / 2;
-    //cout << output.constGamma_ << " " << output.constDeltaTemperature_<< endl;
-    assert(nbOfParticles() % 2 == 0);
-    int midNb = (nbOfParticles() - 1) / 2;
-    for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
-    {
-      //Particle& particle = configuration_[iOfParticle];
-      double dist = 0;
-      double distPrev = 0;
-      double distNext = 0;
-      double flow = 0;
-      double potTempTop = 0;
-      double potTempBot = 0;
-      
-
-      if (iOfParticle == 0)
-      {
-        dist = getParticle(0).position(0) - ancorParticle_.position(0);
-        flow = output.constGamma_ * (output.constTemperatureLeft_ - 2 * getParticle(0).kineticEnergy());
-        //distNe = getParticle(1).position(0) - getParticle(0).position(0);
-        //output.obsModiFlow().currentValue() += (getParticle(0).momentum(0) + distNe) / 4 * (getParticle(0).energyGrad(0) - dist);
-        //cout << iOfParticle << " : " << getParticle(0).energyGrad(0) << " " << dist << endl;
-      }
-      else
-      {
-        // dist is r_iOfParticle
-        dist = getParticle(iOfParticle).position(0) - getParticle(iOfParticle - 1).position(0);
-        if (iOfParticle != 1)
-          distPrev = getParticle(iOfParticle-1).position(0) - getParticle(iOfParticle-2).position(0);
-        // flow is j_iOfParticle
-        flow = - getParticle(iOfParticle).energyGrad(0) * getParticle(iOfParticle - 1).momentum(0);
-        if (iOfParticle != nbOfParticles() - 1)
-        {
-          output.obsSumFlow().currentValue() += flow;
-          if (iOfParticle == midNb)
-            output.obsMidFlow().currentValue() = flow;
-          
-          distNext = getParticle(iOfParticle+1).position(0) - getParticle(iOfParticle).position(0);
-          
-          if (iOfParticle == 1)
-            output.obsModiFlow().currentValue() += (distNext - getParticle(0).momentum(0)) / 4 * (getParticle(iOfParticle).energyGrad(0) - dist);
-          // iOfParticle != 0, 1, N-1
-          else
-            output.obsModiFlow().currentValue() += (distNext - distPrev) / 4 * (getParticle(iOfParticle).energyGrad(0) - dist);
-        }
-        else
-          output.obsModiFlow().currentValue() -= (getParticle(iOfParticle).momentum(0) + distPrev) / 4 * (getParticle(iOfParticle).energyGrad(0) - dist);
-        
-        //cout << iOfParticle << " : " << getParticle(iOfParticle).energyGrad(0) << " " << dist << endl;
-      }
-
-      if (iOfParticle == nbOfParticles() - 1)
-      {
-        potTempTop = pow(getParticle(iOfParticle).energyGrad(0), 2);
-        potTempBot = getParticle(iOfParticle).energyLapla();
-      }
-      else
-      {
-        potTempTop = pow(getParticle(iOfParticle).energyGrad(0) - getParticle(iOfParticle + 1).energyGrad(0), 2);
-        potTempBot = getParticle(iOfParticle).energyLapla() + getParticle(iOfParticle + 1).energyLapla();
-      }
-      
-      
-
-      output.appendBendistProfile(dist , iOfStep, iOfParticle);
-      output.appendKinTempProfile(2 * getParticle(iOfParticle).kineticEnergy(), iOfStep, iOfParticle);
-      output.appendPotTempTopProfile(potTempTop, iOfStep, iOfParticle);
-      output.appendPotTempBotProfile(potTempBot, iOfStep, iOfParticle);
-      output.appendFlowProfile(flow, iOfStep, iOfParticle);
-    }
-    output.obsSumFlow().currentValue() /= (nbOfParticles() - 2.);
-    //output.obsModiFlow().currentValue() /= nbOfParticles();
-    //cout << output.obsSumFlow().currentValue() << endl;
-  }*/
 
 
 
@@ -157,7 +103,6 @@ namespace simol
     //getParticle(-2).position(0) = 0;//3 * input.initialPosition(0) - 2*input.initialPosition(1);
     //ancorParticle2_.position(0) = 0;//2 * input.initialPosition(0) - input.initialPosition(1);
     
-
     configuration_ = vector<Particle*>(nbOfParticles()+2, nullptr);
     for (int iOfParticle = -2; iOfParticle < input.nbOfParticles(); iOfParticle++)
       configuration_[iOfParticle+2] = new Particle(input.mass(), input.initialPosition(iOfParticle), input.initialMomentum(iOfParticle));
@@ -169,6 +114,32 @@ namespace simol
   bool const& TriChain::isOfFixedVolum() const
   {
     return isOfFixedVolum_;
+  }
+  
+  void TriChain::samplePositions(DynamicsParameters const& dynaPara)
+  {
+    cout << " - Sampling the positions..." << endl;
+    if (isOfFixedVolum())
+    {
+      cout << "    - Simulation of fixed volum : q_i = 0..." << endl;
+      for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
+        getParticle(iOfParticle).position(0) = 0;
+    }
+    else
+    {
+      double alpha, localTemp, localBending;
+      for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
+      {
+        alpha = iOfParticle / (double) nbOfParticles();
+        localTemp = (1 - alpha) * dynaPara.temperatureLeft() + alpha * dynaPara.temperatureRight();
+
+        localBending = drawPotLaw(1 / localTemp);
+        double position1 = getParticle(iOfParticle - 1).position(0);
+        double position2 = getParticle(iOfParticle - 2).position(0);
+        getParticle(iOfParticle).position(0) = -position2 + 2 * position1 + localBending;
+        getParticle(iOfParticle).momentum() = drawMomentum(1 / localTemp, getParticle(iOfParticle).mass());
+      }
+    }
   }
 
   ///Computes the force and the energy associated to this triplet interaction, and updates these 2 fields

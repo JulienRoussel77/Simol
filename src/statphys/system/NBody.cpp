@@ -170,20 +170,14 @@ namespace simol
     nbOfParticlesPerDimension_(input.nbOfParticlesPerDimension()),
     latticeParameter_(input.latticeParameter()),
     domainSize_(input.latticeParameter()*input.nbOfParticlesPerDimension()),
-    restart_(input.restart()),
     doCells_(input.doCellMethod()),
     Rcut_(input.cutOffRatio()*input.potentialSigma())
   {
-    //-- initialise the configuration by initializing the particles --
+    //-- initialise the configuration by initializing the particles, intial__ reads the restart file if it exists --
     assert(configuration_.size() > 1);
-    for (int i = 0; i < input.nbOfParticles(); i++)
-      configuration_[i] = new Particle(input.mass(), input.initialPosition(i), input.initialMomentum(i));
+    for (int iOfParticle = 0; iOfParticle < input.nbOfParticles(); iOfParticle++)
+      configuration_[iOfParticle] = new Particle(input.mass(), input.initialPosition(iOfParticle), input.initialMomentum(iOfParticle), input.initialInternalEnergy(iOfParticle));
 
-    //-- check whether the initial configuration should be re-read from a file --
-    if (restart_)
-      {
-	restartFileName_ = input.restartFileName();
-      }
 
     //-- initialize the cells --
     if (doCells_)
@@ -220,23 +214,7 @@ namespace simol
   {
     return latticeParameter_;
   }
-
-  bool NBody::restart() const
-  {
-    return restart_;
-  }
   
-  string NBody::restartFileName() const
-  {
-    return restartFileName_;
-  }
-  
-  /*Particle& NBody::getMember(const int& iOfCell, const int& iOfMember)
-  {return cell(iOfCell).member(iOfMember);}
-  
-  Particle const& NBody::getMember(const int& iOfCell, const int& iOfMember) const
-  {return cell(iOfCell).member(iOfMember);}*/
-
   ///
   /// return position x in the interval [0,domainSize_)
   double NBody::periodicPosition(double x) const
@@ -352,6 +330,46 @@ namespace simol
       cell(cellIndex).push_back(getParticle(iOfParticle));
     }
   }
+  
+  
+  
+  void NBody::samplePositions(DynamicsParameters const& dynaPara)
+  {
+    cout << " - Sampling the positions..." << endl;
+    int Dim = dimension();
+    int NbPartDim = nbOfParticlesPerDimension();
+    double latticeSize = latticeParameter();
+
+    for (int i = 0; i < nbOfParticles(); i++)
+      getParticle(i).momentum() = drawMomentum(dynaPara.beta(), getParticle(i).mass());
+    //-- initialization on a cubic lattice --
+    if (Dim == 2)
+    {
+      for (int i = 0; i < NbPartDim; i++)
+        for (int j = 0; j < NbPartDim; j++)
+        {
+          getParticle(i * NbPartDim + j).position(0) = i * latticeSize;
+          getParticle(i * NbPartDim + j).position(1) = j * latticeSize;
+        }
+    }
+    else if (Dim == 3)
+    {
+      int NbPartDim2 = NbPartDim * NbPartDim;
+      for (int i = 0; i < NbPartDim; i++)
+        for (int j = 0; j < NbPartDim; j++)
+          for (int k = 0; k < NbPartDim; k++)
+          {
+            getParticle(i * NbPartDim2 + j * NbPartDim + k).position(0) = i * latticeSize;
+            getParticle(i * NbPartDim2 + j * NbPartDim + k).position(1) = j * latticeSize;
+            getParticle(i * NbPartDim2 + j * NbPartDim + k).position(2) = k * latticeSize;
+          }
+    }
+    else
+    {
+      throw std::invalid_argument("sampleSystem: Bad dimension, should be 2 or 3");
+    }
+  }
+  
 
   ///
   /// compute the forces (with or without cell method)

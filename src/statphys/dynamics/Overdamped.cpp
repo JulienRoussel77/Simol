@@ -9,11 +9,7 @@ namespace simol
   Overdamped::Overdamped(Input const& input):
     Dynamics(input)
   {}
-  
-  void Overdamped::printName() const
-  {
-    std::cout << "DynamicsType = Overdamped" << std::endl;
-  }
+ 
 
   // /!\ a changer dans le cas N != 1
   ///After refers to the fact that this step comes after the forces update

@@ -55,14 +55,11 @@ namespace simol
     Cell & cell(int const& iOfCell) {return cells_[iOfCell];}
   
     virtual Vector<double> representant(Vector<double> vecDistance) const;
+    void samplePositions(DynamicsParameters const& dynaPara);
     void computeAllForces();
     int nbOfParticlesPerDimension() const;
     double latticeParameter() const;
     void interaction(Particle& particle1, Particle& particle2) const;
-
-    //--- for initial conditions (restart) --
-    bool restart() const;
-    string restartFileName() const;
   
     //--- for cell method ---
     void reinitializeCells();
@@ -76,13 +73,6 @@ namespace simol
     int nbOfParticlesPerDimension_;
     double latticeParameter_;
     double domainSize_;
-
-    //--- if restarting from a given file ---
-    bool restart_;
-    string restartFileName_;
-    
-    //Particle& getMember(const int& iOfCell, const int& iOfMember);
-    //Particle const& getMember(const int& iOfCell, const int& iOfMember) const;
 
     //--- for cell method ---
     bool doCells_;

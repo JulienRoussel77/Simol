@@ -13,9 +13,9 @@ namespace simol
   {
 
     public:
-      Particle(double const & mass, Vector<double> const & position, Vector<double> const & momentum);
+      Particle(double const & mass, Vector<double> const & position0, Vector<double> const & momentum0, double internalEnergy0 = 0);
       Particle(int dimension);
-      Particle(double const & mass, double const & position, double const & momentum);
+      Particle(double const & mass, double const & position0, double const & momentum0, double internalEnergy0 = 0);
 
       int dimension() const;
       double const & mass() const;

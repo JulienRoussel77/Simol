@@ -20,8 +20,8 @@ namespace simol
     YAML::Node data;
     string inputPath_;
     ifstream inputFlux_;
-    ifstream inputSettings_;
     vector<Vector<double>> initialPositions_, initialMomenta_;
+    vector<double> initialInternalEnergies_;
   public:
     Input(CommandLine cmd);
     const string& inputPath() const;
@@ -36,15 +36,16 @@ namespace simol
     int nbOfParticlesPerDimension() const;
     bool doCellMethod() const;
     double mass() const;
-    bool doFileSettings() const;
-    string settingsPath() const;
-    Vector<double> initialPosition(int const& i = 0) const;
-    Vector<double> initialMomentum(int const& i = 0) const;
+    bool doSetting() const;
+    bool doRestart() const;
+    string restartFileName() const;
+    Vector<double> initialPosition(int const& iOfParticle = 0) const;
+    Vector<double> initialMomentum(int const& iOfParticle = 0) const;
+    double initialInternalEnergy(int const& iOfParticle = 0) const;
     //Chain
     bool isOfFixedVolum() const;
     // NBody
     bool restart() const;
-    string restartFileName() const;
 
     //-- Time --
     double timeStep() const;

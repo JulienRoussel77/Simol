@@ -9,7 +9,7 @@ namespace simol
   {
     public:
       Hamiltonian(Input const&  input);
-      virtual void printName() const;
+      virtual string dynamicsName() const {return "Hamiltonian";}
       virtual void computeThermo(Output& output) const;
       virtual void computeGeneratorOnBasis(CVBasis& cvBasis, System const& syst) const;
   };

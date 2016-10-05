@@ -14,6 +14,7 @@ namespace simol
   ///
   ///Constructor
   Dynamics::Dynamics(Input const& input):
+    parameters_(input),
     timeStep_(input.timeStep()),
     nbOfSteps_(input.nbOfSteps()),
     thermalizationNbOfSteps_(input.thermalizationNbOfSteps()),
@@ -22,11 +23,6 @@ namespace simol
     temperature_(1 / beta_),
     galerkin_(nullptr)
   {}
-
-  void Dynamics::printName() const
-  {
-    std::cout << "DynamicsType = Dynamics" << std::endl;
-  }
 
 
 

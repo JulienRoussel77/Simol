@@ -9,12 +9,6 @@ namespace simol
     galerkin_ = createLangevinGalerkin(input);
   }
 
-  ///
-  ///Print de name of the dynamics
-  void Langevin::printName() const
-  {
-    std::cout << "Dynamics = Langevin" << std::endl;
-  }
 
   ///
   ///Returns the amplitude of the brownian motion

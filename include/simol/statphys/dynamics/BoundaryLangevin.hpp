@@ -9,6 +9,8 @@ namespace simol
   {
     public:
       BoundaryLangevin(Input const& input);
+      string dynamicsName() const {return "BoundaryLangevin";}
+      
       virtual const double& betaLeft() const;
       virtual const double& betaRight() const;
       virtual const double& temperatureLeft() const;

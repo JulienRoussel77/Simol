@@ -8,6 +8,7 @@
 //#include "simol/statphys/output/Output.hpp"
 
 #include "simol/statphys/potential/AllPotentials.hpp"
+#include "simol/statphys/dynamics/DynamicsParameters.hpp"
 
 #include <iomanip>
 using std::setw;
@@ -53,14 +54,19 @@ namespace simol
     int iOfNeighbor2_;
     vector<Particle*>::iterator endIt2_;
   };
+  
+  //class System;
+  //System* createSystem(Input const& input);
 
   class System
   {
+  //friend System* createSystem(Input const& input);
   public:
     System(Input const& input);
     virtual ~System();
 
     virtual void printName() const;
+    virtual bool doSetting() const {return doSetting_;}
     virtual bool isBiChain() const {return false;}
     virtual bool isTriChain() const {return false;}
     
@@ -121,7 +127,8 @@ namespace simol
     virtual double boundaryPotEnergy() const;
     double laplacian(Vector<double> const& position) const;
     
-    //virtual void computeProfile(Output& /*output*/, long int /*iOfStep*/)const {};
+    virtual void samplePositions(DynamicsParameters const& dynaPara);
+    virtual void sampleMomenta(DynamicsParameters const& dynaPara);
 
   //protected:
   public:
@@ -131,6 +138,7 @@ namespace simol
     string settingsPath_;
     std::shared_ptr<RNG> rng_;
     Potential* potential_;
+    bool doSetting_;
   };
 
 

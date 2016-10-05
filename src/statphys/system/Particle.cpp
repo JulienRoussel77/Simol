@@ -9,7 +9,7 @@ using std::endl;
 namespace simol
 {
 
-  Particle::Particle(double const & mass, Vector<double> const & position0, Vector<double> const & momentum0):
+  Particle::Particle(double const& mass, Vector<double> const& position0, Vector<double> const& momentum0, double internalEnergy0):
     mass_(mass),
     position_(position0),
     momentum_(momentum0),
@@ -18,7 +18,7 @@ namespace simol
     energyGrad_(dimension(), 0),
     energyLapla_(0),
     countdown_(0),
-    internalEnergy_(0),
+    internalEnergy_(internalEnergy0),
     virial_(0)
   {
   }
@@ -27,8 +27,8 @@ namespace simol
     Particle(0, Vector<double>(dimension, 0), Vector<double>(dimension, 0))
   {}
 
-  Particle::Particle(double const & mass, double const & position0, double const & momentum0):
-    Particle(mass, Vector<double>(1, position0), Vector<double>(1, momentum0))
+  Particle::Particle(double const& mass, double const& position0, double const& momentum0, double internalEnergy0):
+    Particle(mass, Vector<double>(1, position0), Vector<double>(1, momentum0), internalEnergy0)
   {}
 
   int Particle::dimension() const

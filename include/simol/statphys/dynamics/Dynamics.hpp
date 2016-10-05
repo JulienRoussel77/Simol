@@ -12,6 +12,7 @@
 #include "simol/statphys/controlVariate/Galerkin.hpp"
 
 #include "simol/statphys/system/System.hpp"
+#include "simol/statphys/dynamics/DynamicsParameters.hpp"
 
 namespace simol
 {
@@ -22,9 +23,11 @@ namespace simol
     public:
       Dynamics(Input const&  input);
       virtual ~Dynamics() {if (galerkin_) delete galerkin_;};
+      virtual string dynamicsName() const=0;
 
-      virtual void printName() const;
 
+      //Contains all the parameters of the dynamics
+      DynamicsParameters const& parameters() const {return parameters_;}
       //-- time step and numbers of steps --
       double& timeStep();
       const double& timeStep() const;
@@ -41,6 +44,7 @@ namespace simol
       std::shared_ptr<RNG>& rng();
 
       //-- (inverse) temperatures --
+      
       virtual const double&  temperature() const;
       virtual const double& temperatureLeft() const;
       virtual const double& temperatureRight() const;
@@ -84,7 +88,7 @@ namespace simol
       virtual void computeProfileBiChain(Output&, System const&, long int) const {}
       virtual void computeProfileTriChain(Output&, System const&, long int) const {}
     protected:
-
+      DynamicsParameters parameters_;
       double timeStep_;
       long int nbOfSteps_, thermalizationNbOfSteps_, burninNbOfSteps_;
       double beta_;

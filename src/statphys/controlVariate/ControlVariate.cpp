@@ -376,7 +376,7 @@ namespace simol
     //cout << coeffsVec_ << endl;
   }
 
-  double BasisControlVariate::basisFunction(System const& syst, int iOfFunction) const
+  double BasisControlVariate::basisFunction(System const& syst, int /*iOfFunction*/) const
   {
     assert(iOfFunction == 0);
     double result = 0;
@@ -391,7 +391,7 @@ namespace simol
     return result;
   }
 
-  Vector<double> BasisControlVariate::gradientQ(System const& syst, int iOfParticle, int iOfFunction) const
+  Vector<double> BasisControlVariate::gradientQ(System const& syst, int iOfParticle, int /*iOfFunction*/) const
   {
     //cout << "BasisControlVariate::gradientQ" << endl;
     Vector<double> result(1, 0);
@@ -410,7 +410,7 @@ namespace simol
     return result;
   }
 
-  double BasisControlVariate::laplacianQ(System const& syst, int iOfParticle, int iOfFunction) const
+  double BasisControlVariate::laplacianQ(System const& syst, int iOfParticle, int /*iOfFunction*/) const
   {
     double result = 0;
     assert(iOfFunction == 0);
@@ -425,7 +425,7 @@ namespace simol
     return result;
   }
 
-  Vector<double> BasisControlVariate::gradientP(System const& syst, int iOfParticle, int iOfFunction) const
+  Vector<double> BasisControlVariate::gradientP(System const& syst, int iOfParticle, int /*iOfFunction*/) const
   {
     Vector<double> result(1, 0);
     assert(iOfFunction == 0);
@@ -442,7 +442,7 @@ namespace simol
     return result;
   }
 
-  double BasisControlVariate::laplacianP(System const& syst, int iOfParticle, int iOfFunction) const
+  double BasisControlVariate::laplacianP(System const& syst, int iOfParticle, int /*iOfFunction*/) const
   {
     double result = 0;
     assert(iOfFunction == 0);

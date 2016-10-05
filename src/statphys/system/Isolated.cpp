@@ -13,6 +13,12 @@ namespace simol
   {
     cout << "System = Isolated" << endl;
   }
+  
+  void Isolated::samplePositions(DynamicsParameters const& dynaPara)
+  {
+    cout << " - Sampling the positions..." << endl;
+    getParticle(0).position(0) = drawPotLaw(dynaPara.beta());
+  }
 
   void Isolated::computeAllForces()
   {

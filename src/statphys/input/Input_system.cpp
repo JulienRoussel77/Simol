@@ -76,21 +76,23 @@ namespace simol
       return defaultLatticeParameter;
   }
 
-  // Returns True if the initial conditions are read from the "settings" file
-  bool Input::doFileSettings() const
+  // Returns True if the initial conditions are either read from the "settings" file or written in te input file
+  bool Input::doSetting() const
   {
-    if (data["System"]["Settings"])
-      if (data["System"]["Settings"].as<string>() == "FileSettings")
+    if (data["System"]["Setting"])
+      return true;
+    return false;
+  }
+  
+  // Returns True if the initial conditions are read from the "settings" file
+  bool Input::doRestart() const
+  {
+    if (data["System"]["Setting"])
+      if (data["System"]["Setting"]["RestartFileName"])
         return true;
     return false;
   }
 
-  string Input::settingsPath() const
-  {
-    if (data["System"]["SettingsPath"])
-      return simuTypeName() + data["System"]["SettingsPath"].as<string>();
-    else return parametersName() + "settings/settings";
-  }
 
 
   Vector<double> Input::initialPosition(int const& iOfParticle) const
@@ -98,7 +100,7 @@ namespace simol
     Vector<double> q0(dimension(), 0);
     if (data["System"]["Position"])
       q0(0) = data["System"]["Position"].as<double>();
-    else if (doFileSettings())
+    else if (doRestart())
     {
       // the initial positions have been read in the constructor of Input()
       cout << "using settings for q : " << iOfParticle << "->" << initialPositions_[iOfParticle] << endl;
@@ -112,13 +114,26 @@ namespace simol
     Vector<double> p0(dimension(), 0);
     if (data["System"]["Momentum"])
       p0(0) =  data["System"]["Momentum"].as<double>();
-    else if (doFileSettings())
+    else if (doRestart())
     {
       // the initial positions have been read in the constructor of Input()
       cout << "using settings for p : " << iOfParticle << "->" << initialMomenta_[iOfParticle] << endl;
       p0 = initialMomenta_[iOfParticle];
     }
     return p0;
+  }
+  
+  double Input::initialInternalEnergy(int const& iOfParticle) const
+  {
+    if (data["System"]["InternalEnergy"])
+      return data["System"]["Position"].as<double>();
+    else if (doRestart())
+    {
+      // the initial positions have been read in the constructor of Input()
+      cout << "using settings for e : " << iOfParticle << "->" << initialInternalEnergies_[iOfParticle] << endl;
+      return initialInternalEnergies_[iOfParticle];
+    }
+    else return 0;
   }
 
   //Chain
@@ -140,18 +155,19 @@ namespace simol
       return defaultHeatCapacity;
   }
 
-  bool Input::restart() const
+  string Input::restartFileName() const
   {
-    if (data["System"]["InitialConditions"])
-      return true;
-    else 
-      return false;
+    if (data["System"]["Setting"])
+      if (data["System"]["Setting"]["RestartFileName"])
+        return data["System"]["Setting"]["RestartFileName"].as<string>();
+    
+    return "";
   }
 
-  string Input::restartFileName() const
+  /*string Input::restartFileName() const
   {
     string name = data["System"]["InitialConditions"].as<string>();
     return name;
-  }
+  }*/
 
 }

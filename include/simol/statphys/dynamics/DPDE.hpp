@@ -13,11 +13,11 @@ namespace simol
     double cutOff_;
     double rejectionCount_;
     double totalCountForRejection_;
-    double rejectionRate_;
     double negativeEnergiesCount_;
+    double rejectionRate_;
   public:
     DPDE(Input const&  input);
-    virtual void printName() const;
+    virtual string dynamicsName() const {return "DPDE";}
     virtual double& cutOff();
     double sigma() const;
     const double& rejectionCount() const;

@@ -10,13 +10,12 @@ namespace simol
   DPDE::DPDE(Input const&  input):
     LangevinBase(input),
     heatCapacity_(input.heatCapacity()),
-    cutOff_(input.cutOffRatio()*input.potentialSigma())
+    cutOff_(input.cutOffRatio()*input.potentialSigma()),
+    rejectionCount_(0),
+    totalCountForRejection_(0),
+    negativeEnergiesCount_(0),
+    rejectionRate_(0)
   {}
-
-  void DPDE::printName() const
-  {
-    std::cout << "DynamicsType = DPDE" << std::endl;
-  }
 
   const double& DPDE::heatCapacity() const
   {
@@ -309,7 +308,7 @@ namespace simol
     Vector<double> e12 = r12/distance;
     // compute the variation of the relative velocity
     //double old_kin_energy = particle1.kineticEnergy() + particle2.kineticEnergy();
-    //dyna.printName(); 
+    
     double mu12 = 1./( 1./particle1.mass() + 1./particle2.mass() ); // reduced mass
     Vector<double> vect12 = particle1.momentum()/particle1.mass() - particle2.momentum()/particle2.mass();  
     double v12_0 = dot(vect12,e12);

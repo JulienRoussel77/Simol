@@ -31,31 +31,30 @@ namespace simol
     data(YAML::LoadFile(cmd.inputFileName())),
     inputPath_(cmd.inputFileName()),
     inputFlux_(inputPath()),
-    inputSettings_(settingsPath())
+    initialPositions_(nbOfParticles(), Vector<double>(dimension())),
+    initialMomenta_(nbOfParticles(), Vector<double>(dimension())),
+    initialInternalEnergies_(nbOfParticles(), 0)
   {
     assert(data.IsDefined());
-    if (doFileSettings())
+    if (doRestart())
     {
-      assert(inputFlux_.is_open());
-      cout << "Reading the settings from " << settingsPath() << "...";
-      initialPositions_ = vector<Vector<double>>(nbOfParticles());
-      initialMomenta_ = vector<Vector<double>>(nbOfParticles());
-      for (int iOfParticle = 0; iOfParticle < (int)nbOfParticles(); iOfParticle++)
+      cout << " - reading from restart file " << restartFileName() << endl;
+      ifstream initialConditions(restartFileName());
+      if (!initialConditions.is_open()) throw std::runtime_error("RestartFile not open !");
+      int Dim = dimension();
+      for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
       {
-        readItem(inputSettings_);
-        assert( (int) readItem(inputSettings_) == (int) iOfParticle);
-        for (int i = 0; i < dimension(); i++)
-          initialPositions_[iOfParticle](i) = readItem(inputSettings_);
-        for (int i = 0; i < dimension(); i++)
-          initialMomenta_[iOfParticle](i) = readItem(inputSettings_);
-        for (int i = 0; i < 4; i++)
-          readItem(inputSettings_);
-        //cout << iOfParticle << " " << initialPositions_[iOfParticle] << " " << initialMomenta_[iOfParticle] << endl;
+        for (int dim = 0; dim < Dim; dim++)
+          initialConditions >> initialPositions_[iOfParticle](dim) >> std::ws; 
+        for (int dim = 0; dim < Dim; dim++)
+          initialConditions >> initialMomenta_[iOfParticle](dim) >> std::ws;
+        initialConditions >> initialInternalEnergies_[iOfParticle] >> std::ws;
       }
       cout << " Successful reading of the settings files... " << endl;
     }
-    cout << "Successful reading of input variables" << endl;
   }
+    
+  
 
   const std::string& Input::inputPath() const
   {

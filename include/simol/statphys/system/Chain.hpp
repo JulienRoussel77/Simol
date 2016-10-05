@@ -18,6 +18,7 @@ namespace simol
     
     virtual void incrementePairIterator(ParticlePairIterator& it);
     bool pairFinished(ParticlePairIterator const& it) const;
+    virtual void sampleMomenta(DynamicsParameters const& dynaPara);
   };
 
   class BiChain : public Chain
@@ -29,6 +30,7 @@ namespace simol
       const Particle& operator()(int iOfParticle = 0) const {return *(configuration_[iOfParticle+1]);}
       Particle& operator()(int iOfParticle = 0) {return *(configuration_[iOfParticle+1]);};
       
+      virtual void samplePositions(DynamicsParameters const& dynaPara);
       void computeAllForces();
       //virtual void computeProfile(Output& output, long int iOfStep) const;
     protected:
@@ -46,6 +48,8 @@ namespace simol
       
       bool const& isOfFixedVolum() const;
       void triInteraction(Particle& particle1, Particle& particle2, Particle& particle3) const;
+      
+      virtual void samplePositions(DynamicsParameters const& dynaPara);
       void computeAllForces();
       virtual double boundaryPotEnergy() const;
       //virtual void computeProfile(Output& output, long int iOfStep) const;

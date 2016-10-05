@@ -49,11 +49,14 @@ namespace simol
   {} 
   
   
+  
+  
+  
   System::System(Input const& input):
     dimension_(input.dimension()),
     //configuration_(input.nbOfParticles(), new Particle(dimension_)),
     configuration_(input.nbOfParticles(), nullptr),
-    settingsPath_(input.settingsPath())
+    doSetting_(input.doSetting())
   {
     potential_ = createPotential(input);
   }
@@ -204,6 +207,20 @@ namespace simol
   double System::drawPotLaw(double localBeta)
   {
     return potential_->drawLaw(localBeta, rng_);
+  }
+  
+  void System::samplePositions(DynamicsParameters const&)
+  {
+    printName();
+    throw std::invalid_argument("samplePositions : Function undefined");
+  }
+  
+  //-- initialization of the momenta according to a Gaussian distribution --
+  void System::sampleMomenta(DynamicsParameters const& dynaPara)
+  {
+    cout << " - Sampling the momenta..." << endl;
+    for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
+      getParticle(iOfParticle).momentum() = drawMomentum(dynaPara.beta(), getParticle(iOfParticle).mass());
   }
 
   void System::computeAllForces()

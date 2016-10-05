@@ -8,6 +8,8 @@ namespace simol
   class LangevinBase : public Dynamics
   {
     public:
+      virtual string dynamicsName() const {return "LangevinBase";}
+      
       virtual const double& gamma() const;
       virtual const double& xi() const;
       virtual double& xi();
