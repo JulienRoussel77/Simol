@@ -18,11 +18,11 @@ namespace simol
     nbOfParticles_(input.nbOfParticles()),
     nbOfSteps_(input.nbOfSteps()),
     latticeParameter_(input.latticeParameter()),
-    constTemperatureLeft_(input.temperature() + input.deltaTemperature()),
-    constTemperatureRight_(input.temperature() - input.deltaTemperature()),
     constTemperature_(input.temperature()),
-    constGamma_(input.gamma()),
+    constTemperatureLeft_(input.temperature() + input.deltaTemperature()),
+    constTemperatureRight_(input.temperature() - input.deltaTemperature()),    
     constDeltaTemperature_(input.deltaTemperature()),
+    constGamma_(input.gamma()),
     constXi_(input.xi()),
     constTauBending_(input.tauBending()),
     constExternalForce_(input.externalForce()),
@@ -140,6 +140,12 @@ namespace simol
       cout << "  " << observables(iOfObs)->outPath();
     cout << endl << endl;
 
+  }
+  
+  Output::~Output()
+  {
+    for (int iOfObservable = 0; iOfObservable < nbOfObservables(); iOfObservable++)
+      delete observables(iOfObservable);
   }
   
   Observable* Output::addObservable(const Input& input, const string& outPath)
@@ -345,34 +351,34 @@ namespace simol
                 << std::endl;
   }
 
-  void Output::displayParticles(vector<Particle*> const& configuration, long int iOfStep)
+  void Output::displayParticles(System const& syst, long int iOfStep)
   {                     
     //for (ParticleIterator it = syst.begin(); !syst.finished(it); ++it)
     for (int iOfParticle = 0; iOfParticle < nbOfParticles_; iOfParticle++)
       outParticles() << iOfStep * timeStep()
                      << " " << iOfParticle
-                     << " " << configuration[iOfParticle]->position()
-                     << " " << configuration[iOfParticle]->momentum()
-                     << " " << configuration[iOfParticle]->kineticEnergy()
-                     << " " << configuration[iOfParticle]->potentialEnergy()
-                     << " " << configuration[iOfParticle]->energy()
-                     << " " << configuration[iOfParticle]->force()
+                     << " " << syst(iOfParticle).position()
+                     << " " << syst(iOfParticle).momentum()
+                     << " " << syst(iOfParticle).kineticEnergy()
+                     << " " << syst(iOfParticle).potentialEnergy()
+                     << " " << syst(iOfParticle).energy()
+                     << " " << syst(iOfParticle).force()
                      << endl; 
   }
   
   ///
   ///-- keep the full current configuration in order to restart from it ---
-  void Output::displayBackUp(vector<Particle*> const& configuration, long int iOfStep)
+  void Output::displayBackUp(System const& syst, long int iOfStep)
   {
     outBackUp() << "Time = " << iOfStep * timeStep() << endl;
     int Dim = dimension_;
-    for (int i = 0; i < nbOfParticles_; i++)
+    for (int iOfParticle = 0; iOfParticle < nbOfParticles_; iOfParticle++)
     {
       for (int dim = 0; dim < Dim; dim++)
-        outBackUp() << configuration[i]->position(dim) << " ";
+        outBackUp() << syst(iOfParticle).position(dim) << " ";
       for (int dim = 0; dim < Dim; dim++)
-        outBackUp() << configuration[i]->momentum(dim) << " ";
-      outBackUp() << configuration[i]->internalEnergy() << " ";
+        outBackUp() << syst(iOfParticle).momentum(dim) << " ";
+      outBackUp() << syst(iOfParticle).internalEnergy() << " ";
       outBackUp() << endl;
     }
     outBackUp() << endl;
@@ -380,12 +386,12 @@ namespace simol
 
 
 
-  void Output::displayThermoVariablesDPDE(vector<Particle*> const& configuration, long int iOfStep)
+  void Output::displayThermoVariablesDPDE(System const& syst, long int iOfStep)
   {
     //double totalEnergy = kineticEnergy() + potentialEnergy() + internalEnergy();
     outThermo() << iOfStep * timeStep()
-		     << " " << configuration[0]->position(0) 
-		     << " " << configuration[0]->momentum(0) 
+		     << " " << syst(0).position(0) 
+		     << " " << syst(0).momentum(0) 
 		     << " " << internalEnergy() 
          << " " << kineticEnergy()
          << " " << potentialEnergy()

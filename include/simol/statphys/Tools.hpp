@@ -10,7 +10,12 @@
 #include "simol/core/linalg/Vector.hpp"
 #include <stdexcept>
 #include <list>
+#include <iomanip>
+#include <fstream>
+#include <vector>
+#include <memory>
 
+using std::setw;
 using std::ofstream;
 using std::cout;
 using std::endl;
@@ -20,6 +25,8 @@ using std::string;
 using std::to_string;
 using std::ifstream;
 using std::tolower;
+using std::shared_ptr;
+using std::make_shared;
 
 using std::vector;
 using std::list;

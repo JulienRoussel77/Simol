@@ -7,7 +7,7 @@ using std::vector;
 namespace simol
 {
 
-  void Output::setControlVariates(Input& input, Potential& potential, Galerkin* galerkin)
+  void Output::setControlVariates(Input& input, Potential& potential, Galerkin* /*galerkin*/)
   {
     if (input.controlVariateName() == "ExpFourierHermite")
       cvBasis_.basis_ = new ExpFourierHermiteBasis(input, potential);

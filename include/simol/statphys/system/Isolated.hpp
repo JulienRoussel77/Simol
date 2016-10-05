@@ -11,11 +11,6 @@ namespace simol
       Isolated(Input const& input);
       void printName() const;
       void computeAllForces();
-      virtual void computeKineticEnergy(Output& output) const;
-      virtual void computePotentialEnergy(Output& output) const;
-      //virtual void computePressure(Output& output) const;
-      //virtual void computeInternalEnergy(Output& output) const;
-      //virtual void computeInternalTemperature(Output& output) const;
   };
 
 

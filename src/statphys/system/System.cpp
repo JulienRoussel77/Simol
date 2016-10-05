@@ -51,7 +51,8 @@ namespace simol
   
   System::System(Input const& input):
     dimension_(input.dimension()),
-    configuration_(input.nbOfParticles(), new Particle(dimension_)),
+    //configuration_(input.nbOfParticles(), new Particle(dimension_)),
+    configuration_(input.nbOfParticles(), nullptr),
     settingsPath_(input.settingsPath())
   {
     potential_ = createPotential(input);
@@ -62,6 +63,8 @@ namespace simol
   System::~System()
   {
     delete potential_;
+    for (int iOfParticle = 0; iOfParticle < (int)configuration_.size(); iOfParticle++)
+      delete configuration_[iOfParticle];
   }
 
   void System::printName() const

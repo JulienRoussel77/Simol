@@ -112,7 +112,7 @@ namespace simol
   
 
   void computeOutput(Dynamics const& dyna, System const& syst, Output& output, long int iOfStep);
-  void computeControlVariate(Dynamics const& dyna, vector<Particle*> const& configuration, Output& output);
+  void computeControlVariate(Dynamics const& dyna, System const& syst, Output& output);
   void writeOutput(Dynamics const& dyna, System const& syst , Output& output, long int iOfStep);
   void writeFinalOutput(System const& syst, Output& output);
   

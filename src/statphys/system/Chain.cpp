@@ -8,14 +8,7 @@ namespace simol
 
   Chain::Chain(Input const& input):
     System(input)
-  {
-    assert(configuration_.size() > 1);
-    for (int i = 0; i < input.nbOfParticles(); i++)
-    {
-      configuration_[i] = new Particle(input.mass(), input.initialPosition(i), input.initialMomentum(i));
-      //std::cout << configuration_[i].force() << std::endl;
-    }
-  }
+  {}
 
   //--------------- particle pair iterators ------------
   
@@ -38,11 +31,14 @@ namespace simol
   //###### BiChain ######
 
   BiChain::BiChain(Input const& input):
-    Chain(input),
-    ancorParticle_(input.dimension())
+    Chain(input)//,
+    //ancorParticle_(input.dimension())
   {
-    //ancorParticle_.position(0) = 2 * input.initialPosition(0) - input.initialPosition(1);
-    ancorParticle_.position(0) = 0;
+    configuration_ = vector<Particle*>(nbOfParticles()+1, nullptr);    
+    for (int iOfParticle = -1; iOfParticle < input.nbOfParticles(); iOfParticle++)
+      configuration_[iOfParticle+2] = new Particle(input.mass(), input.initialPosition(iOfParticle), input.initialMomentum(iOfParticle));
+    
+    getParticle(-1).position(0) = 0;
   }
 
 
@@ -68,7 +64,7 @@ namespace simol
     
   }
 
-  void BiChain::computeProfile(Output& output, long int iOfStep) const
+  /*void BiChain::computeProfile(Output& output, long int iOfStep) const
   {
     //output.obsSumFlow().currentValue() = 0;
     output.obsModiFlow().currentValue() = output.constGamma_ * output.constDeltaTemperature_ / 2;
@@ -144,7 +140,7 @@ namespace simol
     output.obsSumFlow().currentValue() /= (nbOfParticles() - 2.);
     //output.obsModiFlow().currentValue() /= nbOfParticles();
     //cout << output.obsSumFlow().currentValue() << endl;
-  }
+  }*/
 
 
 
@@ -154,12 +150,20 @@ namespace simol
 
   TriChain::TriChain(Input const& input):
     Chain(input),
-    ancorParticle1_(input.dimension()),
-    ancorParticle2_(input.dimension()),
+    /*getParticle(-2)(input.dimension()),
+    ancorParticle2_(input.dimension()),*/
     isOfFixedVolum_(input.isOfFixedVolum())
   {
-    ancorParticle1_.position(0) = 0;//3 * input.initialPosition(0) - 2*input.initialPosition(1);
-    ancorParticle2_.position(0) = 0;//2 * input.initialPosition(0) - input.initialPosition(1);
+    //getParticle(-2).position(0) = 0;//3 * input.initialPosition(0) - 2*input.initialPosition(1);
+    //ancorParticle2_.position(0) = 0;//2 * input.initialPosition(0) - input.initialPosition(1);
+    
+
+    configuration_ = vector<Particle*>(nbOfParticles()+2, nullptr);
+    for (int iOfParticle = -2; iOfParticle < input.nbOfParticles(); iOfParticle++)
+      configuration_[iOfParticle+2] = new Particle(input.mass(), input.initialPosition(iOfParticle), input.initialMomentum(iOfParticle));
+    
+    getParticle(-2).position(0) = 0;
+    getParticle(-1).position(0) = 0;
   }
 
   bool const& TriChain::isOfFixedVolum() const
@@ -192,19 +196,19 @@ namespace simol
       getParticle(iOfParticle).resetForce(potential());
     //for (auto&& particle : configuration_)
     //  dyna.computeForce(particle);
-    triInteraction(ancorParticle1_, ancorParticle2_, getParticle(0));
-    triInteraction(ancorParticle2_, getParticle(0), getParticle(1));
+    triInteraction(getParticle(-2), getParticle(-1), getParticle(0));
+    triInteraction(getParticle(-1), getParticle(0), getParticle(1));
     for (int iOfParticle = 0; iOfParticle < nbOfParticles() - 2; iOfParticle++)
       triInteraction(getParticle(iOfParticle), getParticle(iOfParticle + 1), getParticle(iOfParticle + 2));
     //dyna.bending(configuration_[nbOfParticles() - 2], configuration_[nbOfParticles() - 1]);
     if (isOfFixedVolum_)
-      triInteraction(getParticle(nbOfParticles() - 1), ancorParticle1_, ancorParticle2_);
+      triInteraction(getParticle(nbOfParticles() - 1), getParticle(-2), getParticle(-1));
   }
 
   double TriChain::boundaryPotEnergy() const
-  {return ancorParticle1_.potentialEnergy() + ancorParticle2_.potentialEnergy();}
+  {return getParticle(-2).potentialEnergy() + getParticle(-1).potentialEnergy();}
 
-  void TriChain::computeProfile(Output& output, long int iOfStep) const
+  /*void TriChain::computeProfile(Output& output, long int iOfStep) const
   {
     output.obsSumFlow().currentValue() = 0;
     
@@ -220,11 +224,11 @@ namespace simol
 
       if (iOfParticle == 0)
       {
-        bending = ancorParticle2_.position(0) - 2 * getParticle(0).position(0) + getParticle(1).position(0);
+        bending = getParticle(-1).position(0) - 2 * getParticle(0).position(0) + getParticle(1).position(0);
         flow = output.constGamma_ * (output.constTemperatureLeft_ - 2 * getParticle(0).kineticEnergy())
-               - ancorParticle2_.energyGrad(0) * getParticle(0).momentum(0);
-        potTempTop = pow(- ancorParticle2_.energyGrad(0) + 2 * getParticle(0).energyGrad(0) - getParticle(1).energyGrad(0), 2);
-        potTempBot = ancorParticle2_.energyLapla() + 4 * getParticle(0).energyLapla() + getParticle(1).energyLapla();
+               - getParticle(-1).energyGrad(0) * getParticle(0).momentum(0);
+        potTempTop = pow(- getParticle(-1).energyGrad(0) + 2 * getParticle(0).energyGrad(0) - getParticle(1).energyGrad(0), 2);
+        potTempBot = getParticle(-1).energyLapla() + 4 * getParticle(0).energyLapla() + getParticle(1).energyLapla();
       }
       else if (iOfParticle < (int)configuration_.size() - 1)
       {
@@ -260,7 +264,7 @@ namespace simol
     }
     output.obsSumFlow().currentValue() /= (nbOfParticles() - 2.);
     //cout << output.obsSumFlow().currentValue() << endl;
-  }
+  }*/
 
 
 

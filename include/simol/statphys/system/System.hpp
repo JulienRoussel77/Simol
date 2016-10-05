@@ -5,7 +5,7 @@
 #include <vector>
 #include "simol/statphys/system/Particle.hpp"
 //#include "simol/statphys/dynamics/Dynamics.hpp"
-#include "simol/statphys/output/Output.hpp"
+//#include "simol/statphys/output/Output.hpp"
 
 #include "simol/statphys/potential/AllPotentials.hpp"
 
@@ -61,7 +61,9 @@ namespace simol
     virtual ~System();
 
     virtual void printName() const;
-
+    virtual bool isBiChain() const {return false;}
+    virtual bool isTriChain() const {return false;}
+    
     //-- fundamental brick: array of particles --
     const std::vector<Particle*> & configuration() const;
     std::vector<Particle*> & configuration();
@@ -73,6 +75,7 @@ namespace simol
     //virtual Particle const& getMember(const int& iOfCell, const int& iOfMember) const {return getParticle(iOfMember);}
     const int& dimension() const;
     int nbOfParticles() const;
+    
     
     virtual Cell const& cell(int const&) const {throw std::runtime_error("Cell only exist for NBody !");}
     virtual Cell & cell(int const&) {throw std::runtime_error("Cell only exist for NBody !");}
@@ -118,7 +121,7 @@ namespace simol
     virtual double boundaryPotEnergy() const;
     double laplacian(Vector<double> const& position) const;
     
-    virtual void computeProfile(Output& /*output*/, long int /*iOfStep*/)const {};
+    //virtual void computeProfile(Output& /*output*/, long int /*iOfStep*/)const {};
 
   //protected:
   public:

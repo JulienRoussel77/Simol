@@ -32,7 +32,7 @@ namespace simol
     
     if (doComputeCorrelations())
     {
-      outFluxCorrelation_ = new ofstream(input.outputFolderName() + "correlation_" + outPath0);
+      outFluxCorrelation_ = make_shared<ofstream>(input.outputFolderName() + "correlation_" + outPath0);
       outFluxCorrelation() << "# iOfSpan correlation varOfCorrelation" << endl;
     }
   }

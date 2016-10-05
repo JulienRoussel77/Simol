@@ -31,7 +31,7 @@ namespace simol
       SMat tQ_, tP_;
       SMat Lthm0_;
       SMat Lthm_, Lham_;
-      SMat L1_;
+      SMat Lrep_;
       SMat Leq_, Leta_;
       double beta_, gamma_;
       double amplitude_;
@@ -43,6 +43,7 @@ namespace simol
       ExpFourierHermiteBasis basis_;
     public:
       Galerkin(Input const& input);
+      virtual ~Galerkin();
 
       virtual int nbOfVariables() const;
       virtual int nbOfParticles() const;

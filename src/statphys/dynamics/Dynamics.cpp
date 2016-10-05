@@ -154,6 +154,9 @@ namespace simol
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
       output.obsInternalTemperature().currentValue() += 1/internalTemperature(syst(iOfParticle).internalEnergy());
   }
+  
+  
+
 
 
 

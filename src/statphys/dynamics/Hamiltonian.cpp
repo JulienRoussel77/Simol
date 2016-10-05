@@ -22,13 +22,12 @@ namespace simol
   
   ///
   ///Applies the generator of this dynamics to the basis functions of the CV
-  void Hamiltonian::computeGeneratorOnBasis(CVBasis& cvBasis, vector<Particle*> const& configuration) const
+  void Hamiltonian::computeGeneratorOnBasis(CVBasis& cvBasis, System const& syst) const
   {
-    int nbOfParticles = (int)configuration.size();
     //Vector<double> result = Vector<double>::Zero(nbOfFunctions());
     for (int iOfFunction = 0; iOfFunction < cvBasis.nbOfFunctions(); iOfFunction++)
-      for (int iOfParticle = 0; iOfParticle < nbOfParticles; iOfParticle++)
-        cvBasis.generatorOnBasisValues_(iOfFunction) += dot( configuration[iOfParticle]->momentum() , cvBasis.basis_->gradientQ(configuration, iOfParticle, iOfFunction))
-                               + dot( configuration[iOfParticle]->force() , cvBasis.basis_->gradientP(configuration, iOfParticle, iOfFunction));
+      for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
+        cvBasis.generatorOnBasisValues_(iOfFunction) += dot( syst(iOfParticle).momentum() , cvBasis.basis_->gradientQ(syst, iOfParticle, iOfFunction))
+                               + dot( syst(iOfParticle).force() , cvBasis.basis_->gradientP(syst, iOfParticle, iOfFunction));
   }
 }

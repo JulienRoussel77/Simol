@@ -7,8 +7,6 @@ namespace simol
     System(input)
   {
     configuration_[0] = new Particle(input.mass(), input.initialPosition(), input.initialMomentum());
-    //cout << getParticle().mass() << endl;
-    //cout << getParticle().mass() << "  " << getParticle().position() << "  " << getParticle().momentum() << endl;
   }
 
   void Isolated::printName() const
@@ -23,7 +21,7 @@ namespace simol
     getParticle().force() = totalForce(getParticle().position());
   }
   
-  void Isolated::computeKineticEnergy(Output& output) const
+  /*void Isolated::computeKineticEnergy(Output& output) const
   {
     output.kineticEnergy() = getParticle().kineticEnergy();
   }
@@ -31,7 +29,7 @@ namespace simol
   void Isolated::computePotentialEnergy(Output& output) const
   {
     output.potentialEnergy() = getParticle().potentialEnergy();
-  }
+  }*/
   
   /*void Isolated::computePressure(Output& output) const
   {

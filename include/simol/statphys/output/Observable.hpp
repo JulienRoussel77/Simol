@@ -6,6 +6,7 @@ using std::setw;
 #include "simol/statphys/Tools.hpp"
 #include "Statistics.hpp"
 #include "simol/statphys/system/Particle.hpp"
+#include "simol/statphys/system/System.hpp"
 
 namespace simol
 {
@@ -25,7 +26,7 @@ namespace simol
       
       string outPath_;
       ofstream outFlux_;      
-      ofstream* outFluxCorrelation_;
+      shared_ptr<ofstream> outFluxCorrelation_;
     public:
       Observable(Input const& input, const string& outPath);
       virtual ~Observable();
@@ -69,14 +70,14 @@ namespace simol
       virtual void appendCurrent(long int iOfStep);
       
       /*void computeGeneratorHamiltonian(){};
-      void computeGeneratorOverdamped(vector<Particle*> const& configuration, double beta){};
-      void computeGeneratorLangevin(vector<Particle*> const& configuration, double beta, double gamma){};
-      void computeGeneratorBoundarylangevin(vector<Particle*> const& configuration, double betaLeft, double betaRight, double gamma){};*/
+      void computeGeneratorOverdamped(System const& syst, double beta){};
+      void computeGeneratorLangevin(System const& syst, double beta, double gamma){};
+      void computeGeneratorBoundarylangevin(System const& syst, double betaLeft, double betaRight, double gamma){};*/
   
-      virtual void updateHamiltonian(vector<Particle*> const& /*configuration*/){};
-      virtual void updateOverdamped(vector<Particle*> const& /*configuration*/, double /*beta*/){};
-      virtual void updateLangevin(vector<Particle*> const& /*configuration*/, double /*beta*/, double /*gamma*/){};
-      virtual void updateBoundaryLangevin(vector<Particle*> const& /*configuration*/, double /*betaLeft*/, double /*betaRight*/, double /*gamma*/){};
+      virtual void updateHamiltonian(System const&){};
+      virtual void updateOverdamped(System const&, double /*beta*/){};
+      virtual void updateLangevin(System const&, double /*beta*/, double /*gamma*/){};
+      virtual void updateBoundaryLangevin(System const&, double /*betaLeft*/, double /*betaRight*/, double /*gamma*/){};
 
       bool doOutput(long int iOfStep) const;
       //bool doFinal() const;

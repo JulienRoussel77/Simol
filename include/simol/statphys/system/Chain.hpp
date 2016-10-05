@@ -24,25 +24,34 @@ namespace simol
   {
     public:
       BiChain(Input const& input);
+      virtual bool isBiChain() const {return true;}
+
+      const Particle& operator()(int iOfParticle = 0) const {return *(configuration_[iOfParticle+1]);}
+      Particle& operator()(int iOfParticle = 0) {return *(configuration_[iOfParticle+1]);};
       
       void computeAllForces();
-      virtual void computeProfile(Output& output, long int iOfStep) const;
+      //virtual void computeProfile(Output& output, long int iOfStep) const;
     protected:
-      Particle ancorParticle_;
+      //Particle ancorParticle_;
   };
 
   class TriChain : public Chain
   {
     public:
       TriChain(Input const& input);
+      virtual bool isTriChain() const {return true;}
+          
+      const Particle& operator()(int iOfParticle = 0) const {return *(configuration_[iOfParticle+2]);}
+      Particle& operator()(int iOfParticle = 0) {return *(configuration_[iOfParticle+2]);};
+      
       bool const& isOfFixedVolum() const;
       void triInteraction(Particle& particle1, Particle& particle2, Particle& particle3) const;
       void computeAllForces();
       virtual double boundaryPotEnergy() const;
-      virtual void computeProfile(Output& output, long int iOfStep) const;
+      //virtual void computeProfile(Output& output, long int iOfStep) const;
     protected:
-      Particle ancorParticle1_;
-      Particle ancorParticle2_;
+      //Particle ancorParticle1_;
+      //Particle ancorParticle2_;
       bool isOfFixedVolum_;
   };
 

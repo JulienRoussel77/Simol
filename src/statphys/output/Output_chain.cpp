@@ -2,26 +2,26 @@
 
 namespace simol
 {
-  void Output::displayChainPositions(vector<Particle*> const& configuration, long int iOfStep)
+  void Output::displayChainPositions(System const& syst, long int iOfStep)
   {
     outBeam() << iOfStep * timeStep()
-              << " " << configuration[0]->position() - 2 * configuration[1]->position() + configuration[2]->position()
-              //<< " " << configuration[0]->position() - 2*configuration[1]->position() + configuration[2]->position()
-              << " " << configuration[(nbOfParticles_ - 2) / 4]->position() - 2 * configuration[(nbOfParticles_ - 2) / 4 + 1]->position() + configuration[(nbOfParticles_ - 2) / 4 + 2]->position()
-              << " " << configuration[(nbOfParticles_ - 2) / 2]->position() - 2 * configuration[(nbOfParticles_ - 2) / 2 + 1]->position() + configuration[(nbOfParticles_ - 2) / 2 + 2]->position()
-              << " " << configuration[3 * (nbOfParticles_ - 2) / 4]->position() - 2 * configuration[3 * (nbOfParticles_ - 2) / 4 + 1]->position() + configuration[3 * (nbOfParticles_ - 2) / 4 + 2]->position()
-              << " " << configuration[nbOfParticles_ - 3]->position() - 2 * configuration[nbOfParticles_ - 2]->position() + configuration[nbOfParticles_ - 1]->position()
+              << " " << syst(0).position() - 2 * syst(1).position() + syst(2).position()
+              //<< " " << syst(0).position() - 2*syst(1).position() + syst(2).position()
+              << " " << syst((nbOfParticles_ - 2) / 4).position() - 2 * syst((nbOfParticles_ - 2) / 4 + 1).position() + syst((nbOfParticles_ - 2) / 4 + 2).position()
+              << " " << syst((nbOfParticles_ - 2) / 2).position() - 2 * syst((nbOfParticles_ - 2) / 2 + 1).position() + syst((nbOfParticles_ - 2) / 2 + 2).position()
+              << " " << syst(3 * (nbOfParticles_ - 2) / 4).position() - 2 * syst(3 * (nbOfParticles_ - 2) / 4 + 1).position() + syst(3 * (nbOfParticles_ - 2) / 4 + 2).position()
+              << " " << syst(nbOfParticles_ - 3).position() - 2 * syst(nbOfParticles_ - 2).position() + syst(nbOfParticles_ - 1).position()
               << endl;
   }
 
-  void Output::displayChainMomenta(vector<Particle*> const& configuration, long int iOfStep)
+  void Output::displayChainMomenta(System const& syst, long int iOfStep)
   {
     outChainVelocities() << iOfStep * timeStep()
-                         << " " << configuration[0]->momentum()
-                         << " " << configuration[nbOfParticles_ / 4]->momentum()
-                         << " " << configuration[nbOfParticles_ / 2]->momentum()
-                         << " " << configuration[3 * nbOfParticles_ / 4]->momentum()
-                         << " " << configuration[nbOfParticles_ - 1]->momentum()
+                         << " " << syst(0).momentum()
+                         << " " << syst(nbOfParticles_ / 4).momentum()
+                         << " " << syst(nbOfParticles_ / 2).momentum()
+                         << " " << syst(3 * nbOfParticles_ / 4).momentum()
+                         << " " << syst(nbOfParticles_ - 1).momentum()
                          << endl;
   }
 

@@ -21,7 +21,7 @@ namespace simol
 
     public:
       Dynamics(Input const&  input);
-      virtual ~Dynamics() = default;
+      virtual ~Dynamics() {if (galerkin_) delete galerkin_;};
 
       virtual void printName() const;
 
@@ -72,7 +72,7 @@ namespace simol
       
       //-- control variates --
       Galerkin* galerkin();
-      virtual void computeGeneratorOnBasis(CVBasis& /*cvBasis*/, vector<Particle*> const& /*configuration*/) const {};
+      virtual void computeGeneratorOnBasis(CVBasis&, System const&) const {};
       
       //-- output functions --
       virtual void computeKineticEnergy(Output& output, System const& syst) const;
@@ -80,7 +80,9 @@ namespace simol
       virtual void computePressure(Output& output, System const& syst) const;
       virtual void computeInternalEnergy(Output& output, System const& syst) const;
       virtual void computeInternalTemperature(Output& output, System const& syst) const;
-
+      
+      virtual void computeProfileBiChain(Output&, System const&, long int) const {}
+      virtual void computeProfileTriChain(Output&, System const&, long int) const {}
     protected:
 
       double timeStep_;

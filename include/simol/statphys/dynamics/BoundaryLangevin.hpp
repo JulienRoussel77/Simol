@@ -20,7 +20,10 @@ namespace simol
       void initializeMomenta(vector<Particle>& configuration);
       virtual void bending(Particle& particle1, Particle& particle2) const;
       
-      virtual void computeGeneratorOnBasis(CVBasis& cvBasis, vector<Particle*> const& configuration) const;
+      virtual void computeGeneratorOnBasis(CVBasis& cvBasis, System const& syst) const;
+      
+      virtual void computeProfileBiChain(Output& output, System const& syst, long int iOfStep) const;
+      virtual void computeProfileTriChain(Output& output, System const& syst, long int iOfStep) const;
     protected:
       double deltaTemperature_;
       double temperatureLeft_;

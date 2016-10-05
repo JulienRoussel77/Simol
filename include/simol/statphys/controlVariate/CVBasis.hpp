@@ -12,8 +12,9 @@ namespace simol
   public:
     CVBasis();
     CVBasis(Input const& input);
+    ~CVBasis();
     int const& nbOfFunctions() const;
-    void computeValueBasis(vector<Particle*> const& configuration);
+    void computeValueBasis(System const& syst);
     
     int nbOfFunctions_;
     TensorBasis* basis_;

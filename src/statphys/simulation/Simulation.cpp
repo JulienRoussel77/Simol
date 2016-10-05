@@ -147,16 +147,17 @@ namespace simol
   
   void computeOutput(Dynamics const& dyna, System const& syst, Output& output, long int iOfStep)
   {
-    // #### faire un output.obsMidFlow().updateBoundaryLangevin(syst.configuration(), dyna.betaLeft(), dyna.betaRight(), dyna.gamma()); ####
+    // #### faire un output.obsMidFlow().updateBoundaryLangevin(syst, dyna.betaLeft(), dyna.betaRight(), dyna.gamma()); ####
     if (output.obsKineticEnergy_) dyna.computeKineticEnergy(output, syst);
     if (output.obsPotentialEnergy_) dyna.computePotentialEnergy(output, syst);
-    syst.computeProfile(output, iOfStep);
+    if (syst.isBiChain()) dyna.computeProfileBiChain(output, syst, iOfStep);
+    else if (syst.isTriChain()) dyna.computeProfileBiChain(output, syst, iOfStep);
     if (output.obsPressure_) dyna.computePressure(output, syst);
     if (output.obsInternalEnergy_) dyna.computeInternalEnergy(output, syst);
     if (output.obsInternalTemperature_) dyna.computeInternalTemperature(output, syst);
     dyna.getThermo(output);
     
-    if (output.hasControlVariate()) computeControlVariate(dyna, syst.configuration(), output);
+    if (output.hasControlVariate()) computeControlVariate(dyna, syst, output);
     
     //cout << "sumFlow = " << output.obsSumFlow().currentValue() << endl;
     
@@ -167,10 +168,10 @@ namespace simol
     dyna.specificComputeOutput(output);
   }
   
-  void computeControlVariate(Dynamics const& dyna, vector<Particle*> const& configuration, Output& output)
+  void computeControlVariate(Dynamics const& dyna, System const& syst, Output& output)
   {
-    output.cvBasis_.computeValueBasis(configuration);
-    dyna.computeGeneratorOnBasis(output.cvBasis_, configuration);
+    output.cvBasis_.computeValueBasis(syst);
+    dyna.computeGeneratorOnBasis(output.cvBasis_, syst);
   }
   
   //------------------- writeOutput and its specifications by dynamics ---------------------------
@@ -185,16 +186,16 @@ namespace simol
       output.displayThermoVariables(iOfStep);
       if (output.doOutChain())
       {
-        output.displayChainPositions(syst.configuration(), iOfStep);
-        output.displayChainMomenta(syst.configuration(), iOfStep);
+        output.displayChainPositions(syst, iOfStep);
+        output.displayChainMomenta(syst, iOfStep);
       }
     }
     
     if (output.doLongPeriodOutput(iOfStep))
     {
-      if (output.doOutParticles()) output.displayParticles(syst.configuration(), iOfStep);
-      if (output.doOutXMakeMol()) output.displayXMakeMol(syst.configuration(), iOfStep);   
-      if (output.doOutBackUp()) output.displayBackUp(syst.configuration(), iOfStep);
+      if (output.doOutParticles()) output.displayParticles(syst, iOfStep);
+      if (output.doOutXMakeMol()) output.displayXMakeMol(syst, iOfStep);   
+      if (output.doOutBackUp()) output.displayBackUp(syst, iOfStep);
       if (output.doOutChain()) output.displayProfile(iOfStep);
     }
   }

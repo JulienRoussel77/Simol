@@ -303,15 +303,15 @@ namespace simol
           + expFourierMeans(2 * abs(iOfFourier - jOfFourier)) / sqrt(2.);
 
         int eps = (iOfFourier >= jOfFourier) - (iOfFourier <= jOfFourier); // -1 if i smaller, 0 if equal, 1 if i larger
-        //cosine times sinus
+        //cosine times sinus   /!\ doing the test in this order avoids to read expFourierMeans(-1)
         trigToExpMat_(2 * iOfFourier, 2 * jOfFourier - 1) =
           expFourierMeans(2 * (iOfFourier + jOfFourier) - 1) / sqrt(2.)
-          + eps * expFourierMeans(2 * abs(iOfFourier - jOfFourier) - 1) / sqrt(2.);
-
+          + (!eps)?0:eps * expFourierMeans(2 * abs(iOfFourier - jOfFourier) - 1) / sqrt(2.);
+          
         //sinus times cosine
         trigToExpMat_(2 * iOfFourier - 1, 2 * jOfFourier) =
           expFourierMeans(2 * (iOfFourier + jOfFourier) - 1) / sqrt(2.)
-          - eps * expFourierMeans(2 * abs(iOfFourier - jOfFourier) - 1) / sqrt(2.);
+          - (!eps)?0:eps * expFourierMeans(2 * abs(iOfFourier - jOfFourier) - 1) / sqrt(2.);
       }
 
 
@@ -394,7 +394,7 @@ namespace simol
     Lthm0_(nbOfHermite_, nbOfHermite_),
     Lthm_(sizeOfBasis_, sizeOfBasis_),
     Lham_(sizeOfBasis_, sizeOfBasis_),
-    L1_(sizeOfBasis_, sizeOfBasis_),
+    Lrep_(sizeOfBasis_, sizeOfBasis_),
     Leq_(sizeOfBasis_, sizeOfBasis_),
     Leta_(sizeOfBasis_, sizeOfBasis_),
     beta_(input.beta()),
@@ -426,10 +426,13 @@ namespace simol
     createP();
     display(P_, "output/Galerkin/P");
     cout << "OK" << endl;
-
-
   }
 
+  Galerkin::~Galerkin()
+  {
+    delete potential_;
+  }
+  
   int Galerkin::nbOfVariables() const
   {
     return 2 * nbOfParticles_;
@@ -460,7 +463,7 @@ namespace simol
     return gamma_;
   }
   
-  const double& Galerkin::expFourierMeans(int iOfElt) const
+  double const& Galerkin::expFourierMeans(int iOfElt) const
   {
     return basis_.expFourierMeans(iOfElt);
   }
@@ -584,9 +587,9 @@ namespace simol
     cout << "varOfH1 = " << varOfH1 << endl;
     cout << "conductivity = " << .5 * varOfH1 << endl;
 
-    DVec LinvL1LinvH1 = solveWithSaddle(Leq_, L1_ * LinvH1);
-    //double varCoeff = -.5 * dot( L1_ * LinvH1, LeqInv * L1_ * LinvH1);
-    double varCoeff = -2 * dot( L1_ * LinvH1, LinvL1LinvH1);
+    DVec LinvL1LinvH1 = solveWithSaddle(Leq_, Lrep_ * LinvH1);
+    //double varCoeff = -.5 * dot( Lrep_ * LinvH1, LeqInv * Lrep_ * LinvH1);
+    double varCoeff = -2 * dot( Lrep_ * LinvH1, LinvL1LinvH1);
     cout << "varCoeff = " << varCoeff << endl;
   }
   
@@ -672,7 +675,8 @@ namespace simol
   {
     basis_(0)->laplacianMatrix(Leq_);
     Leq_ /= -beta_;
-    
+    basis_(0)->gradMatrix(Lrep_);
+    Leq_ += externalForce_ * Lrep_;
     /*for (int iOfHermite = 0; iOfHermite < (int)nbOfHermite_; iOfHermite++)
       for (int jOfHermite = 0; jOfHermite < (int)nbOfHermite_; jOfHermite++)
         Leq_(iOfHermite, iOfHermite) = - 1 / beta_ * basis_(0)->xLaplacianY(iOfHermite+1, jOfHermite+1);*/
@@ -767,11 +771,11 @@ namespace simol
     Leq_  = Lham_ + gamma_ * Lthm_;
 
     cout << "############ L1 ############" << endl;
-    //L1_ = kron(SMat::Identity(nbOfFourier_) , P_);
-    L1_ = kron(SIdQ_, P_);
+    //Lrep_ = kron(SMat::Identity(nbOfFourier_) , P_);
+    Lrep_ = kron(SIdQ_, P_);
 
     cout << "############ Leta ############" << endl;
-    Leta_ = Leq_ + externalForce_ * L1_;
+    Leta_ = Leq_ + externalForce_ * Lrep_;
   }
   
   void LangevinGalerkin::createLthm0()
@@ -988,9 +992,9 @@ namespace simol
     cout << "varOfH1 = " << varOfH1 << endl;
     cout << "conductivity = " << .5 * varOfH1 << endl;*/
 
-    /*DVec LinvL1LinvH1 = solveWithSaddle(Leq_, L1_ * LinvH1);
-    //double varCoeff = -.5 * dot( L1_ * LinvH1, LeqInv * L1_ * LinvH1);
-    double varCoeff = -2 * dot( L1_ * LinvH1, LinvL1LinvH1);
+    /*DVec LinvL1LinvH1 = solveWithSaddle(Leq_, Lrep_ * LinvH1);
+    //double varCoeff = -.5 * dot( Lrep_ * LinvH1, LeqInv * Lrep_ * LinvH1);
+    double varCoeff = -2 * dot( Lrep_ * LinvH1, LinvL1LinvH1);
     cout << "varCoeff = " << varCoeff << endl;*/
   }
 
