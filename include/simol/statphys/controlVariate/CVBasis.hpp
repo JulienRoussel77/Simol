@@ -11,13 +11,16 @@ namespace simol
   {
   public:
     CVBasis();
-    CVBasis(Input const& input);
+    //CVBasis(Input const& input);
+    CVBasis(TensorBasis* basis0, shared_ptr<DVec> cvCoeffs0);
     ~CVBasis();
-    int const& nbOfFunctions() const;
+    int const& totalNbOfElts() const;
     void computeValueBasis(System const& syst);
     
-    int nbOfFunctions_;
+    int totalNbOfElts_;
     TensorBasis* basis_;
+    shared_ptr<DVec> cvCoeffs_;
+    
     DVec basisValues_;
     DVec generatorOnBasisValues_;
   };

@@ -27,6 +27,7 @@ using std::ifstream;
 using std::tolower;
 using std::shared_ptr;
 using std::make_shared;
+using std::runtime_error;
 
 using std::vector;
 using std::list;
@@ -43,4 +44,18 @@ void displayTime(double time);
 int getNbOfLines(ifstream& file);
 //bool hasSmallerNorm(const cplx& a, const cplx& b);
 bool hasSmallerNorm(cplx a, cplx b);
+
+const int idKineticEnergy = 0;
+const int idPotentialEnergy = 1;
+const int idPressure = 2;
+const int idInternalEnergy = 3;
+const int idInternalTemperature = 4;
+const int idVelocity = 5;
+const int idForce = 6;
+const int idLength = 7;
+const int idMidFlow = 8;
+const int idSumFlow = 9;
+const int idModiFlow = 10;
+const int nbOfIdObs = 11;
+
 #endif

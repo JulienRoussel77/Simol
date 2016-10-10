@@ -28,7 +28,7 @@ namespace simol
       ofstream outFlux_;      
       shared_ptr<ofstream> outFluxCorrelation_;
     public:
-      Observable(Input const& input, const string& outPath);
+      Observable(Input const& input, int idObs);
       virtual ~Observable();
       
       const double& timeStep() const;

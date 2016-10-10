@@ -6,21 +6,35 @@ using std::string;
 
 namespace simol
 {
+  string Input::CVObservable() const
+  {
+    if (data["ControlVariate"])
+      if (data["ControlVariate"]["Observable"])
+        return data["ControlVariate"]["Observable"].as<string>();
+
+    return "None";
+  }
+  
+  bool Input::doCVObservable(int idObs) const
+  {
+    return nameOfObs(idObs) == CVObservable();
+  }
 
   string Input::controlVariateName() const
   {
-    if (data["ControlVariate"]["Name"])
-      return data["ControlVariate"]["Name"].as<string>();
-    else
-      return "None";
+    if (data["ControlVariate"])
+      if (data["ControlVariate"]["Name"])
+        return data["ControlVariate"]["Name"].as<string>();
+
+    return "None";
   }
 
   string Input::controlVariateCoeffsPath() const
   {
-    if (data["ControlVariate"]["CoeffsPath"])
-      return data["ControlVariate"]["CoeffsPath"].as<string>();
-    else
-      assert(false);
+    if (data["ControlVariate"])
+      if (data["ControlVariate"]["CoeffsPath"])
+        return data["ControlVariate"]["CoeffsPath"].as<string>();
+
     return "None";
   }
 

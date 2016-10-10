@@ -30,9 +30,8 @@ namespace simol
   ///Evaluate at the current state of "conifguration"
   void Langevin::computeGeneratorOnBasis(CVBasis& cvBasis, System const& syst) const
   {
-    //cout << "generatorOn(const Langevin& dyna, S const& syst, const ControlVariate& controlVariate)" << endl;
-    //Vector<double> result = Vector<double>::Zero(nbOfFunctions());
-    for (int iOfFunction = 0; iOfFunction < cvBasis.nbOfFunctions(); iOfFunction++)
+    cvBasis.generatorOnBasisValues_ = DVec(cvBasis.totalNbOfElts(), 0);
+    for (int iOfFunction = 0; iOfFunction < cvBasis.totalNbOfElts(); iOfFunction++)
       for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
       {
         cvBasis.generatorOnBasisValues_(iOfFunction) += dot(syst(iOfParticle).momentum() , cvBasis.basis_->gradientQ(syst, iOfParticle, iOfFunction))
@@ -40,6 +39,11 @@ namespace simol
                                + gamma() * (- dot(syst(iOfParticle).momentum() , cvBasis.basis_->gradientP(syst, iOfParticle, iOfFunction))
                                           + cvBasis.basis_->laplacianP(syst, iOfParticle, iOfFunction) / beta() );
       }
+      
+    ofstream tempOut("aaaaaaaaaaaaaaaaaaaa.txt", std::ofstream::app);
+    tempOut << syst(0).position(0) << " " << syst(0).momentum(0) << " " << syst(0).force(0) << " " << dot(*cvBasis.cvCoeffs_, cvBasis.generatorOnBasisValues_) << endl;
   }
+  
+
 
 }

@@ -54,8 +54,9 @@ namespace simol
   
   System::System(Input const& input):
     dimension_(input.dimension()),
+    nbOfParticles_(input.nbOfParticles()),
     //configuration_(input.nbOfParticles(), new Particle(dimension_)),
-    configuration_(input.nbOfParticles(), nullptr),
+    configuration_(nbOfParticles_, nullptr),
     doSetting_(input.doSetting())
   {
     potential_ = createPotential(input);
@@ -77,12 +78,12 @@ namespace simol
 
   const Particle& System::getParticle(int index) const
   {
-    return *configuration_[index];
+    return operator()(index);
   }
 
   Particle& System::getParticle(int index)
   {
-    return *configuration_[index];
+    return operator()(index);
   }
 
   const int& System::dimension() const
@@ -98,9 +99,9 @@ namespace simol
   std::vector<Particle*> & System::configuration()
   { return configuration_; }
 
-  int System::nbOfParticles() const
+  const int& System::nbOfParticles() const
   {
-    return configuration_.size();
+    return nbOfParticles_;
   }
 
   //-------------- Random numbers ----------------

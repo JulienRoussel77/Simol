@@ -100,7 +100,7 @@ namespace simol
     Vector<double> q0(dimension(), 0);
     if (data["System"]["Position"])
       q0(0) = data["System"]["Position"].as<double>();
-    else if (doRestart())
+    else if (doRestart() && iOfParticle >= 0)
     {
       // the initial positions have been read in the constructor of Input()
       cout << "using settings for q : " << iOfParticle << "->" << initialPositions_[iOfParticle] << endl;
@@ -114,7 +114,7 @@ namespace simol
     Vector<double> p0(dimension(), 0);
     if (data["System"]["Momentum"])
       p0(0) =  data["System"]["Momentum"].as<double>();
-    else if (doRestart())
+    else if (doRestart() && iOfParticle >= 0)
     {
       // the initial positions have been read in the constructor of Input()
       cout << "using settings for p : " << iOfParticle << "->" << initialMomenta_[iOfParticle] << endl;
@@ -127,7 +127,7 @@ namespace simol
   {
     if (data["System"]["InternalEnergy"])
       return data["System"]["Position"].as<double>();
-    else if (doRestart())
+    else if (doRestart() && iOfParticle >= 0)
     {
       // the initial positions have been read in the constructor of Input()
       cout << "using settings for e : " << iOfParticle << "->" << initialInternalEnergies_[iOfParticle] << endl;

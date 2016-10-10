@@ -9,7 +9,7 @@ namespace simol
   ///
   /// creation of output class
   /// including creation/opening of appropriate output files
-  Output::Output(Input const& input):
+  Output::Output(Input const& input, shared_ptr<CVBasis> cvBasis0):
     outputFolderName_(input.outputFolderName()),
     printPeriodNbOfSteps_(input.printPeriodNbOfSteps()),
     printLongPeriodNbOfSteps_(input.printLongPeriodNbOfSteps()),
@@ -52,9 +52,12 @@ namespace simol
     potTempBotProfile_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts(), nbOfParticles_),
     bendistProfile_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts(), nbOfParticles_),
     flowProfile_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts(), nbOfParticles_),
-    cvBasis_(input)
+    cvBasis_(cvBasis0)
   {    
-    if (input.doKineticEnergy()) obsKineticEnergy_ = addObservable(input, "kineticEnergy.txt");
+    for (int idObs = 0; idObs < nbOfIdObs; idObs++)
+      addObservable(input, idObs);
+    
+    /*if (input.doKineticEnergy()) obsKineticEnergy_ = addObservable(input, "kineticEnergy.txt");
     if (input.doPotentialEnergy()) obsPotentialEnergy_ = addObservable(input, "potentialEnergy.txt");
     if (input.doPressure()) obsPressure_ = addObservable(input, "pressure.txt");
     if (input.doInternalEnergy()) obsInternalEnergy_ = addObservable(input, "internalEnergy.txt");
@@ -64,7 +67,7 @@ namespace simol
     if (input.doLength()) obsLength_ = addObservable(input, "length.txt");
     if (input.doMidFlow())obsMidFlow_  = addObservable(input, "midFlow.txt");
     if (input.doSumFlow()) obsSumFlow_ = addObservable(input, "sumFlow.txt");
-    if (input.doModiFlow()) obsModiFlow_ = addObservable(input, "modiFlow.txt");
+    if (input.doModiFlow()) obsModiFlow_ = addObservable(input, "modiFlow.txt");*/
     
     if (input.doOutThermo())
     {
@@ -92,9 +95,8 @@ namespace simol
       outChainVelocities() << "# time i=0 i=N/4 i=N/2 i=3N/4 i=N-1" << endl;      
       outProfile_           = std::make_shared<ofstream>(input.outputFolderName() + "profile.txt");
     }
-
     
-    
+    //if (input.CVObservable() != "None") makeCVObservables(input);
     
     //--------- announce where input/outputs are ----------------------------
     std::cout << endl;
@@ -148,12 +150,61 @@ namespace simol
       delete observables(iOfObservable);
   }
   
-  Observable* Output::addObservable(const Input& input, const string& outPath)
+  Observable*& Output::getObservablePtr(int idObs)
+  {
+    switch (idObs)
+    {
+      case idKineticEnergy : return obsKineticEnergy_;
+      case idPotentialEnergy : return obsPotentialEnergy_;
+      case idPressure : return obsPressure_;
+      case idInternalEnergy : return obsInternalEnergy_;
+      case idInternalTemperature : return obsInternalTemperature_;
+      case idVelocity : return obsVelocity_;
+      case idForce : return obsForce_;
+      case idLength : return obsLength_;
+      case idMidFlow : return obsMidFlow_;
+      case idSumFlow : return obsSumFlow_;
+      case idModiFlow : return obsModiFlow_;
+      default : throw std::runtime_error("This observable id corresponds to no observable !");
+    }
+  }
+  
+  /*Observable* Output::addObservable(const Input& input, const string& outPath)
   {
     Observable* obsPtr = new Observable(input, outPath);
     observables_.push_back(obsPtr);
     return obsPtr;
+  }*/
+  
+  void Output::addObservable(const Input& input, int idObs)
+  {
+    /*Observable* obsPtr = new Observable(input, outPath);
+    observables_.push_back(obsPtr);
+    return obsPtr;*/
+    
+    Observable* obsPtr = nullptr;
+    if (input.doObservable(idObs))
+    {
+      if (!input.doCVObservable(idObs)) obsPtr = new Observable(input, idObs);
+      else obsPtr = createControlVariate(input, idObs, cvBasis_);
+      getObservablePtr(idObs) = obsPtr;
+      observables_.push_back(obsPtr);
+    }
   }
+  
+  /*Observable* Output::addKineticEnergy(const Input& input, Galerkin* galerkin)
+  {
+    Observable* obsPtr = nullptr;
+    if (input.doKineticEnergy())
+    {
+      if (input.CVObservable() != "kineticEnergy") obsPtr = new Observable(input, "kineticEnergy.txt");
+      else obsPtr = new Observable(input, "kineticEnergy.txt", galerkin);
+      observables_.push_back(obsPtr);
+    }
+    return obsPtr;
+  }*/
+  
+  
 
   //----- various assessors --------
 
@@ -218,6 +269,18 @@ namespace simol
   
   double& Output::totalVirial()
   {return totalVirial_;}
+  
+  const double& Output::velocity() const
+  {return obsVelocity().currentValue();}
+  
+  double& Output::velocity()
+  {return obsVelocity().currentValue();}
+  
+  const double& Output::force() const
+  {return obsForce().currentValue();}
+  
+  double& Output::force()
+  {return obsForce().currentValue();}
   
   const double& Output::totalEnergy() const
   {return totalEnergy_;}
@@ -440,7 +503,7 @@ namespace simol
   }
   
   bool Output::hasControlVariate() const
-  {return cvBasis_.basis_;}
+  {return (bool)cvBasis_;}
 
 
 }

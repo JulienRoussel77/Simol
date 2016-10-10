@@ -56,8 +56,9 @@ namespace simol
   ///Evaluate at the current state of "conifguration"
   void BoundaryLangevin::computeGeneratorOnBasis(CVBasis& cvBasis, System const& syst) const
   {
+    cvBasis.generatorOnBasisValues_ = DVec(cvBasis.totalNbOfElts(), 0);
     //Vector<double> result = Vector<double>::Zero(nbOfFunctions());
-    for (int iOfFunction = 0; iOfFunction < cvBasis.nbOfFunctions(); iOfFunction++)
+    for (int iOfFunction = 0; iOfFunction < cvBasis.totalNbOfElts(); iOfFunction++)
     {
       for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
         cvBasis.generatorOnBasisValues_(iOfFunction) += dot(syst(iOfParticle).momentum(), cvBasis.basis_->gradientQ(syst, iOfParticle, iOfFunction))

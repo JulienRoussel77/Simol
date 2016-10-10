@@ -40,8 +40,12 @@ namespace simol
   int product(vector<int>& nbOfElts);
   //DTVec product(DMat& A, DTVec& X, int iOfVariable);
 
+  //class Basis;
+  //Basis* createBasis(Input const& input, Potential& potential);
+  
   class Basis
   {
+  //friend   Basis* createBasis(Input const& input, Potential& potential);
   protected:
     int nbOfElts_;
   public:
@@ -153,6 +157,7 @@ namespace simol
       virtual int const& nbOfElts(const int iOfVariable) const;
       virtual int& nbOfElts(const int iOfVariable);
       virtual vector<int> nbOfElts() const;
+      virtual int totalNbOfElts() const;
       const Basis* operator()(const int iOfBasis) const;
       virtual double value(System const& syst, const int iOfElt) const = 0;
       virtual double value(System const& syst, vector<int>& vecIndex) const = 0;

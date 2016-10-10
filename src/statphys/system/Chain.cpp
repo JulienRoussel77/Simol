@@ -43,14 +43,14 @@ namespace simol
   //###### BiChain ######
 
   BiChain::BiChain(Input const& input):
-    Chain(input)//,
-    //ancorParticle_(input.dimension())
+    Chain(input)
   {
     configuration_ = vector<Particle*>(nbOfParticles()+1, nullptr);    
     for (int iOfParticle = -1; iOfParticle < input.nbOfParticles(); iOfParticle++)
-      configuration_[iOfParticle+2] = new Particle(input.mass(), input.initialPosition(iOfParticle), input.initialMomentum(iOfParticle));
+      configuration_[iOfParticle+1] = new Particle(input.mass(), input.initialPosition(iOfParticle), input.initialMomentum(iOfParticle));
     
     getParticle(-1).position(0) = 0;
+    getParticle(-1).momentum(0) = 0;
   }
 
 
@@ -178,64 +178,6 @@ namespace simol
 
   double TriChain::boundaryPotEnergy() const
   {return getParticle(-2).potentialEnergy() + getParticle(-1).potentialEnergy();}
-
-  /*void TriChain::computeProfile(Output& output, long int iOfStep) const
-  {
-    output.obsSumFlow().currentValue() = 0;
-    
-    // modiFlow expression is easier for pair nbOfParticles
-    
-    for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
-    {
-      double bending = 0;
-      double flow = 0;
-      double potTempTop = 0;
-      double potTempBot = 0;
-
-
-      if (iOfParticle == 0)
-      {
-        bending = getParticle(-1).position(0) - 2 * getParticle(0).position(0) + getParticle(1).position(0);
-        flow = output.constGamma_ * (output.constTemperatureLeft_ - 2 * getParticle(0).kineticEnergy())
-               - getParticle(-1).energyGrad(0) * getParticle(0).momentum(0);
-        potTempTop = pow(- getParticle(-1).energyGrad(0) + 2 * getParticle(0).energyGrad(0) - getParticle(1).energyGrad(0), 2);
-        potTempBot = getParticle(-1).energyLapla() + 4 * getParticle(0).energyLapla() + getParticle(1).energyLapla();
-      }
-      else if (iOfParticle < (int)configuration_.size() - 1)
-      {
-        // bending is k_iOfParticle
-        bending = getParticle(iOfParticle - 1).position(0) - 2 * getParticle(iOfParticle).position(0) + getParticle(iOfParticle + 1).position(0);
-        // flow is j_iOfParticle
-        flow = - getParticle(iOfParticle - 1).energyGrad(0) * getParticle(iOfParticle).momentum(0)
-               + getParticle(iOfParticle).energyGrad(0) * getParticle(iOfParticle - 1).momentum(0);
-
-        potTempTop = pow(- getParticle(iOfParticle - 1).energyGrad(0) + 2 * getParticle(iOfParticle).energyGrad(0) - getParticle(iOfParticle + 1).energyGrad(0), 2);
-        potTempBot = getParticle(iOfParticle - 1).energyLapla() + 4 * getParticle(iOfParticle).energyLapla() + getParticle(iOfParticle + 1).energyLapla();
-        output.obsSumFlow().currentValue() += flow;
-      }
-      else
-      {
-        bending = nan("");
-        flow = - getParticle(iOfParticle - 1).energyGrad(0) * getParticle(iOfParticle).momentum(0);
-        potTempTop = pow(- getParticle(iOfParticle - 1).energyGrad(0), 2);
-        potTempBot = getParticle(iOfParticle - 1).energyLapla();
-      }
-      
-      
-
-      int midNb = (nbOfParticles() - 1) / 2;
-      if (iOfParticle == midNb)
-        output.obsMidFlow().currentValue() = flow;
-
-      output.appendBendistProfile(bending , iOfStep, iOfParticle);
-      output.appendKinTempProfile(2 * getParticle(iOfParticle).kineticEnergy(), iOfStep, iOfParticle);
-      output.appendPotTempTopProfile(potTempTop, iOfStep, iOfParticle);
-      output.appendPotTempBotProfile(potTempBot, iOfStep, iOfParticle);
-      output.appendFlowProfile(flow, iOfStep, iOfParticle);
-    }
-    output.obsSumFlow().currentValue() /= (nbOfParticles() - 2.);
-    //cout << output.obsSumFlow().currentValue() << endl;
-  }*/
 
 
 

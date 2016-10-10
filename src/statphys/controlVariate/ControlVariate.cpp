@@ -10,36 +10,53 @@ using std::ofstream;
 namespace simol
 {
 
-  Observable* createControlVariate(Input const& input, const string& outPath, CVBasis& cvBasis0, Galerkin* galerkin)
+  Observable* createControlVariate(Input const& input, int idObs, shared_ptr<CVBasis> cvBasis0)
   {
     if (input.controlVariateName() == "None")
-      return new Observable(input, outPath);
+      return new Observable(input, idObs);
     if (input.controlVariateName() == "Sinus")
-      return new SinusControlVariate(input, outPath, cvBasis0);
+      return new SinusControlVariate(input, idObs, cvBasis0);
     else if (input.controlVariateName() == "ExpFourierHermite")
-      return new ExpFourierHermiteControlVariate(input, outPath, cvBasis0, galerkin);
+      return new ExpFourierHermiteControlVariate(input, idObs, cvBasis0);
     else
       std::cout << input.controlVariateName() << " is not a valid control variate !" << std::endl;
     return 0;
   }
 
 
-  ControlVariate::ControlVariate(Input const& input, const string& outPath, CVBasis& cvBasis0, int nbOfFunctions):
-    Observable(input, outPath),
+  ControlVariate::ControlVariate(Input const& input, int idObs, shared_ptr<CVBasis> cvBasis0, int nbOfFunctions):
+    Observable(input, idObs),
     dimension_(input.dimension()),
     nbOfFunctions_(nbOfFunctions),
     nbOfFunctionPairs_(pow(nbOfFunctions_, 2)),
+    doEstimateCvCoeffs_(false),
     autocoStatsBetter_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts()),
     statsGeneratorOnBasis_(nbOfFunctions_),
     statsB1_(nbOfFunctions_),
     statsB2_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts(), nbOfFunctions_),
     statsD_(nbOfFunctions_, nbOfFunctions_),
     lastA_(nbOfFunctions_),
-    cvBasis_(&cvBasis0)
-    /*,
-    basisValue(nbOfFunctions_),
-    generatorOnBasisValue(nbOfFunctions_)*/
-  {}
+    cvBasis_(cvBasis0)
+  {    
+    if (!cvBasis_) throw runtime_error("ControlVariate build without cvBasis !");
+    if (cvBasis().cvCoeffs_)
+    {
+      cout << "CVcoeffs from Galerkin !" << endl;    
+    }
+    else if (input.controlVariateCoeffsPath() != "None")
+    {
+      cout << "CVcoeffs from file !" << endl;
+      throw runtime_error("Reading CV coefficients from a file is not fixed yet !");
+      std::string coeffsPath = input.outputFolderName() + input.controlVariateCoeffsPath();
+      ifstream file(coeffsPath);
+      //coeffsVec_ = SparseMatrix<double>(coeffsPath, getNbOfLines(file));
+    }
+    else
+    {
+      cout << "CVcoeffs estimated on the fly !" << endl;
+      doEstimateCvCoeffs_ = true;
+    }
+  }
 
   int ControlVariate::nbOfFunctions() const
   {
@@ -60,27 +77,19 @@ namespace simol
   {
     return false;
   }
+  
+  bool ControlVariate::doEstimateCvCoeffs() const
+  {return doEstimateCvCoeffs_;}
 
-  /*double ControlVariate::potential(Vector<double> const& position) const
-  {
-    return (*potential_)(position);
-  }
-
-  Vector<double> ControlVariate::potentialDerivative(Vector<double> const& position) const
-  {
-    return potential_->gradient(position);
-  }
-
-  double ControlVariate::potentialLaplacian(Vector<double> const& position) const
-  {
-    return potential_->laplacian(position);
-  }*/
 
   int ControlVariate::nbOfFourier() const
   {return 0;}
 
   int ControlVariate::nbOfHermite() const
   {return 0;}
+  
+
+  
 
   double ControlVariate::lastValueBetter() const
   {
@@ -117,24 +126,32 @@ namespace simol
     return statsB2_.integratedCorrelation(iOfFunction);
   }
   
+  
+  
+  CVBasis const& ControlVariate::cvBasis() const
+  {return *cvBasis_;}
+  
+  CVBasis& ControlVariate::cvBasis()
+  {return *cvBasis_;}
+  
   const double& ControlVariate::basisValue(int iOfFunction) const
   {
-    return cvBasis_->basisValues_(iOfFunction);
+    return cvBasis().basisValues_(iOfFunction);
   }
   
   const DVec& ControlVariate::basisValues() const
   {
-    return cvBasis_->basisValues_;
+    return cvBasis().basisValues_;
   }
   
   const double& ControlVariate::generatorOnBasisValue(int iOfFunction) const
   {
-    return cvBasis_->generatorOnBasisValues_(iOfFunction);
+    return cvBasis().generatorOnBasisValues_(iOfFunction);
   }
   
   const DVec& ControlVariate::generatorOnBasisValues() const
   {
-    return cvBasis_->generatorOnBasisValues_;
+    return cvBasis().generatorOnBasisValues_;
   }
   
   
@@ -174,26 +191,29 @@ namespace simol
 
 
   void ControlVariate::appendToBetter(double observable, long int iOfStep)
-  {
-    //double betterObservableTerm = dot((statsB_.meanMat() - statsB2_.integratedCorrelationMat()), statsD_.meanMat().llt().solve(generatorOnBasisFunction));
-    /*DenseMatrix<double> Dinv = statsD_.meanMat().llt().solve(generatorOnBasisFunction);
-    Vector<double> B = statsB_.meanMat() - statsB2_.integratedCorrelationMat();
-    std::cout << B.transpose() * Dinv << endl;*/
-    //cout << (statsB_.meanMat() - statsB2_.integratedCorrelationMat()).transpose().size() << "  " << statsD_.meanMat().inverse().size() << endl;
-    //lastA_ = (statsB_.meanMat() - statsB2_.integratedCorrelationMat()).transpose() * statsD_.meanMat().llt().solve(generatorOnBasisFunction);
-    //cout << lastA_.size() << "   " << generatorOnBasisFunction.size() << endl;
-
-    if (statsD_.meanMat().determinant() != 0)
+  {    
+    if (doEstimateCvCoeffs())
     {
-      //lastA_ = - .5 * statsD_.meanMat().llt().solve(meanB());
-      //lastA_ = Vector<double>(1,1);
-      lastA_.fill(1);
-      autocoStatsBetter_.append(observable - dot(lastA_, generatorOnBasisValues()), iOfStep);
+      throw std::runtime_error("CV with coefficients estimated on the fly is not fixed yet !");
+      //double betterObservableTerm = dot((statsB_.meanMat() - statsB2_.integratedCorrelationMat()), statsD_.meanMat().llt().solve(generatorOnBasisFunction));
+      /*DenseMatrix<double> Dinv = statsD_.meanMat().llt().solve(generatorOnBasisFunction);
+      Vector<double> B = statsB_.meanMat() - statsB2_.integratedCorrelationMat();
+      std::cout << B.transpose() * Dinv << endl;*/
+      //cout << (statsB_.meanMat() - statsB2_.integratedCorrelationMat()).transpose().size() << "  " << statsD_.meanMat().inverse().size() << endl;
+      //lastA_ = (statsB_.meanMat() - statsB2_.integratedCorrelationMat()).transpose() * statsD_.meanMat().llt().solve(generatorOnBasisFunction);
+      //cout << lastA_.size() << "   " << generatorOnBasisFunction.size() << endl;
     }
     else
     {
-      lastA_.fill(0);
-      autocoStatsBetter_.append(observable, iOfStep);
+      if (!cvBasis().cvCoeffs_) throw std::runtime_error("cvCoeffs is supposed to be initialized here !");
+      /*cout << "---------generatorOnBasisValues--------------" << endl;
+      cout << generatorOnBasisValues() << endl;
+      cout << "-----------------------------------------------" << endl;
+      cout << "---------coeffsVec--------------" << endl;
+      cout << coeffsVec_ << endl;
+      cout << "-----------------------------------------------" << endl;
+      cout << "---------> " << dot(coeffsVec_, generatorOnBasisValues()) << endl;*/
+      autocoStatsBetter_.append(observable - dot(*cvBasis().cvCoeffs_, -generatorOnBasisValues()), iOfStep);
     }
 
     for (int iOfFunction = 0; iOfFunction < nbOfFunctions_; iOfFunction++)
@@ -207,10 +227,6 @@ namespace simol
 
   Vector<double> ControlVariate::lastB1() const
   {
-    /*Vector<double> result(nbOfFunctions_);
-    for (int iOfFunction =0; iOfFunction < nbOfFunctions_; iOfFunction++)
-      result(iOfFunction) = statsB_.lastValue(iOfFunction);
-    return result;*/
     return statsB1_.lastValueVec();
   }
 
@@ -265,9 +281,12 @@ namespace simol
   /// /!\ an update*** method must be called beforehand
   void ControlVariate::append(double observable, long int iOfStep)
   {
-    appendToB1(observable);
-    appendToB2(observable, iOfStep);
-    appendToD();
+    if (doEstimateCvCoeffs())
+    {
+      appendToB1(observable);
+      appendToB2(observable, iOfStep);
+      appendToD();
+    }
     appendToObservable(observable, iOfStep);
     appendToBetter(observable, iOfStep);
     //cout << "end ControlVariate::update" << endl;
@@ -275,51 +294,57 @@ namespace simol
   
 
 
-  void ControlVariate::display(std::ofstream& out, double time) const
+  void ControlVariate::display(long int iOfStep)
   {
-    out << time;
-    for (int iOfFunction = 0; iOfFunction < nbOfFunctions(); iOfFunction++)
-      out << " " << meanB()(iOfFunction) * lastA(iOfFunction);
-    for (int iOfFunction = 0; iOfFunction < nbOfFunctions(); iOfFunction++)
-      out << " " << lastA(iOfFunction);
-    /*for (int iOfFunction = 0; iOfFunction < nbOfFunctions(); iOfFunction++)
-      out << " " << lastB()(iOfFunction);*/
-    for (int iOfFunction = 0; iOfFunction < nbOfFunctions(); iOfFunction++)
-      out << " " << meanB()(iOfFunction);
-    /*for (int iOfFunction = 0; iOfFunction < nbOfFunctions(); iOfFunction++)
-      for (int iOfFunction2 = 0; iOfFunction2 < nbOfFunctions(); iOfFunction2++)
-    out << " " << lastD()(iOfFunction, iOfFunction2);*/
-    for (int iOfFunction = 0; iOfFunction < nbOfFunctions(); iOfFunction++)
-      for (int iOfFunction2 = 0; iOfFunction2 < nbOfFunctions(); iOfFunction2++)
-        out << " " << meanD()(iOfFunction, iOfFunction2);  //8-11
-
-    out << " " << lastValue()
+    outFlux() << iOfStep * timeStep();
+    if (doEstimateCvCoeffs())
+    {
+      for (int iOfFunction = 0; iOfFunction < nbOfFunctions(); iOfFunction++)
+        outFlux() << " " << meanB()(iOfFunction) * lastA(iOfFunction);
+      for (int iOfFunction = 0; iOfFunction < nbOfFunctions(); iOfFunction++)
+        outFlux() << " " << lastA(iOfFunction);
+      /*for (int iOfFunction = 0; iOfFunction < nbOfFunctions(); iOfFunction++)
+        outFlux() << " " << lastB()(iOfFunction);*/
+      for (int iOfFunction = 0; iOfFunction < nbOfFunctions(); iOfFunction++)
+        outFlux() << " " << meanB()(iOfFunction);
+      /*for (int iOfFunction = 0; iOfFunction < nbOfFunctions(); iOfFunction++)
+        for (int iOfFunction2 = 0; iOfFunction2 < nbOfFunctions(); iOfFunction2++)
+      outFlux() << " " << lastD()(iOfFunction, iOfFunction2);*/
+      for (int iOfFunction = 0; iOfFunction < nbOfFunctions(); iOfFunction++)
+        for (int iOfFunction2 = 0; iOfFunction2 < nbOfFunctions(); iOfFunction2++)
+          outFlux() << " " << meanD()(iOfFunction, iOfFunction2);  //8-11
+    }
+    outFlux() << " " << lastValue()
         << " " << mean()   //13
         << " " << variance()
         << " " << varOfVar()
         << " " << lastValueBetter()
         << " " << meanBetter()
-        << " " << varOfVarBetter();
-    for (int iOfFunction = 0; iOfFunction < nbOfFunctions(); iOfFunction++)
-      out << " " << lastGeneratorOnBasis()(iOfFunction);
-    for (int iOfFunction = 0; iOfFunction < nbOfFunctions(); iOfFunction++)
-      out << " " << meanGeneratorOnBasis()(iOfFunction);
+        << " " << varBetter()
+        << " " << varOfVarBetter()
+        << " " << dot(*cvBasis().cvCoeffs_, basisValues());
+    if (doEstimateCvCoeffs())
+    {
+      for (int iOfFunction = 0; iOfFunction < nbOfFunctions(); iOfFunction++)
+        outFlux() << " " << lastGeneratorOnBasis()(iOfFunction);
+      for (int iOfFunction = 0; iOfFunction < nbOfFunctions(); iOfFunction++)
+        outFlux() << " " << meanGeneratorOnBasis()(iOfFunction);
 
-    for (int iOfFunction = 0; iOfFunction < nbOfFunctions(); iOfFunction++)
-      out << " " << meanB1()(iOfFunction);
+      for (int iOfFunction = 0; iOfFunction < nbOfFunctions(); iOfFunction++)
+        outFlux() << " " << meanB1()(iOfFunction);
 
-    for (int iOfFunction = 0; iOfFunction < nbOfFunctions(); iOfFunction++)
-      out << " " << -correlationB2()(iOfFunction);  //22-23
-
-    out << endl;
+      for (int iOfFunction = 0; iOfFunction < nbOfFunctions(); iOfFunction++)
+        outFlux() << " " << -correlationB2()(iOfFunction);  //22-23
+    }
+    outFlux() << endl;
   }
 
 
 
  
 
-  SinusControlVariate::SinusControlVariate(Input const& input, const string& outPath, CVBasis& cvBasis):
-    ControlVariate(input, outPath, cvBasis, 1)
+  SinusControlVariate::SinusControlVariate(Input const& input, int idObs, shared_ptr<CVBasis> cvBasis0):
+    ControlVariate(input, idObs, cvBasis0, 1)
   {}
 
   double SinusControlVariate::basisFunction(System const& syst, int /*iOfFunction*/) const
@@ -356,39 +381,50 @@ namespace simol
 
   //#####BasisControlVariate#####
 
-  BasisControlVariate::BasisControlVariate(Input const& input, const string& outPath, CVBasis& cvBasis0, Galerkin* galerkin):
-    ControlVariate(input, outPath, cvBasis0, 1),
-    coeffsVec_(input.nbOfFourier() * input.nbOfHermite(), 1)
+  BasisControlVariate::BasisControlVariate(Input const& input, int idObs, shared_ptr<CVBasis> cvBasis0):
+    ControlVariate(input, idObs, cvBasis0, 1)
   {
-    if (galerkin)
-    {
-      cout << "CVcoeffs from Galerkin !" << endl;
-      coeffsVec_ = galerkin->CVcoeffs();
-    }
-    else
-    {
-      cout << "CVcoeffs from file !" << endl;
-      std::string coeffsPath = input.outputFolderName() + input.controlVariateCoeffsPath();
-      ifstream file(coeffsPath);
-      coeffsVec_ = SparseMatrix<double>(coeffsPath, getNbOfLines(file));
-    }
+
     //cout << "coeffsVec_ : " << endl;
     //cout << coeffsVec_ << endl;
+  }
+  
+  DVec const& BasisControlVariate::cvCoeffs() const
+  {
+    if (!(cvBasis().cvCoeffs_)) throw runtime_error("cvCoeffs not in memory !");
+    return (*cvBasis().cvCoeffs_);
+  }
+  
+  DVec& BasisControlVariate::cvCoeffs()
+  {
+    if (!(cvBasis().cvCoeffs_)) throw runtime_error("cvCoeffs not in memory !");
+    return (*cvBasis().cvCoeffs_);
+  }
+  
+  double const& BasisControlVariate::cvCoeffs(int i) const
+  {
+    if (!(cvBasis().cvCoeffs_)) throw runtime_error("cvCoeffs not in memory !");
+    return (*cvBasis().cvCoeffs_)(i);
+  }
+  
+  double& BasisControlVariate::cvCoeffs(int i)
+  {
+    if (!(cvBasis().cvCoeffs_)) throw runtime_error("cvCoeffs not in memory !");
+    return (*cvBasis().cvCoeffs_)(i);
   }
 
   double BasisControlVariate::basisFunction(System const& syst, int /*iOfFunction*/) const
   {
     assert(iOfFunction == 0);
-    double result = 0;
+    
+    return dot(cvCoeffs(), basisValues());
+    
+    /*double result = 0;
 
-    for (SMat::iterator it(coeffsVec_, 0); it; ++it)
-    {
-      int iOfCoeff = it.row();
-      double valOfCoeff = it.value();
-      result += valOfCoeff * cvBasis_->basis_->value(syst, iOfCoeff);
-    }
+    for (int i=0; i < (int)cvCoeffs().size(); i++)
+      result += cvCoeffs(i) * cvBasis().basis_->value(syst, i);
 
-    return result;
+    return result;*/
   }
 
   Vector<double> BasisControlVariate::gradientQ(System const& syst, int iOfParticle, int /*iOfFunction*/) const
@@ -396,17 +432,10 @@ namespace simol
     //cout << "BasisControlVariate::gradientQ" << endl;
     Vector<double> result(1, 0);
     assert(iOfFunction == 0);
-    //cout << "gradientQ" << endl;
-    for (SMat::iterator it(coeffsVec_, 0); it; ++it)
-    {
-      int iOfCoeff = it.row();
-      double valOfCoeff = it.value();
-      //cout << "+ " << valOfCoeff << " X ";
-      result += valOfCoeff * cvBasis_->basis_->gradientQ(syst, iOfParticle, iOfCoeff);
-    }
-    //cout << endl;
-    //cout << "end BasisControlVariate::gradientQ" << endl;
-    //cout << "gradientQ = " << result << endl;
+    
+    for (int i=0; i < (int)cvCoeffs().size(); i++)
+      result += cvCoeffs(i) * cvBasis().basis_->gradientQ(syst, iOfParticle, i);
+      
     return result;
   }
 
@@ -415,13 +444,9 @@ namespace simol
     double result = 0;
     assert(iOfFunction == 0);
 
-    for (SMat::iterator it(coeffsVec_, 0); it; ++it)
-    {
-      int iOfCoeff = it.row();
-      double valOfCoeff = it.value();
-      result += valOfCoeff * cvBasis_->basis_->laplacianQ(syst, iOfParticle, iOfCoeff);
-    }
-    //cout << "laplacianQ = " << result << endl;
+    for (int i=0; i < (int)cvCoeffs().size(); i++)
+      result += cvCoeffs(i) * cvBasis().basis_->laplacianQ(syst, iOfParticle, i);
+
     return result;
   }
 
@@ -429,14 +454,9 @@ namespace simol
   {
     Vector<double> result(1, 0);
     assert(iOfFunction == 0);
-    //cout << "gradientP" << endl;
-    for (SMat::iterator it(coeffsVec_, 0); it; ++it)
-    {
-      int iOfCoeff = it.row();
-      double valOfCoeff = it.value();
-      //cout << "+ " << valOfCoeff << " X ";
-      result += valOfCoeff * cvBasis_->basis_->gradientP(syst, iOfParticle, iOfCoeff);
-    }
+    
+    for (int i=0; i < (int)cvCoeffs().size(); i++)
+      result += cvCoeffs(i) * cvBasis().basis_->gradientP(syst, iOfParticle, i);
     //cout << endl;
     //cout << "gradientP = " << result << endl;
     return result;
@@ -447,20 +467,16 @@ namespace simol
     double result = 0;
     assert(iOfFunction == 0);
 
-    for (SMat::iterator it(coeffsVec_, 0); it; ++it)
-    {
-      int iOfCoeff = it.row();
-      double valOfCoeff = it.value();
-      result += valOfCoeff * cvBasis_->basis_->laplacianP(syst, iOfParticle, iOfCoeff);
-    }
+    for (int i=0; i < (int)cvCoeffs().size(); i++)
+      result += cvCoeffs(i) * cvBasis().basis_->laplacianP(syst, iOfParticle, i);
     //cout << "laplacianP = " << result << endl;
     return result;
   }
 
 
 
-  ExpFourierHermiteControlVariate::ExpFourierHermiteControlVariate(Input const& input, const string& outPath, CVBasis& cvBasis0, Galerkin* galerkin):
-    BasisControlVariate(input, outPath, cvBasis0, galerkin)
+  ExpFourierHermiteControlVariate::ExpFourierHermiteControlVariate(Input const& input, int idObs, shared_ptr<CVBasis> cvBasis0):
+    BasisControlVariate(input, idObs, cvBasis0)
   {
     //basis_ = new ExpFourierHermiteBasis(input, potential);
     nbQ_ = 100;  // rafinement du maillage de l'output map
@@ -471,10 +487,10 @@ namespace simol
   }
 
   int ExpFourierHermiteControlVariate::nbOfFourier() const
-  {return cvBasis_->basis_->nbOfElts(0);}
+  {return cvBasis().basis_->nbOfElts(0);}
 
   int ExpFourierHermiteControlVariate::nbOfHermite() const
-  {return cvBasis_->basis_->nbOfElts(1);}
+  {return cvBasis().basis_->nbOfElts(1);}
 
   /*void ExpFourierHermiteControlVariate::displayMap(ofstream& out) const
   {

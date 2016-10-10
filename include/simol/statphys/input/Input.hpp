@@ -99,6 +99,9 @@ namespace simol
     double printLongPeriodTime() const;
     int nbOfAutocoPts() const;
     
+    // -- observables --
+    string nameOfObs(int idObs) const;
+    bool doObservable(int idObs) const;
     bool doKineticEnergy() const;
     bool doPotentialEnergy() const;
     bool doPressure() const;
@@ -123,6 +126,8 @@ namespace simol
     bool doOutVelocitiesGenerator() const;
     
     //-- Controle Variate --
+    string CVObservable() const;
+    bool doCVObservable(int idObs) const;
     string controlVariateName() const;
     string controlVariateCoeffsPath() const;
     bool doGalerkinCV() const;

@@ -13,20 +13,20 @@
 
 namespace simol
 {
-  
-
 
   class Output
   {
 
   public:
 
-    Output(Input const& input);
+    Output(Input const& input, shared_ptr<CVBasis> cvBasis0=nullptr);
     virtual ~Output();
       
-    Observable* addObservable(const Input& input, const string& outPath);
-    Observable* addControlVariate(const Input& input, const string& outPath, Galerkin* galerkin);
-    void setControlVariates(Input& input, Potential& potential, Galerkin* galerkin);
+    //Observable* addObservable(const Input& input, const string& outPath);
+    Observable*& getObservablePtr(int idObs);
+    void addObservable(const Input& input, int idObs);
+    //Observable* addControlVariate(const Input& input, const string& outPath, Galerkin* galerkin);
+    //void setControlVariates(Input& input, Potential& potential, Galerkin* galerkin);
     
 
     ofstream & outThermo() {return *outThermo_;}
@@ -78,6 +78,10 @@ namespace simol
     double& internalEnergy();
     const double& internalTemperature() const;
     double& internalTemperature();
+    const double& velocity() const;  
+    double& velocity();
+    const double& force() const;  
+    double& force();
     const double& pressure() const;  
     double& pressure();
     const double& totalVirial() const;
@@ -215,6 +219,7 @@ namespace simol
     
     std::shared_ptr<ofstream> outTest_;   // for debug purpose only
     
+    vector<Observable*> allObservables_;
     Observable* obsKineticEnergy_;
     Observable* obsPotentialEnergy_;
     Observable* obsPressure_;
@@ -237,8 +242,7 @@ namespace simol
     AutocorrelationStats bendistProfile_;
     AutocorrelationStats flowProfile_;
     
-    CVBasis cvBasis_;
-    
+    shared_ptr<CVBasis> cvBasis_;
   };
   
 

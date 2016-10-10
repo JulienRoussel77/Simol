@@ -15,17 +15,19 @@ namespace simol
 {
 
   //class ControlVariate;
-  Observable* createControlVariate(const Input& input, const string& outPath, CVBasis& cvBasis, Galerkin* galerkin);
+  Observable* createControlVariate(const Input& input, int idObs, shared_ptr<CVBasis> cvBasis);
 
   class ControlVariate : public Observable
   {
-  friend Observable* createControlVariate(const Input& input, const string& outPath, CVBasis& cvBasis0, Galerkin* galerkin);
+  friend Observable* createControlVariate(const Input& input, int idObs, shared_ptr<CVBasis> cvBasis0);
   //protected:
   public:
       int dimension_;
 
       int nbOfFunctions_;
       int nbOfFunctionPairs_;
+      
+      bool doEstimateCvCoeffs_;
       
       AutocorrelationStats autocoStatsBetter_;
       
@@ -34,14 +36,18 @@ namespace simol
       Statistics statsB1_;
       CorrelationStats statsB2_;
       Statistics statsD_;
-      Vector<double> lastA_;
+      DVec lastA_;
 
-      CVBasis* cvBasis_;
+      ///
+      ///cvBasis contains the basis, the cvCoeffs if they are known, and temporary basisValues
+      ///it can be shared with other ControlVariates
+      shared_ptr<CVBasis> cvBasis_;
     public:
-      ControlVariate(const Input& input, const string& outPath, CVBasis& cvBasis0, int nbOfFunctions);
+      ControlVariate(const Input& input, int idObs, shared_ptr<CVBasis> cvBasis0, int nbOfFunctions);
 
       // ACCESSEURS
       virtual bool isNone() const;
+      bool doEstimateCvCoeffs() const;
       double potential(Vector<double> const& position) const;
       Vector<double> potentialDerivative(Vector<double> const& position) const;
       double potentialLaplacian(Vector<double> const& position) const;
@@ -49,6 +55,8 @@ namespace simol
       virtual int nbOfFunctionPairs() const;
       virtual int nbOfFourier() const;
       virtual int nbOfHermite() const;
+      CVBasis const& cvBasis() const;
+      CVBasis& cvBasis();
 
       virtual Vector<double> lastB1() const;
       virtual Vector<double> meanB1() const;
@@ -100,7 +108,7 @@ namespace simol
       virtual Vector<double> gradientP(System const& syst, int iOfParticle = 0, int iOfFunction = 0) const = 0;
       
 
-      virtual void display(std::ofstream& out, double time) const;
+      virtual void display(long int iOfStep);
 
       // TEMP
 
@@ -109,28 +117,11 @@ namespace simol
       virtual void displayGradPMap(ofstream&) const {};*/
   };
 
-  /*class NoControlVariate : public ControlVariate
-  {
-    public:
-      NoControlVariate(const Input& input, Potential& potential);
-      virtual int nbOfFunctions() const;
-      virtual int nbOfFunctionPairs() const;
-      bool isNone() const;
-      Vector<double> lastGeneratorOnBasis() const;
-      double basisFunction(System const& syst, int iOfFunction = 0) const;
-      virtual double laplacianQ(System const& syst, int iOfParticle = 0, int iOfFunction = 0) const;
-      virtual Vector<double> gradientQ(System const& syst, int iOfParticle = 0, int iOfFunction = 0) const;
-      virtual double laplacianP(System const& syst, int iOfParticle = 0, int iOfFunction = 0) const;
-      virtual Vector<double> gradientP(System const& syst, int iOfParticle = 0, int iOfFunction = 0) const;
-      void update(double value, Vector<double>& generatorOnBasisFunction long int iOfStep);
-      virtual void postTreat(std::ofstream& out, double timeStep);
-  };*/
-
 
   class SinusControlVariate : public ControlVariate
   {
     public:
-      SinusControlVariate(const Input& input, const string& outPath, CVBasis& cvBasis0);
+      SinusControlVariate(const Input& input, int idObs, shared_ptr<CVBasis> cvBasis0);
       double basisFunction(System const& syst, int iOfFunction = 0) const;
       virtual double laplacianQ(System const& syst, int iOfParticle = 0, int iOfFunction = 0) const;
       virtual Vector<double> gradientQ(System const& syst, int iOfParticle = 0, int iOfFunction = 0) const;
@@ -141,10 +132,15 @@ namespace simol
   class BasisControlVariate : public ControlVariate
   {
     protected:
-      SMat coeffsVec_;
+
       //TensorBasis* basis_;
     public:
-      BasisControlVariate(const Input& input, const string& outPath, CVBasis& cvBasis0, Galerkin* galerkin);
+      BasisControlVariate(const Input& input, int idObs, shared_ptr<CVBasis> cvBasis0);
+      DVec const& cvCoeffs() const;
+      DVec& cvCoeffs();
+      double const& cvCoeffs(int i) const;
+      double& cvCoeffs(int i);
+      
       double basisFunction(System const& syst, int iOfFunction = 0) const;
       virtual double laplacianQ(System const& syst, int iOfParticle = 0, int iOfFunction = 0) const;
       virtual Vector<double> gradientQ(System const& syst, int iOfParticle = 0, int iOfFunction = 0) const;
@@ -157,7 +153,7 @@ namespace simol
       int nbQ_, nbP_;
       double pMax_, deltaQ_, deltaP_;
     public:
-      ExpFourierHermiteControlVariate(const Input& input, const string& outPath, CVBasis& cvBasis0, Galerkin* galerkin);
+      ExpFourierHermiteControlVariate(const Input& input, int idObs, shared_ptr<CVBasis> cvBasis0);
       int nbOfFourier() const;
       int nbOfHermite() const;
       /*virtual void displayMap(ofstream& out) const;

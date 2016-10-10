@@ -73,14 +73,14 @@ namespace simol
     //-- fundamental brick: array of particles --
     const std::vector<Particle*> & configuration() const;
     std::vector<Particle*> & configuration();
-    const Particle& operator()(int iOfParticle = 0) const {return *(configuration_[iOfParticle]);}
-    Particle& operator()(int iOfParticle = 0) {return *(configuration_[iOfParticle]);};
+    virtual const Particle& operator()(int iOfParticle = 0) const {return *(configuration_[iOfParticle]);}
+    virtual Particle& operator()(int iOfParticle = 0) {return *(configuration_[iOfParticle]);};
     const Particle& getParticle(int iOfParticle = 0) const;
     Particle& getParticle(int iOfParticle = 0);
     //virtual Particle& getMember(const int& iOfCell, const int& iOfMember) {return getParticle(iOfMember);}
     //virtual Particle const& getMember(const int& iOfCell, const int& iOfMember) const {return getParticle(iOfMember);}
     const int& dimension() const;
-    int nbOfParticles() const;
+    int const& nbOfParticles() const;
     
     
     virtual Cell const& cell(int const&) const {throw std::runtime_error("Cell only exist for NBody !");}
@@ -133,6 +133,7 @@ namespace simol
   //protected:
   public:
     int dimension_;
+    int nbOfParticles_;
     std::vector<Particle*> configuration_;
     //list<Particle> configuration_;
     string settingsPath_;

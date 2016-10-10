@@ -185,6 +185,46 @@ namespace simol
   
     
   //---------------- check whether observables should be add --------------------
+  
+  string Input::nameOfObs(int idObs) const
+  {
+    switch (idObs)
+    {
+      case idKineticEnergy : return "kineticEnergy";
+      case idPotentialEnergy : return "potentialEnergy";
+      case idPressure : return "pressure";
+      case idInternalEnergy : return "internalEnergy";
+      case idInternalTemperature : return "internalTemperature";
+      case idVelocity : return "velocity";
+      case idForce : return "force";
+      case idLength : return "length";
+      case idMidFlow : return "midFlow";
+      case idSumFlow : return "sumFlow";
+      case idModiFlow : return "modiFlow";
+      default : throw std::runtime_error("This observable id corresponds to no observable !");
+    }
+  }
+  
+  bool Input::doObservable(int idObs) const
+  {
+    switch (idObs)
+    {
+      case idKineticEnergy : return doKineticEnergy();
+      case idPotentialEnergy : return doPotentialEnergy();
+      case idPressure : return doPressure();
+      case idInternalEnergy : return doInternalEnergy();
+      case idInternalTemperature : return doInternalTemperature();
+      case idVelocity : return doVelocity();
+      case idForce : return doForce();
+      case idLength : return doLength();
+      case idMidFlow : return doMidFlow();
+      case idSumFlow : return doSumFlow();
+      case idModiFlow : return doModiFlow();
+      default : throw std::runtime_error("doObs not defined for this observable id !");
+    }
+  }
+      
+  
   bool Input::doKineticEnergy() const
   {return dynamicsName() != "Overdamped";}
   

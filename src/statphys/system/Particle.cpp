@@ -58,7 +58,7 @@ namespace simol
   { return position_(i); }
 
   double & Particle::position(int i)
-  { return position_(i); }
+  {return position_(i);}
 
   Vector<double> const & Particle::momentum() const
   { return momentum_; }
@@ -117,6 +117,9 @@ namespace simol
 
   Vector<double> Particle::velocity() const
   {return momentum_ / mass_;}
+  
+  double Particle::velocity(int iOfDim) const
+  {return momentum_(iOfDim) / mass_;}
 
   //---- currently specific to chains -----
 

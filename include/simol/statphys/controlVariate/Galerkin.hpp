@@ -6,6 +6,7 @@
 #include "simol/statphys/potential/AllPotentials.hpp"
 #include "simol/statphys/controlVariate/Basis.hpp"
 #include "simol/core/linalg/DenseMatrix.hpp"
+#include "simol/statphys/controlVariate/CVBasis.hpp"
 
 namespace simol
 {
@@ -14,12 +15,13 @@ namespace simol
   DenseMatrix<double> kron(const DenseMatrix<double>& A, const DenseMatrix<double>& B);
 
   class Galerkin;
-
+  Galerkin* createOverdampedGalerkin(Input const& input);
   Galerkin* createLangevinGalerkin(Input const& input);
 
   class Galerkin
   {
-      friend Galerkin* createLangevinGalerkin(Input const& input);
+    friend Galerkin* createOverdampedGalerkin(Input const& input);
+    friend Galerkin* createLangevinGalerkin(Input const& input);
 
     protected:
       int nbOfParticles_;
@@ -41,6 +43,7 @@ namespace simol
       DenseMatrix<double> trigToExpTens_, expToTrigTens_;
       Potential* potential_;
       ExpFourierHermiteBasis basis_;
+      //Basis* basis_;
     public:
       Galerkin(Input const& input);
       virtual ~Galerkin();
@@ -53,6 +56,8 @@ namespace simol
       virtual int sizeOfBasis() const;
       
       const double& gamma() const;
+      ExpFourierHermiteBasis const& basis() const {return basis_;}
+      ExpFourierHermiteBasis& basis() {return basis_;}
 
       const double& expFourierMeans(int iOfElt) const;
       Vector<double> const& gVector() const;
@@ -85,8 +90,10 @@ namespace simol
       DVec getLtGiHjTrig(int i, int j) const;
       DVec getLinvtGiHj(int i, int j) const;
       DVec getLinvtGiHjTrig(int i, int j) const;
-      SMat CVcoeffs() const;
-      
+      //SMat CVcoeffs() const;
+      virtual DVec CVcoeffsVec() const {throw runtime_error("Cvcoeffs does not exist for Galerkin");}
+      CVBasis makeCvBasis();
+        
       void computeEigen() const;
   };
   
@@ -98,6 +105,7 @@ namespace simol
       virtual void computeExpToTrigTens();
       virtual void compute();
       DVec getGradV() const;
+      DVec CVcoeffsVec() const;
   };
 
   class LangevinGalerkin : public Galerkin
@@ -108,6 +116,7 @@ namespace simol
       virtual void computeExpToTrigTens();
       virtual void createLthm0();
       virtual void createLthm();
+      DVec CVcoeffsVec() const;
   };
 
   class BoundaryLangevinGalerkin : public Galerkin
@@ -124,6 +133,7 @@ namespace simol
       virtual void createLthm();
 
       virtual void compute();
+      DVec CVcoeffsVec() const {throw runtime_error("CVcoeffs not implemented for the chain !");}
   };
 
 

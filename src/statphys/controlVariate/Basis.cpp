@@ -90,8 +90,20 @@ namespace simol
     DTVec AX(X.nbOfElts());
     return AX;
   }*/
+  
+  
+  
+  
+  
+  
 
-
+  /*Basis* createBasis(Input const& input, Potential& potential)
+  {
+    if (input.galerkinElts() == "ExpFourierHermite")
+      return new ExpFourierHermiteBasis(input, potential);
+    //throw runtime_error("Invalid type of basis !");
+    return nullptr;
+  }*/
 
   Basis::Basis(const int nbOfElts):
     nbOfElts_(nbOfElts)
@@ -135,68 +147,6 @@ namespace simol
     A = A.adjoint();
   }
   
-
-
-  /*FourierBasis::FourierBasis(const int nbOfElts):
-    Basis(nbOfElts)
-  {
-    assert(nbOfElts % 2 == 1);
-  }
-
-  double FourierBasis::value(double variable, const int iOfElt) const
-  {
-    int iOfFreq = (iOfElt + 1) / 2;
-    if (iOfElt == 0)
-      return 1;
-    else if (iOfElt % 2 == 1)
-      return sqrt(2.) * sin(iOfFreq * variable);
-    else
-      return sqrt(2.) * cos(iOfFreq * variable);
-  }
-
-  Vector<double> FourierBasis::gradient(double variable, const int iOfElt) const
-  {
-    int iOfFreq = (iOfElt + 1) / 2;
-    if (iOfElt == 0)
-      return Vector<double>(1, 0);
-    else if (iOfElt % 2 == 1)
-      return Vector<double>(1,   sqrt(2.) * iOfFreq * cos(iOfFreq * variable));
-    else
-      return Vector<double>(1, - sqrt(2.) * iOfFreq * sin(iOfFreq * variable));
-  }
-
-  double FourierBasis::laplacian(double variable, const int iOfElt) const
-  {
-    int iOfFreq = (iOfElt + 1) / 2;
-    if (iOfElt == 0)
-      return 1;
-    else if (iOfElt % 2 == 1)
-      return - sqrt(2.) * pow(iOfFreq, 2) * sin(iOfFreq * variable);
-    else
-      return - sqrt(2.) * pow(iOfFreq, 2) * cos(iOfFreq * variable);
-  }
-  
-  // Compute <G_k, \partial_q G_l>
-  double FourierBasis::xGradY(const int iOfEltLeft, const int iOfEltRight) const
-  {
-    return 0;
-  }
-  
-  void FourierBasis::gradMatrix(SMat& A) const
-  {}
-  
-  // Compute <G_k, \partial_q^* \partial_q G_l>
-  double FourierBasis::xLaplacianY(const int iOfEltLeft, const int iOfEltRight) const
-  {
-    return 0;
-  }
-  
-  void FourierBasis::laplacianMatrix(SMat& A) const{}*/
-  
-  
-  
-  
-
   ExpFourierBasis::ExpFourierBasis(const int nbOfElts0, double beta0, Potential& potential0):
     Basis(nbOfElts0),
     beta_(beta0),
@@ -256,8 +206,9 @@ namespace simol
     return (potential_->laplacian(variable));
   }
   
-  //We compute the real Fourier coefficients of the function C^-1 exp(-\beta V(q)/2)
-  //where C = ExpFourierBasis::basisCoefficient_
+  ///We compute the real Fourier coefficients of the function C^-1 exp(-\beta V(q)/2)
+  ///More precisely a_k = 1 / pi int cos(k q) C^-1 exp(-beta V / 2) dq and b_k = 1 / pi int sin(k q) C^-1 exp(-beta V / 2) dq
+  ///where C = ExpFourierBasis::basisCoefficient_ Note that a_0 has the same normalization as a_k so that a_{k-l} = a_0 when k=l
   void ExpFourierBasis::computeExpFourierMeans()
   {
     double step = 2 * M_PI / (double)nbOfIntegrationNodes_;
@@ -265,10 +216,10 @@ namespace simol
     {
       double q = - M_PI + iOfNode * step;
       qRepartitionFct_ += exp(-beta_ * potential(q)) * step;
-      expFourierMeans_(0) += exp(-beta_ * potential(q) / 2);
-      for (int iOfFourier = 1; iOfFourier < 2 * nbOfElts(); iOfFourier++)
-        if (iOfFourier % 2 == 0) expFourierMeans_(iOfFourier) += sqrt(2) * cos(iOfFourier/2 * q) * exp(-beta_ * potential(q) / 2);
-        else expFourierMeans_(iOfFourier) += sqrt(2) * sin((iOfFourier+1)/2 * q) * exp(-beta_ * potential(q) / 2);
+      //expFourierMeans_(0) += exp(-beta_ * potential(q) / 2);
+      for (int iOfFourier = 0; iOfFourier < 2 * nbOfElts(); iOfFourier++)
+        if (iOfFourier % 2 == 0) expFourierMeans_(iOfFourier) += cos(iOfFourier/2 * q) * exp(-beta_ * potential(q) / 2);
+        else expFourierMeans_(iOfFourier) += sin((iOfFourier+1)/2 * q) * exp(-beta_ * potential(q) / 2);
       
       /*for (int iOfFourier = 1; iOfFourier <= 2 * nbOfFreq(); iOfFourier++)
         expFourierMeans_(2 * iOfFourier) += sqrt(2) * cos(iOfFourier * q) * exp(-beta_ * potential(q) / 2);
@@ -277,10 +228,13 @@ namespace simol
     }
     basisCoefficient_ = sqrt(qRepartitionFct_ / (2 * M_PI));
     
-    expFourierMeans_ *= step / (2 * M_PI * basisCoefficient_);
+    expFourierMeans_ *= step / (M_PI * basisCoefficient_);
     
-    gVector_ = expFourierMeans_.subvec(0, nbOfElts());
+    // gVector is the projection of the constant fct 1, ie it contains the mean of the expfourier elements
+    gVector_ = expFourierMeans_.subvec(0, nbOfElts()) / sqrt(2.);
+    gVector_(0) /= sqrt(2.);
     norm2gVector_ = pow(gVector_.norm(), 2);
+    cout << "Squared norm of vector g = " << norm2gVector_ << endl;
   }
   
   
@@ -331,16 +285,16 @@ namespace simol
     double result = 0;
     if (iOfEltRight % 2 == 1)
     {
-      if (iOfEltLeft == iOfEltRight-1) result = beta_ / 4;
-      else if (iOfEltLeft == iOfEltRight+1) result = amplitude() * (iOfEltRight+1)/2;
-      else if (iOfEltLeft == iOfEltRight+3) result = -beta_ / 4;
+      if (iOfEltLeft == iOfEltRight-1) result = amplitude() * beta_ / 4;
+      else if (iOfEltLeft == iOfEltRight+1) result = (iOfEltRight+1)/2;
+      else if (iOfEltLeft == iOfEltRight+3) result = -amplitude() * beta_ / 4;
       else return 0;
     }
     else if (iOfEltRight % 2 == 0)
     {
-      if (iOfEltLeft == iOfEltRight-3) result = -beta_ / 4;
+      if (iOfEltLeft == iOfEltRight-3) result = -amplitude() * beta_ / 4;
       else if (iOfEltLeft == iOfEltRight-1) result = -iOfEltRight/2;
-      else if (iOfEltLeft == iOfEltRight+1) result = beta_ / 4;
+      else if (iOfEltLeft == iOfEltRight+1) result = amplitude() * beta_ / 4;
       else return 0;
     }
     
@@ -496,6 +450,14 @@ namespace simol
       nbOfElts0[iOfVariable] = bases_[iOfVariable]->nbOfElts();
     return nbOfElts0;
   }
+  
+  int TensorBasis::totalNbOfElts() const
+  {
+    int totalNbOfElts0 = 1;
+    for (int iOfVariable = 0; iOfVariable < (int)nbOfVariables(); iOfVariable++)
+      totalNbOfElts0 *= bases_[iOfVariable]->nbOfElts();
+    return totalNbOfElts0;
+  }
 
   const Basis* TensorBasis::operator()(const int iOfBasis) const
   {
@@ -553,6 +515,13 @@ namespace simol
     vecIndex[1] = iTens0 / nbOfFourier();
     return vecIndex;
   }
+  
+  /*DVec QPBasis::values(System const& syst) const
+  {
+    DVec val(nbOfElts(), 0);
+    for (int iOfElt=0; iOfElt<nbOfElts(); iOfElt++)
+      val(iOfElt) = values
+  }*/
 
   double QPBasis::value(System const& syst, const int iOfElt) const
   {
@@ -562,6 +531,7 @@ namespace simol
 
   double QPBasis::value(System const& syst, vector<int>& vecIndex) const
   {
+    //cout << syst(0).position(0) << " " << bases_[0]->value(syst(0).position(0), vecIndex[0]) << " " << bases_[1]->value(syst(0).momentum(0), vecIndex[1]) << endl;
     return bases_[0]->value(syst(0).position(0), vecIndex[0]) * bases_[1]->value(syst(0).momentum(0), vecIndex[1]);
   }
 

@@ -4,18 +4,9 @@ namespace simol
 {
 
 
-  //-------------- BiChain -----------------
 
 
-
-
-
-  // ------------ TriChain -----------------
-
-
-
-
-  void thermalize(LangevinBase& dyna, System& syst)
+  void thermalize(BoundaryLangevin& dyna, System& syst)
   {
     //for (auto&& particle : configuration_)
     //dyna.updateBefore(particle);

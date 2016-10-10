@@ -46,6 +46,7 @@ namespace simol
       double const & virial() const;
       double & virial();
       Vector<double> velocity() const;
+      double velocity(int iOfDim) const;
 
       //-- currently specific for chains --
       Vector<double> const& energyGrad() const;

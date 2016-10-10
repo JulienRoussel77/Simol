@@ -15,15 +15,15 @@ namespace simol
     return new Observable(input);
   }*/
 
-  Observable::Observable(Input const& input, const string& outPath0):
+  Observable::Observable(Input const& input, int idObs):
     decorrelationNbOfSteps_(input.decorrelationNbOfSteps()),
     timeStep_(input.timeStep()),
     printPeriodNbOfSteps_(input.printPeriodNbOfSteps()),
     nbOfAutocoPts_(input.nbOfAutocoPts()),
     currentValue_(0),
     autocoStats_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts()),
-    outPath_(outPath0),
-    outFlux_(input.outputFolderName() + outPath0)
+    outPath_(input.nameOfObs(idObs)+".txt"),
+    outFlux_(input.outputFolderName() + input.nameOfObs(idObs)+".txt")
   {
     outFlux() << "# time value mean variance" << endl;
     //if (outPathFinal != "")
@@ -32,7 +32,7 @@ namespace simol
     
     if (doComputeCorrelations())
     {
-      outFluxCorrelation_ = make_shared<ofstream>(input.outputFolderName() + "correlation_" + outPath0);
+      outFluxCorrelation_ = make_shared<ofstream>(input.outputFolderName() + "correlation_" + input.nameOfObs(idObs)+".txt");
       outFluxCorrelation() << "# iOfSpan correlation varOfCorrelation" << endl;
     }
   }
@@ -180,18 +180,6 @@ namespace simol
              << " " << variance()
              << " " << varOfVar() << endl;
   }
-  
-  /*void Observable::finalDisplay(vector<double> parameters)
-  {
-    if (doFinal())
-    {
-      for (int iOfParameter=0; iOfParameter < (int)parameters.size(); iOfParameter++)
-        *outFluxFinal_  << parameters[iOfParameter] << " " << setw(6);
-        *outFluxFinal_ << " " << setw(12) << mean()
-                       << " " << setw(12) << variance()
-                       << " " << setw(12) << varOfVar() << endl;
-    }
-  }*/
   
   void Observable::displayCorrelations(long int iOfStep)
   {

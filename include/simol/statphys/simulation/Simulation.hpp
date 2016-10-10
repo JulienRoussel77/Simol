@@ -47,8 +47,8 @@ namespace simol
   void sampleInternalEnergies(DPDE const& dyna, System& syst);
   
   void thermalize(Dynamics& dyna, System& syst);
-  void thermalize(LangevinBase& dyna, System& syst);
-  //void thermalize(DPDE& dyna, NBody& syst);
+  void thermalize(BoundaryLangevin& dyna, System& syst);
+  void thermalize(DPDE& dyna, System& syst);
 
   //void simulate(DPDE& dyna            , NBody& syst);    // A supprimer ?
   void simulate(Dynamics& dyna        , System& syst);
@@ -73,14 +73,14 @@ namespace simol
     rng_(std::make_shared<RNG>(RNG(input.seed(), input.dimension()))),
     system_(createSystem(input)),
     dynamics_(input),
-    output_(input)
+    output_(input, dynamics_.cvBasis())
   {
     if (input.dynamicsName() != dynamics_.dynamicsName()) throw std::runtime_error("Dynamics generated incompatible with the input file !");
     system_->rng() = rng_;
     dynamics_.rng() = rng_;
 
     //-- when using control variates --
-    output_.setControlVariates(input, system_->potential(), dynamics_.galerkin());
+    //output_.setControlVariates(input, system_->potential(), dynamics_.galerkin());
   }
 
   ///
@@ -104,6 +104,7 @@ namespace simol
 
       //---- update the system_em by the numerical integration ---
       simulate(dynamics_, *system_);
+      if (output_.hasControlVariate()) system_->computeAllForces();
     }
 
     //--- write final outputs ----

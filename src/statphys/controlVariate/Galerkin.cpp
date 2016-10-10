@@ -12,6 +12,13 @@ using std::setw;
 
 namespace simol
 {
+  Galerkin* createOverdampedGalerkin(Input const& input)
+  {
+    if (input.doGalerkinCV())
+      return new OverdampedGalerkin(input);
+    else
+      return nullptr;
+  }
 
   Galerkin* createLangevinGalerkin(Input const& input)
   {
@@ -248,10 +255,10 @@ namespace simol
         if (true)//fabs(A(i,j)) > 1e-15)
         {
           //cout << i << " " << j << " " << A(i,j) << endl;
-          out << setw(10) << A(i, j) << " ";
+          out << setw(12) << A(i, j) << " ";
         }
         else
-          out << setw(10) << "nan ";
+          out << setw(12) << "nan ";
       }
       out << endl;
     }
@@ -284,34 +291,34 @@ namespace simol
   {
     for (int iOfFourier2 = 1; iOfFourier2 <=  2 * (int)maxOfFourier_; iOfFourier2++)
     {
-      trigToExpMat_(0, iOfFourier2) = expFourierMeans(iOfFourier2);
-      trigToExpMat_(iOfFourier2, 0) = expFourierMeans(iOfFourier2);
+      trigToExpMat_(0, iOfFourier2) = expFourierMeans(iOfFourier2) / sqrt(2.);
+      trigToExpMat_(iOfFourier2, 0) = expFourierMeans(iOfFourier2) / sqrt(2.);
     }
-    trigToExpMat_(0, 0) = expFourierMeans(0) / sqrt(2.);
+    trigToExpMat_(0, 0) = expFourierMeans(0) / 2;
 
     for (int iOfFourier = 1; iOfFourier <= (int) maxOfFourier_; iOfFourier++)
       for (int jOfFourier = 1; jOfFourier <= (int) maxOfFourier_; jOfFourier++)
       {
         //cosine times cosine
         trigToExpMat_(2 * iOfFourier, 2 * jOfFourier) =
-          expFourierMeans(2 * (iOfFourier + jOfFourier)) / sqrt(2.)
-          + expFourierMeans(2 * abs(iOfFourier - jOfFourier)) / sqrt(2.);
+          expFourierMeans(2 * (iOfFourier + jOfFourier)) / 2
+          + expFourierMeans(2 * abs(iOfFourier - jOfFourier)) / 2;
 
         //sinus times sinus
         trigToExpMat_(2 * iOfFourier - 1, 2 * jOfFourier - 1) =
-          - expFourierMeans(2 * (iOfFourier + jOfFourier)) / sqrt(2.)
-          + expFourierMeans(2 * abs(iOfFourier - jOfFourier)) / sqrt(2.);
+          - expFourierMeans(2 * (iOfFourier + jOfFourier)) / 2
+          + expFourierMeans(2 * abs(iOfFourier - jOfFourier)) / 2;
 
         int eps = (iOfFourier >= jOfFourier) - (iOfFourier <= jOfFourier); // -1 if i smaller, 0 if equal, 1 if i larger
         //cosine times sinus   /!\ doing the test in this order avoids to read expFourierMeans(-1)
         trigToExpMat_(2 * iOfFourier, 2 * jOfFourier - 1) =
-          expFourierMeans(2 * (iOfFourier + jOfFourier) - 1) / sqrt(2.)
-          + (!eps)?0:eps * expFourierMeans(2 * abs(iOfFourier - jOfFourier) - 1) / sqrt(2.);
+          expFourierMeans(2 * (iOfFourier + jOfFourier) - 1) / 2
+          + (!eps)?0:eps * expFourierMeans(2 * abs(iOfFourier - jOfFourier) - 1) / 2;
           
         //sinus times cosine
         trigToExpMat_(2 * iOfFourier - 1, 2 * jOfFourier) =
-          expFourierMeans(2 * (iOfFourier + jOfFourier) - 1) / sqrt(2.)
-          - (!eps)?0:eps * expFourierMeans(2 * abs(iOfFourier - jOfFourier) - 1) / sqrt(2.);
+          expFourierMeans(2 * (iOfFourier + jOfFourier) - 1) / 2
+          - (!eps)?0:eps * expFourierMeans(2 * abs(iOfFourier - jOfFourier) - 1) / 2;
       }
 
 
@@ -599,21 +606,29 @@ namespace simol
     DenseMatrix<double> DLeq = Leq_.dense();
     return EigenSolver<MatrixXd>(DLeq.wrapped_);
   }
-
-  DVec Galerkin::gettGiHj(int i, int j) const
-  {
-    DVec GiHjTrig = Vector<double>::Zero(sizeOfBasis_);
-    GiHjTrig(iTens(i, j)) = 1;
-    DVec GiHj = trigToExpTens_ * GiHjTrig;
-    return GiHj;
-  }
-
+  
+  ///Returns te coefficients of tG_i * Hj in the tG_i * H_j basis
+  ///tG designs the Fourier functions (V=0)
   DVec Galerkin::gettGiHjTrig(int i, int j) const
   {
     DVec GiHjTrig = Vector<double>::Zero(sizeOfBasis_);
     GiHjTrig(iTens(i, j)) = 1;
     return GiHjTrig;
   }
+
+  ///Returns te coefficients of tG_i * Hj in the G_i * H_j basis
+  ///tG designs the Fourier functions (V=0)
+  DVec Galerkin::gettGiHj(int i, int j) const
+  {
+    /*DVec GiHjTrig = Vector<double>::Zero(sizeOfBasis_);
+    GiHjTrig(iTens(i, j)) = 1;
+    DVec GiHj = trigToExpTens_ * GiHjTrig;
+    return GiHj;*/
+    
+    return trigToExpTens_ * gettGiHjTrig(i,j);
+  }
+
+
 
   DVec Galerkin::getLtGiHj(int i, int j) const
   { return Leq_ * gettGiHj(i, j); }
@@ -627,11 +642,18 @@ namespace simol
   DVec Galerkin::getLinvtGiHjTrig(int i, int j) const
   { return expToTrigTens_ * solveWithSaddle(Leq_, gettGiHj(i, j)); }
 
-  SMat Galerkin::CVcoeffs() const
+  /*SMat Galerkin::CVcoeffs() const
   {
     DVec vecCoeffs = getLinvtGiHj(0, 1);
 
     return SparseMatrix<double>(vecCoeffs, vecCoeffs.size(), 1);
+  }*/
+  
+
+  
+  CVBasis Galerkin::makeCvBasis()
+  {
+    return CVBasis(dynamic_cast<TensorBasis*>(&basis_), make_shared<DVec>(CVcoeffsVec()));
   }
   
   void Galerkin::computeEigen() const
@@ -726,9 +748,10 @@ namespace simol
     cout << "OK" << endl;
     display(DLeqInv, "output/Galerkin/DLeqInv");
     
+    cout << "g   = " << gVector() << endl << endl;
     cout << "L g = " << Leq_ * gVector() << endl << endl;
     
-    DVec gradV = gVector(); //getGradV();
+    DVec gradV = getGradV();
     display(gradV, "output/Galerkin/gradV");
     
     DVec LinvGradV = solve(Leq_, gradV);
@@ -738,16 +761,17 @@ namespace simol
     display(LinvGradVsad, "output/Galerkin/LinvGradVsad");
   }
   
+  ///
+  /// Returns the coefficients of the sinus functions in the G_i * H_j basis
   DVec OverdampedGalerkin::getGradV() const
+  {    
+    return amplitude_ * gettGiHj(1,0) / sqrt(2.);    // /!\ the basis elements are normalized in L2, not Linfty, so   sin = gettGiHj(1,0) / sqrt(2.)
+  }
+  
+  DVec OverdampedGalerkin::CVcoeffsVec() const
   {
-    DVec gradV(sizeOfBasis());
-    gradV(0) = 0;
-    for (int iOfFourier = 1; iOfFourier < nbOfFourier(); iOfFourier++)
-      if (iOfFourier % 2 == 0)  gradV(iOfFourier) = iOfFourier / beta_ * expFourierMeans(iOfFourier-1);
-      else gradV(iOfFourier) = -(iOfFourier+1) / beta_ * expFourierMeans(iOfFourier+1);
-    
-    assert(dot(gradV, gVector()) == 0);
-    return gradV;
+    //return getGradV();
+    return -solve(Leq_, -getGradV());
   }
 
 
@@ -798,6 +822,17 @@ namespace simol
   {
     trigToExpTens_ = simol::kron(trigToExpMat_, DIdP_);
     expToTrigTens_ = simol::kron(expToTrigMat_, DIdP_);
+  }
+  
+  ///
+  ///Returns 
+  DVec LangevinGalerkin::CVcoeffsVec() const
+  {
+    cout << "p    : " << gettGiHj(0,1) << endl << endl;
+    cout << "Lp   : " << getLinvtGiHj(0, 1) << endl << endl;
+    cout << "Linvp: " << getLtGiHj(0, 1) << endl << endl;
+    return -getLinvtGiHj(0, 1);
+    //return gettGiHj(0,1);     // returns "p"
   }
 
 

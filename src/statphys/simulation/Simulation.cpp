@@ -28,8 +28,10 @@ namespace simol
       syst.getParticle(i).internalEnergy() = 1;
   }
   
-  void thermalize(Dynamics& /*model*/, System& /*syst*/)
-  {throw std::invalid_argument("thermalize not defined");}
+  void thermalize(Dynamics& model, System& syst)
+  {
+    simulate(model, syst);
+  }
    
   
   
@@ -51,10 +53,10 @@ namespace simol
   
   void simulate(Overdamped& dyna, System& syst)
   {
-    syst.computeAllForces();
-    
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
       dyna.updatePosition(syst(iOfParticle));
+    
+    syst.computeAllForces();
   }
   
   //------------- LangevinBase --------------------
@@ -133,6 +135,8 @@ namespace simol
     if (output.obsPressure_) dyna.computePressure(output, syst);
     if (output.obsInternalEnergy_) dyna.computeInternalEnergy(output, syst);
     if (output.obsInternalTemperature_) dyna.computeInternalTemperature(output, syst);
+    if (output.obsVelocity_) output.velocity() = syst(0).velocity(0);
+    if (output.obsForce_) output.force() = syst(0).force(0);
     dyna.getThermo(output);
     
     if (output.hasControlVariate()) computeControlVariate(dyna, syst, output);
@@ -148,8 +152,8 @@ namespace simol
   
   void computeControlVariate(Dynamics const& dyna, System const& syst, Output& output)
   {
-    output.cvBasis_.computeValueBasis(syst);
-    dyna.computeGeneratorOnBasis(output.cvBasis_, syst);
+    output.cvBasis_->computeValueBasis(syst);
+    dyna.computeGeneratorOnBasis(*output.cvBasis_, syst);
   }
   
   //------------------- writeOutput and its specifications by dynamics ---------------------------
@@ -168,6 +172,8 @@ namespace simol
         output.displayChainMomenta(syst, iOfStep);
       }
     }
+    
+
     
     if (output.doLongPeriodOutput(iOfStep))
     {
