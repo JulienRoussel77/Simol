@@ -10,6 +10,7 @@ namespace simol
   DPDE::DPDE(Input const&  input):
     LangevinBase(input),
     heatCapacity_(input.heatCapacity()),
+    kappa_(input.kappa()),
     cutOff_(input.cutOffRatio()*input.potentialSigma()),
     rejectionCount_(0),
     totalCountForRejection_(0),
@@ -25,6 +26,16 @@ namespace simol
   double& DPDE::heatCapacity()
   {
     return heatCapacity_;
+  }
+
+  const double& DPDE::kappa() const
+  {
+    return kappa_;
+  }
+
+  double& DPDE::kappa()
+  {
+    return kappa_;
   }
 
   double& DPDE::cutOff()
@@ -112,7 +123,7 @@ namespace simol
       + sqrt(2*temperature()*heatCapacity()*timeStep_)*rng_->scalarGaussian();
   }
 
-  //-------------------------------- FOR ISOLATED SYSTEMS --------------------------
+  //-------------------------------- FLUCT/DISS FOR ISOLATED SYSTEMS --------------------------
   
   void DPDE::energyReinjection(Particle& particle)
   {
@@ -177,7 +188,7 @@ namespace simol
       }
   }
 
-  //-------------------------------- FOR ISOLATED SYSTEMS --------------------------
+  //-------------------------------- FLUCT/DISS FOR NBODY SYSTEMS --------------------------
   
   double DPDE::chi(double dist)
   {
@@ -233,68 +244,48 @@ namespace simol
       }
   }
   
-  void DPDE::getThermo(Output& output) const
-  {
-    output.temperature() = 2 * output.kineticEnergy() / (output.dimension() * output.nbOfParticles());
-    output.totalEnergy() = output.kineticEnergy() + output.potentialEnergy() + output.internalEnergy();
-  }
-  
-  void DPDE::specificComputeOutput(Output& output) const
-  {
-    //-- rejection rate --
-    output.rejectionCount() = rejectionCount()/totalCountForRejection();
-    output.negativeEnergiesCount() = negativeEnergiesCount();
-  }
-  
-  
-  
-  
-  
-  
-    ///
+  ///
   /// compute the fluctuation/dissipation in DPDE using SSA
   void DPDE::fluctuationDissipation(NBody& syst)
   {
     if (syst.doCells_)
-    {
-      //-- reinitialize cells before looping on the pair interactions --
-      syst.reinitializeCells();
-      //-- compute the interactions --
-      for (ParticlePairIterator it = syst.pairBegin(); !syst.pairFinished(it); syst.incrementePairIterator(it))
-        elementaryFluctuationDissipation(syst, it.particle1(), it.particle2());
-      
-      /*int neighborIndex = 1;
-      for (int k = 0; k < nbOfCells_; k++)
       {
-        //-- interaction within cells: avoid double counting by setting i1 \leq i2 + 1 --
-        for (list<int>::iterator it1 = cells_[k].members().begin(); it1 != cells_[k].members().end(); it1++)
-          for (list<int>::iterator it2 = std::next(it1, 1); it2 != cells_[k].members().end(); it2++)
-            elementaryFluctuationDissipationDPDE(dyna, configuration_[*it1], configuration_[*it2]);
-          
-        //-- interactions between neighboring cells: full double loops --
-        for (int l = 0; l < nbOfNeighbors_; l++)
-        {
-          // index of neighboring cell
-          neighborIndex = cells_[k].indexNeighbors()[l];
-          // complete double loop between the elements of cells_[k] and its neighbor cells_[neighborIndex]
-          for (list<int>::iterator it1 = cells_[k].members().begin(); it1 != cells_[k].members().end(); it1++)
-            for (list<int>::iterator it2 = cells_[neighborIndex].members().begin(); it2 != cells_[neighborIndex].members().end(); it2++)
-              elementaryFluctuationDissipationDPDE(dyna, configuration_[*it1], configuration_[*it2]);
-        }
-      }*/
-    }
+	//-- reinitialize cells before looping on the pair interactions --
+	syst.reinitializeCells();
+	//-- compute the interactions --
+	for (ParticlePairIterator it = syst.pairBegin(); !syst.pairFinished(it); syst.incrementePairIterator(it))
+	  elementaryFluctuationDissipation(syst, it.particle1(), it.particle2());
+	
+	/*int neighborIndex = 1;
+	  for (int k = 0; k < nbOfCells_; k++)
+	  {
+	  //-- interaction within cells: avoid double counting by setting i1 \leq i2 + 1 --
+	  for (list<int>::iterator it1 = cells_[k].members().begin(); it1 != cells_[k].members().end(); it1++)
+	  for (list<int>::iterator it2 = std::next(it1, 1); it2 != cells_[k].members().end(); it2++)
+	  elementaryFluctuationDissipationDPDE(dyna, configuration_[*it1], configuration_[*it2]);
+	  
+	  //-- interactions between neighboring cells: full double loops --
+	  for (int l = 0; l < nbOfNeighbors_; l++)
+	  {
+	  // index of neighboring cell
+	  neighborIndex = cells_[k].indexNeighbors()[l];
+	  // complete double loop between the elements of cells_[k] and its neighbor cells_[neighborIndex]
+	  for (list<int>::iterator it1 = cells_[k].members().begin(); it1 != cells_[k].members().end(); it1++)
+	  for (list<int>::iterator it2 = cells_[neighborIndex].members().begin(); it2 != cells_[neighborIndex].members().end(); it2++)
+	  elementaryFluctuationDissipationDPDE(dyna, configuration_[*it1], configuration_[*it2]);
+	  }
+	  }*/
+      }
     else
-    {
-      //-- no cell method: std double loop --
-      for (int i = 0; i < syst.nbOfParticles(); i++)
-        for (int j = i + 1; j < syst.nbOfParticles(); j++)
-          elementaryFluctuationDissipation(syst, syst(i), syst(j));
-    }
+      {
+	//-- no cell method: std double loop --
+	for (int i = 0; i < syst.nbOfParticles(); i++)
+	  for (int j = i + 1; j < syst.nbOfParticles(); j++)
+	    elementaryFluctuationDissipation(syst, syst(i), syst(j));
+      }
   }
   
-  
-  
-    ///
+  ///
   /// elementary interaction between two particles
   //----------- !!!! UPDATE FORMULAS FOR PARTICLES WITH DIFFERENT MASSES !!!! ------------
   void DPDE::elementaryFluctuationDissipation(System const& syst, Particle& particle1, Particle& particle2)
@@ -344,6 +335,78 @@ namespace simol
     }
   }
   
+  //--------------------------- THERMAL CONDUCTION ------------------------------
+
+  ///
+  /// compute the thermal conduction in DPDE using SSA
+  void DPDE::thermalConduction(NBody& syst)
+  {
+    if (syst.doCells_)
+      {
+	//-- reinitialize cells before looping on the pair interactions --
+	syst.reinitializeCells();
+	//-- compute the interactions --
+	for (ParticlePairIterator it = syst.pairBegin(); !syst.pairFinished(it); syst.incrementePairIterator(it))
+	  elementaryThermalConduction(syst, it.particle1(), it.particle2());
+      }
+    else
+      {
+	//-- no cell method: std double loop --
+	for (int i = 0; i < syst.nbOfParticles(); i++)
+	  for (int j = i + 1; j < syst.nbOfParticles(); j++)
+	    elementaryThermalConduction(syst, syst(i), syst(j));
+      }
+  }
+
+  ///
+  /// elementary thermal conduction exchange between two particles
+  void DPDE::elementaryThermalConduction(System const& syst, Particle& particle1, Particle& particle2)
+  {
+    double old_internalEnergy_1 = particle1.internalEnergy();
+    double old_internalEnergy_2 = particle2.internalEnergy();
+    // compute the distance 
+    Vector<double> r12 = syst.representant(particle1.position() - particle2.position());
+    double distance = r12.norm();
+    // compute predicted energy variation
+    double deltaInternalEnergy = pairwiseThermalConduction(distance,old_internalEnergy_1,old_internalEnergy_2);
+    // 
+    // accept/reject step  ----> A COMPLETER !!
+    //
+    // update the internal energies
+    particle1.internalEnergy() += deltaInternalEnergy;
+    particle2.internalEnergy() -= deltaInternalEnergy;
+  }
+
+  double DPDE::pairwiseThermalConduction(double dist, double internalEnergy1, double internalEnergy2)
+  {
+    // if the distance is beyond the cut off, no update
+    if (dist > cutOff_)
+      return 0;
+    else 
+      {
+	double chi_n = chi(dist);
+	double G = rng_->scalarGaussian();
+	double energy_increment = kappa()*pow(chi_n,2)*heatCapacity()/(1./internalEnergy1-1./internalEnergy2)*timeStep_ + sqrt(2*kappa()*timeStep_)*chi_n*G;
+	// update the rate for accept/reject correction
+	rejectionRate() = 0.5*pow(G, 2);
+	// return the energy increment
+	return energy_increment;
+      }
+  }
+
+  //------------------------ Specific output functions ------------------------------------
+
+  void DPDE::getThermo(Output& output) const
+  {
+    output.temperature() = 2 * output.kineticEnergy() / (output.dimension() * output.nbOfParticles());
+    output.totalEnergy() = output.kineticEnergy() + output.potentialEnergy() + output.internalEnergy();
+  }
   
+  void DPDE::specificComputeOutput(Output& output) const
+  {
+    //-- rejection rate --
+    output.rejectionCount() = rejectionCount()/totalCountForRejection();
+    output.negativeEnergiesCount() = negativeEnergiesCount();
+  }
   
 }

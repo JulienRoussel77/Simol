@@ -35,6 +35,7 @@ namespace simol
     nbOfAutocoPts_(input.nbOfAutocoPts()),
     doFinalFlow_(input.doFinalFlow()),
     doFinalVelocity_(input.doFinalVelocity()),
+    doDPDE_(input.doDPDE()),
     obsKineticEnergy_(nullptr),
     obsPotentialEnergy_(nullptr),
     obsPressure_(nullptr),
@@ -70,13 +71,26 @@ namespace simol
     if (input.doModiFlow()) obsModiFlow_ = addObservable(input, "modiFlow.txt");*/
     
     if (input.doOutThermo())
-    {
-      outThermo_       = std::make_shared<ofstream>(input.outputFolderName() + "thermo.txt");
-      outThermo() << "# 1:time  2:position  3:momentum  4:internalEnergy  5:kineticEnergy  6:potentialEnergy  7:totalEnergy  8:kineticTemperature  9:internalTemperature  10:pressure  11:averageRejection  12:negativeEnergiesCount" << endl;
-      //outThermo() << "# time kineticEnergy potentialEnergy energy temperature pressure" << endl;
-      outMeanThermo_       = std::make_shared<ofstream>(input.outputFolderName() + "meanThermo.txt");
-      outMeanThermo() << "# 1:time  2:kineticEnergy  3:potentialEnergy  4:internalEnergy  5:kineticTemperature  6:internalTemperature  7:pressure" << endl;
-    }
+      {
+	//-- instantaneous values --
+	outThermo_       = std::make_shared<ofstream>(input.outputFolderName() + "thermo.txt");
+	if (obsKineticEnergy_)
+	  {
+	    if (doDPDE_)
+	      outThermo() << "# 1:time  2:kineticEnergy  3:potentialEnergy  4:totalEnergy  5:temperature 6:pressure 7:internalEnergy 8:internalTemperature 9:negativeEnergiesCount" << endl;
+	    else
+	      outThermo() << "# 1:time  2:kineticEnergy  3:potentialEnergy  4:totalEnergy  5:temperature 6:pressure" << endl;
+	  }
+	else
+	  outThermo() << "# 1:time  2:potentialEnergy  3:totalEnergy  4:temperature 5:pressure" << endl;
+	//-- current estimates of averages --
+	outMeanThermo_       = std::make_shared<ofstream>(input.outputFolderName() + "meanThermo.txt");
+	if (doDPDE_)
+	  outMeanThermo() << "# 1:time  2:potentialEnergy  3:kineticEnergy  4:temperature 5:pressure 6:internalEnergy 7:internalTemperature 8:averageRejectionRate" << endl;
+	else
+	  outMeanThermo() << "# 1:time  2:potentialEnergy  3:kineticEnergy  4:temperature 5:pressure" << endl;
+      }
+
     if (input.doOutParticles())
     {
       outParticles_ = std::make_shared<ofstream>(input.outputFolderName() + "particles.txt");
@@ -405,13 +419,34 @@ namespace simol
 
   void Output::displayThermoVariables(long int iOfStep)
   {
+    //---- instantaneous values ----
     outThermo() << iOfStep * timeStep();
     if (obsKineticEnergy_) outThermo() << " " << kineticEnergy();
     outThermo() << " " << potentialEnergy()
                 << " " << totalEnergy()
                 << " " << temperature()
-                << " " << pressure()
-                << std::endl;
+                << " " << pressure();
+      if (doDPDE_) // add fields for DPDE
+      {
+	outThermo() << " " << internalEnergy() 
+		    << " " << 1./internalTemperature()
+		    << " " << negativeEnergiesCount();
+      }
+    outThermo() << std::endl;
+    //---- current estimates of the averages ----
+    outMeanThermo() << iOfStep * timeStep()
+		    << " " << obsKineticEnergy().mean() 
+		    << " " << obsPotentialEnergy().mean() 
+      		    << " " << 2*obsKineticEnergy().mean()/(dimension_ * nbOfParticles_)
+      		    << " " << obsPressure().mean();
+    if (doDPDE_) // add fields for DPDE
+      {
+	outMeanThermo() << " " << obsInternalEnergy().mean() 
+			<< " " << 1./obsInternalTemperature().mean()
+			<< " " << rejectionCount();
+      }
+    outMeanThermo() << std::endl;
+    
   }
 
   void Output::displayParticles(System const& syst, long int iOfStep)
@@ -445,35 +480,6 @@ namespace simol
       outBackUp() << endl;
     }
     outBackUp() << endl;
-  }
-
-
-
-  void Output::displayThermoVariablesDPDE(System const& syst, long int iOfStep)
-  {
-    //double totalEnergy = kineticEnergy() + potentialEnergy() + internalEnergy();
-    outThermo() << iOfStep * timeStep()
-		     << " " << syst(0).position(0) 
-		     << " " << syst(0).momentum(0) 
-		     << " " << internalEnergy() 
-         << " " << kineticEnergy()
-         << " " << potentialEnergy()
-		     << " " << totalEnergy()
-		     << " " << temperature()
-		     << " " << 1./internalTemperature()
-		     << " " << pressure()
-		     << " " << rejectionCount()
-		     << " " << negativeEnergiesCount()
-		     << std::endl;
-    outMeanThermo() << iOfStep * timeStep()
-			   << " " << obsKineticEnergy().mean() 
-         << " " << obsPotentialEnergy().mean() 
-			   << " " << obsInternalEnergy().mean() 
-			   << " " << 2*obsKineticEnergy().mean()/(dimension_ * nbOfParticles_)
-			   << " " << 1./obsInternalTemperature().mean() 
-			   //<< " " << (2*obsKineticEnergy().mean()+obsTotalVirial().mean())/(dimension_*nbOfParticles_*pow(latticeParameter_, dimension_))
-         << " " << obsPressure().mean()
-			   << std::endl;
   }
   
   // ------------ final outputs ----------------

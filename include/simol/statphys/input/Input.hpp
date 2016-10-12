@@ -86,6 +86,7 @@ namespace simol
     int seed() const;
     double eta() const;
     double heatCapacity() const;  // used for DPDE dynamics
+    double kappa() const;         // used for DPDE dynamics
 
     //-- Output --
     string simuTypeName() const;
@@ -105,6 +106,7 @@ namespace simol
     bool doKineticEnergy() const;
     bool doPotentialEnergy() const;
     bool doPressure() const;
+    bool doDPDE() const;
     bool doInternalEnergy() const;
     bool doInternalTemperature() const;
     bool doVelocity() const;

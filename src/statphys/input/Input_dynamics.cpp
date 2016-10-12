@@ -10,6 +10,7 @@ const double defaultXi = 0;
 const double defaultDeltaTemperature = 0;
 const double defaultExternalForce = 0;
 const double defaultTauBending = 0;
+const double defaultKappa = 0; 
 
 namespace simol
 {
@@ -118,6 +119,13 @@ namespace simol
       return deltaTemperature();
     else
       return externalForce();
+  }
+
+  double Input::kappa() const
+  {
+    if (data["Dynamics"]["Kappa"])
+      return data["Dynamics"]["Kappa"].as<double>();
+    else return defaultKappa;
   }
 
 

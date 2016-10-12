@@ -234,6 +234,9 @@ namespace simol
   bool Input::doPressure() const
   {return true;}
   
+  bool Input::doDPDE() const
+  {return dynamicsName() == "DPDE";}
+  
   bool Input::doInternalEnergy() const
   {return dynamicsName() == "DPDE";}
   
@@ -257,7 +260,6 @@ namespace simol
   
   bool Input::doModiFlow() const
   {return dynamicsName() == "BoundaryLangevin";}
-  
   
   bool Input::doOutThermo() const
   {return true;}  
