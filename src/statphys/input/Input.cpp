@@ -38,9 +38,9 @@ namespace simol
     assert(data.IsDefined());
     if (doRestart())
     {
-      cout << " - reading from restart file " << restartFileName() << endl;
+      cout << " -- reading from restart file " << restartFileName() << endl;
       ifstream initialConditions(restartFileName());
-      if (!initialConditions.is_open()) throw std::runtime_error("RestartFile not open !");
+      if (!initialConditions.is_open()) throw std::runtime_error("RestartFile not open!");
       int Dim = dimension();
       for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
       {
@@ -48,9 +48,10 @@ namespace simol
           initialConditions >> initialPositions_[iOfParticle](dim) >> std::ws; 
         for (int dim = 0; dim < Dim; dim++)
           initialConditions >> initialMomenta_[iOfParticle](dim) >> std::ws;
-        initialConditions >> initialInternalEnergies_[iOfParticle] >> std::ws;
+        if (doDPDE()) // reading an additional field: internal energy
+	  initialConditions >> initialInternalEnergies_[iOfParticle] >> std::ws;
       }
-      cout << " Successful reading of the settings files... " << endl;
+      cout << " -- successful reading of the settings files... " << endl;
     }
   }
     

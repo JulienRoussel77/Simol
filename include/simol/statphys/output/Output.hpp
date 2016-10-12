@@ -68,7 +68,7 @@ namespace simol
     
     bool doFinalVelocity() const {return (bool)outFinalVelocity_;}
     bool doFinalFlow() const {return (bool)outFinalFlow_;}
-
+    
     //-- fields to output --
     const double& kineticEnergy() const;
     double& kineticEnergy();
@@ -127,9 +127,8 @@ namespace simol
     void finalChainDisplay();
     void displayFinalFlow(double parameter1=0, double parameter2=0);
 
-      //------------- pour DPDE ---------------
-    void displayThermoVariablesDPDE(System const& syst, long int iOfStep);
-    void finalDisplayCorrelationsDPDE();
+    //------------- pour DPDE ---------------
+    //void finalDisplayCorrelationsDPDE();
     
     Observable& obsKineticEnergy();
     Observable const& obsKineticEnergy() const;
@@ -158,6 +157,7 @@ namespace simol
   protected:
     string outputFolderName_;
     std::shared_ptr<ofstream> outThermo_;
+    std::shared_ptr<ofstream> outMeanThermo_;
     std::shared_ptr<ofstream> outParticles_;
     std::shared_ptr<ofstream> outCorrelation_;
 
@@ -167,9 +167,6 @@ namespace simol
 
     //-- average velocity for Isolated --
     std::shared_ptr<ofstream> outFinalVelocity_;
-
-    //-- mean observables for DPDE --
-    std::shared_ptr<ofstream> outMeanThermo_;
 
     //-- control variate outputs --
     std::shared_ptr<ofstream> outVelocitiesGenerator_;
@@ -213,9 +210,9 @@ namespace simol
     //-- parametrization of outputs --
     int decorrelationNbOfSteps_;
     int nbOfAutocoPts_;
-    bool doFinalFlow_, doFinalVelocity_;
+    bool doFinalFlow_, doFinalVelocity_,doDPDE_;
+    
   public:
-
     
     std::shared_ptr<ofstream> outTest_;   // for debug purpose only
     

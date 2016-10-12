@@ -10,6 +10,7 @@ namespace simol
   class DPDE: public LangevinBase
   {
     double heatCapacity_;
+    double kappa_;
     double cutOff_;
     double rejectionCount_;
     double totalCountForRejection_;
@@ -34,6 +35,10 @@ namespace simol
     virtual double internalTemperature(double intEnergy) const;
     double& heatCapacity();
     const double& heatCapacity() const;
+
+    //-- thermal conduction --
+    double& kappa();
+    const double& kappa() const;
     
     //-- functions pour integration of the fluctuation/dissipation (isolated systems) --
     void energyReinjection(Particle& particle);
@@ -55,6 +60,10 @@ namespace simol
     
     void fluctuationDissipation(NBody& syst);
     void elementaryFluctuationDissipation(System const& syst, Particle& particle1, Particle& particle2);
+    double pairwiseThermalConduction(double dist, double internalEnergy1, double internalEnergy2);
+    
+    void thermalConduction(NBody& syst);
+    void elementaryThermalConduction(System const& syst, Particle& particle1, Particle& particle2);
   };
   
 }

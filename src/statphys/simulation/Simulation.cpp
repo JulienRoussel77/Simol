@@ -108,7 +108,7 @@ namespace simol
         dyna.updateMomentaExchange(syst(iOfParticle), syst(iOfParticle + 1));
   }
   
-  //------------- DPDE --------------------
+  //------------- DPDE [1D systems...] --------------------
   
   void simulate(DPDE& dyna, System& syst)
   {
@@ -122,7 +122,6 @@ namespace simol
       //dyna.energyReinjection(syst(iOfParticle));  // integration of p at fixed gamma + energy reinjection
       dyna.metropolizedEnergyReinjection(syst(iOfParticle));  // Metropolis correction of effective dynamics on p 
   }
-  
   
   
   void computeOutput(Dynamics const& dyna, System const& syst, Output& output, long int iOfStep)
@@ -172,8 +171,6 @@ namespace simol
         output.displayChainMomenta(syst, iOfStep);
       }
     }
-    
-
     
     if (output.doLongPeriodOutput(iOfStep))
     {

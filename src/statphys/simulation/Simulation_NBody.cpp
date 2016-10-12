@@ -27,5 +27,7 @@ namespace simol
       dyna.verletSecondPart(syst(iOfParticle));
     //-- fluctuation/dissipation --
     dyna.fluctuationDissipation(syst);
+    //-- thermal conduction --
+    dyna.thermalConduction(syst);
   }
 }
