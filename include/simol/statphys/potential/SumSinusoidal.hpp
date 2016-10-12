@@ -11,7 +11,7 @@ namespace simol
     public:
       SumSinusoidal(Input const& input);
       double operator()(double position) const;
-      Vector<double> gradient(double position) const;
+      DVec gradient(double position) const;
       virtual double laplacian(double position) const;
 
 

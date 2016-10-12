@@ -41,7 +41,7 @@ namespace simol
   {
     if (particle2.countdown() == 0)
     {
-      Vector<double> temp = particle2.momentum();
+      DVec temp = particle2.momentum();
       particle2.momentum() = particle1.momentum();
       particle1.momentum() = temp;
       particle2.countdown() = rng_->scalarExponential() * xiNbOfSteps(); // / (xi() * timestep());

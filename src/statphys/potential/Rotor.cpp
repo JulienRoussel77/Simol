@@ -14,9 +14,9 @@ namespace simol
     return 1 - cos(distance);
   }
 
-  Vector<double> Rotor::gradient(double distance) const
+  DVec Rotor::gradient(double distance) const
   {
-    return Vector<double>(1, sin(distance));
+    return DVec::Constant(1,1, sin(distance));
   }
 
   double Rotor::laplacian(double distance) const

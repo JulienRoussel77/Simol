@@ -9,14 +9,14 @@ namespace simol
     pulsation_(2 * M_PI / input.length())
   {}
 
-  double SpaceSinus::operator()(Vector<double> const& position) const
+  double SpaceSinus::operator()(DVec const& position) const
   {
     return amplitude_ * (1 - cos(pulsation_ * position(0)) * cos(pulsation_ * position(1)) * cos(pulsation_ * position(2)));
   }
 
-  Vector<double> SpaceSinus::gradient(Vector<double> const& position) const
+  DVec SpaceSinus::gradient(DVec const& position) const
   {
-    Vector<double> grad(3);
+    DVec grad(3);
     grad(0) = sin(pulsation_ * position(0)) * cos(pulsation_ * position(1)) * cos(pulsation_ * position(2));
     grad(1) = cos(pulsation_ * position(0)) * sin(pulsation_ * position(1)) * cos(pulsation_ * position(2));
     grad(2) = cos(pulsation_ * position(0)) * cos(pulsation_ * position(1)) * sin(pulsation_ * position(2));
@@ -24,7 +24,7 @@ namespace simol
     return grad;
   }
 
-  double SpaceSinus::laplacian(Vector<double> const& position) const
+  double SpaceSinus::laplacian(DVec const& position) const
   {
     return 3 * pow(pulsation_, 2) * value(position);
   }

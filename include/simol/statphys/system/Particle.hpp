@@ -3,7 +3,7 @@
 
 #include "simol/statphys/Tools.hpp"
 #include "simol/statphys/potential/Potential.hpp"
-#include "simol/core/linalg/Vector.hpp"
+//#include "simol/core/linalg/Vector.hpp"
 #include "simol/core/random/RNG.hpp"
 
 namespace simol
@@ -13,7 +13,7 @@ namespace simol
   {
 
     public:
-      Particle(double const & mass, Vector<double> const & position0, Vector<double> const & momentum0, double internalEnergy0 = 0);
+      Particle(double const & mass, DVec const & position0, DVec const & momentum0, double internalEnergy0 = 0);
       Particle(int dimension);
       Particle(double const & mass, double const & position0, double const & momentum0, double internalEnergy0 = 0);
 
@@ -22,12 +22,12 @@ namespace simol
       void resetForce(Potential const& pot);
 
       //-- access to primary variables --
-      Vector<double> const & position() const;
-      Vector<double> & position();
+      DVec const & position() const;
+      DVec & position();
       const double& position(int i) const;
       double& position(int i);
-      Vector<double> const & momentum() const;
-      Vector<double> & momentum();
+      DVec const & momentum() const;
+      DVec & momentum();
       const double& momentum(int i) const;
       double& momentum(int i);
       double const & internalEnergy() const;
@@ -39,18 +39,18 @@ namespace simol
       double& potentialEnergy();
       double energy() const;
       double totalEnergyDPDE() const;
-      Vector<double> const& force() const;
-      Vector<double>& force();
+      DVec const& force() const;
+      DVec& force();
       const double& force(int i) const;
       double& force(int i);
       double const & virial() const;
       double & virial();
-      Vector<double> velocity() const;
+      DVec velocity() const;
       double velocity(int iOfDim) const;
 
       //-- currently specific for chains --
-      Vector<double> const& energyGrad() const;
-      Vector<double>& energyGrad();
+      DVec const& energyGrad() const;
+      DVec& energyGrad();
       const double& energyGrad(int i) const;
       double& energyGrad(int i);
       const double& energyLapla() const;
@@ -61,11 +61,11 @@ namespace simol
     private:
 
       double mass_;
-      Vector<double> position_;
-      Vector<double> momentum_;
+      DVec position_;
+      DVec momentum_;
       double potentialEnergy_;
-      Vector<double> force_;
-      Vector<double> energyGrad_;
+      DVec force_;
+      DVec energyGrad_;
       double energyLapla_;
       int countdown_;
       double internalEnergy_;

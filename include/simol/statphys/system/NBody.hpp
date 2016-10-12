@@ -54,7 +54,7 @@ namespace simol
     Cell const& cell(int const& iOfCell) const {return cells_[iOfCell];}
     Cell & cell(int const& iOfCell) {return cells_[iOfCell];}
   
-    virtual Vector<double> representant(Vector<double> vecDistance) const;
+    virtual DVec representant(DVec vecDistance) const;
     void samplePositions(DynamicsParameters const& dynaPara);
     void computeAllForces();
     int nbOfParticlesPerDimension() const;
@@ -64,7 +64,7 @@ namespace simol
     //--- for cell method ---
     void reinitializeCells();
     void findNeighboringCells();
-    int findIndex(Vector<double> const& pos) const;
+    int findIndex(DVec const& pos) const;
     int returnIndexCell(int i1, int i2 = -1, int i3 = -1) const;
     double periodicPosition(double x) const;
 

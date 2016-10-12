@@ -12,79 +12,51 @@ using std::setw;
 
 namespace simol
 {
-  Galerkin* createOverdampedGalerkin(Input const& input)
+  Galerkin* createGalerkin(Input const& input)
   {
     if (input.doGalerkinCV())
-      return new OverdampedGalerkin(input);
-    else
-      return nullptr;
-  }
-
-  Galerkin* createLangevinGalerkin(Input const& input)
-  {
-    if (input.doGalerkinCV())
-      return new LangevinGalerkin(input);
-    else
-      return nullptr;
-  }
-
-  Galerkin* createBoundaryLangevinGalerkin(Input const& input)
-  {
-    if (input.doGalerkinCV())
-      return new BoundaryLangevinGalerkin(input);
-    else
-      return nullptr;
-  }
-  
-  //
-  //Create a unitary matrix rectangular matrix representing a bon of the orthogonal of u
-  /*DMat createOrthoBasis(Vector<double> const& u)
-  {
-    Vector<double> u0 = u / u.norm();
-    DMat A = DMat::Random(u0.size(), u0.size() - 1);
-    for (int jOfCol = 0; jOfCol < (int) A.numberOfColumns(); jOfCol++)
     {
-      A.column(jOfCol) -= dot(A.column(jOfCol), u0) * u0;
-      for (int jOfCol2 = 0; jOfCol2 < jOfCol; jOfCol2++)
-        A.column(jOfCol) -= dot(A.column(jOfCol), A.column(jOfCol2)) * A.column(jOfCol2);
-      assert(A.column(jOfCol).norm() != 0);           // can be zero if the initial random family is not free
-      A.column(jOfCol) /= A.column(jOfCol).norm();
-    }
-    return A;
-  }*/
+        if (input.dynamicsName() == "Overdamped") return new OverdampedGalerkin(input);
+        else if (input.dynamicsName() == "Langevin") return new LangevinGalerkin(input);
+        else if (input.dynamicsName() == "BoundaryLangevin") return new BoundaryLangevinGalerkin(input);
+        else throw runtime_error("This dynamics matches no Galerkin method !");
+      }
+    else
+      return nullptr;
+  }
   
   
 
-  DenseMatrix<double> Galerkin::shapeSaddle(const DenseMatrix<double>& A) const
+  DMat Galerkin::shapeSaddle(const DMat& A) const
   {
-    DenseMatrix<double> Asad = DenseMatrix<double>::Zero(A.numberOfRows() + 1, A.numberOfColumns() + 1);
-    Asad.block(0, 0, A.numberOfRows(), A.numberOfColumns()) = A.block(0, 0, A.numberOfRows(), A.numberOfColumns());
+    DMat Asad = DMat::Zero(A.rows() + 1, A.cols() + 1);
+    Asad.block(0, 0, A.rows(), A.cols()) = A.block(0, 0, A.rows(), A.cols());
     for (int iOfFourier2 = 0; iOfFourier2 <= 2 * maxOfFourier_; iOfFourier2++)
     {
-      Asad(A.numberOfRows(), iTens(iOfFourier2, 0)) = expFourierMeans(iOfFourier2);
-      Asad(iTens(iOfFourier2, 0), A.numberOfColumns()) = expFourierMeans(iOfFourier2);
+      Asad(A.rows(), iTens(iOfFourier2, 0)) = expFourierMeans(iOfFourier2);
+      Asad(iTens(iOfFourier2, 0), A.cols()) = expFourierMeans(iOfFourier2);
     }
     return Asad;
   }
   
-  /*DenseMatrix<double> Galerkin::shapePrec(const DenseMatrix<double>& A) const
+  /*DMat Galerkin::shapePrec(const DMat& A) const
   {
     return A + norm2gVector() / (1 - norm2gVector()) * extProduct(gVector(), A.adjoint() * gVector());
   }*/
 
-  DenseMatrix<double> Galerkin::unshapeSaddle(const DenseMatrix<double>& Asad) const
-  { return Asad.block(0, 0, Asad.numberOfRows() - 1, Asad.numberOfColumns() - 1); }
+  DMat Galerkin::unshapeSaddle(const DMat& Asad) const
+  { return Asad.block(0, 0, Asad.rows() - 1, Asad.cols() - 1); }
 
   DVec Galerkin::shapeSaddle(const DVec& X) const
   {
-    DVec Xsad = Vector<double>::Zero(X.size() + 1);
-    Xsad.subvec(0, X.size()) = X;
+    DVec Xsad = DVec::Zero(X.size() + 1);
+    Xsad.head(X.size()) = X;
     return Xsad;
   }
 
   DVec Galerkin::unshapeSaddle(const DVec& Xsad) const
   {
-    return Xsad.subvec(0, Xsad.size() - 1);
+    return Xsad.head(Xsad.size() - 1);
   }
 
   // TODO: utiliser des solveurs lineaires plutôt qu'inverser
@@ -92,17 +64,17 @@ namespace simol
   // son inverse est generalement dense
   // par consequent, pas de fonction membre inverse() dans SparseMatrix
 
-  /*DenseMatrix<double> inverse(const SMat& A)
+  /*DMat inverse(const SMat& A)
   {
-    DenseMatrix<double> Id = DenseMatrix<double>::Identity(A.numberOfRows());
-    DenseMatrix<double> C = spsolve(A, Id);
+    DMat Id = DMat::Identity(A.rows());
+    DMat C = spsolve(A, Id);
     return C;
   }
 
-  DenseMatrix<double> inverse(const DenseMatrix<double>& A)
+  DMat inverse(const DMat& A)
   {
-    DenseMatrix<double> Id = DenseMatrix<double>::Identity(A.numberOfRows());
-    DenseMatrix<double> C = solve(A, Id);
+    DMat Id = DMat::Identity(A.rows());
+    DMat C = solve(A, Id);
     return C;
   }*/
   
@@ -117,66 +89,56 @@ namespace simol
   
   DVec Galerkin::solve(SMat const& A, DVec const& Y) const
   {
-    //cout << "wiiiiiiiiiiiiiiiiiiii" << endl;
-    //DenseMatrix<double> DA = A;
-    //return solveWithSaddle(DA, Y);
     
-    Eigen::SparseMatrix<double> eigA = A.wrapped_;
-    Eigen::VectorXd eigY = Y.wrapped_;
-    
-    Eigen::BiCGSTAB<Eigen::SparseMatrix<double>, Eigen::IdentityPreconditioner > solver;
-    solver.compute(eigA);
-    Eigen::VectorXd eigX = solver.solve(eigY);
-    cout << "Solver info : " << solver.info() << endl;
-    assert(solver.info() == Eigen::Success);
-    return DVec(eigX);
+    Eigen::BiCGSTAB<SMat, Eigen::IdentityPreconditioner > solver;
+    solver.compute(A);
+    DVec X = solver.solve(Y);
+    //if(solver.info() != Eigen::Success) throw runtime_error("System resolution failed !");
+    return X;
   }
   
-  DVec Galerkin::solve(const DenseMatrix<double>& A, const DVec& X) const
+  DVec Galerkin::solve(const DMat& A, const DVec& X) const
   {    
-    return A.solve(X);
+    return A.fullPivLu().solve(X);
   }
 
   DVec Galerkin::solveWithSaddle(SMat const& A, DVec const& Y) const
   {
     
-    Eigen::SparseMatrix<double> eigA = A.wrapped_;
-    Eigen::VectorXd eigY = Y.wrapped_;
-    
-    Eigen::BiCGSTAB<Eigen::SparseMatrix<double>, Eigen::IdentityPreconditioner > solver;
-    solver.compute(eigA);
-    Eigen::VectorXd eigX = solver.solve(eigY);
+    Eigen::BiCGSTAB<SMat, Eigen::IdentityPreconditioner > solver;
+    solver.compute(A);
+    DVec X = solver.solve(Y);
     cout << "Solver info : " << solver.info() << endl;
     assert(solver.info() == Eigen::Success);
-    return DVec(eigX);
+    return X;
   }
 
-  DVec Galerkin::solveWithSaddle(const DenseMatrix<double>& A, const DVec& X) const
+  DVec Galerkin::solveWithSaddle(const DMat& A, const DVec& X) const
   {
     cout << "solveWithSaddle..."; cout.flush();
     cout << "X -> " << X.size() << endl;
     DVec Xsad = shapeSaddle(X);
     cout << "Xsad -> " << Xsad.size() << endl;
-    cout << "A -> " << A.numberOfRows() << "x" << A.numberOfColumns() << endl;
-    DenseMatrix<double> Asad = shapeSaddle(A);
-    cout << "Asad -> " << Asad.numberOfRows() << "x" << Asad.numberOfColumns() << endl;
-    DVec Bsad = Asad.solve(Xsad);
+    cout << "A -> " << A.rows() << "x" << A.cols() << endl;
+    DMat Asad = shapeSaddle(A);
+    cout << "Asad -> " << Asad.rows() << "x" << Asad.cols() << endl;
+    DVec Bsad = Asad.fullPivLu().solve(Xsad);
     cout << "Bsad -> " << Bsad.size() << endl;
     cout << "OK ! (lambda = " << Bsad(Bsad.size() - 1) << ")" << endl;
     return unshapeSaddle(Bsad);
   }
 
-  DenseMatrix<double> Galerkin::invWithSaddle(const SparseMatrix<double>& A) const
+  DMat Galerkin::invWithSaddle(const SMat& A) const
   {
-    DenseMatrix<double> DA = A.dense();
+    DMat DA(A);
     return invWithSaddle(DA);
   }
 
-  DenseMatrix<double> Galerkin::invWithSaddle(const DenseMatrix<double>& A) const
+  DMat Galerkin::invWithSaddle(const DMat& A) const
   {
     cout << "invWithSaddle..."; cout.flush();
-    DenseMatrix<double> Asad = shapeSaddle(A);
-    DenseMatrix<double> Bsad = Asad.inverse();
+    DMat Asad = shapeSaddle(A);
+    DMat Bsad = Asad.inverse();
     cout << "fin invWithSaddle..."; cout.flush();
     return unshapeSaddle(Bsad);
   }
@@ -186,35 +148,35 @@ namespace simol
   //                              )
   SMat kron(const SMat& A, const SMat& B)
   {
-    /*double a_1 = A.numberOfColumns() * (B.numberOfColumns() - 1)/(A.numberOfColumns() - 1);
-    double b_1 = a_1 - B.numberOfColumns();
-    double a_2 = A.numberOfRows() * (B.numberOfRows() - 1)/(A.numberOfRows() - 1);
-    double b_2 = a_2 - B.numberOfRows();*/
+    /*double a_1 = A.cols() * (B.cols() - 1)/(A.cols() - 1);
+    double b_1 = a_1 - B.cols();
+    double a_2 = A.rows() * (B.rows() - 1)/(A.rows() - 1);
+    double b_2 = a_2 - B.rows();*/
 
-    /*cout << "A : O <= i < " << A.numberOfRows() << ", O <= jOfA < " << A.numberOfColumns() << endl;
-    cout << "B : O <= i2 < " << B.numberOfRows() << ", O <= jOfB < " << B.numberOfColumns() << endl;
+    /*cout << "A : O <= i < " << A.rows() << ", O <= jOfA < " << A.cols() << endl;
+    cout << "B : O <= i2 < " << B.rows() << ", O <= jOfB < " << B.cols() << endl;
     cout << "We keep the coefficients such that j * (jOfB + " << b_1 << ") <= " << a_1
       << " and such that i * (i2 + " << b_2 << ") <= " << a_2 << endl; */
-    SMat C(A.numberOfRows()*B.numberOfRows(), A.numberOfColumns()*B.numberOfColumns());
+    SMat C(A.rows()*B.rows(), A.cols()*B.cols());
 
     //SMat C(A.size() % B.size());          //element-wise product of the dimensions
     //
 
     //C(0,0) = 1;
 
-    for (int jOfA = 0; jOfA < (int)A.numberOfColumns(); ++jOfA)
+    for (int jOfA = 0; jOfA < (int)A.cols(); ++jOfA)
     {
-      for (SMat::iterator it(A, jOfA); it; ++it)
+      for (SMat::InnerIterator it(A, jOfA); it; ++it)
       {
         int iOfA = it.row();
         double valOfA = it.value();
-        for (int jOfB = 0; jOfB < (int)B.numberOfColumns(); jOfB++)
+        for (int jOfB = 0; jOfB < (int)B.cols(); jOfB++)
         {
-          for (SMat::iterator it2(B, jOfB); it2; ++it2)
+          for (SMat::InnerIterator it2(B, jOfB); it2; ++it2)
           {
             int iOfB = it2.row();
             double valOfB = it2.value();
-            C(iOfA + A.numberOfRows() * iOfB, jOfA + A.numberOfColumns() * jOfB) = valOfA * valOfB;
+            C.insert(iOfA + A.rows() * iOfB, jOfA + A.cols() * jOfB) = valOfA * valOfB;
           }
         }
       }
@@ -222,35 +184,35 @@ namespace simol
     return C;
   }
 
-  DenseMatrix<double> kron(const DenseMatrix<double>& A, const DenseMatrix<double>& B)
+  DMat kron(const DMat& A, const DMat& B)
   {
-    DenseMatrix<double> C(A.numberOfRows()*B.numberOfRows(), A.numberOfColumns()*B.numberOfColumns());
-    for (int iOfA = 0; iOfA < (int) A.numberOfRows(); iOfA++)
-      for (int jOfA = 0; jOfA < (int) A.numberOfColumns(); jOfA++)
-        for (int iOfB = 0; iOfB < (int) B.numberOfRows(); iOfB++)
-          for (int jOfB = 0; jOfB < (int) B.numberOfColumns(); jOfB++)
-            C(iOfA + A.numberOfRows() * iOfB, jOfA + A.numberOfColumns() * jOfB) = A(iOfA, jOfA) * B(iOfB, jOfB);
+    DMat C(A.rows()*B.rows(), A.cols()*B.cols());
+    for (int iOfA = 0; iOfA < (int) A.rows(); iOfA++)
+      for (int jOfA = 0; jOfA < (int) A.cols(); jOfA++)
+        for (int iOfB = 0; iOfB < (int) B.rows(); iOfB++)
+          for (int jOfB = 0; jOfB < (int) B.cols(); jOfB++)
+            C(iOfA + A.rows() * iOfB, jOfA + A.cols() * jOfB) = A(iOfA, jOfA) * B(iOfB, jOfB);
     return C;
   }
 
-  void displayCplx(const Vector<cplx>& X, ostream& out)
+  void displayCplx(const DVecCplx& X, ostream& out)
   {
     for (int i = 0; i < (int) X.size(); i++)
       out << real(X(i)) << " " << imag(X(i)) << endl;
   }
 
-  void display(const Vector<double>& A, string path)
+  void display(const DVec& A, string path)
   {
     ofstream out(path);
     //display(A, out);
     out << A;
   }
 
-  void display(const DenseMatrix<double>& A, ostream& out)
+  void display(const DMat& A, ostream& out)
   {
-    for (int i = 0; i < (int) A.numberOfRows(); i++)
+    for (int i = 0; i < (int) A.rows(); i++)
     {
-      for (int j = 0; j < (int) A.numberOfColumns(); j++)
+      for (int j = 0; j < (int) A.cols(); j++)
       {
         if (true)//fabs(A(i,j)) > 1e-15)
         {
@@ -264,7 +226,7 @@ namespace simol
     }
   }
 
-  void display(const DenseMatrix<double>& A, string path)
+  void display(const DMat& A, string path)
   {
     ofstream out(path);
     assert(out.is_open());
@@ -273,13 +235,13 @@ namespace simol
 
   void display(const SMat& A, ostream& out)
   {
-    DenseMatrix<double> DA = A.dense();
+    DMat DA(A);;
     display(DA, out);
   }
 
   void display(const SMat& A, string path)
   {
-    DenseMatrix<double> DA = A.dense();
+    DMat DA(A);;
     display(DA, path);
   }
   
@@ -327,8 +289,13 @@ namespace simol
 
     expToTrigMat_  = trigToExpMat_.inverse();
   }
+  
+  DVec Galerkin::projectionOrthoG(DVec const& X) const
+  {
+    return X - dot(X, gVector()) / norm2gVector() * gVector();
+  }
 
-  DenseMatrix<double> Galerkin::convertToTrigBasis(const DenseMatrix<double>& X)
+  DMat Galerkin::convertToTrigBasis(const DMat& X)
   {
     return expToTrigMat_ * X;
   }
@@ -336,31 +303,6 @@ namespace simol
   void Galerkin::createQ()
   {
     basis_(0)->gradMatrix(Q_);
-    
-    /*for (int iOfFourier2 = 0; iOfFourier2 < (int) nbOfFourier_; iOfFourier2++)
-      for (int jOfFourier2 = 0; jOfFourier2 < (int) nbOfFourier_; jOfFourier2++)
-        Q_(iOfFourier2, jOfFourier2) = basis_(0)->xGradY(iOfFourier2, jOfFourier2);*/
-    
-      
-    /*Q_(1, 0) = amplitude_ * beta_ / (2 * sqrt(2.));
-
-    for (int iOfFourier = 1; iOfFourier <= (int) maxOfFourier_; iOfFourier++)
-    {
-      Q_(2 * iOfFourier - 2, 2 * iOfFourier - 1) = amplitude_ * beta_ / 4;   //overwritten if i=1
-      Q_(2 * iOfFourier    , 2 * iOfFourier - 1) = iOfFourier;
-      if (iOfFourier != (int) maxOfFourier_)
-        Q_(2 * iOfFourier + 2, 2 * iOfFourier - 1) = - amplitude_ * beta_ / 4;
-    }
-    Q_(0, 1) = amplitude_ * beta_ / (2 * sqrt(2.));
-
-    for (int iOfFourier = 1; iOfFourier <= (int) maxOfFourier_; iOfFourier++)
-    {
-      if (iOfFourier != 1)
-        Q_(2 * iOfFourier - 3, 2 * iOfFourier) = - amplitude_ * beta_ / 4;
-      Q_(2 * iOfFourier - 1, 2 * iOfFourier) = - iOfFourier;
-      if (iOfFourier != (int) maxOfFourier_)
-        Q_(2 * iOfFourier + 1, 2 * iOfFourier) =   amplitude_ * beta_ / 4;
-    }*/
 
     tQ_ = Q_.adjoint();
   }
@@ -368,19 +310,11 @@ namespace simol
   void Galerkin::createP()
   {
     for (int iOfHermite = 1; iOfHermite < nbOfHermite_; iOfHermite++)
-      //P_(iOfHermite, iOfHermite+1) = cplx(sqrt(beta_) * sqrt(iOfHermite+1.), 0.);
-      P_(iOfHermite - 1, iOfHermite) = sqrt(beta_ * iOfHermite);
+      P_.insert(iOfHermite - 1, iOfHermite) = sqrt(beta_ * iOfHermite);
 
     tP_ = P_.adjoint();
   }
 
-  /*void Galerkin::createLthm0()
-  {
-    cout << "createLthm0" << endl;
-    for (int iOfHermite = 1; iOfHermite < (int)nbOfHermite_; iOfHermite++)
-      Lthm0_(iOfHermite, iOfHermite) = -beta_ * iOfHermite;
-    cout << "end createLthm0" << endl;
-  }*/
 
   using namespace Eigen;
 
@@ -390,10 +324,10 @@ namespace simol
     nbOfHermite_(input.nbOfHermite()),
     maxOfFourier_((nbOfFourier_ - 1) / 2),  //ex : 2
     sizeOfBasis_(pow(nbOfFourier_ * nbOfHermite_, nbOfParticles_)),
-    SIdQ_(speye<double>(nbOfFourier_, nbOfFourier_)),
-    SIdP_(speye<double>(nbOfHermite_, nbOfHermite_)),
-    DIdQ_(eye<double>(nbOfFourier_, nbOfFourier_)),
-    DIdP_(eye<double>(nbOfHermite_, nbOfHermite_)),
+    SIdQ_(DMat::Identity(nbOfFourier_, nbOfFourier_).sparseView()),
+    SIdP_(DMat::Identity(nbOfHermite_, nbOfHermite_).sparseView()),
+    DIdQ_(DMat::Identity(nbOfFourier_, nbOfFourier_)),
+    DIdP_(DMat::Identity(nbOfHermite_, nbOfHermite_)),
     Q_(nbOfFourier_, nbOfFourier_),
     P_(nbOfHermite_, nbOfHermite_),
     tQ_(nbOfFourier_, nbOfFourier_),
@@ -408,10 +342,11 @@ namespace simol
     gamma_(input.gamma()),
     amplitude_(input.amplitude()),
     externalForce_(input.externalForce()),
+    doNonequilibrium_(input.doGalerkinNonequilibrium()),
     nbOfIntegrationNodes_(1000),
     //expFourierMeans_(2 * nbOfFourier_, 0),
-    trigToExpMat_(DenseMatrix<double, eigen>::Zero(nbOfFourier_, nbOfFourier_)),
-    expToTrigMat_(DenseMatrix<double, eigen>::Zero(nbOfFourier_, nbOfFourier_)),
+    trigToExpMat_(DMat::Zero(nbOfFourier_, nbOfFourier_)),
+    expToTrigMat_(DMat::Zero(nbOfFourier_, nbOfFourier_)),
     trigToExpTens_(sizeOfBasis_, sizeOfBasis_),
     expToTrigTens_(sizeOfBasis_, sizeOfBasis_),
     potential_(createPotential(input)),
@@ -475,7 +410,7 @@ namespace simol
     return basis_.expFourierMeans(iOfElt);
   }
   
-  const Vector<double>& Galerkin::gVector() const
+  const DVec& Galerkin::gVector() const
   {
     return basis_.gVector();
   }
@@ -501,32 +436,32 @@ namespace simol
     cout << "############ Leq ############" << endl;
     //cout << Leq_ << endl << endl;
 
-    DenseMatrix<double> DLeq = Leq_.dense();
+    DMat DLeq(Leq_);
     display(Leq_, "output/Galerkin/Leq");
 
-    //DenseMatrix<double> DLeqSad = shapeSaddle(DLeq);
+    //DMat DLeqSad = shapeSaddle(DLeq);
     //display(DLeqSad, "output/Galerkin/LeqSad");
 
     cout << "############ DLeqSad ############" << endl;
     //cout << DLeqSad << endl << endl;
 
-    //DenseMatrix<double> IdSad(sizeOfBasis_+1, sizeOfBasis_, fill::eye);
+    //DMat IdSad(sizeOfBasis_+1, sizeOfBasis_, fill::eye);
 
     cout << "Computing DLeqInv..."; cout.flush();
-    //DenseMatrix<double> LeqInv = invWithSaddle(DLeq);
-    DenseMatrix<double> DLeqInv = invWithSaddle(DLeq);
+    //DMat LeqInv = invWithSaddle(DLeq);
+    DMat DLeqInv = invWithSaddle(DLeq);
 
     cout << "############ LeqInv ############" << endl;
     display(DLeqInv, "output/Galerkin/DLeqInv");
 
 
-    DVec H1Trig = Vector<double>::Zero(sizeOfBasis_);
+    DVec H1Trig = DVec::Zero(sizeOfBasis_);
     H1Trig(iTens(0, 1)) = 1;
 
-    //DenseMatrix<double> H1TrigMat = reshape(H1Trig, nbOfFourier_, nbOfHermite_);
-    DenseMatrix<double> H1TrigMat(H1Trig, nbOfFourier_, nbOfHermite_);
+    //Map<DMat, Eigen::Aligned> H1TrigMat(H1Trig, nbOfFourier_, nbOfHermite_);
+    DMat H1TrigMat = reshape(H1Trig, nbOfFourier_, nbOfHermite_);
 
-    //DenseMatrix<double> H1Mat = trigToExpMat_ * H1TrigMat;
+    //DMat H1Mat = trigToExpMat_ * H1TrigMat;
     //DVec H1 = reshape(H1Mat, nbOfFourier_ * nbOfHermite_, 1);
 
     DVec H1 = trigToExpTens_ * H1Trig;
@@ -538,8 +473,8 @@ namespace simol
 
     cout << "############ H1Mat ############" << endl;
     display(gettGiHj(0, 1), "output/Galerkin/H1");
-    //DenseMatrix<double> H1Mat = reshape(gettGiHj(0,1), nbOfFourier_, nbOfHermite_);
-    DenseMatrix<double> H1Mat(gettGiHj(0, 1), nbOfFourier_, nbOfHermite_);
+    //DMat H1Mat = reshape(gettGiHj(0,1), nbOfFourier_, nbOfHermite_);
+    DMat H1Mat = reshape(gettGiHj(0, 1), nbOfFourier_, nbOfHermite_);
     display(H1Mat, "output/Galerkin/H1Mat");
 
     display(H1Trig, "output/Galerkin/H1Trig");
@@ -548,9 +483,9 @@ namespace simol
 
     display(gettGiHj(0, 0), "output/Galerkin/G0Trig");
 
-    DenseMatrix<double> G0Mat(gettGiHj(0, 0), nbOfFourier_, nbOfHermite_);
+    DMat G0Mat = reshape(gettGiHj(0, 0), nbOfFourier_, nbOfHermite_);
     display(G0Mat, "output/Galerkin/G0Mat");
-    DenseMatrix<double> LG0Mat(getLtGiHj(0, 0), nbOfFourier_, nbOfHermite_);
+    DMat LG0Mat = reshape(getLtGiHj(0, 0), nbOfFourier_, nbOfHermite_);
     display(LG0Mat, "output/Galerkin/LG0Mat");
 
     display(gettGiHj(1, 2), "output/Galerkin/G1H2Trig");
@@ -565,24 +500,24 @@ namespace simol
     //cout << "############ lambda ############" << endl;
     //cout << lambda << endl << endl;
 
-    DenseMatrix<double> LinvH1Mat(LinvH1, nbOfFourier_, nbOfHermite_);
+    DMat LinvH1Mat = reshape(LinvH1, nbOfFourier_, nbOfHermite_);
 
     cout << "############ LinvH1Mat ############" << endl;
     display(LinvH1Mat, "output/Galerkin/LinvH1Mat");
 
-    DenseMatrix<double> LinvH1MatTrig = convertToTrigBasis(LinvH1Mat);
+    DMat LinvH1MatTrig = convertToTrigBasis(LinvH1Mat);
     display(LinvH1MatTrig, "output/Galerkin/LinvH1MatTrig");
 
     DVec H1back = Leq_ * LinvH1;
-    DenseMatrix<double> H1backMat(H1back, nbOfFourier_, nbOfHermite_);
+    DMat H1backMat = reshape(H1back, nbOfFourier_, nbOfHermite_);
     display(H1backMat, "output/Galerkin/H1backMat");
 
     /*cx_vec eigvalLeq;
     cx_mat eigvecLeq;
     eig_gen(eigvalLeq, eigvecLeq, -DLeq);*/
 
-    //DenseMatrix<double> DLeqW = Leq_.wrapped_;
-    EigenSolver<MatrixXd> eigSol(DLeq.wrapped_);
+    //DMat DLeqW = Leq_.wrapped_;
+    EigenSolver<MatrixXd> eigSol(DLeq);
 
     /*/eigs_gen(eigvalLeq, eigvecLeq, Leq_, 20);
 
@@ -603,15 +538,16 @@ namespace simol
   EigenSolver<MatrixXd> Galerkin::getEigenSolver() const
   {
     cout << "Getting eigen elements by a dense matrix method !" << endl;
-    DenseMatrix<double> DLeq = Leq_.dense();
-    return EigenSolver<MatrixXd>(DLeq.wrapped_);
+    //DMat DLeq(Leq_);
+    DMat DLeta(Leta_);
+    return EigenSolver<MatrixXd>(DLeta);
   }
   
   ///Returns te coefficients of tG_i * Hj in the tG_i * H_j basis
   ///tG designs the Fourier functions (V=0)
   DVec Galerkin::gettGiHjTrig(int i, int j) const
   {
-    DVec GiHjTrig = Vector<double>::Zero(sizeOfBasis_);
+    DVec GiHjTrig = DVec::Zero(sizeOfBasis_);
     GiHjTrig(iTens(i, j)) = 1;
     return GiHjTrig;
   }
@@ -620,7 +556,7 @@ namespace simol
   ///tG designs the Fourier functions (V=0)
   DVec Galerkin::gettGiHj(int i, int j) const
   {
-    /*DVec GiHjTrig = Vector<double>::Zero(sizeOfBasis_);
+    /*DVec GiHjTrig = DVec::Zero(sizeOfBasis_);
     GiHjTrig(iTens(i, j)) = 1;
     DVec GiHj = trigToExpTens_ * GiHjTrig;
     return GiHj;*/
@@ -631,22 +567,22 @@ namespace simol
 
 
   DVec Galerkin::getLtGiHj(int i, int j) const
-  { return Leq_ * gettGiHj(i, j); }
+  { return Leta_ * gettGiHj(i, j); }
 
   DVec Galerkin::getLtGiHjTrig(int i, int j) const
   { return expToTrigTens_ * getLtGiHj(i, j); }
 
   DVec Galerkin::getLinvtGiHj(int i, int j) const
-  { return solveWithSaddle(Leq_, gettGiHj(i, j)); }
+  { return solveWithSaddle(Leta_, gettGiHj(i, j)); }
 
   DVec Galerkin::getLinvtGiHjTrig(int i, int j) const
-  { return expToTrigTens_ * solveWithSaddle(Leq_, gettGiHj(i, j)); }
+  { return expToTrigTens_ * getLinvtGiHj(i,j); }
 
   /*SMat Galerkin::CVcoeffs() const
   {
     DVec vecCoeffs = getLinvtGiHj(0, 1);
 
-    return SparseMatrix<double>(vecCoeffs, vecCoeffs.size(), 1);
+    return SMat(vecCoeffs, vecCoeffs.size(), 1);
   }*/
   
 
@@ -658,7 +594,7 @@ namespace simol
   
   void Galerkin::computeEigen() const
   {
-    Eigen::EigenSolver<Eigen::MatrixXd> eigSol = getEigenSolver();
+    Eigen::EigenSolver<DMat> eigSol = getEigenSolver();
     //const cplx* eigVal = eigSol.eigenvalues().data();
     vector<cplx> eigVal;
     for (int i=0; i<sizeOfBasis(); i++)
@@ -669,8 +605,23 @@ namespace simol
     for (int i=0; i<sizeOfBasis(); i++)
       cout << eigVal[i] << endl;
     
+    
     ofstream outFinalGap("output/Galerkin/finalGap.txt",  std::ofstream::app);
-    outFinalGap << gamma() << " " << nbOfFourier() << " " << nbOfHermite() << " " << abs(eigVal[0]) << " " << abs(eigVal[1]) << endl;
+    //outFinalGap << externalForce_ << " " <<  amplitude_ << " " << gamma() << " " << nbOfFourier() << " " << nbOfHermite() << " " << abs(eigVal[0]) << " " << abs(eigVal[1]) << endl;
+    DVec gradV = amplitude_ * gettGiHj(2,0) / sqrt(2.);
+    cout << "gradV : " << gradV << endl << endl;
+    DVec gradVz = gradV - dot(gradV, gVector()) * gVector();
+    cout << "gradVz : " << gradVz << endl;
+    DVec CV = solve(Leq_, gradV);
+    cout << "CV before proj : " << CV << endl;
+    DVec CVzero = CV - dot(CV, gVector()) * gVector();
+    cout << "CV after proj : " << CVzero << endl;
+    DVec LCV = Leq_*CV;
+    DVec LCVz = Leq_*CVzero;
+    cout << "LCV : " << LCV << endl;
+    cout << "LCVz : " << LCVz << endl;
+    DVec CVneq = CV - solve(Leq_, gradV);
+    outFinalGap << externalForce_ << " " <<  amplitude_ << " " << gamma() << " " << nbOfFourier() << " " << nbOfHermite() << " " << abs(eigVal[0]) << " " << abs(eigVal[1]) << " " << CVneq.norm() << endl;
     
     ofstream out_eigvalLeq("output/Galerkin/eigvalLeq");
     for (int i = 0; i < (int) eigVal.size(); i++)
@@ -690,15 +641,16 @@ namespace simol
     Galerkin(input)
   {    
     computeExpToTrigTens();
-    createLeq();
+    createLeta();
   }
   
-  void OverdampedGalerkin::createLeq()
+  void OverdampedGalerkin::createLeta()
   {
     basis_(0)->laplacianMatrix(Leq_);
     Leq_ /= -beta_;
+    
     basis_(0)->gradMatrix(Lrep_);
-    Leq_ += externalForce_ * Lrep_;
+    Leta_ = Leq_ + externalForce_ * Lrep_;
     /*for (int iOfHermite = 0; iOfHermite < (int)nbOfHermite_; iOfHermite++)
       for (int jOfHermite = 0; jOfHermite < (int)nbOfHermite_; jOfHermite++)
         Leq_(iOfHermite, iOfHermite) = - 1 / beta_ * basis_(0)->xLaplacianY(iOfHermite+1, jOfHermite+1);*/
@@ -716,24 +668,24 @@ namespace simol
     cout << "############ Leq ############" << endl;
     //cout << Leq_ << endl << endl;
     
-    cout << "Leq_ size : " << Leq_.numberOfRows() << " x " << Leq_.numberOfColumns() << endl;
+    cout << "Leq_ size : " << Leq_.rows() << " x " << Leq_.cols() << endl;
     cout << "Leq_ nnz : " << Leq_.nonZeros() << endl;
 
-    DenseMatrix<double> DLeq = Leq_.dense();
+    DMat DLeq(Leq_);
     display(Leq_, "output/Galerkin/Leq");
 
 
-    //DenseMatrix<double> DLeqSad = shapeSaddle(DLeq);
+    //DMat DLeqSad = shapeSaddle(DLeq);
     //display(DLeqSad, "output/Galerkin/LeqSad");
 
     cout << "############ DLeqSad ############" << endl;
     //cout << DLeqSad << endl << endl;
 
-    //DenseMatrix<double> IdSad(sizeOfBasis_+1, sizeOfBasis_, fill::eye);
+    //DMat IdSad(sizeOfBasis_+1, sizeOfBasis_, fill::eye);
 
     cout << "Computing DLeqInv..."; cout.flush();
-    //DenseMatrix<double> LeqInvSad = inv(DLeqSad);
-    DenseMatrix<double> DLeqInv = invWithSaddle(DLeq);
+    //DMat LeqInvSad = inv(DLeqSad);
+    DMat DLeqInv = invWithSaddle(DLeq);
     cout << "OK" << endl;
     
     cout << "Norm2gVector : " << norm2gVector() << endl;
@@ -743,8 +695,8 @@ namespace simol
     display(DLeqInv, "output/Galerkin/DLeqInv");
     
     cout << "Computing LeqInv..."; cout.flush();
-    //DenseMatrix<double> LeqInvSad = inv(DLeqSad);
-    DenseMatrix<double> LeqInv = invWithSaddle(Leq_);
+    //DMat LeqInvSad = inv(DLeqSad);
+    DMat LeqInv = invWithSaddle(Leq_);
     cout << "OK" << endl;
     display(DLeqInv, "output/Galerkin/DLeqInv");
     
@@ -770,8 +722,12 @@ namespace simol
   
   DVec OverdampedGalerkin::CVcoeffsVec() const
   {
+    //return gVector();
     //return getGradV();
-    return -solve(Leq_, -getGradV());
+    if (doNonequilibrium())
+      return -projectionOrthoG(solve(Leta_, -projectionOrthoG(getGradV())));
+    else
+      return -projectionOrthoG(solve(Leq_, -projectionOrthoG(getGradV())));
   }
 
 
@@ -783,22 +739,13 @@ namespace simol
   {
     computeExpToTrigTens();
     
-    cout << "############ Lham ############" << endl;
     Lham_ = kron(Q_, tP_) - kron(tQ_, P_);
     display(Lham_, "output/Galerkin/Lham");
-
-    cout << "############ Lthm ############" << endl;
     createLthm();
     display(Lthm_, "output/Galerkin/Lthm");
-
-    cout << "############ Leq ############" << endl;
     Leq_  = Lham_ + gamma_ * Lthm_;
-
-    cout << "############ L1 ############" << endl;
     //Lrep_ = kron(SMat::Identity(nbOfFourier_) , P_);
     Lrep_ = kron(SIdQ_, P_);
-
-    cout << "############ Leta ############" << endl;
     Leta_ = Leq_ + externalForce_ * Lrep_;
   }
   
@@ -851,9 +798,9 @@ namespace simol
     return temp;
   }
 
-  DenseMatrix<double> tensorPower(DenseMatrix<double> const& A, int power)
+  DMat tensorPower(DMat const& A, int power)
   {
-    DenseMatrix<double> temp = A;
+    DMat temp = A;
     for (int i = 1; i < power; i++)
       temp = kron(temp, A);
     return temp;
@@ -862,8 +809,8 @@ namespace simol
   SMat BoundaryLangevinGalerkin::PMatToTens(SMat const& PMat, int iOfParticleP)
   {
     assert(iOfParticleP < nbOfParticles_);
-    //SMat tempId = speye(PMat.numberOfRows(), PMat.numberOfColumns());
-    SMat res = speye<double>(1, 1);
+    //SMat tempId = speye(PMat.rows(), PMat.cols());
+    SMat res = DMat::Identity(1, 1).sparseView();
     for (int i = 0; i < nbOfParticles_; i++)
     {
       res = kron(res, SIdQ_);
@@ -882,8 +829,8 @@ namespace simol
     /*assert(iOfVariableA < iOfVariableB);
     assert(iOfVariableB < nbOfVariables);
     assert(A.size() == B.size());*/
-    //SMat tempId = speye(A.numberOfRows(), A.numberOfColumns());
-    SMat res = speye<double>(1, 1);
+    //SMat tempId = speye(A.rows(), A.cols());
+    SMat res = DMat::Identity(1, 1).sparseView();
     for (int i = 0; i < nbOfParticles_; i++)
     {
       if (i == iOfParticleQ) res = kron(res, QMat);
@@ -891,7 +838,7 @@ namespace simol
       if (i == iOfParticleP) res = kron(res, PMat);
       else res = kron(res, SIdP_);
     }
-    cout << "res : " << res.numberOfRows() << " x " << res.numberOfColumns() << endl;
+    cout << "res : " << res.rows() << " x " << res.cols() << endl;
     return res;
   }
 
@@ -920,7 +867,7 @@ namespace simol
   {
     cout << "createLthm0" << endl;
     for (int iOfHermite = 1; iOfHermite < (int)nbOfHermite_; iOfHermite++)
-      Lthm0_(iOfHermite, iOfHermite) = -beta_ * iOfHermite;
+      Lthm0_.insert(iOfHermite, iOfHermite) = -beta_ * iOfHermite;
     cout << "end createLthm0" << endl;
   }
 
@@ -971,47 +918,47 @@ namespace simol
     cout << "############ Leq ############" << endl;
     //cout << Leq_ << endl << endl;
     
-    cout << "Leq_ size : " << Leq_.numberOfRows() << " x " << Leq_.numberOfColumns() << endl;
+    cout << "Leq_ size : " << Leq_.rows() << " x " << Leq_.cols() << endl;
     cout << "Leq_ nnz : " << Leq_.nonZeros() << endl;
 
-    DenseMatrix<double> DLeq = Leq_.dense();
+    DMat DLeq(Leq_);
     display(Leq_, "output/Galerkin/Leq");
 
-    //DenseMatrix<double> DLeqSad = shapeSaddle(DLeq);
+    //DMat DLeqSad = shapeSaddle(DLeq);
     //display(DLeqSad, "output/Galerkin/LeqSad");
 
     cout << "############ DLeqSad ############" << endl;
     //cout << DLeqSad << endl << endl;
 
-    //DenseMatrix<double> IdSad(sizeOfBasis_+1, sizeOfBasis_, fill::eye);
+    //DMat IdSad(sizeOfBasis_+1, sizeOfBasis_, fill::eye);
 
     cout << "Computing DLeqInv..."; cout.flush();
-    //DenseMatrix<double> LeqInvSad = inv(DLeqSad);
-    DenseMatrix<double> DLeqInv = invWithSaddle(DLeq);
+    //DMat LeqInvSad = inv(DLeqSad);
+    DMat DLeqInv = invWithSaddle(DLeq);
     cout << "OK" << endl;
     display(DLeqInv, "output/Galerkin/DLeqInv");
     
     cout << "Computing LeqInv..."; cout.flush();
-    //DenseMatrix<double> LeqInvSad = inv(DLeqSad);
-    DenseMatrix<double> LeqInv = invWithSaddle(Leq_);
+    //DMat LeqInvSad = inv(DLeqSad);
+    DMat LeqInv = invWithSaddle(Leq_);
     cout << "OK" << endl;
     display(DLeqInv, "output/Galerkin/DLeqInv");
 
-    DVec N0H2Trig = Vector<double>::Zero(sizeOfBasis_);
+    DVec N0H2Trig = DVec::Zero(sizeOfBasis_);
     N0H2Trig(iTens(0, 2, 0)) = 1;
     display(N0H2Trig, "output/Galerkin/N0H2Trig");
     DVec N0H2 = trigToExpTens_ * N0H2Trig;
     display(N0H2, "output/Galerkin/N0H2");
     
-    //DenseMatrix<double> N0H2TrigMat(N0H2Trig, nbOfFourier_, nbOfHermite_); 
-    //DenseMatrix<double> N0H2Mat = trigToExpMat_ * N0H2TrigMat;
+    //DMat N0H2TrigMat(N0H2Trig, nbOfFourier_, nbOfHermite_); 
+    //DMat N0H2Mat = trigToExpMat_ * N0H2TrigMat;
     
-    DenseMatrix<double> N0H2Mat(N0H2, pow(nbOfFourier_, nbOfParticles_), pow(nbOfHermite_, nbOfParticles_));
+    DMat N0H2Mat = reshape(N0H2, pow(nbOfFourier_, nbOfParticles_), pow(nbOfHermite_, nbOfParticles_));
     
     display(N0H2Mat, "output/Galerkin/N0H2Mat");
     
     DVec LinvN0H2 = solveWithSaddle(Leq_, N0H2);
-    DenseMatrix<double> LinvN0H2Mat(LinvN0H2, pow(nbOfFourier_, nbOfParticles_), pow(nbOfHermite_, nbOfParticles_));
+    DMat LinvN0H2Mat = reshape(LinvN0H2, pow(nbOfFourier_, nbOfParticles_), pow(nbOfHermite_, nbOfParticles_));
     display(LinvN0H2Mat, "output/Galerkin/LinvN0H2Mat");
     
     /*cx_vec eigvalLeq;

@@ -44,7 +44,7 @@ namespace simol
     void secondPartThermalization(Particle& particle);
 
     //-- auxiliary functions --
-    Vector<double> effectiveDrift(Particle& particle);
+    DVec effectiveDrift(Particle& particle);
     void incrementRejection();
     void incrementTotalCountForRejection();
     double chi(double dist);

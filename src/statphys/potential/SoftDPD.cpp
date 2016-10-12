@@ -18,11 +18,11 @@ namespace simol
     else return 0;
   }
 
-  Vector<double> SoftDPD::gradient(double dist) const
+  DVec SoftDPD::gradient(double dist) const
   {
     if (dist < cutOffRadius_)
-      return Vector<double>(1, -epsilon_/cutOffRadius_);
-    else return Vector<double>(1, 0);
+      return DVec::Constant(1,1, -epsilon_/cutOffRadius_);
+    else return DVec::Constant(1, 0);
   }
 
 }

@@ -56,17 +56,17 @@ namespace simol
   ///Evaluate at the current state of "conifguration"
   void BoundaryLangevin::computeGeneratorOnBasis(CVBasis& cvBasis, System const& syst) const
   {
-    cvBasis.generatorOnBasisValues_ = DVec(cvBasis.totalNbOfElts(), 0);
-    //Vector<double> result = Vector<double>::Zero(nbOfFunctions());
+    cvBasis.generatorOnBasisValues_ = DVec::Zero(cvBasis.totalNbOfElts());
+    //DVec result = DVec::Zero(nbOfFunctions());
     for (int iOfFunction = 0; iOfFunction < cvBasis.totalNbOfElts(); iOfFunction++)
     {
       for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
-        cvBasis.generatorOnBasisValues_(iOfFunction) += dot(syst(iOfParticle).momentum(), cvBasis.basis_->gradientQ(syst, iOfParticle, iOfFunction))
-                               + dot(syst(iOfParticle).force(), cvBasis.basis_->gradientP(syst, iOfParticle, iOfFunction));
+        cvBasis.generatorOnBasisValues_(iOfFunction) += syst(iOfParticle).momentum().dot(cvBasis.basis_->gradientQ(syst, iOfParticle, iOfFunction))
+                               + syst(iOfParticle).force().dot(cvBasis.basis_->gradientP(syst, iOfParticle, iOfFunction));
       //if(false)
-      cvBasis.generatorOnBasisValues_(iOfFunction) += gamma() * (- dot(syst(0).momentum(), cvBasis.basis_->gradientP(syst, 0, iOfFunction))
+      cvBasis.generatorOnBasisValues_(iOfFunction) += gamma() * (- syst(0).momentum().dot(cvBasis.basis_->gradientP(syst, 0, iOfFunction))
                                       + cvBasis.basis_->laplacianP(syst, 0, iOfFunction) / betaLeft()
-                                      - dot(syst(syst.nbOfParticles() - 1).momentum(), cvBasis.basis_->gradientP(syst, syst.nbOfParticles() - 1, iOfFunction))
+                                      - syst(syst.nbOfParticles() - 1).momentum().dot( cvBasis.basis_->gradientP(syst, syst.nbOfParticles() - 1, iOfFunction))
                                       + cvBasis.basis_->laplacianP(syst, syst.nbOfParticles() - 1, iOfFunction) / betaRight());
     }
   }

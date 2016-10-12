@@ -13,7 +13,7 @@ namespace simol
     public:
       FPU(Input const& input);
       double operator()(double position) const;
-      Vector<double> gradient(double position) const;
+      DVec gradient(double position) const;
       double laplacian(double position) const;
       virtual double shiftToHarmonic() const;
       

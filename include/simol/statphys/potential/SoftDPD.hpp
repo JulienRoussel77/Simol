@@ -11,7 +11,7 @@ namespace simol
   public:
     SoftDPD(Input const& input);
       double operator()(double dist) const;
-    Vector<double> gradient(double dist) const;
+    DVec gradient(double dist) const;
   private:
     
     double epsilon_;

@@ -36,14 +36,16 @@ namespace simol
       return sumValues_(i, j) / nbValues(i, j);
   }
 
-  Vector<double> Statistics::meanVec(int i) const
+  DVec Statistics::meanVec(int i) const
   {
-    return piecewiseDivision(sumValues_.column(i), nbValues_.column(i));
+    //return piecewiseDivision(sumValues_.col(i), nbValues_.col(i));
+    return sumValues_.col(i).array() / nbValues_.cast<double>().col(i).array();
   }
 
-  DenseMatrix<double> Statistics::meanMat() const
+  DMat Statistics::meanMat() const
   {
-    return piecewiseDivision(sumValues_, nbValues_);
+    //return piecewiseDivision(sumValues_, nbValues_);
+    return sumValues_.array() / nbValues_.cast<double>().array();
   }
 
 
@@ -52,12 +54,12 @@ namespace simol
     return nbValues_(i, j);
   }
 
-  const Vector<long int> Statistics::nbValuesVec(int i) const
+  const DVecInt Statistics::nbValuesVec(int i) const
   {
-    return nbValues_.column(i);
+    return nbValues_.col(i);
   }
 
-  const DenseMatrix<long int>& Statistics::nbValuesMat() const
+  const DMatInt& Statistics::nbValuesMat() const
   {
     return nbValues_;
   }
@@ -68,12 +70,12 @@ namespace simol
     return lastValue_(i, j);
   }
 
-  const Vector<double> Statistics::lastValueVec(int i) const
+  const DVec Statistics::lastValueVec(int i) const
   {
-    return lastValue_.column(i);
+    return lastValue_.col(i);
   }
 
-  const DenseMatrix<double>& Statistics::lastValueMat() const
+  const DMat& Statistics::lastValueMat() const
   {
     return lastValue_;
   }  
@@ -233,9 +235,9 @@ namespace simol
     return statsIntegratedCorrelation_.mean(iOfObservable);
   }
 
-  Vector<double> CorrelationStats::integratedCorrelationVec() const
+  DVec CorrelationStats::integratedCorrelationVec() const
   {
-    return statsIntegratedCorrelation_.meanMat().column(0);
+    return statsIntegratedCorrelation_.meanMat().col(0);
   }
 
   double CorrelationStats::integratedCorrelationUnbiased(int iOfObservable) const

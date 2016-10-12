@@ -49,7 +49,7 @@ namespace simol
       throw runtime_error("Reading CV coefficients from a file is not fixed yet !");
       std::string coeffsPath = input.outputFolderName() + input.controlVariateCoeffsPath();
       ifstream file(coeffsPath);
-      //coeffsVec_ = SparseMatrix<double>(coeffsPath, getNbOfLines(file));
+      //coeffsVec_ = SMat(coeffsPath, getNbOfLines(file));
     }
     else
     {
@@ -116,7 +116,7 @@ namespace simol
     return autocoStatsBetter_.varOfVar();
   }
 
-  Vector<double> ControlVariate::correlationB2() const
+  DVec ControlVariate::correlationB2() const
   {
     return statsB2_.integratedCorrelationVec();
   }
@@ -196,8 +196,8 @@ namespace simol
     {
       throw std::runtime_error("CV with coefficients estimated on the fly is not fixed yet !");
       //double betterObservableTerm = dot((statsB_.meanMat() - statsB2_.integratedCorrelationMat()), statsD_.meanMat().llt().solve(generatorOnBasisFunction));
-      /*DenseMatrix<double> Dinv = statsD_.meanMat().llt().solve(generatorOnBasisFunction);
-      Vector<double> B = statsB_.meanMat() - statsB2_.integratedCorrelationMat();
+      /*DMat Dinv = statsD_.meanMat().llt().solve(generatorOnBasisFunction);
+      DVec B = statsB_.meanMat() - statsB2_.integratedCorrelationMat();
       std::cout << B.transpose() * Dinv << endl;*/
       //cout << (statsB_.meanMat() - statsB2_.integratedCorrelationMat()).transpose().size() << "  " << statsD_.meanMat().inverse().size() << endl;
       //lastA_ = (statsB_.meanMat() - statsB2_.integratedCorrelationMat()).transpose() * statsD_.meanMat().llt().solve(generatorOnBasisFunction);
@@ -213,7 +213,7 @@ namespace simol
       cout << coeffsVec_ << endl;
       cout << "-----------------------------------------------" << endl;
       cout << "---------> " << dot(coeffsVec_, generatorOnBasisValues()) << endl;*/
-      autocoStatsBetter_.append(observable - dot(*cvBasis().cvCoeffs_, -generatorOnBasisValues()), iOfStep);
+      autocoStatsBetter_.append(observable + dot(*cvBasis().cvCoeffs_, generatorOnBasisValues()), iOfStep);
     }
 
     for (int iOfFunction = 0; iOfFunction < nbOfFunctions_; iOfFunction++)
@@ -225,38 +225,38 @@ namespace simol
 
 
 
-  Vector<double> ControlVariate::lastB1() const
+  DVec ControlVariate::lastB1() const
   {
     return statsB1_.lastValueVec();
   }
 
 
-  Vector<double> ControlVariate::meanB1() const
+  DVec ControlVariate::meanB1() const
   {
     return statsB1_.meanVec();
   }
 
-  Vector<double> ControlVariate::meanB() const
+  DVec ControlVariate::meanB() const
   {
     return statsB1_.meanVec() - statsB2_.integratedCorrelationVec();
   }
 
-  DenseMatrix<double> ControlVariate::lastD() const
+  DMat ControlVariate::lastD() const
   {
     return statsD_.lastValueMat();
   }
 
-  DenseMatrix<double> ControlVariate::meanD() const
+  DMat ControlVariate::meanD() const
   {
     return statsD_.meanMat();
   }
 
-  Vector<double> ControlVariate::lastGeneratorOnBasis() const
+  DVec ControlVariate::lastGeneratorOnBasis() const
   {
     return statsGeneratorOnBasis_.lastValueVec();
   }
 
-  Vector<double> ControlVariate::meanGeneratorOnBasis() const
+  DVec ControlVariate::meanGeneratorOnBasis() const
   {
     return statsGeneratorOnBasis_.meanVec();
   }
@@ -266,7 +266,7 @@ namespace simol
     return statsB2_.correlationAtSpan(iOfSpan, iOfFunction);
   }
 
-  Vector<double> ControlVariate::lastA() const
+  DVec ControlVariate::lastA() const
   {
     return lastA_;
 
@@ -353,10 +353,10 @@ namespace simol
     return sin(2 * M_PI * q);
   }
 
-  Vector<double> SinusControlVariate::gradientQ(System const& syst, int /*iOfParticle*/, int /*iOfFunction*/) const
+  DVec SinusControlVariate::gradientQ(System const& syst, int /*iOfParticle*/, int /*iOfFunction*/) const
   {
     double q = syst(0).position(0);
-    Vector<double> grad(dimension_);
+    DVec grad(dimension_);
     grad(0) = 2 * M_PI * cos(2 * M_PI * q);
     return grad;
   }
@@ -373,9 +373,9 @@ namespace simol
     return 0;
   }
 
-  Vector<double> SinusControlVariate::gradientP(System const&, int /*iOfParticle*/, int /*iOfFunction*/) const
+  DVec SinusControlVariate::gradientP(System const&, int /*iOfParticle*/, int /*iOfFunction*/) const
   {
-    return Vector<double>(dimension_);
+    return DVec(dimension_);
   }
 
 
@@ -413,7 +413,7 @@ namespace simol
     return (*cvBasis().cvCoeffs_)(i);
   }
 
-  double BasisControlVariate::basisFunction(System const& syst, int /*iOfFunction*/) const
+  double BasisControlVariate::basisFunction(System const&, int /*iOfFunction*/) const
   {
     assert(iOfFunction == 0);
     
@@ -427,10 +427,10 @@ namespace simol
     return result;*/
   }
 
-  Vector<double> BasisControlVariate::gradientQ(System const& syst, int iOfParticle, int /*iOfFunction*/) const
+  DVec BasisControlVariate::gradientQ(System const& syst, int iOfParticle, int /*iOfFunction*/) const
   {
     //cout << "BasisControlVariate::gradientQ" << endl;
-    Vector<double> result(1, 0);
+    DVec result(1, 0);
     assert(iOfFunction == 0);
     
     for (int i=0; i < (int)cvCoeffs().size(); i++)
@@ -450,9 +450,9 @@ namespace simol
     return result;
   }
 
-  Vector<double> BasisControlVariate::gradientP(System const& syst, int iOfParticle, int /*iOfFunction*/) const
+  DVec BasisControlVariate::gradientP(System const& syst, int iOfParticle, int /*iOfFunction*/) const
   {
-    Vector<double> result(1, 0);
+    DVec result(1, 0);
     assert(iOfFunction == 0);
     
     for (int i=0; i < (int)cvCoeffs().size(); i++)
@@ -506,8 +506,8 @@ namespace simol
       out << q << " ";
       for (double p = -pMax_; p < pMax_; p += deltaP_)
       {
-        conf[0]->position() = Vector<double>(1, q);
-        conf[0]->momentum() = Vector<double>(1, p);
+        conf[0]->position() = DVec::Constant(1, q);
+        conf[0]->momentum() = DVec::Constant(1, p);
         out << basisFunction(conf, 0) << " ";
       }
       out << endl;
@@ -529,8 +529,8 @@ namespace simol
       out << q << " ";
       for (double p = -pMax_; p < pMax_; p += deltaP_)
       {
-        conf[0]->position() = Vector<double>(1, q);
-        conf[0]->momentum() = Vector<double>(1, p);
+        conf[0]->position() = DVec::Constant(1, q);
+        conf[0]->momentum() = DVec::Constant(1, p);
         out << gradientQ(conf, 0) << " ";
       }
       out << endl;
@@ -552,8 +552,8 @@ namespace simol
       out << q << " ";
       for (double p = -pMax_; p < pMax_; p += deltaP_)
       {
-        conf[0]->position() = Vector<double>(1, q);
-        conf[0]->momentum() = Vector<double>(1, p);
+        conf[0]->position() = DVec::Constant(1, q);
+        conf[0]->momentum() = DVec::Constant(1, p);
         out << gradientP(conf, 0) << " ";
       }
       out << endl;

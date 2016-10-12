@@ -95,9 +95,9 @@ namespace simol
 
 
 
-  Vector<double> Input::initialPosition(int const& iOfParticle) const
+  DVec Input::initialPosition(int const& iOfParticle) const
   {
-    Vector<double> q0(dimension(), 0);
+    DVec q0(DVec::Zero(dimension()));
     if (data["System"]["Position"])
       q0(0) = data["System"]["Position"].as<double>();
     else if (doRestart() && iOfParticle >= 0)
@@ -109,9 +109,9 @@ namespace simol
     return q0;
   }
 
-  Vector<double> Input::initialMomentum(int const& iOfParticle) const
+  DVec Input::initialMomentum(int const& iOfParticle) const
   {
-    Vector<double> p0(dimension(), 0);
+    DVec p0(DVec::Zero(dimension()));
     if (data["System"]["Momentum"])
       p0(0) =  data["System"]["Momentum"].as<double>();
     else if (doRestart() && iOfParticle >= 0)

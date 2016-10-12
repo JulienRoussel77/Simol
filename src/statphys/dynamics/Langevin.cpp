@@ -6,7 +6,8 @@ namespace simol
   Langevin::Langevin(Input const& input):
     LangevinBase(input)
   {
-    galerkin_ = createLangevinGalerkin(input);
+    //galerkin_ = createLangevinGalerkin(input);
+    galerkin_ = createGalerkin(input);
   }
 
 
@@ -30,7 +31,7 @@ namespace simol
   ///Evaluate at the current state of "conifguration"
   void Langevin::computeGeneratorOnBasis(CVBasis& cvBasis, System const& syst) const
   {
-    cvBasis.generatorOnBasisValues_ = DVec(cvBasis.totalNbOfElts(), 0);
+    cvBasis.generatorOnBasisValues_ = DVec::Zero(cvBasis.totalNbOfElts());
     for (int iOfFunction = 0; iOfFunction < cvBasis.totalNbOfElts(); iOfFunction++)
       for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
       {
@@ -40,8 +41,8 @@ namespace simol
                                           + cvBasis.basis_->laplacianP(syst, iOfParticle, iOfFunction) / beta() );
       }
       
-    ofstream tempOut("aaaaaaaaaaaaaaaaaaaa.txt", std::ofstream::app);
-    tempOut << syst(0).position(0) << " " << syst(0).momentum(0) << " " << syst(0).force(0) << " " << dot(*cvBasis.cvCoeffs_, cvBasis.generatorOnBasisValues_) << endl;
+    //ofstream tempOut("aaaaaaaaaaaaaaaaaaaa.txt", std::ofstream::app);
+    //tempOut << syst(0).position(0) << " " << syst(0).momentum(0) << " " << syst(0).force(0) << " " << dot(*cvBasis.cvCoeffs_, cvBasis.generatorOnBasisValues_) << endl;
   }
   
 

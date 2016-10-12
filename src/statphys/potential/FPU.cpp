@@ -16,9 +16,9 @@ namespace simol
   double FPU::operator()(double distance) const
   { return stiffness_ / 2 * pow(distance, 2) + alpha_ / 3 * pow(distance, 3) + beta_ / 4 * pow(distance, 4); }
 
-  Vector<double> FPU::gradient(double distance) const
+  DVec FPU::gradient(double distance) const
   {
-    Vector<double> deriv(1);
+    DVec deriv(1);
     deriv(0) = stiffness_ * distance + alpha_ * pow(distance, 2) + beta_ * pow(distance, 3);
     return deriv;
   }

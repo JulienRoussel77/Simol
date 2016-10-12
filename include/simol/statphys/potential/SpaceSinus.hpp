@@ -10,9 +10,9 @@ namespace simol
   {
     public:
       SpaceSinus(Input const& input);
-      double operator()(Vector<double> const& position) const;
-      Vector<double> gradient(Vector<double> const& position) const;
-      double laplacian(Vector<double> const& position) const;
+      double operator()(DVec const& position) const;
+      DVec gradient(DVec const& position) const;
+      double laplacian(DVec const& position) const;
 
     private:
       double amplitude_;

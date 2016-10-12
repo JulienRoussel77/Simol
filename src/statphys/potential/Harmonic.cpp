@@ -13,9 +13,10 @@ namespace simol
   double Harmonic::operator()(double distance) const
   { return stiffness_ / 2 * pow(distance - sigmaPot_, 2); }
 
-  Vector<double> Harmonic::gradient(double distance) const
+  DVec Harmonic::gradient(double distance) const
   {
-    return Vector<double>(1, stiffness_ * (distance - sigmaPot_));
+    return DVec::Constant(1,1,stiffness_ * (distance - sigmaPot_));
+    //return DVec::Constant(1, stiffness_ * (distance - sigmaPot_));
   }
 
   double Harmonic::laplacian(double /*distance*/) const

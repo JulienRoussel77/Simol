@@ -41,3 +41,17 @@ bool hasSmallerNorm(cplx a, cplx b)
 {
   return (norm(a) < norm(b));
 }
+
+double dot(DVec const& u, DVec const& v)
+{
+  return u.dot(v);
+}
+
+DMat reshape(DVec const& u, int nbOfRows, int nbOfCols)
+{
+  DMat A(nbOfRows, nbOfCols);
+  for (int j=0; j<nbOfCols; j++)
+    for (int i=0; i<nbOfRows; i++)
+      A(i,j) = u(j * nbOfRows + i);
+  return A;
+}

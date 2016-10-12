@@ -31,8 +31,8 @@ namespace simol
     data(YAML::LoadFile(cmd.inputFileName())),
     inputPath_(cmd.inputFileName()),
     inputFlux_(inputPath()),
-    initialPositions_(nbOfParticles(), Vector<double>(dimension())),
-    initialMomenta_(nbOfParticles(), Vector<double>(dimension())),
+    initialPositions_(nbOfParticles(), DVec(dimension())),
+    initialMomenta_(nbOfParticles(), DVec(dimension())),
     initialInternalEnergies_(nbOfParticles(), 0)
   {
     assert(data.IsDefined());

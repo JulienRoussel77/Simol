@@ -5,15 +5,21 @@
 #include <fstream>
 #include <locale>   //contains std::tolower
 #include <vector>
-#include "simol/core/linalg/SparseMatrix.hpp"
-#include "simol/core/linalg/DenseMatrix.hpp"
-#include "simol/core/linalg/Vector.hpp"
+//#include "simol/core/linalg/SparseMatrix.hpp"
+//#include "simol/core/linalg/DenseMatrix.hpp"
+//#include "simol/core/linalg/Vector.hpp"
 #include <stdexcept>
 #include <list>
 #include <iomanip>
 #include <fstream>
 #include <vector>
 #include <memory>
+
+#include <Eigen/Core>
+#include <Eigen/Dense>
+#include <Eigen/Sparse>
+#include <Eigen/SparseCore>
+#include <Eigen/SVD>
 
 using std::setw;
 using std::ofstream;
@@ -34,9 +40,19 @@ using std::list;
 
 typedef std::complex<double> cplx;
 
-typedef simol::SparseMatrix<double> SMat;
-typedef simol::DenseMatrix<double> DMat;
-typedef simol::Vector<double> DVec;
+//typedef simol::SparseMatrix<double> SMat;
+//typedef simol::DenseMatrix<double> DMat;
+//typedef simol::Vector<double> DVec;
+
+typedef Eigen::SparseMatrix<double> SMat;
+typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> DMat;
+typedef Eigen::Matrix<double, Eigen::Dynamic, 1> DVec;
+
+typedef Eigen::Matrix<cplx, Eigen::Dynamic, 1> DVecCplx;
+
+typedef Eigen::SparseMatrix<long int> SMatInt;
+typedef Eigen::Matrix<long int, Eigen::Dynamic, Eigen::Dynamic> DMatInt;
+typedef Eigen::Matrix<long int, Eigen::Dynamic, 1> DVecInt;
 
 double modulo(double variable, double mini, double maxi);
 int intModulo(int variable, int maxi);
@@ -44,6 +60,8 @@ void displayTime(double time);
 int getNbOfLines(ifstream& file);
 //bool hasSmallerNorm(const cplx& a, const cplx& b);
 bool hasSmallerNorm(cplx a, cplx b);
+double dot(DVec const& u, DVec const& v);
+DMat reshape(DVec const& u, int nbOfRows, int nbOfCols);
 
 const int idKineticEnergy = 0;
 const int idPotentialEnergy = 1;

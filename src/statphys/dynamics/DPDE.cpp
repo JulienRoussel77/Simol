@@ -125,23 +125,23 @@ namespace simol
     particle.internalEnergy() += old_kin_energy - new_kin_energy;
   }
 
-  Vector<double> DPDE::effectiveDrift(Particle& particle)
+  DVec DPDE::effectiveDrift(Particle& particle)
   {
     double e0 = particle.totalEnergyDPDE(); 
-    Vector<double> drift = -pow(sigma(),2)* heatCapacity()/(2*particle.mass())*particle.momentum()/(e0-particle.kineticEnergy());
+    DVec drift = -pow(sigma(),2)* heatCapacity()/(2*particle.mass())*particle.momentum()/(e0-particle.kineticEnergy());
     return drift;
   }
 
   void DPDE::metropolizedEnergyReinjection(Particle& particle)
   {
     //-- keep previous configuration --
-    Vector<double> old_momentum = particle.momentum();
+    DVec old_momentum = particle.momentum();
     double old_kin_energy = particle.kineticEnergy();
     double E0 = old_kin_energy + particle.internalEnergy(); 
     //-- propose a new move --
-    Vector<double> G = rng_->gaussian();
+    DVec G = rng_->gaussian();
     // EM scheme: not stable...
-    //Vector<double> b = effectiveDrift(particle);
+    //DVec b = effectiveDrift(particle);
     //particle.momentum() += b*timeStep_ + sigma()*sqrt(timeStep_)*G;
     // SSA like scheme: should be better
     double gamma_n = gamma_DPDE(E0-old_kin_energy);
@@ -157,7 +157,7 @@ namespace simol
     	double gamma_reverse = gamma_DPDE(E0-new_kin_energy);
     	double alpha_reverse = exp(-gamma_reverse / particle.mass() * timeStep_);
     	double sigma2_reverse = (1 - pow(alpha_reverse,2)) * particle.mass() * temperature() * gamma() / gamma_reverse; 
-    	Vector<double> GG = old_momentum - alpha_reverse*particle.momentum();
+    	DVec GG = old_momentum - alpha_reverse*particle.momentum();
 	rate -= 0.5*pow(GG.norm(), 2)/sigma2_reverse;
     	rate = exp(rate)*sigma_n/sqrt(sigma2_reverse);
       }
@@ -300,22 +300,22 @@ namespace simol
   void DPDE::elementaryFluctuationDissipation(System const& syst, Particle& particle1, Particle& particle2)
   {
     // keep previous configuration
-    Vector<double> old_momentum_1 = particle1.momentum();
-    Vector<double> old_momentum_2 = particle2.momentum();
+    DVec old_momentum_1 = particle1.momentum();
+    DVec old_momentum_2 = particle2.momentum();
     // compute the unit vector e12 of line of centers and the distance (as above) 
-    Vector<double> r12 = syst.representant(particle1.position() - particle2.position());
+    DVec r12 = syst.representant(particle1.position() - particle2.position());
     double distance = r12.norm();
-    Vector<double> e12 = r12/distance;
+    DVec e12 = r12/distance;
     // compute the variation of the relative velocity
     //double old_kin_energy = particle1.kineticEnergy() + particle2.kineticEnergy();
     
     double mu12 = 1./( 1./particle1.mass() + 1./particle2.mass() ); // reduced mass
-    Vector<double> vect12 = particle1.momentum()/particle1.mass() - particle2.momentum()/particle2.mass();  
+    DVec vect12 = particle1.momentum()/particle1.mass() - particle2.momentum()/particle2.mass();  
     double v12_0 = dot(vect12,e12);
     double v12 = pairwiseFluctuationDissipation(v12_0,distance,particle1.internalEnergy(),particle2.internalEnergy(),mu12); 
     // update the momenta
-    Vector<double> totalMomentum = particle1.momentum() + particle2.momentum();
-    Vector<double> v12_perp = vect12 - dot(vect12,e12)*e12;
+    DVec totalMomentum = particle1.momentum() + particle2.momentum();
+    DVec v12_perp = vect12 - dot(vect12,e12)*e12;
     //cout << vect12 << ", " << e12 << " : dot = " << dot(vect12,e12) << endl;
     particle1.momentum() += mu12*(v12-v12_0)*e12;
     particle2.momentum() -= mu12*(v12-v12_0)*e12;

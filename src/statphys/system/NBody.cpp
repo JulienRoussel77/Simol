@@ -224,7 +224,7 @@ namespace simol
 
   ///
   /// find the index of the cell in which a particle is
-  int NBody::findIndex(Vector<double> const& pos) const
+  int NBody::findIndex(DVec const& pos) const
   {
     int i1 = floor(periodicPosition(pos(0)) / cellSize_);
     int i2 = floor(periodicPosition(pos(1)) / cellSize_);
@@ -258,7 +258,6 @@ namespace simol
     //-- initialize the vector of indices of neighboring cells --
     for (int j = 0; j < nbOfCells_; j++)
       cells_[j].indexNeighbors() = vector<int>(nbOfNeighbors_, 0);
-    Vector<int> currentVecIndex(dimension_); 
     //-- find the neighboring cells --
     if (dimension_ == 2)
     {
@@ -308,9 +307,9 @@ namespace simol
     }
   }
   
-  Vector<double> NBody::representant(Vector<double> vecDistance) const
+  DVec NBody::representant(DVec vecDistance) const
   {
-    Vector<double> periodicDistance;
+    DVec periodicDistance;
     for (int d = 0; d < (int)dimension_; d++)
       periodicDistance(d) -= rint(vecDistance(d) / domainSize_) * domainSize_;
     return periodicDistance;
@@ -421,7 +420,7 @@ namespace simol
   /// elementary interaction between two particles
   void NBody::interaction(Particle& particle1, Particle& particle2) const
   {
-    Vector<double> r12 = particle1.position() - particle2.position();
+    DVec r12 = particle1.position() - particle2.position();
     // take closest periodic image
     double distance = 0.;
     for (int d = 0; d < (int)dimension_; d++)

@@ -9,26 +9,25 @@ using std::endl;
 namespace simol
 {
 
-  Particle::Particle(double const& mass, Vector<double> const& position0, Vector<double> const& momentum0, double internalEnergy0):
+  Particle::Particle(double const& mass, DVec const& position0, DVec const& momentum0, double internalEnergy0):
     mass_(mass),
     position_(position0),
     momentum_(momentum0),
     potentialEnergy_(0),
-    force_(dimension(), 0),
-    energyGrad_(dimension(), 0),
+    force_(DVec::Zero(dimension())),
+    energyGrad_(DVec::Zero(dimension())),
     energyLapla_(0),
     countdown_(0),
     internalEnergy_(internalEnergy0),
     virial_(0)
-  {
-  }
+  {}
 
   Particle::Particle(int dimension) :
-    Particle(0, Vector<double>(dimension, 0), Vector<double>(dimension, 0))
+    Particle(0, DVec::Zero(dimension), DVec::Zero(dimension))
   {}
 
   Particle::Particle(double const& mass, double const& position0, double const& momentum0, double internalEnergy0):
-    Particle(mass, Vector<double>(1, position0), Vector<double>(1, momentum0), internalEnergy0)
+    Particle(mass, DVec::Constant(1, position0), DVec::Constant(1, momentum0), internalEnergy0)
   {}
 
   int Particle::dimension() const
@@ -48,10 +47,10 @@ namespace simol
 
   //--- primary variables ----
 
-  Vector<double> const & Particle::position() const
+  DVec const & Particle::position() const
   { return position_; }
 
-  Vector<double> & Particle::position()
+  DVec & Particle::position()
   { return position_; }
 
   double const & Particle::position(int i) const
@@ -60,10 +59,10 @@ namespace simol
   double & Particle::position(int i)
   {return position_(i);}
 
-  Vector<double> const & Particle::momentum() const
+  DVec const & Particle::momentum() const
   { return momentum_; }
 
-  Vector<double> & Particle::momentum()
+  DVec & Particle::momentum()
   { return momentum_; }
 
   double const & Particle::momentum(int i) const
@@ -103,10 +102,10 @@ namespace simol
   double Particle::totalEnergyDPDE() const
   { return kineticEnergy() + potentialEnergy_ + internalEnergy_; }
 
-  Vector<double> const& Particle::force() const
+  DVec const& Particle::force() const
   { return force_; }
 
-  Vector<double>& Particle::force()
+  DVec& Particle::force()
   { return force_; }
 
   const double& Particle::force(int i) const
@@ -115,7 +114,7 @@ namespace simol
   double& Particle::force(int i)
   { return force_(i); }
 
-  Vector<double> Particle::velocity() const
+  DVec Particle::velocity() const
   {return momentum_ / mass_;}
   
   double Particle::velocity(int iOfDim) const
@@ -123,10 +122,10 @@ namespace simol
 
   //---- currently specific to chains -----
 
-  Vector<double> const& Particle::energyGrad() const
+  DVec const& Particle::energyGrad() const
   { return energyGrad_; }
 
-  Vector<double>& Particle::energyGrad()
+  DVec& Particle::energyGrad()
   { return energyGrad_; }
 
   const double& Particle::energyGrad(int i) const

@@ -87,15 +87,15 @@ namespace simol
   { return SparseMatrix(wrapped_.adjoint()); }
 
 
-    //! Returns a dense matrix equal to the sparse matrix
-    template<typename ScalarType> inline
-    DenseMatrix<ScalarType, eigen> SparseMatrix<ScalarType, eigen>::dense() const
-    {
-       DenseMatrix<ScalarType, eigen> M(wrapped_.rows(), wrapped_.cols());
-       M.wrapped_ = wrapped_.template triangularView<Eigen::Upper>();
-       M.wrapped_ += wrapped_.template triangularView<Eigen::StrictlyLower>();
-        return M;
-    }
+  //! Returns a dense matrix equal to the sparse matrix
+  template<typename ScalarType> inline
+  DenseMatrix<ScalarType, eigen> SparseMatrix<ScalarType, eigen>::dense() const
+  {
+      DenseMatrix<ScalarType, eigen> M(wrapped_.rows(), wrapped_.cols());
+      M.wrapped_ = wrapped_.template triangularView<Eigen::Upper>();
+      M.wrapped_ += wrapped_.template triangularView<Eigen::StrictlyLower>();
+      return M;
+  }
 
 
   //! Construction from a file

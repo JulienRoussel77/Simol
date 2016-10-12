@@ -146,10 +146,10 @@ namespace simol
   ///The first 2 derivates of the potential are stored in "particle2"
   void TriChain::triInteraction(Particle& particle1, Particle& particle2, Particle& particle3) const
   {
-    Vector<double> delta = particle3.position() - 2 * particle2.position() + particle1.position();
+    DVec delta = particle3.position() - 2 * particle2.position() + particle1.position();
     //double d12 = r12.norm();
     double energy123 = potential(delta);
-    Vector<double> force123 = potentialForce(delta);    // = - v'(r_2)
+    DVec force123 = potentialForce(delta);    // = - v'(r_2)
     double lapla123 = laplacian(delta);
 
     particle2.potentialEnergy() = energy123;

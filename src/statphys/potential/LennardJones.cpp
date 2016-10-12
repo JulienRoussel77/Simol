@@ -57,16 +57,16 @@ namespace simol
     else return 0;
   }
 
-  Vector<double> LennardJones::gradient(double dist) const
+  DVec LennardJones::gradient(double dist) const
   {
     if (dist < splineRadius_)
-      return Vector<double>(1, untruncatedDerivative(dist));
+      return DVec::Constant(1, untruncatedDerivative(dist));
     else if (dist < cutOffRadius_)
-      return Vector<double>(1, splineFunctionDerivative(dist));
-    else return Vector<double>(1, 0);
+      return DVec::Constant(1, splineFunctionDerivative(dist));
+    else return DVec::Constant(1, 0);
   }
 
-  /*Vector<double> LennardJones::gradient(vector<double> const& distVec) const
+  /*DVec LennardJones::gradient(vector<double> const& distVec) const
   {
     double dist = norm(distVec);
     double norm = -24 * epsilon_/ sigma_ * (2*pow(sigma_/dist,13)-pow(sigma_/dist,7));

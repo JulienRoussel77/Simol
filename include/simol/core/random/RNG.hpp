@@ -2,7 +2,12 @@
 #define SIMOL_GAUSSIAN_HPP
 
 #include <random>
-#include "simol/core/linalg/Vector.hpp"
+//#include "simol/core/linalg/Vector.hpp"
+
+
+typedef Eigen::SparseMatrix<double> SMat;
+typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> DMat;
+typedef Eigen::Matrix<double, Eigen::Dynamic, 1> DVec;
 
 
 namespace simol
@@ -27,10 +32,10 @@ namespace simol
         exponentialDistribution_(1)
       {}
 
-      //Vector<double> gaussian(double const & mean, double const & stdDev)
-      Vector<double> gaussian()
+      //DVec gaussian(double const & mean, double const & stdDev)
+      DVec gaussian()
       {
-        Vector<double> g(dimension_);
+        DVec g(dimension_);
         for (int i = 0; i < dimension_; i++)
           g(i) = normalDistribution_(generator_);
         return g;
@@ -41,9 +46,9 @@ namespace simol
         return normalDistribution_(generator_);
       }
 
-      Vector<double> uniform()
+      DVec uniform()
       {
-        Vector<double> u(dimension_);
+        DVec u(dimension_);
         for (int i = 0; i < dimension_; i++)
           u(i) = uniformDistribution_(generator_);
         return u;

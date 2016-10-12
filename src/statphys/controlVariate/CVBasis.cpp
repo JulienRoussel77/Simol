@@ -36,7 +36,7 @@ namespace simol
       basisValues_(iOfElt) = basis_->value(syst, iOfElt);
     
     ofstream tempOut("valueBasis.txt", std::ofstream::app);
-    tempOut << syst(0).position(0) << " " << syst(0).force(0) << " " << dot(*cvCoeffs_, basisValues_) << endl;
+    tempOut << modulo(syst(0).position(0), 0, 2*M_PI) << " " << syst(0).force(0) << " " << dot(*cvCoeffs_, basisValues_)-1 << endl;
   }
 }   
   

@@ -48,9 +48,9 @@ namespace simol
       // ACCESSEURS
       virtual bool isNone() const;
       bool doEstimateCvCoeffs() const;
-      double potential(Vector<double> const& position) const;
-      Vector<double> potentialDerivative(Vector<double> const& position) const;
-      double potentialLaplacian(Vector<double> const& position) const;
+      double potential(DVec const& position) const;
+      DVec potentialDerivative(DVec const& position) const;
+      double potentialLaplacian(DVec const& position) const;
       virtual int nbOfFunctions() const;
       virtual int nbOfFunctionPairs() const;
       virtual int nbOfFourier() const;
@@ -58,11 +58,11 @@ namespace simol
       CVBasis const& cvBasis() const;
       CVBasis& cvBasis();
 
-      virtual Vector<double> lastB1() const;
-      virtual Vector<double> meanB1() const;
-      virtual Vector<double> meanB() const;
-      virtual DenseMatrix<double> lastD() const;
-      virtual DenseMatrix<double> meanD() const;
+      virtual DVec lastB1() const;
+      virtual DVec meanB1() const;
+      virtual DVec meanB() const;
+      virtual DMat lastD() const;
+      virtual DMat meanD() const;
 
       
       virtual double lastValueBetter() const;
@@ -71,15 +71,15 @@ namespace simol
       virtual double stdDevBetter() const;
       virtual double varOfVarBetter() const;
  
-      virtual Vector<double> lastGeneratorOnBasis() const;
-      virtual Vector<double> meanGeneratorOnBasis() const;
+      virtual DVec lastGeneratorOnBasis() const;
+      virtual DVec meanGeneratorOnBasis() const;
       
       virtual double autocorrelationB2(int iOfSpan, int iOfFunction = 0) const;
 
-      virtual Vector<double> lastA() const;
+      virtual DVec lastA() const;
       virtual double lastA(int iOfFunction = 0) const;
 
-      virtual Vector<double> correlationB2() const;
+      virtual DVec correlationB2() const;
       virtual double correlationB2(int iOfFunction) const;
       
       const double& basisValue(int iOfFunction) const;
@@ -103,9 +103,9 @@ namespace simol
 
 
       virtual double laplacianQ(System const& syst, int iOfParticle = 0, int iOfFunction = 0) const = 0;
-      virtual Vector<double> gradientQ(System const& syst, int iOfParticle = 0, int iOfFunction = 0) const = 0;
+      virtual DVec gradientQ(System const& syst, int iOfParticle = 0, int iOfFunction = 0) const = 0;
       virtual double laplacianP(System const& syst, int iOfParticle = 0, int iOfFunction = 0) const = 0;
-      virtual Vector<double> gradientP(System const& syst, int iOfParticle = 0, int iOfFunction = 0) const = 0;
+      virtual DVec gradientP(System const& syst, int iOfParticle = 0, int iOfFunction = 0) const = 0;
       
 
       virtual void display(long int iOfStep);
@@ -124,9 +124,9 @@ namespace simol
       SinusControlVariate(const Input& input, int idObs, shared_ptr<CVBasis> cvBasis0);
       double basisFunction(System const& syst, int iOfFunction = 0) const;
       virtual double laplacianQ(System const& syst, int iOfParticle = 0, int iOfFunction = 0) const;
-      virtual Vector<double> gradientQ(System const& syst, int iOfParticle = 0, int iOfFunction = 0) const;
+      virtual DVec gradientQ(System const& syst, int iOfParticle = 0, int iOfFunction = 0) const;
       virtual double laplacianP(System const& syst, int iOfParticle = 0, int iOfFunction = 0) const;
-      virtual Vector<double> gradientP(System const& syst, int iOfParticle = 0, int iOfFunction = 0) const;
+      virtual DVec gradientP(System const& syst, int iOfParticle = 0, int iOfFunction = 0) const;
   };
 
   class BasisControlVariate : public ControlVariate
@@ -143,9 +143,9 @@ namespace simol
       
       double basisFunction(System const& syst, int iOfFunction = 0) const;
       virtual double laplacianQ(System const& syst, int iOfParticle = 0, int iOfFunction = 0) const;
-      virtual Vector<double> gradientQ(System const& syst, int iOfParticle = 0, int iOfFunction = 0) const;
+      virtual DVec gradientQ(System const& syst, int iOfParticle = 0, int iOfFunction = 0) const;
       virtual double laplacianP(System const& syst, int iOfParticle = 0, int iOfFunction = 0) const;
-      virtual Vector<double> gradientP(System const& syst, int iOfParticle = 0, int iOfFunction = 0) const;
+      virtual DVec gradientP(System const& syst, int iOfParticle = 0, int iOfFunction = 0) const;
   };
 
   class ExpFourierHermiteControlVariate : public BasisControlVariate

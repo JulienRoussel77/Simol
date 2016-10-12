@@ -9,7 +9,8 @@ namespace simol
   Overdamped::Overdamped(Input const& input):
     Dynamics(input)
   {
-    galerkin_ = createOverdampedGalerkin(input);
+    //galerkin_ = createOverdampedGalerkin(input);
+    galerkin_ = createGalerkin(input);
   }
  
 
@@ -42,15 +43,15 @@ namespace simol
   ///Evaluate at the current state of "conifguration"
   void Overdamped::computeGeneratorOnBasis(CVBasis& cvBasis, System const& syst) const
   {
-    cvBasis.generatorOnBasisValues_ = DVec(cvBasis.totalNbOfElts(), 0);
-    //Vector<double> result = Vector<double>::Zero(nbOfFunctions());
+    cvBasis.generatorOnBasisValues_ = DVec::Zero(cvBasis.totalNbOfElts());
+    //DVec result = DVec::Zero(nbOfFunctions());
     for (int iOfFunction = 0; iOfFunction < cvBasis.totalNbOfElts(); iOfFunction++)
       for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
         cvBasis.generatorOnBasisValues_(iOfFunction) += cvBasis.basis_->laplacianQ(syst, iOfParticle, iOfFunction) / beta()
                                + dot(syst(iOfParticle).force(), cvBasis.basis_->gradientQ(syst, iOfParticle, iOfFunction));
                    
-    ofstream tempOut("generatorOnBasis.txt", std::ofstream::app);
-    tempOut << syst(0).position(0) << " " << syst(0).force(0) << " " << dot(*cvBasis.cvCoeffs_, cvBasis.generatorOnBasisValues_) << endl;
+    //ofstream tempOut("generatorOnBasis.txt", std::ofstream::app);
+    //tempOut << syst(0).position(0) << " " << syst(0).force(0) << " " << dot(*cvBasis.cvCoeffs_, cvBasis.generatorOnBasisValues_) << endl;
   }
 
 }

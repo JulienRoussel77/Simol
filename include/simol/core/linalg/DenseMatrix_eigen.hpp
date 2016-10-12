@@ -71,6 +71,11 @@ namespace simol
       // with CwiseBinaryOp from Eigen
       DenseMatrix operator+(DenseMatrix const & other) const
       { return WrappedType(this->wrapped_ + other.wrapped_); }
+      
+      // TODO: write a non-pessimized version
+      // with CwiseBinaryOp from Eigen
+      DenseMatrix operator-(DenseMatrix const & other) const
+      { return WrappedType(this->wrapped_ - other.wrapped_); }
 
       // TODO: write a non-pessimized version (return type may different in eigen)
       DenseMatrix adjoint() const

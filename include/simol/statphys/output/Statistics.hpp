@@ -11,30 +11,30 @@ namespace simol
   class Statistics
   {
   protected:
-    DenseMatrix<double> sumValues_;
-    DenseMatrix<double> lastValue_;
-    DenseMatrix<long int> nbValues_;
-    DenseMatrix<double> iidVar_;
+    DMat sumValues_;
+    DMat lastValue_;
+    DMatInt nbValues_;
+    DMat iidVar_;
   public:
     Statistics(int nbRows = 1, int nbCols = 1);
     //virtual ~Statistics(){};
     virtual void append(double value, int i = 0, int j = 0);
     double mean(int i = 0, int j = 0) const;
-    Vector<double> meanVec(int i = 0) const;
-    DenseMatrix<double> meanMat() const;
+    DVec meanVec(int i = 0) const;
+    DMat meanMat() const;
     const long int& nbValues(int i = 0, int j = 0) const;
-    const Vector<long int> nbValuesVec(int i = 0) const;
-    const DenseMatrix<long int>& nbValuesMat() const;
+    const DVecInt nbValuesVec(int i = 0) const;
+    const DMatInt& nbValuesMat() const;
     const double& lastValue(int i = 0, int j = 0) const;
-    const Vector<double> lastValueVec(int i = 0) const;
-    const DenseMatrix<double>& lastValueMat() const;      
+    const DVec lastValueVec(int i = 0) const;
+    const DMat& lastValueMat() const;      
   };
   
   ///Compute on the line the mean and variance of a set of iid variables
   ///The variance is computed using a recursive formula so only a few scalar need to be stocked  
   class IIDStats : public Statistics
   {
-    DenseMatrix<double> iidVar_;
+    DMat iidVar_;
   public:
     IIDStats(int nbRows = 1, int nbCols = 1);
     void append(double value, int i = 0, int j = 0);
@@ -75,7 +75,7 @@ namespace simol
     const long int& nbValues(int i = 0, int j = 0) const;
     int statsIntegratedCorrelationNbValues(int iOfObservable = 0) const;
     double integratedCorrelation(int iOfObservable = 0) const;
-    Vector<double> integratedCorrelationVec() const;
+    DVec integratedCorrelationVec() const;
     virtual double integratedCorrelationUnbiased(int iOfObservable = 0) const;
     double varIntegratedCorrelation(int iOfObservable = 0) const;
     double varCorrelationAtSpan(int iOfSpan, int iOfObservable = 0) const;

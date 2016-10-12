@@ -14,7 +14,7 @@ namespace simol
   Potential::Potential() {}
 
   Potential::Potential(Input const & input):
-    externalForce_(input.dimension(), 0)
+    externalForce_(DVec::Zero(input.dimension()))
   {
     externalForce_(0) = input.externalForce();
     //if (externalForce_(0) != 0)
@@ -23,13 +23,13 @@ namespace simol
 
   ///
   ///Read-only accessor for the external force
-  Vector<double> const& Potential::externalForce() const
+  DVec const& Potential::externalForce() const
   {
     return externalForce_;
   }
   ///
   /// Write-read accessor for the external force
-  Vector<double>& Potential::externalForce()
+  DVec& Potential::externalForce()
   {
     return externalForce_;
   }
@@ -56,21 +56,22 @@ namespace simol
     throw std::runtime_error("parameter2 not defined for this potential");
   }
 
-  double Potential::operator()(Vector<double> const& position) const
+  double Potential::operator()(DVec const& position) const
   {
-    //cout << "Potential::operator()(Vector<double> const& position)" << endl;
+    //cout << "Potential::operator()(DVec const& position)" << endl;
     return operator()(position(0));
   }
 
   double Potential::operator()(double position) const
   {
     //cout << "Potential::operator()(double position)" << endl;
-    return operator()(Vector<double>(1, position));
+    return operator()(DVec::Constant(1,1,position));
+    //return operator()(DVec::Constant(1,1, position));
   }
 
-  double Potential::value(Vector<double> const& position) const
+  double Potential::value(DVec const& position) const
   {
-    //cout << "Potential::value(Vector<double> const& position)" << endl;
+    //cout << "Potential::value(DVec const& position)" << endl;
     return operator()(position);
   }
 
@@ -80,44 +81,44 @@ namespace simol
     return operator()(position);
   }
 
-  Vector<double> Potential::gradient(Vector<double> const& position) const
+  DVec Potential::gradient(DVec const& position) const
   {
     return gradient(position(0));
   }
 
-  Vector<double> Potential::gradient(double position) const
+  DVec Potential::gradient(double position) const
   {
-    return -gradient(Vector<double>(1, position));
+    return -gradient(DVec::Constant(1,1, position));
   }
 
-  Vector<double> Potential::totalForce(Vector<double> const& position) const
-  {
-    return externalForce_ - gradient(position);
-  }
-
-  Vector<double> Potential::totalForce(double position) const
+  DVec Potential::totalForce(DVec const& position) const
   {
     return externalForce_ - gradient(position);
   }
 
-  Vector<double> Potential::potentialForce(Vector<double> const& position) const
+  DVec Potential::totalForce(double position) const
+  {
+    return externalForce_ - gradient(position);
+  }
+
+  DVec Potential::potentialForce(DVec const& position) const
   {
     return - gradient(position);
   }
 
-  Vector<double> Potential::potentialForce(double position) const
+  DVec Potential::potentialForce(double position) const
   {
     return - gradient(position);
   }
 
-  double Potential::laplacian(Vector<double> const& position) const
+  double Potential::laplacian(DVec const& position) const
   {
     return laplacian(position(0));
   }
 
   double Potential::laplacian(double position) const
   {
-    return laplacian(Vector<double>(1, position));
+    return laplacian(DVec::Constant(1,1, position));
   }
 
   ///

@@ -14,9 +14,9 @@ namespace simol
     return amplitude_ * cos(2 * M_PI * position) / (2 + sin(2 * M_PI * position));
   }
 
-  Vector<double> FracSinusoidal::gradient(double position) const
+  DVec FracSinusoidal::gradient(double position) const
   {
-    return Vector<double>(1, -amplitude_ * (4 * M_PI * sin(2 * M_PI * position) + 2 * M_PI) / pow(sin(2 * M_PI * position) + 2, 2));
+    return DVec::Constant(1,1, -amplitude_ * (4 * M_PI * sin(2 * M_PI * position) + 2 * M_PI) / pow(sin(2 * M_PI * position) + 2, 2));
   }
 
 

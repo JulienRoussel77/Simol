@@ -143,45 +143,45 @@ namespace simol
   Potential& System::potential() {return *potential_;}
   ///
   ///Evaluate the potential for the vector "position"
-  double System::potential(Vector<double> const& position) const {return (*potential_)(position);}
+  double System::potential(DVec const& position) const {return (*potential_)(position);}
   ///
   ///Evaluate the potential for the scalar "position"
   double System::potential(const double& distance) const {return (*potential_)(distance);}
   ///
   ///Evaluate the force for the scalar "position" (potential and external terms)
-  Vector<double> System::totalForce(Vector<double> const& position) const
+  DVec System::totalForce(DVec const& position) const
   {
     return potential_->totalForce(position);
   }
 
-  Vector<double> System::potentialForce(Vector<double> const& position) const
+  DVec System::potentialForce(DVec const& position) const
   {
     return - potential_->gradient(position);
   }
 
-  Vector<double> System::potentialForce(double position) const
+  DVec System::potentialForce(double position) const
   {
     return - potential_->gradient(position);
   }
   ///
   ///Evaluate the force for the scalar "position" (potential and external terms)
-  Vector<double> System::totalForce(double position) const
+  DVec System::totalForce(double position) const
   {
     return potential_->totalForce(position);
   }
   ///
   ///Evaluate the laplacian of the potential for the vector "position"
-  double System::laplacian(Vector<double> const& position) const
+  double System::laplacian(DVec const& position) const
   {
     return potential_->laplacian(position);
   }
 
   ///
   ///Read-only accessor for the external force
-  Vector<double> const& System::externalForce() const {return potential_->externalForce();}
+  DVec const& System::externalForce() const {return potential_->externalForce();}
   ///
   ///Write-read accessor for the external force
-  Vector<double>& System::externalForce() {return potential_->externalForce();}
+  DVec& System::externalForce() {return potential_->externalForce();}
   ///
   ///Read-only accessor for the i-th component of the external force
   double const& System::externalForce(int const& i) const {return potential_->externalForce(i);}
@@ -199,7 +199,7 @@ namespace simol
 
   ///
   ///Draw a momentum under the invariant measure at inverse temperature "localBeta"
-  Vector<double> System::drawMomentum(double localBeta, double mass)
+  DVec System::drawMomentum(double localBeta, double mass)
   {
     return sqrt(1 / (localBeta * mass)) * rng_->gaussian();
   }
@@ -238,9 +238,9 @@ namespace simol
   ///The first 2 derivates of the potential are stored in "particle2"
   void System::interaction(Particle& particle1, Particle& particle2) const
   {
-    Vector<double> r12 = particle2.position() - particle1.position();
+    DVec r12 = particle2.position() - particle1.position();
     double energy12 = potential(r12);
-    Vector<double> force12 = potentialForce(r12);    // = - v'(q_2 - q_1)
+    DVec force12 = potentialForce(r12);    // = - v'(q_2 - q_1)
     double lapla12 = laplacian(r12);  // v"(q_2 - q_1)
 
     particle2.potentialEnergy() = energy12;
@@ -258,7 +258,7 @@ namespace simol
     double qInteg = 0;
     int nbIntegrationNodes = 1000;
     double step = 8. / nbIntegrationNodes;
-    Vector<double> deltaQ(1);
+    DVec deltaQ(1);
     for (int iOfNode = 0; iOfNode < nbIntegrationNodes; iOfNode++)
     {
       deltaQ(0) = - 4 + iOfNode * step;

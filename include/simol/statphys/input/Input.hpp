@@ -3,7 +3,7 @@
 
 #include<yaml-cpp/yaml.h>
 #include <getopt.h>
-#include "simol/core/linalg/Vector.hpp"
+//#include "simol/core/linalg/Vector.hpp"
 #include "simol/core/io/CommandLine.hpp"
 #include <string>
 #include <iostream>
@@ -20,7 +20,7 @@ namespace simol
     YAML::Node data;
     string inputPath_;
     ifstream inputFlux_;
-    vector<Vector<double>> initialPositions_, initialMomenta_;
+    vector<DVec> initialPositions_, initialMomenta_;
     vector<double> initialInternalEnergies_;
   public:
     Input(CommandLine cmd);
@@ -39,8 +39,8 @@ namespace simol
     bool doSetting() const;
     bool doRestart() const;
     string restartFileName() const;
-    Vector<double> initialPosition(int const& iOfParticle = 0) const;
-    Vector<double> initialMomentum(int const& iOfParticle = 0) const;
+    DVec initialPosition(int const& iOfParticle = 0) const;
+    DVec initialMomentum(int const& iOfParticle = 0) const;
     double initialInternalEnergy(int const& iOfParticle = 0) const;
     //Chain
     bool isOfFixedVolum() const;
@@ -135,7 +135,7 @@ namespace simol
     string galerkinElts() const;
     int nbOfFourier() const;
     int nbOfHermite() const;
-
+    bool doGalerkinNonequilibrium() const;
   };
 
 

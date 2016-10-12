@@ -124,7 +124,7 @@ namespace simol
     throw std::runtime_error("Basis::expFourierMeans is not implemented");
   };
   
-  Vector<double> const& Basis::gVector() const
+  DVec const& Basis::gVector() const
   {
     throw std::runtime_error("Basis::expFourierMeans is not implemented");
   };
@@ -154,8 +154,8 @@ namespace simol
     nbOfIntegrationNodes_(1000*nbOfElts()),
     //nbOfIntegrationNodes_(10),
     qRepartitionFct_(0),
-    expFourierMeans_(2 * nbOfElts0, 0),
-    gVector_(nbOfElts0, 0),
+    expFourierMeans_(DVec::Zero(2 * nbOfElts0)),
+    gVector_(DVec::Zero(nbOfElts0)),
     norm2gVector_(0)
   {
     //cout << "ExpFourierBasis(const int nbOfElts0, double beta0, Potential& potential0)" << endl;
@@ -181,7 +181,7 @@ namespace simol
     return expFourierMeans_(iOfElt);
   }
   
-  Vector<double> const& ExpFourierBasis::gVector() const
+  DVec const& ExpFourierBasis::gVector() const
   {
     return gVector_;
   }
@@ -231,7 +231,7 @@ namespace simol
     expFourierMeans_ *= step / (M_PI * basisCoefficient_);
     
     // gVector is the projection of the constant fct 1, ie it contains the mean of the expfourier elements
-    gVector_ = expFourierMeans_.subvec(0, nbOfElts()) / sqrt(2.);
+    gVector_ = expFourierMeans_.head(nbOfElts()) / sqrt(2.);
     gVector_(0) /= sqrt(2.);
     norm2gVector_ = pow(gVector_.norm(), 2);
     cout << "Squared norm of vector g = " << norm2gVector_ << endl;
@@ -251,17 +251,17 @@ namespace simol
       return sqrt(2) * cos(iOfFreq * variable) * expo;
   }
 
-  Vector<double> ExpFourierBasis::gradient(double variable, const int iOfElt) const
+  DVec ExpFourierBasis::gradient(double variable, const int iOfElt) const
   {
     //cout << basisCoefficient_ << " " << exp(beta_*potential(variable)/2) << " " << potDeriv(variable) << endl;
     double expo = basisCoefficient_ * exp(beta_ * potential(variable) / 2);
     int iOfFreq = (iOfElt + 1) / 2;
     if (iOfElt == 0)
-      return Vector<double>(1, beta_ / 2 * potDeriv(variable) * expo);
+      return DVec::Constant(1, beta_ / 2 * potDeriv(variable) * expo);
     else if (iOfElt % 2 == 1)
-      return Vector<double>(1, sqrt(2.) * ( iOfFreq * cos(iOfFreq * variable) + sin(iOfFreq * variable) * beta_ / 2 * potDeriv(variable)) * expo);
+      return DVec::Constant(1, sqrt(2.) * ( iOfFreq * cos(iOfFreq * variable) + sin(iOfFreq * variable) * beta_ / 2 * potDeriv(variable)) * expo);
     else
-      return Vector<double>(1, sqrt(2.) * (-iOfFreq * sin(iOfFreq * variable) + cos(iOfFreq * variable) * beta_ / 2 * potDeriv(variable)) * expo);
+      return DVec::Constant(1, sqrt(2.) * (-iOfFreq * sin(iOfFreq * variable) + cos(iOfFreq * variable) * beta_ / 2 * potDeriv(variable)) * expo);
   }
 
   double ExpFourierBasis::laplacian(double variable, const int iOfElt) const
@@ -307,7 +307,7 @@ namespace simol
   {
     for (int iOfFourier = 0; iOfFourier < nbOfElts_; iOfFourier++)
       for (int jOfFourier = max(0, iOfFourier-3); jOfFourier < min(nbOfElts_, iOfFourier+4); jOfFourier++)
-        A(iOfFourier, jOfFourier) = xGradY(iOfFourier, jOfFourier);
+        A.insert(iOfFourier, jOfFourier) = xGradY(iOfFourier, jOfFourier);
   }
   
   // Compute <G_k, \partial_q^* \partial_q G_l>
@@ -334,7 +334,7 @@ namespace simol
   {
     for (int iOfFourier = 0; iOfFourier < nbOfElts_; iOfFourier++)
       for (int jOfFourier = max(0, iOfFourier-4); jOfFourier < min(nbOfElts_, iOfFourier+5); jOfFourier++)
-        A(iOfFourier, jOfFourier) = xLaplacianY(iOfFourier, jOfFourier);
+        A.insert(iOfFourier, jOfFourier) = xLaplacianY(iOfFourier, jOfFourier);
   }
     
  
@@ -346,8 +346,8 @@ namespace simol
   HermiteBasis::HermiteBasis(const int nbOfElts0, double beta0)
     : Basis(nbOfElts0),
       beta_(beta0),
-      polyCoeffs_(zero<double>(nbOfElts0, nbOfElts0))
-      //polyCoeffs_(DenseMatrix<double>::Zero(nbOfElts0, nbOfElts0))
+      polyCoeffs_(DMat::Zero(nbOfElts0, nbOfElts0))
+      //polyCoeffs_(DMat::Zero(nbOfElts0, nbOfElts0))
   {
     //cout << "HermiteBasis(const int nbOfElts0)" << endl;
     polyCoeffs_(0, 0) = 1;
@@ -374,12 +374,12 @@ namespace simol
     return result;
   }
 
-  Vector<double> HermiteBasis::gradient(double variable, const int iOfElt) const
+  DVec HermiteBasis::gradient(double variable, const int iOfElt) const
   {
     double result = 0;
     for (int iOfCoeff = 1; iOfCoeff <= iOfElt; iOfCoeff++)
       result += iOfCoeff * polyCoeffs_(iOfElt, iOfCoeff) * pow(variable, iOfCoeff - 1);
-    return Vector<double>(1, result);
+    return DVec::Constant(1, result);
   }
 
   double HermiteBasis::laplacian(double variable, const int iOfElt) const
@@ -399,7 +399,7 @@ namespace simol
   void HermiteBasis::gradMatrix(SMat& A) const
   {
     for (int iOfHermite = 0; iOfHermite< nbOfElts_-1; iOfHermite++)
-      A(iOfHermite+1, iOfHermite) = xGradY(iOfHermite+1, iOfHermite);
+      A.insert(iOfHermite+1, iOfHermite) = xGradY(iOfHermite+1, iOfHermite);
   }
   
   // Compute <H_n, \partial_p H_m>
@@ -411,7 +411,7 @@ namespace simol
   void HermiteBasis::laplacianMatrix(SMat& A) const
   {
     for (int iOfHermite = 0; iOfHermite< nbOfElts_; iOfHermite++)
-      A(iOfHermite, iOfHermite) = xLaplacianY(iOfHermite, iOfHermite);
+      A.insert(iOfHermite, iOfHermite) = xLaplacianY(iOfHermite, iOfHermite);
   }
   
   
@@ -535,7 +535,7 @@ namespace simol
     return bases_[0]->value(syst(0).position(0), vecIndex[0]) * bases_[1]->value(syst(0).momentum(0), vecIndex[1]);
   }
 
-  Vector<double> QPBasis::gradientQ(System const& syst, int /*iOfParticle*/, vector<int>& vecIndex) const
+  DVec QPBasis::gradientQ(System const& syst, int /*iOfParticle*/, vector<int>& vecIndex) const
   {
     //cout << "QPBasis::gradientQ" << endl;
     //cout << vecIndex[0] << " " << vecIndex[1] << endl;
@@ -545,7 +545,7 @@ namespace simol
            * bases_[1]->value(syst(0).momentum(0), vecIndex[1]);
   }
 
-  Vector<double> QPBasis::gradientQ(System const& syst, int iOfParticle, int iOfCoeff) const
+  DVec QPBasis::gradientQ(System const& syst, int iOfParticle, int iOfCoeff) const
   {
     vector<int> vecIndex = vecTens(iOfCoeff);
     return gradientQ(syst, iOfParticle, vecIndex);
@@ -563,7 +563,7 @@ namespace simol
     return laplacianQ(syst, iOfParticle, vecIndex);
   }
 
-  Vector<double> QPBasis::gradientP(System const& syst, int /*iOfParticle*/, vector<int>& vecIndex) const
+  DVec QPBasis::gradientP(System const& syst, int /*iOfParticle*/, vector<int>& vecIndex) const
   {
     //cout << bases_[0]->value(syst(0).position(0), vecIndex[0]) << " X "
     //    << bases_[1]->gradient(syst(0).momentum(0), vecIndex[1]) << endl;
@@ -571,7 +571,7 @@ namespace simol
            * bases_[1]->gradient(syst(0).momentum(0), vecIndex[1]);
   }
 
-  Vector<double> QPBasis::gradientP(System const& syst, int iOfParticle, int iOfCoeff) const
+  DVec QPBasis::gradientP(System const& syst, int iOfParticle, int iOfCoeff) const
   {
     vector<int> vecIndex = vecTens(iOfCoeff);
     return gradientP(syst, iOfParticle, vecIndex);
@@ -613,7 +613,7 @@ namespace simol
     return bases_[0]->expFourierMeans(iOfElt);
   }
   
-  Vector<double> const& ExpFourierHermiteBasis::gVector() const
+  DVec const& ExpFourierHermiteBasis::gVector() const
   {
     return bases_[0]->gVector();
   }

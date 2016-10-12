@@ -40,8 +40,9 @@ namespace simol
 
   bool Input::doGalerkinCV() const
   {
-    if (data["ControlVariate"])
-      if (data["Galerkin"]["Basis"] && !data["ControlVariate"]["CoeffsPath"])
+    //if (data["ControlVariate"])
+      //if (data["Galerkin"]["Basis"] && !data["ControlVariate"]["CoeffsPath"])
+    if (data["Galerkin"])
         return true;
     return false;
   }
@@ -84,6 +85,16 @@ namespace simol
           return data["Galerkin"]["Basis"]["Hermite"].as<int>();
 
     return 0;
+    //throw std::invalid_argument("Number of Hermite modes missing");
+  }
+  
+  bool Input::doGalerkinNonequilibrium() const
+  {
+    if(data["Galerkin"])
+      if(data["Galerkin"]["Nonequilibrium"])
+        if (sameLetters(data["Galerkin"]["Nonequilibrium"].as<string>(), "yes"))
+          return true;
+    return false;
     //throw std::invalid_argument("Number of Hermite modes missing");
   }
 

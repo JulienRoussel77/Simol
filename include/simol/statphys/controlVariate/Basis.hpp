@@ -27,7 +27,7 @@ namespace simol
   
   class DTVec : public TVec
   {
-      Vector<double> data_;
+      DVec data_;
     public:
       DTVec(vector<int>& nbOfElts0);
       virtual int size() const;
@@ -54,10 +54,10 @@ namespace simol
     virtual int const& nbOfElts() const;
     virtual int& nbOfElts();
     virtual double const& expFourierMeans(int iOfElt) const;
-    virtual Vector<double> const& gVector() const;
+    virtual DVec const& gVector() const;
     virtual double const& norm2gVector() const;
     virtual double value(double variable, const int iOfElt) const = 0;
-    virtual Vector<double> gradient(double variable, const int iOfElt) const = 0;
+    virtual DVec gradient(double variable, const int iOfElt) const = 0;
     virtual double laplacian(double variable, const int iOfElt) const = 0;
     
     virtual double xGradY(const int iOfElementLeft, const int iOfElementRight) const = 0;
@@ -74,7 +74,7 @@ namespace simol
     FourierBasis(const int nbOfElts);
     //virtual int nbOfFreq() const;
     virtual double value(double variable, const int iOfElt) const;
-    virtual Vector<double> gradient(double variable, const int iOfElt) const;
+    virtual DVec gradient(double variable, const int iOfElt) const;
     virtual double laplacian(double variable, const int iOfElt) const;
     
     virtual double xGradY(const int iOfElementLeft, const int iOfElementRight) const;
@@ -90,8 +90,8 @@ namespace simol
     Potential* potential_;
     int nbOfIntegrationNodes_;
     double qRepartitionFct_, basisCoefficient_;
-    Vector<double> expFourierMeans_;
-    Vector<double> gVector_;
+    DVec expFourierMeans_;
+    DVec gVector_;
     double norm2gVector_;
   public:
     ExpFourierBasis(const int nbOfElts, double beta0, Potential& potential);
@@ -99,7 +99,7 @@ namespace simol
     const double& amplitude() const;
 
     double const& expFourierMeans(int iOfElt) const;
-    Vector<double> const& gVector() const;
+    DVec const& gVector() const;
     double const& norm2gVector() const;
     
     virtual double potential(double variable) const;
@@ -109,7 +109,7 @@ namespace simol
     void computeExpFourierMeans();
       
     virtual double value(double variable, const int iOfElt) const;
-    virtual Vector<double> gradient(double variable, const int iOfElt) const;
+    virtual DVec gradient(double variable, const int iOfElt) const;
     virtual double laplacian(double variable, const int iOfElt) const;
     
     virtual double xGradY(const int iOfElementLeft, const int iOfElementRight) const;
@@ -136,7 +136,7 @@ namespace simol
   public:
     HermiteBasis(const int nbOfElts, double beta0);
     virtual double value(double variable, const int iOfElt) const;
-    virtual Vector<double> gradient(double variable, const int iOfElt) const;
+    virtual DVec gradient(double variable, const int iOfElt) const;
     virtual double laplacian(double variable, const int iOfElt) const;
     
     virtual double xGradY(const int iOfElementLeft, const int iOfElementRight) const;
@@ -161,12 +161,12 @@ namespace simol
       const Basis* operator()(const int iOfBasis) const;
       virtual double value(System const& syst, const int iOfElt) const = 0;
       virtual double value(System const& syst, vector<int>& vecIndex) const = 0;
-      virtual Vector<double> gradientQ(System const& syst, int iOfParticle, int iOfCoeff) const = 0;
-      virtual Vector<double> gradientQ(System const& syst, int iOfParticle, vector<int>& vecIndex) const = 0;
+      virtual DVec gradientQ(System const& syst, int iOfParticle, int iOfCoeff) const = 0;
+      virtual DVec gradientQ(System const& syst, int iOfParticle, vector<int>& vecIndex) const = 0;
       virtual double laplacianQ(System const& syst, int iOfParticle, int iOfCoeff) const = 0;
       virtual double laplacianQ(System const& syst, int iOfParticle, vector<int>& vecIndex) const = 0;
-      virtual Vector<double> gradientP(System const& syst, int iOfParticle, int iOfCoeff) const = 0;
-      virtual Vector<double> gradientP(System const& syst, int iOfParticle, vector<int>& vecIndex) const = 0;
+      virtual DVec gradientP(System const& syst, int iOfParticle, int iOfCoeff) const = 0;
+      virtual DVec gradientP(System const& syst, int iOfParticle, vector<int>& vecIndex) const = 0;
       virtual double laplacianP(System const& syst, int iOfParticle, int iOfCoeff) const = 0;
       virtual double laplacianP(System const& syst, int iOfParticle, vector<int>& vecIndex) const = 0;
   };
@@ -183,12 +183,12 @@ namespace simol
       vector<int> vecTens(int iTens0) const;
       virtual double value(System const& syst, const int iOfElt) const;
       virtual double value(System const& syst, vector<int>& vecIndex) const;
-      virtual Vector<double> gradientQ(System const& syst, int iOfParticle, int iOfCoeff) const;
-      virtual Vector<double> gradientQ(System const& syst, int iOfParticle, vector<int>& vecIndex) const;
+      virtual DVec gradientQ(System const& syst, int iOfParticle, int iOfCoeff) const;
+      virtual DVec gradientQ(System const& syst, int iOfParticle, vector<int>& vecIndex) const;
       virtual double laplacianQ(System const& syst, int iOfParticle, int iOfCoeff) const;
       virtual double laplacianQ(System const& syst, int iOfParticle, vector<int>& vecIndex) const;
-      virtual Vector<double> gradientP(System const& syst, int iOfParticle, int iOfCoeff) const;
-      virtual Vector<double> gradientP(System const& syst, int iOfParticle, vector<int>& vecIndex) const;
+      virtual DVec gradientP(System const& syst, int iOfParticle, int iOfCoeff) const;
+      virtual DVec gradientP(System const& syst, int iOfParticle, vector<int>& vecIndex) const;
       virtual double laplacianP(System const& syst, int iOfParticle, int iOfCoeff) const;
       virtual double laplacianP(System const& syst, int iOfParticle, vector<int>& vecIndex) const;
   };
@@ -204,7 +204,7 @@ namespace simol
   public:
     ExpFourierHermiteBasis(Input const& input, Potential& potential);
     virtual double const& expFourierMeans(int iOfElt) const;
-    virtual Vector<double> const& gVector() const;
+    virtual DVec const& gVector() const;
     virtual double const& norm2gVector() const;
   };
 

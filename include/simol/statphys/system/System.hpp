@@ -99,25 +99,25 @@ namespace simol
     virtual Cell& getCell2(ParticlePairIterator const&) {return cell(0);}
 
     //-- potential and forces --
-    virtual Vector<double> representant(Vector<double> vecDistance) const {return vecDistance;}
+    virtual DVec representant(DVec vecDistance) const {return vecDistance;}
     virtual void computeAllForces();
     Potential& potential();
     void interaction(Particle& particle1, Particle& particle2) const;
-    double potential(Vector<double> const& position) const;
+    double potential(DVec const& position) const;
     double potential(const double& position) const;
-    Vector<double> totalForce(Vector<double> const& position) const;
-    Vector<double> totalForce(double position) const;
-    Vector<double> potentialForce(Vector<double> const & position) const;
-    Vector<double> potentialForce(double position) const;
-    Vector<double>& externalForce() ;
-    Vector<double> const& externalForce() const;
+    DVec totalForce(DVec const& position) const;
+    DVec totalForce(double position) const;
+    DVec potentialForce(DVec const & position) const;
+    DVec potentialForce(double position) const;
+    DVec& externalForce() ;
+    DVec const& externalForce() const;
     double& externalForce(const int& i);
     double const& externalForce(const int& i) const;
     double const& potParameter1() const;
     double const& potParameter2() const;
 
     //-- sampling of initial configurations --
-    virtual Vector<double> drawMomentum(double localBeta, double mass);
+    virtual DVec drawMomentum(double localBeta, double mass);
     virtual double drawPotLaw(double localBeta);
     virtual double computeMeanPotLaw(double betaLocal) const;
 
@@ -125,7 +125,7 @@ namespace simol
 
     // currently specific to chains
     virtual double boundaryPotEnergy() const;
-    double laplacian(Vector<double> const& position) const;
+    double laplacian(DVec const& position) const;
     
     virtual void samplePositions(DynamicsParameters const& dynaPara);
     virtual void sampleMomenta(DynamicsParameters const& dynaPara);
