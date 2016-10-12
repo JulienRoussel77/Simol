@@ -76,7 +76,7 @@ namespace simol
       return defaultLatticeParameter;
   }
 
-  // Returns True if the initial conditions are either read from the "settings" file or written in te input file
+  // Returns True if the initial conditions are either read from the "settings" file or written in the input file
   bool Input::doSetting() const
   {
     if (data["System"]["Setting"])
@@ -103,7 +103,7 @@ namespace simol
     else if (doRestart() && iOfParticle >= 0)
     {
       // the initial positions have been read in the constructor of Input()
-      cout << "using settings for q : " << iOfParticle << "->" << initialPositions_[iOfParticle] << endl;
+      //cout << "using settings for q : " << iOfParticle << "->" << initialPositions_[iOfParticle] << endl;
       q0 = initialPositions_[iOfParticle];
     }
     return q0;
@@ -117,7 +117,7 @@ namespace simol
     else if (doRestart() && iOfParticle >= 0)
     {
       // the initial positions have been read in the constructor of Input()
-      cout << "using settings for p : " << iOfParticle << "->" << initialMomenta_[iOfParticle] << endl;
+      //cout << "using settings for p : " << iOfParticle << "->" << initialMomenta_[iOfParticle] << endl;
       p0 = initialMomenta_[iOfParticle];
     }
     return p0;
@@ -126,14 +126,14 @@ namespace simol
   double Input::initialInternalEnergy(int const& iOfParticle) const
   {
     if (data["System"]["InternalEnergy"])
-      return data["System"]["Position"].as<double>();
+      return data["System"]["InternalEnergy"].as<double>();
     else if (doRestart() && iOfParticle >= 0)
     {
       // the initial positions have been read in the constructor of Input()
-      cout << "using settings for e : " << iOfParticle << "->" << initialInternalEnergies_[iOfParticle] << endl;
+      //cout << "using settings for e : " << iOfParticle << "->" << initialInternalEnergies_[iOfParticle] << endl;
       return initialInternalEnergies_[iOfParticle];
     }
-    else return 0;
+    else return 1;
   }
 
   //Chain

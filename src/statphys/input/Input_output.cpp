@@ -224,7 +224,6 @@ namespace simol
     }
   }
       
-  
   bool Input::doKineticEnergy() const
   {return dynamicsName() != "Overdamped";}
   
