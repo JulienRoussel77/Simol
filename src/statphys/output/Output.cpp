@@ -476,7 +476,7 @@ namespace simol
         outBackUp() << syst(iOfParticle).position(dim) << " ";
       for (int dim = 0; dim < Dim; dim++)
         outBackUp() << syst(iOfParticle).momentum(dim) << " ";
-      outBackUp() << syst(iOfParticle).internalEnergy() << " ";
+      if (doDPDE_) outBackUp() << syst(iOfParticle).internalEnergy() << " ";
       outBackUp() << endl;
     }
     outBackUp() << endl;

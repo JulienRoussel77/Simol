@@ -172,8 +172,6 @@ namespace simol
       }
     }
     
-
-    
     if (output.doLongPeriodOutput(iOfStep))
     {
       if (output.doOutParticles()) output.displayParticles(syst, iOfStep);
