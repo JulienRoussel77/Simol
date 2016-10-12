@@ -365,7 +365,7 @@ namespace simol
     double old_internalEnergy_1 = particle1.internalEnergy();
     double old_internalEnergy_2 = particle2.internalEnergy();
     // compute the distance 
-    Vector<double> r12 = syst.representant(particle1.position() - particle2.position());
+    DVec r12 = syst.representant(particle1.position() - particle2.position());
     double distance = r12.norm();
     // compute predicted energy variation
     double deltaInternalEnergy = pairwiseThermalConduction(distance,old_internalEnergy_1,old_internalEnergy_2);
