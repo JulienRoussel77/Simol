@@ -17,7 +17,7 @@ namespace simol
     basisValues_(totalNbOfElts_),
     generatorOnBasisValues_(totalNbOfElts_)
   {
-    cout << "cvCoeffs : " << *cvCoeffs0 << endl;
+    //cout << "cvCoeffs : " << *cvCoeffs0 << endl;
   }
   
   CVBasis::~CVBasis()
@@ -35,8 +35,8 @@ namespace simol
     for (int iOfElt = 0; iOfElt < totalNbOfElts(); iOfElt++)
       basisValues_(iOfElt) = basis_->value(syst, iOfElt);
     
-    ofstream tempOut("valueBasis.txt", std::ofstream::app);
-    tempOut << modulo(syst(0).position(0), 0, 2*M_PI) << " " << syst(0).force(0) << " " << dot(*cvCoeffs_, basisValues_)-1 << endl;
+    //ofstream tempOut("valueBasis.txt", std::ofstream::app);
+    //tempOut << modulo(syst(0).position(0), 0, 2*M_PI) << " " << syst(0).force(0) << " " << dot(*cvCoeffs_, basisValues_)-1 << endl;
   }
 }   
   

@@ -426,25 +426,26 @@ namespace simol
                 << " " << totalEnergy()
                 << " " << temperature()
                 << " " << pressure();
-      if (doDPDE_) // add fields for DPDE
-      {
-	outThermo() << " " << internalEnergy() 
-		    << " " << 1./internalTemperature()
-		    << " " << negativeEnergiesCount();
-      }
-    outThermo() << std::endl;
-    //---- current estimates of the averages ----
-    outMeanThermo() << iOfStep * timeStep()
-		    << " " << obsKineticEnergy().mean() 
-		    << " " << obsPotentialEnergy().mean() 
-      		    << " " << 2*obsKineticEnergy().mean()/(dimension_ * nbOfParticles_)
-      		    << " " << obsPressure().mean();
     if (doDPDE_) // add fields for DPDE
-      {
-	outMeanThermo() << " " << obsInternalEnergy().mean() 
+    {
+      outThermo() << " " << internalEnergy() 
+      << " " << 1./internalTemperature()
+      << " " << negativeEnergiesCount();
+    }
+    outThermo() << std::endl;
+    
+    //---- current estimates of the averages ----
+    outMeanThermo() << iOfStep * timeStep();
+    if (obsKineticEnergy_) outMeanThermo() << " " << obsKineticEnergy().mean(); 
+    outMeanThermo() << " " << obsPotentialEnergy().mean(); 
+    if (obsKineticEnergy_) outMeanThermo() << " " << 2*obsKineticEnergy().mean()/(dimension_ * nbOfParticles_);
+    outMeanThermo() << " " << obsPressure().mean();
+    if (doDPDE_) // add fields for DPDE
+    {
+      outMeanThermo() << " " << obsInternalEnergy().mean() 
 			<< " " << 1./obsInternalTemperature().mean()
 			<< " " << rejectionCount();
-      }
+    }
     outMeanThermo() << std::endl;
     
   }

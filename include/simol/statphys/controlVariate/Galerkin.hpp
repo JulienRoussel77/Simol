@@ -90,7 +90,7 @@ namespace simol
       DVec projectionOrthoG(DVec const& X) const;
       void createQ();
       void createP();
-      virtual void compute();
+      virtual void compute() = 0;
 
       DVec gettGiHj(int i, int j) const;
       DVec gettGiHjTrig(int i, int j) const;
@@ -99,7 +99,7 @@ namespace simol
       DVec getLinvtGiHj(int i, int j) const;
       DVec getLinvtGiHjTrig(int i, int j) const;
       //SMat CVcoeffs() const;
-      virtual DVec CVcoeffsVec() const {throw runtime_error("Cvcoeffs does not exist for Galerkin");}
+      virtual DVec CVcoeffsVec() const = 0;
       CVBasis makeCvBasis();
         
       void computeEigen() const;
@@ -124,6 +124,7 @@ namespace simol
       virtual void computeExpToTrigTens();
       virtual void createLthm0();
       virtual void createLthm();
+      virtual void compute();
       DVec CVcoeffsVec() const;
   };
 

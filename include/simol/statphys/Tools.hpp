@@ -20,6 +20,7 @@
 #include <Eigen/Sparse>
 #include <Eigen/SparseCore>
 #include <Eigen/SVD>
+#include <Eigen/IterativeLinearSolvers>
 
 using std::setw;
 using std::ofstream;

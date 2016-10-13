@@ -415,23 +415,13 @@ namespace simol
 
   double BasisControlVariate::basisFunction(System const&, int /*iOfFunction*/) const
   {
-    assert(iOfFunction == 0);
-    
     return dot(cvCoeffs(), basisValues());
-    
-    /*double result = 0;
-
-    for (int i=0; i < (int)cvCoeffs().size(); i++)
-      result += cvCoeffs(i) * cvBasis().basis_->value(syst, i);
-
-    return result;*/
   }
 
   DVec BasisControlVariate::gradientQ(System const& syst, int iOfParticle, int /*iOfFunction*/) const
   {
     //cout << "BasisControlVariate::gradientQ" << endl;
     DVec result(1, 0);
-    assert(iOfFunction == 0);
     
     for (int i=0; i < (int)cvCoeffs().size(); i++)
       result += cvCoeffs(i) * cvBasis().basis_->gradientQ(syst, iOfParticle, i);
@@ -442,7 +432,6 @@ namespace simol
   double BasisControlVariate::laplacianQ(System const& syst, int iOfParticle, int /*iOfFunction*/) const
   {
     double result = 0;
-    assert(iOfFunction == 0);
 
     for (int i=0; i < (int)cvCoeffs().size(); i++)
       result += cvCoeffs(i) * cvBasis().basis_->laplacianQ(syst, iOfParticle, i);
@@ -453,7 +442,6 @@ namespace simol
   DVec BasisControlVariate::gradientP(System const& syst, int iOfParticle, int /*iOfFunction*/) const
   {
     DVec result(1, 0);
-    assert(iOfFunction == 0);
     
     for (int i=0; i < (int)cvCoeffs().size(); i++)
       result += cvCoeffs(i) * cvBasis().basis_->gradientP(syst, iOfParticle, i);
@@ -465,7 +453,6 @@ namespace simol
   double BasisControlVariate::laplacianP(System const& syst, int iOfParticle, int /*iOfFunction*/) const
   {
     double result = 0;
-    assert(iOfFunction == 0);
 
     for (int i=0; i < (int)cvCoeffs().size(); i++)
       result += cvCoeffs(i) * cvBasis().basis_->laplacianP(syst, iOfParticle, i);
