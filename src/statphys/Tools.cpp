@@ -55,3 +55,15 @@ DMat reshape(DVec const& u, int nbOfRows, int nbOfCols)
       A(i,j) = u(j * nbOfRows + i);
   return A;
 }
+
+DVec rint(DVec const& u)
+{
+  DVec v(u.size());
+  for (int d = 0; d < (int)u.rows(); d++)
+    v(d) = rint(u(d));
+  return v;
+}
+
+
+
+

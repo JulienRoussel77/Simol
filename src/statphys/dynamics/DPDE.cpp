@@ -243,7 +243,7 @@ namespace simol
 	negativeEnergiesCount() += 1;
       }
   }
-  
+
   ///
   /// compute the fluctuation/dissipation in DPDE using SSA
   void DPDE::fluctuationDissipation(System& syst)
@@ -255,26 +255,6 @@ namespace simol
 	//-- compute the interactions --
 	for (ParticlePairIterator it = syst.pairBegin(); !syst.pairFinished(it); syst.incrementePairIterator(it))
 	  elementaryFluctuationDissipation(syst, it.particle1(), it.particle2());
-	
-	/*int neighborIndex = 1;
-	  for (int k = 0; k < nbOfCells_; k++)
-	  {
-	  //-- interaction within cells: avoid double counting by setting i1 \leq i2 + 1 --
-	  for (list<int>::iterator it1 = cells_[k].members().begin(); it1 != cells_[k].members().end(); it1++)
-	  for (list<int>::iterator it2 = std::next(it1, 1); it2 != cells_[k].members().end(); it2++)
-	  elementaryFluctuationDissipationDPDE(dyna, configuration_[*it1], configuration_[*it2]);
-	  
-	  //-- interactions between neighboring cells: full double loops --
-	  for (int l = 0; l < nbOfNeighbors_; l++)
-	  {
-	  // index of neighboring cell
-	  neighborIndex = cells_[k].indexNeighbors()[l];
-	  // complete double loop between the elements of cells_[k] and its neighbor cells_[neighborIndex]
-	  for (list<int>::iterator it1 = cells_[k].members().begin(); it1 != cells_[k].members().end(); it1++)
-	  for (list<int>::iterator it2 = cells_[neighborIndex].members().begin(); it2 != cells_[neighborIndex].members().end(); it2++)
-	  elementaryFluctuationDissipationDPDE(dyna, configuration_[*it1], configuration_[*it2]);
-	  }
-	  }*/
       }
     else
       {
@@ -290,6 +270,7 @@ namespace simol
   //----------- !!!! UPDATE FORMULAS FOR PARTICLES WITH DIFFERENT MASSES !!!! ------------
   void DPDE::elementaryFluctuationDissipation(System const& syst, Particle& particle1, Particle& particle2)
   {
+    
     // keep previous configuration
     DVec old_momentum_1 = particle1.momentum();
     DVec old_momentum_2 = particle2.momentum();

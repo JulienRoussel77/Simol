@@ -61,8 +61,10 @@ void displayTime(double time);
 int getNbOfLines(ifstream& file);
 //bool hasSmallerNorm(const cplx& a, const cplx& b);
 bool hasSmallerNorm(cplx a, cplx b);
+
 double dot(DVec const& u, DVec const& v);
 DMat reshape(DVec const& u, int nbOfRows, int nbOfCols);
+DVec rint(DVec const& u);
 
 const int idKineticEnergy = 0;
 const int idPotentialEnergy = 1;

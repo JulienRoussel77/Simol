@@ -456,12 +456,12 @@ namespace simol
     for (int iOfParticle = 0; iOfParticle < nbOfParticles_; iOfParticle++)
       outParticles() << iOfStep * timeStep()
                      << " " << iOfParticle
-                     << " " << syst(iOfParticle).position()
-                     << " " << syst(iOfParticle).momentum()
+                     << " " << syst(iOfParticle).position().transpose()
+                     << " " << syst(iOfParticle).momentum().transpose()
                      << " " << syst(iOfParticle).kineticEnergy()
                      << " " << syst(iOfParticle).potentialEnergy()
                      << " " << syst(iOfParticle).energy()
-                     << " " << syst(iOfParticle).force()
+                     << " " << syst(iOfParticle).force().transpose()
                      << endl; 
   }
   

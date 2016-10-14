@@ -6,31 +6,6 @@ namespace simol
   //--------------- particle pair iterators ------------
   
   
-  
-  /*const Cell& ParticlePairIterator::cell1() const 
-  {return syst_->cell(iOfCell1());}
-  
-  Cell& ParticlePairIterator::cell1() 
-  {return syst_->cell(iOfCell1());}  
-  
-  const int& ParticlePairIterator::iOfCell2() const 
-  {return syst_->cell(iOfCell1()).indexNeighbors(iOfNeighbor2());}
-  
-  int& ParticlePairIterator::iOfCell2() 
-  {return syst_->cell(iOfCell1()).indexNeighbors(iOfNeighbor2());}
-  
-  const Cell& ParticlePairIterator::cell2() const 
-  {return syst_->cell(iOfCell2());}
-  
-  Cell& ParticlePairIterator::cell2() 
-  {return syst_->cell(iOfCell2());}*/
-  
-  /*Particle const& ParticlePairIterator::particle2() const 
-  {return syst_->getMember(iOfCell2(), iOfParticle2());}
-  
-  Particle& ParticlePairIterator::particle2() 
-  {return syst_->getMember(iOfCell2(), iOfParticle2());}*/
-  
   ParticlePairIterator NBody::pairBegin()
   {
     ParticlePairIterator iter = ParticlePairIterator();
@@ -48,46 +23,36 @@ namespace simol
   
   void NBody::incrementePairIterator(ParticlePairIterator& it)
   {
-    //if (cell(cell(it.iOfCell1()).indexNeighbors(it.iOfNeighbor2())).members().end() != it.endIt2()) cout << "endIt2 is not well defined !" << endl;
     it.it2_++;
     //if the neighbor cell is fully visited
-    //if (it.it2_ == it.cell2().members().end())
     while (it.it2_ == it.endIt2())
     {
-      //cout << "Box 2 finished !" << endl;
       //we jump to the next neighbor cell
       it.iOfNeighbor2()++;
-      //Cell* cell2 = &(cell(cell(it.iOfCell1()).indexNeighbors(it.iOfNeighbor2())));
         
       if (it.iOfNeighbor2() != nbOfNeighbors())
         it.it2_ = getCell2(it).members().begin();
       //if all the neighbor cells has been visited
       else
       {
-        //cout << "Loop over neighbor boxes finished !" << endl;
         //we jump to the next particle
         it.it1_++;
         it.iOfNeighbor2() = 0;
-        //it.endIt2() = cell2->members().end();
         //if the cell is fully visited
         while (it.it1_ == cell(it.iOfCell1()).members().end())
         {
-          //cout << "Box 1 finished !" << endl;
           //we jump to the next one
           it.iOfCell1()++;
           if (it.iOfCell1() != nbOfCells())
             it.it1_ = cell(it.iOfCell1()).members().begin();
           else
             return;
-          //cout << "iOfCell1 / nbOfCells : " << it.iOfCell1() << " / " << nbOfCells() << endl;
         }
         //in both case this allows to avoid counting twice a pair or a particle with it self
         it.it2_ = std::next(it.it1_, 1);        
       }
       it.endIt2() = getCell2(it).members().end();
     }
-    //if(!*it.it1_) cout << "it1_ is nullptr !" << endl;
-    //if(!*it.it2_) cout << "it2_ is nullptr !" << endl;
   }
   
   Cell const& NBody::getCell2(ParticlePairIterator const& it) const
@@ -309,10 +274,7 @@ namespace simol
   
   DVec NBody::periodicImage(DVec const& vecDistance) const
   {
-    DVec periodicDistance(vecDistance.cols());
-    for (int d = 0; d < (int)dimension_; d++)
-      periodicDistance(d) -= rint(vecDistance(d) / domainSize_) * domainSize_;
-    return periodicDistance;
+    return vecDistance - rint(vecDistance / domainSize_) * domainSize_;
   }
 
   ///
@@ -374,7 +336,6 @@ namespace simol
   /// compute the forces (with or without cell method)
   void NBody::computeAllForces()
   {
-    //for (auto && particle : configuration_)
     for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
       getParticle(iOfParticle).resetForce(potential());
     if (doCells_)
@@ -383,29 +344,7 @@ namespace simol
       reinitializeCells();
       //-- compute the interactions --
       for (ParticlePairIterator it = pairBegin(); !pairFinished(it); incrementePairIterator(it))
-      {
-        //cout << it.iOfCell1_ << " " << it.iOfNeighbor2_ << endl;
         interaction(it.particle1(), it.particle2());
-      }
-      
-      /*int neighborIndex = 1;
-      for (int k = 0; k < nbOfCells_; k++)
-      {
-        //-- interaction within cells: avoid double counting by setting i1 \leq i2 + 1 --
-        for (list<int>::iterator it1 = cells_[k].members().begin(); it1 != cells_[k].members().end(); it1++)
-          for (list<int>::iterator it2 = std::next(it1, 1); it2 != cells_[k].members().end(); it2++)
-            interaction(configuration_[*it1], configuration_[*it2]);
-        //-- interactions between neighboring cells: full double loops --
-        for (int l = 0; l < nbOfNeighbors_; l++)
-        {
-          // index of neighboring cell
-          neighborIndex = cells_[k].indexNeighbors()[l];
-          // complete double loop between the elements of cells_[k] and its neighbor cells_[neighborIndex]
-          for (list<int>::iterator it1 = cells_[k].members().begin(); it1 != cells_[k].members().end(); it1++)
-            for (list<int>::iterator it2 = cells_[neighborIndex].members().begin(); it2 != cells_[neighborIndex].members().end(); it2++)
-              interaction(configuration_[*it1], configuration_[*it2]);
-        }
-      }*/
     }
     else
     {
@@ -420,15 +359,9 @@ namespace simol
   /// elementary interaction between two particles
   void NBody::interaction(Particle& particle1, Particle& particle2) const
   {
-    DVec r12 = particle1.position() - particle2.position();
     // take closest periodic image
-    double distance = 0.;
-    for (int d = 0; d < (int)dimension_; d++)
-    {
-      r12(d) -= rint(r12(d) / domainSize_) * domainSize_;
-      distance += r12(d) * r12(d);
-    }
-    distance = sqrt(distance);
+    DVec r12 = periodicImage(particle1.position() - particle2.position());
+    double distance = r12.norm();
     // compute energy
     double energy12 = potential(distance);
     particle1.potentialEnergy() += energy12 / 2;
