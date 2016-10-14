@@ -41,10 +41,12 @@ using std::list;
 
 typedef std::complex<double> cplx;
 
+//--- if using the Simol wrappers ---
 //typedef simol::SparseMatrix<double> SMat;
 //typedef simol::DenseMatrix<double> DMat;
 //typedef simol::Vector<double> DVec;
 
+//--- standard eigen functions ---
 typedef Eigen::SparseMatrix<double> SMat;
 typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> DMat;
 typedef Eigen::Matrix<double, Eigen::Dynamic, 1> DVec;

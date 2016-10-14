@@ -15,7 +15,6 @@ namespace simol
     return iter;
   }
   
-
   bool NBody::pairFinished(ParticlePairIterator const& it) const
   {
     return (it.iOfCell1() == nbOfCells());
@@ -32,10 +31,10 @@ namespace simol
         
       if (it.iOfNeighbor2() != nbOfNeighbors())
         it.it2_ = getCell2(it).members().begin();
-      //if all the neighbor cells has been visited
+      //if all the neighboring cells of particle 1 have been visited, increment iterator of particle 1
       else
       {
-        //we jump to the next particle
+        //we jump to the next particle 1
         it.it1_++;
         it.iOfNeighbor2() = 0;
         //if the cell is fully visited
