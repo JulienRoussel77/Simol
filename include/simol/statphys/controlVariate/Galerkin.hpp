@@ -5,8 +5,8 @@
 #include "simol/statphys/input/Input.hpp"
 #include "simol/statphys/potential/AllPotentials.hpp"
 #include "simol/statphys/controlVariate/Basis.hpp"
-//#include "simol/core/linalg/DenseMatrix.hpp"
 #include "simol/statphys/controlVariate/CVBasis.hpp"
+//#include "simol/statphys/controlVariate/MatrixFree.hpp"
 
 namespace simol
 {

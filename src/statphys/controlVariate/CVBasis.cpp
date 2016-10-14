@@ -17,7 +17,7 @@ namespace simol
     basisValues_(totalNbOfElts_),
     generatorOnBasisValues_(totalNbOfElts_)
   {
-    //cout << "cvCoeffs : " << *cvCoeffs0 << endl;
+    cout << "cvCoeffs : " << endl << *cvCoeffs0 << endl;
   }
   
   CVBasis::~CVBasis()

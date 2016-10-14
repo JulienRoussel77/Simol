@@ -622,14 +622,27 @@ namespace simol
         
     if (doNonequilibrium())
     {
-      SMat Keta = Leta_.transpose() * Leta_;
+      cout << "Computing the control variate by a nonequilibrium LLT" << endl;
+      
+      ///TODO : use a matrix free approach to avoid dense matrices
+      SMat LtL = Leta_.transpose() * Leta_;
+      DMat DKeta = DMat(LtL) + gVector() * gVector().transpose();
+      SMat Keta = DKeta.sparseView();
       //Eigen::LeastSquaresConjugateGradient<SMat> solver(Leta_);
-      Eigen::ConjugateGradient<SMat> solver(Keta);
-      return -solver.solve(-Leta_.transpose() * getGradV());
+      Eigen::ConjugateGradient<SMat> solver0(Keta);
+      //solver0.setTolerance(1e-12);
+      DVec CV0 = -solver0.solve(-Leta_.transpose() * getGradV());
+      cout << "CG : " << solver0.info() << " " << solver0.error() << " " << solver0.iterations()<< endl << Keta * CV0 - Leta_.transpose() * getGradV() << endl;
+      Eigen::BiCGSTAB<SMat> solver(Keta);
+      //solver.setTolerance(1e-12);
+      DVec CV = -solver.solve(-Leta_.transpose() * getGradV());
+      cout << "BC : " << solver.info() << " " << solver.error() << " " << solver0.iterations() << endl <<Keta * CV - Leta_.transpose() * getGradV() << endl;
+      return CV;
       //return -projectionOrthoG(solve(Keta, -Leta_.transpose() * getGradV()));
     }
     else
     {
+      cout << "Computing the control variate by an equilibrium CG" << endl;
       //SMat Keq = Leq_.transpose() * Leq_;
       //return -projectionOrthoG(solve(Keq, -Leq_.transpose() * getGradV()));
       Eigen::ConjugateGradient<SMat> solver(Leq_);
@@ -795,8 +808,11 @@ namespace simol
     else
     {
       cout << "Computing the control variate by an equilibrium LLT" << endl;
-      SMat Keq = Leq_.transpose() * Leq_;
-      return -solve(Keq, Leq_.transpose() * gettGiHj(0,1));
+      //SMat Keq = Leq_.transpose() * Leq_;
+      //return -solve(Keq, Leq_.transpose() * gettGiHj(0,1));
+      
+      Eigen::BiCGSTAB<SMat> solver(Leq_);
+      return -solver.solve(-projectionOrthoG(gettGiHj(0,1)));
     }
   }
 
