@@ -10,6 +10,8 @@ namespace simol
     public:
       Isolated(Input const& input);
       void printName() const;
+      virtual string name() const {return "Isolated";}
+
       virtual void samplePositions(DynamicsParameters const& dynaPara);
       void computeAllForces();
   };

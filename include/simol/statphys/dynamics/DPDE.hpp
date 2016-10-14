@@ -58,11 +58,11 @@ namespace simol
     virtual void getThermo(Output& output) const;
     virtual void specificComputeOutput(Output& output) const;
     
-    void fluctuationDissipation(NBody& syst);
+    void fluctuationDissipation(System& syst);
     void elementaryFluctuationDissipation(System const& syst, Particle& particle1, Particle& particle2);
     double pairwiseThermalConduction(double dist, double internalEnergy1, double internalEnergy2);
     
-    void thermalConduction(NBody& syst);
+    void thermalConduction(System& syst);
     void elementaryThermalConduction(System const& syst, Particle& particle1, Particle& particle2);
   };
   

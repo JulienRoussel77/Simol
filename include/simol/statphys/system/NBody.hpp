@@ -40,7 +40,8 @@ namespace simol
 
     NBody(Input const& input);
     void printName() const;
-    
+    virtual string name() const {return "NBody";}
+
     //-- pair iterator --
     ParticlePairIterator pairBegin();
     bool pairFinished(ParticlePairIterator const& it) const;
@@ -54,7 +55,7 @@ namespace simol
     Cell const& cell(int const& iOfCell) const {return cells_[iOfCell];}
     Cell & cell(int const& iOfCell) {return cells_[iOfCell];}
   
-    virtual DVec representant(DVec vecDistance) const;
+    virtual DVec periodicImage(DVec const& vecDistance) const;
     void samplePositions(DynamicsParameters const& dynaPara);
     void computeAllForces();
     int nbOfParticlesPerDimension() const;

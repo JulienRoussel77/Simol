@@ -246,9 +246,9 @@ namespace simol
   
   ///
   /// compute the fluctuation/dissipation in DPDE using SSA
-  void DPDE::fluctuationDissipation(NBody& syst)
+  void DPDE::fluctuationDissipation(System& syst)
   {
-    if (syst.doCells_)
+    if (syst.doCells())
       {
 	//-- reinitialize cells before looping on the pair interactions --
 	syst.reinitializeCells();
@@ -294,7 +294,7 @@ namespace simol
     DVec old_momentum_1 = particle1.momentum();
     DVec old_momentum_2 = particle2.momentum();
     // compute the unit vector e12 of line of centers and the distance (as above) 
-    DVec r12 = syst.representant(particle1.position() - particle2.position());
+    DVec r12 = syst.periodicImage(particle1.position() - particle2.position());
     double distance = r12.norm();
     DVec e12 = r12/distance;
     // compute the variation of the relative velocity
@@ -339,9 +339,9 @@ namespace simol
 
   ///
   /// compute the thermal conduction in DPDE using SSA
-  void DPDE::thermalConduction(NBody& syst)
+  void DPDE::thermalConduction(System& syst)
   {
-    if (syst.doCells_)
+    if (syst.doCells())
       {
 	//-- reinitialize cells before looping on the pair interactions --
 	syst.reinitializeCells();
@@ -365,7 +365,7 @@ namespace simol
     double old_internalEnergy_1 = particle1.internalEnergy();
     double old_internalEnergy_2 = particle2.internalEnergy();
     // compute the distance 
-    DVec r12 = syst.representant(particle1.position() - particle2.position());
+    DVec r12 = syst.periodicImage(particle1.position() - particle2.position());
     double distance = r12.norm();
     // compute predicted energy variation
     double deltaInternalEnergy = pairwiseThermalConduction(distance,old_internalEnergy_1,old_internalEnergy_2);

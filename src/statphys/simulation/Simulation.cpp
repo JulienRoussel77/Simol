@@ -16,27 +16,17 @@ namespace simol
       throw std::runtime_error(input.systemName() + " is not a valid system name !");
   }
   
-
-  
-  void sampleInternalEnergies(Dynamics const&, System&)
-  {}
-  
-  void sampleInternalEnergies(DPDE const&, System& syst)
-  {
-    cout << " - Sampling internal energies..." << endl;
-    for (int i = 0; i < syst.nbOfParticles(); i++)
-      syst.getParticle(i).internalEnergy() = 1;
-  }
-  
   void thermalize(Dynamics& model, System& syst)
   {
     simulate(model, syst);
   }
    
-  
-  
-  void simulate(Dynamics&, System&){}
-  
+  void sampleInternalEnergies(Dynamics const& dyna, System& syst)
+  {}
+
+  void simulate(Dynamics& dyna, System& syst)
+  {}
+
   //------------- Hamiltonian -------------------
   void simulate(Hamiltonian& dyna, System& syst)
   {
@@ -63,12 +53,12 @@ namespace simol
   
   void simulate(LangevinBase& dyna, System& syst)
   {
-  //for (ParticleIterator it = syst.begin(); !syst.finished(it); ++it)
-  for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
+    //for (ParticleIterator it = syst.begin(); !syst.finished(it); ++it)
+    for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
       dyna.verletFirstPart(syst(iOfParticle));
     syst.computeAllForces();
-  //for (ParticleIterator it = syst.begin(); !syst.finished(it); ++it)
-  for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
+    //for (ParticleIterator it = syst.begin(); !syst.finished(it); ++it)
+    for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
       dyna.verletSecondPart(syst(iOfParticle));
   }
   
@@ -108,22 +98,6 @@ namespace simol
         dyna.updateMomentaExchange(syst(iOfParticle), syst(iOfParticle + 1));
   }
   
-  //------------- DPDE [1D systems...] --------------------
-  
-  void simulate(DPDE& dyna, System& syst)
-  {
-    for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
-      dyna.verletFirstPart(syst(iOfParticle));
-    syst.computeAllForces();
-    for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
-      dyna.verletSecondPart(syst(iOfParticle));
-    //-- fluctuation/dissipation --
-    for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
-      //dyna.energyReinjection(syst(iOfParticle));  // integration of p at fixed gamma + energy reinjection
-      dyna.metropolizedEnergyReinjection(syst(iOfParticle));  // Metropolis correction of effective dynamics on p 
-  }
-  
-  
   void computeOutput(Dynamics const& dyna, System const& syst, Output& output, long int iOfStep)
   {
     // #### faire un output.obsMidFlow().updateBoundaryLangevin(syst, dyna.betaLeft(), dyna.betaRight(), dyna.gamma()); ####
@@ -145,7 +119,7 @@ namespace simol
     for (auto&& observable : output.observables())
       observable->appendCurrent(iOfStep);
     
-    //compute the rejection rate and the negative energies in DPDE
+    //compute specific outputs, e.g. rejection rate, negative energies in DPDE, etc
     dyna.specificComputeOutput(output);
   }
   
