@@ -15,7 +15,8 @@ namespace simol
     //virtual ParticlePairIterator pairBegin();
     //virtual bool finished(ParticleIterator const& it) const;
     //virtual void incrementeIterator(ParticleIterator& it);    
-    
+    virtual string name() const {return "Chain";}
+
     virtual void incrementePairIterator(ParticlePairIterator& it);
     bool pairFinished(ParticlePairIterator const& it) const;
     virtual void sampleMomenta(DynamicsParameters const& dynaPara);
@@ -26,6 +27,7 @@ namespace simol
     public:
       BiChain(Input const& input);
       virtual bool isBiChain() const {return true;}
+    
 
       const Particle& operator()(int iOfParticle = 0) const {return *(configuration_[iOfParticle+1]);}
       Particle& operator()(int iOfParticle = 0) {return *(configuration_[iOfParticle+1]);};

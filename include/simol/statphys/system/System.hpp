@@ -66,6 +66,7 @@ namespace simol
     virtual ~System();
 
     virtual void printName() const;
+    virtual string name() const = 0;
     virtual bool doSetting() const {return doSetting_;}
     virtual bool isBiChain() const {return false;}
     virtual bool isTriChain() const {return false;}
@@ -82,9 +83,10 @@ namespace simol
     const int& dimension() const;
     int const& nbOfParticles() const;
     
-    
+    virtual bool doCells() const {return false;}
     virtual Cell const& cell(int const&) const {throw std::runtime_error("Cell only exist for NBody !");}
     virtual Cell & cell(int const&) {throw std::runtime_error("Cell only exist for NBody !");}
+    virtual void reinitializeCells() {}
 
     //-- random numbers --
     const std::shared_ptr<RNG>& rng() const;
@@ -99,7 +101,7 @@ namespace simol
     virtual Cell& getCell2(ParticlePairIterator const&) {return cell(0);}
 
     //-- potential and forces --
-    virtual DVec representant(DVec vecDistance) const {return vecDistance;}
+    virtual DVec periodicImage(DVec const& vecDistance) const {return vecDistance;}
     virtual void computeAllForces();
     Potential& potential();
     void interaction(Particle& particle1, Particle& particle2) const;

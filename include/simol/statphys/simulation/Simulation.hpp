@@ -49,8 +49,7 @@ namespace simol
   void thermalize(Dynamics& dyna, System& syst);
   void thermalize(BoundaryLangevin& dyna, System& syst);
   void thermalize(DPDE& dyna, System& syst);
-
-  //void simulate(DPDE& dyna            , NBody& syst);    // A supprimer ?
+  
   void simulate(Dynamics& dyna        , System& syst);
   void simulate(Overdamped& dyna      , System& syst);
   void simulate(LangevinBase& dyna    , System& syst);
@@ -58,7 +57,6 @@ namespace simol
   void simulate(BoundaryLangevin& dyna, System& syst);
   void simulate(DPDE& dyna            , System& syst);
   
-
   void computeOutput(Dynamics const& dyna, System const& syst, Output& output, long int iOfStep);
   void computeControlVariate(Dynamics const& dyna, System const& syst, Output& output);
   void writeOutput(Dynamics const& dyna, System const& syst , Output& output, long int iOfStep);

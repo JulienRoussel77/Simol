@@ -307,9 +307,9 @@ namespace simol
     }
   }
   
-  DVec NBody::representant(DVec vecDistance) const
+  DVec NBody::periodicImage(DVec const& vecDistance) const
   {
-    DVec periodicDistance;
+    DVec periodicDistance(vecDistance.cols());
     for (int d = 0; d < (int)dimension_; d++)
       periodicDistance(d) -= rint(vecDistance(d) / domainSize_) * domainSize_;
     return periodicDistance;
