@@ -263,6 +263,8 @@ namespace simol
 	  for (int j = i + 1; j < syst.nbOfParticles(); j++)
 	    elementaryFluctuationDissipation(syst, syst(i), syst(j));
       }
+    // check total number of interactions
+    cout << rejectionCount() << " " << totalCountForRejection() << endl;
   }
   
   ///
@@ -277,43 +279,49 @@ namespace simol
     // compute the unit vector e12 of line of centers and the distance (as above) 
     DVec r12 = syst.periodicImage(particle1.position() - particle2.position());
     double distance = r12.norm();
-    DVec e12 = r12/distance;
-    // compute the variation of the relative velocity
-    //double old_kin_energy = particle1.kineticEnergy() + particle2.kineticEnergy();
-    
-    double mu12 = 1./( 1./particle1.mass() + 1./particle2.mass() ); // reduced mass
-    DVec vect12 = particle1.momentum()/particle1.mass() - particle2.momentum()/particle2.mass();  
-    double v12_0 = dot(vect12,e12);
-    double v12 = pairwiseFluctuationDissipation(v12_0,distance,particle1.internalEnergy(),particle2.internalEnergy(),mu12); 
-    // update the momenta
-    DVec totalMomentum = particle1.momentum() + particle2.momentum();
-    DVec v12_perp = vect12 - dot(vect12,e12)*e12;
-    //cout << vect12 << ", " << e12 << " : dot = " << dot(vect12,e12) << endl;
-    particle1.momentum() += mu12*(v12-v12_0)*e12;
-    particle2.momentum() -= mu12*(v12-v12_0)*e12;
-    //mu12*( totalMomentum/particle2.mass() + v12_perp + v12*e12);
-    //particle2.momentum() = mu12*( totalMomentum/particle1.mass() - v12_perp - v12*e12);
-    // accept/reject step
-    incrementTotalCountForRejection();
-    acceptRejectRate(v12,v12_0,particle1.internalEnergy(),particle2.internalEnergy(),mu12,distance);
-    double U = rng_->scalarUniform();
-    if (U > rejectionRate())
-    {
-      //-- reject the move --
-      incrementRejection();
-      particle1.momentum() = old_momentum_1;
-      particle2.momentum() = old_momentum_2;
-    }
-    else 
-    {
-      //-- update internal energies --
-      //double new_kin_energy = particle1.kineticEnergy() + particle2.kineticEnergy();
-      //double internal_energy_variation = 0.5*(new_kin_energy-old_kin_energy);
-      double internal_energy_variation = mu12*( pow(v12,2)-pow(v12_0,2) )/4;
-      //cout << mu12*( pow(v12,2)-pow(v12_0,2) )/4 - internal_energy_variation << endl;
-      particle1.internalEnergy() -= internal_energy_variation;
-      particle2.internalEnergy() -= internal_energy_variation;
-    }
+    // if the distance is not below the cutoff, nothing has to be done
+    if (distance < cutOff_)
+      {
+	DVec e12 = r12/distance;
+	// compute the variation of the relative velocity
+	//double old_kin_energy = particle1.kineticEnergy() + particle2.kineticEnergy();
+	
+	double mu12 = 1./( 1./particle1.mass() + 1./particle2.mass() ); // reduced mass
+	DVec vect12 = particle1.momentum()/particle1.mass() - particle2.momentum()/particle2.mass();  
+	double v12_0 = dot(vect12,e12);
+	double v12 = pairwiseFluctuationDissipation(v12_0,distance,particle1.internalEnergy(),particle2.internalEnergy(),mu12); 
+	// update the momenta
+	DVec totalMomentum = particle1.momentum() + particle2.momentum();
+	DVec v12_perp = vect12 - dot(vect12,e12)*e12;
+	//cout << vect12 << ", " << e12 << " : dot = " << dot(vect12,e12) << endl;
+	particle1.momentum() += mu12*(v12-v12_0)*e12;
+	particle2.momentum() -= mu12*(v12-v12_0)*e12;
+	//mu12*( totalMomentum/particle2.mass() + v12_perp + v12*e12);
+	//particle2.momentum() = mu12*( totalMomentum/particle1.mass() - v12_perp - v12*e12);
+	// accept/reject step
+	incrementTotalCountForRejection();
+	acceptRejectRate(v12,v12_0,particle1.internalEnergy(),particle2.internalEnergy(),mu12,distance);
+	double U = rng_->scalarUniform();
+	//cout << rejectionRate() << endl;
+	if (U > rejectionRate())
+	  {
+	    //-- reject the move --
+	    incrementRejection();
+	    particle1.momentum() = old_momentum_1;
+	    particle2.momentum() = old_momentum_2;
+	    cout << rejectionRate() << " " << rejectionCount() << " " << totalCountForRejection() << endl;
+	  }
+	else 
+	  {
+	    //-- update internal energies --
+	    //double new_kin_energy = particle1.kineticEnergy() + particle2.kineticEnergy();
+	    //double internal_energy_variation = 0.5*(new_kin_energy-old_kin_energy);
+	    double internal_energy_variation = mu12*( pow(v12,2)-pow(v12_0,2) )/4;
+	    //cout << mu12*( pow(v12,2)-pow(v12_0,2) )/4 - internal_energy_variation << endl;
+	    particle1.internalEnergy() -= internal_energy_variation;
+	    particle2.internalEnergy() -= internal_energy_variation;
+	  }
+      }
   }
   
   //--------------------------- THERMAL CONDUCTION ------------------------------
@@ -348,14 +356,17 @@ namespace simol
     // compute the distance 
     DVec r12 = syst.periodicImage(particle1.position() - particle2.position());
     double distance = r12.norm();
-    // compute predicted energy variation
-    double deltaInternalEnergy = pairwiseThermalConduction(distance,old_internalEnergy_1,old_internalEnergy_2);
-    // 
-    // accept/reject step  ----> A COMPLETER !!
-    //
-    // update the internal energies
-    particle1.internalEnergy() += deltaInternalEnergy;
-    particle2.internalEnergy() -= deltaInternalEnergy;
+    if (distance < cutOff_)
+      {
+	// compute predicted energy variation
+	double deltaInternalEnergy = pairwiseThermalConduction(distance,old_internalEnergy_1,old_internalEnergy_2);
+	// 
+	// accept/reject step  ----> A COMPLETER !!
+	//
+	// update the internal energies
+	particle1.internalEnergy() += deltaInternalEnergy;
+	particle2.internalEnergy() -= deltaInternalEnergy;
+      }
   }
 
   double DPDE::pairwiseThermalConduction(double dist, double internalEnergy1, double internalEnergy2)

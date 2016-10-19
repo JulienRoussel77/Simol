@@ -48,13 +48,14 @@ namespace simol
     void incrementePairIterator(ParticlePairIterator& it);
     Cell const& getCell2(ParticlePairIterator const& it) const;
     Cell& getCell2(ParticlePairIterator const& it);
-    
+
     // -- accessors --
     int const& nbOfNeighbors() const {return nbOfNeighbors_;}
     int const& nbOfCells() const {return nbOfCells_;}
     Cell const& cell(int const& iOfCell) const {return cells_[iOfCell];}
     Cell & cell(int const& iOfCell) {return cells_[iOfCell];}
-  
+    bool doCells() const {return doCells_;}
+
     virtual DVec periodicImage(DVec const& vecDistance) const;
     void samplePositions(DynamicsParameters const& dynaPara);
     void computeAllForces();
