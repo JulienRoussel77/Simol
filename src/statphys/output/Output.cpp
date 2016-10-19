@@ -86,7 +86,7 @@ namespace simol
 	//-- current estimates of averages --
 	outMeanThermo_       = std::make_shared<ofstream>(input.outputFolderName() + "meanThermo.txt");
 	if (doDPDE_)
-	  outMeanThermo() << "# 1:time  2:potentialEnergy  3:kineticEnergy  4:temperature 5:pressure 6:internalEnergy 7:internalTemperature 8:averageRejectionRate" << endl;
+	  outMeanThermo() << "# 1:time  2:potentialEnergy  3:kineticEnergy  4:temperature 5:pressure 6:internalEnergy 7:internalTemperature 8:averageRejectionRate 9:negativeEnergiesCount" << endl;
 	else
 	  outMeanThermo() << "# 1:time  2:potentialEnergy  3:kineticEnergy  4:temperature 5:pressure" << endl;
       }
@@ -429,7 +429,7 @@ namespace simol
     if (doDPDE_) // add fields for DPDE
     {
       outThermo() << " " << internalEnergy() 
-      << " " << 1./internalTemperature()
+      << " " << internalTemperature()
       << " " << negativeEnergiesCount();
     }
     outThermo() << std::endl;
@@ -443,8 +443,9 @@ namespace simol
     if (doDPDE_) // add fields for DPDE
     {
       outMeanThermo() << " " << obsInternalEnergy().mean() 
-			<< " " << 1./obsInternalTemperature().mean()
-			<< " " << rejectionCount();
+		      << " " << obsInternalTemperature().mean()
+		      << " " << rejectionCount()
+		      << " " << negativeEnergiesCount() ;
     }
     outMeanThermo() << std::endl;
     
