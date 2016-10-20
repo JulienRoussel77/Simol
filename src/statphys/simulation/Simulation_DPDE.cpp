@@ -43,9 +43,11 @@ namespace simol
     else if (syst.name() == "NBody")
       {
 	//-- fluctuation/dissipation --
-	dyna.fluctuationDissipation(syst);
+	if (dyna.gamma() > 0)
+	  dyna.fluctuationDissipation(syst);
 	//-- thermal conduction --
-	//dyna.thermalConduction(syst);
+	if (dyna.kappa() > 0)
+	  dyna.thermalConduction(syst);
       }
     else 
       throw std::runtime_error("The system is not implemented for DPDE dynamics!");

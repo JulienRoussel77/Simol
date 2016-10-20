@@ -33,6 +33,8 @@ namespace simol
     //-- microscopic EOS --
     virtual double gamma_DPDE(double intEnergy);  
     virtual double internalTemperature(double intEnergy) const;
+    virtual double entropy(double intEnergy) const; 
+    virtual double entropy_derivative(double intEnergy) const; 
     double& heatCapacity();
     const double& heatCapacity() const;
 

@@ -43,6 +43,18 @@ namespace simol
     return cutOff_;
   }
 
+  //-- for 1D systems --
+  double DPDE::gamma_DPDE(double intEnergy)
+  {
+    return gamma_ * heatCapacity() * temperature() / intEnergy;
+  }
+
+  double DPDE::sigma() const
+  {
+    return sqrt(2 * gamma_ * temperature());
+  }
+
+  //-- for Metropolis procedures --
   const double& DPDE::rejectionRate() const
   {
     return rejectionRate_;
@@ -82,22 +94,7 @@ namespace simol
   {
     return totalCountForRejection_;
   }
-
-  double DPDE::gamma_DPDE(double intEnergy)
-  {
-    return gamma_ * heatCapacity() * temperature() / intEnergy;
-  }
-
-  double DPDE::internalTemperature(double intEnergy) const
-  {
-    return intEnergy/heatCapacity();
-  }
-
-  double DPDE::sigma() const
-  {
-    return sqrt(2 * gamma_ * temperature());
-  }
-
+  
   void DPDE::incrementRejection()
   {
     rejectionCount_ += 1;
@@ -106,6 +103,23 @@ namespace simol
   void DPDE::incrementTotalCountForRejection()
   {
     totalCountForRejection_ += 1;
+  }
+
+  //-------------------- micro EOS for NBody systems ----------------------------
+  
+  double DPDE::entropy(double intEnergy) const
+  {
+    return heatCapacity()*log(intEnergy);
+  }
+
+  double DPDE::entropy_derivative(double intEnergy) const
+  {
+    return heatCapacity()/intEnergy;
+  }
+
+  double DPDE::internalTemperature(double intEnergy) const
+  {
+    return 1./entropy_derivative(intEnergy);
   }
 
   //----------------- THERMALIZATION: LANGEVIN-LIKE FLUCT/DISS ---------------------
@@ -204,7 +218,7 @@ namespace simol
     else 
       {
 	double chi_n = chi(dist);
-	double gamma_n = (gamma_DPDE(internalEnergy1) + gamma_DPDE(internalEnergy2)) / 2;
+	double gamma_n = 0.5 * gamma() * temperature() * (entropy_derivative(internalEnergy1) + entropy_derivative(internalEnergy2));
 	double alpha_n = exp(- gamma_n * pow(chi_n,2)/reduced_mass * timeStep_);
 	double G = rng_->scalarGaussian();
 	double sigma_n = sqrt((1 - pow(alpha_n, 2)) * temperature() * gamma() / (gamma_n * reduced_mass ) );
@@ -227,9 +241,9 @@ namespace simol
 	// compute the new energies
 	double E1 = internalEnergy1 - Delta_v2;
 	double E2 = internalEnergy2 - Delta_v2;
-	rejectionRate() += heatCapacity()*(log(E1) + log(E2) - log(internalEnergy1) - log(internalEnergy2));
+	rejectionRate() += entropy(E1) + entropy(E2) - entropy(internalEnergy1) - entropy(internalEnergy2); 
 	double chi_n = chi(dist);
-	double gamma_reverse = ( gamma_DPDE(E1) + gamma_DPDE(E2) ) / 2;
+	double gamma_reverse = 0.5 * gamma() * temperature() * (entropy_derivative(E1) + entropy_derivative(E2));
 	double alpha_reverse = exp(- gamma_reverse * pow(chi_n,2)/reduced_mass * timeStep_);
 	double sigma_reverse = sqrt((1 - pow(alpha_reverse, 2)) * temperature() * gamma() / (gamma_reverse*reduced_mass) );
 	double GG = (alpha_reverse*v12_current - v12_init)/sigma_reverse;
@@ -264,7 +278,7 @@ namespace simol
 	    elementaryFluctuationDissipation(syst, syst(i), syst(j));
       }
     // check total number of interactions
-    cout << rejectionCount() << " " << totalCountForRejection() << endl;
+    //cout << rejectionCount() << " " << totalCountForRejection() << endl;
   }
   
   ///
@@ -272,7 +286,6 @@ namespace simol
   //----------- !!!! UPDATE FORMULAS FOR PARTICLES WITH DIFFERENT MASSES !!!! ------------
   void DPDE::elementaryFluctuationDissipation(System const& syst, Particle& particle1, Particle& particle2)
   {
-    
     // keep previous configuration
     DVec old_momentum_1 = particle1.momentum();
     DVec old_momentum_2 = particle2.momentum();
@@ -309,7 +322,7 @@ namespace simol
 	    incrementRejection();
 	    particle1.momentum() = old_momentum_1;
 	    particle2.momentum() = old_momentum_2;
-	    cout << rejectionRate() << " " << rejectionCount() << " " << totalCountForRejection() << endl;
+	    //cout << rejectionRate() << " " << rejectionCount() << " " << totalCountForRejection() << endl;
 	  }
 	else 
 	  {
@@ -366,24 +379,20 @@ namespace simol
 	// update the internal energies
 	particle1.internalEnergy() += deltaInternalEnergy;
 	particle2.internalEnergy() -= deltaInternalEnergy;
+	//cout << "   so " << old_internalEnergy_1 << " " << old_internalEnergy_2 << " : " << deltaInternalEnergy << endl;
       }
   }
 
   double DPDE::pairwiseThermalConduction(double dist, double internalEnergy1, double internalEnergy2)
   {
-    // if the distance is beyond the cut off, no update
-    if (dist > cutOff_)
-      return 0;
-    else 
-      {
-	double chi_n = chi(dist);
-	double G = rng_->scalarGaussian();
-	double energy_increment = kappa()*pow(chi_n,2)*heatCapacity()/(1./internalEnergy1-1./internalEnergy2)*timeStep_ + sqrt(2*kappa()*timeStep_)*chi_n*G;
-	// update the rate for accept/reject correction
-	rejectionRate() = 0.5*pow(G, 2);
-	// return the energy increment
-	return energy_increment;
-      }
+    double chi_n = chi(dist);
+    double G = rng_->scalarGaussian();
+    double energy_increment = kappa()*pow(chi_n,2)*(entropy_derivative(internalEnergy1)-entropy_derivative(internalEnergy2))*timeStep_ 
+      + sqrt(2*kappa()*timeStep_)*chi_n*G;
+    // update the rate for accept/reject correction
+    rejectionRate() = 0.5*pow(G, 2);
+    // return the energy increment
+    return energy_increment;
   }
 
   //------------------------ Specific output functions ------------------------------------
