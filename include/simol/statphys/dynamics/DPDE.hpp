@@ -10,6 +10,7 @@ namespace simol
   class DPDE: public LangevinBase
   {
     double heatCapacity_;
+    double einsteinTemperature_;
     double kappa_;
     double cutOff_;
     double rejectionCount_;
@@ -37,7 +38,9 @@ namespace simol
     virtual double entropy_derivative(double intEnergy) const; 
     double& heatCapacity();
     const double& heatCapacity() const;
-
+    double& einsteinTemperature();
+    const double& einsteinTemperature() const;
+    
     //-- thermal conduction --
     double& kappa();
     const double& kappa() const;

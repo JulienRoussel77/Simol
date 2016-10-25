@@ -87,6 +87,7 @@ namespace simol
     double eta() const;
     double heatCapacity() const;  // used for DPDE dynamics
     double kappa() const;         // used for DPDE dynamics
+    double einsteinTemperature() const; // used for DPDE dynamics
 
     //-- Output --
     string simuTypeName() const;

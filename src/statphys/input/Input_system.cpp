@@ -146,7 +146,7 @@ namespace simol
     return false;
   }
   
-  //-- heat capacity for DPDE --
+  //-- for DPDE --
   double Input::heatCapacity() const
   {
     if (data["System"]["HeatCapacity"])

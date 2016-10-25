@@ -10,6 +10,7 @@ namespace simol
   DPDE::DPDE(Input const&  input):
     LangevinBase(input),
     heatCapacity_(input.heatCapacity()),
+    einsteinTemperature_(input.einsteinTemperature()),
     kappa_(input.kappa()),
     cutOff_(input.cutOffRatio()*input.potentialSigma()),
     rejectionCount_(0),
@@ -26,6 +27,16 @@ namespace simol
   double& DPDE::heatCapacity()
   {
     return heatCapacity_;
+  }
+
+  const double& DPDE::einsteinTemperature() const
+  {
+    return einsteinTemperature_;
+  }
+
+  double& DPDE::einsteinTemperature()
+  {
+    return einsteinTemperature_;
   }
 
   const double& DPDE::kappa() const
@@ -109,12 +120,18 @@ namespace simol
   
   double DPDE::entropy(double intEnergy) const
   {
-    return heatCapacity()*log(intEnergy);
+    if (einsteinTemperature() > 0)
+      return ((intEnergy+heatCapacity()*einsteinTemperature())*log(intEnergy+heatCapacity()*einsteinTemperature()) - intEnergy*log(intEnergy) )/einsteinTemperature();
+    else
+      return heatCapacity()*log(intEnergy);
   }
 
   double DPDE::entropy_derivative(double intEnergy) const
   {
-    return heatCapacity()/intEnergy;
+    if (einsteinTemperature() > 0)
+      return -log(intEnergy/(intEnergy+heatCapacity()*einsteinTemperature()))/einsteinTemperature();
+    else
+      return heatCapacity()/intEnergy;
   }
 
   double DPDE::internalTemperature(double intEnergy) const
@@ -132,9 +149,29 @@ namespace simol
     // Ornstein-Uhlenbeck process on the momenta
     double alpha = exp(- gamma_ / particle.mass() * timeStep_);
     particle.momentum() = alpha * particle.momentum() + sqrt((1 - pow(alpha, 2)) / beta_ * particle.mass()) * rng_->gaussian();
-    // update of the internal energies 
-    particle.internalEnergy() += -(1-temperature()/internalTemperature(particle.internalEnergy()))*heatCapacity()*timeStep_ 
-      + sqrt(2*temperature()*heatCapacity()*timeStep_)*rng_->scalarGaussian();
+    // update of the internal energies; need to be metropolized as well; use a timestep "adapted" to the convergence rate of the dynamics 
+    double effectiveTimeStep = timeStep_*heatCapacity();
+    double G = rng_->scalarGaussian();
+    double old_energy = particle.internalEnergy();
+    particle.internalEnergy() += -(1-entropy_derivative(particle.internalEnergy())*temperature())*effectiveTimeStep
+      + sqrt(2*temperature()*effectiveTimeStep)*G;
+    double rate = 0; 
+    double GG = 0;
+    if (particle.internalEnergy() > 0)
+      {
+	rate += entropy(particle.internalEnergy()) - entropy(old_energy) - (particle.internalEnergy() - old_energy)/temperature();
+	GG = (old_energy - particle.internalEnergy() + (1-entropy_derivative(particle.internalEnergy())*temperature())*effectiveTimeStep)/sqrt(2*temperature()*effectiveTimeStep);
+	rate += 0.5*( pow(G,2) - pow(GG,2) );
+	rate = exp(rate);
+      }
+    double U = rng_->scalarUniform();
+    //cout << rate << endl; //" : " << G << " " << GG << ", cf. " << entropy_derivative(old_energy) << " " << entropy_derivative(particle.internalEnergy()) << endl;
+    if (U > rate)
+      {
+    	//-- reject the move --
+    	//incrementRejection();
+	particle.internalEnergy() = old_energy;
+      }
   }
 
   //-------------------------------- FLUCT/DISS FOR ISOLATED SYSTEMS --------------------------

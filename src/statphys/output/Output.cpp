@@ -141,7 +141,13 @@ namespace simol
     cout << " Time step            : " << timeStep_ << endl;
     //-- specific screen outputs --
     if (input.dynamicsName() == "DPDE")
-      cout << " Heat capacity        : " << input.heatCapacity() << endl;
+      {
+	cout << " Heat capacity        : " << input.heatCapacity() << endl;
+	if (input.einsteinTemperature() > 0)
+	  cout << " -- Einstein model" << endl;  
+	else
+	  cout << " -- classical model" << endl;  
+      }
     if (input.systemName() == "NBody" && input.doCellMethod())
     {
       cout << endl;
