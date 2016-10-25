@@ -343,7 +343,7 @@ namespace simol
       reinitializeCells();
       //-- compute the interactions --
       for (ParticlePairIterator it = pairBegin(); !pairFinished(it); incrementePairIterator(it))
-        interaction(it.particle1(), it.particle2());
+	interaction(it.particle1(), it.particle2());
     }
     else
     {
@@ -361,6 +361,15 @@ namespace simol
     // take closest periodic image
     DVec r12 = periodicImage(particle1.position() - particle2.position());
     double distance = r12.norm();
+    
+    if (distance < 0.001)
+      {
+	for (int i =0; i < 2; i++)
+	  cout << particle1.position(i) << " " << particle2.position(i) << " ";
+	cout << " also " << particle1.momentum(0) << " " << particle2.momentum(0) << endl;
+	cout << endl;
+      }
+
     // compute energy
     double energy12 = potential(distance);
     particle1.potentialEnergy() += energy12 / 2;
