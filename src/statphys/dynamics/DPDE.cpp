@@ -149,7 +149,7 @@ namespace simol
     // Ornstein-Uhlenbeck process on the momenta
     double alpha = exp(- gamma_ / particle.mass() * timeStep_);
     particle.momentum() = alpha * particle.momentum() + sqrt((1 - pow(alpha, 2)) / beta_ * particle.mass()) * rng_->gaussian();
-    // update of the internal energies; need to be metropolized as well; use a timestep "adapted" to the convergence rate of the dynamics 
+    //---- update of the internal energies; requires metropolization; also use timestep "adapted" to cv. rate of the dynamics ---- 
     double effectiveTimeStep = timeStep_*heatCapacity();
     double G = rng_->scalarGaussian();
     double old_energy = particle.internalEnergy();
@@ -165,13 +165,8 @@ namespace simol
 	rate = exp(rate);
       }
     double U = rng_->scalarUniform();
-    //cout << rate << endl; //" : " << G << " " << GG << ", cf. " << entropy_derivative(old_energy) << " " << entropy_derivative(particle.internalEnergy()) << endl;
-    if (U > rate)
-      {
-    	//-- reject the move --
-    	//incrementRejection();
-	particle.internalEnergy() = old_energy;
-      }
+    if (U > rate) //-- reject the move --
+      particle.internalEnergy() = old_energy;
   }
 
   //-------------------------------- FLUCT/DISS FOR ISOLATED SYSTEMS --------------------------
