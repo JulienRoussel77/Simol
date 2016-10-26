@@ -8,10 +8,24 @@ namespace simol
   
   ParticlePairIterator NBody::pairBegin()
   {
+    if (nbOfParticles() < 2) throw runtime_error("Cannot initialize a Particle Pair Iterator if the system has 0 or 1 particle !");
     ParticlePairIterator iter = ParticlePairIterator();
+    int iOfCell = 0;
     iter.it1_ = cell(0).members().begin();
+    // Look for the first non empty cell
+    while (iter.it1_ == cell(iOfCell).members().end())
+    {
+      iOfCell++;
+      iter.it1_ = cell(iOfCell).members().begin();
+    }
     iter.it2_ = std::next(iter.it1_, 1);
-    iter.endIt2_ = cell(0).members().end();
+    // If the first cell has a single particle, look for the next non empty cell
+    while (iter.it2_ == cell(iOfCell).members().end())
+    {
+      iOfCell++;
+      iter.it2_ = cell(iOfCell).members().begin();
+    }
+    iter.endIt2_ = cell(iOfCell).members().end();
     return iter;
   }
   
