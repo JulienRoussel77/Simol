@@ -65,7 +65,7 @@ namespace simol
     
     void fluctuationDissipation(System& syst);
     void elementaryFluctuationDissipation(System const& syst, Particle& particle1, Particle& particle2);
-    double pairwiseThermalConduction(double dist, double internalEnergy1, double internalEnergy2);
+    double pairwiseThermalConduction(double chi_n, double internalEnergy1, double internalEnergy2);
     
     void thermalConduction(System& syst);
     void elementaryThermalConduction(System const& syst, Particle& particle1, Particle& particle2);
