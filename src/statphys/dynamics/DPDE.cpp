@@ -403,43 +403,37 @@ namespace simol
     double distance = r12.norm();
     if (distance < cutOff_)
       {
-	// compute predicted energy variation
-	double chi_n = chi(distance);
-	double deltaInternalEnergy = pairwiseThermalConduction(chi_n,old_internalEnergy_1,old_internalEnergy_2);
+    	// compute predicted energy variation
+    	double chi_n = chi(distance);
+    	double deltaInternalEnergy = pairwiseThermalConduction(chi_n,old_internalEnergy_1,old_internalEnergy_2);
 	// check whether the energy variation is admissible; otherwise set acceptance rate to 0
-	if (fabs(deltaInternalEnergy) < min(old_internalEnergy_1,old_internalEnergy_2)) 
-	  {
-	    particle1.internalEnergy() += deltaInternalEnergy;
-	    particle2.internalEnergy() -= deltaInternalEnergy;
-	    rejectionRate() += entropy(particle1.internalEnergy())+entropy(particle2.internalEnergy()) - entropy(old_internalEnergy_1)-entropy(old_internalEnergy_2);
-	    // cout << "---" << endl;
-	    // cout << fabs(deltaInternalEnergy) << " " << deltaInternalEnergy << " " << min(old_internalEnergy_1,old_internalEnergy_2) << endl;
-	    // cout << endl;
-	    // cout << particle1.internalEnergy() << " " << entropy(particle1.internalEnergy()) << endl;
-	    // cout << particle2.internalEnergy() << " " << entropy(particle2.internalEnergy()) << endl;
-	    // cout << old_internalEnergy_1 << " " << entropy(old_internalEnergy_1) << endl;
-	    // cout << old_internalEnergy_2 << " " << entropy(old_internalEnergy_2) << endl;
+    	if (fabs(deltaInternalEnergy) < min(old_internalEnergy_1,old_internalEnergy_2)) 
+    	  {
+    	    particle1.internalEnergy() += deltaInternalEnergy;
+    	    particle2.internalEnergy() -= deltaInternalEnergy;
+    	    rejectionRate() += entropy(particle1.internalEnergy())+entropy(particle2.internalEnergy())-entropy(old_internalEnergy_1)-entropy(old_internalEnergy_2);
 	    // compute the probability of the reverse move
-	    double GG = particle1.internalEnergy() - old_internalEnergy_1 
-	      - kappa()*pow(chi_n,2)*(entropy_derivative(particle1.internalEnergy())-entropy_derivative(particle2.internalEnergy()))*timeStep_ ;
-	    GG /= chi_n*sqrt(2*kappa()*timeStep_);
-	    rejectionRate() += -0.5*pow(GG,2);
+    	    double GG = old_internalEnergy_1 - particle1.internalEnergy()
+    	      - kappa()*pow(chi_n,2)*(entropy_derivative(particle1.internalEnergy())-entropy_derivative(particle2.internalEnergy()))*timeStep_ ;
+    	    GG /= chi_n*sqrt(2*kappa()*timeStep_);
+    	    rejectionRate() += -0.5*pow(GG,2);
 	    rejectionRate() = exp(rejectionRate());
-	    //cout << rejectionRate()  << endl;
-	  }
-	else
-	  rejectionRate() = 0;
-	//cout << rejectionRate() << ", " << old_internalEnergy_1 << " " << old_internalEnergy_2 << " with increment " << deltaInternalEnergy << " so that " << particle1.internalEnergy() << " " << particle2.internalEnergy() << endl;
+    	  }
+    	else
+    	  {
+    	    rejectionRate() = 0;
+    	    negativeEnergiesCount() += 1;
+    	  }
 	// actual acceptance/rejection step
-	double U = rng_->scalarUniform();
-	if (U > rejectionRate())
-	  {
+    	incrementTotalCountForRejection();
+    	double U = rng_->scalarUniform();
+    	if (U > rejectionRate())
+    	  {
 	    //-- reject the move --
-	    incrementRejection();
-	    particle1.internalEnergy() = old_internalEnergy_1;
-	    particle2.internalEnergy() = old_internalEnergy_2;
-	  }
-	//cout << "   so " << old_internalEnergy_1 << " " << old_internalEnergy_2 << " : " << deltaInternalEnergy << endl;
+    	    incrementRejection();
+    	    particle1.internalEnergy() = old_internalEnergy_1;
+    	    particle2.internalEnergy() = old_internalEnergy_2;
+    	  }
       }
   }
 
