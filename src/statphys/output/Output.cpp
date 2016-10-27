@@ -77,7 +77,7 @@ namespace simol
 	if (obsKineticEnergy_)
 	  {
 	    if (doDPDE_)
-	      outThermo() << "# 1:time  2:kineticEnergy  3:potentialEnergy  4:totalEnergy  5:temperature 6:pressure 7:internalEnergy 8:internalTemperature 9:negativeEnergiesCount" << endl;
+	      outThermo() << "# 1:time  2:kineticEnergy  3:potentialEnergy  4:totalEnergy  5:temperature 6:pressure 7:internalEnergy 8:internalTemperature 9:negativeEnergiesCountFD 10:negativeEnergiesCountThermal" << endl;
 	    else
 	      outThermo() << "# 1:time  2:kineticEnergy  3:potentialEnergy  4:totalEnergy  5:temperature 6:pressure" << endl;
 	  }
@@ -86,7 +86,7 @@ namespace simol
 	//-- current estimates of averages --
 	outMeanThermo_       = std::make_shared<ofstream>(input.outputFolderName() + "meanThermo.txt");
 	if (doDPDE_)
-	  outMeanThermo() << "# 1:time  2:potentialEnergy  3:kineticEnergy  4:temperature 5:pressure 6:internalEnergy 7:internalTemperature 8:averageRejectionRate 9:negativeEnergiesCount" << endl;
+	  outMeanThermo() << "# 1:time  2:potentialEnergy  3:kineticEnergy  4:temperature 5:pressure 6:internalEnergy 7:internalTemperature 8:averageRejectionRateFD 9:negativeEnergiesCountFD 10:averageRejectionRateThermal 11:negativeEnergiesCountThermal" << endl;
 	else
 	  outMeanThermo() << "# 1:time  2:potentialEnergy  3:kineticEnergy  4:temperature 5:pressure" << endl;
       }
@@ -147,6 +147,10 @@ namespace simol
 	  cout << " -- Einstein model" << endl;  
 	else
 	  cout << " -- classical model" << endl;  
+	if (input.doMetropolis())
+	  cout << " With Metropolis correction" << endl;
+	else 
+	  cout << " No Metropolis correction" << endl;
       }
     if (input.systemName() == "NBody" && input.doCellMethod())
     {
@@ -396,17 +400,29 @@ namespace simol
   double& Output::internalTemperature()
   {return obsInternalTemperature().currentValue();}
 
-  const double& Output::rejectionCount() const 
-  {return rejectionCount_;}
+  const double& Output::rejectionCountFD() const 
+  {return rejectionCountFD_;}
 
-  double& Output::rejectionCount() 
-  {return rejectionCount_;}
+  double& Output::rejectionCountFD() 
+  {return rejectionCountFD_;}
 
-  const double& Output::negativeEnergiesCount() const 
-  {return negativeEnergiesCount_;}
+  const double& Output::negativeEnergiesCountFD() const 
+  {return negativeEnergiesCountFD_;}
 
-  double& Output::negativeEnergiesCount() 
-  {return negativeEnergiesCount_;}
+  double& Output::negativeEnergiesCountFD() 
+  {return negativeEnergiesCountFD_;}
+
+  const double& Output::rejectionCountThermal() const 
+  {return rejectionCountThermal_;}
+
+  double& Output::rejectionCountThermal() 
+  {return rejectionCountThermal_;}
+
+  const double& Output::negativeEnergiesCountThermal() const 
+  {return negativeEnergiesCountThermal_;}
+
+  double& Output::negativeEnergiesCountThermal() 
+  {return negativeEnergiesCountThermal_;}
   
   //---------------- check whether outputs should be performed --------------------
 
@@ -435,8 +451,9 @@ namespace simol
     if (doDPDE_) // add fields for DPDE
     {
       outThermo() << " " << internalEnergy() 
-      << " " << internalTemperature()
-      << " " << negativeEnergiesCount();
+		  << " " << internalTemperature()
+		  << " " << negativeEnergiesCountFD()
+		  << " " << negativeEnergiesCountThermal();
     }
     outThermo() << std::endl;
     
@@ -450,8 +467,10 @@ namespace simol
     {
       outMeanThermo() << " " << obsInternalEnergy().mean() 
 		      << " " << obsInternalTemperature().mean()
-		      << " " << rejectionCount()
-		      << " " << negativeEnergiesCount() ;
+		      << " " << rejectionCountFD()
+		      << " " << negativeEnergiesCountFD()
+		      << " " << rejectionCountThermal()
+		      << " " << negativeEnergiesCountThermal() ;
     }
     outMeanThermo() << std::endl;
     

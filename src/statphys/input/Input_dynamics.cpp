@@ -13,7 +13,6 @@ const double defaultTauBending = 0;
 const double defaultKappa = 0; 
 const double defaultEinsteinTemperature = 0;
 
-
 namespace simol
 {
 
@@ -57,6 +56,14 @@ namespace simol
   double Input::beta() const
   {
     return 1 / temperature();
+  }
+
+  bool Input::doMetropolis() const
+  {
+    if (data["Dynamics"]["Metropolis"] && data["Dynamics"]["Metropolis"].as<string>() == "yes")
+      return true;
+    else
+      return false;
   }
 
   /*double Input::betaLeft() const
