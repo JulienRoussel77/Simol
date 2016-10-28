@@ -375,7 +375,7 @@ namespace simol
     	double chi_n = chi(distance);
     	double deltaInternalEnergy = pairwiseThermalConduction(chi_n,old_internalEnergy_1,old_internalEnergy_2);
 	// check whether the energy variation is admissible; otherwise set acceptance rate to 0
-    	if (fabs(deltaInternalEnergy) < min(old_internalEnergy_1,old_internalEnergy_2)) 
+    	if ( (old_internalEnergy_1+deltaInternalEnergy>0) & (old_internalEnergy_2-deltaInternalEnergy>0)) 
     	  {
     	    particle1.internalEnergy() += deltaInternalEnergy;
     	    particle2.internalEnergy() -= deltaInternalEnergy;
