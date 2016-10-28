@@ -77,7 +77,7 @@ namespace simol
 	if (obsKineticEnergy_)
 	  {
 	    if (doDPDE_)
-	      outThermo() << "# 1:time  2:kineticEnergy  3:potentialEnergy  4:totalEnergy  5:temperature 6:pressure 7:internalEnergy 8:internalTemperature 9:negativeEnergiesCountFD 10:negativeEnergiesCountThermal" << endl;
+	      outThermo() << "# 1:time  2:kineticEnergy  3:potentialEnergy  4:totalEnergy  5:temperature 6:pressure 7:internalEnergy 8:fieldForInternalTemperature 9:negativeEnergiesCountFD 10:negativeEnergiesCountThermal" << endl;
 	    else
 	      outThermo() << "# 1:time  2:kineticEnergy  3:potentialEnergy  4:totalEnergy  5:temperature 6:pressure" << endl;
 	  }
@@ -451,7 +451,7 @@ namespace simol
     if (doDPDE_) // add fields for DPDE
     {
       outThermo() << " " << internalEnergy() 
-		  << " " << internalTemperature()
+		  << " " << internalTemperature()  // in fact, field used to compute the internal temperature as a ratio of averages
 		  << " " << negativeEnergiesCountFD()
 		  << " " << negativeEnergiesCountThermal();
     }
@@ -466,7 +466,7 @@ namespace simol
     if (doDPDE_) // add fields for DPDE
     {
       outMeanThermo() << " " << obsInternalEnergy().mean() 
-		      << " " << obsInternalTemperature().mean()
+		      << " " << obsInternalEnergy().mean()/nbOfParticles_/(1+obsInternalTemperature().mean())
 		      << " " << rejectionCountFD()
 		      << " " << negativeEnergiesCountFD()
 		      << " " << rejectionCountThermal()

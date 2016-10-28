@@ -57,7 +57,8 @@ namespace simol
       virtual void getPressure(Output& output) const = 0;
        
       //-- for DPDE --
-      virtual double internalTemperature(double /*intEnergy*/) const {return 0;}
+    virtual double internalTemperature(double /*intEnergy*/) const {return 0;}
+    virtual double entropy_derivative(double /*intEnergy*/) const {return 0;}
       virtual void specificComputeOutput(Output& /*output*/) const {}
 
     //-- external forces --

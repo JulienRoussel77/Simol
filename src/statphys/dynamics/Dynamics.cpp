@@ -148,8 +148,8 @@ namespace simol
   {
     output.obsInternalTemperature().currentValue() = 0;
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
-      output.obsInternalTemperature().currentValue() += 1/internalTemperature(syst(iOfParticle).internalEnergy());
-    output.obsInternalTemperature().currentValue() = syst.nbOfParticles()/output.obsInternalTemperature().currentValue();
+      output.obsInternalTemperature().currentValue() += syst(iOfParticle).internalEnergy()*entropy_derivative(syst(iOfParticle).internalEnergy()); 
+    output.obsInternalTemperature().currentValue() = output.obsInternalTemperature().currentValue()/syst.nbOfParticles();
   }
   
  

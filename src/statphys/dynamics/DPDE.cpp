@@ -96,7 +96,7 @@ namespace simol
   double DPDE::entropy(double intEnergy) const
   {
     if (einsteinTemperature() > 0)
-      return ((intEnergy+heatCapacity()*einsteinTemperature())*log(intEnergy+heatCapacity()*einsteinTemperature()) - intEnergy*log(intEnergy) )/einsteinTemperature();
+      return ((intEnergy+heatCapacity()*einsteinTemperature())*log(intEnergy+heatCapacity()*einsteinTemperature()) - intEnergy*log(intEnergy) )/einsteinTemperature(); 
     else
       return heatCapacity()*log(intEnergy);
   }
@@ -104,7 +104,7 @@ namespace simol
   double DPDE::entropy_derivative(double intEnergy) const
   {
     if (einsteinTemperature() > 0)
-      return -log(intEnergy/(intEnergy+heatCapacity()*einsteinTemperature()))/einsteinTemperature();
+      return -log( intEnergy/(intEnergy+heatCapacity()*einsteinTemperature()) )/einsteinTemperature();
     else
       return heatCapacity()/intEnergy;
   }
