@@ -13,23 +13,35 @@ namespace simol
     double einsteinTemperature_;
     double kappa_;
     double cutOff_;
-    double rejectionCount_;
-    double totalCountForRejection_;
-    double negativeEnergiesCount_;
     double rejectionRate_;
+    bool doMetropolis_;
+    //-- counting rejections for fluctuation/dissipation part --
+    double rejectionCountFD_;
+    double totalCountForRejectionFD_;
+    double negativeEnergiesCountFD_;
+    //-- counting rejections for thermal conduction --
+    double rejectionCountThermal_;
+    double totalCountForRejectionThermal_;
+    double negativeEnergiesCountThermal_;
   public:
     DPDE(Input const&  input);
     virtual string dynamicsName() const {return "DPDE";}
     virtual double& cutOff();
     double sigma() const;
-    const double& rejectionCount() const;
-    double& rejectionCount();
-    const double& totalCountForRejection() const;
-    double& totalCountForRejection();
     const double& rejectionRate() const;
     double& rejectionRate();
-    const double& negativeEnergiesCount() const;
-    double& negativeEnergiesCount();
+    const double& rejectionCountFD() const;
+    double& rejectionCountFD();
+    const double& totalCountForRejectionFD() const;
+    double& totalCountForRejectionFD();
+    const double& negativeEnergiesCountFD() const;
+    double& negativeEnergiesCountFD();
+    const double& rejectionCountThermal() const;
+    double& rejectionCountThermal();
+    const double& totalCountForRejectionThermal() const;
+    double& totalCountForRejectionThermal();
+    const double& negativeEnergiesCountThermal() const;
+    double& negativeEnergiesCountThermal();
 
     //-- microscopic EOS --
     virtual double gamma_DPDE(double intEnergy);  
@@ -55,8 +67,10 @@ namespace simol
 
     //-- auxiliary functions --
     DVec effectiveDrift(Particle& particle);
-    void incrementRejection();
-    void incrementTotalCountForRejection();
+    void incrementRejectionFD();
+    void incrementTotalCountForRejectionFD();
+    void incrementRejectionThermal();
+    void incrementTotalCountForRejectionThermal();
     double chi(double dist);
     void acceptRejectRate(double v12_current, double v12_init, double internalEnergy1, double internalEnergy2, double reduced_mass, double dist);
     
@@ -65,7 +79,7 @@ namespace simol
     
     void fluctuationDissipation(System& syst);
     void elementaryFluctuationDissipation(System const& syst, Particle& particle1, Particle& particle2);
-    double pairwiseThermalConduction(double dist, double internalEnergy1, double internalEnergy2);
+    double pairwiseThermalConduction(double chi_n, double internalEnergy1, double internalEnergy2);
     
     void thermalConduction(System& syst);
     void elementaryThermalConduction(System const& syst, Particle& particle1, Particle& particle2);

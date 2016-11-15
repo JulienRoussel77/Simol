@@ -44,8 +44,7 @@ namespace simol
       std::shared_ptr<RNG>& rng();
 
       //-- (inverse) temperatures --
-      
-      virtual const double&  temperature() const;
+    virtual const double&  temperature() const;
       virtual const double& temperatureLeft() const;
       virtual const double& temperatureRight() const;
       virtual double deltaTemperature() const;
@@ -58,10 +57,11 @@ namespace simol
       virtual void getPressure(Output& output) const = 0;
        
       //-- for DPDE --
-      virtual double internalTemperature(double /*intEnergy*/) const {return 0;}
+    virtual double internalTemperature(double /*intEnergy*/) const {return 0;}
+    virtual double entropy_derivative(double /*intEnergy*/) const {return 0;}
       virtual void specificComputeOutput(Output& /*output*/) const {}
 
-      //-- external forces --
+    //-- external forces --
       double& externalForce(const int& i);
       double const& externalForce(const int& i) const;
 

@@ -94,10 +94,14 @@ namespace simol
     double& temperature();
     //double temperature() const;
     //double pressure() const;
-    const double& rejectionCount() const;
-    double& rejectionCount();
-    const double& negativeEnergiesCount() const;
-    double& negativeEnergiesCount();
+    const double& rejectionCountFD() const;
+    double& rejectionCountFD();
+    const double& negativeEnergiesCountFD() const;
+    double& negativeEnergiesCountFD();
+    const double& rejectionCountThermal() const;
+    double& rejectionCountThermal();
+    const double& negativeEnergiesCountThermal() const;
+    double& negativeEnergiesCountThermal();
 
     //-- parametrization of outputs --
     int const& nbOfAutocoPts() const;
@@ -206,8 +210,11 @@ namespace simol
     double totalEnergy_;
     double totalVirial_;
     double temperature_;
-    double rejectionCount_;
-    double negativeEnergiesCount_;
+    // rejection rates (DPDE)
+    double rejectionCountFD_;
+    double negativeEnergiesCountFD_;
+    double rejectionCountThermal_;
+    double negativeEnergiesCountThermal_;
 
     //-- parametrization of outputs --
     int decorrelationNbOfSteps_;

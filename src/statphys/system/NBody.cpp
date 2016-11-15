@@ -8,7 +8,7 @@ namespace simol
   
   ParticlePairIterator NBody::pairBegin()
   {
-    if (nbOfParticles() < 2) throw runtime_error("Cannot initialize a Particle Pair Iterator if the system has 0 or 1 particle !");
+    if (nbOfParticles() < 2) throw runtime_error("Cannot initialize a Particle Pair Iterator if the system has 0 or 1 particle!");
     ParticlePairIterator iter = ParticlePairIterator();
     int iOfCell = 0;
     iter.it1_ = cell(0).members().begin();
@@ -375,15 +375,6 @@ namespace simol
     // take closest periodic image
     DVec r12 = periodicImage(particle1.position() - particle2.position());
     double distance = r12.norm();
-    
-    if (distance < 0.001)
-      {
-	for (int i =0; i < 2; i++)
-	  cout << particle1.position(i) << " " << particle2.position(i) << " ";
-	cout << " also " << particle1.momentum(0) << " " << particle2.momentum(0) << endl;
-	cout << endl;
-      }
-
     // compute energy
     double energy12 = potential(distance);
     particle1.potentialEnergy() += energy12 / 2;

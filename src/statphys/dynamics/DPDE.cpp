@@ -13,10 +13,14 @@ namespace simol
     einsteinTemperature_(input.einsteinTemperature()),
     kappa_(input.kappa()),
     cutOff_(input.cutOffRatio()*input.potentialSigma()),
-    rejectionCount_(0),
-    totalCountForRejection_(0),
-    negativeEnergiesCount_(0),
-    rejectionRate_(0)
+    rejectionCountFD_(0),
+    totalCountForRejectionFD_(0),
+    negativeEnergiesCountFD_(0),
+    rejectionCountThermal_(0),
+    totalCountForRejectionThermal_(0),
+    negativeEnergiesCountThermal_(0),
+    rejectionRate_(0),
+    doMetropolis_(input.doMetropolis())
   {}
 
   const double& DPDE::heatCapacity() const
@@ -66,62 +70,33 @@ namespace simol
   }
 
   //-- for Metropolis procedures --
-  const double& DPDE::rejectionRate() const
-  {
-    return rejectionRate_;
-  }
-  
-  double& DPDE::rejectionRate()
-  {
-    return rejectionRate_;
-  }
-
-  const double& DPDE::rejectionCount() const
-  {
-    return rejectionCount_;
-  }
-  
-  double& DPDE::rejectionCount()
-  {
-    return rejectionCount_;
-  }
-
-  const double& DPDE::negativeEnergiesCount() const
-  {
-    return negativeEnergiesCount_;
-  }
-  
-  double& DPDE::negativeEnergiesCount()
-  {
-    return negativeEnergiesCount_;
-  }
-
-  const double& DPDE::totalCountForRejection() const
-  {
-    return totalCountForRejection_;
-  }
-  
-  double& DPDE::totalCountForRejection()
-  {
-    return totalCountForRejection_;
-  }
-  
-  void DPDE::incrementRejection()
-  {
-    rejectionCount_ += 1;
-  }
-
-  void DPDE::incrementTotalCountForRejection()
-  {
-    totalCountForRejection_ += 1;
-  }
+  const double& DPDE::rejectionRate() const {return rejectionRate_;}
+  double& DPDE::rejectionRate() {return rejectionRate_;}
+  // FD part
+  const double& DPDE::rejectionCountFD() const {return rejectionCountFD_;}
+  double& DPDE::rejectionCountFD() {return rejectionCountFD_;}
+  const double& DPDE::negativeEnergiesCountFD() const {return negativeEnergiesCountFD_;}
+  double& DPDE::negativeEnergiesCountFD() {return negativeEnergiesCountFD_;}
+  const double& DPDE::totalCountForRejectionFD() const {return totalCountForRejectionFD_;}
+  double& DPDE::totalCountForRejectionFD() {return totalCountForRejectionFD_;}
+  void DPDE::incrementRejectionFD() {rejectionCountFD_ += 1;}
+  void DPDE::incrementTotalCountForRejectionFD() {totalCountForRejectionFD_ += 1;}
+  // Thermal part 
+  const double& DPDE::rejectionCountThermal() const {return rejectionCountThermal_;}
+  double& DPDE::rejectionCountThermal() {return rejectionCountThermal_;}
+  const double& DPDE::negativeEnergiesCountThermal() const {return negativeEnergiesCountThermal_;}
+  double& DPDE::negativeEnergiesCountThermal() {return negativeEnergiesCountThermal_;}
+  const double& DPDE::totalCountForRejectionThermal() const {return totalCountForRejectionThermal_;}
+  double& DPDE::totalCountForRejectionThermal() {return totalCountForRejectionThermal_;}
+  void DPDE::incrementRejectionThermal() {rejectionCountThermal_ += 1;}
+  void DPDE::incrementTotalCountForRejectionThermal() {totalCountForRejectionThermal_ += 1;}
 
   //-------------------- micro EOS for NBody systems ----------------------------
   
   double DPDE::entropy(double intEnergy) const
   {
     if (einsteinTemperature() > 0)
-      return ((intEnergy+heatCapacity()*einsteinTemperature())*log(intEnergy+heatCapacity()*einsteinTemperature()) - intEnergy*log(intEnergy) )/einsteinTemperature();
+      return ((intEnergy+heatCapacity()*einsteinTemperature())*log(intEnergy+heatCapacity()*einsteinTemperature()) - intEnergy*log(intEnergy) )/einsteinTemperature(); 
     else
       return heatCapacity()*log(intEnergy);
   }
@@ -129,7 +104,7 @@ namespace simol
   double DPDE::entropy_derivative(double intEnergy) const
   {
     if (einsteinTemperature() > 0)
-      return -log(intEnergy/(intEnergy+heatCapacity()*einsteinTemperature()))/einsteinTemperature();
+      return -log( intEnergy/(intEnergy+heatCapacity()*einsteinTemperature()) )/einsteinTemperature();
     else
       return heatCapacity()/intEnergy;
   }
@@ -219,12 +194,12 @@ namespace simol
     	rate = exp(rate)*sigma_n/sqrt(sigma2_reverse);
       }
     //-- acceptance/rejection procedure --
-    incrementTotalCountForRejection();
+    incrementTotalCountForRejectionFD();
     double U = rng_->scalarUniform();
     if (U > rate)
       {
     	//-- reject the move --
-    	incrementRejection();
+    	incrementRejectionFD();
 	particle.momentum() = old_momentum;
       }
     else 
@@ -286,7 +261,7 @@ namespace simol
     else 
       {
 	rejectionRate() = 0;
-	negativeEnergiesCount() += 1;
+	negativeEnergiesCountFD() += 1;
       }
   }
 
@@ -309,8 +284,6 @@ namespace simol
 	  for (int j = i + 1; j < syst.nbOfParticles(); j++)
 	    elementaryFluctuationDissipation(syst, syst(i), syst(j));
       }
-    // check total number of interactions
-    //cout << rejectionCount() << " " << totalCountForRejection() << endl;
   }
   
   ///
@@ -329,8 +302,6 @@ namespace simol
       {
 	DVec e12 = r12/distance;
 	// compute the variation of the relative velocity
-	//double old_kin_energy = particle1.kineticEnergy() + particle2.kineticEnergy();
-	
 	double mu12 = 1./( 1./particle1.mass() + 1./particle2.mass() ); // reduced mass
 	DVec vect12 = particle1.momentum()/particle1.mass() - particle2.momentum()/particle2.mass();  
 	double v12_0 = dot(vect12,e12);
@@ -338,31 +309,28 @@ namespace simol
 	// update the momenta
 	DVec totalMomentum = particle1.momentum() + particle2.momentum();
 	DVec v12_perp = vect12 - dot(vect12,e12)*e12;
-	//cout << vect12 << ", " << e12 << " : dot = " << dot(vect12,e12) << endl;
 	particle1.momentum() += mu12*(v12-v12_0)*e12;
 	particle2.momentum() -= mu12*(v12-v12_0)*e12;
 	//mu12*( totalMomentum/particle2.mass() + v12_perp + v12*e12);
 	//particle2.momentum() = mu12*( totalMomentum/particle1.mass() - v12_perp - v12*e12);
 	// accept/reject step
-	incrementTotalCountForRejection();
+	incrementTotalCountForRejectionFD();
 	acceptRejectRate(v12,v12_0,particle1.internalEnergy(),particle2.internalEnergy(),mu12,distance);
-	double U = rng_->scalarUniform();
-	//cout << rejectionRate() << endl;
+	// check whether Metropolis required
+	double U = -1; // in order to accept even if energies are negative...
+	if (doMetropolis_)
+	  U = rng_->scalarUniform();
 	if (U > rejectionRate())
 	  {
 	    //-- reject the move --
-	    incrementRejection();
+	    incrementRejectionFD();
 	    particle1.momentum() = old_momentum_1;
 	    particle2.momentum() = old_momentum_2;
-	    //cout << rejectionRate() << " " << rejectionCount() << " " << totalCountForRejection() << endl;
 	  }
 	else 
 	  {
 	    //-- update internal energies --
-	    //double new_kin_energy = particle1.kineticEnergy() + particle2.kineticEnergy();
-	    //double internal_energy_variation = 0.5*(new_kin_energy-old_kin_energy);
 	    double internal_energy_variation = mu12*( pow(v12,2)-pow(v12_0,2) )/4;
-	    //cout << mu12*( pow(v12,2)-pow(v12_0,2) )/4 - internal_energy_variation << endl;
 	    particle1.internalEnergy() -= internal_energy_variation;
 	    particle2.internalEnergy() -= internal_energy_variation;
 	  }
@@ -403,21 +371,44 @@ namespace simol
     double distance = r12.norm();
     if (distance < cutOff_)
       {
-	// compute predicted energy variation
-	double deltaInternalEnergy = pairwiseThermalConduction(distance,old_internalEnergy_1,old_internalEnergy_2);
-	// 
-	// accept/reject step  ----> A COMPLETER !!
-	//
-	// update the internal energies
-	particle1.internalEnergy() += deltaInternalEnergy;
-	particle2.internalEnergy() -= deltaInternalEnergy;
-	//cout << "   so " << old_internalEnergy_1 << " " << old_internalEnergy_2 << " : " << deltaInternalEnergy << endl;
+    	// compute predicted energy variation
+    	double chi_n = chi(distance);
+    	double deltaInternalEnergy = pairwiseThermalConduction(chi_n,old_internalEnergy_1,old_internalEnergy_2);
+	// check whether the energy variation is admissible; otherwise set acceptance rate to 0
+    	if ( (old_internalEnergy_1+deltaInternalEnergy>0) & (old_internalEnergy_2-deltaInternalEnergy>0)) 
+    	  {
+    	    particle1.internalEnergy() += deltaInternalEnergy;
+    	    particle2.internalEnergy() -= deltaInternalEnergy;
+    	    rejectionRate() += entropy(particle1.internalEnergy())+entropy(particle2.internalEnergy())-entropy(old_internalEnergy_1)-entropy(old_internalEnergy_2);
+	    // compute the probability of the reverse move
+    	    double GG = old_internalEnergy_1 - particle1.internalEnergy()
+    	      - kappa()*pow(chi_n,2)*(entropy_derivative(particle1.internalEnergy())-entropy_derivative(particle2.internalEnergy()))*timeStep_ ;
+    	    GG /= chi_n*sqrt(2*kappa()*timeStep_);
+    	    rejectionRate() += -0.5*pow(GG,2);
+	    rejectionRate() = exp(rejectionRate());
+    	  }
+    	else
+    	  {
+    	    rejectionRate() = 0;
+    	    negativeEnergiesCountThermal() += 1;
+    	  }
+	// actual acceptance/rejection step
+    	incrementTotalCountForRejectionThermal();
+	double U = -1;  // in order to accept even if energies are negative...
+	if (doMetropolis_)
+	  U = rng_->scalarUniform();
+	if (U > rejectionRate())
+    	  {
+	    //-- reject the move --
+    	    incrementRejectionThermal();
+    	    particle1.internalEnergy() = old_internalEnergy_1;
+    	    particle2.internalEnergy() = old_internalEnergy_2;
+    	  }
       }
   }
 
-  double DPDE::pairwiseThermalConduction(double dist, double internalEnergy1, double internalEnergy2)
+  double DPDE::pairwiseThermalConduction(double chi_n, double internalEnergy1, double internalEnergy2)
   {
-    double chi_n = chi(dist);
     double G = rng_->scalarGaussian();
     double energy_increment = kappa()*pow(chi_n,2)*(entropy_derivative(internalEnergy1)-entropy_derivative(internalEnergy2))*timeStep_ 
       + sqrt(2*kappa()*timeStep_)*chi_n*G;
@@ -437,9 +428,11 @@ namespace simol
   
   void DPDE::specificComputeOutput(Output& output) const
   {
-    //-- rejection rate --
-    output.rejectionCount() = rejectionCount()/totalCountForRejection();
-    output.negativeEnergiesCount() = negativeEnergiesCount();
+    //-- rejection rates --
+    output.rejectionCountFD() = rejectionCountFD()/totalCountForRejectionFD();
+    output.negativeEnergiesCountFD() = negativeEnergiesCountFD();
+    output.rejectionCountThermal() = rejectionCountThermal()/totalCountForRejectionThermal();
+    output.negativeEnergiesCountThermal() = negativeEnergiesCountThermal();
   }
   
 }
