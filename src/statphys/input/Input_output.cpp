@@ -249,7 +249,7 @@ namespace simol
   {return (dynamicsName() == "Overdamped" && systemName() == "Isolated");}
   
   bool Input::doLength() const
-  {return dynamicsName() == "Isolated";}
+  {return systemName() == "Isolated";}
   
   bool Input::doMidFlow() const
   {return dynamicsName() == "BoundaryLangevin";}

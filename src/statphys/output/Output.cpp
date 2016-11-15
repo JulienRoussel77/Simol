@@ -290,6 +290,12 @@ namespace simol
   double& Output::totalVirial()
   {return totalVirial_;}
   
+  const double& Output::length() const
+  {return obsLength().currentValue();}
+  
+  double& Output::length()
+  {return obsLength().currentValue();}
+  
   const double& Output::velocity() const
   {return obsVelocity().currentValue();}
   

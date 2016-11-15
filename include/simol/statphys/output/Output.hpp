@@ -78,6 +78,8 @@ namespace simol
     double& internalEnergy();
     const double& internalTemperature() const;
     double& internalTemperature();
+    const double& length() const;  
+    double& length();
     const double& velocity() const;  
     double& velocity();
     const double& force() const;  

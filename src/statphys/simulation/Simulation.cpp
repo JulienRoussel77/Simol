@@ -21,10 +21,10 @@ namespace simol
     simulate(model, syst);
   }
    
-  void sampleInternalEnergies(Dynamics const& dyna, System& syst)
+  void sampleInternalEnergies(Dynamics const&, System&)
   {}
 
-  void simulate(Dynamics& dyna, System& syst)
+  void simulate(Dynamics&, System&)
   {}
 
   //------------- Hamiltonian -------------------
@@ -108,6 +108,7 @@ namespace simol
     if (output.obsPressure_) dyna.computePressure(output, syst);
     if (output.obsInternalEnergy_) dyna.computeInternalEnergy(output, syst);
     if (output.obsInternalTemperature_) dyna.computeInternalTemperature(output, syst);
+    if (output.obsLength_) output.length() = syst(0).position(0);
     if (output.obsVelocity_) output.velocity() = syst(0).velocity(0);
     if (output.obsForce_) output.force() = syst(0).force(0);
     dyna.getThermo(output);
