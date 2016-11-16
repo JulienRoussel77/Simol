@@ -10,6 +10,8 @@ const int defaultNbOfParticlesPerDimension = 1;
 const double defaultLength = 2 * M_PI;
 const double defaultLatticeParameter = 1.;
 const double defaultHeatCapacity = 1;
+const double defaultHeatCapacityEinstein = defaultHeatCapacity;
+const double defaultEinsteinTemperature = 0;
 
 namespace simol
 {
@@ -153,6 +155,22 @@ namespace simol
       return data["System"]["HeatCapacity"].as<double>();
     else
       return defaultHeatCapacity;
+  }
+
+  double Input::heatCapacityEinstein() const
+  {
+    if (data["System"]["EinsteinHeatCapacity"])
+      return data["System"]["EinsteinHeatCapacity"].as<double>();
+    else
+      return defaultHeatCapacityEinstein;
+  }
+
+  double Input::einsteinTemperature() const
+  {
+    if (data["System"]["EinsteinTemperature"])
+      return data["System"]["EinsteinTemperature"].as<double>();
+    else
+      return defaultEinsteinTemperature;
   }
 
   string Input::restartFileName() const

@@ -142,15 +142,23 @@ namespace simol
     //-- specific screen outputs --
     if (input.dynamicsName() == "DPDE")
       {
-	cout << " Heat capacity        : " << input.heatCapacity() << endl;
-	if (input.einsteinTemperature() > 0)
-	  cout << " -- Einstein model" << endl;  
-	else
-	  cout << " -- classical model" << endl;  
 	if (input.doMetropolis())
 	  cout << " With Metropolis correction" << endl;
 	else 
 	  cout << " No Metropolis correction" << endl;
+	cout << endl;
+	if (input.heatCapacityEinstein() > input.heatCapacity())
+	  {
+	    cout << " -- blended Einstein model for micro EOS " << endl; 
+	    cout << " Baseline heat capacity        : " << input.heatCapacity() << endl;
+	    cout << " Limiting heat capacity        : " << input.heatCapacityEinstein() << endl;
+	    cout << " Einstein temperature          : " << input.einsteinTemperature() << endl;
+	  }
+	else
+	  {
+	    cout << " -- classical micro EOS " << endl;
+	    cout << " Heat capacity        : " << input.heatCapacity() << endl;
+	  }
       }
     if (input.systemName() == "NBody" && input.doCellMethod())
     {

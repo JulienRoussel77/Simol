@@ -10,6 +10,7 @@ namespace simol
   DPDE::DPDE(Input const&  input):
     LangevinBase(input),
     heatCapacity_(input.heatCapacity()),
+    heatCapacityEinstein_(input.heatCapacityEinstein()),
     einsteinTemperature_(input.einsteinTemperature()),
     kappa_(input.kappa()),
     cutOff_(input.cutOffRatio()*input.potentialSigma()),
@@ -31,6 +32,16 @@ namespace simol
   double& DPDE::heatCapacity()
   {
     return heatCapacity_;
+  }
+
+  const double& DPDE::heatCapacityEinstein() const
+  {
+    return heatCapacityEinstein_;
+  }
+
+  double& DPDE::heatCapacityEinstein()
+  {
+    return heatCapacityEinstein_;
   }
 
   const double& DPDE::einsteinTemperature() const
@@ -95,18 +106,18 @@ namespace simol
   
   double DPDE::entropy(double intEnergy) const
   {
-    if (einsteinTemperature() > 0)
-      return ((intEnergy+heatCapacity()*einsteinTemperature())*log(intEnergy+heatCapacity()*einsteinTemperature()) - intEnergy*log(intEnergy) )/einsteinTemperature(); 
-    else
-      return heatCapacity()*log(intEnergy);
+    double entropy_value = heatCapacity()*log(intEnergy);
+    if (heatCapacityEinstein() > heatCapacity())
+      entropy_value += ((intEnergy+(heatCapacityEinstein()-heatCapacity())*einsteinTemperature())*log(intEnergy+(heatCapacityEinstein()-heatCapacity())*einsteinTemperature()) - intEnergy*log(intEnergy) )/einsteinTemperature(); 
+    return entropy_value;
   }
 
   double DPDE::entropy_derivative(double intEnergy) const
   {
-    if (einsteinTemperature() > 0)
-      return -log( intEnergy/(intEnergy+heatCapacity()*einsteinTemperature()) )/einsteinTemperature();
-    else
-      return heatCapacity()/intEnergy;
+    double entropy_derivative_value = heatCapacity()/intEnergy;
+    if (heatCapacityEinstein() > heatCapacity())
+      entropy_derivative_value += -log( intEnergy/(intEnergy+(heatCapacityEinstein()-heatCapacity())*einsteinTemperature()) )/einsteinTemperature();
+    return entropy_derivative_value;
   }
 
   double DPDE::internalTemperature(double intEnergy) const

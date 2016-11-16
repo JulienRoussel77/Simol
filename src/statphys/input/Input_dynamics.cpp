@@ -11,7 +11,6 @@ const double defaultDeltaTemperature = 0;
 const double defaultExternalForce = 0;
 const double defaultTauBending = 0;
 const double defaultKappa = 0; 
-const double defaultEinsteinTemperature = 0;
 
 namespace simol
 {
@@ -136,15 +135,6 @@ namespace simol
       return data["Dynamics"]["Kappa"].as<double>();
     else return defaultKappa;
   }
-
-  double Input::einsteinTemperature() const
-  {
-    if (data["Dynamics"]["EinsteinTemperature"])
-      return data["Dynamics"]["EinsteinTemperature"].as<double>();
-    else
-      return defaultEinsteinTemperature;
-  }
-
 
 
 }

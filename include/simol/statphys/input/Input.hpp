@@ -86,7 +86,8 @@ namespace simol
     double xi() const;
     int seed() const;
     double eta() const;
-    double heatCapacity() const;  // used for DPDE dynamics
+    double heatCapacity() const;          // used for DPDE dynamics
+    double heatCapacityEinstein() const;  // used for DPDE dynamics
     double kappa() const;         // used for DPDE dynamics
     double einsteinTemperature() const; // used for DPDE dynamics
     
