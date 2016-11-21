@@ -1,5 +1,4 @@
 #include "simol/statphys/dynamics/DPDE.hpp"
-
 #include "simol/statphys/dynamics/LangevinBase.hpp"
 
 using std::cout;
