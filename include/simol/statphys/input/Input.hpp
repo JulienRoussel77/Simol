@@ -75,6 +75,7 @@ namespace simol
     double gamma() const;
     double temperature() const;
     bool doMetropolis() const;
+    bool doMTS() const;
     //double temperatureLeft() const;
     //double temperatureRight() const;
     double beta() const;
@@ -90,7 +91,8 @@ namespace simol
     double heatCapacityEinstein() const;  // used for DPDE dynamics
     double kappa() const;         // used for DPDE dynamics
     double einsteinTemperature() const; // used for DPDE dynamics
-    
+    int MTSfrequency() const;   // for multiple timestepping, currently DPDE
+
     //-- Output --
     string simuTypeName() const;
     string parametersName() const;

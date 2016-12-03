@@ -11,6 +11,7 @@ const double defaultDeltaTemperature = 0;
 const double defaultExternalForce = 0;
 const double defaultTauBending = 0;
 const double defaultKappa = 0; 
+const int    defaultMTSfrequency = 1;
 
 namespace simol
 {
@@ -134,6 +135,13 @@ namespace simol
     if (data["Dynamics"]["Kappa"])
       return data["Dynamics"]["Kappa"].as<double>();
     else return defaultKappa;
+  }
+
+ int Input::MTSfrequency() const
+  {
+    if (data["Dynamics"]["MTS frequency"])
+      return data["Dynamics"]["MTS frequency"].as<int>();
+    else return defaultMTSfrequency;
   }
 
 

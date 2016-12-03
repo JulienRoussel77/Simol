@@ -16,6 +16,7 @@ namespace simol
     double cutOff_;
     double rejectionRate_;
     bool doMetropolis_;
+    int MTSfrequency_;
     //-- counting rejections for fluctuation/dissipation part --
     double rejectionCountFD_;
     double totalCountForRejectionFD_;
@@ -43,6 +44,8 @@ namespace simol
     double& totalCountForRejectionThermal();
     const double& negativeEnergiesCountThermal() const;
     double& negativeEnergiesCountThermal();
+    const int& MTSfrequency() const;
+    int& MTSfrequency();
 
     //-- microscopic EOS --
     virtual double gamma_DPDE(double intEnergy);  
@@ -66,7 +69,7 @@ namespace simol
 
      //-- functions for integration of the fluctuation/dissipation (NBody systems) --
     double pairwiseFluctuationDissipation(double v12, double dist, double internalEnergy1, double internalEnergy2, double reduced_mass);
-    void secondPartThermalization(Particle& particle);
+    void Thermalization(Particle& particle);
 
     //-- auxiliary functions --
     DVec effectiveDrift(Particle& particle);

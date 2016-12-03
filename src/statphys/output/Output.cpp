@@ -142,6 +142,8 @@ namespace simol
     //-- specific screen outputs --
     if (input.dynamicsName() == "DPDE")
       {
+	if (input.MTSfrequency() != 1)
+	  cout << " -- Multiple timestepping (stoch. part DPDE): " << input.MTSfrequency() << endl;
 	if (input.doMetropolis())
 	  cout << " With Metropolis correction" << endl;
 	else 
