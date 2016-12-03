@@ -465,7 +465,7 @@ namespace simol
     if (doDPDE_) // add fields for DPDE
     {
       outThermo() << " " << internalEnergy() 
-		  << " " << internalTemperature()  // in fact, field used to compute the internal temperature as a ratio of averages
+		  << " " << 1./internalTemperature()  // in fact, field used to compute internal temp. as ratio of averages when general microEOS; otherwise instantaneous inverse internal temperature (should not be averaged as such...)
 		  << " " << negativeEnergiesCountFD()
 		  << " " << negativeEnergiesCountThermal();
     }
@@ -480,7 +480,7 @@ namespace simol
     if (doDPDE_) // add fields for DPDE
     {
       outMeanThermo() << " " << obsInternalEnergy().mean() 
-		      << " " << obsInternalEnergy().mean()/nbOfParticles_/(1+obsInternalTemperature().mean())
+		      << " " << 1./obsInternalTemperature().mean() // for general microEOS, use: obsInternalEnergy().mean()/nbOfParticles_/(1+obsInternalTemperature().mean())
 		      << " " << rejectionCountFD()
 		      << " " << negativeEnergiesCountFD()
 		      << " " << rejectionCountThermal()
