@@ -161,6 +161,11 @@ namespace simol
 	    cout << " -- classical micro EOS " << endl;
 	    cout << " Heat capacity        : " << input.heatCapacity() << endl;
 	  }
+	if ( (input.initialInternalTemperature() != input.temperature()) & (input.thermalizationNbOfSteps() > 0) )
+	  {
+	    cout << endl;
+	    cout << " NONEQUILIBRIUM equilibration dynamics" << endl;
+	  }
       }
     if (input.systemName() == "NBody" && input.doCellMethod())
     {

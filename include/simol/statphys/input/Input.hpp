@@ -92,6 +92,7 @@ namespace simol
     double kappa() const;         // used for DPDE dynamics
     double einsteinTemperature() const; // used for DPDE dynamics
     int MTSfrequency() const;   // for multiple timestepping, currently DPDE
+    double initialInternalTemperature() const; // initial temp. for internal d.o.f. (for equilibration)
 
     //-- Output --
     string simuTypeName() const;

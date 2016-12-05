@@ -17,6 +17,7 @@ namespace simol
     double rejectionRate_;
     bool doMetropolis_;
     int MTSfrequency_;
+    double initialInternalTemperature_; 
     //-- counting rejections for fluctuation/dissipation part --
     double rejectionCountFD_;
     double totalCountForRejectionFD_;

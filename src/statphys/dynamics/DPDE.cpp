@@ -21,7 +21,8 @@ namespace simol
     negativeEnergiesCountThermal_(0),
     rejectionRate_(0),
     doMetropolis_(input.doMetropolis()),
-    MTSfrequency_(input.MTSfrequency())
+    MTSfrequency_(input.MTSfrequency()),
+    initialInternalTemperature_(input.initialInternalTemperature())
   {
     // renormalize the timestep when multiple timestepping is used
     timeStep() = timeStep()/MTSfrequency_;
@@ -147,18 +148,19 @@ namespace simol
     // Ornstein-Uhlenbeck process on the momenta
     double alpha = exp(- gamma_ / particle.mass() * effectiveTimeStep);
     particle.momentum() = alpha * particle.momentum() + sqrt((1 - pow(alpha, 2)) / beta_ * particle.mass()) * rng_->gaussian();
-    //---- update of the internal energies; requires metropolization; also use timestep "adapted" to cv. rate of the dynamics ---- 
+    //---- update of the internal energies; requires metropolization; also use timestep "adapted" to cv. rate of the dynamics; 
+    //     and with possibly different temperature than Hamiltonian d.o.f. in order to perform equilibration ---- 
     effectiveTimeStep *= heatCapacity();
     double G = rng_->scalarGaussian();
     double old_energy = particle.internalEnergy();
-    particle.internalEnergy() += -(1-entropy_derivative(particle.internalEnergy())*temperature())*effectiveTimeStep
-      + sqrt(2*temperature()*effectiveTimeStep)*G;
+    particle.internalEnergy() += -(1-entropy_derivative(particle.internalEnergy())*initialInternalTemperature_)*effectiveTimeStep
+      + sqrt(2*initialInternalTemperature_*effectiveTimeStep)*G;
     double rate = 0; 
     double GG = 0;
     if (particle.internalEnergy() > 0)
       {
-	rate += entropy(particle.internalEnergy()) - entropy(old_energy) - (particle.internalEnergy() - old_energy)/temperature();
-	GG = (old_energy - particle.internalEnergy() + (1-entropy_derivative(particle.internalEnergy())*temperature())*effectiveTimeStep)/sqrt(2*temperature()*effectiveTimeStep);
+	rate += entropy(particle.internalEnergy()) - entropy(old_energy) - (particle.internalEnergy() - old_energy)/initialInternalTemperature_;
+	GG = (old_energy - particle.internalEnergy() + (1-entropy_derivative(particle.internalEnergy())*initialInternalTemperature_)*effectiveTimeStep)/sqrt(2*initialInternalTemperature_*effectiveTimeStep);
 	rate += 0.5*( pow(G,2) - pow(GG,2) );
 	rate = exp(rate);
       }
