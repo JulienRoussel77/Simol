@@ -13,23 +13,35 @@ namespace simol
   //--- DPDE dynamics ---
   void thermalize(DPDE& dyna, System& syst)
   {
-    //-- Verlet part --
+    //-- Verlet part: possibly MTS here as well, as in the function "simulate"--
+    for (int k = 0; k < dyna.MTSfrequency(); k++)
+      {
+	for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
+	  dyna.verletFirstPart(syst(iOfParticle));
+	syst.computeAllForces();
+	for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
+	  dyna.verletSecondPart(syst(iOfParticle));
+      }
+    //-- for the FD part, the timestep is renormalized as the effective timestep MTSfrequency()*timeStep_, as in the function "simulate" --
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
-      dyna.verletFirstPart(syst(iOfParticle));
-    syst.computeAllForces();
-    for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
-      dyna.secondPartThermalization(syst(iOfParticle));
-  }
+      dyna.Thermalization(syst(iOfParticle));
+    }
 
   //------------- DPDE --------------------
   
   void simulate(DPDE& dyna, System& syst)
   {
-    for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
-      dyna.verletFirstPart(syst(iOfParticle));
-    syst.computeAllForces();
-    for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
-      dyna.verletSecondPart(syst(iOfParticle));
+    //-- first do a certain number of steps of Hamiltonian part, prescribed by "MTS frequency" in the input file
+    //   !! works only for NBody systems... !!
+    //cout << "time step is in fact... " << dyna.timeStep() << endl;
+    for (int k = 0; k < dyna.MTSfrequency(); k++)
+      {
+	for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
+	  dyna.verletFirstPart(syst(iOfParticle));
+	syst.computeAllForces();
+	for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
+	  dyna.verletSecondPart(syst(iOfParticle));
+      }
     
     //---------- Isolated systems -------------
     if (syst.name() == "Isolated")
@@ -39,6 +51,7 @@ namespace simol
 	  //dyna.energyReinjection(syst(iOfParticle));  // integration of p at fixed gamma + energy reinjection
 	  dyna.metropolizedEnergyReinjection(syst(iOfParticle));  // Metropolis correction of effective dynamics on p 
       }
+    //-- then integrate once the fluctuation terms, with effective timestep MTSfrequency()*timeStep_ --
     //------------- NBody --------------------
     else if (syst.name() == "NBody")
       {

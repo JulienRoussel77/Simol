@@ -11,6 +11,7 @@ const double defaultDeltaTemperature = 0;
 const double defaultExternalForce = 0;
 const double defaultTauBending = 0;
 const double defaultKappa = 0; 
+const int    defaultMTSfrequency = 1;
 
 namespace simol
 {
@@ -35,7 +36,7 @@ namespace simol
       return (data["Dynamics"]["TemperatureLeft"].as<double>() + data["Dynamics"]["TemperatureRight"].as<double>()) / 2;
     else if (data["Dynamics"]["BetaLeft"] && data["Dynamics"]["BetaRight"])
       return .5 / data["Dynamics"]["BetaLeft"].as<double>() + .5 / data["Dynamics"]["BetaRight"].as<double>();
-    else throw std::runtime_error("Temperature not precised !");
+    else throw std::runtime_error("No given temperature!");
   }
 
   /*double Input::temperatureLeft() const
@@ -136,5 +137,18 @@ namespace simol
     else return defaultKappa;
   }
 
+ int Input::MTSfrequency() const
+  {
+    if (data["Dynamics"]["MTS frequency"])
+      return data["Dynamics"]["MTS frequency"].as<int>();
+    else return defaultMTSfrequency;
+  }
+
+  double Input::initialInternalTemperature() const
+  {
+    if (data["Dynamics"]["InitialInternalTemperature"])
+      return data["Dynamics"]["InitialInternalTemperature"].as<double>();
+    else return temperature();
+  }
 
 }

@@ -20,8 +20,13 @@ namespace simol
     totalCountForRejectionThermal_(0),
     negativeEnergiesCountThermal_(0),
     rejectionRate_(0),
-    doMetropolis_(input.doMetropolis())
-  {}
+    doMetropolis_(input.doMetropolis()),
+    MTSfrequency_(input.MTSfrequency()),
+    initialInternalTemperature_(input.initialInternalTemperature())
+  {
+    // renormalize the timestep when multiple timestepping is used
+    timeStep() = timeStep()/MTSfrequency_;
+  }
 
   const double& DPDE::heatCapacity() const
   {
@@ -66,6 +71,16 @@ namespace simol
   double& DPDE::cutOff()
   {
     return cutOff_;
+  }
+
+  const int& DPDE::MTSfrequency() const
+  {
+    return MTSfrequency_;
+  }
+
+  int& DPDE::MTSfrequency()
+  {
+    return MTSfrequency_;
   }
 
   //-- for 1D systems --
@@ -126,26 +141,26 @@ namespace simol
 
   //----------------- THERMALIZATION: LANGEVIN-LIKE FLUCT/DISS ---------------------
 
-  //-- second part of Verlet + integrate the O-U analytically + update internal energies --
-  void DPDE::secondPartThermalization(Particle& particle)
+  //-- integrate the O-U analytically + update internal energies --
+  void DPDE::Thermalization(Particle& particle)
   {
-    // second part of Verlet
-    particle.momentum() += timeStep_ * particle.force() / 2;
+    double effectiveTimeStep = MTSfrequency_*timeStep_;
     // Ornstein-Uhlenbeck process on the momenta
-    double alpha = exp(- gamma_ / particle.mass() * timeStep_);
+    double alpha = exp(- gamma_ / particle.mass() * effectiveTimeStep);
     particle.momentum() = alpha * particle.momentum() + sqrt((1 - pow(alpha, 2)) / beta_ * particle.mass()) * rng_->gaussian();
-    //---- update of the internal energies; requires metropolization; also use timestep "adapted" to cv. rate of the dynamics ---- 
-    double effectiveTimeStep = timeStep_*heatCapacity();
+    //---- update of the internal energies; requires metropolization; also use timestep "adapted" to cv. rate of the dynamics; 
+    //     and with possibly different temperature than Hamiltonian d.o.f. in order to perform equilibration ---- 
+    effectiveTimeStep *= heatCapacity();
     double G = rng_->scalarGaussian();
     double old_energy = particle.internalEnergy();
-    particle.internalEnergy() += -(1-entropy_derivative(particle.internalEnergy())*temperature())*effectiveTimeStep
-      + sqrt(2*temperature()*effectiveTimeStep)*G;
+    particle.internalEnergy() += -(1-entropy_derivative(particle.internalEnergy())*initialInternalTemperature_)*effectiveTimeStep
+      + sqrt(2*initialInternalTemperature_*effectiveTimeStep)*G;
     double rate = 0; 
     double GG = 0;
     if (particle.internalEnergy() > 0)
       {
-	rate += entropy(particle.internalEnergy()) - entropy(old_energy) - (particle.internalEnergy() - old_energy)/temperature();
-	GG = (old_energy - particle.internalEnergy() + (1-entropy_derivative(particle.internalEnergy())*temperature())*effectiveTimeStep)/sqrt(2*temperature()*effectiveTimeStep);
+	rate += entropy(particle.internalEnergy()) - entropy(old_energy) - (particle.internalEnergy() - old_energy)/initialInternalTemperature_;
+	GG = (old_energy - particle.internalEnergy() + (1-entropy_derivative(particle.internalEnergy())*initialInternalTemperature_)*effectiveTimeStep)/sqrt(2*initialInternalTemperature_*effectiveTimeStep);
 	rate += 0.5*( pow(G,2) - pow(GG,2) );
 	rate = exp(rate);
       }
@@ -219,7 +234,7 @@ namespace simol
       }
   }
 
-  //-------------------------------- FLUCT/DISS FOR NBODY SYSTEMS --------------------------
+  //-------------------------------- FLUCT/DISS FOR NBODY SYSTEMS (WITH MULTIPLE TIMESTEPPING) --------------------------
   
   double DPDE::chi(double dist)
   {
@@ -234,9 +249,10 @@ namespace simol
     // otherwise, integrate the Ornstein-Uhlenbeck process of the projected velocity
     else 
       {
+	double effectiveTimeStep = MTSfrequency_*timeStep_;
 	double chi_n = chi(dist);
 	double gamma_n = 0.5 * gamma() * temperature() * (entropy_derivative(internalEnergy1) + entropy_derivative(internalEnergy2));
-	double alpha_n = exp(- gamma_n * pow(chi_n,2)/reduced_mass * timeStep_);
+	double alpha_n = exp(- gamma_n * pow(chi_n,2)/reduced_mass * effectiveTimeStep);
 	double G = rng_->scalarGaussian();
 	double sigma_n = sqrt((1 - pow(alpha_n, 2)) * temperature() * gamma() / (gamma_n * reduced_mass ) );
 	double new_v12 = alpha_n * v12 +  sigma_n * G;
@@ -255,13 +271,14 @@ namespace simol
     if (Delta_v2 < min(internalEnergy1,internalEnergy2))
       {
 	// rejectionRate() = 1; // always accept -- for debugging
+	double effectiveTimeStep = MTSfrequency_*timeStep_;
 	// compute the new energies
 	double E1 = internalEnergy1 - Delta_v2;
 	double E2 = internalEnergy2 - Delta_v2;
 	rejectionRate() += entropy(E1) + entropy(E2) - entropy(internalEnergy1) - entropy(internalEnergy2); 
 	double chi_n = chi(dist);
 	double gamma_reverse = 0.5 * gamma() * temperature() * (entropy_derivative(E1) + entropy_derivative(E2));
-	double alpha_reverse = exp(- gamma_reverse * pow(chi_n,2)/reduced_mass * timeStep_);
+	double alpha_reverse = exp(- gamma_reverse * pow(chi_n,2)/reduced_mass * effectiveTimeStep);
 	double sigma_reverse = sqrt((1 - pow(alpha_reverse, 2)) * temperature() * gamma() / (gamma_reverse*reduced_mass) );
 	double GG = (alpha_reverse*v12_current - v12_init)/sigma_reverse;
 	rejectionRate() -= 0.5*pow(GG, 2) + log(sigma_reverse);
@@ -381,6 +398,7 @@ namespace simol
     double distance = r12.norm();
     if (distance < cutOff_)
       {
+	double effectiveTimeStep = MTSfrequency_*timeStep_;
     	// compute predicted energy variation
     	double chi_n = chi(distance);
     	double deltaInternalEnergy = pairwiseThermalConduction(chi_n,old_internalEnergy_1,old_internalEnergy_2);
@@ -392,8 +410,8 @@ namespace simol
     	    rejectionRate() += entropy(particle1.internalEnergy())+entropy(particle2.internalEnergy())-entropy(old_internalEnergy_1)-entropy(old_internalEnergy_2);
 	    // compute the probability of the reverse move
     	    double GG = old_internalEnergy_1 - particle1.internalEnergy()
-    	      - kappa()*pow(chi_n,2)*(entropy_derivative(particle1.internalEnergy())-entropy_derivative(particle2.internalEnergy()))*timeStep_ ;
-    	    GG /= chi_n*sqrt(2*kappa()*timeStep_);
+    	      - kappa()*pow(chi_n,2)*(entropy_derivative(particle1.internalEnergy())-entropy_derivative(particle2.internalEnergy()))*effectiveTimeStep;
+    	    GG /= chi_n*sqrt(2*kappa()*effectiveTimeStep);
     	    rejectionRate() += -0.5*pow(GG,2);
 	    rejectionRate() = exp(rejectionRate());
     	  }
@@ -420,8 +438,9 @@ namespace simol
   double DPDE::pairwiseThermalConduction(double chi_n, double internalEnergy1, double internalEnergy2)
   {
     double G = rng_->scalarGaussian();
-    double energy_increment = kappa()*pow(chi_n,2)*(entropy_derivative(internalEnergy1)-entropy_derivative(internalEnergy2))*timeStep_ 
-      + sqrt(2*kappa()*timeStep_)*chi_n*G;
+    double effectiveTimeStep = MTSfrequency_*timeStep_;
+    double energy_increment = kappa()*pow(chi_n,2)*(entropy_derivative(internalEnergy1)-entropy_derivative(internalEnergy2))*effectiveTimeStep 
+      + sqrt(2*kappa()*effectiveTimeStep)*chi_n*G;
     // update the rate for accept/reject correction
     rejectionRate() = 0.5*pow(G, 2);
     // return the energy increment

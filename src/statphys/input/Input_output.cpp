@@ -68,6 +68,7 @@ namespace simol
         else if (vecParameters[iOfVec] == "seed")     name += doubleToString(seed());
         else if (vecParameters[iOfVec] == "potAlpha") name += doubleToString(potentialAlpha());
         else if (vecParameters[iOfVec] == "potBeta")  name += doubleToString(potentialBeta());
+	else if (vecParameters[iOfVec] == "MTSfrequency")  name += doubleToString(MTSfrequency());
         else throw std::runtime_error(vecParameters[iOfVec] + " is not a parameter name !");
       }
       name += "/";
