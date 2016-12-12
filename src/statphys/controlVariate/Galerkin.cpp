@@ -105,13 +105,14 @@ namespace simol
 
   DVec Galerkin::solveWithSaddle(SMat const& A, DVec const& Y) const
   {
+    return solveWithSaddle(DMat(A), Y);
     
-    Eigen::BiCGSTAB<SMat> solver;
+    /*Eigen::BiCGSTAB<SMat> solver;
     solver.compute(A);
     DVec X = solver.solve(Y);
     cout << "Solver info : " << solver.info() << endl;
     assert(solver.info() == Eigen::Success);
-    return X;
+    return X;*/
   }
 
   DVec Galerkin::solveWithSaddle(const DMat& A, const DVec& X) const
@@ -483,7 +484,7 @@ namespace simol
   }
   
   void Galerkin::computeEigen() const
-  {
+  {    
     Eigen::EigenSolver<DMat> eigSol = getEigenSolver();
     //const cplx* eigVal = eigSol.eigenvalues().data();
     vector<cplx> eigVal;
@@ -492,11 +493,11 @@ namespace simol
     
     std::sort(eigVal.begin(), eigVal.end(), hasSmallerNorm);
     
-    for (int i=0; i<sizeOfBasis(); i++)
-      cout << eigVal[i] << endl;
+    //for (int i=0; i<sizeOfBasis(); i++)
+    //  cout << eigVal[i] << endl;
     
     
-    ofstream outFinalGap("output/Galerkin/finalGap.txt",  std::ofstream::app);
+    /*ofstream outFinalGap("output/Galerkin/finalGap.txt",  std::ofstream::app);
     //outFinalGap << externalForce_ << " " <<  amplitude_ << " " << gamma() << " " << nbOfFourier() << " " << nbOfHermite() << " " << abs(eigVal[0]) << " " << abs(eigVal[1]) << endl;
     DVec gradV = amplitude_ * gettGiHj(2,0) / sqrt(2.);
     cout << "gradV : " << gradV << endl << endl;
@@ -511,7 +512,7 @@ namespace simol
     cout << "LCV : " << LCV << endl;
     cout << "LCVz : " << LCVz << endl;
     DVec CVneq = CV - solve(Leq_, gradV);
-    outFinalGap << externalForce_ << " " <<  amplitude_ << " " << gamma() << " " << nbOfFourier() << " " << nbOfHermite() << " " << abs(eigVal[0]) << " " << abs(eigVal[1]) << " " << CVneq.norm() << endl;
+    outFinalGap << externalForce_ << " " <<  amplitude_ << " " << gamma() << " " << nbOfFourier() << " " << nbOfHermite() << " " << abs(eigVal[0]) << " " << abs(eigVal[1]) << " " << CVneq.norm() << endl;*/
     
     ofstream out_eigvalLeq("output/Galerkin/eigvalLeq");
     for (int i = 0; i < (int) eigVal.size(); i++)

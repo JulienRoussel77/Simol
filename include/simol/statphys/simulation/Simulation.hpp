@@ -106,7 +106,7 @@ namespace simol
     }
 
     //--- write final outputs ----
-    //writeFinalOutput(*system_, output_);
+    writeFinalOutput(*system_, output_);
   }
   
   

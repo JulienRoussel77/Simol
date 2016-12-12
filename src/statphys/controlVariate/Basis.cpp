@@ -332,9 +332,13 @@ namespace simol
   
   void ExpFourierBasis::laplacianMatrix(SMat& A) const
   {
+    cout << "laplacianMatrix" << endl;
     for (int iOfFourier = 0; iOfFourier < nbOfElts_; iOfFourier++)
       for (int jOfFourier = max(0, iOfFourier-4); jOfFourier < min(nbOfElts_, iOfFourier+5); jOfFourier++)
+      {
+        cout << "coucou" << endl;
         A.insert(iOfFourier, jOfFourier) = xLaplacianY(iOfFourier, jOfFourier);
+      }
   }
     
  
