@@ -13,16 +13,16 @@ namespace simol
     einsteinTemperature_(input.einsteinTemperature()),
     kappa_(input.kappa()),
     cutOff_(input.cutOffRatio()*input.potentialSigma()),
-    rejectionCountFD_(0),
-    totalCountForRejectionFD_(0),
-    negativeEnergiesCountFD_(0),
-    rejectionCountThermal_(0),
-    totalCountForRejectionThermal_(0),
-    negativeEnergiesCountThermal_(0),
     rejectionRate_(0),
     doMetropolis_(input.doMetropolis()),
     MTSfrequency_(input.MTSfrequency()),
-    initialInternalTemperature_(input.initialInternalTemperature())
+    initialInternalTemperature_(input.initialInternalTemperature()),
+    rejectionCountFD_(0),
+    totalCountForRejectionFD_(0),    
+    negativeEnergiesCountFD_(0),    
+    rejectionCountThermal_(0),    
+    totalCountForRejectionThermal_(0),    
+    negativeEnergiesCountThermal_(0)    
   {
     // renormalize the timestep when multiple timestepping is used
     timeStep() = timeStep()/MTSfrequency_;

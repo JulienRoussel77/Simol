@@ -14,6 +14,7 @@
 namespace simol
 {
   bool sameLetters(const string& x, const string& y);
+  DVec scanTensor(const string path, vector<int>& dimensions);
 
   class Input
   {

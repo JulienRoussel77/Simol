@@ -25,6 +25,30 @@ namespace simol
     return item;
   }
 
+  DVec scanTensor(const string path, vector<int>& dimensions)
+  {
+    ifstream inTensor(path);
+    string str;
+    int dim;
+    inTensor >> str >> dim;
+    dimensions.push_back(dim);
+    inTensor >> dim;
+    dimensions.push_back(dim);
+    
+    int nbOfValues = dimensions[0]*dimensions[1];
+    DVec tensor(nbOfValues);
+    double  value;
+    for (int iOfVal = 0; iOfVal < nbOfValues; iOfVal++)
+    {
+      inTensor >> value;
+      //cout << value << endl;
+      tensor[iOfVal] = value;
+    }
+    
+
+    return tensor;
+  }
+  
   ///Reads the input file using the YAML library
   ///Reads the initial conditions in the "settings" file, if indicated
   Input::Input(CommandLine cmd):
