@@ -68,11 +68,14 @@ namespace simol
 
       const double& expFourierMeans(int iOfElt) const;
       DVec const& gVector() const;
+      double gVector(int iOfElt) const;
       const double& norm2gVector() const;
       int iTens(int iOfFourier2, int iOfHermite) const;
       DMat shapeSaddle(const DMat& A) const;
-      DMat shapePrec(const DMat& A) const;
+      SMat shapeSaddle(const SMat& A) const;
+      //DMat shapePrec(const DMat& A) const;
       DMat unshapeSaddle(const DMat& Asad) const;
+      SMat unshapeSaddle(const SMat& Asad) const;
       DVec shapeSaddle(const DVec& X) const;
       DVec unshapeSaddle(const DVec& Xsad) const;
       DVec solve(const DMat& A, const DVec& X) const;

@@ -126,12 +126,17 @@ namespace simol
   
   DVec const& Basis::gVector() const
   {
-    throw std::runtime_error("Basis::expFourierMeans is not implemented");
+    throw std::runtime_error("Basis::gVector is not implemented");
+  };
+  
+  double Basis::gVector(int) const
+  {
+    throw std::runtime_error("Basis::gVector(int) is not implemented");
   };
   
   double const& Basis::norm2gVector() const
   {
-    throw std::runtime_error("Basis::sumExpFourierMeans is not implemented");
+    throw std::runtime_error("Basis::norm2gVector is not implemented");
   };
   
   
@@ -184,6 +189,11 @@ namespace simol
   DVec const& ExpFourierBasis::gVector() const
   {
     return gVector_;
+  }
+  
+  double ExpFourierBasis::gVector(int iOfElt) const
+  {
+    return gVector_[iOfElt];
   }
   
   double const& ExpFourierBasis::norm2gVector() const
@@ -620,6 +630,11 @@ namespace simol
   DVec const& ExpFourierHermiteBasis::gVector() const
   {
     return bases_[0]->gVector();
+  }
+  
+  double ExpFourierHermiteBasis::gVector(int iOfElt) const
+  {
+    return bases_[0]->gVector(iOfElt);
   }
   
   double const& ExpFourierHermiteBasis::norm2gVector() const

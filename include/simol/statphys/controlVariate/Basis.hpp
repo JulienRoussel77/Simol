@@ -55,6 +55,7 @@ namespace simol
     virtual int& nbOfElts();
     virtual double const& expFourierMeans(int iOfElt) const;
     virtual DVec const& gVector() const;
+    virtual double gVector(int iOfElt) const;
     virtual double const& norm2gVector() const;
     virtual double value(double variable, const int iOfElt) const = 0;
     virtual DVec gradient(double variable, const int iOfElt) const = 0;
@@ -100,6 +101,7 @@ namespace simol
 
     double const& expFourierMeans(int iOfElt) const;
     DVec const& gVector() const;
+    virtual double gVector(int iOfElt) const;
     double const& norm2gVector() const;
     
     virtual double potential(double variable) const;
@@ -205,6 +207,7 @@ namespace simol
     ExpFourierHermiteBasis(Input const& input, Potential& potential);
     virtual double const& expFourierMeans(int iOfElt) const;
     virtual DVec const& gVector() const;
+    virtual double gVector(int iOfElt) const;
     virtual double const& norm2gVector() const;
   };
 

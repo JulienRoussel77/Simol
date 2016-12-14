@@ -29,22 +29,45 @@ namespace simol
 
   DMat Galerkin::shapeSaddle(const DMat& A) const
   {
-    DMat Asad = DMat::Zero(A.rows() + 1, A.cols() + 1);
+    DMat Asad = DMat::Zero(A.rows() + 1, A.cols() + 1);    
     Asad.block(0, 0, A.rows(), A.cols()) = A.block(0, 0, A.rows(), A.cols());
-    for (int iOfFourier2 = 0; iOfFourier2 <= 2 * maxOfFourier_; iOfFourier2++)
+    for (int iOfFourier = 0; iOfFourier < nbOfFourier(); iOfFourier++)
     {
-      Asad(A.rows(), iTens(iOfFourier2, 0)) = expFourierMeans(iOfFourier2);
-      Asad(iTens(iOfFourier2, 0), A.cols()) = expFourierMeans(iOfFourier2);
+      Asad(A.rows(), iTens(iOfFourier, 0)) = gVector(iOfFourier); //expFourierMeans(iOfFourier2);
+      Asad(iTens(iOfFourier, 0), A.cols()) = gVector(iOfFourier); //expFourierMeans(iOfFourier2);
     }
     return Asad;
   }
   
-  /*DMat Galerkin::shapePrec(const DMat& A) const
+  SMat Galerkin::shapeSaddle(const SMat& A) const
   {
-    return A + norm2gVector() / (1 - norm2gVector()) * extProduct(gVector(), A.adjoint() * gVector());
-  }*/
+    //SMat Asad = SMat::Zero(A.rows() + 1, A.cols() + 1);
+    SMat Asad(A.rows() + 1, A.cols() + 1);
+    //Asad.block(0, 0, A.rows(), A.cols()) = A.block(0, 0, A.rows(), A.cols());
+    
+    for (int jOfA = 0; jOfA < (int)A.cols(); ++jOfA)
+      for (SMat::InnerIterator it(A, jOfA); it; ++it)
+      {
+        int iOfA = it.row();
+        double valOfA = it.value();
+        Asad.insert(iOfA, jOfA) = valOfA;
+      }
+    
+    /*for (int iOfFourier = 0; iOfFourier < nbOfFourier(); iOfFourier++)
+      for (int iOfHermite = 0; iOfHermite < nbOfHermite(); iOfHermite++)
+        Asad.insert(iOfFourier, iOfHermite) = A(iOfFourier, iOfHermite);*/
+    for (int iOfFourier = 0; iOfFourier < nbOfFourier(); iOfFourier++)
+    {
+      Asad.insert(A.rows(), iTens(iOfFourier, 0)) = gVector(iOfFourier); //expFourierMeans(iOfFourier);
+      Asad.insert(iTens(iOfFourier, 0), A.cols()) = gVector(iOfFourier); //expFourierMeans(iOfFourier);
+    }
+    return Asad;
+  }
 
   DMat Galerkin::unshapeSaddle(const DMat& Asad) const
+  { return Asad.block(0, 0, Asad.rows() - 1, Asad.cols() - 1); }
+  
+  SMat Galerkin::unshapeSaddle(const SMat& Asad) const
   { return Asad.block(0, 0, Asad.rows() - 1, Asad.cols() - 1); }
 
   DVec Galerkin::shapeSaddle(const DVec& X) const
@@ -58,34 +81,6 @@ namespace simol
   {
     return Xsad.head(Xsad.size() - 1);
   }
-
-  // TODO: utiliser des solveurs lineaires plutôt qu'inverser
-  // de plus, on n'inverse jamais une matrice creuse car
-  // son inverse est generalement dense
-  // par consequent, pas de fonction membre inverse() dans SparseMatrix
-
-  /*DMat inverse(const SMat& A)
-  {
-    DMat Id = DMat::Identity(A.rows());
-    DMat C = spsolve(A, Id);
-    return C;
-  }
-
-  DMat inverse(const DMat& A)
-  {
-    DMat Id = DMat::Identity(A.rows());
-    DMat C = solve(A, Id);
-    return C;
-  }*/
-  
-  //Denote P the projector on the orthogonal of u
-  //Compute a vector x such that (1-P) A x = (1-P) b and dot(u, x) = 0 
-  /*DVec Galerkin::pseudoSolve(SMat const& A, DVec const& b, DVec const& u) const
-  {
-    DMat B = computeOrthoBasis(u);
-    assert(false);
-    return b;
-  }*/
   
   DVec Galerkin::solve(SMat const& A, DVec const& Y) const
   {
@@ -105,29 +100,37 @@ namespace simol
 
   DVec Galerkin::solveWithSaddle(SMat const& A, DVec const& Y) const
   {
-    return solveWithSaddle(DMat(A), Y);
+    //return solveWithSaddle(DMat(A), Y);
+    cout << "Sparse solveWithSaddle..."; cout.flush();
     
-    /*Eigen::BiCGSTAB<SMat> solver;
-    solver.compute(A);
-    DVec X = solver.solve(Y);
-    cout << "Solver info : " << solver.info() << endl;
-    assert(solver.info() == Eigen::Success);
-    return X;*/
+    DVec Ysad = shapeSaddle(Y);
+    SMat Asad = shapeSaddle(A);
+    //cout << Asad << endl;
+    
+    //Eigen::BiCGSTAB<SMat> solver;
+    Eigen::SparseLU<SMat> solver;
+    Asad.makeCompressed();
+    solver.compute(Asad);
+    DVec Xsad = solver.solve(Ysad);
+    //cout << "Solver info : " << solver.info() << endl;
+    //assert(solver.info() == Eigen::Success);
+    
+    return unshapeSaddle(Xsad);
   }
 
-  DVec Galerkin::solveWithSaddle(const DMat& A, const DVec& X) const
+  DVec Galerkin::solveWithSaddle(const DMat& A, const DVec& Y) const
   {
-    cout << "solveWithSaddle..."; cout.flush();
-    cout << "X -> " << X.size() << endl;
-    DVec Xsad = shapeSaddle(X);
-    cout << "Xsad -> " << Xsad.size() << endl;
+    cout << "Dense solveWithSaddle..."; cout.flush();
+    cout << "Y -> " << Y.size() << endl;
+    DVec Ysad = shapeSaddle(Y);
+    cout << "Xsad -> " << Ysad.size() << endl;
     cout << "A -> " << A.rows() << "x" << A.cols() << endl;
     DMat Asad = shapeSaddle(A);
     cout << "Asad -> " << Asad.rows() << "x" << Asad.cols() << endl;
-    DVec Bsad = Asad.fullPivLu().solve(Xsad);
-    cout << "Bsad -> " << Bsad.size() << endl;
-    cout << "OK ! (lambda = " << Bsad(Bsad.size() - 1) << ")" << endl;
-    return unshapeSaddle(Bsad);
+    DVec Xsad = Asad.fullPivLu().solve(Ysad);
+    cout << "Xsad -> " << Xsad.size() << endl;
+    cout << "OK ! (lambda = " << Xsad(Xsad.size() - 1) << ")" << endl;
+    return unshapeSaddle(Xsad);
   }
 
   DMat Galerkin::invWithSaddle(const SMat& A) const
@@ -253,15 +256,15 @@ namespace simol
   //where C = ExpFourierBasis::basisCoefficient_
   void Galerkin::computeExpToTrigMat()
   {
-    for (int iOfFourier2 = 1; iOfFourier2 <=  2 * (int)maxOfFourier_; iOfFourier2++)
+    for (int iOfFourier2 = 1; iOfFourier2 < nbOfFourier(); iOfFourier2++)
     {
       trigToExpMat_(0, iOfFourier2) = expFourierMeans(iOfFourier2) / sqrt(2.);
       trigToExpMat_(iOfFourier2, 0) = expFourierMeans(iOfFourier2) / sqrt(2.);
     }
     trigToExpMat_(0, 0) = expFourierMeans(0) / 2;
 
-    for (int iOfFourier = 1; iOfFourier <= (int) maxOfFourier_; iOfFourier++)
-      for (int jOfFourier = 1; jOfFourier <= (int) maxOfFourier_; jOfFourier++)
+    for (int iOfFourier = 1; iOfFourier < maxOfFourier_; iOfFourier++)
+      for (int jOfFourier = 1; jOfFourier < maxOfFourier_; jOfFourier++)
       {
         //cosine times cosine
         trigToExpMat_(2 * iOfFourier, 2 * jOfFourier) =
@@ -324,7 +327,7 @@ namespace simol
     nbOfParticles_(input.nbOfParticles()),
     nbOfFourier_(input.nbOfFourier()),  //ex : 5
     nbOfHermite_(input.nbOfHermite()),
-    maxOfFourier_((nbOfFourier_ - 1) / 2),  //ex : 2
+    maxOfFourier_((nbOfFourier_ + 1) / 2),  //ex : 3
     sizeOfBasis_(pow(nbOfFourier_ * nbOfHermite_, nbOfParticles_)),
     SIdQ_(DMat::Identity(nbOfFourier_, nbOfFourier_).sparseView()),
     SIdP_(DMat::Identity(nbOfHermite_, nbOfHermite_).sparseView()),
@@ -408,6 +411,11 @@ namespace simol
   const DVec& Galerkin::gVector() const
   {
     return basis_.gVector();
+  }
+  
+  double Galerkin::gVector(int iOfElt) const
+  {
+    return basis_.gVector(iOfElt);
   }
   
   const double& Galerkin::norm2gVector() const
