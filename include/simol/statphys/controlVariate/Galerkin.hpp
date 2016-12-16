@@ -8,11 +8,15 @@
 #include "simol/statphys/controlVariate/CVBasis.hpp"
 //#include "simol/statphys/controlVariate/MatrixFree.hpp"
 
+
+#include <unsupported/Eigen/KroneckerProduct>
+
 namespace simol
 {
 
   SMat kron(const SMat& A, const SMat& B);
   DMat kron(const DMat& A, const DMat& B);
+  SMat kron(const DMat& A, const SMat& B);
 
   class Galerkin;
   Galerkin* createGalerkin(Input const& input);
@@ -43,7 +47,7 @@ namespace simol
       bool doNonequilibrium_;
       int nbOfIntegrationNodes_;
       DMat trigToExpMat_, expToTrigMat_;
-      DMat trigToExpTens_, expToTrigTens_;
+      SMat trigToExpTens_, expToTrigTens_;
       Potential* potential_;
       ExpFourierHermiteBasis basis_;
       //Basis* basis_;

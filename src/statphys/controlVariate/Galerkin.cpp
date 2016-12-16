@@ -154,22 +154,9 @@ namespace simol
   SMat kron(const SMat& A, const SMat& B)
   {
     double totalTime = clock();
-    /*double a_1 = A.cols() * (B.cols() - 1)/(A.cols() - 1);
-    double b_1 = a_1 - B.cols();
-    double a_2 = A.rows() * (B.rows() - 1)/(A.rows() - 1);
-    double b_2 = a_2 - B.rows();*/
-
-    /*cout << "A : O <= i < " << A.rows() << ", O <= jOfA < " << A.cols() << endl;
-    cout << "B : O <= i2 < " << B.rows() << ", O <= jOfB < " << B.cols() << endl;
-    cout << "We keep the coefficients such that j * (jOfB + " << b_1 << ") <= " << a_1
-      << " and such that i * (i2 + " << b_2 << ") <= " << a_2 << endl; */
     SMat C(A.rows()*B.rows(), A.cols()*B.cols());
-
-    //SMat C(A.size() % B.size());          //element-wise product of the dimensions
-    //
-
-    //C(0,0) = 1;
-
+    
+    /*int count = 0;
     for (int jOfA = 0; jOfA < (int)A.cols(); ++jOfA)
     {
       for (SMat::InnerIterator it(A, jOfA); it; ++it)
@@ -180,6 +167,7 @@ namespace simol
         {
           for (SMat::InnerIterator it2(B, jOfB); it2; ++it2)
           {
+            count++;
             int iOfB = it2.row();
             double valOfB = it2.value();
             C.insert(iOfA + A.rows() * iOfB, jOfA + A.cols() * jOfB) = valOfA * valOfB;
@@ -187,6 +175,10 @@ namespace simol
         }
       }
     }
+    cout << "count = " << count << " " << C.nonZeros() << endl;*/
+
+    C = kroneckerProduct(A,B);
+
     cout << "- - Sparse kron : " << clock() - totalTime << endl;
     return C;
   }
@@ -196,6 +188,7 @@ namespace simol
     double totalTime = clock();
     
     DMat C(A.rows()*B.rows(), A.cols()*B.cols());
+    //C = kroneckerProduct(A,B);
     for (int iOfA = 0; iOfA < (int) A.rows(); iOfA++)
       for (int jOfA = 0; jOfA < (int) A.cols(); jOfA++)
         for (int iOfB = 0; iOfB < (int) B.rows(); iOfB++)
@@ -206,25 +199,27 @@ namespace simol
     return C;
   }
   
-  DMat kron(const DMat& A, const SMat& B)
+  SMat kron(const DMat& A, const SMat& B)
   {
     double totalTime = clock();
     
+    //SMat SC = kroneckerProduct(A, B);
+    
     DMat C(A.rows()*B.rows(), A.cols()*B.cols());
-    for (int iOfA = 0; iOfA < (int) A.rows(); iOfA++)
-      for (int jOfA = 0; jOfA < (int) A.cols(); jOfA++)
-        for (int jOfB = 0; jOfB < (int)B.cols(); jOfB++)
-        {
-          for (SMat::InnerIterator it2(B, jOfB); it2; ++it2)
-          {
-            int iOfB = it2.row();
-            double valOfB = it2.value();
-            C(iOfA + A.rows() * iOfB, jOfA + A.cols() * jOfB) = A(iOfA, jOfA) * valOfB;
-          }
-        }
-          
+    for (int jOfB = 0; jOfB < (int)B.cols(); jOfB++)
+      for (SMat::InnerIterator it2(B, jOfB); it2; ++it2)
+      {
+        int iOfB = it2.row();
+        double valOfB = it2.value();
+        C.block(A.rows() * iOfB, A.cols() * jOfB, A.rows(), A.cols()) = valOfB * A;
+        
+        /*for (int iOfA = 0; iOfA < (int) A.rows(); iOfA++)
+          for (int jOfA = 0; jOfA < (int) A.cols(); jOfA++)
+            C(iOfA + A.rows() * iOfB, jOfA + A.cols() * jOfB) = A(iOfA, jOfA) * valOfB;*/
+      }
+    SMat SC = C.sparseView();      
     cout << "- - Dense Sparse kron : " << clock() - totalTime << endl;
-    return C;
+    return SC;
   }
 
   void displayCplx(const DVecCplx& X, ostream& out)
@@ -543,6 +538,7 @@ namespace simol
     cout << "gradV : " << gradV << endl << endl;
     DVec gradVz = gradV - dot(gradV, gVector()) * gVector();
     cout << "gradVz : " << gradVz << endl;
+   
     DVec CV = solve(Leq_, gradV);
     cout << "CV before proj : " << CV << endl;
     DVec CVzero = CV - dot(CV, gVector()) * gVector();
@@ -589,8 +585,9 @@ namespace simol
   
   void OverdampedGalerkin::computeExpToTrigTens()
   {
-    trigToExpTens_ = trigToExpMat_;
-    expToTrigTens_ = expToTrigMat_;
+    cout << "Suboptimal implementation of OverdampedGalerkin::computeExpToTrigTens !!!" << endl;
+    trigToExpTens_ = trigToExpMat_.sparseView();
+    expToTrigTens_ = expToTrigMat_.sparseView();
   }
   
   void OverdampedGalerkin::compute()
@@ -735,8 +732,8 @@ namespace simol
 
   void LangevinGalerkin::computeExpToTrigTens()
   {
-    trigToExpTens_ = simol::kron(trigToExpMat_, SIdP_);
-    expToTrigTens_ = simol::kron(expToTrigMat_, SIdP_);
+    trigToExpTens_ = kron(trigToExpMat_, SIdP_);
+    expToTrigTens_ = kron(expToTrigMat_, SIdP_);
   }
   
   void LangevinGalerkin::compute()
@@ -985,9 +982,9 @@ namespace simol
 
   void BoundaryLangevinGalerkin::computeExpToTrigTens()
   {
-    trigToExpTens_ = simol::kron(trigToExpMat_, DIdP_);
+    trigToExpTens_ = kron(trigToExpMat_, SIdP_);
     trigToExpTens_ = tensorPower(trigToExpTens_, nbOfParticles_);
-    expToTrigTens_ = simol::kron(expToTrigMat_, DIdP_);
+    expToTrigTens_ = kron(expToTrigMat_, SIdP_);
     expToTrigTens_ = tensorPower(expToTrigTens_, nbOfParticles_);
     
     display(trigToExpTens_, "output/Galerkin/trigToExpTens");
