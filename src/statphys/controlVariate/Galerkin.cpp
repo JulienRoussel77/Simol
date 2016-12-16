@@ -153,6 +153,7 @@ namespace simol
   //                              )
   SMat kron(const SMat& A, const SMat& B)
   {
+    double totalTime = clock();
     /*double a_1 = A.cols() * (B.cols() - 1)/(A.cols() - 1);
     double b_1 = a_1 - B.cols();
     double a_2 = A.rows() * (B.rows() - 1)/(A.rows() - 1);
@@ -186,17 +187,43 @@ namespace simol
         }
       }
     }
+    cout << "- - Sparse kron : " << clock() - totalTime << endl;
     return C;
   }
 
   DMat kron(const DMat& A, const DMat& B)
   {
+    double totalTime = clock();
+    
     DMat C(A.rows()*B.rows(), A.cols()*B.cols());
     for (int iOfA = 0; iOfA < (int) A.rows(); iOfA++)
       for (int jOfA = 0; jOfA < (int) A.cols(); jOfA++)
         for (int iOfB = 0; iOfB < (int) B.rows(); iOfB++)
           for (int jOfB = 0; jOfB < (int) B.cols(); jOfB++)
             C(iOfA + A.rows() * iOfB, jOfA + A.cols() * jOfB) = A(iOfA, jOfA) * B(iOfB, jOfB);
+          
+    cout << "- - Dense kron : " << clock() - totalTime << endl;
+    return C;
+  }
+  
+  DMat kron(const DMat& A, const SMat& B)
+  {
+    double totalTime = clock();
+    
+    DMat C(A.rows()*B.rows(), A.cols()*B.cols());
+    for (int iOfA = 0; iOfA < (int) A.rows(); iOfA++)
+      for (int jOfA = 0; jOfA < (int) A.cols(); jOfA++)
+        for (int jOfB = 0; jOfB < (int)B.cols(); jOfB++)
+        {
+          for (SMat::InnerIterator it2(B, jOfB); it2; ++it2)
+          {
+            int iOfB = it2.row();
+            double valOfB = it2.value();
+            C(iOfA + A.rows() * iOfB, jOfA + A.cols() * jOfB) = A(iOfA, jOfA) * valOfB;
+          }
+        }
+          
+    cout << "- - Dense Sparse kron : " << clock() - totalTime << endl;
     return C;
   }
 
@@ -329,8 +356,8 @@ namespace simol
     nbOfHermite_(input.nbOfHermite()),
     maxOfFourier_((nbOfFourier_ + 1) / 2),  //ex : 3
     sizeOfBasis_(pow(nbOfFourier_ * nbOfHermite_, nbOfParticles_)),
-    SIdQ_(DMat::Identity(nbOfFourier_, nbOfFourier_).sparseView()),
-    SIdP_(DMat::Identity(nbOfHermite_, nbOfHermite_).sparseView()),
+    SIdQ_(nbOfFourier_, nbOfFourier_),
+    SIdP_(nbOfHermite_, nbOfHermite_),
     DIdQ_(DMat::Identity(nbOfFourier_, nbOfFourier_)),
     DIdP_(DMat::Identity(nbOfHermite_, nbOfHermite_)),
     Q_(nbOfFourier_, nbOfFourier_),
@@ -359,13 +386,18 @@ namespace simol
   {
     assert(nbOfFourier_ % 2 == 1);
     cout << endl << "Number of modes : " << nbOfFourier_ << " x " << nbOfHermite_ << endl;
+    
+    SIdQ_.setIdentity();
+    SIdP_.setIdentity();
 
     //computeFourierCoeffsExp();
     // Computation of the passage matrix
+    double totalTime = clock();
     computeExpToTrigMat();
     createQ();
     createP();
-    display(P_, "output/Galerkin/P");
+    cout << "- Galerkin::Galerkin : " << clock() - totalTime << endl;
+    //display(P_, "output/Galerkin/P");
   }
 
   Galerkin::~Galerkin()
@@ -666,16 +698,23 @@ namespace simol
   LangevinGalerkin::LangevinGalerkin(Input const& input):
     Galerkin(input)
   {
+    double totalTime = clock();
     computeExpToTrigTens();
-    
-    Lham_ = kron(Q_, tP_) - kron(tQ_, P_);
-    display(Lham_, "output/Galerkin/Langevin/Lham");
+    //cout << "- computeExp : " << clock() - totalTime << endl; totalTime = clock();
+    SMat QtP = kron(Q_, tP_);
+    SMat tQP = QtP.transpose();
+    Lham_ = QtP - tQP;
+    //Lham_ = kron(Q_, tP_) - kron(tQ_, P_);
+    //display(Lham_, "output/Galerkin/Langevin/Lham");
     createLthm();
-    display(Lthm_, "output/Galerkin/Langevin/Lthm");
+    //cout << "- Lham and Lthm : " << clock() - totalTime << endl; totalTime = clock();
+    //display(Lthm_, "output/Galerkin/Langevin/Lthm");
     Leq_  = Lham_ + gamma_ * Lthm_;
+    //cout << "- Leq : " << clock() - totalTime << endl; totalTime = clock();
     //Lrep_ = kron(SMat::Identity(nbOfFourier_) , P_);
     Lrep_ = kron(SIdQ_, P_);
     Leta_ = Leq_ + externalForce_ * Lrep_;
+    cout << "- LangevinGalerkin : " << clock() - totalTime << endl; totalTime = clock();
   }
   
   void LangevinGalerkin::createLthm0()
@@ -696,8 +735,8 @@ namespace simol
 
   void LangevinGalerkin::computeExpToTrigTens()
   {
-    trigToExpTens_ = simol::kron(trigToExpMat_, DIdP_);
-    expToTrigTens_ = simol::kron(expToTrigMat_, DIdP_);
+    trigToExpTens_ = simol::kron(trigToExpMat_, SIdP_);
+    expToTrigTens_ = simol::kron(expToTrigMat_, SIdP_);
   }
   
   void LangevinGalerkin::compute()
