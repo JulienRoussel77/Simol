@@ -57,6 +57,8 @@ typedef Eigen::SparseMatrix<long int> SMatInt;
 typedef Eigen::Matrix<long int, Eigen::Dynamic, Eigen::Dynamic> DMatInt;
 typedef Eigen::Matrix<long int, Eigen::Dynamic, 1> DVecInt;
 
+typedef Eigen::Triplet<double> Trid;
+
 double modulo(double variable, double mini, double maxi);
 int intModulo(int variable, int maxi);
 void displayTime(double time);

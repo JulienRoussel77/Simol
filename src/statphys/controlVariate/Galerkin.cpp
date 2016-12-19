@@ -148,15 +148,17 @@ namespace simol
     return unshapeSaddle(Bsad);
   }
 
-  // C = ( A B_11    A B_12   ...
-  //       A B_21    A B_22   ...
-  //                              )
+  /// C = A \otimes B = ( A_11 B    A_12 B   ...
+  ///                     A_21 B    A_22 B   ...
+  ///                                            )
+  /// Note that (A \otimes B) (x \otimes y) = (Bx) \otimes (Ay)
   SMat kron(const SMat& A, const SMat& B)
   {
     double totalTime = clock();
-    SMat C(A.rows()*B.rows(), A.cols()*B.cols());
     
-    /*int count = 0;
+    
+    vector<Trid> Ccoeffs;
+    Ccoeffs.reserve(A.nonZeros() * B.nonZeros());
     for (int jOfA = 0; jOfA < (int)A.cols(); ++jOfA)
     {
       for (SMat::InnerIterator it(A, jOfA); it; ++it)
@@ -167,17 +169,27 @@ namespace simol
         {
           for (SMat::InnerIterator it2(B, jOfB); it2; ++it2)
           {
-            count++;
             int iOfB = it2.row();
             double valOfB = it2.value();
-            C.insert(iOfA + A.rows() * iOfB, jOfA + A.cols() * jOfB) = valOfA * valOfB;
+            Ccoeffs.push_back(Trid(B.rows() * iOfA + iOfB, B.cols() * jOfA + jOfB, valOfA * valOfB));
           }
         }
       }
     }
-    cout << "count = " << count << " " << C.nonZeros() << endl;*/
-
-    C = kroneckerProduct(A,B);
+    
+    SMat C(A.rows()*B.rows(), A.cols()*B.cols());
+    C.setFromTriplets(Ccoeffs.begin(), Ccoeffs.end());
+    
+    //C = kroneckerProduct(A,B);
+    
+    /*SMat C2 = C.transpose();
+    
+    cout << "count = " << count << " " << C.nonZeros() << " " << D.nonZeros() << endl;
+    
+    SMat CD = C-D;
+    SMat C2D = C2-D;
+    cout << "C-D : " << CD.norm() << endl;
+    cout << "C2-D : " << C2D.norm() << endl;*/
 
     cout << "- - Sparse kron : " << clock() - totalTime << endl;
     return C;
@@ -191,12 +203,50 @@ namespace simol
     //C = kroneckerProduct(A,B);
     for (int iOfA = 0; iOfA < (int) A.rows(); iOfA++)
       for (int jOfA = 0; jOfA < (int) A.cols(); jOfA++)
-        for (int iOfB = 0; iOfB < (int) B.rows(); iOfB++)
-          for (int jOfB = 0; jOfB < (int) B.cols(); jOfB++)
-            C(iOfA + A.rows() * iOfB, jOfA + A.cols() * jOfB) = A(iOfA, jOfA) * B(iOfB, jOfB);
+        C.block(B.rows() * iOfA, B.cols() * jOfA, B.rows(), B.cols()) = A(iOfA, jOfA) * B;
           
     cout << "- - Dense kron : " << clock() - totalTime << endl;
     return C;
+  }
+  
+  SMat kron(const SMat& A, const DMat& B)
+  {
+    double totalTime = clock();
+
+    //SMat SC = kroneckerProduct(A, B);   
+    
+    // Fastest and no memory issue !
+    vector<Trid> Ccoeffs;
+    Ccoeffs.reserve(A.nonZeros() * B.nonZeros());
+    for (int jOfA = 0; jOfA < (int)A.cols(); jOfA++)
+    {
+      for (SMat::InnerIterator it2(A, jOfA); it2; ++it2)
+      {
+        int iOfA = it2.row();
+        double valOfA = it2.value();
+        for (int iOfB = 0; iOfB < (int) B.rows(); iOfB++)
+          for (int jOfB = 0; jOfB < (int) B.cols(); jOfB++)
+            Ccoeffs.push_back(Trid(B.rows() * iOfA + iOfB, B.cols() * jOfA + jOfB, valOfA * B(iOfB, jOfB)));
+      }
+    }
+    SMat SC(A.rows()*B.rows(), A.cols()*B.cols());
+    SC.setFromTriplets(Ccoeffs.begin(), Ccoeffs.end());
+        
+    // Fast but extensive in memory !
+    /*DMat C(A.rows()*B.rows(), A.cols()*B.cols());
+    for (int jOfA = 0; jOfA < (int)A.cols(); jOfA++)
+    {
+      for (SMat::InnerIterator it2(A, jOfA); it2; ++it2)
+      {
+        int iOfA = it2.row();
+        double valOfA = it2.value();
+        C.block(B.rows() * iOfA, B.cols() * jOfA, B.rows(), B.cols()) = valOfA * B;
+      }
+    }    
+    SMat SC = C.sparseView();    */
+    
+    cout << "- - Dense Sparse kron : " << clock() - totalTime << endl;
+    return SC;
   }
   
   SMat kron(const DMat& A, const SMat& B)
@@ -205,19 +255,26 @@ namespace simol
     
     //SMat SC = kroneckerProduct(A, B);
     
-    DMat C(A.rows()*B.rows(), A.cols()*B.cols());
+    vector<Trid> Ccoeffs;
+    Ccoeffs.reserve(A.nonZeros() * B.nonZeros());
+    for (int iOfA = 0; iOfA < (int) A.rows(); iOfA++)
+       for (int jOfA = 0; jOfA < (int) A.cols(); jOfA++)
     for (int jOfB = 0; jOfB < (int)B.cols(); jOfB++)
       for (SMat::InnerIterator it2(B, jOfB); it2; ++it2)
       {
         int iOfB = it2.row();
         double valOfB = it2.value();
-        C.block(A.rows() * iOfB, A.cols() * jOfB, A.rows(), A.cols()) = valOfB * A;
-        
-        /*for (int iOfA = 0; iOfA < (int) A.rows(); iOfA++)
-          for (int jOfA = 0; jOfA < (int) A.cols(); jOfA++)
-            C(iOfA + A.rows() * iOfB, jOfA + A.cols() * jOfB) = A(iOfA, jOfA) * valOfB;*/
+        Ccoeffs.push_back(Trid(B.rows() * iOfA + iOfB, B.cols() * jOfA + jOfB, A(iOfA, jOfA) * valOfB));
       }
-    SMat SC = C.sparseView();      
+    SMat SC(A.rows()*B.rows(), A.cols()*B.cols());
+    SC.setFromTriplets(Ccoeffs.begin(), Ccoeffs.end());
+    
+    /*DMat C(A.rows()*B.rows(), A.cols()*B.cols());
+    for (int iOfA = 0; iOfA < (int) A.rows(); iOfA++)
+      for (int jOfA = 0; jOfA < (int) A.cols(); jOfA++)
+        C.block(B.rows() * iOfA, B.cols() * jOfA, B.rows(), B.cols()) = A(iOfA, jOfA) * B;
+
+    SMat SC = C.sparseView();      */
     cout << "- - Dense Sparse kron : " << clock() - totalTime << endl;
     return SC;
   }
@@ -698,9 +755,9 @@ namespace simol
     double totalTime = clock();
     computeExpToTrigTens();
     //cout << "- computeExp : " << clock() - totalTime << endl; totalTime = clock();
-    SMat QtP = kron(Q_, tP_);
-    SMat tQP = QtP.transpose();
-    Lham_ = QtP - tQP;
+    SMat PQt = kron(tP_, Q_);
+    SMat PtQ = PQt.transpose();
+    Lham_ = PQt - PtQ;
     //Lham_ = kron(Q_, tP_) - kron(tQ_, P_);
     //display(Lham_, "output/Galerkin/Langevin/Lham");
     createLthm();
@@ -709,7 +766,7 @@ namespace simol
     Leq_  = Lham_ + gamma_ * Lthm_;
     //cout << "- Leq : " << clock() - totalTime << endl; totalTime = clock();
     //Lrep_ = kron(SMat::Identity(nbOfFourier_) , P_);
-    Lrep_ = kron(SIdQ_, P_);
+    Lrep_ = kron(P_, SIdQ_);
     Leta_ = Leq_ + externalForce_ * Lrep_;
     cout << "- LangevinGalerkin : " << clock() - totalTime << endl; totalTime = clock();
   }
@@ -727,13 +784,13 @@ namespace simol
   void LangevinGalerkin::createLthm()
   {
     createLthm0();
-    Lthm_ = kron(SIdQ_, Lthm0_);
+    Lthm_ = kron(Lthm0_, SIdQ_);
   }
 
   void LangevinGalerkin::computeExpToTrigTens()
   {
-    trigToExpTens_ = kron(trigToExpMat_, SIdP_);
-    expToTrigTens_ = kron(expToTrigMat_, SIdP_);
+    trigToExpTens_ = kron(SIdP_, trigToExpMat_);
+    expToTrigTens_ = kron(SIdP_, expToTrigMat_);
   }
   
   void LangevinGalerkin::compute()
