@@ -23,6 +23,7 @@
 #include <Eigen/IterativeLinearSolvers>
 
 using std::setw;
+using std::setprecision;
 using std::ofstream;
 using std::cout;
 using std::endl;
