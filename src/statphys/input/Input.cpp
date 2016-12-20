@@ -28,8 +28,10 @@ namespace simol
   DVec scanTensor(const string path, vector<int>& dimensions)
   {
     ifstream inTensor(path);
+    assert(inTensor.is_open());
     string str;
     int dim;
+      
     inTensor >> str >> dim;
     dimensions.push_back(dim);
     inTensor >> dim;
@@ -38,14 +40,14 @@ namespace simol
     int nbOfValues = dimensions[0]*dimensions[1];
     DVec tensor(nbOfValues);
     double  value;
-    for (int iOfVal = 0; iOfVal < nbOfValues; iOfVal++)
+    int iOfVal = 0;
+    while (inTensor >> value)
     {
-      inTensor >> value;
-      //cout << value << endl;
+      //cout << "value : " << value << endl;
       tensor[iOfVal] = value;
+      iOfVal++;
     }
-    
-
+    assert(iOfVal == nbOfValues);
     return tensor;
   }
   
