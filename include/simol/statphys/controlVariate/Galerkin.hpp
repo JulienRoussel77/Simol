@@ -17,6 +17,7 @@ namespace simol
   SMat kron(const SMat& A, const SMat& B);
   DMat kron(const DMat& A, const DMat& B);
   SMat kron(const DMat& A, const SMat& B);
+  double computeSpectralGap(SMat const& A);
 
   class Galerkin;
   Galerkin* createGalerkin(Input const& input);
