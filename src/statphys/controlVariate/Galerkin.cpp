@@ -45,12 +45,15 @@ namespace simol
     SMat Asad(A.rows() + 1, A.cols() + 1);
     //Asad.block(0, 0, A.rows(), A.cols()) = A.block(0, 0, A.rows(), A.cols());
     
+    vector<Trid> coeffs;
+    coeffs.reserve(A.nonZeros());
     for (int jOfA = 0; jOfA < (int)A.cols(); ++jOfA)
       for (SMat::InnerIterator it(A, jOfA); it; ++it)
       {
         int iOfA = it.row();
         double valOfA = it.value();
-        Asad.insert(iOfA, jOfA) = valOfA;
+        coeffs.push_back(Trid(iOfA, jOfA, valOfA));
+        //Asad.insert(iOfA, jOfA) = valOfA;
       }
     
     /*for (int iOfFourier = 0; iOfFourier < nbOfFourier(); iOfFourier++)
@@ -58,9 +61,12 @@ namespace simol
         Asad.insert(iOfFourier, iOfHermite) = A(iOfFourier, iOfHermite);*/
     for (int iOfFourier = 0; iOfFourier < nbOfFourier(); iOfFourier++)
     {
-      Asad.insert(A.rows(), iTens(iOfFourier, 0)) = gVector(iOfFourier); //expFourierMeans(iOfFourier);
-      Asad.insert(iTens(iOfFourier, 0), A.cols()) = gVector(iOfFourier); //expFourierMeans(iOfFourier);
+      coeffs.push_back(Trid(A.rows(), iTens(iOfFourier, 0), gVector(iOfFourier)));
+      coeffs.push_back(Trid(iTens(iOfFourier, 0), A.cols(), gVector(iOfFourier)));
+      //Asad.insert(A.rows(), iTens(iOfFourier, 0)) = gVector(iOfFourier); //expFourierMeans(iOfFourier);
+      //Asad.insert(iTens(iOfFourier, 0), A.cols()) = gVector(iOfFourier); //expFourierMeans(iOfFourier);
     }
+    Asad.setFromTriplets(coeffs.begin(), coeffs.end());
     return Asad;
   }
 
@@ -84,12 +90,22 @@ namespace simol
   
   DVec Galerkin::solve(SMat const& A, DVec const& Y) const
   {
-    
-    Eigen::BiCGSTAB<SMat> solver(A);
-    //solver.compute(A);
+    SMat Acomp = A;
+    Acomp.makeCompressed();
+    Eigen::SparseLU<SMat > solver(Acomp);
+    /*solver.compute(Acomp);
+    if(solver.info()!=Eigen::Success) {
+      // decomposition failed
+      cout << "failed !" << endl;
+    }*/
     DVec X = solver.solve(Y);
-    //if(solver.info() != Eigen::Success) throw runtime_error("System resolution failed !");
     return X;
+    
+    //Eigen::BiCGSTAB<SMat> solver(A);
+    //solver.compute(A);
+    //DVec X = solver.solve(Y);
+    //if(solver.info() != Eigen::Success) throw runtime_error("System resolution failed !");
+    //return X;
   }
   
   
@@ -107,13 +123,12 @@ namespace simol
     SMat Asad = shapeSaddle(A);
     //cout << Asad << endl;
     
-    //Eigen::BiCGSTAB<SMat> solver;
-    Eigen::SparseLU<SMat> solver;
-    Asad.makeCompressed();
-    solver.compute(Asad);
-    DVec Xsad = solver.solve(Ysad);
-    //cout << "Solver info : " << solver.info() << endl;
-    //assert(solver.info() == Eigen::Success);
+    DVec Xsad = solve(Asad,Ysad);
+    
+    //Asad.makeCompressed();
+    //Eigen::SparseLU<SMat> solver(Asad);    
+    //solver.compute(Asad);
+    //DVec Xsad = solver.solve(Ysad);
     
     return unshapeSaddle(Xsad);
   }
@@ -128,6 +143,7 @@ namespace simol
     DMat Asad = shapeSaddle(A);
     cout << "Asad -> " << Asad.rows() << "x" << Asad.cols() << endl;
     DVec Xsad = Asad.fullPivLu().solve(Ysad);
+    
     cout << "Xsad -> " << Xsad.size() << endl;
     cout << "OK ! (lambda = " << Xsad(Xsad.size() - 1) << ")" << endl;
     return unshapeSaddle(Xsad);
@@ -179,17 +195,6 @@ namespace simol
     
     SMat C(A.rows()*B.rows(), A.cols()*B.cols());
     C.setFromTriplets(Ccoeffs.begin(), Ccoeffs.end());
-    
-    //C = kroneckerProduct(A,B);
-    
-    /*SMat C2 = C.transpose();
-    
-    cout << "count = " << count << " " << C.nonZeros() << " " << D.nonZeros() << endl;
-    
-    SMat CD = C-D;
-    SMat C2D = C2-D;
-    cout << "C-D : " << CD.norm() << endl;
-    cout << "C2-D : " << C2D.norm() << endl;*/
 
     cout << "- - Sparse kron : " << clock() - totalTime << endl;
     return C;
@@ -211,9 +216,7 @@ namespace simol
   
   SMat kron(const SMat& A, const DMat& B)
   {
-    double totalTime = clock();
-
-    //SMat SC = kroneckerProduct(A, B);   
+    double totalTime = clock(); 
     
     // Fastest and no memory issue !
     vector<Trid> Ccoeffs;
@@ -231,29 +234,14 @@ namespace simol
     }
     SMat SC(A.rows()*B.rows(), A.cols()*B.cols());
     SC.setFromTriplets(Ccoeffs.begin(), Ccoeffs.end());
-        
-    // Fast but extensive in memory !
-    /*DMat C(A.rows()*B.rows(), A.cols()*B.cols());
-    for (int jOfA = 0; jOfA < (int)A.cols(); jOfA++)
-    {
-      for (SMat::InnerIterator it2(A, jOfA); it2; ++it2)
-      {
-        int iOfA = it2.row();
-        double valOfA = it2.value();
-        C.block(B.rows() * iOfA, B.cols() * jOfA, B.rows(), B.cols()) = valOfA * B;
-      }
-    }    
-    SMat SC = C.sparseView();    */
     
-    cout << "- - Dense Sparse kron : " << clock() - totalTime << endl;
+    cout << "- - Sparse Dense kron : " << clock() - totalTime << endl;
     return SC;
   }
   
   SMat kron(const DMat& A, const SMat& B)
   {
     double totalTime = clock();
-    
-    //SMat SC = kroneckerProduct(A, B);
     
     vector<Trid> Ccoeffs;
     Ccoeffs.reserve(A.nonZeros() * B.nonZeros());
@@ -269,15 +257,37 @@ namespace simol
     SMat SC(A.rows()*B.rows(), A.cols()*B.cols());
     SC.setFromTriplets(Ccoeffs.begin(), Ccoeffs.end());
     
-    /*DMat C(A.rows()*B.rows(), A.cols()*B.cols());
-    for (int iOfA = 0; iOfA < (int) A.rows(); iOfA++)
-      for (int jOfA = 0; jOfA < (int) A.cols(); jOfA++)
-        C.block(B.rows() * iOfA, B.cols() * jOfA, B.rows(), B.cols()) = A(iOfA, jOfA) * B;
-
-    SMat SC = C.sparseView();      */
     cout << "- - Dense Sparse kron : " << clock() - totalTime << endl;
     return SC;
   }
+  
+  double computeSpectralGap(SMat const& A)
+  {
+    double tol = 1e-12;
+    int nbOfIter = 0;
+    Eigen::SparseLU<SMat> solver;
+    SMat Acomp = A;
+    solver.compute(Acomp);
+    DVec X = DVec::Random(A.rows());
+    //A.col(0);
+    double eigVal = X.norm();
+    double eigValDiff = 1;
+    X /= eigVal;
+    while (fabs(eigValDiff) > tol)
+    {
+      X = solver.solve(X);
+      eigValDiff = X.norm() - eigVal;
+      eigVal += eigValDiff;
+      X /= eigVal;
+      nbOfIter++;
+      cout << nbOfIter << " : eigVal = " << eigVal << ", " << eigValDiff << " > " << tol << endl;
+      
+    }
+    cout << "Lanczos algo : " << nbOfIter << " iterations" << endl;
+    return 1/eigVal;
+  }
+  
+  
 
   void displayCplx(const DVecCplx& X, ostream& out)
   {
@@ -615,6 +625,8 @@ namespace simol
 
     //displayCplx(eigVal, out_eigvalLeq);
   }
+  
+
 
   
   
