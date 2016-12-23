@@ -543,6 +543,7 @@ namespace simol
                         << " " << setw(3) << constNbOfHermite_
                         << " " << setw(12) << obsVelocity().mean()
                         << " " << setw(12) << obsVelocity().variance()
+                        << " " << setw(12) << obsVelocity().varOfVar()
                         << std::endl;
   }
 

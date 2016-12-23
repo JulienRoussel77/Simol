@@ -16,6 +16,7 @@ namespace simol
   double readItem(ifstream& in);
   bool sameLetters(const string& x, const string& y);
   DVec scanTensor(const string path, vector<int>& dimensions);
+  string doubleToString(double x);
 
   class Input
   {
@@ -146,6 +147,7 @@ namespace simol
     int nbOfFourier() const;
     int nbOfHermite() const;
     bool doGalerkinNonequilibrium() const;
+    bool doComputeRef() const;
   };
 
 
