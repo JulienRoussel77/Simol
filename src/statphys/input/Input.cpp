@@ -20,6 +20,7 @@ namespace simol
   ///Reads the next element in the file read
   double readItem(ifstream& in)
   {
+    assert(in.is_open());
     double item;
     in >> item;
     return item;

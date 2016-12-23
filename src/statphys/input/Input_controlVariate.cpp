@@ -97,5 +97,15 @@ namespace simol
     return false;
     //throw std::invalid_argument("Number of Hermite modes missing");
   }
-
+  
+  bool Input::doComputeRef() const
+  {
+    if(data["Galerkin"])
+      if(data["Galerkin"]["ComputeRef"])
+        if (sameLetters(data["Galerkin"]["ComputeRef"].as<string>(), "yes"))
+          return true;
+    return false;
+    //throw std::invalid_argument("Number of Hermite modes missing");
+  }
+  
 }
