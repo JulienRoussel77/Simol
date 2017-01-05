@@ -16,6 +16,7 @@ namespace simol
   double readItem(ifstream& in);
   bool sameLetters(const string& x, const string& y);
   DVec scanTensor(const string path, vector<int>& dimensions);
+  map<double, double> scanMap(const string path);
   string doubleToString(double x);
 
   class Input

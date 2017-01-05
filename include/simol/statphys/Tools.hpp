@@ -21,6 +21,8 @@
 #include <Eigen/SparseCore>
 #include <Eigen/SVD>
 #include <Eigen/IterativeLinearSolvers>
+#include <Eigen/Eigenvalues>
+#include <unsupported/Eigen/IterativeSolvers>
 
 using std::setw;
 using std::setprecision;
@@ -39,6 +41,7 @@ using std::runtime_error;
 
 using std::vector;
 using std::list;
+using std::map;
 
 typedef std::complex<double> cplx;
 

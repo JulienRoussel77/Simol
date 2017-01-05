@@ -108,12 +108,21 @@ namespace simol
     //return X;
   }
   
+  DVec Galerkin::solveWithGuess(SMat const& A, DVec const& Y, DVec const& X0) const
+  {
+    //SMat Acomp = A;
+    //Acomp.makeCompressed();
+    Eigen::GMRES<SMat, Eigen::IncompleteLUT<double>> solver(A);
+    DVec X = solver.solveWithGuess(Y, X0);
+    return X;
+  }
+  
   
   DVec Galerkin::solve(const DMat& A, const DVec& X) const
   {    
     return A.fullPivLu().solve(X);
   }
-
+  
   DVec Galerkin::solveWithSaddle(SMat const& A, DVec const& Y) const
   {
     //return solveWithSaddle(DMat(A), Y);
@@ -121,14 +130,20 @@ namespace simol
     
     DVec Ysad = shapeSaddle(Y);
     SMat Asad = shapeSaddle(A);
+    DVec Xsad = solve(Asad,Ysad);    
+    return unshapeSaddle(Xsad);
+  }
+
+  DVec Galerkin::solveWithSaddleAndGuess(SMat const& A, DVec const& Y, const DVec& X0) const
+  {
+    //return solveWithSaddle(DMat(A), Y);
+    cout << "Sparse solveWithSaddle..."; cout.flush();
+    
+    DVec Ysad = shapeSaddle(Y);
+    SMat Asad = shapeSaddle(A);
     //cout << Asad << endl;
-    
-    DVec Xsad = solve(Asad,Ysad);
-    
-    //Asad.makeCompressed();
-    //Eigen::SparseLU<SMat> solver(Asad);    
-    //solver.compute(Asad);
-    //DVec Xsad = solver.solve(Ysad);
+    DVec X0sad = shapeSaddle(X0);
+    DVec Xsad = solveWithGuess(Asad,Ysad, X0sad);
     
     return unshapeSaddle(Xsad);
   }
@@ -142,6 +157,7 @@ namespace simol
     cout << "A -> " << A.rows() << "x" << A.cols() << endl;
     DMat Asad = shapeSaddle(A);
     cout << "Asad -> " << Asad.rows() << "x" << Asad.cols() << endl;
+      
     DVec Xsad = Asad.fullPivLu().solve(Ysad);
     
     cout << "Xsad -> " << Xsad.size() << endl;
@@ -261,27 +277,38 @@ namespace simol
     return SC;
   }
   
+  ///
+  /// Becareful by default the preconditioner is diagonal, and not working for our matrices !!
+  /// Becareful X = solver.solve(X) is not valid !!
   double computeSpectralGap(SMat const& A)
   {
-    double tol = 1e-12;
+    cout << "computeSpectralGap" << endl;
+     
+    double tol = 1e-15;
     int nbOfIter = 0;
-    Eigen::SparseLU<SMat> solver;
-    SMat Acomp = A;
-    solver.compute(Acomp);
+    //Eigen::SparseLU<SMat> solver(A);
+    Eigen::GMRES<SMat, Eigen::IncompleteLUT<double>> solver(A); //solver.setTolerance(1e-15);
+    //Eigen::GMRES<SMat, Eigen::IdentityPreconditioner> solver(A);
+    //Eigen::BiCGSTAB<SMat, Eigen::IncompleteLUT<double>> solver(A);
+
     DVec X = DVec::Random(A.rows());
-    //A.col(0);
+    DVec Y;
     double eigVal = X.norm();
     double eigValDiff = 1;
-    X /= eigVal;
+    
     while (fabs(eigValDiff) > tol)
     {
-      X = solver.solve(X);
+      Y = X / eigVal;
+      //X = solver.solve(Y);
+      X = solver.solveWithGuess(Y, Y * eigVal);
+      //std::cout << "#iterations:     " << solver.iterations() << std::endl;
+      //std::cout << "estimated error: " << solver.error()      << std::endl;
+      DVec Xdiff = X - Y*eigVal;
       eigValDiff = X.norm() - eigVal;
-      eigVal += eigValDiff;
-      X /= eigVal;
+      eigVal = X.norm();   // The sign is due to the positive sign of the matrix A !
       nbOfIter++;
-      cout << nbOfIter << " : eigVal = " << eigVal << ", " << eigValDiff << " > " << tol << endl;
       
+      cout << nbOfIter << " : eigVal = " << eigVal << ", " << eigValDiff << " > " << tol << " / XdiffNorm = " << Xdiff.norm() << endl;
     }
     cout << "Lanczos algo : " << nbOfIter << " iterations" << endl;
     return 1/eigVal;
@@ -640,13 +667,15 @@ namespace simol
     createLeta();
   }
   
+  ///
+  /// The matrix Leq, Leta are positive !
   void OverdampedGalerkin::createLeta()
   {
     basis_(0)->laplacianMatrix(Leq_);
-    Leq_ /= -beta_;
+    Leq_ /= beta_;
     
     basis_(0)->gradMatrix(Lrep_);
-    Leta_ = Leq_ + externalForce_ * Lrep_;
+    Leta_ = Leq_ - externalForce_ * Lrep_;
     /*for (int iOfHermite = 0; iOfHermite < (int)nbOfHermite_; iOfHermite++)
       for (int jOfHermite = 0; jOfHermite < (int)nbOfHermite_; jOfHermite++)
         Leq_(iOfHermite, iOfHermite) = - 1 / beta_ * basis_(0)->xLaplacianY(iOfHermite+1, jOfHermite+1);*/
@@ -769,7 +798,7 @@ namespace simol
     //cout << "- computeExp : " << clock() - totalTime << endl; totalTime = clock();
     SMat PQt = kron(tP_, Q_);
     SMat PtQ = PQt.transpose();
-    Lham_ = PQt - PtQ;
+    Lham_ = -PQt + PtQ;   // The matricies and the operators have opposite signs
     //Lham_ = kron(Q_, tP_) - kron(tQ_, P_);
     //display(Lham_, "output/Galerkin/Langevin/Lham");
     createLthm();
@@ -778,15 +807,17 @@ namespace simol
     Leq_  = Lham_ + gamma_ * Lthm_;
     //cout << "- Leq : " << clock() - totalTime << endl; totalTime = clock();
     //Lrep_ = kron(SMat::Identity(nbOfFourier_) , P_);
-    Lrep_ = kron(P_, SIdQ_);
+    Lrep_ = -kron(P_, SIdQ_);
     Leta_ = Leq_ + externalForce_ * Lrep_;
     cout << "- LangevinGalerkin : " << clock() - totalTime << endl; totalTime = clock();
   }
   
+  ///
+  /// The matricies Leq, Leta are positive !
   void LangevinGalerkin::createLthm0()
   {
     basis_(1)->laplacianMatrix(Lthm0_);
-    Lthm0_ /= -beta_;
+    Lthm0_ /= beta_;
     /*cout << "createLthm0" << endl;
     for (int iOfHermite = 1; iOfHermite < (int)nbOfHermite_; iOfHermite++)
       Lthm0_(iOfHermite, iOfHermite) = - iOfHermite;

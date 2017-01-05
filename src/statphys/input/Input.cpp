@@ -28,12 +28,13 @@ namespace simol
 
   DVec scanTensor(const string path, vector<int>& dimensions)
   {
+    cout << "scanTensor" << endl;
     ifstream inTensor(path);
     assert(inTensor.is_open());
     string str;
     int dim;
       
-    inTensor >> str >> dim;
+    inTensor >> str >> str >> dim;
     dimensions.push_back(dim);
     inTensor >> dim;
     dimensions.push_back(dim);
@@ -50,6 +51,25 @@ namespace simol
     }
     assert(iOfVal == nbOfValues);
     return tensor;
+  }
+  
+  map<double, double> scanMap(const string path)
+  {
+    cout << "Reading the spectral gaps :" << endl;
+    ifstream inMap(path);
+    if (!inMap.is_open())
+      throw runtime_error(path+" is not a valid path !");
+    string str;
+    inMap >> str >> str >> str;
+    double key, value;
+    map<double, double> map;
+    while (inMap >> key >> value)
+    {
+      cout << key << " -> " << value << endl;
+      map[key] = value;
+    }
+    
+    return map;
   }
   
   ///Reads the input file using the YAML library
