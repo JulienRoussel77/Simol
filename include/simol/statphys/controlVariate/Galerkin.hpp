@@ -85,8 +85,10 @@ namespace simol
       DVec unshapeSaddle(const DVec& Xsad) const;
       DVec solve(const DMat& A, const DVec& X) const;
       DVec solve(const SMat& A, const DVec& X) const;
+      DVec solveWithGuess(const SMat& A, const DVec& X, DVec const& X0) const;
       DVec solveWithSaddle(const DMat& A, const DVec& X) const;
       DVec solveWithSaddle(const SMat& A, const DVec& X) const;
+      DVec solveWithSaddleAndGuess(const SMat& A, const DVec& X, const DVec& X0) const;
       DMat invWithSaddle(const SMat& A) const;
       DMat invWithSaddle(const DMat& A) const;
       
