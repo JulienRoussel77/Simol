@@ -295,8 +295,9 @@ namespace simol
     DVec Y;
     double eigVal = X.norm();
     double eigValDiff = 1;
+    double prevEigValDiff = 2;
     
-    while (fabs(eigValDiff) > tol)
+    while (fabs(eigValDiff) > tol && fabs(eigValDiff) < fabs(prevEigValDiff))
     {
       Y = X / eigVal;
       //X = solver.solve(Y);
@@ -304,12 +305,15 @@ namespace simol
       //std::cout << "#iterations:     " << solver.iterations() << std::endl;
       //std::cout << "estimated error: " << solver.error()      << std::endl;
       DVec Xdiff = X - Y*eigVal;
+      prevEigValDiff = eigValDiff;
       eigValDiff = X.norm() - eigVal;
       eigVal = X.norm();   // The sign is due to the positive sign of the matrix A !
       nbOfIter++;
       
       cout << nbOfIter << " : eigVal = " << eigVal << ", " << eigValDiff << " > " << tol << " / XdiffNorm = " << Xdiff.norm() << endl;
     }
+    if (fabs(eigValDiff) > tol)
+      cout << "##################### !! Simulation not converged !! #########################" << endl;
     cout << "Lanczos algo : " << nbOfIter << " iterations" << endl;
     return 1/eigVal;
   }
