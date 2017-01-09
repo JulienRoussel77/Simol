@@ -32,9 +32,9 @@ MESSAGE(STATUS "Simol will be installed in ${CMAKE_INSTALL_PREFIX}")
 
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/config)
 INCLUDE(config)
-
 PROJECT(simol Fortran C CXX)
-
+# /!\ The command PROJECT unsets "CMAKE_INSTALL_PREFIX" so it is necessary to reset it ! Another solution is to run cmake several times...
+SET(CMAKE_INSTALL_PREFIX ${SIMOL_INSTALL_PREFIX})
 #==================================
 # Path to CMake modules
 #  - recipes for external libraries

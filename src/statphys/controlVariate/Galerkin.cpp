@@ -297,7 +297,7 @@ namespace simol
     double eigValDiff = 1;
     double prevEigValDiff = 2;
     
-    while (fabs(eigValDiff) > tol && fabs(eigValDiff) < fabs(prevEigValDiff))
+    while (fabs(eigValDiff) > tol && (fabs(eigValDiff) < fabs(prevEigValDiff) || nbOfIter < 100))
     {
       Y = X / eigVal;
       //X = solver.solve(Y);
