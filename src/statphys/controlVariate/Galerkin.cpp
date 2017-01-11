@@ -114,6 +114,10 @@ namespace simol
     //Acomp.makeCompressed();
     Eigen::GMRES<SMat, Eigen::IncompleteLUT<double>> solver(A);
     DVec X = solver.solveWithGuess(Y, X0);
+    if (solver.info() != Eigen::Success)
+      throw runtime_error("solveWithGuess didnt succeed !");
+    DVec residual = A*X-Y;
+    cout << "Residual = " << residual.norm() << endl << endl;
     return X;
   }
   
@@ -159,7 +163,7 @@ namespace simol
     cout << "Asad -> " << Asad.rows() << "x" << Asad.cols() << endl;
       
     DVec Xsad = Asad.fullPivLu().solve(Ysad);
-    
+     
     cout << "Xsad -> " << Xsad.size() << endl;
     cout << "OK ! (lambda = " << Xsad(Xsad.size() - 1) << ")" << endl;
     return unshapeSaddle(Xsad);

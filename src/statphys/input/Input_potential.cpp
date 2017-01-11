@@ -96,7 +96,8 @@ namespace simol
     if (data["Potential"]["Beta"])
       return data["Potential"]["Beta"].as<double>();
     else
-      return defaultPotentialCoeff;
+      return pow(potentialAlpha(), 2) / (3 * amplitude());
+      //return defaultPotentialCoeff;
   }
 
 }
