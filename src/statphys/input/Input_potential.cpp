@@ -91,6 +91,8 @@ namespace simol
       return defaultPotentialCoeff;
   }
 
+  ///
+  /// The value by default is such that the potential is convexe
   double Input::potentialBeta() const
   {
     if (data["Potential"]["Beta"])

@@ -36,6 +36,7 @@ namespace simol
     doFinalFlow_(input.doFinalFlow()),
     doFinalVelocity_(input.doFinalVelocity()),
     doDPDE_(input.doDPDE()),
+    fitModifFlow_(input.fitModiFlow()),
     obsKineticEnergy_(nullptr),
     obsPotentialEnergy_(nullptr),
     obsPressure_(nullptr),
@@ -48,11 +49,11 @@ namespace simol
     obsSumFlow_(nullptr),
     obsModiFlow_(nullptr),
     observables_(),
-    kinTempProfile_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts(), nbOfParticles_),
-    potTempTopProfile_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts(), nbOfParticles_),
-    potTempBotProfile_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts(), nbOfParticles_),
-    bendistProfile_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts(), nbOfParticles_),
-    flowProfile_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts(), nbOfParticles_),
+    kinTempProfile_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts(), nbOfParticles_-1),
+    potTempTopProfile_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts(), nbOfParticles_-1),
+    potTempBotProfile_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts(), nbOfParticles_-1),
+    bendistProfile_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts(), nbOfParticles_-1),
+    flowProfile_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts(), nbOfParticles_-1),
     cvBasis_(cvBasis0)
   {    
     for (int idObs = 0; idObs < nbOfIdObs; idObs++)

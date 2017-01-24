@@ -220,6 +220,7 @@ namespace simol
     int decorrelationNbOfSteps_;
     int nbOfAutocoPts_;
     bool doFinalFlow_, doFinalVelocity_,doDPDE_;
+    bool fitModifFlow_;
     
   public:
     

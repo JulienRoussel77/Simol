@@ -6,9 +6,21 @@ namespace simol
 {
   //### Chain ###
 
-  Chain::Chain(Input const& input):
-    System(input)
-  {}
+  Chain::Chain(Input const& input, int nbOfWallParticles0):
+    System(input),
+    nbOfWallParticles_(nbOfWallParticles0)
+  {
+    configuration_ = vector<Particle*>(nbOfParticles()+nbOfWallParticles_, nullptr);    
+    for (int iOfParticle = -nbOfWallParticles_; iOfParticle < input.nbOfParticles(); iOfParticle++)
+      configuration_[iOfParticle+nbOfWallParticles_] = new Particle(input.mass(), input.initialPosition(iOfParticle), input.initialMomentum(iOfParticle));
+    
+    
+    for (int iOfParticle = -nbOfWallParticles_; iOfParticle < 0; iOfParticle++)
+    {
+      getParticle(iOfParticle).position(0) = 0;
+      getParticle(iOfParticle).momentum(0) = 0;
+    }
+  }
 
   //--------------- particle pair iterators ------------
   
@@ -43,15 +55,8 @@ namespace simol
   //###### BiChain ######
 
   BiChain::BiChain(Input const& input):
-    Chain(input)
-  {
-    configuration_ = vector<Particle*>(nbOfParticles()+1, nullptr);    
-    for (int iOfParticle = -1; iOfParticle < input.nbOfParticles(); iOfParticle++)
-      configuration_[iOfParticle+1] = new Particle(input.mass(), input.initialPosition(iOfParticle), input.initialMomentum(iOfParticle));
-    
-    getParticle(-1).position(0) = 0;
-    getParticle(-1).momentum(0) = 0;
-  }
+    Chain(input, 0)
+  {}
 
 
 
@@ -64,7 +69,7 @@ namespace simol
       alpha = iOfParticle / (double) nbOfParticles();
       localTemp = (1 - alpha) * dynaPara.temperatureLeft() + alpha * dynaPara.temperatureRight();
       localDist = drawPotLaw(1 / localTemp);
-      double prevPosition = getParticle(iOfParticle - 1).position(0);
+      double prevPosition = (iOfParticle==0)?0:getParticle(iOfParticle - 1).position(0);
 
       getParticle(iOfParticle).position(0) = prevPosition + localDist;
     }
@@ -95,21 +100,11 @@ namespace simol
 
 
   TriChain::TriChain(Input const& input):
-    Chain(input),
+    Chain(input, 2),
     /*getParticle(-2)(input.dimension()),
     ancorParticle2_(input.dimension()),*/
     isOfFixedVolum_(input.isOfFixedVolum())
-  {
-    //getParticle(-2).position(0) = 0;//3 * input.initialPosition(0) - 2*input.initialPosition(1);
-    //ancorParticle2_.position(0) = 0;//2 * input.initialPosition(0) - input.initialPosition(1);
-    
-    configuration_ = vector<Particle*>(nbOfParticles()+2, nullptr);
-    for (int iOfParticle = -2; iOfParticle < input.nbOfParticles(); iOfParticle++)
-      configuration_[iOfParticle+2] = new Particle(input.mass(), input.initialPosition(iOfParticle), input.initialMomentum(iOfParticle));
-    
-    getParticle(-2).position(0) = 0;
-    getParticle(-1).position(0) = 0;
-  }
+  {}
 
   bool const& TriChain::isOfFixedVolum() const
   {

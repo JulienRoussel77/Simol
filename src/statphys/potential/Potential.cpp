@@ -155,7 +155,25 @@ namespace simol
     }
     return xdraw;
   }
+  
+  double Potential::harmonicForce(double /*dist*/) const
+  {
+    throw std::invalid_argument("Potential::harmonicForce : Function undefined");
+  }
+  
+  double Potential::harmonicStiffness() const
+  {
+    throw std::invalid_argument("Potential::harmonicStiffness : Function undefined");
+  }
 
-
+  double Potential::harmonicEquilibrium() const
+  {
+    throw std::invalid_argument("Potential::harmonicEquilibrium: Function undefined");
+  }
+  
+  double Potential::harmonicFrequency() const
+  {
+    throw std::invalid_argument("Potential::harmonicEquilibrium: Function undefined");
+  }
 }
 #endif

@@ -73,79 +73,66 @@ namespace simol
   
   
   void BoundaryLangevin::computeProfileBiChain(Output& output, System const& syst, long int iOfStep) const
-  {
-    //output.obsSumFlow().currentValue() = 0;
-    output.obsModiFlow().currentValue() = output.constGamma_ * output.constDeltaTemperature_ / 2;
+  {    
+    double nu2 = pow(syst.potential().harmonicFrequency() / output.constGamma_, 2);
+    
+    static bool outbool = true;
+    if (outbool)
+      cout << "refFlux = " << 2 * output.constDeltaTemperature_ * output.constGamma_ * nu2 / (2 * (1+nu2)) << endl;
+    outbool = false;
+    
+    output.obsSumFlow().currentValue() = 0;
+    output.obsModiFlow().currentValue() = 2 * output.constDeltaTemperature_ * nu2;
     //cout << output.constGamma_ << " " << output.constDeltaTemperature_<< endl;
     assert(syst.nbOfParticles() % 2 == 0);
     int midNb = (syst.nbOfParticles() - 1) / 2;
-    for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
+    output.obsMidFlow().currentValue() = - syst(midNb).energyGrad(0) * syst(midNb).momentum(0);
+    
+    for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles()-1; iOfParticle++)
     {
       //Particle& particle = configuration_[iOfParticle];
-      double dist = 0;
-      double distPrev = 0;
-      double distNext = 0;
-      double flow = 0;
-      double potTempTop = 0;
-      double potTempBot = 0;
+      double dist = syst(iOfParticle+1).position(0) - syst(iOfParticle).position(0);        // dist is r_iOfParticle
+      double distPrev = (iOfParticle == 0) ? (syst(0).momentum(0)/(output.constGamma_)) : (nu2*(syst(iOfParticle).position(0) - syst(iOfParticle-1).position(0) - syst.potential().harmonicEquilibrium()));
+      double distNext = (iOfParticle == syst.nbOfParticles() - 2) ? (-syst(syst.nbOfParticles() - 1).momentum(0)/(output.constGamma_)) : (nu2*(syst(iOfParticle+2).position(0) - syst(iOfParticle+1).position(0) - syst.potential().harmonicEquilibrium()));
       
+      //double distPrev = (iOfParticle == 0) ? 0 : (syst(iOfParticle).position(0) - syst(iOfParticle-1).position(0));
+      //double distNext = (iOfParticle == syst.nbOfParticles() - 2) ? 0 : (syst(iOfParticle+2).position(0) - syst(iOfParticle+1).position(0));
+      
+      double harmonicForce = syst.potential().harmonicForce(dist);
 
-      if (iOfParticle == 0)
+      /*if (iOfParticle == 0)
       {
-        dist = syst(0).position(0) - syst(-1).position(0);
         flow = gamma() * (temperatureLeft() - 2 * syst(0).kineticEnergy());
-        //distNe = syst(1).position(0) - syst(0).position(0);
-        //output.obsModiFlow().currentValue() += (syst(0).momentum(0) + distNe) / 4 * (syst(0).energyGrad(0) - dist);
-        //cout << iOfParticle << " : " << syst(0).energyGrad(0) << " " << dist << endl;
+        output.obsModiFlow().currentValue() += (distNext - syst(0).momentum(0)) / 4 * (syst(iOfParticle).energyGrad(0) - harmonicForce);
       }
       else
-      {
-        // dist is r_iOfParticle
-        dist = syst(iOfParticle).position(0) - syst(iOfParticle - 1).position(0);
-        if (iOfParticle != 1)
-          distPrev = syst(iOfParticle-1).position(0) - syst(iOfParticle-2).position(0);
+      {*/
         // flow is j_iOfParticle
-        flow = - syst(iOfParticle).energyGrad(0) * syst(iOfParticle - 1).momentum(0);
-        if (iOfParticle != syst.nbOfParticles() - 1)
-        {
-          output.obsSumFlow().currentValue() += flow;
-          if (iOfParticle == midNb)
-            output.obsMidFlow().currentValue() = flow;
-          
-          distNext = syst(iOfParticle+1).position(0) - syst(iOfParticle).position(0);
-          
-          if (iOfParticle == 1)
-            output.obsModiFlow().currentValue() += (distNext - syst(0).momentum(0)) / 4 * (syst(iOfParticle).energyGrad(0) - dist);
-          // iOfParticle != 0, 1, N-1
-          else
-            output.obsModiFlow().currentValue() += (distNext - distPrev) / 4 * (syst(iOfParticle).energyGrad(0) - dist);
-        }
-        else
-          output.obsModiFlow().currentValue() -= (syst(iOfParticle).momentum(0) + distPrev) / 4 * (syst(iOfParticle).energyGrad(0) - dist);
-        
-        //cout << iOfParticle << " : " << syst(iOfParticle).energyGrad(0) << " " << dist << endl;
-      }
-
-      if (iOfParticle == syst.nbOfParticles() - 1)
+      double flow = - syst(iOfParticle).energyGrad(0) * syst(iOfParticle+1).momentum(0);
+      output.obsSumFlow().currentValue() += flow;
+      output.obsModiFlow().currentValue() += (distNext - distPrev) * (syst(iOfParticle).energyGrad(0) - harmonicForce);
+      
+      //cout << "w(r) = " << syst(iOfParticle).energyGrad(0) << " - " << harmonicForce << " = " << syst(iOfParticle).energyGrad(0) - harmonicForce << endl;
+      
+      /*if (iOfParticle == syst.nbOfParticles() - 1)
       {
         potTempTop = pow(syst(iOfParticle).energyGrad(0), 2);
         potTempBot = syst(iOfParticle).energyLapla();
       }
       else
-      {
-        potTempTop = pow(syst(iOfParticle).energyGrad(0) - syst(iOfParticle + 1).energyGrad(0), 2);
-        potTempBot = syst(iOfParticle).energyLapla() + syst(iOfParticle + 1).energyLapla();
-      }
+      {*/
+      double potTempTop = pow(syst(iOfParticle).energyGrad(0) - syst(iOfParticle + 1).energyGrad(0), 2);
+      double potTempBot = syst(iOfParticle).energyLapla() + syst(iOfParticle + 1).energyLapla();
       
-      
-
       output.appendBendistProfile(dist , iOfStep, iOfParticle);
       output.appendKinTempProfile(2 * syst(iOfParticle).kineticEnergy(), iOfStep, iOfParticle);
       output.appendPotTempTopProfile(potTempTop, iOfStep, iOfParticle);
       output.appendPotTempBotProfile(potTempBot, iOfStep, iOfParticle);
       output.appendFlowProfile(flow, iOfStep, iOfParticle);
     }
-    output.obsSumFlow().currentValue() /= (syst.nbOfParticles() - 2.);
+    output.obsSumFlow().currentValue() /= (syst.nbOfParticles() - 1.);
+    output.obsModiFlow().currentValue() *= output.constGamma_ / (2 * (1+nu2));
+    
     //output.obsModiFlow().currentValue() /= syst.nbOfParticles();
     //cout << output.obsSumFlow().currentValue() << endl;
   }

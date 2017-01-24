@@ -4,38 +4,7 @@
 #include "simol/statphys/system/System.hpp"
 
 namespace simol
-{
-  /*ParticleIteratorBase::ParticleIteratorBase()
-  {}
-  
-  ParticleIterator::ParticleIterator(System& syst0):
-    //syst_(&syst0),
-    it_(syst0.configuration().begin())
-  {}
-  
-  ParticleIterator& ParticleIterator::operator++()
-  {
-    it_++;
-    return *this;
-  }
-  
-  ConstParticleIterator::ConstParticleIterator(System const& syst0):
-    //syst_(&syst0),
-    it_(syst0.configuration().begin())
-  {}
-  
-  ConstParticleIterator& ConstParticleIterator::operator++()
-  {
-    it_++;
-    return *this;
-  }*/
-  
-  /*const Particle& ParticleIterator::particle() const 
-  {return syst_->getParticle(iOfParticle_);}
-  
-  Particle& ParticleIterator::particle() 
-  {return syst_->getParticle(iOfParticle_);}*/
-  
+{ 
 
   
   ///
@@ -47,10 +16,6 @@ namespace simol
     //it2_(std::next(it1_, 1)),
     iOfNeighbor2_(0)
   {} 
-  
-  
-  
-  
   
   System::System(Input const& input):
     dimension_(input.dimension()),
@@ -141,6 +106,9 @@ namespace simol
   ///
   ///Returns by value the potential of the dynamics
   Potential& System::potential() {return *potential_;}
+  ///
+  ///Returns by const value the potential of the dynamics
+  Potential const& System::potential() const {return *potential_;}
   ///
   ///Evaluate the potential for the vector "position"
   double System::potential(DVec const& position) const {return (*potential_)(position);}
@@ -243,11 +211,11 @@ namespace simol
     DVec force12 = potentialForce(r12);    // = - v'(q_2 - q_1)
     double lapla12 = laplacian(r12);  // v"(q_2 - q_1)
 
-    particle2.potentialEnergy() = energy12;
+    particle1.potentialEnergy() = energy12;
     particle1.force() -= force12;
     particle2.force() += force12;
-    particle2.energyGrad() = -force12;    // v'(q_2 - q_1)
-    particle2.energyLapla() = lapla12;    // v"(q_2 - q_1)
+    particle1.energyGrad() = -force12;    // v'(q_2 - q_1)
+    particle1.energyLapla() = lapla12;    // v"(q_2 - q_1)
   }
 
   ///Compute the mean distance or bending under the invariant measure
