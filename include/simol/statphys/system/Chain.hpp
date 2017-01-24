@@ -10,16 +10,21 @@ namespace simol
   class Chain : public System
   {
   public:
-    Chain(Input const& input);
+    Chain(Input const& input, int nbOfWallParticles0 = 0);
     //virtual ParticleIterator begin();
     //virtual ParticlePairIterator pairBegin();
     //virtual bool finished(ParticleIterator const& it) const;
     //virtual void incrementeIterator(ParticleIterator& it);    
     virtual string name() const {return "Chain";}
+    
+    const Particle& operator()(int iOfParticle = 0) const {return *(configuration_[iOfParticle+nbOfWallParticles_]);}
+    Particle& operator()(int iOfParticle = 0) {return *(configuration_[iOfParticle+nbOfWallParticles_]);};
 
     virtual void incrementePairIterator(ParticlePairIterator& it);
     bool pairFinished(ParticlePairIterator const& it) const;
     virtual void sampleMomenta(DynamicsParameters const& dynaPara);
+  protected:
+    int nbOfWallParticles_;
   };
 
   class BiChain : public Chain
@@ -27,10 +32,6 @@ namespace simol
     public:
       BiChain(Input const& input);
       virtual bool isBiChain() const {return true;}
-    
-
-      const Particle& operator()(int iOfParticle = 0) const {return *(configuration_[iOfParticle+1]);}
-      Particle& operator()(int iOfParticle = 0) {return *(configuration_[iOfParticle+1]);};
       
       virtual void samplePositions(DynamicsParameters const& dynaPara);
       void computeAllForces();
@@ -44,9 +45,6 @@ namespace simol
     public:
       TriChain(Input const& input);
       virtual bool isTriChain() const {return true;}
-          
-      const Particle& operator()(int iOfParticle = 0) const {return *(configuration_[iOfParticle+2]);}
-      Particle& operator()(int iOfParticle = 0) {return *(configuration_[iOfParticle+2]);};
       
       bool const& isOfFixedVolum() const;
       void triInteraction(Particle& particle1, Particle& particle2, Particle& particle3) const;

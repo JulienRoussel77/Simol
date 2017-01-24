@@ -15,6 +15,11 @@ namespace simol
       if (tolower(x[i]) != tolower(y[i])) return false;
     return true;
   }
+  
+  bool isYes(const string& s)
+  {
+    return sameLetters(s, "yes");
+  }
 
   ///
   ///Reads the next element in the file read

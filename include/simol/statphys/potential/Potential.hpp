@@ -37,7 +37,10 @@ namespace simol
       virtual double laplacian(double position) const;
       virtual double shiftToHarmonic() const;
       virtual double drawLaw(double /*localBeta*/, std::shared_ptr<RNG>& /*rng*/) const;
-
+      virtual double harmonicForce(double dist) const;
+      virtual double harmonicStiffness() const;
+      virtual double harmonicEquilibrium() const;
+      virtual double harmonicFrequency() const;
     protected:
       Potential();
       DVec externalForce_;

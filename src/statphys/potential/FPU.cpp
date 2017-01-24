@@ -10,6 +10,7 @@ namespace simol
     beta_(input.potentialBeta())
   {
     assert(beta_ > 0 || (beta_ == 0 && alpha_ == 0));
+    cout << "FPU potential created : V(r) = " << stiffness_ << "r^2/2 + " << alpha_ << "r^3/3 + " << beta_ << "r^4/4" << endl;
   }
 
 
@@ -45,6 +46,34 @@ namespace simol
   double const& FPU::parameter2() const
   {
     return beta_;
+  }
+  
+  /// /!\ The inverse temperature is supposed to be 1 !
+  /// Returns an evaluation of a fitted harmonic force
+  double FPU::harmonicForce(double dist) const
+  {
+    return harmonicStiffness() * (dist - harmonicEquilibrium());
+  }
+  
+  ///
+  /// Returns the stiffness of the best fitted harmonic potential
+  double FPU::harmonicStiffness() const
+  {
+    return stiffness_;// + pow(alpha_/stiffness_, 2);
+  }
+  
+  ///
+  /// Returns the frequency omega of the best fitted harmonic potential
+  double FPU::harmonicFrequency() const
+  {
+    return sqrt(harmonicStiffness()); //stiffness_ + pow(alpha_, 2);
+  }
+  
+  ///
+  /// Returns the equilibrium distance of the best fitted harmonic potential
+  double FPU::harmonicEquilibrium() const
+  {
+    return 0;//- alpha_ * stiffness_ / (pow(alpha_, 2) + 3 * pow(stiffness_, 3));
   }
 
   /*double FPU::drawLaw(double localBeta, std::shared_ptr<RNG>& rng) const

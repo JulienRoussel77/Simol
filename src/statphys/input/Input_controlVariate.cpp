@@ -51,7 +51,7 @@ namespace simol
   {
     if (data["Galerkin"])
       if (data["Galerkin"]["Resolve"])
-        if (sameLetters(data["Galerkin"]["Resolve"].as<string>(), "yes"))
+        if (isYes(data["Galerkin"]["Resolve"].as<string>()))
           return true;
 
     return false;
@@ -92,7 +92,7 @@ namespace simol
   {
     if(data["Galerkin"])
       if(data["Galerkin"]["Nonequilibrium"])
-        if (sameLetters(data["Galerkin"]["Nonequilibrium"].as<string>(), "yes"))
+        if (isYes(data["Galerkin"]["Nonequilibrium"].as<string>()))
           return true;
     return false;
     //throw std::invalid_argument("Number of Hermite modes missing");
@@ -102,10 +102,19 @@ namespace simol
   {
     if(data["Galerkin"])
       if(data["Galerkin"]["ComputeRef"])
-        if (sameLetters(data["Galerkin"]["ComputeRef"].as<string>(), "yes"))
+        if (isYes(data["Galerkin"]["ComputeRef"].as<string>()))
           return true;
     return false;
     //throw std::invalid_argument("Number of Hermite modes missing");
+  }
+  
+  bool Input::fitModiFlow() const
+  {
+    if (data["ControlVariate"])
+      if (data["ControlVariate"]["fitModiFlow"])
+        if (isYes(data["Galerkin"]["ComputeRef"].as<string>()))
+          return true;
+    return false;
   }
   
 }

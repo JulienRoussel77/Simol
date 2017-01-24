@@ -8,6 +8,8 @@ namespace simol
   ///
   /// Potential V(x) = stiffness x^2 / 2 + alpha x^3 / 3 + beta x^4 / 4
   /// Is convex if and only if alpha^2 < 3 beta
+  /// parameter1_ : alpha
+  /// parameter2_ : beta
   class FPU : public Potential
   {
     public:
@@ -19,6 +21,10 @@ namespace simol
       
       virtual double const& parameter1() const;
       virtual double const& parameter2() const;
+      virtual double harmonicForce(double dist) const;
+      virtual double harmonicStiffness() const;
+      virtual double harmonicEquilibrium() const;
+      virtual double harmonicFrequency() const;
       //double drawLaw(double localBeta, std::shared_ptr<RNG>& rng_) const;
     private:
       double stiffness_, alpha_, beta_;

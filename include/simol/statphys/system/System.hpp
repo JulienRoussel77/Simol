@@ -104,6 +104,7 @@ namespace simol
     virtual DVec periodicImage(DVec const& vecDistance) const {return vecDistance;}
     virtual void computeAllForces();
     Potential& potential();
+    Potential const& potential() const;
     void interaction(Particle& particle1, Particle& particle2) const;
     double potential(DVec const& position) const;
     double potential(const double& position) const;
