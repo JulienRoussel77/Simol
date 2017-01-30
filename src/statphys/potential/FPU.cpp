@@ -48,7 +48,7 @@ namespace simol
     return beta_;
   }
   
-  /// /!\ The inverse temperature is supposed to be 1 !
+  /// /!\ The mass is supposed to be 1 !
   /// Returns an evaluation of a fitted harmonic force
   double FPU::harmonicForce(double dist) const
   {
