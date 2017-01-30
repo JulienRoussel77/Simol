@@ -149,6 +149,7 @@ namespace simol
     
     if (output.doLongPeriodOutput(iOfStep))
     {
+      cout << "Print Long !" << endl;
       if (output.doOutParticles()) output.displayParticles(syst, iOfStep);
       if (output.doOutXMakeMol()) output.displayXMakeMol(syst, iOfStep);   
       if (output.doOutBackUp()) output.displayBackUp(syst, iOfStep);
