@@ -33,7 +33,7 @@ namespace simol
   void Output::writeProfile(ofstream & out_, long int iOfStep)
   {
     assert(out_ && out_.is_open());
-    for (int iOfParticle = 0; iOfParticle < nbOfParticles_; iOfParticle++)
+    for (int iOfParticle = 0; iOfParticle < nbOfParticles_-1; iOfParticle++)
       out_ << iOfStep * timeStep() << " "
            << iOfParticle << " "
            << bendistProfile_.mean(iOfParticle) << " "
