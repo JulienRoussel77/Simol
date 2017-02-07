@@ -27,6 +27,7 @@
 using std::setw;
 using std::setprecision;
 using std::ofstream;
+using std::ostream;
 using std::cout;
 using std::endl;
 using std::min;

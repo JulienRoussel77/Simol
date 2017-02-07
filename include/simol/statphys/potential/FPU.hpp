@@ -14,6 +14,7 @@ namespace simol
   {
     public:
       FPU(Input const& input);
+      void computeHarmonic();
       double operator()(double position) const;
       DVec gradient(double position) const;
       double laplacian(double position) const;
@@ -28,6 +29,8 @@ namespace simol
       //double drawLaw(double localBeta, std::shared_ptr<RNG>& rng_) const;
     private:
       double stiffness_, alpha_, beta_;
+      double qRepartitionFct_, m1_, m2_, m3_, m4_;
+      double harmonicEquilibrium_, harmonicStiffness_;
   };
 
 }
