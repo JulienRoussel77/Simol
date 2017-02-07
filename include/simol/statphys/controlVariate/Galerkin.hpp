@@ -7,6 +7,7 @@
 #include "simol/statphys/controlVariate/Basis.hpp"
 #include "simol/statphys/controlVariate/CVBasis.hpp"
 //#include "simol/statphys/controlVariate/MatrixFree.hpp"
+#include "simol/statphys/TensorTools.hpp"
 
 
 #include <unsupported/Eigen/KroneckerProduct>
@@ -14,21 +15,17 @@
 namespace simol
 {
 
-  SMat kron(const SMat& A, const SMat& B);
+  /*SMat kron(const SMat& A, const SMat& B);
   DMat kron(const DMat& A, const DMat& B);
   SMat kron(const DMat& A, const SMat& B);
-  double computeSpectralGap(SMat const& A);
+  double computeSpectralGap(SMat const& A);*/
 
-  class Galerkin;
-  Galerkin* createGalerkin(Input const& input);
-  //Galerkin* createOverdampedGalerkin(Input const& input);
-  //Galerkin* createLangevinGalerkin(Input const& input);
+  //class Galerkin;
+  //Galerkin* createGalerkin(Input const& input);
 
   class Galerkin
   {
-    friend Galerkin* createGalerkin(Input const& input);
-    //friend Galerkin* createOverdampedGalerkin(Input const& input);
-    //friend Galerkin* createLangevinGalerkin(Input const& input);
+    //friend Galerkin* createGalerkin(Input const& input);
 
     protected:
       int nbOfParticles_;
@@ -125,37 +122,6 @@ namespace simol
       DVec getGradV() const;
       DVec CVcoeffsVec() const;
   };
-
-  class LangevinGalerkin : public Galerkin
-  {
-    public:
-      LangevinGalerkin(Input const& input);
-
-      virtual void computeExpToTrigTens();
-      virtual void createLthm0();
-      virtual void createLthm();
-      virtual void compute();
-      DVec CVcoeffsVec() const;
-  };
-
-  class BoundaryLangevinGalerkin : public Galerkin
-  {
-      //SMat SId_;
-    public:
-      BoundaryLangevinGalerkin(Input const& input);
-      int iTens(int iOfFourier2, int iOfHermite, int iOfParticle) const;
-      SMat PMatToTens(SMat const& PMat, int iOfParticleP);
-      SMat doubleMatToTens(SMat const& QMat, SMat const& PMat, int iOfParticleQ, int iOfParticleP);
-      virtual void computeExpToTrigTens();
-      void createLham();
-      virtual void createLthm0();
-      virtual void createLthm();
-
-      virtual void compute();
-      DVec CVcoeffsVec() const {throw runtime_error("CVcoeffs not implemented for the chain !");}
-  };
-
-
 }
 
 #endif

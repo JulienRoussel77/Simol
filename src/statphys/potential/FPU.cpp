@@ -7,12 +7,46 @@ namespace simol
     Potential(input),
     stiffness_(input.potentialStiffness()),
     alpha_(input.potentialAlpha()),
-    beta_(input.potentialBeta())
+    beta_(input.potentialBeta()),
+    qRepartitionFct_(0),
+    m1_(0),
+    m2_(0),
+    m3_(0),
+    m4_(0),
+    harmonicEquilibrium_(0),
+    harmonicStiffness_(0)
   {
     assert(beta_ > 0 || (beta_ == 0 && alpha_ == 0));
     cout << "FPU potential created : V(r) = " << stiffness_ << "r^2/2 + " << alpha_ << "r^3/3 + " << beta_ << "r^4/4" << endl;
+    computeHarmonic();
+    cout << " m1 = " << m1_ << " m2 = " << m2_ << " m3 = " << m3_ << " m4 = " << m4_ << endl;
+    cout << "harmonic potential : Vh(r) = " << harmonicStiffness() << " Dr^2/2 where Delta r = r - r_h and r_h = " << harmonicEquilibrium() << endl;
   }
-
+  
+  void FPU::computeHarmonic()
+  {
+    int nbOfIntegrationNodes = 10000;
+    double xMax = 10;
+    double step = 2*xMax / nbOfIntegrationNodes;
+    for (int iOfNode = 0; iOfNode < nbOfIntegrationNodes; iOfNode++)
+    {
+      double q = - xMax + iOfNode * step;
+      double nuq = exp(-1 * operator()(q)) * step;
+      qRepartitionFct_ += nuq;
+      m1_ += q * nuq;
+      m2_ += pow(q, 2) * nuq;
+      m3_ += pow(q, 3) * nuq;
+      m4_ += pow(q, 4) * nuq;
+    }
+    m1_ /= qRepartitionFct_;
+    m2_ /= qRepartitionFct_;
+    m3_ /= qRepartitionFct_;
+    m4_ /= qRepartitionFct_;
+    
+    double harmonicFirstOrder = (alpha_ * (pow(m2_, 2) - m1_*m3_) + beta_ * (m2_ * m3_ - m1_ * m4_)) / (m2_ - pow(m1_, 2));
+    harmonicStiffness_ = stiffness_ + (alpha_ * (m3_ - m1_*m2_) + beta_ * (m4_ - m1_ * m3_)) / (m2_ - pow(m1_, 2));
+    harmonicEquilibrium_ = - harmonicFirstOrder / harmonicStiffness_;
+  }
 
   double FPU::operator()(double distance) const
   { return stiffness_ / 2 * pow(distance, 2) + alpha_ / 3 * pow(distance, 3) + beta_ / 4 * pow(distance, 4); }
@@ -59,7 +93,8 @@ namespace simol
   /// Returns the stiffness of the best fitted harmonic potential
   double FPU::harmonicStiffness() const
   {
-    return stiffness_;// + pow(alpha_/stiffness_, 2);
+    //return stiffness_;// + pow(alpha_/stiffness_, 2);
+    return harmonicStiffness_;
   }
   
   ///
@@ -73,7 +108,8 @@ namespace simol
   /// Returns the equilibrium distance of the best fitted harmonic potential
   double FPU::harmonicEquilibrium() const
   {
-    return 0;//- alpha_ * stiffness_ / (pow(alpha_, 2) + 3 * pow(stiffness_, 3));
+    //return 0;//- alpha_ * stiffness_ / (pow(alpha_, 2) + 3 * pow(stiffness_, 3));
+    return harmonicEquilibrium_;
   }
 
   /*double FPU::drawLaw(double localBeta, std::shared_ptr<RNG>& rng) const

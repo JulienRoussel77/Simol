@@ -9,7 +9,7 @@
 #include "simol/statphys/controlVariate/ControlVariate.hpp"
 #include "simol/statphys/controlVariate/CVBasis.hpp"
 # include <iostream>
-#include "simol/statphys/controlVariate/Galerkin.hpp"
+#include "simol/statphys/controlVariate/AllGalerkins.hpp"
 
 #include "simol/statphys/system/System.hpp"
 #include "simol/statphys/dynamics/DynamicsParameters.hpp"
