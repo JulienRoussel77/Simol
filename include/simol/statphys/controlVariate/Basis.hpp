@@ -69,22 +69,7 @@ namespace simol
     virtual void laplacianMatrix(SMat& A) const = 0;
   };
 
-  /*class FourierBasis : public Basis
-  {
-  public:
-    FourierBasis(const int nbOfElts);
-    //virtual int nbOfFreq() const;
-    virtual double value(double variable, const int iOfElt) const;
-    virtual DVec gradient(double variable, const int iOfElt) const;
-    virtual double laplacian(double variable, const int iOfElt) const;
-    
-    virtual double xGradY(const int iOfElementLeft, const int iOfElementRight) const;
-    virtual void gradMatrix(SMat& A) const;
-    virtual double xLaplacianY(const int iOfElementLeft, const int iOfElementRight) const;
-    virtual void laplacianMatrix(SMat& A) const;
-  };*/
-
-  class ExpFourierBasis : public Basis
+  class QBasis : public Basis
   {
   protected:
     double beta_;
@@ -95,19 +80,24 @@ namespace simol
     DVec gVector_;
     double norm2gVector_;
   public:
-    ExpFourierBasis(const int nbOfElts, double beta0, Potential& potential);
-    //virtual int nbOfFreq() const;
+    QBasis(const int nbOfElts, double beta0, Potential& potential);
+    virtual double potential(double variable) const;
+    virtual double potDeriv(double variable) const;
+    virtual double potLapla(double variable) const;
+    
     const double& amplitude() const;
 
     double const& expFourierMeans(int iOfElt) const;
     DVec const& gVector() const;
     virtual double gVector(int iOfElt) const;
     double const& norm2gVector() const;
-    
-    virtual double potential(double variable) const;
-    virtual double potDeriv(double variable) const;
-    virtual double potLapla(double variable) const;
-    
+  };
+
+  class ExpFourierBasis : public QBasis
+  {
+  public:
+    ExpFourierBasis(const int nbOfElts, double beta0, Potential& potential);
+        
     void computeExpFourierMeans();
       
     virtual double value(double variable, const int iOfElt) const;
@@ -120,16 +110,7 @@ namespace simol
     virtual void laplacianMatrix(SMat& A) const;
   };
   
-  /*class SinExpFourierBasis : public ExpFourierBasis
-  {
-    public:
-      SinExpFourierBasis(const int nbOfElts, double beta0, Potential& potential);
-      const double& amplitude() const;
-      
-      virtual double xGradY(const int iOfElementLeft, const int iOfElementRight) const;
-      virtual double xGradStarY(const int iOfElementLeft, const int iOfElementRight) const;
-      virtual double xLaplacianY(const int iOfElementLeft, const int iOfElementRight) const;
-  };*/
+
 
   class HermiteBasis : public Basis
   {
@@ -195,12 +176,6 @@ namespace simol
       virtual double laplacianP(System const& syst, int iOfParticle, vector<int>& vecIndex) const;
   };
 
-  /*class FourierHermiteBasis : public QPBasis
-  {
-    public:
-      FourierHermiteBasis(Input const& input);
-  };*/
-
   class ExpFourierHermiteBasis : public QPBasis
   {
   public:
@@ -211,12 +186,7 @@ namespace simol
     virtual double const& norm2gVector() const;
   };
 
-  /*class TrigBasis : public TensorBasis
-  {
-  public:
-    TensorBasis(const int nbOfElts1, const int nbOfElts2);
-    virtual double valueOfElt(double variable, const int iOfElt, const int iOfVariable);
-  };*/
+
 }
 
 #endif

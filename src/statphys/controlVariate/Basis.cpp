@@ -85,25 +85,9 @@ namespace simol
     return result;
   }
 
-  /*DTVec product(DMat& A, DTVec& X, int iOfVariable)
-  {
-    DTVec AX(X.nbOfElts());
-    return AX;
-  }*/
-  
-  
-  
-  
-  
-  
 
-  /*Basis* createBasis(Input const& input, Potential& potential)
-  {
-    if (input.galerkinElts() == "ExpFourierHermite")
-      return new ExpFourierHermiteBasis(input, potential);
-    //throw runtime_error("Invalid type of basis !");
-    return nullptr;
-  }*/
+  
+  
 
   Basis::Basis(const int nbOfElts):
     nbOfElts_(nbOfElts)
@@ -127,17 +111,17 @@ namespace simol
   DVec const& Basis::gVector() const
   {
     throw std::runtime_error("Basis::gVector is not implemented");
-  };
+  }
   
   double Basis::gVector(int) const
   {
     throw std::runtime_error("Basis::gVector(int) is not implemented");
-  };
+  }
   
   double const& Basis::norm2gVector() const
   {
     throw std::runtime_error("Basis::norm2gVector is not implemented");
-  };
+  }
   
   
   // Compute <H_n, \partial_p^* \partial_p H_m>
@@ -152,69 +136,68 @@ namespace simol
     A = A.adjoint();
   }
   
-  ExpFourierBasis::ExpFourierBasis(const int nbOfElts0, double beta0, Potential& potential0):
+  // ##### QBasis ####
+  
+  QBasis::QBasis(const int nbOfElts0, double beta0, Potential& potential0):
     Basis(nbOfElts0),
     beta_(beta0),
     potential_(&potential0),
     nbOfIntegrationNodes_(1000*nbOfElts()),
-    //nbOfIntegrationNodes_(10),
     qRepartitionFct_(0),
     expFourierMeans_(DVec::Zero(2 * nbOfElts0)),
     gVector_(DVec::Zero(nbOfElts0)),
     norm2gVector_(0)
+  {}
+  
+  double QBasis::potential(double variable) const
   {
-    //cout << "ExpFourierBasis(const int nbOfElts0, double beta0, Potential& potential0)" << endl;
-    //assert(nbOfElts0 % 2 == 1);
-    //cout << "ExpFourierBasis : nbOfElts = " << nbOfElts0 << " and " <<  nbOfElts0 % 2 << endl << endl;
-    
-    computeExpFourierMeans();
+    return potential_->value(variable);
   }
 
-  /*int ExpFourierBasis::nbOfFreq() const
+  double QBasis::potDeriv(double variable) const
   {
-    return (nbOfElts_ - 1) / 2;
-  }*/
+    return (potential_->gradient(variable))(0);
+  }
+
+  double QBasis::potLapla(double variable) const
+  {
+    return (potential_->laplacian(variable));
+  }
   
-  const double& ExpFourierBasis::amplitude() const
+  const double& QBasis::amplitude() const
   {
     return potential_->parameter1();
   }
   
 
-  double const& ExpFourierBasis::expFourierMeans(int iOfElt) const
+  double const& QBasis::expFourierMeans(int iOfElt) const
   {
     return expFourierMeans_(iOfElt);
   }
   
-  DVec const& ExpFourierBasis::gVector() const
+  DVec const& QBasis::gVector() const
   {
     return gVector_;
   }
   
-  double ExpFourierBasis::gVector(int iOfElt) const
+  double QBasis::gVector(int iOfElt) const
   {
     return gVector_[iOfElt];
   }
   
-  double const& ExpFourierBasis::norm2gVector() const
+  double const& QBasis::norm2gVector() const
   {
     return norm2gVector_;
   }
-
-  double ExpFourierBasis::potential(double variable) const
+  
+  // #### ExpFourierBasis ####
+  
+  ExpFourierBasis::ExpFourierBasis(const int nbOfElts0, double beta0, Potential& potential0):
+    QBasis(nbOfElts0, beta0, potential0)
   {
-    return potential_->value(variable);
+    computeExpFourierMeans();
   }
 
-  double ExpFourierBasis::potDeriv(double variable) const
-  {
-    return (potential_->gradient(variable))(0);
-  }
-
-  double ExpFourierBasis::potLapla(double variable) const
-  {
-    return (potential_->laplacian(variable));
-  }
   
   ///We compute the real Fourier coefficients of the function C^-1 exp(-\beta V(q)/2)
   ///More precisely a_k = 1 / pi int cos(k q) C^-1 exp(-beta V / 2) dq and b_k = 1 / pi int sin(k q) C^-1 exp(-beta V / 2) dq
@@ -329,15 +312,6 @@ namespace simol
     //for (int iOfElt = 0; iOfElt < nbOfElts(); iOfElt++)
       result += xGradY(iOfElt, iOfEltLeft) * xGradY(iOfElt, iOfEltRight);
     return result;
-    
-    /*if      (iOfEltLeft == iOfEltRight-4) result = - pow(amplitude() * beta_, 2) / 16;
-    else if (iOfEltLeft == iOfEltRight-2) result = -amplitude() * beta_/4;
-    else if (iOfEltLeft == iOfEltRight)   result = pow(floor((iOfEltRight+1)/2), 2) + pow(beta_, 2) / 8;      
-    else if (iOfEltLeft == iOfEltRight+2) result = -amplitude() * beta_/4;
-    else if (iOfEltLeft == iOfEltRight+4) result = - pow(amplitude() * beta_, 2) / 16;
-    else result = 0;
-    
-    return result * (iOfEltLeft == 0?sqrt(2.):1) * (iOfEltRight == 0?sqrt(2.):1);*/
   }
   
   void ExpFourierBasis::laplacianMatrix(SMat& A) const
@@ -349,42 +323,28 @@ namespace simol
         cout << "coucou" << endl;
         A.insert(iOfFourier, jOfFourier) = xLaplacianY(iOfFourier, jOfFourier);
       }
-  }
-    
- 
-    
+  }   
   
   
-  
+// #### HermiteBasis ####
 
   HermiteBasis::HermiteBasis(const int nbOfElts0, double beta0)
     : Basis(nbOfElts0),
       beta_(beta0),
       polyCoeffs_(DMat::Zero(nbOfElts0, nbOfElts0))
-      //polyCoeffs_(DMat::Zero(nbOfElts0, nbOfElts0))
   {
-    //cout << "HermiteBasis(const int nbOfElts0)" << endl;
     polyCoeffs_(0, 0) = 1;
     polyCoeffs_(1, 1) = beta_;
     for (int iOfElt = 2; iOfElt < (int)nbOfElts0; iOfElt++)
       for (int iOfCoeff = 0; iOfCoeff <= iOfElt; iOfCoeff++)
-      {
         polyCoeffs_(iOfElt, iOfCoeff) = (iOfCoeff ? (sqrt(beta_ / iOfElt) * polyCoeffs_(iOfElt - 1, iOfCoeff - 1)) : 0) - sqrt((iOfElt - 1) / (double)iOfElt) * polyCoeffs_(iOfElt - 2, iOfCoeff);
-        //polyCoeffs_(iOfElt, iOfCoeff) /= sqrt(iOfElt);
-      }
-    //cout << "Hermite coeffs : " << endl;
-    //cout << polyCoeffs_ << endl;
   }
 
   double HermiteBasis::value(double variable, const int iOfElt) const
   {
     double result = 0;
     for (int iOfCoeff = 0; iOfCoeff <= iOfElt; iOfCoeff++)
-    {
       result += polyCoeffs_(iOfElt, iOfCoeff) * pow(variable, iOfCoeff);
-      //cout << polyCoeffs_(iOfElt, iOfCoeff) << endl;
-    }
-    //cout << variable << " , " << iOfElt << " -> " << result << endl;
     return result;
   }
 
@@ -486,13 +446,6 @@ namespace simol
     //cout << "QPBasis()" << endl;
   }
 
-  /*QPBasis::QPBasis(const int nbOfFourier0, const int nbOfHermite0):
-    TensorBasis(2)
-  {
-    bases_[0] = new ExpFourierBasis(nbOfFourier0);
-    bases_[1] = new HermiteBasis(nbOfHermite0);
-  }*/
-
   int& QPBasis::nbOfFourier()
   {
     return nbOfElts(0);
@@ -529,13 +482,6 @@ namespace simol
     vecIndex[1] = iTens0 / nbOfFourier();
     return vecIndex;
   }
-  
-  /*DVec QPBasis::values(System const& syst) const
-  {
-    DVec val(nbOfElts(), 0);
-    for (int iOfElt=0; iOfElt<nbOfElts(); iOfElt++)
-      val(iOfElt) = values
-  }*/
 
   double QPBasis::value(System const& syst, const int iOfElt) const
   {
@@ -551,10 +497,6 @@ namespace simol
 
   DVec QPBasis::gradientQ(System const& syst, int /*iOfParticle*/, vector<int>& vecIndex) const
   {
-    //cout << "QPBasis::gradientQ" << endl;
-    //cout << vecIndex[0] << " " << vecIndex[1] << endl;
-    //cout << bases_[0]->gradient(syst(0).position(0), vecIndex[0]) << " X "
-    //    << bases_[1]->value(syst(0).momentum(0), vecIndex[1]) << endl;
     return bases_[0]->gradient(syst(0).position(0), vecIndex[0])
            * bases_[1]->value(syst(0).momentum(0), vecIndex[1]);
   }
@@ -579,8 +521,6 @@ namespace simol
 
   DVec QPBasis::gradientP(System const& syst, int /*iOfParticle*/, vector<int>& vecIndex) const
   {
-    //cout << bases_[0]->value(syst(0).position(0), vecIndex[0]) << " X "
-    //    << bases_[1]->gradient(syst(0).momentum(0), vecIndex[1]) << endl;
     return bases_[0]->value(syst(0).position(0), vecIndex[0])
            * bases_[1]->gradient(syst(0).momentum(0), vecIndex[1]);
   }
@@ -603,23 +543,13 @@ namespace simol
     return laplacianP(syst, iOfParticle, vecIndex);
   }
 
-  
-  
-
-  /*FourierHermiteBasis::FourierHermiteBasis(Input const& input):
-    QPBasis()
-  {
-    bases_[0] = new FourierBasis(input.nbOfFourier());
-    bases_[1] = new HermiteBasis(input.nbOfHermite(), input.beta());
-  }*/
+  // #### ExpFourierHermiteBasis ####
 
   ExpFourierHermiteBasis::ExpFourierHermiteBasis(Input const& input, Potential& potential):
     QPBasis()
   {
-    //cout << "ExpFourierHermiteBasis(Input const& input)" << endl;
     bases_[0] = new ExpFourierBasis(input.nbOfFourier(), input.beta(), potential);
     bases_[1] = new HermiteBasis(input.nbOfHermite(), input.beta());
-    //cout << "end ExpFourierHermiteBasis(Input const& input)" << endl;
   }
 
   double const& ExpFourierHermiteBasis::expFourierMeans(int iOfElt) const
