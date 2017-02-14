@@ -364,9 +364,10 @@ namespace simol
 	//   }
 	//---------------- END OF PREVIOUS ROUTINE --------------------
 	bool doRejection = true;
- 	if (doMetropolis_)
+ 	double U = -1;
+	if (doMetropolis_)
 	  {
-	    double U = rng_->scalarUniform();
+	    U = rng_->scalarUniform();
 	    if (U < rejectionRate())
 	      doRejection = false;
 	  }
@@ -377,6 +378,7 @@ namespace simol
 	  }
 	if (doRejection)
 	  {
+	    //cout << "FD :" << doRejection << " : " << rejectionRate() << ", " << U << endl; 
 	    //-- reject the move --
 	    incrementRejectionFD();
 	    particle1.momentum() = old_momentum_1;
@@ -463,7 +465,7 @@ namespace simol
     	//   }
 	//---------------- END OF PREVIOUS ROUTINE --------------------
 	bool doRejection = true;
-	double U = 0;
+	double U = -1;
  	if (doMetropolis_)
 	  {
 	    U = rng_->scalarUniform();
@@ -477,6 +479,7 @@ namespace simol
 	  }
 	if (doRejection)
 	  {
+	    //cout << "TC : " << doRejection << " : " << rejectionRate() << ", " << U << endl; 
 	    //-- reject the move --
     	    incrementRejectionThermal();
     	    particle1.internalEnergy() = old_internalEnergy_1;
