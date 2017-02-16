@@ -22,8 +22,8 @@ namespace simol
     Asad.block(0, 0, A.rows(), A.cols()) = A.block(0, 0, A.rows(), A.cols());
     for (int iOfFourier = 0; iOfFourier < nbOfFourier(); iOfFourier++)
     {
-      Asad(A.rows(), iTens(iOfFourier, 0)) = gVector(iOfFourier); //expFourierMeans(iOfFourier2);
-      Asad(iTens(iOfFourier, 0), A.cols()) = gVector(iOfFourier); //expFourierMeans(iOfFourier2);
+      Asad(A.rows(), iTens(iOfFourier, 0)) = basisMean2(0, iOfFourier); //expFourierMeans(iOfFourier2);
+      Asad(iTens(iOfFourier, 0), A.cols()) = basisMean2(0, iOfFourier); //expFourierMeans(iOfFourier2);
     }
     return Asad;
   }
@@ -47,8 +47,8 @@ namespace simol
     
     for (int iOfFourier = 0; iOfFourier < nbOfFourier(); iOfFourier++)
     {
-      coeffs.push_back(Trid(A.rows(), iTens(iOfFourier, 0), gVector(iOfFourier)));
-      coeffs.push_back(Trid(iTens(iOfFourier, 0), A.cols(), gVector(iOfFourier)));
+      coeffs.push_back(Trid(A.rows(), iTens(iOfFourier, 0), basisMean2(0, iOfFourier)));
+      coeffs.push_back(Trid(iTens(iOfFourier, 0), A.cols(), basisMean2(0, iOfFourier)));
     }
     Asad.setFromTriplets(coeffs.begin(), coeffs.end());
     return Asad;
@@ -118,7 +118,8 @@ namespace simol
     
     DVec Ysad = shapeSaddle(Y);
     SMat Asad = shapeSaddle(A);
-    DVec Xsad = solve(Asad,Ysad);    
+    DVec Xsad = solve(Asad,Ysad);  
+    cout << "Done !" << endl;
     return unshapeSaddle(Xsad);
   }
 
@@ -172,74 +173,12 @@ namespace simol
   
   
 
-  //We compute the real Fourier coefficients of the function C^-1 exp(-\beta V(q)/2)
-  //where C = ExpFourierBasis::basisCoefficient_
-  void Galerkin::computeExpToTrigMat()
-  {
-    for (int iOfFourier2 = 1; iOfFourier2 < nbOfFourier(); iOfFourier2++)
-    {
-      trigToExpMat_(0, iOfFourier2) = expFourierMeans(iOfFourier2) / sqrt(2.);
-      trigToExpMat_(iOfFourier2, 0) = expFourierMeans(iOfFourier2) / sqrt(2.);
-    }
-    trigToExpMat_(0, 0) = expFourierMeans(0) / 2;
 
-    for (int iOfFourier = 1; iOfFourier < maxOfFourier_; iOfFourier++)
-      for (int jOfFourier = 1; jOfFourier < maxOfFourier_; jOfFourier++)
-      {
-        //cosine times cosine
-        trigToExpMat_(2 * iOfFourier, 2 * jOfFourier) =
-          expFourierMeans(2 * (iOfFourier + jOfFourier)) / 2
-          + expFourierMeans(2 * abs(iOfFourier - jOfFourier)) / 2;
-
-        //sinus times sinus
-        trigToExpMat_(2 * iOfFourier - 1, 2 * jOfFourier - 1) =
-          - expFourierMeans(2 * (iOfFourier + jOfFourier)) / 2
-          + expFourierMeans(2 * abs(iOfFourier - jOfFourier)) / 2;
-
-        int eps = (iOfFourier >= jOfFourier) - (iOfFourier <= jOfFourier); // -1 if i smaller, 0 if equal, 1 if i larger
-        //cosine times sinus   /!\ doing the test in this order avoids to read expFourierMeans(-1)
-        trigToExpMat_(2 * iOfFourier, 2 * jOfFourier - 1) =
-          expFourierMeans(2 * (iOfFourier + jOfFourier) - 1) / 2
-          + (!eps)?0:eps * expFourierMeans(2 * abs(iOfFourier - jOfFourier) - 1) / 2;
-          
-        //sinus times cosine
-        trigToExpMat_(2 * iOfFourier - 1, 2 * jOfFourier) =
-          expFourierMeans(2 * (iOfFourier + jOfFourier) - 1) / 2
-          - (!eps)?0:eps * expFourierMeans(2 * abs(iOfFourier - jOfFourier) - 1) / 2;
-      }
-
-
-    ofstream out_trigToExpMat("output/Galerkin/trigToExpMat");
-    display(trigToExpMat_, out_trigToExpMat);
-
-    expToTrigMat_  = trigToExpMat_.inverse();
-  }
   
   DVec Galerkin::projectionOrthoG(DVec const& X) const
   {
-    return X - dot(X, gVector()) / norm2gVector() * gVector();
+    return X - dot(X, basisMeans2(0)) / norm2meansVec(0) * basisMeans2(0);
   }
-
-  DMat Galerkin::convertToTrigBasis(const DMat& X)
-  {
-    return expToTrigMat_ * X;
-  }
-
-  void Galerkin::createQ()
-  {
-    basis_(0)->gradMatrix(Q_);
-
-    tQ_ = Q_.adjoint();
-  }
-
-  void Galerkin::createP()
-  {
-    for (int iOfHermite = 1; iOfHermite < nbOfHermite_; iOfHermite++)
-      P_.insert(iOfHermite - 1, iOfHermite) = sqrt(beta_ * iOfHermite);
-
-    tP_ = P_.adjoint();
-  }
-
 
   using namespace Eigen;
 
@@ -275,7 +214,8 @@ namespace simol
     trigToExpTens_(sizeOfBasis_, sizeOfBasis_),
     expToTrigTens_(sizeOfBasis_, sizeOfBasis_),
     potential_(createPotential(input)),
-    basis_(input, *potential_)
+    tensorBasis_(nullptr),
+    outputFolderName_(input.outputFolderName())
   {
     assert(nbOfFourier_ % 2 == 1);
     cout << endl << "Number of modes : " << nbOfFourier_ << " x " << nbOfHermite_ << endl;
@@ -283,14 +223,10 @@ namespace simol
     SIdQ_.setIdentity();
     SIdP_.setIdentity();
 
-    //computeFourierCoeffsExp();
     // Computation of the passage matrix
-    double totalTime = clock();
-    computeExpToTrigMat();
+    /*computeExpToTrigMat();
     createQ();
-    createP();
-    cout << "- Galerkin::Galerkin : " << clock() - totalTime << endl;
-    //display(P_, "output/Galerkin/P");
+    createP();*/
   }
 
   Galerkin::~Galerkin()
@@ -323,29 +259,24 @@ namespace simol
     return nbOfHermite_;
   }
 
-  const double& Galerkin::gamma() const
+  double Galerkin::gamma() const
   {
     return gamma_;
   }
   
-  double const& Galerkin::expFourierMeans(int iOfElt) const
+  double Galerkin::basisMean2(int iOfVariable, int iOfElt) const
   {
-    return basis_.expFourierMeans(iOfElt);
+    return tensorBasis(iOfVariable)->basisMean2(iOfElt);
   }
   
-  const DVec& Galerkin::gVector() const
+  const DVec& Galerkin::basisMeans2(int iOfVariable) const
   {
-    return basis_.gVector();
+    return tensorBasis(iOfVariable)->basisMeans2();
   }
   
-  double Galerkin::gVector(int iOfElt) const
+  double Galerkin::norm2meansVec(int iOfVariable) const
   {
-    return basis_.gVector(iOfElt);
-  }
-  
-  const double& Galerkin::norm2gVector() const
-  {
-    return basis_.norm2gVector();
+    return tensorBasis(iOfVariable)->norm2meansVec();
   }
 
   //psi = (1,1  1,2  ...  1,N_H  2,1 ... )
@@ -367,7 +298,7 @@ namespace simol
     return EigenSolver<MatrixXd>(DLeta);
   }
   
-  ///Returns te coefficients of tG_i * Hj in the tG_i * H_j basis
+  /*///Returns te coefficients of tG_i * Hj in the tG_i * H_j basis
   ///tG designs the Fourier functions (V=0)
   DVec Galerkin::gettGiHjTrig(int i, int j) const
   {
@@ -380,10 +311,6 @@ namespace simol
   ///tG designs the Fourier functions (V=0)
   DVec Galerkin::gettGiHj(int i, int j) const
   {
-    /*DVec GiHjTrig = DVec::Zero(sizeOfBasis_);
-    GiHjTrig(iTens(i, j)) = 1;
-    DVec GiHj = trigToExpTens_ * GiHjTrig;
-    return GiHj;*/
     
     return trigToExpTens_ * gettGiHjTrig(i,j);
   }
@@ -400,20 +327,12 @@ namespace simol
   { return solveWithSaddle(Leta_, gettGiHj(i, j)); }
 
   DVec Galerkin::getLinvtGiHjTrig(int i, int j) const
-  { return expToTrigTens_ * getLinvtGiHj(i,j); }
-
-  /*SMat Galerkin::CVcoeffs() const
-  {
-    DVec vecCoeffs = getLinvtGiHj(0, 1);
-
-    return SMat(vecCoeffs, vecCoeffs.size(), 1);
-  }*/
-  
+  { return expToTrigTens_ * getLinvtGiHj(i,j); }*/
 
   
   CVBasis Galerkin::makeCvBasis()
   {
-    return CVBasis(dynamic_cast<TensorBasis*>(&basis_), make_shared<DVec>(CVcoeffsVec()));
+    return CVBasis(dynamic_cast<TensorBasis*>(tensorBasis_), make_shared<DVec>(CVcoeffsVec()));
   }
   
   void Galerkin::computeEigen() const
@@ -426,38 +345,112 @@ namespace simol
     
     std::sort(eigVal.begin(), eigVal.end(), hasSmallerNorm);
     
-    //for (int i=0; i<sizeOfBasis(); i++)
-    //  cout << eigVal[i] << endl;
-    
-    
-    /*ofstream outFinalGap("output/Galerkin/finalGap.txt",  std::ofstream::app);
-    //outFinalGap << externalForce_ << " " <<  amplitude_ << " " << gamma() << " " << nbOfFourier() << " " << nbOfHermite() << " " << abs(eigVal[0]) << " " << abs(eigVal[1]) << endl;
-    DVec gradV = amplitude_ * gettGiHj(2,0) / sqrt(2.);
-    cout << "gradV : " << gradV << endl << endl;
-    DVec gradVz = gradV - dot(gradV, gVector()) * gVector();
-    cout << "gradVz : " << gradVz << endl;
-   
-    DVec CV = solve(Leq_, gradV);
-    cout << "CV before proj : " << CV << endl;
-    DVec CVzero = CV - dot(CV, gVector()) * gVector();
-    cout << "CV after proj : " << CVzero << endl;
-    DVec LCV = Leq_*CV;
-    DVec LCVz = Leq_*CVzero;
-    cout << "LCV : " << LCV << endl;
-    cout << "LCVz : " << LCVz << endl;
-    DVec CVneq = CV - solve(Leq_, gradV);
-    outFinalGap << externalForce_ << " " <<  amplitude_ << " " << gamma() << " " << nbOfFourier() << " " << nbOfHermite() << " " << abs(eigVal[0]) << " " << abs(eigVal[1]) << " " << CVneq.norm() << endl;*/
-    
     ofstream out_eigvalLeq("output/Galerkin/eigvalLeq");
     for (int i = 0; i < (int) eigVal.size(); i++)
       out_eigvalLeq << real(eigVal[i]) << " " << imag(eigVal[i]) << endl;
     
     cout << "computeEigen ok" << endl;
-
-    //displayCplx(eigVal, out_eigvalLeq);
   }
   
+  void Galerkin::studyLangevinErrors(bool doComputeRef)
+  {
+    string outPath = "output/Galerkin/Langevin/H2/";
+    //string outPath = "output/Galerkin/Langevin/velocity/";
+    
+    
+    cout << "gamma = " << gamma_ << endl;
+    
+    SMat Lsad = shapeSaddle(Leq());
+    //cout << Lsad << endl;
+    
+    int regOfq = 2;
+    int regOfp = 2;
+    DVec z(nbOfFourier()* nbOfHermite());       // y is weakly H^1/2+regOfq in q and H^1/2+regOfp in p
+    for (int iOfFourier=0; iOfFourier < nbOfFourier(); iOfFourier++)
+      for (int iOfHermite=0; iOfHermite < nbOfHermite(); iOfHermite++)
+        z(iOfHermite*nbOfFourier() + iOfFourier) = (iOfFourier?pow(iOfFourier, -.5-regOfq):1) * (iOfHermite?pow(iOfHermite, -.5-regOfp/2.):1);
+    
+    //DVec z = gettGiHj(0,1); 
+    
+    string strRefLinvZ = outPath+"ref/refLinvZ"+doubleToString(gamma_)+".txt";
+    string strRefZ = outPath+"ref/refZ"+doubleToString(gamma_)+".txt";
+    string strRefSpGap = outPath+"ref/refSpGap.txt";
+    
+    if (doComputeRef)
+    {
+      DVec refLinvZ = solveWithSaddle(Leq(), z);
+      double refSpGap = computeSpectralGap(Lsad);
+      //DMat refLinvZMat = reshape(refLinvZ, nbOfFourier(), nbOfHermite());
+      
+      ofstream outRefZ(strRefZ);
+      if (!outRefZ.is_open())
+        throw runtime_error("Reference output file in strRefLinvZ cannot be open");
+      ofstream outRefLinvZ(strRefLinvZ);      
+      ofstream outRefSpGap(strRefSpGap, std::ofstream::app);
+      // Closing the file is very important if it is read right after !
+      outRefZ << setprecision(15); outRefZ << "# " << gamma_ << " " << nbOfFourier() << " " << nbOfHermite() << endl << z; outRefZ.close();
+      outRefLinvZ << setprecision(15); outRefLinvZ << "# " << gamma_ << " " << nbOfFourier() << " " << nbOfHermite() << endl << refLinvZ; outRefLinvZ.close();
+      outRefSpGap << setprecision(15); outRefSpGap << gamma_<< " " << refSpGap << " " << dot(refLinvZ, z) << endl; outRefSpGap.close();
+      
+      cout << "Reference written in " << strRefLinvZ << endl;
+    }
+    else
+    {    
 
+      
+      vector<int> dimensions;
+      
+      cout << "Reading reference in " << strRefZ << endl;
+      DVec refZ = scanTensor(strRefZ, dimensions);
+      cout << "Reading reference in " << strRefLinvZ << endl;
+      DVec refLinvZ = scanTensor(strRefLinvZ, dimensions);
+      /*ifstream inSpGap(strRefSpGap);
+      if (!inSpGap.is_open())
+        throw runtime_error(strRefSpGap+" is not a valid path !");*/
+      cout << "Reading reference in " << strRefSpGap << endl;
+      map<double, double> gammaToSpGap = scanMap(strRefSpGap);
+      //double refSpGap = readItem(inSpGap);      
+      if (gammaToSpGap.find(gamma_) == gammaToSpGap.end())
+        throw runtime_error("gamma = "+doubleToString(gamma_)+" not found in refSpGap !");
+      double refSpGap = gammaToSpGap[gamma_];
+      int refNbOfFourier = dimensions[0];
+      int refNbOfHermite = dimensions[1];
+      
+      cout << "Reference solution : " << refNbOfFourier << " x " << refNbOfHermite << endl;
+      if (refNbOfFourier < nbOfFourier() || refNbOfHermite < nbOfHermite())
+        throw runtime_error("The reference solution must be bigger !");
+      
+      DMat refLinvZMat = reshape(refLinvZ, refNbOfFourier, refNbOfHermite);
+      DMat truncRefLinvZMat = refLinvZMat.block(0,0,nbOfFourier(), nbOfHermite());
+      DVec truncRefLinvZ = reshape(truncRefLinvZMat, 1, nbOfFourier() * nbOfHermite());
+      
+      cout << "Starting to solve" << endl;
+      DVec LinvZ = solveWithSaddleAndGuess(Leq(), z, truncRefLinvZ);
+      
+      DMat LinvZMat = reshape(LinvZ, nbOfFourier(), nbOfHermite());
+      cout << "Solved !" << endl;
+      
+      DMat approxErrorMat = refLinvZMat; approxErrorMat.block(0,0,nbOfFourier(), nbOfHermite()) = DMat::Zero(nbOfFourier(), nbOfHermite()); // Xref - Pi Xref
+      DMat consistErrorMat = LinvZMat - refLinvZMat.block(0,0,nbOfFourier(), nbOfHermite());   // X - Pi Xref
+      
+      double approxError = approxErrorMat.norm();
+      double consistError = consistErrorMat.norm();
+      double totalError = sqrt(pow(approxError, 2) + pow(consistError, 2));
+      double mobilityError = dot(refLinvZ, refZ) - dot(LinvZ, z);
+      cout << "Reference mobility : " << dot(refLinvZ, refZ) << endl;
+      
+      double spGap = refSpGap;
+      //if (false)
+        spGap = computeSpectralGap(Lsad);
+      double spGapError = refSpGap - spGap;
+      cout << setprecision(15);
+      cout << "spGapError = " << refSpGap << " - " << spGap << " = " << spGapError << endl;
+
+      
+      ofstream outError(outPath+"errors.txt", std::ofstream::app);
+      outError << gamma_ << " " << nbOfFourier() << " " << nbOfHermite() << " " << approxError << " " << consistError << " " << totalError << " " << mobilityError << " " << spGap << " " << spGapError << endl;;
+    } 
+  }
 
   
   
@@ -467,7 +460,14 @@ namespace simol
   OverdampedGalerkin::OverdampedGalerkin(Input const& input):
     Galerkin(input)
   {    
-    computeExpToTrigTens();
+    tensorBasis_ = new ExpFourierHermiteBasis(input, *potential_);
+    
+    //computeExpToTrigMat();
+    //computeExpToTrigTens();
+    
+    tensorBasis(0)->gradMatrix(Q_);
+    tQ_ = Q_.adjoint();
+    
     createLeta();
   }
   
@@ -475,22 +475,22 @@ namespace simol
   /// The matrix Leq, Leta are positive !
   void OverdampedGalerkin::createLeta()
   {
-    basis_(0)->laplacianMatrix(Leq_);
+    tensorBasis(0)->laplacianMatrix(Leq_);
     Leq_ /= beta_;
     
-    basis_(0)->gradMatrix(Lrep_);
+    tensorBasis(0)->gradMatrix(Lrep_);
     Leta_ = Leq_ - externalForce_ * Lrep_;
     /*for (int iOfHermite = 0; iOfHermite < (int)nbOfHermite_; iOfHermite++)
       for (int jOfHermite = 0; jOfHermite < (int)nbOfHermite_; jOfHermite++)
-        Leq_(iOfHermite, iOfHermite) = - 1 / beta_ * basis_(0)->xLaplacianY(iOfHermite+1, jOfHermite+1);*/
+        Leq_(iOfHermite, iOfHermite) = - 1 / beta_ * basis(0)->xLaplacianY(iOfHermite+1, jOfHermite+1);*/
   }
   
-  void OverdampedGalerkin::computeExpToTrigTens()
+  /*void OverdampedGalerkin::computeExpToTrigTens()
   {
     cout << "Suboptimal implementation of OverdampedGalerkin::computeExpToTrigTens !!!" << endl;
     trigToExpTens_ = trigToExpMat_.sparseView();
     expToTrigTens_ = expToTrigMat_.sparseView();
-  }
+  }*/
   
   void OverdampedGalerkin::compute()
   {
@@ -518,7 +518,7 @@ namespace simol
     DMat DLeqInv = invWithSaddle(DLeq);
     cout << "OK" << endl;
     
-    cout << "Norm2gVector : " << norm2gVector() << endl;
+    cout << "Norm2basisMeans2 : " << norm2meansVec(0) << endl;
     cout << "Norm of LeqinvSad : " << DLeqInv.norm() << endl;
     cout << "Norm of Leqinv : " << DLeq.inverse().norm() << endl;
     //cout << "Norm of Sinv Leqinv : " << shapePrec(DLeq).inverse().norm() << endl;
@@ -530,8 +530,8 @@ namespace simol
     cout << "OK" << endl;
     display(DLeqInv, "output/Galerkin/Overdamped/DLeqInv");
     
-    cout << "g   = " << gVector() << endl << endl;
-    cout << "L g = " << Leq_ * gVector() << endl << endl;
+    cout << "g   = " << basisMeans2(0) << endl << endl;
+    cout << "L g = " << Leq_ * basisMeans2(0) << endl << endl;
     
     DVec gradV = getGradV();
     display(gradV, "output/Galerkin/Overdamped/gradV");
@@ -546,13 +546,14 @@ namespace simol
   ///
   /// Returns the coefficients of the sinus functions in the G_i * H_j basis
   DVec OverdampedGalerkin::getGradV() const
-  {    
-    return amplitude_ * gettGiHj(1,0) / sqrt(2.);    // /!\ the basis elements are normalized in L2, not Linfty, so   sin = gettGiHj(1,0) / sqrt(2.)
+  { 
+    throw runtime_error("OverdampedGalerkin::getGradV not implemented !");
+    //return amplitude_ * gettGiHj(1,0) / sqrt(2.);    // /!\ the basis elements are normalized in L2, not Linfty, so   sin = gettGiHj(1,0) / sqrt(2.)
   }
   
   DVec OverdampedGalerkin::CVcoeffsVec() const
   {
-    //return gVector();
+    //return basisMeans2();
     //return getGradV();
     
     /*if (doNonequilibrium())
@@ -566,7 +567,7 @@ namespace simol
       
       ///TODO : use a matrix free approach to avoid dense matrices
       SMat LtL = Leta_.transpose() * Leta_;
-      DMat DKeta = DMat(LtL) + gVector() * gVector().transpose();
+      DMat DKeta = DMat(LtL) + basisMeans2(0) * basisMeans2(0).transpose();
       SMat Keta = DKeta.sparseView();
       //Eigen::LeastSquaresConjugateGradient<SMat> solver(Leta_);
       Eigen::ConjugateGradient<SMat> solver0(Keta);

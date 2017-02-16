@@ -10,7 +10,7 @@ namespace simol
     public:
       LangevinGalerkin(Input const& input);
 
-      virtual void computeExpToTrigTens();
+      //virtual void computeExpToTrigTens();
       virtual void createLthm0();
       virtual void createLthm();
       virtual void compute() = 0;
@@ -19,20 +19,20 @@ namespace simol
   
   class PeriodicLangevinGalerkin : public LangevinGalerkin
   {
-    public:
-      PeriodicLangevinGalerkin(Input const& input);
+  public:
+    PeriodicLangevinGalerkin(Input const& input);
 
-      virtual void compute();
-      DVec CVcoeffsVec() const;
+    virtual void compute();
+    DVec CVcoeffsVec() const;
   };
   
   class ColloidLangevinGalerkin : public LangevinGalerkin
   {
-    public:
-      ColloidLangevinGalerkin(Input const& input);
+  public:
+    ColloidLangevinGalerkin(Input const& input);
 
-      virtual void compute();
-      DVec CVcoeffsVec() const;
+    virtual void compute();
+    DVec CVcoeffsVec() const;
   };
 
   class BoundaryLangevinGalerkin : public Galerkin
@@ -43,7 +43,7 @@ namespace simol
       int iTens(int iOfFourier2, int iOfHermite, int iOfParticle) const;
       SMat PMatToTens(SMat const& PMat, int iOfParticleP);
       SMat doubleMatToTens(SMat const& QMat, SMat const& PMat, int iOfParticleQ, int iOfParticleP);
-      virtual void computeExpToTrigTens();
+      //virtual void computeExpToTrigTens();
       void createLham();
       virtual void createLthm0();
       virtual void createLthm();

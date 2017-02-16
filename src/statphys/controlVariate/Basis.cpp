@@ -55,7 +55,7 @@ namespace simol
     return data_.size();
   }
 
-  double const& DTVec::operator()(vector<int>& vecIndex) const
+  double DTVec::operator()(vector<int>& vecIndex) const
   {
     return data_(iTens(vecIndex));
   }
@@ -65,7 +65,7 @@ namespace simol
     return data_(iTens(vecIndex));
   }
 
-  double const& DTVec::operator()(int iTensOfElt) const
+  double DTVec::operator()(int iTensOfElt) const
   {
     return data_(iTensOfElt);
   }
@@ -89,8 +89,10 @@ namespace simol
   
   
 
-  Basis::Basis(const int nbOfElts):
-    nbOfElts_(nbOfElts)
+  Basis::Basis(const int nbOfElts0):
+    nbOfElts_(nbOfElts0),
+    basisMeans2_(DVec::Zero(nbOfElts0)),
+    norm2meansVec_(0)
   {}
 
   int const& Basis::nbOfElts() const
@@ -103,12 +105,19 @@ namespace simol
     return nbOfElts_;
   }
 
-  double const& Basis::expFourierMeans(int /*iOfElt*/) const
+  DVec const& Basis::basisMeans2() const
   {
-    throw std::runtime_error("Basis::expFourierMeans is not implemented");
+    return basisMeans2_;
+    //throw std::runtime_error("Basis::basisMean2 is not implemented");
   };
   
-  DVec const& Basis::gVector() const
+  double Basis::basisMean2(int iOfElt) const
+  {
+    return basisMeans2_[iOfElt];
+    //throw std::runtime_error("Basis::basisMean2 is not implemented");
+  };
+  
+  /*DVec const& Basis::gVector() const
   {
     throw std::runtime_error("Basis::gVector is not implemented");
   }
@@ -116,11 +125,11 @@ namespace simol
   double Basis::gVector(int) const
   {
     throw std::runtime_error("Basis::gVector(int) is not implemented");
-  }
+  }*/
   
-  double const& Basis::norm2gVector() const
+  double Basis::norm2meansVec() const
   {
-    throw std::runtime_error("Basis::norm2gVector is not implemented");
+    throw std::runtime_error("Basis::norm2meansVec is not implemented");
   }
   
   
@@ -143,10 +152,9 @@ namespace simol
     beta_(beta0),
     potential_(&potential0),
     nbOfIntegrationNodes_(1000*nbOfElts()),
-    qRepartitionFct_(0),
-    expFourierMeans_(DVec::Zero(2 * nbOfElts0)),
-    gVector_(DVec::Zero(nbOfElts0)),
-    norm2gVector_(0)
+    qRepartitionFct_(0)
+    //basisMeans2_(DVec::Zero(nbOfElts0)),
+
   {}
   
   double QBasis::potential(double variable) const
@@ -170,64 +178,69 @@ namespace simol
   }
   
 
-  double const& QBasis::expFourierMeans(int iOfElt) const
+  /*double QBasis::basisMean2(int iOfElt) const
   {
-    return expFourierMeans_(iOfElt);
+    return basisMean2_(iOfElt);
   }
   
   DVec const& QBasis::gVector() const
   {
-    return gVector_;
+    return basisMeans2_;
   }
   
   double QBasis::gVector(int iOfElt) const
   {
-    return gVector_[iOfElt];
-  }
+    return basisMeans2_[iOfElt];
+  }*/
   
-  double const& QBasis::norm2gVector() const
+  /*double QBasis::norm2meansVec() const
   {
-    return norm2gVector_;
-  }
+    return norm2meansVec_;
+  }*/
   
   // #### ExpFourierBasis ####
   
   ExpFourierBasis::ExpFourierBasis(const int nbOfElts0, double beta0, Potential& potential0):
-    QBasis(nbOfElts0, beta0, potential0)
+    QBasis(nbOfElts0, beta0, potential0),
+    expFourierCoeffs_(DVec::Zero(2 * nbOfElts0))
   {
-    computeExpFourierMeans();
+    computeBasisMeans();
+  }
+  
+  DVec const& ExpFourierBasis::expFourierCoeffs() const
+  {
+    return expFourierCoeffs_;
+  }
+  
+  double ExpFourierBasis::expFourierCoeff(int iOfElt) const
+  {
+    return expFourierCoeffs_[iOfElt];
   }
 
   
   ///We compute the real Fourier coefficients of the function C^-1 exp(-\beta V(q)/2)
   ///More precisely a_k = 1 / pi int cos(k q) C^-1 exp(-beta V / 2) dq and b_k = 1 / pi int sin(k q) C^-1 exp(-beta V / 2) dq
   ///where C = ExpFourierBasis::basisCoefficient_ Note that a_0 has the same normalization as a_k so that a_{k-l} = a_0 when k=l
-  void ExpFourierBasis::computeExpFourierMeans()
+  void ExpFourierBasis::computeBasisMeans()
   {
     double step = 2 * M_PI / (double)nbOfIntegrationNodes_;
     for (int iOfNode = 0; iOfNode < nbOfIntegrationNodes_; iOfNode++)
     {
       double q = - M_PI + iOfNode * step;
       qRepartitionFct_ += exp(-beta_ * potential(q)) * step;
-      //expFourierMeans_(0) += exp(-beta_ * potential(q) / 2);
       for (int iOfFourier = 0; iOfFourier < 2 * nbOfElts(); iOfFourier++)
-        if (iOfFourier % 2 == 0) expFourierMeans_(iOfFourier) += cos(iOfFourier/2 * q) * exp(-beta_ * potential(q) / 2);
-        else expFourierMeans_(iOfFourier) += sin((iOfFourier+1)/2 * q) * exp(-beta_ * potential(q) / 2);
-      
-      /*for (int iOfFourier = 1; iOfFourier <= 2 * nbOfFreq(); iOfFourier++)
-        expFourierMeans_(2 * iOfFourier) += sqrt(2) * cos(iOfFourier * q) * exp(-beta_ * potential(q) / 2);
-      for (int iOfFourier = 1; iOfFourier <= 2 * nbOfFreq(); iOfFourier++)
-        expFourierMeans_(2 * iOfFourier - 1) += sqrt(2) * sin(iOfFourier * q) * exp(-beta_ * potential(q) / 2);*/
+        if (iOfFourier % 2 == 0) expFourierCoeffs_(iOfFourier) += cos(iOfFourier/2 * q) * exp(-beta_ * potential(q) / 2);
+        else expFourierCoeffs_(iOfFourier) += sin((iOfFourier+1)/2 * q) * exp(-beta_ * potential(q) / 2);
     }
     basisCoefficient_ = sqrt(qRepartitionFct_ / (2 * M_PI));
     
-    expFourierMeans_ *= step / (M_PI * basisCoefficient_);
+    expFourierCoeffs_ *= step / (M_PI * basisCoefficient_);
     
     // gVector is the projection of the constant fct 1, ie it contains the mean of the expfourier elements
-    gVector_ = expFourierMeans_.head(nbOfElts()) / sqrt(2.);
-    gVector_(0) /= sqrt(2.);
-    norm2gVector_ = pow(gVector_.norm(), 2);
-    cout << "Squared norm of vector g = " << norm2gVector_ << endl;
+    basisMeans2_ = expFourierCoeffs_.head(nbOfElts()) / sqrt(2.);
+    basisMeans2_(0) /= sqrt(2.);
+    norm2meansVec_ = pow(basisMeans2_.norm(), 2);
+    cout << "Squared norm of vector g = " << norm2meansVec_ << endl;
   }
   
   
@@ -325,6 +338,50 @@ namespace simol
       }
   }   
   
+    //We compute the real Fourier coefficients of the function C^-1 exp(-\beta V(q)/2)
+  //where C = ExpFourierBasis::basisCoefficient_
+  void ExpFourierBasis::computeExpToTrigMat()
+  {
+    for (int iOfFourier2 = 1; iOfFourier2 < nbOfElts(); iOfFourier2++)
+    {
+      trigToExpMat_(0, iOfFourier2) = expFourierCoeff(iOfFourier2) / sqrt(2.);
+      trigToExpMat_(iOfFourier2, 0) = expFourierCoeff(iOfFourier2) / sqrt(2.);
+    }
+    trigToExpMat_(0, 0) = expFourierCoeff(0) / 2;
+
+    int maxOfFourier = (nbOfElts() + 1) / 2;
+    for (int iOfFourier = 1; iOfFourier < maxOfFourier; iOfFourier++)
+      for (int jOfFourier = 1; jOfFourier < maxOfFourier; jOfFourier++)
+      {
+        //cosine times cosine
+        trigToExpMat_(2 * iOfFourier, 2 * jOfFourier) =
+          expFourierCoeff(2 * (iOfFourier + jOfFourier)) / 2
+          + expFourierCoeff(2 * abs(iOfFourier - jOfFourier)) / 2;
+
+        //sinus times sinus
+        trigToExpMat_(2 * iOfFourier - 1, 2 * jOfFourier - 1) =
+          - expFourierCoeff(2 * (iOfFourier + jOfFourier)) / 2
+          + expFourierCoeff(2 * abs(iOfFourier - jOfFourier)) / 2;
+
+        int eps = (iOfFourier >= jOfFourier) - (iOfFourier <= jOfFourier); // -1 if i smaller, 0 if equal, 1 if i larger
+        //cosine times sinus   /!\ doing the test in this order avoids to read expFourierCoeff(-1)
+        trigToExpMat_(2 * iOfFourier, 2 * jOfFourier - 1) =
+          expFourierCoeff(2 * (iOfFourier + jOfFourier) - 1) / 2
+          + (!eps)?0:eps * expFourierCoeff(2 * abs(iOfFourier - jOfFourier) - 1) / 2;
+          
+        //sinus times cosine
+        trigToExpMat_(2 * iOfFourier - 1, 2 * jOfFourier) =
+          expFourierCoeff(2 * (iOfFourier + jOfFourier) - 1) / 2
+          - (!eps)?0:eps * expFourierCoeff(2 * abs(iOfFourier - jOfFourier) - 1) / 2;
+      }
+
+
+    ofstream out_trigToExpMat("output/Galerkin/trigToExpMat");
+    //display(trigToExpMat_, out_trigToExpMat);
+
+    expToTrigMat_  = trigToExpMat_.inverse();
+  }
+  
   
 // #### HermiteBasis ####
 
@@ -338,6 +395,8 @@ namespace simol
     for (int iOfElt = 2; iOfElt < (int)nbOfElts0; iOfElt++)
       for (int iOfCoeff = 0; iOfCoeff <= iOfElt; iOfCoeff++)
         polyCoeffs_(iOfElt, iOfCoeff) = (iOfCoeff ? (sqrt(beta_ / iOfElt) * polyCoeffs_(iOfElt - 1, iOfCoeff - 1)) : 0) - sqrt((iOfElt - 1) / (double)iOfElt) * polyCoeffs_(iOfElt - 2, iOfCoeff);
+  
+    basisMeans2_[0] = 1;
   }
 
   double HermiteBasis::value(double variable, const int iOfElt) const
@@ -432,13 +491,34 @@ namespace simol
       totalNbOfElts0 *= bases_[iOfVariable]->nbOfElts();
     return totalNbOfElts0;
   }
+  
+  double TensorBasis::basisMean2(int iOfVariable, int iOfElt) const
+  {
+    return bases_[iOfVariable]->basisMean2(iOfElt);
+  }
+  
+  DVec const& TensorBasis::basisMeans2(int iOfVariable) const
+  {
+    return bases_[iOfVariable]->basisMeans2();
+  }
+  
+  double TensorBasis::norm2meansVec(int iOfVariable) const
+    {
+    return bases_[iOfVariable]->norm2meansVec();
+  }
 
-  const Basis* TensorBasis::operator()(const int iOfBasis) const
+  const Basis* TensorBasis::operator()(int iOfBasis) const
+  {
+    return bases_[iOfBasis];
+  }
+  
+  Basis* TensorBasis::operator()(int iOfBasis)
   {
     return bases_[iOfBasis];
   }
   
   
+  // #### QPBasis ####
 
   QPBasis::QPBasis():
     TensorBasis(2)
@@ -542,6 +622,31 @@ namespace simol
     vector<int> vecIndex = vecTens(iOfCoeff);
     return laplacianP(syst, iOfParticle, vecIndex);
   }
+  
+  DVec QPBasis::getBasisElement(int iOfElt1, int iOfElt2) const
+  {
+    cout << "getBasisElement" << endl;
+    DVec vect = DVec::Zero(totalNbOfElts());
+    vect(iTens(iOfElt1, iOfElt2)) = 1;
+    cout << "end of getBasisElement" << endl;
+    cout << vect << endl;
+    return vect;
+  }
+  
+  DVec QPBasis::getPartialElement(int iOfVariable, int iOfElt) const
+  {
+    cout << "getPartialElement" << endl;
+    DVec vect = DVec::Zero(totalNbOfElts());
+    if (iOfVariable == 0)
+      for (int iOfElt2 = 0; iOfElt2 < nbOfElts(1); iOfElt2++)
+        vect(iTens(iOfElt, iOfElt2)) = basisMean2(1, iOfElt2);
+    else
+      for (int iOfElt2 = 0; iOfElt2 < nbOfElts(0); iOfElt2++)
+        vect(iTens(iOfElt2, iOfElt)) = basisMean2(0, iOfElt2);
+    cout << "end of getPartialElement" << endl;
+    cout << vect << endl;
+    return vect;
+  }
 
   // #### ExpFourierHermiteBasis ####
 
@@ -551,10 +656,12 @@ namespace simol
     bases_[0] = new ExpFourierBasis(input.nbOfFourier(), input.beta(), potential);
     bases_[1] = new HermiteBasis(input.nbOfHermite(), input.beta());
   }
+  
 
-  double const& ExpFourierHermiteBasis::expFourierMeans(int iOfElt) const
+
+  /*double ExpFourierHermiteBasis::basisMean2(int iOfVariable, int iOfElt) const
   {
-    return bases_[0]->expFourierMeans(iOfElt);
+    return bases_[iOfVariable]->basisMeans(iOfElt);
   }
   
   DVec const& ExpFourierHermiteBasis::gVector() const
@@ -567,11 +674,24 @@ namespace simol
     return bases_[0]->gVector(iOfElt);
   }
   
-  double const& ExpFourierHermiteBasis::norm2gVector() const
+  double ExpFourierHermiteBasis::norm2meansVec() const
   {
-    return bases_[0]->norm2gVector();
+    return bases_[0]->norm2meansVec();
+  }*/
+  
+  DMat ExpFourierHermiteBasis::convertToTrigBasis(const DMat& X)
+  {
+    return bases_[0]->expToTrigMat() * X;
   }
+  
+  // #### HermiteHermiteBasis ####
     
+  HermiteHermiteBasis::HermiteHermiteBasis(Input const& input, Potential& /*potential*/):
+    QPBasis()
+  {
+    bases_[0] = new HermiteBasis(input.nbOfFourier(), input.beta()/*, potential*/);
+    bases_[1] = new HermiteBasis(input.nbOfHermite(), input.beta());
+  }
 }
 
 

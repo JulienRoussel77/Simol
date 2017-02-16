@@ -15,17 +15,8 @@
 namespace simol
 {
 
-  /*SMat kron(const SMat& A, const SMat& B);
-  DMat kron(const DMat& A, const DMat& B);
-  SMat kron(const DMat& A, const SMat& B);
-  double computeSpectralGap(SMat const& A);*/
-
-  //class Galerkin;
-  //Galerkin* createGalerkin(Input const& input);
-
   class Galerkin
   {
-    //friend Galerkin* createGalerkin(Input const& input);
 
     protected:
       int nbOfParticles_;
@@ -47,7 +38,9 @@ namespace simol
       DMat trigToExpMat_, expToTrigMat_;
       SMat trigToExpTens_, expToTrigTens_;
       Potential* potential_;
-      ExpFourierHermiteBasis basis_;
+      TensorBasis* tensorBasis_;
+      
+      string outputFolderName_;
       //Basis* basis_;
     public:
       Galerkin(Input const& input);
@@ -60,19 +53,24 @@ namespace simol
       virtual int nbOfHermite() const;
       virtual int sizeOfBasis() const;
       
-      const double& gamma() const;
-      const bool& doNonequilibrium() const {return doNonequilibrium_;}
-      ExpFourierHermiteBasis const& basis() const {return basis_;}
-      ExpFourierHermiteBasis& basis() {return basis_;}
+      double gamma() const;
+      bool doNonequilibrium() const {return doNonequilibrium_;}
+      TensorBasis* const& tensorBasis() const {return tensorBasis_;}
+      TensorBasis* tensorBasis() {return tensorBasis_;}
+      Basis const* tensorBasis(int iOfVariable) const {return tensorBasis_->bases_[iOfVariable];}
+      Basis* tensorBasis(int iOfVariable) {return tensorBasis_->bases_[iOfVariable];}
       
       SMat const& Leq() const {return Leq_;}
       SMat const& Leta() const {return Leta_;}
 
-      const double& expFourierMeans(int iOfElt) const;
-      DVec const& gVector() const;
-      double gVector(int iOfElt) const;
-      const double& norm2gVector() const;
+      double basisMean2(int iOfVariable, int iOfElt) const;
+      const DVec& basisMeans2(int iOfVariable) const;
+      /*DVec const& gVector() const;
+      double gVector(int iOfElt) const;*/
+      double norm2meansVec(int iOfVariable) const;
       int iTens(int iOfFourier2, int iOfHermite) const;
+      string outputFolderName() const {return outputFolderName_;}
+      
       DMat shapeSaddle(const DMat& A) const;
       SMat shapeSaddle(const SMat& A) const;
       //DMat shapePrec(const DMat& A) const;
@@ -91,20 +89,19 @@ namespace simol
       
       Eigen::EigenSolver<Eigen::MatrixXd> getEigenSolver() const;
 
-      void computeExpToTrigMat();
-      virtual void computeExpToTrigTens() = 0;
-      DMat convertToTrigBasis(const DMat& X);
+      //virtual void computeExpToTrigTens() = 0;
+      //DMat convertToTrigBasis(const DMat& X);
       DVec projectionOrthoG(DVec const& X) const;
-      void createQ();
-      void createP();
       virtual void compute() = 0;
+      void studyLangevinErrors(bool doComputeRef);
 
-      DVec gettGiHj(int i, int j) const;
+      /*DVec gettGiHj(int i, int j) const;
       DVec gettGiHjTrig(int i, int j) const;
       DVec getLtGiHj(int i, int j) const;
       DVec getLtGiHjTrig(int i, int j) const;
       DVec getLinvtGiHj(int i, int j) const;
-      DVec getLinvtGiHjTrig(int i, int j) const;
+      DVec getLinvtGiHjTrig(int i, int j) const;*/
+      
       //SMat CVcoeffs() const;
       virtual DVec CVcoeffsVec() const = 0;
       CVBasis makeCvBasis();
@@ -114,13 +111,13 @@ namespace simol
   
   class OverdampedGalerkin : public Galerkin
   {
-    public:
-      OverdampedGalerkin(Input const& input);
-      void createLeta();
-      virtual void computeExpToTrigTens();
-      virtual void compute();
-      DVec getGradV() const;
-      DVec CVcoeffsVec() const;
+  public:
+    OverdampedGalerkin(Input const& input);
+    void createLeta();
+    //virtual void computeExpToTrigTens();
+    virtual void compute();
+    DVec getGradV() const;
+    DVec CVcoeffsVec() const;
   };
 }
 

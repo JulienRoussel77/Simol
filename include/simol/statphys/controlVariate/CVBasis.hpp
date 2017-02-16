@@ -7,6 +7,9 @@
   
 namespace simol
 {
+  /// Structure containing a basis type
+  /// basisValues_ is a vector containing the values of the basis functions e_k(q,p)
+  /// generatorOnBasisValues_ is a vector containing the values of the functions (L e_k)(q,p)
   class CVBasis
   {
   public:
