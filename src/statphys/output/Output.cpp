@@ -142,7 +142,6 @@ namespace simol
     cout << " Time step            : " << timeStep_ << endl;
     //-- specific screen outputs --
     if (input.dynamicsName() == "DPDE")
-<<<<<<< HEAD
       {
 	if (input.MTSfrequency() != 1)
 	  cout << " -- Multiple timestepping (stoch. part DPDE): " << input.MTSfrequency() << endl;
@@ -174,7 +173,6 @@ namespace simol
 	    cout << " NONEQUILIBRIUM equilibration dynamics" << endl;
 	  }
       }
-=======
     {
       if (input.MTSfrequency() != 1)
         cout << " -- Multiple timestepping (stoch. part DPDE): " << input.MTSfrequency() << endl;
