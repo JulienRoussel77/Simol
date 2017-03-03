@@ -150,6 +150,11 @@ namespace simol
 	else 
 	  cout << " No Metropolis correction" << endl;
 	cout << endl;
+	if (input.doProjectionDPDE())
+	  cout << " With projection for energies" << endl;
+	else 
+	  cout << " No projection" << endl;
+	cout << endl;
 	if (input.heatCapacityEinstein() > input.heatCapacity())
 	  {
 	    cout << " -- blended Einstein model for micro EOS " << endl; 

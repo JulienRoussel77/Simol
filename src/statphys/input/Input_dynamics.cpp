@@ -66,6 +66,15 @@ namespace simol
       return false;
   }
 
+  bool Input::doProjectionDPDE() const
+  {
+    if (data["Dynamics"]["Projection DPDE"] && data["Dynamics"]["Projection DPDE"].as<string>() == "yes")
+      return true;
+    else
+      return false;
+  }
+
+
   /*double Input::betaLeft() const
   {
     if (data["Dynamics"]["BetaLeft"])
