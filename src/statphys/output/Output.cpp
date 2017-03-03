@@ -143,13 +143,13 @@ namespace simol
     //-- specific screen outputs --
     if (input.dynamicsName() == "DPDE")
       {
+	cout << endl;
 	if (input.MTSfrequency() != 1)
 	  cout << " -- Multiple timestepping (stoch. part DPDE): " << input.MTSfrequency() << endl;
 	if (input.doMetropolis())
 	  cout << " With Metropolis correction" << endl;
 	else 
 	  cout << " No Metropolis correction" << endl;
-	cout << endl;
 	if (input.doProjectionDPDE())
 	  cout << " With projection for energies" << endl;
 	else 
@@ -199,7 +199,6 @@ namespace simol
           cout << " NONEQUILIBRIUM equilibration dynamics" << endl;
         }
     }
->>>>>>> 08337e29280aa8b0bb7c24c085997d36df00fb34
     if (input.systemName() == "NBody" && input.doCellMethod())
     {
       cout << endl;

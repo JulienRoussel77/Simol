@@ -16,6 +16,7 @@ namespace simol
     double cutOff_;
     double rejectionRate_;
     bool doMetropolis_;
+    bool doProjectionDPDE_;
     int MTSfrequency_;
     double initialInternalTemperature_; 
     //-- counting rejections for fluctuation/dissipation part --
@@ -47,6 +48,8 @@ namespace simol
     double& negativeEnergiesCountThermal();
     const int& MTSfrequency() const;
     int& MTSfrequency();
+    const bool& doProjectionDPDE() const;
+    bool& doProjectionDPDE();
 
     //-- microscopic EOS --
     virtual double gamma_DPDE(double intEnergy);  
