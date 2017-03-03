@@ -10,6 +10,7 @@ const double defaultEpsLJ = 1.;
 const double defaultSigmaLJ = 1.;
 const double defaultSplineRatio = 0.8;
 const double defaultCutOffRatio = 2.5;
+const double defaultPotentialCenter = 0;
 
 namespace simol
 {
@@ -74,6 +75,14 @@ namespace simol
   }
 
   //----- Harmonic ----
+  double Input::potentialCenter() const
+  {
+    if (data["Potential"]["Center"])
+      return data["Potential"]["Center"].as<double>();
+    else
+      return defaultPotentialCenter;
+  }
+  
   double Input::potentialStiffness() const
   {
     if (data["Potential"]["Stiffness"])

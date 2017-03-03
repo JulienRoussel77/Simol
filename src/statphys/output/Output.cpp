@@ -26,8 +26,8 @@ namespace simol
     constXi_(input.xi()),
     constTauBending_(input.tauBending()),
     constExternalForce_(input.externalForce()),
-    constNbOfFourier_(input.nbOfFourier()),
-    constNbOfHermite_(input.nbOfHermite()),
+    constNbOfQModes_(input.nbOfQModes()),
+    constNbOfPModes_(input.nbOfPModes()),
     totalEnergy_(0),
     totalVirial_(0),
     temperature_(0),
@@ -73,23 +73,23 @@ namespace simol
     
     if (input.doOutThermo())
       {
-	//-- instantaneous values --
-	outThermo_       = std::make_shared<ofstream>(input.outputFolderName() + "thermo.txt");
-	if (obsKineticEnergy_)
-	  {
-	    if (doDPDE_)
-	      outThermo() << "# 1:time  2:kineticEnergy  3:potentialEnergy  4:totalEnergy  5:temperature 6:pressure 7:internalEnergy 8:fieldForInternalTemperature 9:negativeEnergiesCountFD 10:negativeEnergiesCountThermal" << endl;
-	    else
-	      outThermo() << "# 1:time  2:kineticEnergy  3:potentialEnergy  4:totalEnergy  5:temperature 6:pressure" << endl;
-	  }
-	else
-	  outThermo() << "# 1:time  2:potentialEnergy  3:totalEnergy  4:temperature 5:pressure" << endl;
-	//-- current estimates of averages --
-	outMeanThermo_       = std::make_shared<ofstream>(input.outputFolderName() + "meanThermo.txt");
-	if (doDPDE_)
-	  outMeanThermo() << "# 1:time  2:potentialEnergy  3:kineticEnergy  4:temperature 5:pressure 6:internalEnergy 7:internalTemperature 8:averageRejectionRateFD 9:negativeEnergiesCountFD 10:averageRejectionRateThermal 11:negativeEnergiesCountThermal" << endl;
-	else
-	  outMeanThermo() << "# 1:time  2:potentialEnergy  3:kineticEnergy  4:temperature 5:pressure" << endl;
+        //-- instantaneous values --
+        outThermo_       = std::make_shared<ofstream>(input.outputFolderName() + "thermo.txt");
+        if (obsKineticEnergy_)
+          {
+            if (doDPDE_)
+              outThermo() << "# 1:time  2:kineticEnergy  3:potentialEnergy  4:totalEnergy  5:temperature 6:pressure 7:internalEnergy 8:fieldForInternalTemperature 9:negativeEnergiesCountFD 10:negativeEnergiesCountThermal" << endl;
+            else
+              outThermo() << "# 1:time  2:kineticEnergy  3:potentialEnergy  4:totalEnergy  5:temperature 6:pressure" << endl;
+          }
+        else
+          outThermo() << "# 1:time  2:potentialEnergy  3:totalEnergy  4:temperature 5:pressure" << endl;
+        //-- current estimates of averages --
+        outMeanThermo_       = std::make_shared<ofstream>(input.outputFolderName() + "meanThermo.txt");
+        if (doDPDE_)
+          outMeanThermo() << "# 1:time  2:potentialEnergy  3:kineticEnergy  4:temperature 5:pressure 6:internalEnergy 7:internalTemperature 8:averageRejectionRateFD 9:negativeEnergiesCountFD 10:averageRejectionRateThermal 11:negativeEnergiesCountThermal" << endl;
+        else
+          outMeanThermo() << "# 1:time  2:potentialEnergy  3:kineticEnergy  4:temperature 5:pressure" << endl;
       }
 
     if (input.doOutParticles())
@@ -142,6 +142,7 @@ namespace simol
     cout << " Time step            : " << timeStep_ << endl;
     //-- specific screen outputs --
     if (input.dynamicsName() == "DPDE")
+<<<<<<< HEAD
       {
 	if (input.MTSfrequency() != 1)
 	  cout << " -- Multiple timestepping (stoch. part DPDE): " << input.MTSfrequency() << endl;
@@ -173,6 +174,34 @@ namespace simol
 	    cout << " NONEQUILIBRIUM equilibration dynamics" << endl;
 	  }
       }
+=======
+    {
+      if (input.MTSfrequency() != 1)
+        cout << " -- Multiple timestepping (stoch. part DPDE): " << input.MTSfrequency() << endl;
+      if (input.doMetropolis())
+        cout << " With Metropolis correction" << endl;
+      else 
+        cout << " No Metropolis correction" << endl;
+      cout << endl;
+      if (input.heatCapacityEinstein() > input.heatCapacity())
+        {
+          cout << " -- blended Einstein model for micro EOS " << endl; 
+          cout << " Baseline heat capacity        : " << input.heatCapacity() << endl;
+          cout << " Limiting heat capacity        : " << input.heatCapacityEinstein() << endl;
+          cout << " Einstein temperature          : " << input.einsteinTemperature() << endl;
+        }
+      else
+        {
+          cout << " -- classical micro EOS " << endl;
+          cout << " Heat capacity        : " << input.heatCapacity() << endl;
+        }
+      if ( (input.initialInternalTemperature() != input.temperature()) & (input.thermalizationNbOfSteps() > 0) )
+        {
+          cout << endl;
+          cout << " NONEQUILIBRIUM equilibration dynamics" << endl;
+        }
+    }
+>>>>>>> 08337e29280aa8b0bb7c24c085997d36df00fb34
     if (input.systemName() == "NBody" && input.doCellMethod())
     {
       cout << endl;
@@ -545,8 +574,8 @@ namespace simol
                         << " " << setw(6) << nbOfParticles()
                         << " " << setw(4) << constTemperature_
                         << " " << setw(6) << constExternalForce_
-                        << " " << setw(3) << constNbOfFourier_
-                        << " " << setw(3) << constNbOfHermite_
+                        << " " << setw(3) << constNbOfQModes_
+                        << " " << setw(3) << constNbOfPModes_
                         << " " << setw(12) << obsVelocity().mean()
                         << " " << setw(12) << obsVelocity().variance()
                         << " " << setw(12) << obsVelocity().varOfVar()

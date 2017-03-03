@@ -39,7 +39,12 @@ namespace simol
                                + dot(syst(iOfParticle).force() , cvBasis.basis_->gradientP(syst, iOfParticle, iOfFunction))
                                + gamma() * (- dot(syst(iOfParticle).momentum() , cvBasis.basis_->gradientP(syst, iOfParticle, iOfFunction))
                                           + cvBasis.basis_->laplacianP(syst, iOfParticle, iOfFunction) / beta() );
+        //cout << cvBasis.generatorOnBasisValues_(iOfFunction) << endl;
       }
+    /*ofstream geneOnBasis("output/Langevin/Isolated/DoubleWell/HermiteHermite/geneOnBasis", std::ofstream::app);
+    geneOnBasis << syst(0).position(0) << " " << syst(0).momentum(0) << " " << cvBasis.generatorOnBasisValues_(0) << " " << cvBasis.basisValues_[0] << endl;
+  
+    cout << "||||||||||||||OK---------------------" <<endl << endl;*/
   }
   
 

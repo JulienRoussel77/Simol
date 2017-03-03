@@ -18,6 +18,8 @@ namespace simol
       return new SinusControlVariate(input, idObs, cvBasis0);
     else if (input.controlVariateName() == "ExpFourierHermite")
       return new ExpFourierHermiteControlVariate(input, idObs, cvBasis0);
+    else if(input.controlVariateName() == "HermiteHermite")
+      return new HermiteHermiteControlVariate(input, idObs, cvBasis0);
     else
       std::cout << input.controlVariateName() << " is not a valid control variate !" << std::endl;
     return 0;
@@ -46,9 +48,11 @@ namespace simol
     else if (input.controlVariateCoeffsPath() != "None")
     {
       cout << "CVcoeffs from file !" << endl;
-      throw runtime_error("Reading CV coefficients from a file is not fixed yet !");
+      //throw runtime_error("Reading CV coefficients from a file is not fixed yet !");
       std::string coeffsPath = input.outputFolderName() + input.controlVariateCoeffsPath();
-      ifstream file(coeffsPath);
+      //ifstream file(coeffsPath);
+      vector<int> dimensions;
+      cvBasis().cvCoeffs_ = make_shared<DVec>(scanTensor(coeffsPath, dimensions));
       //coeffsVec_ = SMat(coeffsPath, getNbOfLines(file));
     }
     else
@@ -500,53 +504,11 @@ namespace simol
       out << endl;
     }
     cout << "end displayMap" << endl;
-  }
-
-  void ExpFourierHermiteControlVariate::displayGradQMap(ofstream& out) const
-  {
-    cout << "displayGradQMap" << endl;
-    vector<Particle*> conf(1, new Particle(0, 0, 0));
-    //conf[0] = Particle(0,0,0);
-    out << nbP_ + 1 << " ";
-    for (double p = -pMax_; p < pMax_; p += deltaP_)
-      out << p << " ";
-    out << endl;
-    for (double q = -M_PI; q < M_PI; q += deltaQ_)
-    {
-      out << q << " ";
-      for (double p = -pMax_; p < pMax_; p += deltaP_)
-      {
-        conf[0]->position() = DVec::Constant(1, q);
-        conf[0]->momentum() = DVec::Constant(1, p);
-        out << gradientQ(conf, 0) << " ";
-      }
-      out << endl;
-    }
-    cout << "end displayMap" << endl;
-  }
-
-  void ExpFourierHermiteControlVariate::displayGradPMap(ofstream& out) const
-  {
-    cout << "displayGradPMap" << endl;
-    vector<Particle*> conf(1, new Particle(0, 0, 0));
-    //nf[0] = Particle(0,0,0);
-    out << nbP_ + 1 << " ";
-    for (double p = -pMax_; p < pMax_; p += deltaP_)
-      out << p << " ";
-    out << endl;
-    for (double q = -M_PI; q < M_PI; q += deltaQ_)
-    {
-      out << q << " ";
-      for (double p = -pMax_; p < pMax_; p += deltaP_)
-      {
-        conf[0]->position() = DVec::Constant(1, q);
-        conf[0]->momentum() = DVec::Constant(1, p);
-        out << gradientP(conf, 0) << " ";
-      }
-      out << endl;
-    }
-    cout << "end displayMap" << endl;
   }*/
+  
+  HermiteHermiteControlVariate::HermiteHermiteControlVariate(Input const& input, int idObs, shared_ptr<CVBasis> cvBasis0):
+    BasisControlVariate(input, idObs, cvBasis0)
+  {}
 
 }
 

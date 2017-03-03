@@ -160,7 +160,12 @@ namespace simol
       virtual void displayGradQMap(ofstream& out) const;
       virtual void displayGradPMap(ofstream& out) const;*/
   };
-
+  
+  class HermiteHermiteControlVariate : public BasisControlVariate
+  {
+    public:
+      HermiteHermiteControlVariate(const Input& input, int idObs, shared_ptr<CVBasis> cvBasis0);
+  };
 }
 
 #endif

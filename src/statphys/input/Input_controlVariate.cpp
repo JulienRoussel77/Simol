@@ -66,23 +66,23 @@ namespace simol
     return "None";
   }
 
-  int Input::nbOfFourier() const
+  int Input::nbOfQModes() const
   {
     if (data["Galerkin"])
       if (data["Galerkin"]["Basis"])
-        if (data["Galerkin"]["Basis"]["Fourier"])
-          return data["Galerkin"]["Basis"]["Fourier"].as<int>();
+        if (data["Galerkin"]["Basis"]["QModes"])
+          return data["Galerkin"]["Basis"]["QModes"].as<int>();
 
     return 0;
     //throw std::invalid_argument("Number of Fourier modes missing");
   }
 
-  int Input::nbOfHermite() const
+  int Input::nbOfPModes() const
   {
     if(data["Galerkin"])
       if(data["Galerkin"]["Basis"])
-        if(data["Galerkin"]["Basis"]["Hermite"])
-          return data["Galerkin"]["Basis"]["Hermite"].as<int>();
+        if(data["Galerkin"]["Basis"]["PModes"])
+          return data["Galerkin"]["Basis"]["PModes"].as<int>();
 
     return 0;
     //throw std::invalid_argument("Number of Hermite modes missing");
@@ -117,4 +117,44 @@ namespace simol
     return false;
   }
   
+  double Input::omegaHermite() const
+  {
+    if (data["Galerkin"])
+      if (data["Galerkin"]["Basis"])
+        if (data["Galerkin"]["Basis"]["Omega"])
+          return data["Galerkin"]["Basis"]["Omega"].as<double>();
+
+    return 1;
+    //throw std::invalid_argument("Number of Fourier modes missing");
+  }
+  
+  double Input::integrationStep() const
+  {
+    if (data["Galerkin"])
+      if (data["Galerkin"]["Integration"])
+        if (data["Galerkin"]["Integration"]["Step"])
+          return data["Galerkin"]["Integration"]["Step"].as<double>();
+
+    return 0.01;
+  }
+    
+  double Input::integrationQMin() const
+  {
+    if (data["Galerkin"])
+      if (data["Galerkin"]["Integration"])
+        if (data["Galerkin"]["Integration"]["QMin"])
+          return data["Galerkin"]["Integration"]["QMin"].as<double>();
+
+    return 0;
+  }
+  
+  double Input::integrationLength() const
+  {
+    if (data["Galerkin"])
+      if (data["Galerkin"]["Integration"])
+        if (data["Galerkin"]["Integration"]["Length"])
+          return data["Galerkin"]["Integration"]["Length"].as<double>();
+
+    return 0;
+  }
 }

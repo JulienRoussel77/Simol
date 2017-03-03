@@ -3,6 +3,7 @@
 
 #include "Galerkin.hpp"
 #include "LangevinGalerkin.hpp"
+#include "OverdampedGalerkin.hpp"
 
 namespace simol
 {

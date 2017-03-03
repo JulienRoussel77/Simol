@@ -16,7 +16,7 @@ namespace simol
       double drawLaw(double localBeta, std::shared_ptr<RNG>& rng_) const;
     private:
       double stiffness_;
-      double sigmaPot_;
+      double center_;
   };
 
 }

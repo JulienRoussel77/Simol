@@ -64,6 +64,16 @@ DVec rint(DVec const& u)
   return v;
 }
 
-
+DVec polynomialProduct(DVec const& P, DVec const& Q)
+{
+  DVec PQ(DVec::Zero(P.rows() + Q.rows() - 1));
+  for (int iOfCoeffP = 0; iOfCoeffP < P.rows(); iOfCoeffP++)
+    for (int iOfCoeffQ = 0; iOfCoeffQ < Q.rows(); iOfCoeffQ++)
+    {
+      //cout << iOfCoeff << " = " << iOfCoeffP << " + " << iOfCoeff - iOfCoeffP << " -> " << P(iOfCoeffP) << " x " << Q(iOfCoeff - iOfCoeffP) << endl;
+      PQ(iOfCoeffP + iOfCoeffQ) += P(iOfCoeffP) * Q(iOfCoeffQ);
+    }
+  return PQ;
+}
 
 

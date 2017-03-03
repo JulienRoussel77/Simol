@@ -89,11 +89,16 @@ namespace simol
   
   
 
-  Basis::Basis(const int nbOfElts0):
+  Basis::Basis(int nbOfElts0, double beta0):
     nbOfElts_(nbOfElts0),
     basisMeans2_(DVec::Zero(nbOfElts0)),
-    norm2meansVec_(0)
-  {}
+    beta_(beta0),
+    gramMatrix_(nbOfElts_, nbOfElts0),
+    gradMatrix_(nbOfElts_, nbOfElts0),
+    laplacianMatrix_(nbOfElts_, nbOfElts0)
+  {
+    if (nbOfElts0 == 0) throw runtime_error("The Galerkin basis is empty, check the input file !");
+  }
 
   int const& Basis::nbOfElts() const
   {
@@ -117,24 +122,43 @@ namespace simol
     //throw std::runtime_error("Basis::basisMean2 is not implemented");
   };
   
-  /*DVec const& Basis::gVector() const
-  {
-    throw std::runtime_error("Basis::gVector is not implemented");
-  }
-  
-  double Basis::gVector(int) const
-  {
-    throw std::runtime_error("Basis::gVector(int) is not implemented");
-  }*/
-  
   double Basis::norm2meansVec() const
   {
-    throw std::runtime_error("Basis::norm2meansVec is not implemented");
+    return pow(basisMeans2().norm(), 2);
+    //throw std::runtime_error("Basis::norm2meansVec is not implemented");
   }
   
+  void Basis::computeGramMatrix()
+  {
+    for (int iOfElt1 = 0; iOfElt1< nbOfElts_; iOfElt1++)
+      for (int iOfElt2 = iOfElt1; iOfElt2< nbOfElts_; iOfElt2++)
+      {
+        double scalarProd = xY(iOfElt1, iOfElt2);
+        gramMatrix_.insert(iOfElt1, iOfElt2) = scalarProd;
+        if (iOfElt1 != iOfElt2) gramMatrix_.insert(iOfElt2, iOfElt1) = scalarProd;
+      }
+  }
   
-  // Compute <H_n, \partial_p^* \partial_p H_m>
-  double Basis::xGradStarY(const int iOfEltLeft, const int iOfEltRight) const
+  void Basis::computeGradMatrix()
+  {
+    for (int iOfElt1 = 0; iOfElt1< nbOfElts_; iOfElt1++)
+      for (int iOfElt2 = 0; iOfElt2< nbOfElts_; iOfElt2++)
+        gradMatrix_.insert(iOfElt1, iOfElt2) = xGradY(iOfElt1, iOfElt2);
+  }
+  
+  void Basis::computeLaplacianMatrix()
+  {
+    for (int iOfElt1 = 0; iOfElt1< nbOfElts_; iOfElt1++)
+      for (int iOfElt2 = iOfElt1; iOfElt2< nbOfElts_; iOfElt2++)
+      {
+        double scalarProd = xLaplacianY(iOfElt1, iOfElt2);
+        laplacianMatrix_.insert(iOfElt1, iOfElt2) = scalarProd;
+        if (iOfElt1 != iOfElt2) laplacianMatrix_.insert(iOfElt2, iOfElt1) = scalarProd;
+      }
+  }
+  
+  /*// Compute <H_n, \partial_p^* \partial_p H_m>
+  double Basis::xGradStarY(int iOfEltLeft, int iOfEltRight) const
   {
     return xGradY(iOfEltRight, iOfEltLeft);
   }
@@ -143,18 +167,18 @@ namespace simol
   {
     gradMatrix(A);
     A = A.adjoint();
-  }
+  }*/
   
   // ##### QBasis ####
   
-  QBasis::QBasis(const int nbOfElts0, double beta0, Potential& potential0):
-    Basis(nbOfElts0),
-    beta_(beta0),
+  QBasis::QBasis(Input const& input, Potential& potential0):
+    Basis(input.nbOfQModes(), input.beta()),
     potential_(&potential0),
-    nbOfIntegrationNodes_(1000*nbOfElts()),
-    qRepartitionFct_(0)
+    integrationStep_(input.integrationStep()),
+    qRepartitionFct_(0),
+    basisCoefficient_(0),
+    measureMomenta_(DVec::Zero(2*nbOfElts_-1))
     //basisMeans2_(DVec::Zero(nbOfElts0)),
-
   {}
   
   double QBasis::potential(double variable) const
@@ -177,34 +201,31 @@ namespace simol
     return potential_->parameter1();
   }
   
-
-  /*double QBasis::basisMean2(int iOfElt) const
+  
+  int QBasis::nbOfIntegrationSteps() const
   {
-    return basisMean2_(iOfElt);
+    //cout << "length = " << length() << " integrationStep_ = " << integrationStep_ << "nbOfIntegrationSteps = " << (int) (length() / integrationStep_) << endl;
+    return (int) (length() / integrationStep_);
   }
-  
-  DVec const& QBasis::gVector() const
-  {
-    return basisMeans2_;
-  }
-  
-  double QBasis::gVector(int iOfElt) const
-  {
-    return basisMeans2_[iOfElt];
-  }*/
-  
-  /*double QBasis::norm2meansVec() const
-  {
-    return norm2meansVec_;
-  }*/
   
   // #### ExpFourierBasis ####
   
-  ExpFourierBasis::ExpFourierBasis(const int nbOfElts0, double beta0, Potential& potential0):
-    QBasis(nbOfElts0, beta0, potential0),
-    expFourierCoeffs_(DVec::Zero(2 * nbOfElts0))
+  ExpFourierBasis::ExpFourierBasis(Input const& input, Potential& potential0):
+    QBasis(input, potential0),
+    expFourierCoeffs_(DVec::Zero(2 * nbOfElts_))
   {
+    /*cout << "nb :" << nbOfElts0 << endl;
+    cout << "Constructor expFourierCoeffs_ : " << endl << expFourierCoeffs_ << endl << endl;
+    cout << "zero :" << DVec::Zero(2 * nbOfElts0)<< endl << endl;*/
     computeBasisMeans();
+    computeGramMatrix();
+    computeGradMatrix();
+    computeLaplacianMatrix();  
+  }
+  
+  double ExpFourierBasis::length() const
+  {
+    return 2*M_PI;
   }
   
   DVec const& ExpFourierBasis::expFourierCoeffs() const
@@ -216,15 +237,16 @@ namespace simol
   {
     return expFourierCoeffs_[iOfElt];
   }
-
   
   ///We compute the real Fourier coefficients of the function C^-1 exp(-\beta V(q)/2)
   ///More precisely a_k = 1 / pi int cos(k q) C^-1 exp(-beta V / 2) dq and b_k = 1 / pi int sin(k q) C^-1 exp(-beta V / 2) dq
   ///where C = ExpFourierBasis::basisCoefficient_ Note that a_0 has the same normalization as a_k so that a_{k-l} = a_0 when k=l
   void ExpFourierBasis::computeBasisMeans()
   {
-    double step = 2 * M_PI / (double)nbOfIntegrationNodes_;
-    for (int iOfNode = 0; iOfNode < nbOfIntegrationNodes_; iOfNode++)
+    double step = integrationStep_;
+    //double step = 2 * M_PI / (double)nbOfIntegrationNodes_;
+    //nbOfIntegrationNodes = (int)
+    for (int iOfNode = 0; iOfNode <= nbOfIntegrationSteps(); iOfNode++)
     {
       double q = - M_PI + iOfNode * step;
       qRepartitionFct_ += exp(-beta_ * potential(q)) * step;
@@ -236,16 +258,16 @@ namespace simol
     
     expFourierCoeffs_ *= step / (M_PI * basisCoefficient_);
     
+    cout << "expFourierCoeffs_ :" << endl << expFourierCoeffs_ << endl;
+    
     // gVector is the projection of the constant fct 1, ie it contains the mean of the expfourier elements
     basisMeans2_ = expFourierCoeffs_.head(nbOfElts()) / sqrt(2.);
     basisMeans2_(0) /= sqrt(2.);
-    norm2meansVec_ = pow(basisMeans2_.norm(), 2);
-    cout << "Squared norm of vector g = " << norm2meansVec_ << endl;
+    //norm2meansVec_ = pow(basisMeans2_.norm(), 2);
+    //cout << "Squared norm of vector g = " << norm2meansVec_ << endl;
   }
-  
-  
 
-  double ExpFourierBasis::value(double variable, const int iOfElt) const
+  double ExpFourierBasis::value(double variable, int iOfElt) const
   {
     double expo = basisCoefficient_ * exp(beta_ * potential(variable) / 2);
     int iOfFreq = (iOfElt + 1) / 2;
@@ -257,7 +279,7 @@ namespace simol
       return sqrt(2) * cos(iOfFreq * variable) * expo;
   }
 
-  DVec ExpFourierBasis::gradient(double variable, const int iOfElt) const
+  DVec ExpFourierBasis::gradient(double variable, int iOfElt) const
   {
     //cout << basisCoefficient_ << " " << exp(beta_*potential(variable)/2) << " " << potDeriv(variable) << endl;
     double expo = basisCoefficient_ * exp(beta_ * potential(variable) / 2);
@@ -270,7 +292,7 @@ namespace simol
       return DVec::Constant(1, sqrt(2.) * (-iOfFreq * sin(iOfFreq * variable) + cos(iOfFreq * variable) * beta_ / 2 * potDeriv(variable)) * expo);
   }
 
-  double ExpFourierBasis::laplacian(double variable, const int iOfElt) const
+  double ExpFourierBasis::laplacian(double variable, int iOfElt) const
   {
     double expo = basisCoefficient_ * exp(potential(variable) / 2);
     int iOfFreq = (iOfElt + 1) / 2;
@@ -284,8 +306,19 @@ namespace simol
                          + (beta_ / 2 * potLapla(variable) + pow(beta_, 2) / 4 * pow(potDeriv(variable), 2) - pow(iOfFreq, 2)) * cos(iOfFreq * variable)) * expo;
   }
   
-     // Compute <G_k, \partial_q G_l>
-  double ExpFourierBasis::xGradY(const int iOfEltLeft, const int iOfEltRight) const
+  // Compute <G_k, G_k'>
+  double ExpFourierBasis::xY(int iOfEltLeft, int iOfEltRight) const
+  {
+    return (iOfEltLeft == iOfEltRight);
+  }
+  
+  /*void ExpFourierBasis::gramMatrix(SMat& A) const
+  {
+    A.setIdentity();
+  }*/
+  
+  // Compute <G_k, \partial_q G_l>
+  double ExpFourierBasis::xGradY(int iOfEltLeft, int iOfEltRight) const
   {
     if ((iOfEltLeft - iOfEltRight) % 2 == 0 || iOfEltLeft < 0 || iOfEltRight < 0) return 0;
     double result = 0;
@@ -309,15 +342,8 @@ namespace simol
     else return result;
   }
   
-  void ExpFourierBasis::gradMatrix(SMat& A) const
-  {
-    for (int iOfFourier = 0; iOfFourier < nbOfElts_; iOfFourier++)
-      for (int jOfFourier = max(0, iOfFourier-3); jOfFourier < min(nbOfElts_, iOfFourier+4); jOfFourier++)
-        A.insert(iOfFourier, jOfFourier) = xGradY(iOfFourier, jOfFourier);
-  }
-  
   // Compute <G_k, \partial_q^* \partial_q G_l>
-  double ExpFourierBasis::xLaplacianY(const int iOfEltLeft, const int iOfEltRight) const
+  double ExpFourierBasis::xLaplacianY(int iOfEltLeft, int iOfEltRight) const
   {
     if ((iOfEltLeft - iOfEltRight) % 2 == 1 || iOfEltLeft < 0 || iOfEltRight < 0) return 0;
     double result = 0;
@@ -325,18 +351,7 @@ namespace simol
     //for (int iOfElt = 0; iOfElt < nbOfElts(); iOfElt++)
       result += xGradY(iOfElt, iOfEltLeft) * xGradY(iOfElt, iOfEltRight);
     return result;
-  }
-  
-  void ExpFourierBasis::laplacianMatrix(SMat& A) const
-  {
-    cout << "laplacianMatrix" << endl;
-    for (int iOfFourier = 0; iOfFourier < nbOfElts_; iOfFourier++)
-      for (int jOfFourier = max(0, iOfFourier-4); jOfFourier < min(nbOfElts_, iOfFourier+5); jOfFourier++)
-      {
-        cout << "coucou" << endl;
-        A.insert(iOfFourier, jOfFourier) = xLaplacianY(iOfFourier, jOfFourier);
-      }
-  }   
+  } 
   
     //We compute the real Fourier coefficients of the function C^-1 exp(-\beta V(q)/2)
   //where C = ExpFourierBasis::basisCoefficient_
@@ -382,40 +397,128 @@ namespace simol
     expToTrigMat_  = trigToExpMat_.inverse();
   }
   
-  
-// #### HermiteBasis ####
+  // #### HermiteQBasis ####
 
-  HermiteBasis::HermiteBasis(const int nbOfElts0, double beta0)
-    : Basis(nbOfElts0),
-      beta_(beta0),
-      polyCoeffs_(DMat::Zero(nbOfElts0, nbOfElts0))
-  {
+  ///
+  ///Builds the basis composed of the Hermite polynomials
+  ///The measure is any nu so that the basis is not orthonormal
+  HermiteQBasis::HermiteQBasis(Input const& input, Potential& potential0)
+    : QBasis(input, potential0),
+      length_(input.integrationLength()),
+      qMin_(input.integrationQMin()),
+      //qMin_(0),
+      omega_(input.omegaHermite()),
+      polyCoeffs_(DMat::Zero(nbOfElts_, nbOfElts_))
+  {    
+    if (length_ == 0)
+      throw runtime_error("The integration length is set to zero !");
+    cout << "HermiteQBasis::HermiteQBasis" << endl;
     polyCoeffs_(0, 0) = 1;
-    polyCoeffs_(1, 1) = beta_;
-    for (int iOfElt = 2; iOfElt < (int)nbOfElts0; iOfElt++)
+    polyCoeffs_(1, 1) = sqrt(omega_);
+    for (int iOfElt = 2; iOfElt < (int)nbOfElts_; iOfElt++)
       for (int iOfCoeff = 0; iOfCoeff <= iOfElt; iOfCoeff++)
-        polyCoeffs_(iOfElt, iOfCoeff) = (iOfCoeff ? (sqrt(beta_ / iOfElt) * polyCoeffs_(iOfElt - 1, iOfCoeff - 1)) : 0) - sqrt((iOfElt - 1) / (double)iOfElt) * polyCoeffs_(iOfElt - 2, iOfCoeff);
+        polyCoeffs_(iOfElt, iOfCoeff) = (iOfCoeff ? (sqrt(omega_ / iOfElt) * polyCoeffs_(iOfElt - 1, iOfCoeff - 1)) : 0) - sqrt((iOfElt - 1) / (double)iOfElt) * polyCoeffs_(iOfElt - 2, iOfCoeff);
   
-    basisMeans2_[0] = 1;
+    cout << "Initialization of HermiteQBasis..."; cout.flush();
+    computeMeasureMomenta();
+    computeGramMatrix();
+    computeGradMatrix();
+    computeLaplacianMatrix();  
+    computeBasisMeans(); 
+    cout << "OK !" << endl;
+    
+    //double step = integrationStep_;
+    //double step = length_ / (double)nbOfIntegrationSteps();
+    ofstream qbasis("output/Galerkin/qbasis", std::ofstream::app);
+    ofstream qbasisgrad("output/Galerkin/qbasisgrad", std::ofstream::app);
+    for (int iOfNode = 0; iOfNode <= nbOfIntegrationSteps(); iOfNode++)
+    {
+      double q = qMin_ + iOfNode * integrationStep_;
+      qbasis << q << " " << value(q, 0) << " " << value(q, 1) << " " << value(q, 2) <<" " <<exp(-beta_ * potential(q)) << " " << potential(q) << endl; 
+      qbasisgrad << q << " " << gradient(q, 0)(0) << " " << gradient(q, 1)(0) << " " << gradient(q, 2)(0) <<" " <<exp(-beta_ * potential(q)) << " " << potential(q) << endl; 
+   }
+  }
+  
+  double HermiteQBasis::length() const
+  {
+    return length_;
+  }
+  
+  void HermiteQBasis::computeMeasureMomenta()
+  {
+    //double step = (length_/2) / (double)nbOfIntegrationNodes_;
+    // Triangle integration
+    measureMomenta_(0) += exp(-beta_ * potential(0));
+    for (int iOfNode = 0; iOfNode <= nbOfIntegrationSteps()/2; iOfNode++)
+    {
+      double q = (iOfNode+1) * integrationStep_;
+      double betaPotPos = beta_ * potential(q);
+      double betaPotNeg = beta_ * potential(-q);
+      //double logq = (q!=0)?log(pow(q,2))/2:-1000;
+      double logq = log(q);
+      //cout << "q=" << q << " logq = " << logq << " betaPotPos=" << betaPotPos << " betaPotNeg=" << betaPotNeg<< endl;
+      for (int iOfElt = 0; iOfElt < 2*nbOfElts()-1; iOfElt++)
+      {
+        if (iOfElt%2==0)
+          measureMomenta_(iOfElt) += exp(iOfElt * logq - betaPotNeg) + exp(iOfElt * logq - betaPotPos);
+        else
+          measureMomenta_(iOfElt) += -exp(iOfElt * logq - betaPotNeg) + exp(iOfElt * logq - betaPotPos);
+        //measureMomenta_(iOfElt) += ((q<0 && iOfElt%2==1)?-1:1) * exp(iOfElt * logq - betaPot);
+        //if (iOfElt == 2*nbOfElts()-2)
+        //  cout << "q=" << q << " betaPot=" << betaPot << " arg = " << ((q<0 && iOfElt%2==1)?-1:1) * exp(iOfElt * logq - betaPot) << endl;
+        //if (iOfElt == 2)
+          //cout << "q=" << q << " exp(iOfElt * logq - betaPotNeg) = " << exp(iOfElt * logq - betaPotPos) << endl;
+          //cout << "q=" << q << " A " << exp(iOfElt * logq - betaPotNeg) << " B " << measureMomenta_(iOfElt)*step << endl;
+      }
+    }
+    measureMomenta_ *= integrationStep_;
+    qRepartitionFct_ = measureMomenta_[0];
+    measureMomenta_ /= qRepartitionFct_;
+    cout << "end computeMeasureMomenta :" << endl << measureMomenta_ << endl;
+    cout << "qRepartitionFct_ = " << qRepartitionFct_ << endl;
+  }
+  
+  void HermiteQBasis::computeBasisMeans()
+  {   
+    for (int iOfElt = 0; iOfElt < nbOfElts(); iOfElt++)
+      basisMeans2_[iOfElt] = dot(polyCoeffs_.row(iOfElt), measureMomenta_.head(nbOfElts()+1));
+    
+    /*cout << "basisMeans2_1 :" << endl << basisMeans2_ << endl;
+    
+    double step = length_ / (double)nbOfIntegrationNodes_;
+    for (int iOfNode = 0; iOfNode <= nbOfIntegrationNodes_; iOfNode++)
+    {
+      double q = qMin_ + iOfNode * step;
+      qRepartitionFct_ += exp(-beta_ * potential(q)) * step;
+      for (int iOfElt = 0; iOfElt < nbOfElts(); iOfElt++)
+        basisMeans2_(iOfElt) += value(q, iOfElt) * exp(-beta_ * potential(q)) * step;
+    }
+    basisMeans2_ /= qRepartitionFct_;
+    
+    cout << "basisMeans2_2 :" << endl << basisMeans2_ << endl;
+    //cout << "Squared norm of vector g = " << norm2meansVec_ << endl;*/
   }
 
-  double HermiteBasis::value(double variable, const int iOfElt) const
+  double HermiteQBasis::value(double variable, int iOfElt) const
   {
+    if (iOfElt < 0) return 0;
     double result = 0;
     for (int iOfCoeff = 0; iOfCoeff <= iOfElt; iOfCoeff++)
       result += polyCoeffs_(iOfElt, iOfCoeff) * pow(variable, iOfCoeff);
     return result;
   }
 
-  DVec HermiteBasis::gradient(double variable, const int iOfElt) const
+  DVec HermiteQBasis::gradient(double variable, int iOfElt) const
   {
     double result = 0;
-    for (int iOfCoeff = 1; iOfCoeff <= iOfElt; iOfCoeff++)
-      result += iOfCoeff * polyCoeffs_(iOfElt, iOfCoeff) * pow(variable, iOfCoeff - 1);
+    //for (int iOfCoeff = 1; iOfCoeff <= iOfElt; iOfCoeff++)
+    //  result += iOfCoeff * polyCoeffs_(iOfElt, iOfCoeff) * pow(variable, iOfCoeff - 1);
+    if (iOfElt == 0) result = 0;
+    else result = sqrt(omega_ * iOfElt) * value(variable, iOfElt-1);
     return DVec::Constant(1, result);
   }
 
-  double HermiteBasis::laplacian(double variable, const int iOfElt) const
+  double HermiteQBasis::laplacian(double variable, int iOfElt) const
   {
     double result = 0;
     for (int iOfCoeff = 2; iOfCoeff <= iOfElt; iOfCoeff++)
@@ -423,34 +526,140 @@ namespace simol
     return result;
   }
   
-  // Compute <H_n, \partial_p H_m>
-  double HermiteBasis::xGradY(const int iOfEltLeft, const int iOfEltRight) const
+  // Computes <H_n, \partial_p H_m> for any the measure nu on [0, length]
+  double HermiteQBasis::xY(int iOfEltLeft, int iOfEltRight) const
   {
-    return (iOfEltLeft == iOfEltRight+1) * sqrt(beta_*iOfEltRight);
+    DVec hermiteProduct = polynomialProduct(polyCoeffs_.row(iOfEltLeft), polyCoeffs_.row(iOfEltRight));
+    /*cout << iOfEltLeft << " x " << iOfEltRight  << endl;
+    cout << "X =" << endl << polyCoeffs_.row(iOfEltLeft) << endl;
+    cout << "Y =" << endl << polyCoeffs_.row(iOfEltRight) << endl;
+    cout << "hermiteProduct = " << endl << hermiteProduct << endl;
+    cout << "measureMomenta_ = " << endl << measureMomenta_ << endl;*/
+    return dot(hermiteProduct, measureMomenta_);
+    
+    /*double scalarProd = 0;
+    int nbOfIntegrationNodes = nbOfIntegrationNodes_;
+    double step = length_ / (double)nbOfIntegrationNodes;
+    if(exp(-beta_ * potential(-qMin_)) > 1e-12 || exp(-beta_ * potential(qMin_)) > 1e-12)
+      throw runtime_error("Integration length too small !");
+    for (int iOfNode = 0; iOfNode <= nbOfIntegrationNodes; iOfNode++)
+    {
+      double q = qMin_ + iOfNode * step;
+      double expo = exp(-beta_ * potential(q));
+      if (expo > 1e-15)
+        scalarProd += value(q, iOfEltLeft) * value(q, iOfEltRight) * expo / qRepartitionFct_ * step;
+    }
+    //cout << iOfEltLeft << " xY " << iOfEltRight << " -> " << scalarProd << endl;
+    return 1e-9*round(1e9*scalarProd);*/
   }
   
-  void HermiteBasis::gradMatrix(SMat& A) const
+  // Compute <H_n, \partial_q H_m>
+  double HermiteQBasis::xGradY(int iOfEltLeft, int iOfEltRight) const
   {
-    for (int iOfHermite = 0; iOfHermite< nbOfElts_-1; iOfHermite++)
-      A.insert(iOfHermite+1, iOfHermite) = xGradY(iOfHermite+1, iOfHermite);
+    cout << "xGradY should not be called !" << endl;
+    /*double scalarProd = 0;
+    double step = length_ / (double)nbOfIntegrationNodes_;
+    for (int iOfNode = 0; iOfNode <= nbOfIntegrationNodes_; iOfNode++)
+    {
+      double q = qMin_ + iOfNode * step;
+      scalarProd += value(q, iOfEltLeft) * gradient(q, iOfEltRight)(0) * exp(-beta_ * potential(q)) / qRepartitionFct_ * step;
+    }
+    return 1e-9*round(1e9*scalarProd);*/
+    return sqrt(omega_ * iOfEltRight) * xY(iOfEltLeft, iOfEltRight-1);
+  }
+  
+  // Compute <partial_q H_n, \partial_q H_m>
+  double HermiteQBasis::xLaplacianY(int iOfEltLeft, int iOfEltRight) const
+  {
+    cout << "xLaplacianY should not be called !" << endl;
+    /*double scalarProd = 0;
+    double step = length_ / (double)nbOfIntegrationNodes_;
+    for (int iOfNode = 0; iOfNode <= nbOfIntegrationNodes_; iOfNode++)
+    {
+      double q = qMin_ + iOfNode * step;
+      scalarProd += gradient(q, iOfEltLeft)(0) * gradient(q, iOfEltRight)(0) * exp(-beta_ * potential(q)) / qRepartitionFct_ * step;
+    }
+    return 1e-9*round(1e9*scalarProd);*/
+    return omega_ * sqrt(iOfEltLeft * iOfEltRight) * xY(iOfEltLeft-1, iOfEltRight-1);
+  }  
+  
+  void HermiteQBasis::computeGradMatrix()
+  {
+    for (int iOfElt1 = 0; iOfElt1< nbOfElts_; iOfElt1++)
+      for (int iOfElt2 = 1; iOfElt2< nbOfElts_; iOfElt2++)
+        gradMatrix_.insert(iOfElt1, iOfElt2) = sqrt(omega_ * iOfElt2) * gramMatrix_.coeff(iOfElt1, iOfElt2-1);
+  }
+  
+  void HermiteQBasis::computeLaplacianMatrix()
+  {
+    for (int iOfElt1 = 1; iOfElt1< nbOfElts_; iOfElt1++)
+      for (int iOfElt2 = 1; iOfElt2< nbOfElts_; iOfElt2++)
+        laplacianMatrix_.insert(iOfElt1, iOfElt2) = omega_ * sqrt(iOfElt1 * iOfElt2) * gramMatrix_.coeff(iOfElt1-1, iOfElt2-1);
+  }
+  
+// #### HermiteBasis ####
+
+  HermiteBasis::HermiteBasis(Input const& input)
+    : Basis(input.nbOfPModes(), input.beta()),
+      polyCoeffs_(DMat::Zero(nbOfElts_, nbOfElts_))
+  {
+    polyCoeffs_(0, 0) = 1;
+    polyCoeffs_(1, 1) = sqrt(beta_);
+    for (int iOfElt = 2; iOfElt < (int)nbOfElts_; iOfElt++)
+      for (int iOfCoeff = 0; iOfCoeff <= iOfElt; iOfCoeff++)
+        polyCoeffs_(iOfElt, iOfCoeff) = (iOfCoeff ? (sqrt(beta_ / iOfElt) * polyCoeffs_(iOfElt - 1, iOfCoeff - 1)) : 0) - sqrt((iOfElt - 1) / (double)iOfElt) * polyCoeffs_(iOfElt - 2, iOfCoeff);
+  
+    basisMeans2_[0] = 1;
+    computeGramMatrix();
+    computeGradMatrix();
+    computeLaplacianMatrix();  
+  }
+
+  double HermiteBasis::value(double variable, int iOfElt) const
+  {
+    double result = 0;
+    for (int iOfCoeff = 0; iOfCoeff <= iOfElt; iOfCoeff++)
+      result += polyCoeffs_(iOfElt, iOfCoeff) * pow(variable, iOfCoeff);
+    return result;
+  }
+
+  DVec HermiteBasis::gradient(double variable, int iOfElt) const
+  {
+    double result = 0;
+    for (int iOfCoeff = 1; iOfCoeff <= iOfElt; iOfCoeff++)
+      result += iOfCoeff * polyCoeffs_(iOfElt, iOfCoeff) * pow(variable, iOfCoeff - 1);
+    return DVec::Constant(1, result);
+  }
+
+  double HermiteBasis::laplacian(double variable, int iOfElt) const
+  {
+    double result = 0;
+    for (int iOfCoeff = 2; iOfCoeff <= iOfElt; iOfCoeff++)
+      result += iOfCoeff * (iOfCoeff - 1) * polyCoeffs_(iOfElt, iOfCoeff) * pow(variable, iOfCoeff - 2);
+    return result;
+  }
+  
+  // Computes <H_k, H_k'> for the measure kappa
+  double HermiteBasis::xY(int iOfEltLeft, int iOfEltRight) const
+  {
+    return (iOfEltLeft == iOfEltRight);
+  }
+  
+  // Computes <H_n, \partial_p H_m>
+  double HermiteBasis::xGradY(int iOfEltLeft, int iOfEltRight) const
+  {
+    return (iOfEltLeft+1 == iOfEltRight) * sqrt(beta_*iOfEltRight);
   }
   
   // Compute <H_n, \partial_p H_m>
-  double HermiteBasis::xLaplacianY(const int iOfEltLeft, const int iOfEltRight) const
+  double HermiteBasis::xLaplacianY(int iOfEltLeft, int iOfEltRight) const
   {
     return (iOfEltLeft == iOfEltRight) * beta_*iOfEltRight;
-  }
- 
-  void HermiteBasis::laplacianMatrix(SMat& A) const
-  {
-    for (int iOfHermite = 0; iOfHermite< nbOfElts_; iOfHermite++)
-      A.insert(iOfHermite, iOfHermite) = xLaplacianY(iOfHermite, iOfHermite);
-  }
-  
+  }  
   
  
 
-  TensorBasis::TensorBasis(const int nbOfVariables0):
+  TensorBasis::TensorBasis(int nbOfVariables0):
     bases_(nbOfVariables0)
   {
   }
@@ -466,12 +675,12 @@ namespace simol
     return bases_.size();
   }
 
-  int const& TensorBasis::nbOfElts(const int iOfVariable) const
+  int const& TensorBasis::nbOfElts(int iOfVariable) const
   {
     return bases_[iOfVariable]->nbOfElts();
   }
 
-  int& TensorBasis::nbOfElts(const int iOfVariable)
+  int& TensorBasis::nbOfElts(int iOfVariable)
   {
     return bases_[iOfVariable]->nbOfElts();
   }
@@ -492,6 +701,15 @@ namespace simol
     return totalNbOfElts0;
   }
   
+  DVec TensorBasis::basisMeans() const
+  {
+    DVec vect = basisMeans2(0);
+    for (int iOfVariable = 1; iOfVariable < nbOfVariables(); iOfVariable++)
+      vect = kron(basisMeans2(iOfVariable), vect);
+    return vect;
+    //throw runtime_error("TensorBasis::allBasisMeans not implemented");
+  }
+  
   double TensorBasis::basisMean2(int iOfVariable, int iOfElt) const
   {
     return bases_[iOfVariable]->basisMean2(iOfElt);
@@ -506,6 +724,19 @@ namespace simol
     {
     return bases_[iOfVariable]->norm2meansVec();
   }
+  
+  ///
+  ///Computes the Gram matrix of the global basis
+  ///Recall that the variable order is reversed for the operators
+  SMat TensorBasis::gramMatrix() const
+  {
+    SMat mat = bases_[0]->gramMatrix();
+    for (int iOfVariable = 1; iOfVariable < nbOfVariables(); iOfVariable++)
+      mat = kron(bases_[iOfVariable]->gramMatrix(), mat);
+    return mat;
+    //throw runtime_error("TensorBasis::allBasisMeans not implemented");
+  }
+  
 
   const Basis* TensorBasis::operator()(int iOfBasis) const
   {
@@ -522,26 +753,24 @@ namespace simol
 
   QPBasis::QPBasis():
     TensorBasis(2)
-  {
-    //cout << "QPBasis()" << endl;
-  }
+  {}
 
-  int& QPBasis::nbOfFourier()
+  int& QPBasis::nbOfQModes()
   {
     return nbOfElts(0);
   }
 
-  const int& QPBasis::nbOfFourier() const
+  const int& QPBasis::nbOfQModes() const
   {
     return nbOfElts(0);
   }
 
-  int& QPBasis::nbOfHermite()
+  int& QPBasis::nbOfPModes()
   {
     return nbOfElts(1);
   }
 
-  const int& QPBasis::nbOfHermite() const
+  const int& QPBasis::nbOfPModes() const
   {
     return nbOfElts(1);
   }
@@ -550,20 +779,20 @@ namespace simol
   //N_H blocks of size N_G (we concatene the columns of the matrix)
   int QPBasis::iTens(int iOfFourier2, int iOfHermite) const
   {
-    assert(iOfFourier2 < nbOfFourier()  && iOfHermite < nbOfHermite());
-    return nbOfFourier() * iOfHermite + iOfFourier2;
+    assert(iOfFourier2 < nbOfQModes()  && iOfHermite < nbOfPModes());
+    return nbOfQModes() * iOfHermite + iOfFourier2;
   }
 
   vector<int> QPBasis::vecTens(int iTens0) const
   {
-    assert(iTens0 < nbOfHermite() * nbOfFourier());
+    assert(iTens0 < nbOfPModes() * nbOfQModes());
     vector<int> vecIndex(2);
-    vecIndex[0] = iTens0 % nbOfFourier();
-    vecIndex[1] = iTens0 / nbOfFourier();
+    vecIndex[0] = iTens0 % nbOfQModes();
+    vecIndex[1] = iTens0 / nbOfQModes();
     return vecIndex;
   }
 
-  double QPBasis::value(System const& syst, const int iOfElt) const
+  double QPBasis::value(System const& syst, int iOfElt) const
   {
     vector<int> vecIndex = vecTens(iOfElt);
     return value(syst, vecIndex);
@@ -625,11 +854,8 @@ namespace simol
   
   DVec QPBasis::getBasisElement(int iOfElt1, int iOfElt2) const
   {
-    cout << "getBasisElement" << endl;
     DVec vect = DVec::Zero(totalNbOfElts());
     vect(iTens(iOfElt1, iOfElt2)) = 1;
-    cout << "end of getBasisElement" << endl;
-    cout << vect << endl;
     return vect;
   }
   
@@ -653,31 +879,9 @@ namespace simol
   ExpFourierHermiteBasis::ExpFourierHermiteBasis(Input const& input, Potential& potential):
     QPBasis()
   {
-    bases_[0] = new ExpFourierBasis(input.nbOfFourier(), input.beta(), potential);
-    bases_[1] = new HermiteBasis(input.nbOfHermite(), input.beta());
+    bases_[0] = new ExpFourierBasis(input, potential);
+    bases_[1] = new HermiteBasis(input);
   }
-  
-
-
-  /*double ExpFourierHermiteBasis::basisMean2(int iOfVariable, int iOfElt) const
-  {
-    return bases_[iOfVariable]->basisMeans(iOfElt);
-  }
-  
-  DVec const& ExpFourierHermiteBasis::gVector() const
-  {
-    return bases_[0]->gVector();
-  }
-  
-  double ExpFourierHermiteBasis::gVector(int iOfElt) const
-  {
-    return bases_[0]->gVector(iOfElt);
-  }
-  
-  double ExpFourierHermiteBasis::norm2meansVec() const
-  {
-    return bases_[0]->norm2meansVec();
-  }*/
   
   DMat ExpFourierHermiteBasis::convertToTrigBasis(const DMat& X)
   {
@@ -686,11 +890,11 @@ namespace simol
   
   // #### HermiteHermiteBasis ####
     
-  HermiteHermiteBasis::HermiteHermiteBasis(Input const& input, Potential& /*potential*/):
+  HermiteHermiteBasis::HermiteHermiteBasis(Input const& input, Potential& potential):
     QPBasis()
   {
-    bases_[0] = new HermiteBasis(input.nbOfFourier(), input.beta()/*, potential*/);
-    bases_[1] = new HermiteBasis(input.nbOfHermite(), input.beta());
+    bases_[0] = new HermiteQBasis(input, potential);
+    bases_[1] = new HermiteBasis(input);
   }
 }
 
