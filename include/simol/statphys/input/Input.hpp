@@ -66,6 +66,7 @@ namespace simol
     double height() const;
     double interWell() const;
     //Harmonic
+    double potentialCenter() const;
     double potentialStiffness() const;
     double potentialAlpha() const;
     double potentialBeta() const;
@@ -146,11 +147,15 @@ namespace simol
     bool doGalerkinCV() const;
     bool isGalerkin() const;
     string galerkinElts() const;
-    int nbOfFourier() const;
-    int nbOfHermite() const;
+    int nbOfQModes() const;
+    int nbOfPModes() const;
     bool doGalerkinNonequilibrium() const;
     bool doComputeRef() const;
     bool fitModiFlow() const;
+    double omegaHermite() const;
+    double integrationStep() const;
+    double integrationQMin() const;
+    double integrationLength() const;
   };
 
 

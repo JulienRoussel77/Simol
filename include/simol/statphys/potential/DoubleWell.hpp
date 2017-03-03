@@ -17,6 +17,7 @@ namespace simol
     private:
       double height_;
       double interWell_;
+      double center_;
   };
 
 }

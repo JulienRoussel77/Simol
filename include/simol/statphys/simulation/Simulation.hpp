@@ -73,7 +73,8 @@ namespace simol
     dynamics_(input),
     output_(input, dynamics_.cvBasis())
   {
-    if (input.dynamicsName() != dynamics_.dynamicsName()) throw std::runtime_error("Dynamics generated incompatible with the input file !");
+    if (input.dynamicsName() != dynamics_.dynamicsName()) 
+      throw std::runtime_error("Dynamics generated incompatible with the input file !");
     system_->rng() = rng_;
     dynamics_.rng() = rng_;
 

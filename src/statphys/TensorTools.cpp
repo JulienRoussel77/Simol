@@ -134,6 +134,7 @@ double computeSpectralGap(SMat const& A)
     
     cout << nbOfIter << " : eigVal = " << eigVal << ", " << eigValDiff << " > " << tol << " / XdiffNorm = " << Xdiff.norm() << endl;
   }
+  cout << setprecision(3) << "Smallest eigenvector :" << endl << X/eigVal << endl;
   if (fabs(eigValDiff) > tol)
     cout << "##################### !! Simulation not converged !! #########################" << endl;
   cout << "Lanczos algo : " << nbOfIter << " iterations" << endl;

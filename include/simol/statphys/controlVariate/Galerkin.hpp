@@ -20,12 +20,12 @@ namespace simol
 
     protected:
       int nbOfParticles_;
-      int nbOfFourier_, nbOfHermite_, maxOfFourier_;
+      int nbOfQModes_, nbOfPModes_;
       int sizeOfBasis_;
       SMat SIdQ_, SIdP_;
       DMat DIdQ_, DIdP_;
       SMat Q_, P_;
-      SMat tQ_, tP_;
+      SMat Qt_, Pt_;
       SMat Lthm0_;
       SMat Lthm_, Lham_;
       SMat Lrep_;
@@ -49,8 +49,8 @@ namespace simol
       virtual int nbOfVariables() const;
       virtual int nbOfParticles() const;
       
-      virtual int nbOfFourier() const;
-      virtual int nbOfHermite() const;
+      virtual int nbOfQModes() const;
+      virtual int nbOfPModes() const;
       virtual int sizeOfBasis() const;
       
       double gamma() const;
@@ -73,7 +73,6 @@ namespace simol
       
       DMat shapeSaddle(const DMat& A) const;
       SMat shapeSaddle(const SMat& A) const;
-      //DMat shapePrec(const DMat& A) const;
       DMat unshapeSaddle(const DMat& Asad) const;
       SMat unshapeSaddle(const SMat& Asad) const;
       DVec shapeSaddle(const DVec& X) const;
@@ -109,16 +108,6 @@ namespace simol
       void computeEigen() const;
   };
   
-  class OverdampedGalerkin : public Galerkin
-  {
-  public:
-    OverdampedGalerkin(Input const& input);
-    void createLeta();
-    //virtual void computeExpToTrigTens();
-    virtual void compute();
-    DVec getGradV() const;
-    DVec CVcoeffsVec() const;
-  };
 }
 
 #endif

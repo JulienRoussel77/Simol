@@ -74,6 +74,7 @@ bool hasSmallerNorm(cplx a, cplx b);
 double dot(DVec const& u, DVec const& v);
 DMat reshape(DVec const& u, int nbOfRows, int nbOfCols);
 DVec rint(DVec const& u);
+DVec polynomialProduct(DVec const& P, DVec const& Q);
 
 const int idKineticEnergy = 0;
 const int idPotentialEnergy = 1;

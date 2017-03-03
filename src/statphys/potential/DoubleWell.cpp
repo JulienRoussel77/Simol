@@ -3,15 +3,19 @@
 namespace simol
 {
 
-  DoubleWell::DoubleWell(Input const & input): Potential(input), height_(input.height()), interWell_(input.interWell())
+  DoubleWell::DoubleWell(Input const & input): 
+    Potential(input), 
+    height_(input.height()), 
+    interWell_(input.interWell()),
+    center_(input.potentialCenter())
   {}
 
   double DoubleWell::operator()(double position) const
-  { return height_ * pow(position - interWell_ / 2, 2) * pow(position + interWell_ / 2, 2); }
+  { return height_ * pow(position - center_ - interWell_ / 2, 2) * pow(position - center_ + interWell_ / 2, 2); }
 
   DVec DoubleWell::gradient(double position) const
   {
-    return DVec::Constant(1,1, 4 * height_ * position * (position - interWell_ / 2) * (position + interWell_ / 2));
+    return DVec::Constant(1,1, 4 * height_ * (position - center_) * (position - center_ - interWell_ / 2) * (position - center_ + interWell_ / 2));
   }
   
   double DoubleWell::shiftToHarmonic() const
