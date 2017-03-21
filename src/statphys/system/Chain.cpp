@@ -50,6 +50,15 @@ namespace simol
     }
   }
   
+  ///
+  ///Computes the instant value of the observable length
+  double Chain::length() const
+  {
+    // /!\ Warning : the chain length is computed assuming it is not attached...
+    DVec r12 = getParticle(0).position() - getParticle(nbOfParticles()-1).position();
+    return r12.norm();
+  }
+  
 
 
   //###### BiChain ######

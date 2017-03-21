@@ -166,6 +166,12 @@ namespace simol
     public:
       HermiteHermiteControlVariate(const Input& input, int idObs, shared_ptr<CVBasis> cvBasis0);
   };
+  
+  class ExpHermiteHermiteControlVariate : public BasisControlVariate
+  {
+    public:
+      ExpHermiteHermiteControlVariate(const Input& input, int idObs, shared_ptr<CVBasis> cvBasis0);
+  };
 }
 
 #endif

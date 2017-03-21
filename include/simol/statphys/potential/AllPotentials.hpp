@@ -14,8 +14,19 @@
 
 namespace simol
 {
-
+  Potential* createPotential(Input const& input, string potName);
   Potential* createPotential(Input const& input);
+  
+  class TwoTypes : public Potential
+  {
+    public:
+      TwoTypes(Input const& input);
+      double operator()(double position, int type) const;
+      DVec gradient(double position, int type) const;
+    private:
+      Potential* firstPot_;
+      Potential* secondPot_;
+  };
 
 }
 

@@ -1,6 +1,12 @@
 #ifndef SIMOL_TOOLS_HPP
 #define SIMOL_TOOLS_HPP
 
+// Disables certain warnings when including the following files
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+#pragma GCC diagnostic ignored "-Wsign-compare"
+
 #include <iostream>
 #include <fstream>
 #include <locale>   //contains std::tolower
@@ -23,6 +29,8 @@
 #include <Eigen/IterativeLinearSolvers>
 #include <Eigen/Eigenvalues>
 #include <unsupported/Eigen/IterativeSolvers>
+
+#pragma GCC diagnostic pop
 
 using std::setw;
 using std::setprecision;
@@ -63,6 +71,14 @@ typedef Eigen::Matrix<long int, Eigen::Dynamic, Eigen::Dynamic> DMatInt;
 typedef Eigen::Matrix<long int, Eigen::Dynamic, 1> DVecInt;
 
 typedef Eigen::Triplet<double> Trid;
+
+using Eigen::JacobiSVD;
+using Eigen::ComputeThinU;
+using Eigen::ComputeThinV;
+
+using Eigen::ComplexEigenSolver;
+using Eigen::real;
+using Eigen::imag;
 
 double modulo(double variable, double mini, double maxi);
 int intModulo(int variable, int maxi);

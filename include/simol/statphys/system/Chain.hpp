@@ -23,6 +23,8 @@ namespace simol
     virtual void incrementePairIterator(ParticlePairIterator& it);
     bool pairFinished(ParticlePairIterator const& it) const;
     virtual void sampleMomenta(DynamicsParameters const& dynaPara);
+    
+    virtual double length() const;
   protected:
     int nbOfWallParticles_;
   };

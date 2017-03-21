@@ -12,6 +12,8 @@ namespace simol
       return new TriChain(input);
     else if (input.systemName() == "NBody")
       return new NBody(input);
+    else if (input.systemName() == "Colloid")
+      return new Colloid(input, 2);
     else 
       throw std::runtime_error(input.systemName() + " is not a valid system name !");
   }
@@ -108,7 +110,16 @@ namespace simol
     if (output.obsPressure_) dyna.computePressure(output, syst);
     if (output.obsInternalEnergy_) dyna.computeInternalEnergy(output, syst);
     if (output.obsInternalTemperature_) dyna.computeInternalTemperature(output, syst);
-    if (output.obsLength_) output.length() = syst(0).position(0);
+    if (output.obsLength_) output.length() = syst.length();
+    /*{
+      if (syst.nbOfParticles() == 1)
+        output.length() = syst(0).position(0);
+      else
+      {
+        DVec r12 = syst(0).position() - syst(1).position();
+        output.length() = r12.norm();
+      }
+    }*/
     if (output.obsVelocity_) output.velocity() = syst(0).velocity(0);
     if (output.obsForce_) output.force() = syst(0).force(0);
     dyna.getThermo(output);
@@ -166,5 +177,7 @@ namespace simol
     if (output.doFinalFlow()) output.displayFinalFlow(syst.potParameter1(), syst.potParameter2());
     if (output.doFinalVelocity()) output.displayFinalVelocity();
   }
+  
+
 
 }

@@ -28,5 +28,15 @@ namespace simol
   {
     return rng->scalarGaussian() / sqrt(localBeta);
   }
+  
+  DVec Harmonic::polynomialCoeffs() const
+  {
+    DVec coeffs(DVec::Zero(3));
+    coeffs[0] = pow(center_, 2)/2;
+    coeffs[1] = - center_;
+    coeffs[2] = 1./2;
+    
+    return stiffness_ * coeffs;
+  }
 
 }

@@ -10,6 +10,7 @@ namespace simol
   public:
     OverdampedGalerkin(Input const& input);
     virtual void createOperators();
+    virtual DVec solveResilient(const SMat& A, const DVec& Y) const;
     
     //void createLeta();
     //virtual void computeExpToTrigTens();

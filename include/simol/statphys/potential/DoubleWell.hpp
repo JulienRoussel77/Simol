@@ -13,7 +13,7 @@ namespace simol
       double operator()(double position) const;
       DVec gradient(double position) const;
       virtual double shiftToHarmonic() const;
-
+      virtual DVec polynomialCoeffs() const;
     private:
       double height_;
       double interWell_;

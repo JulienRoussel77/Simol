@@ -20,6 +20,8 @@ namespace simol
       return new ExpFourierHermiteControlVariate(input, idObs, cvBasis0);
     else if(input.controlVariateName() == "HermiteHermite")
       return new HermiteHermiteControlVariate(input, idObs, cvBasis0);
+    else if(input.controlVariateName() == "ExpHermiteHermite")
+      return new ExpHermiteHermiteControlVariate(input, idObs, cvBasis0);
     else
       std::cout << input.controlVariateName() << " is not a valid control variate !" << std::endl;
     return 0;
@@ -507,6 +509,10 @@ namespace simol
   }*/
   
   HermiteHermiteControlVariate::HermiteHermiteControlVariate(Input const& input, int idObs, shared_ptr<CVBasis> cvBasis0):
+    BasisControlVariate(input, idObs, cvBasis0)
+  {}
+  
+  ExpHermiteHermiteControlVariate::ExpHermiteHermiteControlVariate(Input const& input, int idObs, shared_ptr<CVBasis> cvBasis0):
     BasisControlVariate(input, idObs, cvBasis0)
   {}
 

@@ -111,37 +111,37 @@ namespace simol
   Potential const& System::potential() const {return *potential_;}
   ///
   ///Evaluate the potential for the vector "position"
-  double System::potential(DVec const& position) const {return (*potential_)(position);}
+  double System::potential(DVec const& position, int type) const {return (*potential_)(position, type);}
   ///
   ///Evaluate the potential for the scalar "position"
-  double System::potential(const double& distance) const {return (*potential_)(distance);}
+  double System::potential(const double& distance, int type) const {return (*potential_)(distance, type);}
   ///
   ///Evaluate the force for the scalar "position" (potential and external terms)
-  DVec System::totalForce(DVec const& position) const
+  DVec System::totalForce(DVec const& position, int type) const
   {
-    return potential_->totalForce(position);
+    return potential_->totalForce(position, type);
   }
 
-  DVec System::potentialForce(DVec const& position) const
+  DVec System::potentialForce(DVec const& position, int type) const
   {
-    return - potential_->gradient(position);
+    return - potential_->gradient(position, type);
   }
 
-  DVec System::potentialForce(double position) const
+  DVec System::potentialForce(double position, int type) const
   {
-    return - potential_->gradient(position);
+    return - potential_->gradient(position, type);
   }
   ///
   ///Evaluate the force for the scalar "position" (potential and external terms)
-  DVec System::totalForce(double position) const
+  DVec System::totalForce(double position, int type) const
   {
-    return potential_->totalForce(position);
+    return potential_->totalForce(position, type);
   }
   ///
   ///Evaluate the laplacian of the potential for the vector "position"
-  double System::laplacian(DVec const& position) const
+  double System::laplacian(DVec const& position, int type) const
   {
-    return potential_->laplacian(position);
+    return potential_->laplacian(position, type);
   }
 
   ///
@@ -234,6 +234,13 @@ namespace simol
       qInteg += deltaQ(0) * exp(-localBeta * potential(deltaQ));
     }
     return qInteg / repFunc;
+  }
+  
+  ///
+  ///Computes the instant value of the observable length
+  double System::length() const
+  {
+    return getParticle(0).position(0);
   }
   
 

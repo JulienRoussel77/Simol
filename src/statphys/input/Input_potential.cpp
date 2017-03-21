@@ -16,6 +16,8 @@ namespace simol
 {
 
   string Input::potentialName() const {return data["Potential"]["Name"].as<string>();}
+  string Input::firstPotentialName() const {return data["Potential"]["FirstType"].as<string>();}
+  string Input::secondPotentialName() const {return data["Potential"]["SecondType"].as<string>();}
 
   //--- Sinusoidal ---
   double Input::amplitude() const

@@ -1,7 +1,12 @@
 #ifndef SIMOL_INPUT_HPP
 #define SIMOL_INPUT_HPP
 
+// Disables certain warnings when including the following files
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #include<yaml-cpp/yaml.h>
+#pragma GCC diagnostic pop
+
 #include <getopt.h>
 //#include "simol/core/linalg/Vector.hpp"
 #include "simol/core/io/CommandLine.hpp"
@@ -60,6 +65,8 @@ namespace simol
 
     //-- Potential --
     string potentialName() const;
+    string firstPotentialName() const;
+    string secondPotentialName() const;
     //Sinus
     double amplitude() const;
     //DoubleWell

@@ -17,6 +17,7 @@ namespace simol
       virtual void compute() = 0;
       virtual DVec CVcoeffsVec() const;
       virtual DVec CVObservable() const = 0;
+      virtual DVec solveResilient(const SMat& A, const DVec& Y) const;
   };
   
   class PeriodicLangevinGalerkin : public LangevinGalerkin
@@ -38,7 +39,7 @@ namespace simol
     virtual DVec CVObservable() const;
   };
 
-  class BoundaryLangevinGalerkin : public Galerkin
+  /*class BoundaryLangevinGalerkin : public Galerkin
   {
       //SMat SId_;
     public:
@@ -53,7 +54,7 @@ namespace simol
 
       virtual void compute();
       DVec CVcoeffsVec() const {throw runtime_error("CVcoeffs not implemented for the chain !");}
-  };
+  };*/
 
 
 }

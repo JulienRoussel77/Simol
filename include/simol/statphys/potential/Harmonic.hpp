@@ -14,6 +14,7 @@ namespace simol
       DVec gradient(double position) const;
       double laplacian(double position) const;
       double drawLaw(double localBeta, std::shared_ptr<RNG>& rng_) const;
+      virtual DVec polynomialCoeffs() const;
     private:
       double stiffness_;
       double center_;

@@ -5,6 +5,7 @@
 #include "simol/statphys/system/System.hpp"
 #include "simol/statphys/system/Isolated.hpp"
 #include "simol/statphys/system/NBody.hpp"
+#include "simol/statphys/system/Colloid.hpp"
 #include "simol/statphys/system/Chain.hpp"
 #include "simol/statphys/controlVariate/ControlVariate.hpp"
 

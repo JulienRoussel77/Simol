@@ -105,13 +105,13 @@ namespace simol
     virtual void computeAllForces();
     Potential& potential();
     Potential const& potential() const;
-    void interaction(Particle& particle1, Particle& particle2) const;
-    double potential(DVec const& position) const;
-    double potential(const double& position) const;
-    DVec totalForce(DVec const& position) const;
-    DVec totalForce(double position) const;
-    DVec potentialForce(DVec const & position) const;
-    DVec potentialForce(double position) const;
+    virtual void interaction(Particle& particle1, Particle& particle2) const;
+    double potential(DVec const& position, int type = 0) const;
+    double potential(const double& position, int type = 0) const;
+    DVec totalForce(DVec const& position, int type = 0) const;
+    DVec totalForce(double position, int type = 0) const;
+    DVec potentialForce(DVec const & position, int type = 0) const;
+    DVec potentialForce(double position, int type = 0) const;
     DVec& externalForce() ;
     DVec const& externalForce() const;
     double& externalForce(const int& i);
@@ -128,10 +128,12 @@ namespace simol
 
     // currently specific to chains
     virtual double boundaryPotEnergy() const;
-    double laplacian(DVec const& position) const;
+    double laplacian(DVec const& position, int type = 0) const;
     
     virtual void samplePositions(DynamicsParameters const& dynaPara);
     virtual void sampleMomenta(DynamicsParameters const& dynaPara);
+    
+    virtual double length() const;
 
   //protected:
   public:

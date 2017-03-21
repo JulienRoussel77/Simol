@@ -91,7 +91,8 @@ namespace simol
 
   Basis::Basis(int nbOfElts0, double beta0):
     nbOfElts_(nbOfElts0),
-    basisMeans2_(DVec::Zero(nbOfElts0)),
+    basisMeans_(DVec::Zero(nbOfElts0)),
+    constantFctCoeffs_(DVec::Zero(nbOfElts0)),
     beta_(beta0),
     gramMatrix_(nbOfElts_, nbOfElts0),
     gradMatrix_(nbOfElts_, nbOfElts0),
@@ -110,21 +111,33 @@ namespace simol
     return nbOfElts_;
   }
 
-  DVec const& Basis::basisMeans2() const
+  DVec const& Basis::basisMeans() const
   {
-    return basisMeans2_;
-    //throw std::runtime_error("Basis::basisMean2 is not implemented");
+    return basisMeans_;
+    //throw std::runtime_error("Basis::basisMean is not implemented");
   };
   
-  double Basis::basisMean2(int iOfElt) const
+  double Basis::basisMean(int iOfElt) const
   {
-    return basisMeans2_[iOfElt];
-    //throw std::runtime_error("Basis::basisMean2 is not implemented");
+    return basisMeans_[iOfElt];
+    //throw std::runtime_error("Basis::basisMean is not implemented");
+  };
+  
+  DVec const& Basis::constantFctCoeffs() const
+  {
+    return constantFctCoeffs_;
+    //throw std::runtime_error("Basis::basisMean is not implemented");
+  };
+  
+  double Basis::constantFctCoeff(int iOfElt) const
+  {
+    return constantFctCoeffs_[iOfElt];
+    //throw std::runtime_error("Basis::basisMean is not implemented");
   };
   
   double Basis::norm2meansVec() const
   {
-    return pow(basisMeans2().norm(), 2);
+    return pow(basisMeans().norm(), 2);
     //throw std::runtime_error("Basis::norm2meansVec is not implemented");
   }
   
@@ -178,7 +191,7 @@ namespace simol
     qRepartitionFct_(0),
     basisCoefficient_(0),
     measureMomenta_(DVec::Zero(2*nbOfElts_-1))
-    //basisMeans2_(DVec::Zero(nbOfElts0)),
+    //basisMeans_(DVec::Zero(nbOfElts0)),
   {}
   
   double QBasis::potential(double variable) const
@@ -261,10 +274,13 @@ namespace simol
     cout << "expFourierCoeffs_ :" << endl << expFourierCoeffs_ << endl;
     
     // gVector is the projection of the constant fct 1, ie it contains the mean of the expfourier elements
-    basisMeans2_ = expFourierCoeffs_.head(nbOfElts()) / sqrt(2.);
-    basisMeans2_(0) /= sqrt(2.);
-    //norm2meansVec_ = pow(basisMeans2_.norm(), 2);
+    basisMeans_ = expFourierCoeffs_.head(nbOfElts()) / sqrt(2.);
+    basisMeans_(0) /= sqrt(2.);
+    //norm2meansVec_ = pow(basisMeans_.norm(), 2);
     //cout << "Squared norm of vector g = " << norm2meansVec_ << endl;
+    
+    // The basis is orthonormal so this egality holds
+    constantFctCoeffs_ = basisMeans_;
   }
 
   double ExpFourierBasis::value(double variable, int iOfElt) const
@@ -348,7 +364,6 @@ namespace simol
     if ((iOfEltLeft - iOfEltRight) % 2 == 1 || iOfEltLeft < 0 || iOfEltRight < 0) return 0;
     double result = 0;
     for (int iOfElt = max(iOfEltLeft, iOfEltRight) - 3; iOfElt < min(iOfEltLeft, iOfEltRight) + 4; iOfElt++)
-    //for (int iOfElt = 0; iOfElt < nbOfElts(); iOfElt++)
       result += xGradY(iOfElt, iOfEltLeft) * xGradY(iOfElt, iOfEltRight);
     return result;
   } 
@@ -481,23 +496,11 @@ namespace simol
   void HermiteQBasis::computeBasisMeans()
   {   
     for (int iOfElt = 0; iOfElt < nbOfElts(); iOfElt++)
-      basisMeans2_[iOfElt] = dot(polyCoeffs_.row(iOfElt), measureMomenta_.head(nbOfElts()+1));
-    
-    /*cout << "basisMeans2_1 :" << endl << basisMeans2_ << endl;
-    
-    double step = length_ / (double)nbOfIntegrationNodes_;
-    for (int iOfNode = 0; iOfNode <= nbOfIntegrationNodes_; iOfNode++)
-    {
-      double q = qMin_ + iOfNode * step;
-      qRepartitionFct_ += exp(-beta_ * potential(q)) * step;
-      for (int iOfElt = 0; iOfElt < nbOfElts(); iOfElt++)
-        basisMeans2_(iOfElt) += value(q, iOfElt) * exp(-beta_ * potential(q)) * step;
-    }
-    basisMeans2_ /= qRepartitionFct_;
-    
-    cout << "basisMeans2_2 :" << endl << basisMeans2_ << endl;
-    //cout << "Squared norm of vector g = " << norm2meansVec_ << endl;*/
+      basisMeans_[iOfElt] = dot(polyCoeffs_.row(iOfElt), measureMomenta_.head(nbOfElts()+1));
+    constantFctCoeffs_[0] = 1;
   }
+  
+  
 
   double HermiteQBasis::value(double variable, int iOfElt) const
   {
@@ -597,6 +600,220 @@ namespace simol
         laplacianMatrix_.insert(iOfElt1, iOfElt2) = omega_ * sqrt(iOfElt1 * iOfElt2) * gramMatrix_.coeff(iOfElt1-1, iOfElt2-1);
   }
   
+  DVec HermiteQBasis::getMonome0() const
+  {
+    DVec vec(DVec::Zero(nbOfElts()));
+    vec[0] = 1;
+    return vec;
+  }
+  
+  DVec HermiteQBasis::getMonome1() const
+  {
+    DVec vec(DVec::Zero(nbOfElts()));
+    vec[1] = 1/sqrt(omega());
+    return vec;
+  }
+  
+  // #### ExpHermiteBasis ####
+  
+  ExpHermiteBasis::ExpHermiteBasis(Input const& input, Potential& potential0):
+    QBasis(input, potential0),
+    length_(input.integrationLength()),
+    qMin_(input.integrationQMin()),
+    omega_(input.omegaHermite()),
+    polyCoeffs_(DMat::Zero(nbOfElts_, nbOfElts_)),
+    productXMat_(DMat::Zero(nbOfElts_, nbOfElts_)),
+    productWdMat_(DMat::Zero(nbOfElts_, nbOfElts_)),
+    productWddMat_(DMat::Zero(nbOfElts_, nbOfElts_))
+  {
+    if (length_ == 0)
+      throw runtime_error("The integration length is set to zero !");
+    cout << "ExpHermiteBasis::ExpHermiteBasis" << endl;
+    polyCoeffs_(0, 0) = 1;
+    polyCoeffs_(1, 1) = sqrt(omega_);
+    for (int iOfElt = 2; iOfElt < (int)nbOfElts_; iOfElt++)
+      for (int iOfCoeff = 0; iOfCoeff <= iOfElt; iOfCoeff++)
+        polyCoeffs_(iOfElt, iOfCoeff) = (iOfCoeff ? (sqrt(omega_ / iOfElt) * polyCoeffs_(iOfElt - 1, iOfCoeff - 1)) : 0) - sqrt((iOfElt - 1) / (double)iOfElt) * polyCoeffs_(iOfElt - 2, iOfCoeff);
+  
+    // We initialize the matrix of the operator phi(x) -> x*phi(x) in the ExpHermite basis
+    for (int iOfElt = 0; iOfElt < (int)nbOfElts_; iOfElt++)
+    {
+      if (iOfElt!=0)            
+        productXMat_(iOfElt-1, iOfElt) = sqrt(iOfElt/(beta_*omega()));
+      if (iOfElt!=nbOfElts_-1)  
+        productXMat_(iOfElt+1, iOfElt) = sqrt((iOfElt+1)/(beta_*omega()));
+    }
+    
+    DVec potWPolyCoeffs = potential_->polynomialCoeffs();
+    potWDegree_ = potWPolyCoeffs.rows()-1;
+    potWPolyCoeffs[2] -= omega()/2;
+    cout << "potWDegree_ = " << potWDegree_ << endl;
+    cout << "potWPolyCoeffs : " << potWPolyCoeffs.adjoint() << endl;
+    DVec potWdPolyCoeffs = DVec::Zero(potWDegree_);
+    for (int iOfOrder = 1; iOfOrder < potWDegree_ + 1; iOfOrder++)
+      potWdPolyCoeffs[iOfOrder-1] = iOfOrder * potWPolyCoeffs[iOfOrder];
+    cout << "potWdPolyCoeffs : " << potWdPolyCoeffs.adjoint() << endl;
+    DVec potWddPolyCoeffs = DVec::Zero(potWDegree_ - 1);
+    for (int iOfOrder = 1; iOfOrder < potWDegree_; iOfOrder++)
+      potWddPolyCoeffs[iOfOrder-1] = iOfOrder * potWdPolyCoeffs[iOfOrder];
+    cout << "potWddPolyCoeffs : " << potWddPolyCoeffs.adjoint() << endl;
+    cout << "productWdMat_ : " << endl << productWdMat_ << endl;
+    for (int iOfOrder = potWDegree_-1; iOfOrder >= 0; iOfOrder--)
+      productWdMat_ = productXMat_ * productWdMat_ + potWdPolyCoeffs[iOfOrder]*DMat::Identity(nbOfElts_, nbOfElts_);
+    
+    cout << "productXMat_ : " << endl << productXMat_ << endl;
+    cout << "productWdMat_ : " << endl << productWdMat_ << endl;
+    
+    cout << "AtA : " << endl << productWdMat_ * productWdMat_ << endl;
+    
+    computeMeasureMomenta();
+    computeGramMatrix();
+    computeGradMatrix();
+    computeLaplacianMatrix();  
+    computeBasisMeans();
+  }
+  
+  double ExpHermiteBasis::length() const
+  {
+    return length_;
+  }
+  
+  double ExpHermiteBasis::potentialW(double variable) const
+  {
+    return potential_->value(variable) - omega()/2 * pow(variable,2);
+  }
+
+  double ExpHermiteBasis::potWDeriv(double variable) const
+  {
+    return (potential_->gradient(variable))(0) - omega() * variable;
+  }
+
+  double ExpHermiteBasis::potWLapla(double variable) const
+  {
+    return potential_->laplacian(variable) - omega();
+  }
+  
+  /*DVec const& ExpHermiteBasis::expFourierCoeffs() const
+  {
+    return expFourierCoeffs_;
+  }
+  
+  double ExpHermiteBasis::expFourierCoeff(int iOfElt) const
+  {
+    return expFourierCoeffs_[iOfElt];
+  }*/
+  
+    void ExpHermiteBasis::computeMeasureMomenta()
+  {
+    //double step = (length_/2) / (double)nbOfIntegrationNodes_;
+    
+    //We compute the repartition function of the marginal measure in position
+    qRepartitionFct_ = exp(-beta_ * potential(0));
+    for (int iOfNode = 0; iOfNode <= nbOfIntegrationSteps()/2; iOfNode++)
+    {
+      double q = (iOfNode+1) * integrationStep_;
+      qRepartitionFct_ += exp(-beta_ * potential(q)) + exp(-beta_ * potential(-q));
+      //cout << q << " -> " << potential(q) << " " << qRepartitionFct_ << endl;
+    }
+    qRepartitionFct_ *= integrationStep_;
+    
+    //We compute the quantities \int q^n sqrt(G/nu) d nu
+    // Trapeze integration
+    measureMomenta_(0) += exp(-beta_ * potential(0));
+    for (int iOfNode = 0; iOfNode <= nbOfIntegrationSteps()/2; iOfNode++)
+    {
+      double q = (iOfNode+1) * integrationStep_;
+      double betaPotPos = beta_/2 * (potential(q) + omega()/2*pow(q,2));
+      double betaPotNeg = beta_/2 * (potential(-q) + omega()/2*pow(q,2));
+      //double logq = (q!=0)?log(pow(q,2))/2:-1000;
+      double logq = log(q);
+      //cout << "q=" << q << " logq = " << logq << " betaPotPos=" << betaPotPos << " betaPotNeg=" << betaPotNeg<< endl;
+      for (int iOfElt = 0; iOfElt < 2*nbOfElts()-1; iOfElt++)
+      {
+        if (iOfElt%2==0)
+          measureMomenta_(iOfElt) += exp(iOfElt * logq - betaPotNeg) + exp(iOfElt * logq - betaPotPos);
+        else
+          measureMomenta_(iOfElt) += -exp(iOfElt * logq - betaPotNeg) + exp(iOfElt * logq - betaPotPos);
+      }
+    }
+    double gaussianRepFct = sqrt(2*M_PI / (beta_ * omega()));
+    cout << "gaussian rep function : " << gaussianRepFct << endl;
+    cout << "nu rep function : " << qRepartitionFct_ << endl;
+    cout << "ratio = " << qRepartitionFct_ / gaussianRepFct << endl;
+    measureMomenta_ *= integrationStep_;
+    cout << "measureMomenta before repFct :" << endl << measureMomenta_ << endl;
+    measureMomenta_ /= sqrt(gaussianRepFct*qRepartitionFct_);
+    basisCoefficient_ = sqrt(qRepartitionFct_ / gaussianRepFct);
+    cout << "end computeMeasureMomenta :" << endl << measureMomenta_ << endl;
+    cout << "qRepartitionFct_ = " << qRepartitionFct_ << endl;
+  }
+  
+  void ExpHermiteBasis::computeBasisMeans()
+  {   
+    for (int iOfElt = 0; iOfElt < nbOfElts(); iOfElt++)
+      basisMeans_[iOfElt] = dot(polyCoeffs_.row(iOfElt), measureMomenta_.head(nbOfElts()+1));
+    constantFctCoeffs_ = basisMeans_;
+    
+    cout << "basisMeans_ :" << endl << basisMeans_ << endl;
+  }
+
+  double ExpHermiteBasis::value(double variable, int iOfElt) const
+  {
+    if (iOfElt < 0) return 0;
+    double result = 0;
+    for (int iOfCoeff = 0; iOfCoeff <= iOfElt; iOfCoeff++)
+      result += polyCoeffs_(iOfElt, iOfCoeff) * pow(variable, iOfCoeff);
+    double expo = basisCoefficient_ * exp(beta_/2 * potentialW(variable));
+    return result * expo;
+  }
+
+  DVec ExpHermiteBasis::gradient(double variable, int iOfElt) const
+  {
+    double derivate = sqrt(beta_ * omega() * iOfElt) * value(variable, iOfElt-1) 
+                      + beta_ /2 *  potWDeriv(variable) * value(variable, iOfElt);
+    return DVec::Constant(1, derivate);
+  }
+
+  double ExpHermiteBasis::laplacian(double variable, int iOfElt) const
+  {
+    double potWDer = potWDeriv(variable);
+    return beta_ * (omega() * sqrt(iOfElt*(iOfElt-1)) * value(variable, iOfElt-2) 
+                    + sqrt(beta_*omega()*iOfElt)*potWDer * value(variable, iOfElt-1) 
+                    + (potWLapla(variable)/2 + beta_ / 4 * pow(potWDer, 2)) * value(variable, iOfElt));
+  }
+  
+  // Computes <H_k, H_k'> for the measure kappa
+  double ExpHermiteBasis::xY(int iOfEltLeft, int iOfEltRight) const
+  {
+    return (iOfEltLeft == iOfEltRight);
+  }
+  
+  // Computes <H_n, \partial_p H_m>
+  double ExpHermiteBasis::xGradY(int iOfEltLeft, int iOfEltRight) const
+  {
+    return (iOfEltLeft+1 == iOfEltRight) * sqrt(beta_ * omega() * iOfEltRight) + beta_/2 * productWdMat_(iOfEltLeft, iOfEltRight);
+  }
+  
+  // Compute <H_n, \partial_p H_m>
+  double ExpHermiteBasis::xLaplacianY(int iOfEltLeft, int iOfEltRight) const
+  {
+    double result = 0;
+    //for (int iOfElt = max(iOfEltLeft, iOfEltRight) - potWDegree_; iOfElt <= min(iOfEltLeft, iOfEltRight) + potWDegree_; iOfElt++)
+    for (int iOfElt = 0; iOfElt < nbOfElts(); iOfElt++)
+      result += xGradY(iOfElt, iOfEltLeft) * xGradY(iOfElt, iOfEltRight);
+    return result;
+  }  
+  
+  DVec ExpHermiteBasis::getMonome0() const
+  {
+    return basisMeans();
+  }
+  
+  DVec ExpHermiteBasis::getMonome1() const
+  {
+    return productXMat_ * basisMeans();
+  }
+  
 // #### HermiteBasis ####
 
   HermiteBasis::HermiteBasis(Input const& input)
@@ -609,7 +826,10 @@ namespace simol
       for (int iOfCoeff = 0; iOfCoeff <= iOfElt; iOfCoeff++)
         polyCoeffs_(iOfElt, iOfCoeff) = (iOfCoeff ? (sqrt(beta_ / iOfElt) * polyCoeffs_(iOfElt - 1, iOfCoeff - 1)) : 0) - sqrt((iOfElt - 1) / (double)iOfElt) * polyCoeffs_(iOfElt - 2, iOfCoeff);
   
-    basisMeans2_[0] = 1;
+    basisMeans_[0] = 1;
+    
+    // The basis is orthonormal so tis equaility holds
+    constantFctCoeffs_ = basisMeans_;
     computeGramMatrix();
     computeGradMatrix();
     computeLaplacianMatrix();  
@@ -657,7 +877,19 @@ namespace simol
     return (iOfEltLeft == iOfEltRight) * beta_*iOfEltRight;
   }  
   
- 
+  DVec HermiteBasis::getMonome0() const
+  {
+    DVec vec(DVec::Zero(nbOfElts()));
+    vec[0] = 1;
+    return vec;
+  }
+  
+  DVec HermiteBasis::getMonome1() const
+  {
+    DVec vec(DVec::Zero(nbOfElts()));
+    vec[1] = 1/sqrt(beta_);
+    return vec;
+  }
 
   TensorBasis::TensorBasis(int nbOfVariables0):
     bases_(nbOfVariables0)
@@ -703,26 +935,45 @@ namespace simol
   
   DVec TensorBasis::basisMeans() const
   {
-    DVec vect = basisMeans2(0);
+    DVec vect = basisMeans(0);
     for (int iOfVariable = 1; iOfVariable < nbOfVariables(); iOfVariable++)
-      vect = kron(basisMeans2(iOfVariable), vect);
+      vect = kron(basisMeans(iOfVariable), vect);
     return vect;
     //throw runtime_error("TensorBasis::allBasisMeans not implemented");
   }
   
-  double TensorBasis::basisMean2(int iOfVariable, int iOfElt) const
+  double TensorBasis::basisMean(int iOfVariable, int iOfElt) const
   {
-    return bases_[iOfVariable]->basisMean2(iOfElt);
+    return bases_[iOfVariable]->basisMean(iOfElt);
   }
   
-  DVec const& TensorBasis::basisMeans2(int iOfVariable) const
+  DVec const& TensorBasis::basisMeans(int iOfVariable) const
   {
-    return bases_[iOfVariable]->basisMeans2();
+    return bases_[iOfVariable]->basisMeans();
   }
   
   double TensorBasis::norm2meansVec(int iOfVariable) const
     {
     return bases_[iOfVariable]->norm2meansVec();
+  }
+  
+    DVec TensorBasis::constantFctCoeffs() const
+  {
+    DVec vect = constantFctCoeffs(0);
+    for (int iOfVariable = 1; iOfVariable < nbOfVariables(); iOfVariable++)
+      vect = kron(constantFctCoeffs(iOfVariable), vect);
+    return vect;
+    //throw runtime_error("TensorBasis::allBasisMeans not implemented");
+  }
+  
+  double TensorBasis::constantFctCoeff(int iOfVariable, int iOfElt) const
+  {
+    return bases_[iOfVariable]->constantFctCoeff(iOfElt);
+  }
+  
+  DVec const& TensorBasis::constantFctCoeffs(int iOfVariable) const
+  {
+    return bases_[iOfVariable]->constantFctCoeffs();
   }
   
   ///
@@ -865,10 +1116,10 @@ namespace simol
     DVec vect = DVec::Zero(totalNbOfElts());
     if (iOfVariable == 0)
       for (int iOfElt2 = 0; iOfElt2 < nbOfElts(1); iOfElt2++)
-        vect(iTens(iOfElt, iOfElt2)) = basisMean2(1, iOfElt2);
+        vect(iTens(iOfElt, iOfElt2)) = basisMean(1, iOfElt2);
     else
       for (int iOfElt2 = 0; iOfElt2 < nbOfElts(0); iOfElt2++)
-        vect(iTens(iOfElt2, iOfElt)) = basisMean2(0, iOfElt2);
+        vect(iTens(iOfElt2, iOfElt)) = basisMean(0, iOfElt2);
     cout << "end of getPartialElement" << endl;
     cout << vect << endl;
     return vect;
@@ -894,6 +1145,15 @@ namespace simol
     QPBasis()
   {
     bases_[0] = new HermiteQBasis(input, potential);
+    bases_[1] = new HermiteBasis(input);
+  }
+  
+    // #### ExpHermiteHermiteBasis ####
+    
+  ExpHermiteHermiteBasis::ExpHermiteHermiteBasis(Input const& input, Potential& potential):
+    QPBasis()
+  {
+    bases_[0] = new ExpHermiteBasis(input, potential);
     bases_[1] = new HermiteBasis(input);
   }
 }

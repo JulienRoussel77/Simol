@@ -120,9 +120,37 @@ namespace simol
   {
     return laplacian(DVec::Constant(1,1, position));
   }
+  
+  
+  double Potential::operator()(DVec const & position, int /*type*/) const
+  {return operator()(position);}  
+  double Potential::operator()(double position, int /*type*/) const
+  {return operator()(position);}
+  double Potential::value(DVec const& position, int /*type*/) const
+  {return value(position);}
+  double Potential::value(double position, int /*type*/) const
+  {return value(position);}
+  DVec Potential::gradient(DVec const & position, int /*type*/) const
+  {return gradient(position);}
+  DVec Potential::gradient(double position, int /*type*/) const
+  {return gradient(position);}
+  DVec Potential::totalForce(DVec const & position, int /*type*/) const
+  {return totalForce(position);}
+  DVec Potential::totalForce(double position, int /*type*/) const
+  {return totalForce(position);}
+  DVec Potential::potentialForce(DVec const & position, int /*type*/) const
+  {return potentialForce(position);}
+  DVec Potential::potentialForce(double position, int /*type*/) const
+  {return potentialForce(position);}
+  double Potential::laplacian(DVec const & position, int /*type*/) const
+  {return laplacian(position);}
+  double Potential::laplacian(double position, int /*type*/) const
+  {return laplacian(position);}
+      
+      
 
   ///
-  /// ration used in the rejection method
+  /// Ratio used in the rejection method
   double Potential::shiftToHarmonic() const
   {
     throw std::invalid_argument("Potential::shiftToHarmonic : Function undefined");
@@ -173,7 +201,12 @@ namespace simol
   
   double Potential::harmonicFrequency() const
   {
-    throw std::invalid_argument("Potential::harmonicEquilibrium: Function undefined");
+    throw std::invalid_argument("Potential::harmonicFrequency: Function undefined");
+  }
+  
+  DVec Potential::polynomialCoeffs() const
+  {
+    throw std::invalid_argument("Potential::polynomialCoeffs: Function undefined");
   }
 }
 #endif

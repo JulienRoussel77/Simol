@@ -112,7 +112,7 @@ namespace simol
   {
     if (data["ControlVariate"])
       if (data["ControlVariate"]["fitModiFlow"])
-        if (isYes(data["Galerkin"]["ComputeRef"].as<string>()))
+        if (isYes(data["Galerkin"]["fitModiFlow"].as<string>()))
           return true;
     return false;
   }

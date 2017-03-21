@@ -20,17 +20,22 @@ namespace simol
     Lrep_ = tensorBasis(0)->gradMatrix();
     Leta_ = Leq_ - externalForce_ * Lrep_;
     
+    // U is the componants of 1 in the basis and SU is the scalar products of 1 with these elements
+    SU_ = tensorBasis()->basisMeans();
+    
     display(tensorBasis_->gramMatrix(), outputFolderName()+"gramMat");
+    display(Lrep_, outputFolderName()+"Q");
     display(Leq_, outputFolderName()+"Leq");
-    SMat Lsad = shapeSaddle(Leq_);
+    
+    SMat Lsad = shapeSaddle(Leq_, SU_);
     display(Lsad, outputFolderName()+"Lsad");
     //cout << "Leq spectral gap : " << computeSpectralGap(Leq_) << endl;
-    cout << "Lsad spectral gap : " << computeSpectralGap(Lsad) << endl;
+    //cout << "Lsad spectral gap : " << computeSpectralGap(Lsad) << endl;
   }
   
   DVec OverdampedGalerkin::CVcoeffsVec() const
   {
-    //return basisMeans2();
+    //return basisMeans();
     //return getGradV();
     
     /*if (doNonequilibrium())
@@ -45,7 +50,7 @@ namespace simol
       
       /*///TODO : use a matrix free approach to avoid dense matrices
       SMat LtL = Leta_.transpose() * Leta_;
-      DMat DKeta = DMat(LtL) + basisMeans2(0) * basisMeans2(0).transpose();
+      DMat DKeta = DMat(LtL) + basisMeans(0) * basisMeans(0).transpose();
       SMat Keta = DKeta.sparseView();
       //Eigen::LeastSquaresConjugateGradient<SMat> solver(Leta_);
       Eigen::ConjugateGradient<SMat> solver0(Keta);
@@ -67,9 +72,47 @@ namespace simol
       cout << "gramMat : " << gramMat.rows() << " " << gramMat.cols() << endl << gramMat << endl;
       cout << "Leq : " << Leq().rows() << " " << Leq().cols() << endl << Leq() << endl;
       cout << "CVObs : " << CVObservable().rows() << " " << CVObservable().cols() << endl << CVObservable() << endl;
-      DVec LinvObs = solveWithSaddle(Leq(), gramMat * CVObservable());
+      DVec LinvObs = solveWithSaddle(Leq(), gramMat * CVObservable(), SU_);
+      cout << "LinvObs : " << endl << LinvObs << endl;
       return LinvObs;
+      //return CVObservable();
     }
+  }
+  
+  ///
+  ///Finds the eigenvectors of S corresponding to eigenvectors > tol and solves AX=Y on the spanned subspace
+  DVec OverdampedGalerkin::solveResilient(const SMat& A, const DVec& Y) const
+  {    
+    DMat S = tensorBasis()->gramMatrix();
+    ComplexEigenSolver<DMat> ces(S);
+    DVec vapS = ces.eigenvalues().real();
+    DMat vepS = ces.eigenvectors().real();
+    cout << "Eigenvalues of S :" << vapS.adjoint() << endl;
+    //cout << "Eigenvectors of S :" << endl << vepS << endl;
+    DMat C(DMat::Zero(sizeOfBasis(), sizeOfBasis()));
+    C.col(0) = tensorBasis_->basisMeans();
+    double tol = 1e-6;
+    int nbOfSmall = 1;    
+
+    ofstream outSpGramMat(outputFolderName()+"spGramMat", ofstream::app);
+    for (int iOfElt = 0; iOfElt < sizeOfBasis(); iOfElt++)
+    {
+      outSpGramMat << sizeOfBasis() << " " << vapS(iOfElt) << endl;
+      if (vapS(iOfElt) < tol)
+      {
+        //cout << "Addeed col " << iOfElt << " as constraint n" << nbOfSmall << endl;
+        C.col(nbOfSmall) = vepS.col(iOfElt);
+        nbOfSmall++;
+      }
+    }
+    // Becareful the block function does not work "in place"
+    DMat Ctemp = C.leftCols(nbOfSmall); 
+    C = Ctemp;
+    //cout << "C = " << endl << C << endl;
+    //cout << "S = " << endl << S << endl;
+    DVec X = solveWithSaddle(A, S*Y, C);
+    cout << "X = " << endl << X << endl;
+    return X;
   }
   
   // #### PeriodicOverdampedGalerkin ####
@@ -105,10 +148,10 @@ namespace simol
 
     cout << "Computing DLeqInv..."; cout.flush();
     //DMat LeqInvSad = inv(DLeqSad);
-    DMat DLeqInv = invWithSaddle(DLeq);
+    DMat DLeqInv = invWithSaddle(DLeq, SU_);
     cout << "OK" << endl;
     
-    cout << "Norm2basisMeans2 : " << norm2meansVec(0) << endl;
+    cout << "Norm2basisMeans : " << norm2meansVec(0) << endl;
     cout << "Norm of LeqinvSad : " << DLeqInv.norm() << endl;
     cout << "Norm of Leqinv : " << DLeq.inverse().norm() << endl;
     //cout << "Norm of Sinv Leqinv : " << shapePrec(DLeq).inverse().norm() << endl;
@@ -116,12 +159,12 @@ namespace simol
     
     cout << "Computing LeqInv..."; cout.flush();
     //DMat LeqInvSad = inv(DLeqSad);
-    DMat LeqInv = invWithSaddle(Leq_);
+    DMat LeqInv = invWithSaddle(Leq_, SU_);
     cout << "OK" << endl;
     display(DLeqInv, "output/Galerkin/Overdamped/DLeqInv");
     
-    cout << "g   = " << basisMeans2(0) << endl << endl;
-    cout << "L g = " << Leq_ * basisMeans2(0) << endl << endl;
+    cout << "g   = " << basisMeans(0) << endl << endl;
+    cout << "L g = " << Leq_ * basisMeans(0) << endl << endl;
     
     DVec gradV = CVObservable();
     display(gradV, "output/Galerkin/Overdamped/gradV");
@@ -129,7 +172,7 @@ namespace simol
     DVec LinvGradV = solve(Leq_, gradV);
     display(LinvGradV, "output/Galerkin/Overdamped/LinvGradV");
     
-    DVec LinvGradVsad = solveWithSaddle(Leq_, gradV);
+    DVec LinvGradVsad = solveWithSaddle(Leq_, gradV, SU_);
     display(LinvGradVsad, "output/Galerkin/Overdamped/LinvGradVsad");
   }
   
@@ -147,8 +190,9 @@ namespace simol
   ColloidOverdampedGalerkin::ColloidOverdampedGalerkin(Input const& input):
     OverdampedGalerkin(input)
   {    
-    tensorBasis_ = new HermiteHermiteBasis(input, *potential_);
-    
+    //tensorBasis_ = new HermiteHermiteBasis(input, *potential_);
+    tensorBasis_ = new ExpHermiteHermiteBasis(input, *potential_);
+
     createOperators();
   }
   
@@ -157,7 +201,7 @@ namespace simol
     display(Leq_, outputFolderName()+"Leq");
 
     cout << "Computing DLeqInv..."; cout.flush();
-    DMat DLeqInv = invWithSaddle(DMat(Leq_));
+    DMat DLeqInv = invWithSaddle(DMat(Leq_), SU_);
     
 
     cout << "############ LeqInv ############" << endl;
@@ -173,31 +217,28 @@ namespace simol
     SMat gramMat = tensorBasis()->gramMatrix();
     display(gramMat, outputFolderName()+"gramMat");
     
-    DVec qMeans = tensorBasis(0)->basisMeans2();
+    DVec qMeans = tensorBasis(0)->basisMeans();
     display(qMeans, outputFolderName()+"qMeans");
     
     cout << "gramMat : " << gramMat.rows() << " " << gramMat.cols() << endl << gramMat << endl;
     cout << "Leq : " << Leq().rows() << " " << Leq().cols() << endl << Leq() << endl;
     cout << "rObs : " << rObs.rows() << " " << rObs.cols() << endl << rObs << endl;
+    DVec tU = basisMeans(0);
+    cout << "tU : " << endl << tU << endl;
+    //DMat gramMatZero = (DMat)gramMat - U * U.adjoint();
     
-    /*DMat DGramMat = gramMat;
-    JacobiSVD<DMat> svd(DGramMat, ComputeThinU | ComputeThinV);
-    display(, outputFolderName()+"LinvRObsMat");*/
-      
-    DVec LinvRObs = solveWithSaddle(Leq(), gramMat * rObs);
-    cout << "solution vec" << endl << LinvRObs << endl;
+    DVec LinvRObs = solveResilient(Leq(), rObs);
     
-    cout << "coucou" << endl;
     DMat LinvRObsMat = reshape(LinvRObs, nbOfQModes_, nbOfPModes_);
-    cout << "solution mat" << endl << LinvRObsMat << endl;
     display(LinvRObsMat, outputFolderName()+"LinvRObsMat");
   }
   
   ///
-  /// Returns the coefficients of the sinus functions in the G_i * H_j basis
+  /// Returns the coefficients of the function q,p -> q in the G_i * H_j basis
   DVec ColloidOverdampedGalerkin::CVObservable() const
   {
     //throw runtime_error("PeriodicOverdampedGalerkin::getGradV not implemented !");
-    return tensorBasis()->getBasisElement(1,0);  
+    //return tensorBasis()->getBasisElement(1,0);  
+    return tensorBasis(0)->getMonome1();
   }
 }

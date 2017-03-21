@@ -49,7 +49,8 @@ namespace simol
   //friend   Basis* createBasis(Input const& input, Potential& potential);
   protected:
     int nbOfElts_;
-    DVec basisMeans2_;
+    DVec basisMeans_;
+    DVec constantFctCoeffs_;
     //double norm2meansVec_;
     double beta_;
     
@@ -59,8 +60,10 @@ namespace simol
     virtual ~Basis() {};
     virtual int const& nbOfElts() const;
     virtual int& nbOfElts();
-    virtual double basisMean2(int iOfElt) const;
-    virtual DVec const& basisMeans2() const;
+    virtual double basisMean(int iOfElt) const;
+    virtual DVec const& basisMeans() const;
+    virtual double constantFctCoeff(int iOfElt) const;
+    virtual DVec const& constantFctCoeffs() const;
     virtual double norm2meansVec() const;
     SMat const& gramMatrix() const {return gramMatrix_;}
     SMat const& gradMatrix() const {return gradMatrix_;}
@@ -81,7 +84,11 @@ namespace simol
     //virtual double xGradStarY(int iOfElementLeft, int iOfElementRight) const;
     virtual double xLaplacianY(int iOfElementLeft, int iOfElementRight) const = 0;
     virtual void computeLaplacianMatrix();
-    virtual double const& omega() const {throw runtime_error("gamma not defined !");};
+    virtual double const& omega() const {throw runtime_error("omega not defined !");}
+    virtual double const& beta() const {return beta_;}
+    
+    virtual DVec getMonome0() const = 0;
+    virtual DVec getMonome1() const = 0;
   };
   
   class QBasis : public Basis
@@ -130,6 +137,9 @@ namespace simol
     virtual double xY(int iOfEltLeft, int iOfEltRight) const;
     virtual double xGradY(int iOfElementLeft, int iOfElementRight) const;
     virtual double xLaplacianY(int iOfElementLeft, int iOfElementRight) const;
+    
+    virtual DVec getMonome0() const {throw runtime_error("Monome0 not implemented for a peridoic system !");}
+    virtual DVec getMonome1() const {throw runtime_error("Monome1 not implemented for a peridoic system !");}
   };
   
   class HermiteQBasis : public QBasis
@@ -155,6 +165,48 @@ namespace simol
     
     virtual void computeGradMatrix();
     virtual void computeLaplacianMatrix();
+    
+    virtual DVec getMonome0() const;
+    virtual DVec getMonome1() const;
+  };
+  
+  class ExpHermiteBasis : public QBasis
+  {
+  public:
+    double length_;
+    double qMin_;
+    double omega_;
+    DMat polyCoeffs_;
+    int potWDegree_;
+    DMat productXMat_, productWdMat_, productWddMat_;
+  public:    
+    ExpHermiteBasis(Input const& input, Potential& potential);
+    
+    virtual double length() const;
+    double potentialW(double variable) const;
+    double potWDeriv(double variable) const;
+    double potWLapla(double variable) const;
+    //virtual DVec const& expFourierCoeffs() const;
+    //virtual double expFourierCoeff(int iOfElt) const;
+        
+    virtual void computeMeasureMomenta();
+    virtual void computeBasisMeans();
+    virtual double const& omega() const {return omega_;}
+    //void computeExpToTrigMat();
+    
+    //DMat const& expToTrigMat() const {return expToTrigMat_;}
+    //DMat const& trigToExpMat() const {return trigToExpMat_;}
+      
+    virtual double value(double variable, int iOfElt) const;
+    virtual DVec gradient(double variable, int iOfElt) const;
+    virtual double laplacian(double variable, int iOfElt) const;
+    
+    virtual double xY(int iOfEltLeft, int iOfEltRight) const;
+    virtual double xGradY(int iOfElementLeft, int iOfElementRight) const;
+    virtual double xLaplacianY(int iOfElementLeft, int iOfElementRight) const;
+    
+    virtual DVec getMonome0() const;
+    virtual DVec getMonome1() const;
   };
 
   class HermiteBasis : public Basis
@@ -169,6 +221,9 @@ namespace simol
     virtual double xY(int iOfEltLeft, int iOfEltRight) const;
     virtual double xGradY(int iOfElementLeft, int iOfElementRight) const;
     virtual double xLaplacianY(int iOfElementLeft, int iOfElementRight) const;
+    
+    virtual DVec getMonome0() const;
+    virtual DVec getMonome1() const;
   };
 
   class TensorBasis
@@ -187,8 +242,11 @@ namespace simol
     virtual vector<int> nbOfElts() const;
     virtual int totalNbOfElts() const;
     virtual DVec basisMeans() const;
-    virtual double basisMean2(int iOfVariable, int iOfElt) const;
-    virtual DVec const& basisMeans2(int iOfVariable) const;
+    virtual double basisMean(int iOfVariable, int iOfElt) const;
+    virtual DVec const& basisMeans(int iOfVariable) const;
+    virtual DVec constantFctCoeffs() const;
+    virtual double constantFctCoeff(int iOfVariable, int iOfElt) const;
+    virtual DVec const& constantFctCoeffs(int iOfVariable) const;
     virtual double norm2meansVec(int iOfVariable) const;
     SMat gramMatrix() const;
     
@@ -251,6 +309,12 @@ namespace simol
   {
   public:
     HermiteHermiteBasis(Input const& input, Potential& potential);
+  };
+  
+  class ExpHermiteHermiteBasis : public QPBasis
+  {
+  public:
+    ExpHermiteHermiteBasis(Input const& input, Potential& potential);
   };
 
 

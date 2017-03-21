@@ -39,6 +39,7 @@ namespace simol
       SMat trigToExpTens_, expToTrigTens_;
       Potential* potential_;
       TensorBasis* tensorBasis_;
+      DVec SU_;
       
       string outputFolderName_;
       //Basis* basis_;
@@ -63,45 +64,38 @@ namespace simol
       SMat const& Leq() const {return Leq_;}
       SMat const& Leta() const {return Leta_;}
 
-      double basisMean2(int iOfVariable, int iOfElt) const;
-      const DVec& basisMeans2(int iOfVariable) const;
+      double basisMean(int iOfVariable, int iOfElt) const;
+      const DVec& basisMeans(int iOfVariable) const;
       /*DVec const& gVector() const;
       double gVector(int iOfElt) const;*/
       double norm2meansVec(int iOfVariable) const;
       int iTens(int iOfFourier2, int iOfHermite) const;
       string outputFolderName() const {return outputFolderName_;}
       
-      DMat shapeSaddle(const DMat& A) const;
-      SMat shapeSaddle(const SMat& A) const;
-      DMat unshapeSaddle(const DMat& Asad) const;
-      SMat unshapeSaddle(const SMat& Asad) const;
-      DVec shapeSaddle(const DVec& X) const;
-      DVec unshapeSaddle(const DVec& Xsad) const;
+      DMat shapeSaddle(const DMat& A, const DMat& C) const;
+      SMat shapeSaddle(const SMat& A, const DMat& C) const;
+      DMat unshapeSaddle(const DMat& Asad, const DMat& C) const;
+      SMat unshapeSaddle(const SMat& Asad, const DMat& C) const;
+      DVec shapeSaddle(const DVec& X, const DMat& C) const;
+      DVec unshapeSaddle(const DVec& Xsad, const DMat& C) const;
       DVec solve(const DMat& A, const DVec& X) const;
       DVec solve(const SMat& A, const DVec& X) const;
       DVec solveWithGuess(const SMat& A, const DVec& X, DVec const& X0) const;
-      DVec solveWithSaddle(const DMat& A, const DVec& X) const;
-      DVec solveWithSaddle(const SMat& A, const DVec& X) const;
-      DVec solveWithSaddleAndGuess(const SMat& A, const DVec& X, const DVec& X0) const;
-      DMat invWithSaddle(const SMat& A) const;
-      DMat invWithSaddle(const DMat& A) const;
+      DVec solveWithSaddle(const DMat& A, const DVec& X, const DMat& C) const;
+      DVec solveWithSaddle(const SMat& A, const DVec& X, const DMat& C) const;
+      DVec solveWithSaddleAndGuess(const SMat& A, const DVec& X, const DVec& X0, const DMat& C) const;
+      DMat invWithSaddle(const SMat& A, const DMat& C) const;
+      DMat invWithSaddle(const DMat& A, const DMat& C) const;
       
       Eigen::EigenSolver<Eigen::MatrixXd> getEigenSolver() const;
 
-      //virtual void computeExpToTrigTens() = 0;
-      //DMat convertToTrigBasis(const DMat& X);
       DVec projectionOrthoG(DVec const& X) const;
       virtual void compute() = 0;
+      virtual DMat computeConstraints(double tol) const;
       void studyLangevinErrors(bool doComputeRef);
-
-      /*DVec gettGiHj(int i, int j) const;
-      DVec gettGiHjTrig(int i, int j) const;
-      DVec getLtGiHj(int i, int j) const;
-      DVec getLtGiHjTrig(int i, int j) const;
-      DVec getLinvtGiHj(int i, int j) const;
-      DVec getLinvtGiHjTrig(int i, int j) const;*/
+      void studyColloidLangevinErrors(bool doComputeRef);
       
-      //SMat CVcoeffs() const;
+      virtual DVec CVObservable() const = 0;
       virtual DVec CVcoeffsVec() const = 0;
       CVBasis makeCvBasis();
         
