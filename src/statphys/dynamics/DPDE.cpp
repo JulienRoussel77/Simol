@@ -15,6 +15,7 @@ namespace simol
     cutOff_(input.cutOffRatio()*input.potentialSigma()),
     rejectionRate_(0),
     doMetropolis_(input.doMetropolis()),
+    doProjectionDPDE_(input.doProjectionDPDE()),
     MTSfrequency_(input.MTSfrequency()),
     initialInternalTemperature_(input.initialInternalTemperature()),
     rejectionCountFD_(0),
@@ -81,6 +82,16 @@ namespace simol
   int& DPDE::MTSfrequency()
   {
     return MTSfrequency_;
+  }
+
+  bool& DPDE::doProjectionDPDE()
+  {
+    return doProjectionDPDE_;
+  }
+
+  const bool& DPDE::doProjectionDPDE() const
+  {
+    return doProjectionDPDE_;
   }
 
   //-- for 1D systems --

@@ -142,37 +142,42 @@ namespace simol
     cout << " Time step            : " << timeStep_ << endl;
     //-- specific screen outputs --
     if (input.dynamicsName() == "DPDE")
-    {
-      if (input.MTSfrequency() != 1)
-        cout << " -- Multiple timestepping (stoch. part DPDE): " << input.MTSfrequency() << endl;
-      if (input.doMetropolis())
-        cout << " With Metropolis correction" << endl;
-      else 
-        cout << " No Metropolis correction" << endl;
-      cout << endl;
-      if (input.heatCapacityEinstein() > input.heatCapacity())
-        {
-          cout << " -- blended Einstein model for micro EOS " << endl; 
-          cout << " Baseline heat capacity        : " << input.heatCapacity() << endl;
-          cout << " Limiting heat capacity        : " << input.heatCapacityEinstein() << endl;
-          cout << " Einstein temperature          : " << input.einsteinTemperature() << endl;
-        }
-      else
-        {
-          cout << " -- classical micro EOS " << endl;
-          cout << " Heat capacity        : " << input.heatCapacity() << endl;
-        }
-      if ( (input.initialInternalTemperature() != input.temperature()) & (input.thermalizationNbOfSteps() > 0) )
-        {
-          cout << endl;
-          cout << " NONEQUILIBRIUM equilibration dynamics" << endl;
-        }
-    }
+      {
+	cout << endl;
+	if (input.MTSfrequency() != 1)
+	  cout << " -- Multiple timestepping (stoch. part DPDE): " << input.MTSfrequency() << endl;
+	if (input.doMetropolis())
+	  cout << " With Metropolis correction" << endl;
+	else 
+	  cout << " No Metropolis correction" << endl;
+	if (input.doProjectionDPDE())
+	  cout << " With projection for energies" << endl;
+	else 
+	  cout << " No projection" << endl;
+	cout << endl;
+	if (input.heatCapacityEinstein() > input.heatCapacity())
+	  {
+	    cout << " -- blended Einstein model for micro EOS " << endl; 
+	    cout << " Baseline heat capacity        : " << input.heatCapacity() << endl;
+	    cout << " Limiting heat capacity        : " << input.heatCapacityEinstein() << endl;
+	    cout << " Einstein temperature          : " << input.einsteinTemperature() << endl;
+	  }
+	else
+	  {
+	    cout << " -- classical micro EOS " << endl;
+	    cout << " Heat capacity        : " << input.heatCapacity() << endl;
+	  }
+	if ( (input.initialInternalTemperature() != input.temperature()) & (input.thermalizationNbOfSteps() > 0) )
+	  {
+	    cout << endl;
+	    cout << " NONEQUILIBRIUM equilibration dynamics" << endl;
+	  }
+      }
     if (input.systemName() == "NBody" && input.doCellMethod())
-    {
-      cout << endl;
-      cout << " Using the method of cells " << endl;
-    }
+      {
+	cout << endl;
+	cout << " Using the method of cells " << endl;
+      }
     cout << " Period between light outputs    : " << input.printPeriodTime() << endl;
     cout << " Period between heavy outputs    : " << input.printLongPeriodTime() << endl;
     cout << endl;

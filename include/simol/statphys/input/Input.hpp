@@ -88,6 +88,7 @@ namespace simol
     double gamma() const;
     double temperature() const;
     bool doMetropolis() const;
+    bool doProjectionDPDE() const;
     bool doMTS() const;
     //double temperatureLeft() const;
     //double temperatureRight() const;
