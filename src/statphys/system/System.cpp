@@ -164,6 +164,26 @@ namespace simol
   ///
   ///Read-only accessor for the first parameter of the potential
   double const& System::potParameter2() const {return potential_->parameter2();}
+  
+  ///
+  /// Returns a matrix containing the force vectors of all the particles
+  DMat System::forces() const
+  {
+    DMat F = DMat::Zero(dimension(), nbOfParticles());
+    for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
+      F.col(iOfParticle) = getParticle(iOfParticle).force();
+    return F;
+  }
+  
+  ///
+  /// Returns a matrix containing the momenta vectors of all the particles
+  DMat System::momenta() const
+  {
+    DMat P = DMat::Zero(dimension(), nbOfParticles());
+    for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
+      P.col(iOfParticle) = getParticle(iOfParticle).momentum();
+    return P;
+  }
 
   ///
   ///Draw a momentum under the invariant measure at inverse temperature "localBeta"

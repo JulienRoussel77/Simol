@@ -115,19 +115,19 @@ namespace simol
   {
     return basisMeans_;
     //throw std::runtime_error("Basis::basisMean is not implemented");
-  };
+  }
   
   double Basis::basisMean(int iOfElt) const
   {
     return basisMeans_[iOfElt];
     //throw std::runtime_error("Basis::basisMean is not implemented");
-  };
-  
+  }
+ 
   DVec const& Basis::constantFctCoeffs() const
   {
     return constantFctCoeffs_;
     //throw std::runtime_error("Basis::basisMean is not implemented");
-  };
+  }
   
   double Basis::constantFctCoeff(int iOfElt) const
   {
@@ -621,22 +621,50 @@ namespace simol
     length_(input.integrationLength()),
     qMin_(input.integrationQMin()),
     omega_(input.omegaHermite()),
-    polyCoeffs_(DMat::Zero(nbOfElts_, nbOfElts_)),
-    productXMat_(DMat::Zero(nbOfElts_, nbOfElts_)),
+    center_(input.potentialCenter()),
+    largerSize_(nbOfElts_ + potential_->polynomialCoeffs().rows()),
+    largerBasisMeans_(DVec::Zero(largerSize_)),
+    largerMeasureMomenta_(DVec::Zero(largerSize_)),
+    polyCoeffs_(DMat::Zero(largerSize_, largerSize_)),
+    productXMat_(DMat::Zero(largerSize_, largerSize_)),
     productWdMat_(DMat::Zero(nbOfElts_, nbOfElts_)),
     productWddMat_(DMat::Zero(nbOfElts_, nbOfElts_))
   {
     if (length_ == 0)
       throw runtime_error("The integration length is set to zero !");
     cout << "ExpHermiteBasis::ExpHermiteBasis" << endl;
+    
+    //We compute the repartition function of the marginal measure in position
+    qRepartitionFct_ = exp(-beta_ * potential(center()));
+    double sigma = 0; // Second order momenta of the invariante measure
+    //ofstream test("testest");
+    for (int iOfNode = 0; iOfNode <= nbOfIntegrationSteps()/2; iOfNode++)
+    {
+      double dq = (iOfNode+1) * integrationStep_;
+      double sumExp = exp(-beta_ * potential(center() + dq)) + exp(-beta_ * potential(center() - dq));
+      qRepartitionFct_ += sumExp;
+      sigma += pow(dq, 2) * sumExp;
+      //test << dq << " " << potential(center() + dq) << " " << potDeriv(center() + dq) << " " << potLapla(center() + dq) << endl;
+      //test << -dq << " " << potential(center()- dq) << " " << potDeriv(center() - dq) << " " << potLapla(center() - dq) << endl;
+    }
+    qRepartitionFct_ *= integrationStep_;
+    sigma *= integrationStep_ / qRepartitionFct_;
+    if (omega_ <= 0)
+    {
+      omega_ = 1 / sigma;
+      cout << "Hermite modes omega automatically fixed to " << omega_ << endl;
+    }
+    else
+      cout << "Hermite modes omega manualy fixed to " << omega_ << endl;
+    
     polyCoeffs_(0, 0) = 1;
     polyCoeffs_(1, 1) = sqrt(omega_);
-    for (int iOfElt = 2; iOfElt < (int)nbOfElts_; iOfElt++)
+    for (int iOfElt = 2; iOfElt < largerSize_; iOfElt++)
       for (int iOfCoeff = 0; iOfCoeff <= iOfElt; iOfCoeff++)
         polyCoeffs_(iOfElt, iOfCoeff) = (iOfCoeff ? (sqrt(omega_ / iOfElt) * polyCoeffs_(iOfElt - 1, iOfCoeff - 1)) : 0) - sqrt((iOfElt - 1) / (double)iOfElt) * polyCoeffs_(iOfElt - 2, iOfCoeff);
   
     // We initialize the matrix of the operator phi(x) -> x*phi(x) in the ExpHermite basis
-    for (int iOfElt = 0; iOfElt < (int)nbOfElts_; iOfElt++)
+    for (int iOfElt = 0; iOfElt < largerSize_; iOfElt++)
     {
       if (iOfElt!=0)            
         productXMat_(iOfElt-1, iOfElt) = sqrt(iOfElt/(beta_*omega()));
@@ -657,14 +685,19 @@ namespace simol
     for (int iOfOrder = 1; iOfOrder < potWDegree_; iOfOrder++)
       potWddPolyCoeffs[iOfOrder-1] = iOfOrder * potWdPolyCoeffs[iOfOrder];
     cout << "potWddPolyCoeffs : " << potWddPolyCoeffs.adjoint() << endl;
-    cout << "productWdMat_ : " << endl << productWdMat_ << endl;
+    //DMat tempMat = DMat::Zero(largerSize_, largerSize_);
+    largerProductWdMat_ = DMat::Zero(largerSize_, largerSize_);
     for (int iOfOrder = potWDegree_-1; iOfOrder >= 0; iOfOrder--)
-      productWdMat_ = productXMat_ * productWdMat_ + potWdPolyCoeffs[iOfOrder]*DMat::Identity(nbOfElts_, nbOfElts_);
-    
+      largerProductWdMat_ = productXMat_ * largerProductWdMat_ + potWdPolyCoeffs[iOfOrder]*DMat::Identity(largerSize_, largerSize_);   
+    productWdMat_ = largerProductWdMat_.topLeftCorner(nbOfElts(), nbOfElts());
+    DMat tempMat = DMat::Zero(largerSize_, largerSize_);
+    for (int iOfOrder = potWDegree_-2; iOfOrder >= 0; iOfOrder--)
+      tempMat = productXMat_ * tempMat + potWddPolyCoeffs[iOfOrder]*DMat::Identity(largerSize_, largerSize_);   
+    productWddMat_ = tempMat.topLeftCorner(nbOfElts(), nbOfElts());
     cout << "productXMat_ : " << endl << productXMat_ << endl;
-    cout << "productWdMat_ : " << endl << productWdMat_ << endl;
-    
-    cout << "AtA : " << endl << productWdMat_ * productWdMat_ << endl;
+    //cout << "productWdMat_ : " << endl << productWdMat_ << endl;
+    cout << "largerProductWdMat_ : " << endl << largerProductWdMat_ << endl;
+    cout << "productWddMat_ : " << endl << productWddMat_ << endl;
     
     computeMeasureMomenta();
     computeGramMatrix();
@@ -678,20 +711,33 @@ namespace simol
     return length_;
   }
   
+  double const& ExpHermiteBasis::center() const
+  {
+    return center_;
+  }
+  
+  /*DVec ExpHermiteBasis::basisMeans() const
+  {
+    return basisMeans_.head(nbOfElts());
+    //throw std::runtime_error("Basis::basisMean is not implemented");
+  }*/
+  
   double ExpHermiteBasis::potentialW(double variable) const
   {
-    return potential_->value(variable) - omega()/2 * pow(variable,2);
+    return potential_->value(variable) - omega()/2 * pow(variable-center(),2);
   }
 
   double ExpHermiteBasis::potWDeriv(double variable) const
   {
-    return (potential_->gradient(variable))(0) - omega() * variable;
+    return (potential_->gradient(variable))(0) - omega() * (variable-center());
   }
 
   double ExpHermiteBasis::potWLapla(double variable) const
   {
     return potential_->laplacian(variable) - omega();
   }
+  
+  
   
   /*DVec const& ExpHermiteBasis::expFourierCoeffs() const
   {
@@ -705,53 +751,46 @@ namespace simol
   
     void ExpHermiteBasis::computeMeasureMomenta()
   {
-    //double step = (length_/2) / (double)nbOfIntegrationNodes_;
-    
-    //We compute the repartition function of the marginal measure in position
-    qRepartitionFct_ = exp(-beta_ * potential(0));
-    for (int iOfNode = 0; iOfNode <= nbOfIntegrationSteps()/2; iOfNode++)
-    {
-      double q = (iOfNode+1) * integrationStep_;
-      qRepartitionFct_ += exp(-beta_ * potential(q)) + exp(-beta_ * potential(-q));
-      //cout << q << " -> " << potential(q) << " " << qRepartitionFct_ << endl;
-    }
-    qRepartitionFct_ *= integrationStep_;
-    
-    //We compute the quantities \int q^n sqrt(G/nu) d nu
+    //We compute the quantities \int (q-center)^n sqrt(G/nu) d nu
     // Trapeze integration
-    measureMomenta_(0) += exp(-beta_ * potential(0));
+    largerMeasureMomenta_(0) += exp(-beta_ * potential(0));
     for (int iOfNode = 0; iOfNode <= nbOfIntegrationSteps()/2; iOfNode++)
     {
-      double q = (iOfNode+1) * integrationStep_;
-      double betaPotPos = beta_/2 * (potential(q) + omega()/2*pow(q,2));
-      double betaPotNeg = beta_/2 * (potential(-q) + omega()/2*pow(q,2));
+      double dq = (iOfNode+1) * integrationStep_;
+      double betaPotPos = beta_/2 * (potential(center()+dq) + omega()/2*pow(dq,2));
+      double betaPotNeg = beta_/2 * (potential(center()-dq) + omega()/2*pow(dq,2));
       //double logq = (q!=0)?log(pow(q,2))/2:-1000;
-      double logq = log(q);
+      double logq = log(dq);
       //cout << "q=" << q << " logq = " << logq << " betaPotPos=" << betaPotPos << " betaPotNeg=" << betaPotNeg<< endl;
-      for (int iOfElt = 0; iOfElt < 2*nbOfElts()-1; iOfElt++)
+      //for (int iOfElt = 0; iOfElt < 2*nbOfElts()-1; iOfElt++)
+      for (int iOfElt = 0; iOfElt < largerSize_; iOfElt++)
       {
         if (iOfElt%2==0)
-          measureMomenta_(iOfElt) += exp(iOfElt * logq - betaPotNeg) + exp(iOfElt * logq - betaPotPos);
+          largerMeasureMomenta_(iOfElt) += exp(iOfElt * logq - betaPotNeg) + exp(iOfElt * logq - betaPotPos);
         else
-          measureMomenta_(iOfElt) += -exp(iOfElt * logq - betaPotNeg) + exp(iOfElt * logq - betaPotPos);
+          largerMeasureMomenta_(iOfElt) += -exp(iOfElt * logq - betaPotNeg) + exp(iOfElt * logq - betaPotPos);
       }
     }
     double gaussianRepFct = sqrt(2*M_PI / (beta_ * omega()));
     cout << "gaussian rep function : " << gaussianRepFct << endl;
     cout << "nu rep function : " << qRepartitionFct_ << endl;
     cout << "ratio = " << qRepartitionFct_ / gaussianRepFct << endl;
-    measureMomenta_ *= integrationStep_;
-    cout << "measureMomenta before repFct :" << endl << measureMomenta_ << endl;
-    measureMomenta_ /= sqrt(gaussianRepFct*qRepartitionFct_);
+    largerMeasureMomenta_ *= integrationStep_;
+    cout << "measureMomenta before repFct :" << endl << largerMeasureMomenta_ << endl;
+    largerMeasureMomenta_ /= sqrt(gaussianRepFct*qRepartitionFct_);
     basisCoefficient_ = sqrt(qRepartitionFct_ / gaussianRepFct);
-    cout << "end computeMeasureMomenta :" << endl << measureMomenta_ << endl;
+    cout << "end computeMeasureMomenta :" << endl << largerMeasureMomenta_ << endl;
     cout << "qRepartitionFct_ = " << qRepartitionFct_ << endl;
+    measureMomenta_ = largerMeasureMomenta_.head(nbOfElts());
   }
   
   void ExpHermiteBasis::computeBasisMeans()
   {   
-    for (int iOfElt = 0; iOfElt < nbOfElts(); iOfElt++)
-      basisMeans_[iOfElt] = dot(polyCoeffs_.row(iOfElt), measureMomenta_.head(nbOfElts()+1));
+    //basisMeans_ = DVec::Zero(largerSize_);
+    for (int iOfElt = 0; iOfElt < largerSize_; iOfElt++)
+      largerBasisMeans_[iOfElt] = dot(polyCoeffs_.row(iOfElt), largerMeasureMomenta_);
+    basisMeans_ = largerBasisMeans_.head(nbOfElts());
+    cout << "norm of basisMeans : " << basisMeans_.norm() << " < " << largerBasisMeans_.norm() << endl;
     constantFctCoeffs_ = basisMeans_;
     
     cout << "basisMeans_ :" << endl << basisMeans_ << endl;
@@ -762,20 +801,24 @@ namespace simol
     if (iOfElt < 0) return 0;
     double result = 0;
     for (int iOfCoeff = 0; iOfCoeff <= iOfElt; iOfCoeff++)
-      result += polyCoeffs_(iOfElt, iOfCoeff) * pow(variable, iOfCoeff);
+      result += polyCoeffs_(iOfElt, iOfCoeff) * pow(variable-center(), iOfCoeff);
     double expo = basisCoefficient_ * exp(beta_/2 * potentialW(variable));
     return result * expo;
   }
 
   DVec ExpHermiteBasis::gradient(double variable, int iOfElt) const
   {
+    //double derivate = 0;
     double derivate = sqrt(beta_ * omega() * iOfElt) * value(variable, iOfElt-1) 
                       + beta_ /2 *  potWDeriv(variable) * value(variable, iOfElt);
+    //cout << "gradient : " << variable << " " << iOfElt << " -> " << derivate;
+    //cout << " ( " << value(variable, iOfElt) << " , " << potWDeriv(variable) << " ) " << endl;
     return DVec::Constant(1, derivate);
   }
 
   double ExpHermiteBasis::laplacian(double variable, int iOfElt) const
   {
+    //return 0;
     double potWDer = potWDeriv(variable);
     return beta_ * (omega() * sqrt(iOfElt*(iOfElt-1)) * value(variable, iOfElt-2) 
                     + sqrt(beta_*omega()*iOfElt)*potWDer * value(variable, iOfElt-1) 
@@ -791,7 +834,7 @@ namespace simol
   // Computes <H_n, \partial_p H_m>
   double ExpHermiteBasis::xGradY(int iOfEltLeft, int iOfEltRight) const
   {
-    return (iOfEltLeft+1 == iOfEltRight) * sqrt(beta_ * omega() * iOfEltRight) + beta_/2 * productWdMat_(iOfEltLeft, iOfEltRight);
+    return (iOfEltLeft+1 == iOfEltRight) * sqrt(beta_ * omega() * iOfEltRight) + beta_/2 * largerProductWdMat_(iOfEltLeft, iOfEltRight);
   }
   
   // Compute <H_n, \partial_p H_m>
@@ -799,7 +842,7 @@ namespace simol
   {
     double result = 0;
     //for (int iOfElt = max(iOfEltLeft, iOfEltRight) - potWDegree_; iOfElt <= min(iOfEltLeft, iOfEltRight) + potWDegree_; iOfElt++)
-    for (int iOfElt = 0; iOfElt < nbOfElts(); iOfElt++)
+    for (int iOfElt = 0; iOfElt < largerSize_; iOfElt++)
       result += xGradY(iOfElt, iOfEltLeft) * xGradY(iOfElt, iOfEltRight);
     return result;
   }  
@@ -811,7 +854,10 @@ namespace simol
   
   DVec ExpHermiteBasis::getMonome1() const
   {
-    return productXMat_ * basisMeans();
+    //cout << "getMonome1" << endl;
+    //cout << "productXMat_ :" << endl << productXMat_ << endl << "largerBasisMeans_:" << endl << largerBasisMeans_ << endl;
+    //cout << "XMat " << endl << productXMat_ << endl << endl << "times basisMeans : " << endl << basisMeans() << endl;
+    return (productXMat_ * largerBasisMeans_).head(nbOfElts());
   }
   
 // #### HermiteBasis ####
@@ -1043,64 +1089,64 @@ namespace simol
     return vecIndex;
   }
 
-  double QPBasis::value(System const& syst, int iOfElt) const
+  double QPBasis::value(DVec const& variables, int iOfElt) const
   {
     vector<int> vecIndex = vecTens(iOfElt);
-    return value(syst, vecIndex);
+    return value(variables, vecIndex);
   }
 
-  double QPBasis::value(System const& syst, vector<int>& vecIndex) const
+  double QPBasis::value(DVec const& variables, vector<int>& vecIndex) const
   {
-    //cout << syst(0).position(0) << " " << bases_[0]->value(syst(0).position(0), vecIndex[0]) << " " << bases_[1]->value(syst(0).momentum(0), vecIndex[1]) << endl;
-    return bases_[0]->value(syst(0).position(0), vecIndex[0]) * bases_[1]->value(syst(0).momentum(0), vecIndex[1]);
+    //cout << variables(0) << " " << bases_[0]->value(variables(0), vecIndex[0]) << " " << bases_[1]->value(variables(1), vecIndex[1]) << endl;
+    return bases_[0]->value(variables(0), vecIndex[0]) * bases_[1]->value(variables(1), vecIndex[1]);
   }
 
-  DVec QPBasis::gradientQ(System const& syst, int /*iOfParticle*/, vector<int>& vecIndex) const
+  DMat QPBasis::gradientQ(DVec const& variables, vector<int>& vecIndex) const
   {
-    return bases_[0]->gradient(syst(0).position(0), vecIndex[0])
-           * bases_[1]->value(syst(0).momentum(0), vecIndex[1]);
+    return bases_[0]->gradient(variables(0), vecIndex[0])
+           * bases_[1]->value(variables(1), vecIndex[1]);
   }
 
-  DVec QPBasis::gradientQ(System const& syst, int iOfParticle, int iOfCoeff) const
-  {
-    vector<int> vecIndex = vecTens(iOfCoeff);
-    return gradientQ(syst, iOfParticle, vecIndex);
-  }
-
-  double QPBasis::laplacianQ(System const& syst, int /*iOfParticle*/, vector<int>& vecIndex) const
-  {
-    return bases_[0]->laplacian(syst(0).position(0), vecIndex[0])
-           * bases_[1]->value(syst(0).momentum(0), vecIndex[1]);
-  }
-
-  double QPBasis::laplacianQ(System const& syst, int iOfParticle, int iOfCoeff) const
+  DMat QPBasis::gradientQ(DVec const& variables, int iOfCoeff) const
   {
     vector<int> vecIndex = vecTens(iOfCoeff);
-    return laplacianQ(syst, iOfParticle, vecIndex);
+    return gradientQ(variables, vecIndex);
   }
 
-  DVec QPBasis::gradientP(System const& syst, int /*iOfParticle*/, vector<int>& vecIndex) const
+  double QPBasis::laplacianQ(DVec const& variables, vector<int>& vecIndex) const
   {
-    return bases_[0]->value(syst(0).position(0), vecIndex[0])
-           * bases_[1]->gradient(syst(0).momentum(0), vecIndex[1]);
+    return bases_[0]->laplacian(variables(0), vecIndex[0])
+           * bases_[1]->value(variables(1), vecIndex[1]);
   }
 
-  DVec QPBasis::gradientP(System const& syst, int iOfParticle, int iOfCoeff) const
-  {
-    vector<int> vecIndex = vecTens(iOfCoeff);
-    return gradientP(syst, iOfParticle, vecIndex);
-  }
-
-  double QPBasis::laplacianP(System const& syst, int /*iOfParticle*/, vector<int>& vecIndex) const
-  {
-    return bases_[0]->value(syst(0).position(0), vecIndex[0])
-           * bases_[1]->laplacian(syst(0).momentum(0), vecIndex[1]);
-  }
-
-  double QPBasis::laplacianP(System const& syst, int iOfParticle, int iOfCoeff) const
+  double QPBasis::laplacianQ(DVec const& variables, int iOfCoeff) const
   {
     vector<int> vecIndex = vecTens(iOfCoeff);
-    return laplacianP(syst, iOfParticle, vecIndex);
+    return laplacianQ(variables, vecIndex);
+  }
+
+  DMat QPBasis::gradientP(DVec const& variables, vector<int>& vecIndex) const
+  {
+    return bases_[0]->value(variables(0), vecIndex[0])
+           * bases_[1]->gradient(variables(1), vecIndex[1]);
+  }
+
+  DMat QPBasis::gradientP(DVec const& variables, int iOfCoeff) const
+  {
+    vector<int> vecIndex = vecTens(iOfCoeff);
+    return gradientP(variables, vecIndex);
+  }
+
+  double QPBasis::laplacianP(DVec const& variables, vector<int>& vecIndex) const
+  {
+    return bases_[0]->value(variables(0), vecIndex[0])
+           * bases_[1]->laplacian(variables(1), vecIndex[1]);
+  }
+
+  double QPBasis::laplacianP(DVec const& variables, int iOfCoeff) const
+  {
+    vector<int> vecIndex = vecTens(iOfCoeff);
+    return laplacianP(variables, vecIndex);
   }
   
   DVec QPBasis::getBasisElement(int iOfElt1, int iOfElt2) const
@@ -1156,6 +1202,7 @@ namespace simol
     bases_[0] = new ExpHermiteBasis(input, potential);
     bases_[1] = new HermiteBasis(input);
   }
+
 }
 
 

@@ -11,10 +11,11 @@ using std::endl;
 namespace simol
 {
 
-  Potential::Potential() {}
+  Potential::Potential(){}
 
   Potential::Potential(Input const & input):
-    externalForce_(DVec::Zero(input.dimension()))
+    externalForce_(DVec::Zero(input.dimension())),
+    center_(input.potentialCenter())
   {
     externalForce_(0) = input.externalForce();
     //if (externalForce_(0) != 0)
@@ -121,6 +122,18 @@ namespace simol
     return laplacian(DVec::Constant(1,1, position));
   }
   
+  ///
+  /// Ratio used in the rejection method
+  double Potential::shiftToHarmonic() const
+  {
+    throw std::invalid_argument("Potential::shiftToHarmonic : Function undefined");
+  }
+  
+  double Potential::drawLaw(double localBeta, std::shared_ptr<RNG>& rng) const
+  {
+    return drawLaw(localBeta, rng, 0);
+  }
+  
   
   double Potential::operator()(DVec const & position, int /*type*/) const
   {return operator()(position);}  
@@ -147,37 +160,30 @@ namespace simol
   double Potential::laplacian(double position, int /*type*/) const
   {return laplacian(position);}
       
-      
+
 
   ///
   /// Ratio used in the rejection method
-  double Potential::shiftToHarmonic() const
+  double Potential::shiftToHarmonic(int /*type*/) const
   {
-    throw std::invalid_argument("Potential::shiftToHarmonic : Function undefined");
+    return shiftToHarmonic();
   }
   
   ///
   ///sampling using the rejection method
-  //double Potential::drawLaw(double /*localBeta*/, std::shared_ptr<RNG>& /*rng*/) const
-  //{
-  //  throw std::invalid_argument("Potential::drawLaw : Function undefined");
-  //}
-  
-  ///
-  ///sampling using the rejection method
-  double Potential::drawLaw(double localBeta, std::shared_ptr<RNG>& rng) const
+  double Potential::drawLaw(double localBeta, std::shared_ptr<RNG>& rng, int type) const
   {
-    double ratio = shiftToHarmonic();
+    double ratio = shiftToHarmonic(type);
     bool reject = true;
     double xdraw, udraw;
     while (reject)
     {
-      xdraw = rng->scalarGaussian() / sqrt(localBeta);
+      xdraw = center_ + rng->scalarGaussian() / sqrt(localBeta);
       //cout << ratio << " " << exp(-localBeta * (pow(xdraw, 2)/2 + ratio)) << " " << exp(- localBeta * potential_->value(xdraw)) << endl;
       //cout << xdraw << " " << localBeta * pow(xdraw, 2)/2 - ratio << " >= " << localBeta * potential_->value(xdraw) << endl;
       udraw = rng->scalarUniform();
 
-      reject = (udraw > exp(- localBeta * (value(xdraw) + pow(xdraw, 2) / 2 - ratio)));
+      reject = (udraw > exp(- localBeta * (value(xdraw, type) + pow(xdraw, 2) / 2 - ratio)));
       //cout << reject << " " << xdraw << " " << ydraw << endl << endl;
       assert(exp(-localBeta * (pow(xdraw, 2) / 2 - ratio)) >= exp(- localBeta * value(xdraw)));
     }

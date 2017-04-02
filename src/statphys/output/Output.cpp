@@ -516,6 +516,9 @@ namespace simol
                      << " " << syst(iOfParticle).energy()
                      << " " << syst(iOfParticle).force().transpose()
                      << endl; 
+                     
+    //ofstream test("distance", std::ofstream::app);
+    //test << (syst(1).position() - syst(0).position()).norm() << endl;                 
   }
   
   ///

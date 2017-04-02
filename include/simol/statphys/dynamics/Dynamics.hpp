@@ -76,11 +76,11 @@ namespace simol
       
       //-- control variates --
       Galerkin* galerkin();
-      //shared_ptr<CVBasis> cvBasis() {return galerkin_?make_shared<CVBasis>(galerkin_->makeCvBasis()):nullptr;}
-      shared_ptr<CVBasis> cvBasis();
+      shared_ptr<CVBasis> createCvBasis(Input const& input) {return galerkin_?(galerkin_->createCvBasis(input)):nullptr;}
+      //shared_ptr<CVBasis> cvBasis();
       //return CVBasis(dynamic_cast<TensorBasis*>(&basis_), make_shared<DVec>(CVcoeffsVec()));
       
-      virtual void computeGeneratorOnBasis(CVBasis&, System const&) const {};
+      virtual void computeGeneratorOnBasis(shared_ptr<CVBasis>, System const&) const {};
       
       //-- output functions --
       virtual void computeKineticEnergy(Output& output, System const& syst) const;

@@ -5,7 +5,7 @@
 #include "simol/statphys/TensorTools.hpp"
 #include "simol/statphys/potential/Potential.hpp"
 #include "simol/statphys/system/Particle.hpp"
-#include "simol/statphys/system/System.hpp"
+//#include "simol/statphys/system/System.hpp"
 
 namespace simol
 {
@@ -176,13 +176,19 @@ namespace simol
     double length_;
     double qMin_;
     double omega_;
+    double center_;
+    int largerSize_;
+    DVec largerBasisMeans_, largerMeasureMomenta_;
     DMat polyCoeffs_;
     int potWDegree_;
     DMat productXMat_, productWdMat_, productWddMat_;
+    DMat largerProductWdMat_;
   public:    
     ExpHermiteBasis(Input const& input, Potential& potential);
     
     virtual double length() const;
+    double const& center() const;
+    //virtual DVec const& basisMeans() const;
     double potentialW(double variable) const;
     double potWDeriv(double variable) const;
     double potWLapla(double variable) const;
@@ -252,16 +258,16 @@ namespace simol
     
     const Basis* operator()(int iOfBasis) const;
     Basis* operator()(int iOfBasis);
-    virtual double value(System const& syst, int iOfElt) const = 0;
-    virtual double value(System const& syst, vector<int>& vecIndex) const = 0;
-    virtual DVec gradientQ(System const& syst, int iOfParticle, int iOfCoeff) const = 0;
-    virtual DVec gradientQ(System const& syst, int iOfParticle, vector<int>& vecIndex) const = 0;
-    virtual double laplacianQ(System const& syst, int iOfParticle, int iOfCoeff) const = 0;
-    virtual double laplacianQ(System const& syst, int iOfParticle, vector<int>& vecIndex) const = 0;
-    virtual DVec gradientP(System const& syst, int iOfParticle, int iOfCoeff) const = 0;
-    virtual DVec gradientP(System const& syst, int iOfParticle, vector<int>& vecIndex) const = 0;
-    virtual double laplacianP(System const& syst, int iOfParticle, int iOfCoeff) const = 0;
-    virtual double laplacianP(System const& syst, int iOfParticle, vector<int>& vecIndex) const = 0;
+    virtual double value(DVec const& variables, int iOfElt) const = 0;
+    virtual double value(DVec const& variables, vector<int>& vecIndex) const = 0;
+    virtual DMat gradientQ(DVec const& variables, int iOfCoeff) const = 0;
+    virtual DMat gradientQ(DVec const& variables, vector<int>& vecIndex) const = 0;
+    virtual double laplacianQ(DVec const& variables, int iOfCoeff) const = 0;
+    virtual double laplacianQ(DVec const& variables, vector<int>& vecIndex) const = 0;
+    virtual DMat gradientP(DVec const& variables, int iOfCoeff) const = 0;
+    virtual DMat gradientP(DVec const& variables, vector<int>& vecIndex) const = 0;
+    virtual double laplacianP(DVec const& variables, int iOfCoeff) const = 0;
+    virtual double laplacianP(DVec const& variables, vector<int>& vecIndex) const = 0;
     
     virtual DVec getBasisElement(int iOfElt1, int iOfElt2) const = 0;
     ///
@@ -279,16 +285,16 @@ namespace simol
     const int& nbOfPModes() const;
     int iTens(int iOfFourier2, int iOfHermite) const;
     vector<int> vecTens(int iTens0) const;
-    virtual double value(System const& syst, int iOfElt) const;
-    virtual double value(System const& syst, vector<int>& vecIndex) const;
-    virtual DVec gradientQ(System const& syst, int iOfParticle, int iOfCoeff) const;
-    virtual DVec gradientQ(System const& syst, int iOfParticle, vector<int>& vecIndex) const;
-    virtual double laplacianQ(System const& syst, int iOfParticle, int iOfCoeff) const;
-    virtual double laplacianQ(System const& syst, int iOfParticle, vector<int>& vecIndex) const;
-    virtual DVec gradientP(System const& syst, int iOfParticle, int iOfCoeff) const;
-    virtual DVec gradientP(System const& syst, int iOfParticle, vector<int>& vecIndex) const;
-    virtual double laplacianP(System const& syst, int iOfParticle, int iOfCoeff) const;
-    virtual double laplacianP(System const& syst, int iOfParticle, vector<int>& vecIndex) const;
+    virtual double value(DVec const& variables, int iOfElt) const;
+    virtual double value(DVec const& variables, vector<int>& vecIndex) const;
+    virtual DMat gradientQ(DVec const& variables, int iOfCoeff) const;
+    virtual DMat gradientQ(DVec const& variables, vector<int>& vecIndex) const;
+    virtual double laplacianQ(DVec const& variables, int iOfCoeff) const;
+    virtual double laplacianQ(DVec const& variables, vector<int>& vecIndex) const;
+    virtual DMat gradientP(DVec const& variables, int iOfCoeff) const;
+    virtual DMat gradientP(DVec const& variables, vector<int>& vecIndex) const;
+    virtual double laplacianP(DVec const& variables, int iOfCoeff) const;
+    virtual double laplacianP(DVec const& variables, vector<int>& vecIndex) const;
     
     virtual DVec getBasisElement(int iOfElt1, int iOfElt2) const;
     virtual DVec getPartialElement(int iOfVariable, int iOfElt) const;

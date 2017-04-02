@@ -16,6 +16,7 @@ namespace simol
     int& nbOfColloidParticles();
     virtual void interaction(Particle& particle1, Particle& particle2) const;
     virtual void computeAllForces();
+    virtual void samplePositions(DynamicsParameters const& dynaPara);
     
     virtual double length() const;
     

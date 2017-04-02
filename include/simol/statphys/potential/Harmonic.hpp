@@ -17,7 +17,6 @@ namespace simol
       virtual DVec polynomialCoeffs() const;
     private:
       double stiffness_;
-      double center_;
   };
 
 }

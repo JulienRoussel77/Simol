@@ -5,8 +5,7 @@ namespace simol
 
   Harmonic::Harmonic(Input const & input):
     Potential(input),
-    stiffness_(input.potentialStiffness()),
-    center_(input.potentialCenter())
+    stiffness_(input.potentialStiffness())
   {}
 
 
@@ -26,14 +25,16 @@ namespace simol
 
   double Harmonic::drawLaw(double localBeta, std::shared_ptr<RNG>& rng) const
   {
-    return rng->scalarGaussian() / sqrt(localBeta);
+    return center_ + rng->scalarGaussian() / sqrt(localBeta);
   }
   
   DVec Harmonic::polynomialCoeffs() const
   {
     DVec coeffs(DVec::Zero(3));
-    coeffs[0] = pow(center_, 2)/2;
+    /*coeffs[0] = pow(center_, 2)/2;
     coeffs[1] = - center_;
+    coeffs[2] = 1./2;*/
+    
     coeffs[2] = 1./2;
     
     return stiffness_ * coeffs;

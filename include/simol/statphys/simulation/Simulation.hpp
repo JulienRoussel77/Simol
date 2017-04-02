@@ -72,7 +72,7 @@ namespace simol
     rng_(std::make_shared<RNG>(RNG(input.seed(), input.dimension()))),
     system_(createSystem(input)),
     dynamics_(input),
-    output_(input, dynamics_.cvBasis())
+    output_(input, dynamics_.createCvBasis(input))
   {
     if (input.dynamicsName() != dynamics_.dynamicsName()) 
       throw std::runtime_error("Dynamics generated incompatible with the input file !");
@@ -117,6 +117,7 @@ namespace simol
   void sampleSystem(D& dyna, S& syst)
   {
     cout << " Initialization of the system..." << endl;
+    cout << "sampleSystem : " << syst(0).position().adjoint() << endl;
 
     if (!syst.doSetting())
     {
@@ -139,6 +140,7 @@ namespace simol
     cout << endl;
 
     syst.computeAllForces();
+    cout << "sampleSystem : " << syst(0).position().adjoint() << endl;
   }
   
 

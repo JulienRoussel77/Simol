@@ -9,11 +9,9 @@ namespace simol
     nbOfColloidParticles_(nbOfColloidParticles0)
   {
     assert (nbOfColloidParticles_ <= nbOfParticles());
-    for (int iOfParticle = nbOfColloidParticles_; iOfParticle < nbOfParticles(); iOfParticle++)
+    for (int iOfParticle = 0; iOfParticle < nbOfColloidParticles(); iOfParticle++)
       getParticle(iOfParticle).type() = 1;
     
-    //getParticle(45).type() = 1;
-    //getParticle(56).type() = 1;
   }
   
   int const& Colloid::nbOfColloidParticles() const
@@ -30,6 +28,7 @@ namespace simol
     //if ((particle1.type() == 1) || (particle2.type() == 1))
     //  cout << particle1.type() << " x " << particle2.type() << " -> " << interactionType << endl;
     // take closest periodic image
+    if (particle1.type() != particle2.type()) return;
     DVec r12 = periodicImage(particle1.position() - particle2.position());
     //DVec r12 = particle1.position() - particle2.position();
     double distance = r12.norm();
@@ -49,6 +48,23 @@ namespace simol
     
     //cout << "inter : " << distance << " " << energy12 << " " << force12 << endl;
     //cout << "--> " << particle1.position().adjoint() << " v " << particle2.position().adjoint() << " -> f= " << particle1.force().adjoint() << endl;
+  }
+  
+  void Colloid::samplePositions(DynamicsParameters const& dynaPara)
+  {
+    NBody::samplePositions(dynaPara);
+    
+
+    DVec q0 = getParticle(0).position();
+    DVec q1 = getParticle(1).position();
+    DVec r10 = q1 - q0;
+    r10 /= r10.norm();
+    DVec qMid = (q0+q1)/2;
+    double dist = potential_->drawLaw(dynaPara.beta(), rng_, 1);
+    cout << "  -> colloid length : " << dist << endl;
+    getParticle(0).position() = qMid - dist/2 * r10;
+    getParticle(1).position() = qMid + dist/2 * r10;
+    
   }
   
   void Colloid::computeAllForces()

@@ -217,7 +217,7 @@ namespace simol
     nbOfParticles_(input.nbOfParticles()),
     nbOfQModes_(input.nbOfQModes()),  //ex : 5
     nbOfPModes_(input.nbOfPModes()),
-    sizeOfBasis_(pow(nbOfQModes_ * nbOfPModes_, nbOfParticles_)),
+    sizeOfBasis_(nbOfQModes_ * nbOfPModes_),
     SIdQ_(nbOfQModes_, nbOfQModes_),
     SIdP_(nbOfPModes_, nbOfPModes_),
     DIdQ_(DMat::Identity(nbOfQModes_, nbOfQModes_)),
@@ -243,7 +243,7 @@ namespace simol
     expToTrigMat_(DMat::Zero(nbOfQModes_, nbOfQModes_)),
     trigToExpTens_(sizeOfBasis_, sizeOfBasis_),
     expToTrigTens_(sizeOfBasis_, sizeOfBasis_),
-    potential_(createPotential(input)),
+    potential_(createGalerkinPotential(input)),
     tensorBasis_(nullptr),
     outputFolderName_(input.outputFolderName())
   {
@@ -252,6 +252,9 @@ namespace simol
     cout << "Output written in " << outputFolderName() << endl;
     SIdQ_.setIdentity();
     SIdP_.setIdentity();
+    
+    //cout << "GalerkinPotential : " << input.secondPotentialName() << endl;
+    //cout << potential_->value(-1) << " " << potential_->value(0) << " " << potential_->value(1) << " " << endl;
 
     // Computation of the passage matrix
     /*computeExpToTrigMat();
@@ -328,9 +331,37 @@ namespace simol
     return EigenSolver<MatrixXd>(DLeta);
   }
   
-  CVBasis Galerkin::makeCvBasis()
+  shared_ptr<CVBasis> Galerkin::createCvBasis(Input const& input)
   {
-    return CVBasis(dynamic_cast<TensorBasis*>(tensorBasis_), make_shared<DVec>(CVcoeffsVec()));
+    TensorBasis* tensBasis = tensorBasis_;
+    shared_ptr<DVec> cvcoeffs = make_shared<DVec>(CVcoeffsVec());
+    //return new IsolatesCVBasis(dynamic_cast<TensorBasis*>(tensorBasis_), make_shared<DVec>(CVcoeffsVec()));
+    
+    if (input.systemName() == "Colloid")
+      return make_shared<ColloidCVBasis>(tensBasis, cvcoeffs);
+    else
+      return make_shared<IsolatedCVBasis>(tensBasis, cvcoeffs);
+      
+    /*if (input.doGalerkinCV())
+    {
+        if (input.dynamicsName() == "Overdamped")
+        {
+          if (input.potentialName() == "Sinusoidal") return new PeriodicOverdampedGalerkin(input);
+          else if (input.potentialName() == "DoubleWell" || input.potentialName() == "Harmonic" || input.potentialName() == "TwoTypes") return new ColloidOverdampedGalerkin(input);
+          else throw runtime_error("This potential matches no Galerkin method !");
+        }
+        else if (input.dynamicsName() == "Langevin")
+        {
+          if (input.potentialName() == "Sinusoidal") return new PeriodicLangevinGalerkin(input);
+          else if (input.potentialName() == "DoubleWell" || input.potentialName() == "Harmonic") return new ColloidLangevinGalerkin(input);
+          else throw runtime_error("This potential matches no Galerkin method !");
+        }
+        //else if (input.dynamicsName() == "BoundaryLangevin") return new BoundaryLangevinGalerkin(input);
+        else throw runtime_error("This dynamics matches no Galerkin method !");
+      }
+    else
+      return nullptr;
+  }*/
   }
   
   ///

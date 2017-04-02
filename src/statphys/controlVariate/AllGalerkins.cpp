@@ -10,7 +10,7 @@ namespace simol
         if (input.dynamicsName() == "Overdamped")
         {
           if (input.potentialName() == "Sinusoidal") return new PeriodicOverdampedGalerkin(input);
-          else if (input.potentialName() == "DoubleWell" || input.potentialName() == "Harmonic") return new ColloidOverdampedGalerkin(input);
+          else if (input.potentialName() == "DoubleWell" || input.potentialName() == "Harmonic" || input.potentialName() == "TwoTypes") return new ColloidOverdampedGalerkin(input);
           else throw runtime_error("This potential matches no Galerkin method !");
         }
         else if (input.dynamicsName() == "Langevin")

@@ -47,7 +47,6 @@ namespace simol
   {
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
       dyna.updatePosition(syst(iOfParticle));
-    
     syst.computeAllForces();
   }
   
@@ -138,7 +137,7 @@ namespace simol
   void computeControlVariate(Dynamics const& dyna, System const& syst, Output& output)
   {
     output.cvBasis_->computeValueBasis(syst);
-    dyna.computeGeneratorOnBasis(*output.cvBasis_, syst);
+    dyna.computeGeneratorOnBasis(output.cvBasis_, syst);
   }
   
   //------------------- writeOutput and its specifications by dynamics ---------------------------

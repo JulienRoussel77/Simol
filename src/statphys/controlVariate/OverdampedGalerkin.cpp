@@ -72,10 +72,11 @@ namespace simol
       cout << "gramMat : " << gramMat.rows() << " " << gramMat.cols() << endl << gramMat << endl;
       cout << "Leq : " << Leq().rows() << " " << Leq().cols() << endl << Leq() << endl;
       cout << "CVObs : " << CVObservable().rows() << " " << CVObservable().cols() << endl << CVObservable() << endl;
+      cout << "Starting solveWithSaddle" << endl;
       DVec LinvObs = solveWithSaddle(Leq(), gramMat * CVObservable(), SU_);
       cout << "LinvObs : " << endl << LinvObs << endl;
-      return LinvObs;
       //return CVObservable();
+      return LinvObs;
     }
   }
   

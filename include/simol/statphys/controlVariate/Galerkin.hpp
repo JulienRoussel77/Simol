@@ -97,7 +97,7 @@ namespace simol
       
       virtual DVec CVObservable() const = 0;
       virtual DVec CVcoeffsVec() const = 0;
-      CVBasis makeCvBasis();
+      shared_ptr<CVBasis> createCvBasis(Input const& input);
         
       void computeEigen() const;
   };

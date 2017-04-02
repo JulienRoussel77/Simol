@@ -35,6 +35,9 @@ namespace simol
       virtual DVec potentialForce(double position) const;
       virtual double laplacian(DVec const & position) const;
       virtual double laplacian(double position) const;
+      
+      virtual double shiftToHarmonic() const;
+      virtual double drawLaw(double /*localBeta*/, std::shared_ptr<RNG>& /*rng*/) const;
  
       virtual double operator()(DVec const & position, int type) const;
       virtual double operator()(double position, int type) const;
@@ -49,8 +52,9 @@ namespace simol
       virtual double laplacian(DVec const & position, int type) const;
       virtual double laplacian(double position, int type) const;
       
-      virtual double shiftToHarmonic() const;
-      virtual double drawLaw(double /*localBeta*/, std::shared_ptr<RNG>& /*rng*/) const;
+      virtual double shiftToHarmonic(int type) const;
+      virtual double drawLaw(double /*localBeta*/, std::shared_ptr<RNG>& /*rng*/, int type) const;
+      
       virtual double harmonicForce(double dist) const;
       virtual double harmonicStiffness() const;
       virtual double harmonicEquilibrium() const;
@@ -60,7 +64,7 @@ namespace simol
     protected:
       Potential();
       DVec externalForce_;
-
+      double center_;
   };
 
 }

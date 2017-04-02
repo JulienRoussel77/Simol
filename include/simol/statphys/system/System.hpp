@@ -118,6 +118,9 @@ namespace simol
     double const& externalForce(const int& i) const;
     double const& potParameter1() const;
     double const& potParameter2() const;
+    
+    DMat forces() const;
+    DMat momenta() const;
 
     //-- sampling of initial configurations --
     virtual DVec drawMomentum(double localBeta, double mass);

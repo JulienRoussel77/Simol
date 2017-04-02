@@ -12,12 +12,12 @@ namespace simol
       DoubleWell(Input const& input);
       double operator()(double position) const;
       DVec gradient(double position) const;
+      double laplacian(double position) const;
       virtual double shiftToHarmonic() const;
       virtual DVec polynomialCoeffs() const;
     private:
-      double height_;
       double interWell_;
-      double center_;
+      double coeff_;
   };
 
 }

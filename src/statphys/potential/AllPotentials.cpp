@@ -38,6 +38,16 @@ namespace simol
     return createPotential(input, input.potentialName());
   }
   
+  ///
+  ///Returns a pointer toward a 1D potential, suitable for Galerkin computation
+  Potential* createGalerkinPotential(Input const& input)
+  {
+    if (input.potentialName() == "TwoTypes")
+      return createPotential(input, input.secondPotentialName());
+    else
+      return createPotential(input, input.potentialName());
+  }
+  
   
   TwoTypes::TwoTypes(Input const & input): 
     Potential(input)
@@ -60,6 +70,24 @@ namespace simol
       return firstPot_->gradient(position);
     else
       return secondPot_->gradient(position);
+  }
+  
+  ///
+  /// Ratio used in the rejection method
+  double TwoTypes::shiftToHarmonic(int type) const
+  {
+    if (type == 0)
+      return firstPot_->shiftToHarmonic();
+    else
+      return secondPot_->shiftToHarmonic();
+  }
+  
+  double TwoTypes::drawLaw(double localBeta, std::shared_ptr<RNG>& rng, int type) const
+  {
+    if (type == 0)
+      return firstPot_->drawLaw(localBeta, rng, type);
+    else
+      return secondPot_->drawLaw(localBeta, rng, type);
   }
 
 }
