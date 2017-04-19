@@ -74,7 +74,7 @@ namespace simol
   
   void BoundaryLangevin::computeProfileBiChain(Output& output, System const& syst, long int iOfStep) const
   {    
-    double nu2 = pow(syst.potential().harmonicFrequency() / output.constGamma_, 2);
+    double nu2 = pow(syst.pairPotential().harmonicFrequency() / output.constGamma_, 2);
     
     static bool outbool = true;
     if (outbool)
@@ -92,13 +92,13 @@ namespace simol
     {
       //Particle& particle = configuration_[iOfParticle];
       double dist = syst(iOfParticle+1).position(0) - syst(iOfParticle).position(0);        // dist is r_iOfParticle
-      double distPrev = (iOfParticle == 0) ? (syst(0).momentum(0)/(output.constGamma_)) : (nu2*(syst(iOfParticle).position(0) - syst(iOfParticle-1).position(0) - syst.potential().harmonicEquilibrium()));
-      double distNext = (iOfParticle == syst.nbOfParticles() - 2) ? (-syst(syst.nbOfParticles() - 1).momentum(0)/(output.constGamma_)) : (nu2*(syst(iOfParticle+2).position(0) - syst(iOfParticle+1).position(0) - syst.potential().harmonicEquilibrium()));
+      double distPrev = (iOfParticle == 0) ? (syst(0).momentum(0)/(output.constGamma_)) : (nu2*(syst(iOfParticle).position(0) - syst(iOfParticle-1).position(0) - syst.pairPotential().harmonicEquilibrium()));
+      double distNext = (iOfParticle == syst.nbOfParticles() - 2) ? (-syst(syst.nbOfParticles() - 1).momentum(0)/(output.constGamma_)) : (nu2*(syst(iOfParticle+2).position(0) - syst(iOfParticle+1).position(0) - syst.pairPotential().harmonicEquilibrium()));
       
       //double distPrev = (iOfParticle == 0) ? 0 : (syst(iOfParticle).position(0) - syst(iOfParticle-1).position(0));
       //double distNext = (iOfParticle == syst.nbOfParticles() - 2) ? 0 : (syst(iOfParticle+2).position(0) - syst(iOfParticle+1).position(0));
       
-      double harmonicForce = syst.potential().harmonicForce(dist);
+      double harmonicForce = syst.pairPotential().harmonicForce(dist);
 
       /*if (iOfParticle == 0)
       {

@@ -44,7 +44,8 @@ namespace simol
   void Overdamped::computeGeneratorOnBasis(shared_ptr<CVBasis> cvBasis, System const& syst) const
   {
     /*cout << "computeGeneratorOnBasis : totalNbOfElts = " << cvBasis->totalNbOfElts() << endl;
-    cout << "p : " << endl << cvBasis->pVariable(syst) << endl;
+    //cout << "p : " << endl << cvBasis->pVariable(syst) << endl;
+    cout << "r : " << endl << cvBasis->qVariable(syst) << endl;
     cout << "f : " << endl << cvBasis->forces(syst) << endl;*/
     cvBasis->generatorOnBasisValues_ = DVec::Zero(cvBasis->totalNbOfElts());
     //DVec result = DVec::Zero(nbOfFunctions());

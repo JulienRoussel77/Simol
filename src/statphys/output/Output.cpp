@@ -25,7 +25,7 @@ namespace simol
     constGamma_(input.gamma()),
     constXi_(input.xi()),
     constTauBending_(input.tauBending()),
-    constExternalForce_(input.externalForce()),
+    constNonEqForce_(input.nonEqForce()),
     constNbOfQModes_(input.nbOfQModes()),
     constNbOfPModes_(input.nbOfPModes()),
     totalEnergy_(0),
@@ -132,7 +132,8 @@ namespace simol
     cout << " Simulation of : " << endl;
     cout << "    System    : " << input.systemName() << endl;
     cout << "    Dynamics  : " << input.dynamicsName() << endl;
-    cout << "    Potential : " << input.potentialName() << endl;
+    cout << "    ExternalPotential : " << input.externalPotentialName() << endl;
+    cout << "    PairPotential : " << input.pairPotentialName() << endl;
     cout << endl;
     cout << " Number of particles  : " << nbOfParticles_ << endl;
     if (nbOfSteps_ < 1e6)
@@ -547,7 +548,7 @@ namespace simol
                         << " " << setw(5) << timeStep()
                         << " " << setw(6) << nbOfParticles()
                         << " " << setw(4) << constTemperature_
-                        << " " << setw(6) << constExternalForce_
+                        << " " << setw(6) << constNonEqForce_
                         << " " << setw(3) << constNbOfQModes_
                         << " " << setw(3) << constNbOfPModes_
                         << " " << setw(12) << obsVelocity().mean()

@@ -180,7 +180,7 @@ namespace simol
     int largerSize_;
     DVec largerBasisMeans_, largerMeasureMomenta_;
     DMat polyCoeffs_;
-    int potWDegree_;
+    int potWdDegree_;
     DMat productXMat_, productWdMat_, productWddMat_;
     DMat largerProductWdMat_;
   public:    

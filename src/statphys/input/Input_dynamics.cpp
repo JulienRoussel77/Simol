@@ -8,7 +8,6 @@ const double defaultSeed = 0;
 const double defaultGamma = 1;
 const double defaultXi = 0;
 const double defaultDeltaTemperature = 0;
-const double defaultExternalForce = 0;
 const double defaultTauBending = 0;
 const double defaultKappa = 0; 
 const int    defaultMTSfrequency = 1;
@@ -100,13 +99,6 @@ namespace simol
     else return defaultDeltaTemperature;
   }
 
-  double Input::externalForce() const
-  {
-    if (data["Dynamics"]["Force"])
-      return data["Dynamics"]["Force"].as<double>();
-    else return defaultExternalForce;
-  }
-
   double Input::tauBending() const
   {
     if (data["Dynamics"]["Tau"])
@@ -136,7 +128,7 @@ namespace simol
     if (sameLetters(dynamicsName(), "BoundaryLangevin"))
       return deltaTemperature();
     else
-      return externalForce();
+      return nonEqForce();
   }
 
   double Input::kappa() const

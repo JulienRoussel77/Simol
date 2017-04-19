@@ -24,6 +24,9 @@ namespace simol
       TwoTypes(Input const& input);
       double operator()(double position, int type) const;
       DVec gradient(double position, int type) const;
+      DVec gradient(double position) const;
+      DVec potentialForce(double position, int type) const;
+      DVec potentialForce(double position) const;
       
       virtual double shiftToHarmonic(int type) const;
       virtual double drawLaw(double localBeta, std::shared_ptr<RNG>& rng, int type) const;

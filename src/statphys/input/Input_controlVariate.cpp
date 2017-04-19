@@ -28,6 +28,15 @@ namespace simol
 
     return "None";
   }
+  
+  string Input::galerkinPotentialName() const
+  {
+    if (data["Galerkin"])
+      if (data["Galerkin"]["PotentialName"])
+        return data["Galerkin"]["PotentialName"].as<string>();
+
+    return externalPotentialName();
+  }
 
   string Input::controlVariateCoeffsPath() const
   {

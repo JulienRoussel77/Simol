@@ -375,7 +375,7 @@ namespace simol
   void NBody::computeAllForces()
   {
     for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
-      getParticle(iOfParticle).resetForce(potential());
+      getParticle(iOfParticle).resetForce(externalPotential());
     if (doCells_)
     {
       //-- reinitialize cells before looping on the pair interactions --
@@ -401,11 +401,11 @@ namespace simol
     DVec r12 = periodicImage(particle1.position() - particle2.position());
     double distance = r12.norm();
     // compute energy
-    double energy12 = potential(distance);
+    double energy12 = pairPotential()(distance);
     particle1.potentialEnergy() += energy12 / 2;
     particle2.potentialEnergy() += energy12 / 2;
     // compute forces
-    double force12 = potentialForce(distance)(0);
+    double force12 = pairPotential().potentialForce(distance)(0);
     r12 /= distance;
     particle1.force() += force12 * r12;
     particle2.force() -= force12 * r12;

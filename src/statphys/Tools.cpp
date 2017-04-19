@@ -64,6 +64,14 @@ DVec rint(DVec const& u)
   return v;
 }
 
+DVec polynomialDerivative(DVec const& P)
+{
+  DVec Q = DVec::Zero(P.rows() - 1);
+  for (int iOfOrder = 1; iOfOrder < P.rows(); iOfOrder++)
+    Q[iOfOrder-1] = iOfOrder * P[iOfOrder];
+  return Q;
+}
+
 DVec polynomialProduct(DVec const& P, DVec const& Q)
 {
   DVec PQ(DVec::Zero(P.rows() + Q.rows() - 1));
@@ -74,6 +82,14 @@ DVec polynomialProduct(DVec const& P, DVec const& Q)
       PQ(iOfCoeffP + iOfCoeffQ) += P(iOfCoeffP) * Q(iOfCoeffQ);
     }
   return PQ;
+}
+
+double extendedLog(double value)
+{
+  if (value > 0)
+    return log(value);
+  else
+    return -std::numeric_limits<double>::infinity();
 }
 
 

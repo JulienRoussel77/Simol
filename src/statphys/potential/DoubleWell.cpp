@@ -16,6 +16,16 @@ namespace simol
     //test << position << " " << coeff_ * pow(position - center_ - interWell_ / 2, 2) * pow(position - center_ + interWell_ / 2, 2) << endl;
     return coeff_ * pow(position - center_ - interWell_ / 2, 2) * pow(position - center_ + interWell_ / 2, 2);
   }
+  
+  double DoubleWell::symmetricValue(double position) const
+  {
+    return value(position);
+  }
+  
+  double DoubleWell::skewsymmetricValue(double /*position*/) const
+  {
+    return 0;
+  }
 
   DVec DoubleWell::gradient(double position) const
   {
@@ -33,7 +43,7 @@ namespace simol
     return (2 * pow(interWell_, 2)*coeff_ + 1) / (16 * coeff_);
   }
   
-  DVec DoubleWell::polynomialCoeffs() const
+  DVec DoubleWell::polyCoeffs() const
   {
     DVec coeffs(DVec::Zero(5));
     /*coeffs[0] = pow(center_, 4) - pow(center_*interWell_, 2)/2 + pow(interWell_/2, 4);
@@ -47,5 +57,42 @@ namespace simol
     coeffs[4] = 1;
     
     return coeff_ * coeffs;
+  }
+  
+  
+  DoubleWellFE::DoubleWellFE(Input const & input):
+    DoubleWell(input),
+    dimension_(input.dimension())
+  {}
+  
+  double DoubleWellFE::operator()(double distance) const
+  { 
+    return DoubleWell::operator()(distance) - (dimension_-1) * extendedLog(distance);
+  }
+  
+  double DoubleWellFE::symmetricValue(double position) const
+  {
+    return DoubleWell::operator()(position) - (dimension_-1)/2 * (extendedLog(position) + extendedLog(2*center_ - position));
+  }
+  
+  double DoubleWellFE::skewsymmetricValue(double position) const
+  {
+    return -(dimension_-1)/2 * (extendedLog(position) - extendedLog(2*center_ - position));
+  }
+
+  DVec DoubleWellFE::gradient(double distance) const
+  {
+    return DoubleWell::gradient(distance) - DVec::Constant(1,1, (dimension_-1) / distance);
+    //return DVec::Constant(1, stiffness_ * (distance - sigmaPot_));
+  }
+
+  double DoubleWellFE::laplacian(double distance) const
+  {
+    return DoubleWell::laplacian(distance) + (dimension_-1) * pow(distance, -2);
+  }
+  
+  double DoubleWellFE::inverseCoeff() const
+  {
+    return dimension_-1;
   }
 }

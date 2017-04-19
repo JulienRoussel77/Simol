@@ -65,8 +65,11 @@ namespace simol
 
     //-- Potential --
     string potentialName() const;
+    string externalPotentialName() const;
+    string pairPotentialName() const;
     string firstPotentialName() const;
     string secondPotentialName() const;
+    string galerkinPotentialName() const;
     //Sinus
     double amplitude() const;
     //DoubleWell
@@ -96,7 +99,7 @@ namespace simol
     //double betaLeft() const;
     //double betaRight() const;
     double deltaTemperature() const;
-    double externalForce() const;
+    double nonEqForce() const;
     double tauBending() const;
     double xi() const;
     int seed() const;

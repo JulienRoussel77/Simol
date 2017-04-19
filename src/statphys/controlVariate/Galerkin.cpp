@@ -235,7 +235,7 @@ namespace simol
     beta_(input.beta()),
     gamma_(input.gamma()),
     amplitude_(input.amplitude()),
-    externalForce_(input.externalForce()),
+    externalForce_(input.nonEqForce()),
     doNonequilibrium_(input.doGalerkinNonequilibrium()),
     nbOfIntegrationNodes_(1000),
     //expFourierMeans_(2 * nbOfQModes_, 0),
@@ -243,7 +243,7 @@ namespace simol
     expToTrigMat_(DMat::Zero(nbOfQModes_, nbOfQModes_)),
     trigToExpTens_(sizeOfBasis_, sizeOfBasis_),
     expToTrigTens_(sizeOfBasis_, sizeOfBasis_),
-    potential_(createGalerkinPotential(input)),
+    potential_(createPotential(input, input.galerkinPotentialName())),
     tensorBasis_(nullptr),
     outputFolderName_(input.outputFolderName())
   {

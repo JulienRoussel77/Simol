@@ -101,8 +101,10 @@ namespace simol
   {
     DVec q0(DVec::Zero(dimension()));
     if (data["System"]["Setting"])
+    {
       if (data["System"]["Setting"]["Position"])
         q0(0) = data["System"]["Setting"]["Position"].as<double>();
+    }
     else if (doRestart() && iOfParticle >= 0)
     {
       // the initial positions have been read in the constructor of Input()
@@ -116,8 +118,10 @@ namespace simol
   {
     DVec p0(DVec::Zero(dimension()));
     if (data["System"]["Setting"])
+    {
       if (data["System"]["Setting"]["Momentum"])
         p0(0) =  data["System"]["Setting"]["Momentum"].as<double>();
+    }
     else if (doRestart() && iOfParticle >= 0)
     {
       // the initial positions have been read in the constructor of Input()

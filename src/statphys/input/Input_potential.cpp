@@ -11,13 +11,59 @@ const double defaultSigmaLJ = 1.;
 const double defaultSplineRatio = 0.8;
 const double defaultCutOffRatio = 2.5;
 const double defaultPotentialCenter = 0;
+const double defaultNonEqForce = 0;
 
 namespace simol
 {
 
-  string Input::potentialName() const {return data["Potential"]["Name"].as<string>();}
-  string Input::firstPotentialName() const {return data["Potential"]["FirstType"].as<string>();}
-  string Input::secondPotentialName() const {return data["Potential"]["SecondType"].as<string>();}
+  string Input::potentialName() const 
+  {
+    if (pairPotentialName() != "None")
+      return pairPotentialName();
+    else
+      return externalPotentialName();
+  }
+  
+    //return data["Potential"]["Name"].as<string>();}
+    
+  string Input::externalPotentialName() const
+  {
+    if (data["Potential"]["External"])
+      //if (data["Potential"]["External"]["Name"])
+      return data["Potential"]["External"].as<string>();
+    else 
+      return "None";
+  }
+  
+  string Input::pairPotentialName() const
+  {
+    if (data["Potential"]["Pair"])
+      //if (data["Potential"]["Pair"]["Name"])
+      return data["Potential"]["Pair"].as<string>();
+    else return "None";
+  }
+  
+  string Input::firstPotentialName() const 
+  {
+    if (data["Potential"]["FirstType"])
+      return data["Potential"]["FirstType"].as<string>();
+    else return "None";
+  }
+  
+  string Input::secondPotentialName() const
+  {
+    if (data["Potential"]["SecondType"])
+      return data["Potential"]["SecondType"].as<string>();
+    else return "None";
+  }
+  
+  
+  double Input::nonEqForce() const
+  {
+    if (data["Dynamics"]["NonEqForce"])
+      return data["Dynamics"]["NonEqForce"].as<double>();
+    else return defaultNonEqForce;
+  }
 
   //--- Sinusoidal ---
   double Input::amplitude() const

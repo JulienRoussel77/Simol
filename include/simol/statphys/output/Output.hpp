@@ -200,7 +200,7 @@ namespace simol
     double constGamma_;
     double constXi_;
     double constTauBending_;
-    double constExternalForce_;
+    double constNonEqForce_;
     int constNbOfQModes_;
     int constNbOfPModes_;
     

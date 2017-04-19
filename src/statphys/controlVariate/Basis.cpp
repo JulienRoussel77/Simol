@@ -622,7 +622,7 @@ namespace simol
     qMin_(input.integrationQMin()),
     omega_(input.omegaHermite()),
     center_(input.potentialCenter()),
-    largerSize_(nbOfElts_ + potential_->polynomialCoeffs().rows()),
+    largerSize_(nbOfElts_ + potential_->polyCoeffs().rows()),
     largerBasisMeans_(DVec::Zero(largerSize_)),
     largerMeasureMomenta_(DVec::Zero(largerSize_)),
     polyCoeffs_(DMat::Zero(largerSize_, largerSize_)),
@@ -644,8 +644,10 @@ namespace simol
       double sumExp = exp(-beta_ * potential(center() + dq)) + exp(-beta_ * potential(center() - dq));
       qRepartitionFct_ += sumExp;
       sigma += pow(dq, 2) * sumExp;
-      //test << dq << " " << potential(center() + dq) << " " << potDeriv(center() + dq) << " " << potLapla(center() + dq) << endl;
-      //test << -dq << " " << potential(center()- dq) << " " << potDeriv(center() - dq) << " " << potLapla(center() - dq) << endl;
+      //cout << dq << " " << potential(center() + dq) << " " << potDeriv(center() + dq) << " " << potLapla(center() + dq) << endl;
+      //cout << -dq << " " << potential(center()- dq) << " " << potDeriv(center() - dq) << " " << potLapla(center() - dq) << endl;
+      //cout << "dq = " << dq << " potential(center() + dq) = " << potential(center() + dq) << " potential(center() - dq) = " << potential(center() - dq) << endl; 
+      //cout << exp(-beta_ * potential(center() + dq)) << " + " << 
     }
     qRepartitionFct_ *= integrationStep_;
     sigma *= integrationStep_ / qRepartitionFct_;
@@ -668,36 +670,54 @@ namespace simol
     {
       if (iOfElt!=0)            
         productXMat_(iOfElt-1, iOfElt) = sqrt(iOfElt/(beta_*omega()));
-      if (iOfElt!=nbOfElts_-1)  
+      if (iOfElt!=largerSize_-1)  
         productXMat_(iOfElt+1, iOfElt) = sqrt((iOfElt+1)/(beta_*omega()));
     }
+    cout << "productXMat_ : " << endl << productXMat_ << endl;
+        
+    DVec potWdPolyCoeffs = potential_->polyDCoeffs();
+    potWdDegree_ = potWdPolyCoeffs.rows() - 1;
+    potWdPolyCoeffs[1] -= omega();
+    DVec potWddPolyCoeffs = polynomialDerivative(potWdPolyCoeffs);
     
-    DVec potWPolyCoeffs = potential_->polynomialCoeffs();
-    potWDegree_ = potWPolyCoeffs.rows()-1;
-    potWPolyCoeffs[2] -= omega()/2;
-    cout << "potWDegree_ = " << potWDegree_ << endl;
-    cout << "potWPolyCoeffs : " << potWPolyCoeffs.adjoint() << endl;
-    DVec potWdPolyCoeffs = DVec::Zero(potWDegree_);
-    for (int iOfOrder = 1; iOfOrder < potWDegree_ + 1; iOfOrder++)
-      potWdPolyCoeffs[iOfOrder-1] = iOfOrder * potWPolyCoeffs[iOfOrder];
     cout << "potWdPolyCoeffs : " << potWdPolyCoeffs.adjoint() << endl;
-    DVec potWddPolyCoeffs = DVec::Zero(potWDegree_ - 1);
-    for (int iOfOrder = 1; iOfOrder < potWDegree_; iOfOrder++)
-      potWddPolyCoeffs[iOfOrder-1] = iOfOrder * potWdPolyCoeffs[iOfOrder];
     cout << "potWddPolyCoeffs : " << potWddPolyCoeffs.adjoint() << endl;
     //DMat tempMat = DMat::Zero(largerSize_, largerSize_);
     largerProductWdMat_ = DMat::Zero(largerSize_, largerSize_);
-    for (int iOfOrder = potWDegree_-1; iOfOrder >= 0; iOfOrder--)
+    for (int iOfOrder = potWdDegree_; iOfOrder >= 0; iOfOrder--)
       largerProductWdMat_ = productXMat_ * largerProductWdMat_ + potWdPolyCoeffs[iOfOrder]*DMat::Identity(largerSize_, largerSize_);   
+
+    if (potential_->inverseCoeff())
+    {
+      DMat A = productXMat_ - center() * DMat::Identity(largerSize_, largerSize_);
+      
+      DMat inverseProductXMat = A.inverse();
+      cout << "inverseProductXMat_ : " << endl << inverseProductXMat << endl;
+      
+      int largestSize = largerSize_ + 2;
+      DMat largestProductXMat = DMat::Zero(largestSize, largestSize);
+      for (int iOfElt = 0; iOfElt < largestSize; iOfElt++)
+      {
+        if (iOfElt!=0)            
+          largestProductXMat(iOfElt-1, iOfElt) = sqrt(iOfElt/(beta_*omega()));
+        if (iOfElt!=largestSize-1)  
+          largestProductXMat(iOfElt+1, iOfElt) = sqrt((iOfElt+1)/(beta_*omega()));
+      }
+      cout << "largestProductXMat : " << endl << largestProductXMat << endl;
+      DMat largestA = largestProductXMat - center() * DMat::Identity(largestSize, largestSize);
+      DMat largestInverseProductXMat = largestA.inverse();
+      cout << "diff inverse matrices :" << endl << inverseProductXMat - largestInverseProductXMat.topLeftCorner(largerSize_, largerSize_) << endl << endl;
+      
+      //cout << "product : " << endl << inverseProductXMat * (productXMat_ - center() * DMat::Identity(largerSize_, largerSize_))<< endl;
+      largerProductWdMat_ += potential_->inverseCoeff() * inverseProductXMat;
+    }
     productWdMat_ = largerProductWdMat_.topLeftCorner(nbOfElts(), nbOfElts());
     DMat tempMat = DMat::Zero(largerSize_, largerSize_);
-    for (int iOfOrder = potWDegree_-2; iOfOrder >= 0; iOfOrder--)
+    for (int iOfOrder = potWdDegree_-1; iOfOrder >= 0; iOfOrder--)
       tempMat = productXMat_ * tempMat + potWddPolyCoeffs[iOfOrder]*DMat::Identity(largerSize_, largerSize_);   
     productWddMat_ = tempMat.topLeftCorner(nbOfElts(), nbOfElts());
-    cout << "productXMat_ : " << endl << productXMat_ << endl;
     //cout << "productWdMat_ : " << endl << productWdMat_ << endl;
     cout << "largerProductWdMat_ : " << endl << largerProductWdMat_ << endl;
-    cout << "productWddMat_ : " << endl << productWddMat_ << endl;
     
     computeMeasureMomenta();
     computeGramMatrix();
@@ -749,26 +769,51 @@ namespace simol
     return expFourierCoeffs_[iOfElt];
   }*/
   
-    void ExpHermiteBasis::computeMeasureMomenta()
+  /// We compute the quantities \int (q-center)^n sqrt(G/nu) d nu
+  /// The integration must be taken care of very carefully as very large terms can appear and cancel out_trigToExpMat
+  /// In order to compute the odd terms one decompose the potential into its symmetric and skew-sym parts, the idea is to use the cancelations before applying the expfourier
+  /// Extra care is needed when the potential can take infinite values
+  void ExpHermiteBasis::computeMeasureMomenta()
   {
-    //We compute the quantities \int (q-center)^n sqrt(G/nu) d nu
+    
     // Trapeze integration
-    largerMeasureMomenta_(0) += exp(-beta_ * potential(0));
+    largerMeasureMomenta_(0) += exp(-beta_ * potential(center()));
     for (int iOfNode = 0; iOfNode <= nbOfIntegrationSteps()/2; iOfNode++)
     {
       double dq = (iOfNode+1) * integrationStep_;
       double betaPotPos = beta_/2 * (potential(center()+dq) + omega()/2*pow(dq,2));
       double betaPotNeg = beta_/2 * (potential(center()-dq) + omega()/2*pow(dq,2));
+      double betaSkewPot = beta_ * potential_->skewsymmetricValue(center()+dq);
       //double logq = (q!=0)?log(pow(q,2))/2:-1000;
       double logq = log(dq);
-      //cout << "q=" << q << " logq = " << logq << " betaPotPos=" << betaPotPos << " betaPotNeg=" << betaPotNeg<< endl;
+      //cout << setprecision(16) << "dq=" << dq << " logq = " << logq << " betaSkewPot=" << betaSkewPot << " betaPotNeg=" << betaPotNeg<< endl;
+      //cout << setprecision(16) << "center()-dq = " << center()-dq << " potential(center()-dq) = " << potential(center()-dq) << endl;
       //for (int iOfElt = 0; iOfElt < 2*nbOfElts()-1; iOfElt++)
+      
       for (int iOfElt = 0; iOfElt < largerSize_; iOfElt++)
       {
         if (iOfElt%2==0)
           largerMeasureMomenta_(iOfElt) += exp(iOfElt * logq - betaPotNeg) + exp(iOfElt * logq - betaPotPos);
+          //largerMeasureMomenta_(iOfElt) += exp(iOfElt * logq - betaPotNeg) * (1 + exp(betaPotNeg - betaPotPos));
+          //largerMeasureMomenta_(iOfElt) += exp(iOfElt * logq - betaPotNeg + log(1 + exp(-betaSkewPot)));
         else
-          largerMeasureMomenta_(iOfElt) += -exp(iOfElt * logq - betaPotNeg) + exp(iOfElt * logq - betaPotPos);
+        {
+          if (betaPotNeg == std::numeric_limits<double>::infinity())
+            largerMeasureMomenta_(iOfElt) += exp(iOfElt * logq - betaPotPos);
+          //largerMeasureMomenta_(iOfElt) += -exp(iOfElt * logq - betaPotNeg) + exp(iOfElt * logq - betaPotPos);
+          //largerMeasureMomenta_(iOfElt) += -exp(iOfElt * logq - betaPotNeg) * (1 - exp(betaPotNeg - betaPotPos));
+          else
+          {
+            if (betaSkewPot > 0)
+              //largerMeasureMomenta_(iOfElt) += -exp(iOfElt * logq - betaPotNeg + log(1 - exp(betaPotNeg - betaPotPos)));
+              largerMeasureMomenta_(iOfElt) += -exp(iOfElt * logq - betaPotNeg + log(1 - exp(-betaSkewPot)));
+            else if (betaSkewPot < 0)
+              //largerMeasureMomenta_(iOfElt) += exp(iOfElt * logq - betaPotNeg + log(-1 + exp(betaPotNeg - betaPotPos)));
+              largerMeasureMomenta_(iOfElt) += exp(iOfElt * logq - betaPotNeg + log(-1 + exp(-betaSkewPot)));
+          }
+        }
+        //if (iOfElt == 0)
+        //  cout << setprecision(16) << exp(iOfElt * logq - betaPotNeg) << " x " << (1 - exp(- betaSkewPot)) << " -> " << largerMeasureMomenta_(iOfElt) << endl;
       }
     }
     double gaussianRepFct = sqrt(2*M_PI / (beta_ * omega()));
@@ -776,7 +821,6 @@ namespace simol
     cout << "nu rep function : " << qRepartitionFct_ << endl;
     cout << "ratio = " << qRepartitionFct_ / gaussianRepFct << endl;
     largerMeasureMomenta_ *= integrationStep_;
-    cout << "measureMomenta before repFct :" << endl << largerMeasureMomenta_ << endl;
     largerMeasureMomenta_ /= sqrt(gaussianRepFct*qRepartitionFct_);
     basisCoefficient_ = sqrt(qRepartitionFct_ / gaussianRepFct);
     cout << "end computeMeasureMomenta :" << endl << largerMeasureMomenta_ << endl;
@@ -790,10 +834,10 @@ namespace simol
     for (int iOfElt = 0; iOfElt < largerSize_; iOfElt++)
       largerBasisMeans_[iOfElt] = dot(polyCoeffs_.row(iOfElt), largerMeasureMomenta_);
     basisMeans_ = largerBasisMeans_.head(nbOfElts());
-    cout << "norm of basisMeans : " << basisMeans_.norm() << " < " << largerBasisMeans_.norm() << endl;
     constantFctCoeffs_ = basisMeans_;
     
     cout << "basisMeans_ :" << endl << basisMeans_ << endl;
+    cout << "norm of basisMeans : " << basisMeans_.norm() << " < " << largerBasisMeans_.norm() << endl;
   }
 
   double ExpHermiteBasis::value(double variable, int iOfElt) const

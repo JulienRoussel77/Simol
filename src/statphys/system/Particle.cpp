@@ -42,7 +42,7 @@ namespace simol
   void Particle::resetForce(Potential const& pot)
   {
     potentialEnergy_ = 0;
-    force_ = pot.externalForce();
+    force_ = pot.nonEqForce();
     virial_ = 0;
   }
 

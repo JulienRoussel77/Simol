@@ -132,7 +132,8 @@ namespace simol
   DVec ColloidCVBasis::basisVariables(System const& syst) const
   {
     DVec variables = DVec::Zero(2);
-    DVec r01 = syst(1).position() - syst(0).position();
+    DVec r01np = syst(1).position() - syst(0).position();
+    DVec r01 = syst.periodicImage(r01np);
     double d01 = r01.norm();
     DVec p01 = syst(1).momentum() - syst(0).momentum();
     variables(0) = d01;
@@ -143,14 +144,17 @@ namespace simol
   DMat ColloidCVBasis::qVariable(System const& syst) const
   {
     DMat distanceMat = DVec::Zero(1);
-    distanceMat(0,0) = (syst(1).position() - syst(0).position()).norm();
+    DVec r01np = syst(1).position() - syst(0).position();
+    DVec r01 = syst.periodicImage(r01np);
+    distanceMat(0,0) = r01.norm();
     return distanceMat;
   }
   
   DMat ColloidCVBasis::pVariable(System const& syst) const
   {
     DMat momentumMat = DVec::Zero(1);
-    DVec r01 = syst(1).position() - syst(0).position();
+    DVec r01np = syst(1).position() - syst(0).position();
+    DVec r01 = syst.periodicImage(r01np);
     double d01 = r01.norm();
     momentumMat(0,0) = dot(syst(1).momentum() - syst(0).momentum(), r01) / d01;
     return momentumMat;
@@ -159,11 +163,12 @@ namespace simol
   DMat ColloidCVBasis::forces(System const& syst) const
   {
     DMat forcesMat = DVec::Zero(1);
-    DVec r01 = syst(1).position() - syst(0).position();
+    DVec r01np = syst(1).position() - syst(0).position();
+    DVec r01 = syst.periodicImage(r01np);
     double d01 = r01.norm();
-    // Pas encore bien compris le coeff 2 ci-dessous ! Faire le calcul proprement...
-    forcesMat(0,0) = dot(syst(1).force() - syst(0).force(), r01) / (2*d01);
-    //cout << (syst(1).position() - syst(0).position()).adjoint() << " -> "  << (syst(1).force() - syst(0).force()).adjoint() << endl;
+    forcesMat(0,0) = dot(syst(1).force() - syst(0).force(), r01) / (2*d01) + (syst.dimension()-1) / d01;
+    //cout << r01.adjoint() << " -> "  << (syst(1).force() - syst(0).force()).adjoint() << endl;
+    //cout << d01 << " -> " << (syst(1).force() - syst(0).force()).norm() << endl;
     return forcesMat;
   }
   

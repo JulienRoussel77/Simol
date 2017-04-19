@@ -5,7 +5,9 @@ namespace simol
   
   Potential* createPotential(Input const& input, string potName)
   {
-    if (potName == "Sinusoidal")
+    if (potName == "None")
+      return nullptr;
+    else if (potName == "Sinusoidal")
       return new Sinusoidal(input);
     else if (potName == "SumSinusoidal")
       return new SumSinusoidal(input);
@@ -27,13 +29,17 @@ namespace simol
       return new SoftDPD(input);
     else if (potName == "TwoTypes")
       return new TwoTypes(input);
+    else if (potName == "HarmonicFE")
+      return new HarmonicFE(input);
+    else if (potName == "DoubleWellFE")
+      return new DoubleWellFE(input);
     else
       throw runtime_error(potName +" is not a valid potential !");
 
     return 0;
   }
 
-  Potential* createPotential(Input const& input)
+  /*Potential* createPotential(Input const& input)
   {
     return createPotential(input, input.potentialName());
   }
@@ -46,7 +52,7 @@ namespace simol
       return createPotential(input, input.secondPotentialName());
     else
       return createPotential(input, input.potentialName());
-  }
+  }*/
   
   
   TwoTypes::TwoTypes(Input const & input): 
@@ -70,6 +76,24 @@ namespace simol
       return firstPot_->gradient(position);
     else
       return secondPot_->gradient(position);
+  }
+  
+  DVec TwoTypes::gradient(double /*position*/) const
+  {
+    throw runtime_error("An interaction type should be specified for a call to a TwoTypes potential !");
+  }
+  
+  DVec TwoTypes::potentialForce(double position, int type) const
+  {
+    if (type == 0)
+      return firstPot_->potentialForce(position);
+    else
+      return secondPot_->potentialForce(position);
+  }
+  
+  DVec TwoTypes::potentialForce(double /*position*/) const
+  {
+    throw runtime_error("An interaction type should be specified for a call to a TwoTypes potential !");
   }
   
   ///

@@ -32,14 +32,15 @@ namespace simol
     DVec r12 = periodicImage(particle1.position() - particle2.position());
     //DVec r12 = particle1.position() - particle2.position();
     double distance = r12.norm();
+    r12 /= distance;
     // compute energy
-    double energy12 = potential(distance, interactionType);
+    double energy12 = pairPotential()(distance, interactionType);
 
     particle1.potentialEnergy() += energy12 / 2;
     particle2.potentialEnergy() += energy12 / 2;
     // compute forces
-    double force12 = potentialForce(distance, interactionType)(0);
-    r12 /= distance;
+    double force12 = pairPotential().potentialForce(distance, interactionType)(0);
+
     particle1.force() += force12 * r12;
     particle2.force() -= force12 * r12;
     // compute pressure, based on the Virial formula for the potential part: P_pot = -\sum_{i < j} r_ij v'(r_ij) / d|Vol|; will divide by d|Vol| at the end
@@ -60,7 +61,7 @@ namespace simol
     DVec r10 = q1 - q0;
     r10 /= r10.norm();
     DVec qMid = (q0+q1)/2;
-    double dist = potential_->drawLaw(dynaPara.beta(), rng_, 1);
+    double dist = pairPotential_->drawLaw(dynaPara.beta(), rng_, 1);
     cout << "  -> colloid length : " << dist << endl;
     getParticle(0).position() = qMid - dist/2 * r10;
     getParticle(1).position() = qMid + dist/2 * r10;
@@ -74,13 +75,15 @@ namespace simol
     //  cout << "1 : i " << iOfParticle << " " << getParticle(iOfParticle).type() << endl;
 
     for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
-      getParticle(iOfParticle).resetForce(potential());
+      getParticle(iOfParticle).resetForce(pairPotential());
     
     //for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
     //  cout << "2 : i " << iOfParticle << ", p " << getParticle(iOfParticle).position().adjoint() << ", e " << getParticle(iOfParticle).potentialEnergy() << ", f " << getParticle(iOfParticle).force().adjoint() << endl;
     
+    
     for (ParticlePairIterator it = pairBegin(); !pairFinished(it); incrementePairIterator(it))
       interaction(it.particle1(), it.particle2());
+    
     
     //for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
     //  cout << "3 : i " << iOfParticle << ", p " << getParticle(iOfParticle).position().adjoint() << ", e " << getParticle(iOfParticle).potentialEnergy() << ", f " << getParticle(iOfParticle).force().adjoint() << endl;
@@ -91,7 +94,7 @@ namespace simol
   ///Computes the instant value of the observable length
   double Colloid::length() const
   {
-    DVec r12 = getParticle(0).position() - getParticle(1).position();
+    DVec r12 = periodicImage(getParticle(0).position() - getParticle(1).position());
     return r12.norm();
   }
   
