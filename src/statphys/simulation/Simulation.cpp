@@ -46,7 +46,11 @@ namespace simol
   void simulate(Overdamped& dyna, System& syst)
   {
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
+    {
+      //cout << iOfParticle << " " << syst(iOfParticle).position().adjoint() << " " << syst(iOfParticle).momentum().adjoint() << " " << syst(iOfParticle).force().adjoint() << endl;
       dyna.updatePosition(syst(iOfParticle));
+      //cout << iOfParticle << " " << syst(iOfParticle).position().adjoint() << " " << syst(iOfParticle).momentum().adjoint() << " " << syst(iOfParticle).force().adjoint() << endl;
+    }
     syst.computeAllForces();
   }
   
@@ -98,6 +102,30 @@ namespace simol
       for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles() - 1; iOfParticle++)
         dyna.updateMomentaExchange(syst(iOfParticle), syst(iOfParticle + 1));
   }
+  
+  /*//----------- Colloid -----------------
+  
+  /!\ The System variable cannot be specialized, called with a pointer...
+    void thermalize(Dynamics& dyna, System& syst)
+  {
+    //for (auto&& particle : configuration_)
+    //dyna.updateBefore(particle);
+    for (int i = 0; i < syst.nbOfParticles(); i++)
+      dyna.verletFirstPart(syst(i));
+
+    syst.computeAllForces();
+
+    for (int i = 0; i < syst.nbOfParticles(); i++)
+      dyna.verletSecondPart(syst(i));
+
+    for (int i = 0; i < syst.nbOfParticles(); i++)
+    {
+      double localTemperature = dyna.temperatureLeft() + i * dyna.deltaTemperature() / syst.nbOfParticles();
+      dyna.updateOrsteinUhlenbeck(syst(0), 1 / localTemperature);
+    }
+  }*/
+  
+  //----------- Ouputs ------------------
   
   void computeOutput(Dynamics const& dyna, System const& syst, Output& output, long int iOfStep)
   {

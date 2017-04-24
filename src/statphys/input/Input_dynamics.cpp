@@ -11,6 +11,7 @@ const double defaultDeltaTemperature = 0;
 const double defaultTauBending = 0;
 const double defaultKappa = 0; 
 const int    defaultMTSfrequency = 1;
+const double defaultNonEqForce = 0;
 
 namespace simol
 {
@@ -121,6 +122,13 @@ namespace simol
       return data["Dynamics"]["Seed"].as<int>();
     else
       return defaultSeed;
+  }
+  
+  double Input::nonEqForce() const
+  {
+    if (data["Dynamics"]["NonEqForce"])
+      return data["Dynamics"]["NonEqForce"].as<double>();
+    else return defaultNonEqForce;
   }
 
   double Input::eta() const

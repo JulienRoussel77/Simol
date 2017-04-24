@@ -86,7 +86,6 @@ namespace simol
       alpha = iOfParticle / (double) nbOfParticles();
       localTemp = (1 - alpha) * dynaPara.temperatureLeft() + alpha * dynaPara.temperatureRight();
       localDist = drawPotLaw(1 / localTemp);
-      cout << "particle " << iOfParticle << " : r = " << localDist << endl;
 
       refPosition += localDist;
       getParticle(iOfParticle).position(0) = refPosition;

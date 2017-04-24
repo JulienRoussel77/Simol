@@ -689,12 +689,28 @@ namespace simol
 
     if (potential_->inverseCoeff())
     {
+      cout << "---------------" << center() << "----------" << endl;
       DMat A = productXMat_ - center() * DMat::Identity(largerSize_, largerSize_);
+      double epsilon = 1e-2;
       
-      DMat inverseProductXMat = A.inverse();
+      JacobiSVD<DMat> svdA(A, ComputeThinU | ComputeThinV);
+      DMat Diag = DMat::Zero(A.rows(), A.cols());
+      DMat DiagA = DMat::Zero(A.rows(), A.cols());
+      for (int iOfCol = 0; iOfCol < A.cols(); iOfCol++)
+      {
+        Diag(iOfCol, iOfCol) = pow(pow(epsilon, 2) + pow(svdA.singularValues()(iOfCol), 2), -.5);
+        DiagA(iOfCol, iOfCol) = svdA.singularValues()(iOfCol);
+      }
+      //svdA.singularValues();
+      cout << "Diag :" << endl << Diag << endl;
+      cout << "DiagA :" << endl << DiagA << endl;
+      //DMat inverseProductXMat = A.inverse();
+      cout << "DiffMat:" << endl << A - svdA.matrixU() * DiagA * svdA.matrixV().adjoint() << endl;
+      DMat inverseProductXMat = svdA.matrixU() * Diag * svdA.matrixV().adjoint();
       cout << "inverseProductXMat_ : " << endl << inverseProductXMat << endl;
+      DMat absAMat = svdA.matrixU() * DiagA * svdA.matrixV().adjoint();
       
-      int largestSize = largerSize_ + 2;
+      /*int largestSize = largerSize_ + 2;
       DMat largestProductXMat = DMat::Zero(largestSize, largestSize);
       for (int iOfElt = 0; iOfElt < largestSize; iOfElt++)
       {
@@ -707,8 +723,9 @@ namespace simol
       DMat largestA = largestProductXMat - center() * DMat::Identity(largestSize, largestSize);
       DMat largestInverseProductXMat = largestA.inverse();
       cout << "diff inverse matrices :" << endl << inverseProductXMat - largestInverseProductXMat.topLeftCorner(largerSize_, largerSize_) << endl << endl;
-      
-      //cout << "product : " << endl << inverseProductXMat * (productXMat_ - center() * DMat::Identity(largerSize_, largerSize_))<< endl;
+      */
+      cout << "product : " << endl << inverseProductXMat * (productXMat_ - center() * DMat::Identity(largerSize_, largerSize_))<< endl;
+      cout << "product2 : " << endl << absAMat * inverseProductXMat << endl;
       largerProductWdMat_ += potential_->inverseCoeff() * inverseProductXMat;
     }
     productWdMat_ = largerProductWdMat_.topLeftCorner(nbOfElts(), nbOfElts());

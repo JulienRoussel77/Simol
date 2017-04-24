@@ -56,7 +56,8 @@ namespace simol
   
   
   TwoTypes::TwoTypes(Input const & input): 
-    Potential(input)
+    Potential(input),
+    interactionRatio_(input.interactionRatio())
   {
     firstPot_ = createPotential(input, input.firstPotentialName());
     secondPot_= createPotential(input, input.secondPotentialName());
@@ -66,16 +67,24 @@ namespace simol
   {
     if (type == 0)
       return firstPot_->value(position);
-    else
+    else if (type == 1)
+      return interactionRatio_ * secondPot_->value(position);
+    else if (type == 2)
       return secondPot_->value(position);
+    else
+      throw runtime_error("Potential type int invalid !");
   }
 
   DVec TwoTypes::gradient(double position, int type) const
   {
     if (type == 0)
       return firstPot_->gradient(position);
-    else
+    else if (type == 1)
+      return interactionRatio_ * secondPot_->gradient(position);
+    else if (type == 2)      
       return secondPot_->gradient(position);
+    else
+      throw runtime_error("Potential type int invalid !");
   }
   
   DVec TwoTypes::gradient(double /*position*/) const
@@ -85,16 +94,25 @@ namespace simol
   
   DVec TwoTypes::potentialForce(double position, int type) const
   {
-    if (type == 0)
-      return firstPot_->potentialForce(position);
-    else
-      return secondPot_->potentialForce(position);
+    return -gradient(position, type);
   }
   
-  DVec TwoTypes::potentialForce(double /*position*/) const
+  /*DVec TwoTypes::potentialForce(double position, int type) const
+  {
+    if (type == 0)
+      return firstPot_->potentialForce(position);
+    else (type == 1)
+      return interactionRatio_ * secondPot_->gradient(position);
+    else (type == 2)
+      return secondPot_->potentialForce(position);
+    else
+      throw runtime_error("Potential type int invalid !");
+  }
+  
+  DVec TwoTypes::potentialForce(double position) const
   {
     throw runtime_error("An interaction type should be specified for a call to a TwoTypes potential !");
-  }
+  }*/
   
   ///
   /// Ratio used in the rejection method

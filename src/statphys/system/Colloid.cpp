@@ -24,11 +24,11 @@ namespace simol
   ///The first 2 derivates of the potential are stored in "particle2"
   void Colloid::interaction(Particle& particle1, Particle& particle2) const
   {
-    int interactionType = ((particle1.type() == 1) && (particle2.type() == 1));
+    int interactionType = particle1.type() + particle2.type();
     //if ((particle1.type() == 1) || (particle2.type() == 1))
-    //  cout << particle1.type() << " x " << particle2.type() << " -> " << interactionType << endl;
+    //cout << particle1.type() << " x " << particle2.type() << " -> " << interactionType << endl;
     // take closest periodic image
-    if (particle1.type() != particle2.type()) return;
+    //if (particle1.type() != particle2.type()) return;
     DVec r12 = periodicImage(particle1.position() - particle2.position());
     //DVec r12 = particle1.position() - particle2.position();
     double distance = r12.norm();
@@ -55,17 +55,19 @@ namespace simol
   {
     NBody::samplePositions(dynaPara);
     
-
-    DVec q0 = getParticle(0).position();
-    DVec q1 = getParticle(1).position();
-    DVec r10 = q1 - q0;
-    r10 /= r10.norm();
-    DVec qMid = (q0+q1)/2;
-    double dist = pairPotential_->drawLaw(dynaPara.beta(), rng_, 1);
-    cout << "  -> colloid length : " << dist << endl;
-    getParticle(0).position() = qMid - dist/2 * r10;
-    getParticle(1).position() = qMid + dist/2 * r10;
-    
+    //!\ Can put the system in an unstable configuration...
+    if (dynaPara.interactionRatio() == 0)
+    {
+      DVec q0 = getParticle(0).position();
+      DVec q1 = getParticle(1).position();
+      DVec r10 = q1 - q0;
+      r10 /= r10.norm();
+      DVec qMid = (q0+q1)/2;
+      double dist = pairPotential_->drawLaw(dynaPara.beta(), rng_, 1);
+      cout << "  -> colloid length : " << dist << endl;
+      getParticle(0).position() = qMid - dist/2 * r10;
+      getParticle(1).position() = qMid + dist/2 * r10;
+    }
   }
   
   void Colloid::computeAllForces()

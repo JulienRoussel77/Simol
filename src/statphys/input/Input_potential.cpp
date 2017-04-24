@@ -6,12 +6,12 @@ using std::string;
 
 //-- default values for potentials ---
 const double defaultPotentialCoeff = 1;
+const double defaultInteractionRatio = 1;
 const double defaultEpsLJ = 1.;
 const double defaultSigmaLJ = 1.;
 const double defaultSplineRatio = 0.8;
 const double defaultCutOffRatio = 2.5;
 const double defaultPotentialCenter = 0;
-const double defaultNonEqForce = 0;
 
 namespace simol
 {
@@ -57,13 +57,13 @@ namespace simol
     else return "None";
   }
   
-  
-  double Input::nonEqForce() const
+  double Input::interactionRatio() const
   {
-    if (data["Dynamics"]["NonEqForce"])
-      return data["Dynamics"]["NonEqForce"].as<double>();
-    else return defaultNonEqForce;
+    if (data["Potential"]["InteractionRatio"])
+      return data["Potential"]["InteractionRatio"].as<double>();
+    else return defaultInteractionRatio;
   }
+  
 
   //--- Sinusoidal ---
   double Input::amplitude() const
