@@ -88,7 +88,14 @@ namespace simol
   ///Returns the pointer of the Galerkin instance of *this
   Galerkin* Dynamics::galerkin() {return galerkin_;}
 
-
+  /*shared_ptr<CVBasis> Dynamics::cvBasis() 
+  {
+    if (galerkin_)
+      return galerkin_->makeCvBasis();
+      //return make_shared<CVBasis>(dynamic_cast<TensorBasis*>(galerkin_->tensorBasis()), make_shared<DVec>(galerkin_->CVcoeffsVec()));
+    else
+      return nullptr;  
+  }*/
 
   ///
   ///Standard first part of the numerical integration : half upadate on "p" and update on "q"

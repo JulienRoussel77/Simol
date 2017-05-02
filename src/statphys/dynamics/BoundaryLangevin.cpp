@@ -54,27 +54,27 @@ namespace simol
   
   ///Applies the generator of this dynamics to the basis functions of the CV
   ///Evaluate at the current state of "conifguration"
-  void BoundaryLangevin::computeGeneratorOnBasis(CVBasis& cvBasis, System const& syst) const
+  void BoundaryLangevin::computeGeneratorOnBasis(shared_ptr<CVBasis> /*cvBasis*/, System const& /*syst*/) const
   {
-    cvBasis.generatorOnBasisValues_ = DVec::Zero(cvBasis.totalNbOfElts());
+    /*cvBasis->generatorOnBasisValues_ = DVec::Zero(cvBasis->totalNbOfElts());
     //DVec result = DVec::Zero(nbOfFunctions());
-    for (int iOfFunction = 0; iOfFunction < cvBasis.totalNbOfElts(); iOfFunction++)
+    for (int iOfFunction = 0; iOfFunction < cvBasis->totalNbOfElts(); iOfFunction++)
     {
-      for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
-        cvBasis.generatorOnBasisValues_(iOfFunction) += syst(iOfParticle).momentum().dot(cvBasis.basis_->gradientQ(syst, iOfParticle, iOfFunction))
-                               + syst(iOfParticle).force().dot(cvBasis.basis_->gradientP(syst, iOfParticle, iOfFunction));
+      //for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
+      cvBasis->generatorOnBasisValues_(iOfFunction) += syst.momenta().dot(cvBasis->gradientQ(syst, iOfFunction))
+                              + syst.forces().dot(cvBasis->gradientP(syst, iOfFunction));
       //if(false)
-      cvBasis.generatorOnBasisValues_(iOfFunction) += gamma() * (- syst(0).momentum().dot(cvBasis.basis_->gradientP(syst, 0, iOfFunction))
-                                      + cvBasis.basis_->laplacianP(syst, 0, iOfFunction) / betaLeft()
-                                      - syst(syst.nbOfParticles() - 1).momentum().dot( cvBasis.basis_->gradientP(syst, syst.nbOfParticles() - 1, iOfFunction))
-                                      + cvBasis.basis_->laplacianP(syst, syst.nbOfParticles() - 1, iOfFunction) / betaRight());
-    }
+      cvBasis->generatorOnBasisValues_(iOfFunction) += gamma() * (- syst(0).momentum().dot(cvBasis->basis_->gradientP(syst, iOfFunction).col(0))
+                                      + cvBasis->basis_->laplacianP(syst, 0, iOfFunction) / betaLeft()
+                                      - syst(syst.nbOfParticles() - 1).momentum().dot( cvBasis->basis_->gradientP(syst, iOfFunction).col(syst.nbOfParticles() - 1))
+                                      + cvBasis->basis_->laplacianP(syst, syst.nbOfParticles() - 1, iOfFunction) / betaRight());
+    }*/
   }
   
   
   void BoundaryLangevin::computeProfileBiChain(Output& output, System const& syst, long int iOfStep) const
   {    
-    double nu2 = pow(syst.potential().harmonicFrequency() / output.constGamma_, 2);
+    double nu2 = pow(syst.pairPotential().harmonicFrequency() / output.constGamma_, 2);
     
     static bool outbool = true;
     if (outbool)
@@ -92,13 +92,13 @@ namespace simol
     {
       //Particle& particle = configuration_[iOfParticle];
       double dist = syst(iOfParticle+1).position(0) - syst(iOfParticle).position(0);        // dist is r_iOfParticle
-      double distPrev = (iOfParticle == 0) ? (syst(0).momentum(0)/(output.constGamma_)) : (nu2*(syst(iOfParticle).position(0) - syst(iOfParticle-1).position(0) - syst.potential().harmonicEquilibrium()));
-      double distNext = (iOfParticle == syst.nbOfParticles() - 2) ? (-syst(syst.nbOfParticles() - 1).momentum(0)/(output.constGamma_)) : (nu2*(syst(iOfParticle+2).position(0) - syst(iOfParticle+1).position(0) - syst.potential().harmonicEquilibrium()));
+      double distPrev = (iOfParticle == 0) ? (syst(0).momentum(0)/(output.constGamma_)) : (nu2*(syst(iOfParticle).position(0) - syst(iOfParticle-1).position(0) - syst.pairPotential().harmonicEquilibrium()));
+      double distNext = (iOfParticle == syst.nbOfParticles() - 2) ? (-syst(syst.nbOfParticles() - 1).momentum(0)/(output.constGamma_)) : (nu2*(syst(iOfParticle+2).position(0) - syst(iOfParticle+1).position(0) - syst.pairPotential().harmonicEquilibrium()));
       
       //double distPrev = (iOfParticle == 0) ? 0 : (syst(iOfParticle).position(0) - syst(iOfParticle-1).position(0));
       //double distNext = (iOfParticle == syst.nbOfParticles() - 2) ? 0 : (syst(iOfParticle+2).position(0) - syst(iOfParticle+1).position(0));
       
-      double harmonicForce = syst.potential().harmonicForce(dist);
+      double harmonicForce = syst.pairPotential().harmonicForce(dist);
 
       /*if (iOfParticle == 0)
       {

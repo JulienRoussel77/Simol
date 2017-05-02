@@ -6,15 +6,64 @@ using std::string;
 
 //-- default values for potentials ---
 const double defaultPotentialCoeff = 1;
+const double defaultInteractionRatio = 1;
 const double defaultEpsLJ = 1.;
 const double defaultSigmaLJ = 1.;
 const double defaultSplineRatio = 0.8;
 const double defaultCutOffRatio = 2.5;
+const double defaultPotentialCenter = 0;
 
 namespace simol
 {
 
-  string Input::potentialName() const {return data["Potential"]["Name"].as<string>();}
+  string Input::potentialName() const 
+  {
+    if (pairPotentialName() != "None")
+      return pairPotentialName();
+    else
+      return externalPotentialName();
+  }
+  
+    //return data["Potential"]["Name"].as<string>();}
+    
+  string Input::externalPotentialName() const
+  {
+    if (data["Potential"]["External"])
+      //if (data["Potential"]["External"]["Name"])
+      return data["Potential"]["External"].as<string>();
+    else 
+      return "None";
+  }
+  
+  string Input::pairPotentialName() const
+  {
+    if (data["Potential"]["Pair"])
+      //if (data["Potential"]["Pair"]["Name"])
+      return data["Potential"]["Pair"].as<string>();
+    else return "None";
+  }
+  
+  string Input::firstPotentialName() const 
+  {
+    if (data["Potential"]["FirstType"])
+      return data["Potential"]["FirstType"].as<string>();
+    else return "None";
+  }
+  
+  string Input::secondPotentialName() const
+  {
+    if (data["Potential"]["SecondType"])
+      return data["Potential"]["SecondType"].as<string>();
+    else return "None";
+  }
+  
+  double Input::interactionRatio() const
+  {
+    if (data["Potential"]["InteractionRatio"])
+      return data["Potential"]["InteractionRatio"].as<double>();
+    else return defaultInteractionRatio;
+  }
+  
 
   //--- Sinusoidal ---
   double Input::amplitude() const
@@ -74,6 +123,14 @@ namespace simol
   }
 
   //----- Harmonic ----
+  double Input::potentialCenter() const
+  {
+    if (data["Potential"]["Center"])
+      return data["Potential"]["Center"].as<double>();
+    else
+      return defaultPotentialCenter;
+  }
+  
   double Input::potentialStiffness() const
   {
     if (data["Potential"]["Stiffness"])

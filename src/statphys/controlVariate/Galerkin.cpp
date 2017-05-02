@@ -16,22 +16,27 @@ namespace simol
   
   
 
-  DMat Galerkin::shapeSaddle(const DMat& A) const
+  DMat Galerkin::shapeSaddle(const DMat& A, const DMat& C) const
   {
-    DMat Asad = DMat::Zero(A.rows() + 1, A.cols() + 1);    
-    Asad.block(0, 0, A.rows(), A.cols()) = A.block(0, 0, A.rows(), A.cols());
-    for (int iOfFourier = 0; iOfFourier < nbOfFourier(); iOfFourier++)
+    DMat Asad = DMat::Zero(A.rows() + C.cols(), A.cols() + C.cols());    
+    Asad.topLeftCorner(A.rows(), A.cols()) = A.topLeftCorner(A.rows(), A.cols());
+    Asad.rightCols(C.cols()) = C;
+    Asad.bottomRows(C.cols()) = C.adjoint();
+
+    /*DVec SU = tensorBasis()->gramMatrix() * tensorBasis()->basisMeans();
+    cout << "SU :" << SU << endl << endl;
+    for (int iOfElt = 0; iOfElt < sizeOfBasis(); iOfElt++)
     {
-      Asad(A.rows(), iTens(iOfFourier, 0)) = gVector(iOfFourier); //expFourierMeans(iOfFourier2);
-      Asad(iTens(iOfFourier, 0), A.cols()) = gVector(iOfFourier); //expFourierMeans(iOfFourier2);
-    }
+      Asad(A.rows(), iOfElt) = SU(iOfElt);
+      Asad(iOfElt, A.cols()) = SU(iOfElt);
+    }*/
     return Asad;
   }
   
-  SMat Galerkin::shapeSaddle(const SMat& A) const
+  SMat Galerkin::shapeSaddle(const SMat& A, const DMat& C) const
   {
     //SMat Asad = SMat::Zero(A.rows() + 1, A.cols() + 1);
-    SMat Asad(A.rows() + 1, A.cols() + 1);
+    SMat Asad(A.rows() + C.cols(), A.cols() + C.cols());
     //Asad.block(0, 0, A.rows(), A.cols()) = A.block(0, 0, A.rows(), A.cols());
     
     vector<Trid> coeffs;
@@ -44,32 +49,38 @@ namespace simol
         coeffs.push_back(Trid(iOfA, jOfA, valOfA));
         //Asad.insert(iOfA, jOfA) = valOfA;
       }
-    
-    for (int iOfFourier = 0; iOfFourier < nbOfFourier(); iOfFourier++)
-    {
-      coeffs.push_back(Trid(A.rows(), iTens(iOfFourier, 0), gVector(iOfFourier)));
-      coeffs.push_back(Trid(iTens(iOfFourier, 0), A.cols(), gVector(iOfFourier)));
-    }
+      
+    //DVec SU = tensorBasis()->gramMatrix() * tensorBasis()->basisMeans();
+    //cout << "SU :" << endl << SU << endl << endl;
+    for (int iOfElt = 0; iOfElt < sizeOfBasis(); iOfElt++)
+      for (int iOfCol = 0; iOfCol < C.cols(); iOfCol++)
+        if (C(iOfElt, iOfCol) != 0)
+        {
+          coeffs.push_back(Trid(A.rows() + iOfCol, iOfElt, C(iOfElt, iOfCol)));
+          coeffs.push_back(Trid(iOfElt, A.cols() + iOfCol, C(iOfElt, iOfCol)));
+          //coeffs.push_back(Trid(A.rows(), iTens(iOfQModes, 0), basisMean(0, iOfQModes)));
+          //coeffs.push_back(Trid(iTens(iOfQModes, 0), A.cols(), basisMean(0, iOfQModes)));
+        }
     Asad.setFromTriplets(coeffs.begin(), coeffs.end());
     return Asad;
   }
 
-  DMat Galerkin::unshapeSaddle(const DMat& Asad) const
-  { return Asad.block(0, 0, Asad.rows() - 1, Asad.cols() - 1); }
+  DMat Galerkin::unshapeSaddle(const DMat& Asad, const DMat& C) const
+  { return Asad.topLeftCorner(Asad.rows() - C.cols(), Asad.cols() - C.cols()); }
   
-  SMat Galerkin::unshapeSaddle(const SMat& Asad) const
-  { return Asad.block(0, 0, Asad.rows() - 1, Asad.cols() - 1); }
+  SMat Galerkin::unshapeSaddle(const SMat& Asad, const DMat& C) const
+  { return Asad.topLeftCorner(Asad.rows() - C.cols(), Asad.cols() - C.cols()); }
 
-  DVec Galerkin::shapeSaddle(const DVec& X) const
+  DVec Galerkin::shapeSaddle(const DVec& X, const DMat& C) const
   {
-    DVec Xsad = DVec::Zero(X.size() + 1);
+    DVec Xsad = DVec::Zero(X.size() + C.cols());
     Xsad.head(X.size()) = X;
     return Xsad;
   }
 
-  DVec Galerkin::unshapeSaddle(const DVec& Xsad) const
+  DVec Galerkin::unshapeSaddle(const DVec& Xsad, const DMat& C) const
   {
-    return Xsad.head(Xsad.size() - 1);
+    return Xsad.head(Xsad.size() - C.cols());
   }
   
   DVec Galerkin::solve(SMat const& A, DVec const& Y) const
@@ -111,153 +122,111 @@ namespace simol
     return A.fullPivLu().solve(X);
   }
   
-  DVec Galerkin::solveWithSaddle(SMat const& A, DVec const& Y) const
+  DVec Galerkin::solveWithSaddle(SMat const& A, DVec const& Y, const DMat& C) const
   {
     //return solveWithSaddle(DMat(A), Y);
     cout << "Sparse solveWithSaddle..."; cout.flush();
+    //cout << "Constraint column : " << endl << C << endl;
+    DVec Ysad = shapeSaddle(Y, C);
+    //cout << "Ysad = " << endl << Ysad << endl;
+    SMat Asad = shapeSaddle(A, C);
+    //cout << "Asad = " << endl << Asad << endl;
+    ComplexEigenSolver<DMat> ces(A);
+    cout << endl << "Sp A : " << ces.eigenvalues().real().adjoint() << endl;
+    ComplexEigenSolver<DMat> ces2(Asad);
+    cout << endl << "Sp Asad : " << ces2.eigenvalues().real().adjoint() << endl;
+    DVec Xsad = solve(Asad,Ysad);  
+    //cout << "Xsad = " << endl << Xsad << endl;
     
-    DVec Ysad = shapeSaddle(Y);
-    SMat Asad = shapeSaddle(A);
-    DVec Xsad = solve(Asad,Ysad);    
-    return unshapeSaddle(Xsad);
+    //cout << "Done !" << endl;
+    //cout << "Asad =" << endl << Asad << endl << endl << "Xsad =" << endl << Xsad << endl << endl <<"Ysad =" << endl << Ysad << endl << endl;
+    //cout << "Asad * Xsad =" << Asad * Xsad << endl << endl;
+    return unshapeSaddle(Xsad, C);
   }
 
-  DVec Galerkin::solveWithSaddleAndGuess(SMat const& A, DVec const& Y, const DVec& X0) const
+  DVec Galerkin::solveWithSaddleAndGuess(SMat const& A, DVec const& Y, const DVec& X0, const DMat& C) const
   {
     //return solveWithSaddle(DMat(A), Y);
     cout << "Sparse solveWithSaddle..."; cout.flush();
     
-    DVec Ysad = shapeSaddle(Y);
-    SMat Asad = shapeSaddle(A);
-    //cout << Asad << endl;
-    DVec X0sad = shapeSaddle(X0);
+    DVec Ysad = shapeSaddle(Y, C);
+    cout << "Ysad = " << endl << Ysad << endl;
+    SMat Asad = shapeSaddle(A, C);
+    cout << "Asad = " << endl << Asad << endl;
+    
+    DVec X0sad = shapeSaddle(X0, C);
     DVec Xsad = solveWithGuess(Asad,Ysad, X0sad);
     
-    return unshapeSaddle(Xsad);
+    return unshapeSaddle(Xsad, C);
   }
 
-  DVec Galerkin::solveWithSaddle(const DMat& A, const DVec& Y) const
+  DVec Galerkin::solveWithSaddle(const DMat& A, const DVec& Y, const DMat& C) const
   {
     cout << "Dense solveWithSaddle..."; cout.flush();
     cout << "Y -> " << Y.size() << endl;
-    DVec Ysad = shapeSaddle(Y);
+    DVec Ysad = shapeSaddle(Y, C);
     cout << "Xsad -> " << Ysad.size() << endl;
     cout << "A -> " << A.rows() << "x" << A.cols() << endl;
-    DMat Asad = shapeSaddle(A);
+    DMat Asad = shapeSaddle(A, C);
     cout << "Asad -> " << Asad.rows() << "x" << Asad.cols() << endl;
       
     DVec Xsad = Asad.fullPivLu().solve(Ysad);
      
     cout << "Xsad -> " << Xsad.size() << endl;
     cout << "OK ! (lambda = " << Xsad(Xsad.size() - 1) << ")" << endl;
-    return unshapeSaddle(Xsad);
+    return unshapeSaddle(Xsad, C);
   }
+  
+  /*/// 
+  /// Finds by SVD the eigenvectors of S corresponding to an eigenvalue > tol and pseudo solve AX=SY on the space spanned by these eigenvectors
+  DVec Galerkin::pseudoSolve(const SMat& A, const DVec& Y, const DMat& C)
+  {
+    //JacobiSVD<DMat> svd(S, ComputeThinU | ComputeThinV);
+    //DVec M = 
+    
+  }*/
 
-  DMat Galerkin::invWithSaddle(const SMat& A) const
+  DMat Galerkin::invWithSaddle(const SMat& A, const DMat& C) const
   {
     DMat DA(A);
-    return invWithSaddle(DA);
+    return invWithSaddle(DA, C);
   }
 
-  DMat Galerkin::invWithSaddle(const DMat& A) const
+  DMat Galerkin::invWithSaddle(const DMat& A, const DMat& C) const
   {
     cout << "invWithSaddle..."; cout.flush();
-    DMat Asad = shapeSaddle(A);
+    DMat Asad = shapeSaddle(A, C);
     DMat Bsad = Asad.inverse();
     cout << "fin invWithSaddle..."; cout.flush();
-    return unshapeSaddle(Bsad);
+    return unshapeSaddle(Bsad, C);
   }
-
   
   
   
 
-  //We compute the real Fourier coefficients of the function C^-1 exp(-\beta V(q)/2)
-  //where C = ExpFourierBasis::basisCoefficient_
-  void Galerkin::computeExpToTrigMat()
-  {
-    for (int iOfFourier2 = 1; iOfFourier2 < nbOfFourier(); iOfFourier2++)
-    {
-      trigToExpMat_(0, iOfFourier2) = expFourierMeans(iOfFourier2) / sqrt(2.);
-      trigToExpMat_(iOfFourier2, 0) = expFourierMeans(iOfFourier2) / sqrt(2.);
-    }
-    trigToExpMat_(0, 0) = expFourierMeans(0) / 2;
 
-    for (int iOfFourier = 1; iOfFourier < maxOfFourier_; iOfFourier++)
-      for (int jOfFourier = 1; jOfFourier < maxOfFourier_; jOfFourier++)
-      {
-        //cosine times cosine
-        trigToExpMat_(2 * iOfFourier, 2 * jOfFourier) =
-          expFourierMeans(2 * (iOfFourier + jOfFourier)) / 2
-          + expFourierMeans(2 * abs(iOfFourier - jOfFourier)) / 2;
-
-        //sinus times sinus
-        trigToExpMat_(2 * iOfFourier - 1, 2 * jOfFourier - 1) =
-          - expFourierMeans(2 * (iOfFourier + jOfFourier)) / 2
-          + expFourierMeans(2 * abs(iOfFourier - jOfFourier)) / 2;
-
-        int eps = (iOfFourier >= jOfFourier) - (iOfFourier <= jOfFourier); // -1 if i smaller, 0 if equal, 1 if i larger
-        //cosine times sinus   /!\ doing the test in this order avoids to read expFourierMeans(-1)
-        trigToExpMat_(2 * iOfFourier, 2 * jOfFourier - 1) =
-          expFourierMeans(2 * (iOfFourier + jOfFourier) - 1) / 2
-          + (!eps)?0:eps * expFourierMeans(2 * abs(iOfFourier - jOfFourier) - 1) / 2;
-          
-        //sinus times cosine
-        trigToExpMat_(2 * iOfFourier - 1, 2 * jOfFourier) =
-          expFourierMeans(2 * (iOfFourier + jOfFourier) - 1) / 2
-          - (!eps)?0:eps * expFourierMeans(2 * abs(iOfFourier - jOfFourier) - 1) / 2;
-      }
-
-
-    ofstream out_trigToExpMat("output/Galerkin/trigToExpMat");
-    display(trigToExpMat_, out_trigToExpMat);
-
-    expToTrigMat_  = trigToExpMat_.inverse();
-  }
   
   DVec Galerkin::projectionOrthoG(DVec const& X) const
   {
-    return X - dot(X, gVector()) / norm2gVector() * gVector();
+    return X - dot(X, basisMeans(0)) / norm2meansVec(0) * basisMeans(0);
   }
-
-  DMat Galerkin::convertToTrigBasis(const DMat& X)
-  {
-    return expToTrigMat_ * X;
-  }
-
-  void Galerkin::createQ()
-  {
-    basis_(0)->gradMatrix(Q_);
-
-    tQ_ = Q_.adjoint();
-  }
-
-  void Galerkin::createP()
-  {
-    for (int iOfHermite = 1; iOfHermite < nbOfHermite_; iOfHermite++)
-      P_.insert(iOfHermite - 1, iOfHermite) = sqrt(beta_ * iOfHermite);
-
-    tP_ = P_.adjoint();
-  }
-
 
   using namespace Eigen;
 
   Galerkin::Galerkin(Input const& input):       //ex : [0:4]
     nbOfParticles_(input.nbOfParticles()),
-    nbOfFourier_(input.nbOfFourier()),  //ex : 5
-    nbOfHermite_(input.nbOfHermite()),
-    maxOfFourier_((nbOfFourier_ + 1) / 2),  //ex : 3
-    sizeOfBasis_(pow(nbOfFourier_ * nbOfHermite_, nbOfParticles_)),
-    SIdQ_(nbOfFourier_, nbOfFourier_),
-    SIdP_(nbOfHermite_, nbOfHermite_),
-    DIdQ_(DMat::Identity(nbOfFourier_, nbOfFourier_)),
-    DIdP_(DMat::Identity(nbOfHermite_, nbOfHermite_)),
-    Q_(nbOfFourier_, nbOfFourier_),
-    P_(nbOfHermite_, nbOfHermite_),
-    tQ_(nbOfFourier_, nbOfFourier_),
-    tP_(nbOfHermite_, nbOfHermite_),
-    Lthm0_(nbOfHermite_, nbOfHermite_),
+    nbOfQModes_(input.nbOfQModes()),  //ex : 5
+    nbOfPModes_(input.nbOfPModes()),
+    sizeOfBasis_(nbOfQModes_ * nbOfPModes_),
+    SIdQ_(nbOfQModes_, nbOfQModes_),
+    SIdP_(nbOfPModes_, nbOfPModes_),
+    DIdQ_(DMat::Identity(nbOfQModes_, nbOfQModes_)),
+    DIdP_(DMat::Identity(nbOfPModes_, nbOfPModes_)),
+    Q_(nbOfQModes_, nbOfQModes_),
+    P_(nbOfPModes_, nbOfPModes_),
+    Qt_(nbOfQModes_, nbOfQModes_),
+    Pt_(nbOfPModes_, nbOfPModes_),
+    Lthm0_(nbOfPModes_, nbOfPModes_),
     Lthm_(sizeOfBasis_, sizeOfBasis_),
     Lham_(sizeOfBasis_, sizeOfBasis_),
     Lrep_(sizeOfBasis_, sizeOfBasis_),
@@ -266,31 +235,31 @@ namespace simol
     beta_(input.beta()),
     gamma_(input.gamma()),
     amplitude_(input.amplitude()),
-    externalForce_(input.externalForce()),
+    externalForce_(input.nonEqForce()),
     doNonequilibrium_(input.doGalerkinNonequilibrium()),
     nbOfIntegrationNodes_(1000),
-    //expFourierMeans_(2 * nbOfFourier_, 0),
-    trigToExpMat_(DMat::Zero(nbOfFourier_, nbOfFourier_)),
-    expToTrigMat_(DMat::Zero(nbOfFourier_, nbOfFourier_)),
+    //expFourierMeans_(2 * nbOfQModes_, 0),
+    trigToExpMat_(DMat::Zero(nbOfQModes_, nbOfQModes_)),
+    expToTrigMat_(DMat::Zero(nbOfQModes_, nbOfQModes_)),
     trigToExpTens_(sizeOfBasis_, sizeOfBasis_),
     expToTrigTens_(sizeOfBasis_, sizeOfBasis_),
-    potential_(createPotential(input)),
-    basis_(input, *potential_)
+    potential_(createPotential(input, input.galerkinPotentialName())),
+    tensorBasis_(nullptr),
+    outputFolderName_(input.outputFolderName())
   {
-    assert(nbOfFourier_ % 2 == 1);
-    cout << endl << "Number of modes : " << nbOfFourier_ << " x " << nbOfHermite_ << endl;
-    
+    assert(nbOfQModes_ % 2 == 1);
+    cout << endl << "Number of modes : " << nbOfQModes_ << " x " << nbOfPModes_ << endl;
+    cout << "Output written in " << outputFolderName() << endl;
     SIdQ_.setIdentity();
     SIdP_.setIdentity();
+    
+    //cout << "GalerkinPotential : " << input.secondPotentialName() << endl;
+    //cout << potential_->value(-1) << " " << potential_->value(0) << " " << potential_->value(1) << " " << endl;
 
-    //computeFourierCoeffsExp();
     // Computation of the passage matrix
-    double totalTime = clock();
-    computeExpToTrigMat();
+    /*computeExpToTrigMat();
     createQ();
-    createP();
-    cout << "- Galerkin::Galerkin : " << clock() - totalTime << endl;
-    //display(P_, "output/Galerkin/P");
+    createP();*/
   }
 
   Galerkin::~Galerkin()
@@ -313,47 +282,42 @@ namespace simol
     return sizeOfBasis_;
   }
   
-  int Galerkin::nbOfFourier() const
+  int Galerkin::nbOfQModes() const
   {
-    return nbOfFourier_;
+    return nbOfQModes_;
   }
   
-  int Galerkin::nbOfHermite() const
+  int Galerkin::nbOfPModes() const
   {
-    return nbOfHermite_;
+    return nbOfPModes_;
   }
 
-  const double& Galerkin::gamma() const
+  double Galerkin::gamma() const
   {
     return gamma_;
   }
   
-  double const& Galerkin::expFourierMeans(int iOfElt) const
+  double Galerkin::basisMean(int iOfVariable, int iOfElt) const
   {
-    return basis_.expFourierMeans(iOfElt);
+    return tensorBasis(iOfVariable)->basisMean(iOfElt);
   }
   
-  const DVec& Galerkin::gVector() const
+  const DVec& Galerkin::basisMeans(int iOfVariable) const
   {
-    return basis_.gVector();
+    return tensorBasis(iOfVariable)->basisMeans();
   }
   
-  double Galerkin::gVector(int iOfElt) const
+  double Galerkin::norm2meansVec(int iOfVariable) const
   {
-    return basis_.gVector(iOfElt);
-  }
-  
-  const double& Galerkin::norm2gVector() const
-  {
-    return basis_.norm2gVector();
+    return tensorBasis(iOfVariable)->norm2meansVec();
   }
 
   //psi = (1,1  1,2  ...  1,N_H  2,1 ... )
   //N_H blocks of size N_G (we concatene the columns of the matrix)
   int Galerkin::iTens(int iOfFourier2, int iOfHermite) const
   {
-    assert(iOfFourier2 < nbOfFourier_ && iOfHermite < nbOfHermite_);
-    return nbOfFourier_ * iOfHermite + iOfFourier2;
+    assert(iOfFourier2 < nbOfQModes_ && iOfHermite < nbOfPModes_);
+    return nbOfQModes_ * iOfHermite + iOfFourier2;
   }
 
 
@@ -367,53 +331,70 @@ namespace simol
     return EigenSolver<MatrixXd>(DLeta);
   }
   
-  ///Returns te coefficients of tG_i * Hj in the tG_i * H_j basis
-  ///tG designs the Fourier functions (V=0)
-  DVec Galerkin::gettGiHjTrig(int i, int j) const
+  shared_ptr<CVBasis> Galerkin::createCvBasis(Input const& input)
   {
-    DVec GiHjTrig = DVec::Zero(sizeOfBasis_);
-    GiHjTrig(iTens(i, j)) = 1;
-    return GiHjTrig;
-  }
-
-  ///Returns te coefficients of tG_i * Hj in the G_i * H_j basis
-  ///tG designs the Fourier functions (V=0)
-  DVec Galerkin::gettGiHj(int i, int j) const
-  {
-    /*DVec GiHjTrig = DVec::Zero(sizeOfBasis_);
-    GiHjTrig(iTens(i, j)) = 1;
-    DVec GiHj = trigToExpTens_ * GiHjTrig;
-    return GiHj;*/
+    TensorBasis* tensBasis = tensorBasis_;
+    shared_ptr<DVec> cvcoeffs = make_shared<DVec>(CVcoeffsVec());
+    //return new IsolatesCVBasis(dynamic_cast<TensorBasis*>(tensorBasis_), make_shared<DVec>(CVcoeffsVec()));
     
-    return trigToExpTens_ * gettGiHjTrig(i,j);
-  }
-
-
-
-  DVec Galerkin::getLtGiHj(int i, int j) const
-  { return Leta_ * gettGiHj(i, j); }
-
-  DVec Galerkin::getLtGiHjTrig(int i, int j) const
-  { return expToTrigTens_ * getLtGiHj(i, j); }
-
-  DVec Galerkin::getLinvtGiHj(int i, int j) const
-  { return solveWithSaddle(Leta_, gettGiHj(i, j)); }
-
-  DVec Galerkin::getLinvtGiHjTrig(int i, int j) const
-  { return expToTrigTens_ * getLinvtGiHj(i,j); }
-
-  /*SMat Galerkin::CVcoeffs() const
-  {
-    DVec vecCoeffs = getLinvtGiHj(0, 1);
-
-    return SMat(vecCoeffs, vecCoeffs.size(), 1);
+    if (input.systemName() == "Colloid")
+      return make_shared<ColloidCVBasis>(tensBasis, cvcoeffs);
+    else
+      return make_shared<IsolatedCVBasis>(tensBasis, cvcoeffs);
+      
+    /*if (input.doGalerkinCV())
+    {
+        if (input.dynamicsName() == "Overdamped")
+        {
+          if (input.potentialName() == "Sinusoidal") return new PeriodicOverdampedGalerkin(input);
+          else if (input.potentialName() == "DoubleWell" || input.potentialName() == "Harmonic" || input.potentialName() == "TwoTypes") return new ColloidOverdampedGalerkin(input);
+          else throw runtime_error("This potential matches no Galerkin method !");
+        }
+        else if (input.dynamicsName() == "Langevin")
+        {
+          if (input.potentialName() == "Sinusoidal") return new PeriodicLangevinGalerkin(input);
+          else if (input.potentialName() == "DoubleWell" || input.potentialName() == "Harmonic") return new ColloidLangevinGalerkin(input);
+          else throw runtime_error("This potential matches no Galerkin method !");
+        }
+        //else if (input.dynamicsName() == "BoundaryLangevin") return new BoundaryLangevinGalerkin(input);
+        else throw runtime_error("This dynamics matches no Galerkin method !");
+      }
+    else
+      return nullptr;
   }*/
+  }
   
-
-  
-  CVBasis Galerkin::makeCvBasis()
+  ///
+  /// Builds the columns corresponding to degenerate directions of the Galerkin space, plus the constant function
+  DMat Galerkin::computeConstraints(double tol) const
   {
-    return CVBasis(dynamic_cast<TensorBasis*>(&basis_), make_shared<DVec>(CVcoeffsVec()));
+    DMat Sq = tensorBasis(0)->gramMatrix();
+    ComplexEigenSolver<DMat> ces(Sq);
+    DVec vapSq = ces.eigenvalues().real();
+    DMat vepSq = ces.eigenvectors().real();
+    cout << "Eigenvalues of Sq :" << vapSq.adjoint() << endl;
+    //cout << "Eigenvectors of S :" << endl << vepS << endl;
+    DMat Cq(DMat::Zero(nbOfQModes(), nbOfQModes()));
+
+    int nbOfSmallQ = 0;    
+
+    ofstream outSpGramMat(outputFolderName()+"spGramMatQ", ofstream::app);
+    for (int iOfElt = 0; iOfElt < nbOfQModes(); iOfElt++)
+    {
+      outSpGramMat << nbOfQModes() << " " << vapSq(iOfElt) << endl;
+      if (vapSq(iOfElt) < tol)
+      {
+        //cout << "Addeed col " << iOfElt << " as constraint n" << nbOfSmall << endl;
+        Cq.col(nbOfSmallQ) = vepSq.col(iOfElt);
+        nbOfSmallQ++;
+      }
+    }
+    int nbOfSmall = nbOfSmallQ*nbOfPModes();
+    DMat C(DMat::Zero(sizeOfBasis(), nbOfSmall+1));
+    C.rightCols(nbOfSmall) = kron(Cq, DIdP_);
+    C.col(0) = tensorBasis()->basisMeans();
+    cout << nbOfSmallQ << " / " << nbOfQModes() << " Q modes deleted" << endl;
+    return C;
   }
   
   void Galerkin::computeEigen() const
@@ -426,173 +407,218 @@ namespace simol
     
     std::sort(eigVal.begin(), eigVal.end(), hasSmallerNorm);
     
-    //for (int i=0; i<sizeOfBasis(); i++)
-    //  cout << eigVal[i] << endl;
-    
-    
-    /*ofstream outFinalGap("output/Galerkin/finalGap.txt",  std::ofstream::app);
-    //outFinalGap << externalForce_ << " " <<  amplitude_ << " " << gamma() << " " << nbOfFourier() << " " << nbOfHermite() << " " << abs(eigVal[0]) << " " << abs(eigVal[1]) << endl;
-    DVec gradV = amplitude_ * gettGiHj(2,0) / sqrt(2.);
-    cout << "gradV : " << gradV << endl << endl;
-    DVec gradVz = gradV - dot(gradV, gVector()) * gVector();
-    cout << "gradVz : " << gradVz << endl;
-   
-    DVec CV = solve(Leq_, gradV);
-    cout << "CV before proj : " << CV << endl;
-    DVec CVzero = CV - dot(CV, gVector()) * gVector();
-    cout << "CV after proj : " << CVzero << endl;
-    DVec LCV = Leq_*CV;
-    DVec LCVz = Leq_*CVzero;
-    cout << "LCV : " << LCV << endl;
-    cout << "LCVz : " << LCVz << endl;
-    DVec CVneq = CV - solve(Leq_, gradV);
-    outFinalGap << externalForce_ << " " <<  amplitude_ << " " << gamma() << " " << nbOfFourier() << " " << nbOfHermite() << " " << abs(eigVal[0]) << " " << abs(eigVal[1]) << " " << CVneq.norm() << endl;*/
-    
     ofstream out_eigvalLeq("output/Galerkin/eigvalLeq");
     for (int i = 0; i < (int) eigVal.size(); i++)
       out_eigvalLeq << real(eigVal[i]) << " " << imag(eigVal[i]) << endl;
     
     cout << "computeEigen ok" << endl;
-
-    //displayCplx(eigVal, out_eigvalLeq);
   }
   
-
-
-  
-  
-  
-  //########## OverdampedGalerkin #########
-  
-  OverdampedGalerkin::OverdampedGalerkin(Input const& input):
-    Galerkin(input)
-  {    
-    computeExpToTrigTens();
-    createLeta();
-  }
-  
-  ///
-  /// The matrix Leq, Leta are positive !
-  void OverdampedGalerkin::createLeta()
+  void Galerkin::studyLangevinErrors(bool doComputeRef)
   {
-    basis_(0)->laplacianMatrix(Leq_);
-    Leq_ /= beta_;
+    string outPath = "output/Galerkin/Langevin/H2/";
+    //string outPath = "output/Galerkin/Langevin/velocity/";
     
-    basis_(0)->gradMatrix(Lrep_);
-    Leta_ = Leq_ - externalForce_ * Lrep_;
-    /*for (int iOfHermite = 0; iOfHermite < (int)nbOfHermite_; iOfHermite++)
-      for (int jOfHermite = 0; jOfHermite < (int)nbOfHermite_; jOfHermite++)
-        Leq_(iOfHermite, iOfHermite) = - 1 / beta_ * basis_(0)->xLaplacianY(iOfHermite+1, jOfHermite+1);*/
-  }
-  
-  void OverdampedGalerkin::computeExpToTrigTens()
-  {
-    cout << "Suboptimal implementation of OverdampedGalerkin::computeExpToTrigTens !!!" << endl;
-    trigToExpTens_ = trigToExpMat_.sparseView();
-    expToTrigTens_ = expToTrigMat_.sparseView();
-  }
-  
-  void OverdampedGalerkin::compute()
-  {
-    cout << "start OverdampedGalerkin::compute()" << endl;
-    cout << "############ Leq ############" << endl;
-    //cout << Leq_ << endl << endl;
     
-    cout << "Leq_ size : " << Leq_.rows() << " x " << Leq_.cols() << endl;
-    cout << "Leq_ nnz : " << Leq_.nonZeros() << endl;
-
-    DMat DLeq(Leq_);
-    display(Leq_, "output/Galerkin/Overdamped/Leq");
-
-
-    //DMat DLeqSad = shapeSaddle(DLeq);
-    //display(DLeqSad, "output/Galerkin/Overdamped/LeqSad");
-
-    cout << "############ DLeqSad ############" << endl;
-    //cout << DLeqSad << endl << endl;
-
-    //DMat IdSad(sizeOfBasis_+1, sizeOfBasis_, fill::eye);
-
-    cout << "Computing DLeqInv..."; cout.flush();
-    //DMat LeqInvSad = inv(DLeqSad);
-    DMat DLeqInv = invWithSaddle(DLeq);
-    cout << "OK" << endl;
+    cout << "gamma = " << gamma_ << endl;
     
-    cout << "Norm2gVector : " << norm2gVector() << endl;
-    cout << "Norm of LeqinvSad : " << DLeqInv.norm() << endl;
-    cout << "Norm of Leqinv : " << DLeq.inverse().norm() << endl;
-    //cout << "Norm of Sinv Leqinv : " << shapePrec(DLeq).inverse().norm() << endl;
-    display(DLeqInv, "output/Galerkin/Overdamped/DLeqInv");
+    SMat Lsad = shapeSaddle(Leq(), SU_);
+    //cout << Lsad << endl;
     
-    cout << "Computing LeqInv..."; cout.flush();
-    //DMat LeqInvSad = inv(DLeqSad);
-    DMat LeqInv = invWithSaddle(Leq_);
-    cout << "OK" << endl;
-    display(DLeqInv, "output/Galerkin/Overdamped/DLeqInv");
+    int regOfq = 2;
+    int regOfp = 2;
+    DVec z(nbOfQModes()* nbOfPModes());       // y is weakly H^1/2+regOfq in q and H^1/2+regOfp in p
+    for (int iOfFourier=0; iOfFourier < nbOfQModes(); iOfFourier++)
+      for (int iOfHermite=0; iOfHermite < nbOfPModes(); iOfHermite++)
+        z(iOfHermite*nbOfQModes() + iOfFourier) = (iOfFourier?pow(iOfFourier, -.5-regOfq):1) * (iOfHermite?pow(iOfHermite, -.5-regOfp/2.):1);
     
-    cout << "g   = " << gVector() << endl << endl;
-    cout << "L g = " << Leq_ * gVector() << endl << endl;
+    //DVec z = gettGiHj(0,1); 
     
-    DVec gradV = getGradV();
-    display(gradV, "output/Galerkin/Overdamped/gradV");
+    string strRefLinvZ = outPath+"ref/refLinvZ"+doubleToString(gamma_)+".txt";
+    string strRefZ = outPath+"ref/refZ"+doubleToString(gamma_)+".txt";
+    string strRefSpGap = outPath+"ref/refSpGap.txt";
     
-    DVec LinvGradV = solve(Leq_, gradV);
-    display(LinvGradV, "output/Galerkin/Overdamped/LinvGradV");
-    
-    DVec LinvGradVsad = solveWithSaddle(Leq_, gradV);
-    display(LinvGradVsad, "output/Galerkin/Overdamped/LinvGradVsad");
-  }
-  
-  ///
-  /// Returns the coefficients of the sinus functions in the G_i * H_j basis
-  DVec OverdampedGalerkin::getGradV() const
-  {    
-    return amplitude_ * gettGiHj(1,0) / sqrt(2.);    // /!\ the basis elements are normalized in L2, not Linfty, so   sin = gettGiHj(1,0) / sqrt(2.)
-  }
-  
-  DVec OverdampedGalerkin::CVcoeffsVec() const
-  {
-    //return gVector();
-    //return getGradV();
-    
-    /*if (doNonequilibrium())
-      return -projectionOrthoG(solve(Leta_, -projectionOrthoG(getGradV())));
-    else
-      return -projectionOrthoG(solve(Leq_, -projectionOrthoG(getGradV())));*/
-        
-    if (doNonequilibrium())
+    if (doComputeRef)
     {
-      cout << "Computing the control variate by a nonequilibrium LLT" << endl;
+      DVec refLinvZ = solveWithSaddle(Leq(), z, SU_);
+      double refSpGap = computeSpectralGap(Lsad);
+      //DMat refLinvZMat = reshape(refLinvZ, nbOfQModes(), nbOfPModes());
       
-      ///TODO : use a matrix free approach to avoid dense matrices
-      SMat LtL = Leta_.transpose() * Leta_;
-      DMat DKeta = DMat(LtL) + gVector() * gVector().transpose();
-      SMat Keta = DKeta.sparseView();
-      //Eigen::LeastSquaresConjugateGradient<SMat> solver(Leta_);
-      Eigen::ConjugateGradient<SMat> solver0(Keta);
-      //solver0.setTolerance(1e-12);
-      DVec CV0 = -solver0.solve(-Leta_.transpose() * getGradV());
-      cout << "CG : " << solver0.info() << " " << solver0.error() << " " << solver0.iterations()<< endl << Keta * CV0 - Leta_.transpose() * getGradV() << endl;
-      Eigen::BiCGSTAB<SMat> solver(Keta);
-      //solver.setTolerance(1e-12);
-      DVec CV = -solver.solve(-Leta_.transpose() * getGradV());
-      cout << "BC : " << solver.info() << " " << solver.error() << " " << solver0.iterations() << endl <<Keta * CV - Leta_.transpose() * getGradV() << endl;
-      return CV;
-      //return -projectionOrthoG(solve(Keta, -Leta_.transpose() * getGradV()));
+      ofstream outRefZ(strRefZ);
+      if (!outRefZ.is_open())
+        throw runtime_error("Reference output file in strRefLinvZ cannot be open");
+      ofstream outRefLinvZ(strRefLinvZ);      
+      ofstream outRefSpGap(strRefSpGap, std::ofstream::app);
+      // Closing the file is very important if it is read right after !
+      outRefZ << setprecision(15); outRefZ << "# " << gamma_ << " " << nbOfQModes() << " " << nbOfPModes() << endl << z; outRefZ.close();
+      outRefLinvZ << setprecision(15); outRefLinvZ << "# " << gamma_ << " " << nbOfQModes() << " " << nbOfPModes() << endl << refLinvZ; outRefLinvZ.close();
+      outRefSpGap << setprecision(15); outRefSpGap << gamma_<< " " << refSpGap << " " << dot(refLinvZ, z) << endl; outRefSpGap.close();
+      
+      cout << "Reference written in " << strRefLinvZ << endl;
     }
     else
-    {
-      cout << "Computing the control variate by an equilibrium CG" << endl;
-      //SMat Keq = Leq_.transpose() * Leq_;
-      //return -projectionOrthoG(solve(Keq, -Leq_.transpose() * getGradV()));
-      Eigen::ConjugateGradient<SMat> solver(Leq_);
-      return -solver.solve(-projectionOrthoG(getGradV()));
-    }
+    {    
+
+      vector<int> dimensions;
+      
+      cout << "Reading reference in " << strRefZ << endl;
+      DVec refZ = scanTensor(strRefZ, dimensions);
+      cout << "Reading reference in " << strRefLinvZ << endl;
+      DVec refLinvZ = scanTensor(strRefLinvZ, dimensions);
+      /*ifstream inSpGap(strRefSpGap);
+      if (!inSpGap.is_open())
+        throw runtime_error(strRefSpGap+" is not a valid path !");*/
+      cout << "Reading reference in " << strRefSpGap << endl;
+      map<double, double> gammaToSpGap = scanMap(strRefSpGap);
+      //double refSpGap = readItem(inSpGap);      
+      if (gammaToSpGap.find(gamma_) == gammaToSpGap.end())
+        throw runtime_error("gamma = "+doubleToString(gamma_)+" not found in refSpGap !");
+      double refSpGap = gammaToSpGap[gamma_];
+      int refNbOfQModes = dimensions[0];
+      int refNbOfPModes = dimensions[1];
+      
+      cout << "Reference solution : " << refNbOfQModes << " x " << refNbOfPModes << endl;
+      if (refNbOfQModes < nbOfQModes() || refNbOfPModes < nbOfPModes())
+        throw runtime_error("The reference solution must be bigger !");
+      
+      DMat refLinvZMat = reshape(refLinvZ, refNbOfQModes, refNbOfPModes);
+      DMat truncRefLinvZMat = refLinvZMat.topLeftCorner(nbOfQModes(), nbOfPModes());
+      DVec truncRefLinvZ = reshape(truncRefLinvZMat, 1, nbOfQModes() * nbOfPModes());
+      
+      cout << "Starting to solve" << endl;
+      DVec LinvZ = solveWithSaddleAndGuess(Leq(), z, truncRefLinvZ, SU_);
+      
+      DMat LinvZMat = reshape(LinvZ, nbOfQModes(), nbOfPModes());
+      cout << "Solved !" << endl;
+      
+      DMat approxErrorMat = refLinvZMat; approxErrorMat.topLeftCorner(nbOfQModes(), nbOfPModes()) = DMat::Zero(nbOfQModes(), nbOfPModes()); // Xref - Pi Xref
+      DMat consistErrorMat = LinvZMat - refLinvZMat.topLeftCorner(nbOfQModes(), nbOfPModes());   // X - Pi Xref
+      
+      double approxError = approxErrorMat.norm();
+      double consistError = consistErrorMat.norm();
+      double totalError = sqrt(pow(approxError, 2) + pow(consistError, 2));
+      double mobilityError = dot(refLinvZ, refZ) - dot(LinvZ, z);
+      cout << "Reference mobility : " << dot(refLinvZ, refZ) << endl;
+      
+      double spGap = refSpGap;
+      //if (false)
+        spGap = computeSpectralGap(Lsad);
+      double spGapError = refSpGap - spGap;
+      cout << setprecision(15);
+      cout << "spGapError = " << refSpGap << " - " << spGap << " = " << spGapError << endl;
+
+      
+      ofstream outError(outPath+"errors.txt", std::ofstream::app);
+      outError << gamma_ << " " << nbOfQModes() << " " << nbOfPModes() << " " << approxError << " " << consistError << " " << totalError << " " << mobilityError << " " << spGap << " " << spGapError << endl;;
+    } 
   }
-
-
   
+  void Galerkin::studyColloidLangevinErrors(bool doComputeRef)
+  {
+    //string outPath = "output/Galerkin/Langevin/DoubleWell/";
+    //string outPath = "output/Galerkin/Langevin/velocity/";
+    
+    
+    cout << "gamma = " << gamma_ << endl;
+    
+    DMat C = computeConstraints(1e-6);
+    SMat Lsad = shapeSaddle(Leq(), C);
+    SMat S = tensorBasis_->gramMatrix();
+    //cout << Lsad << endl;
+    
+    DVec Z = CVObservable();
+    
+    string strRefLinvZ = outputFolderName()+"ref/refLinvZ"+doubleToString(gamma_)+".txt";
+    string strRefZ = outputFolderName()+"ref/refZ"+doubleToString(gamma_)+".txt";
+    string strRefSpGap = outputFolderName()+"ref/refSpGap.txt";
+    
+    if (doComputeRef)
+    {
+      DVec refLinvZ = solveWithSaddle(Leq(), S*Z, C);
+      //double refSpGap = computeSpectralGap(Lsad);
+      //DMat refLinvZMat = reshape(refLinvZ, nbOfQModes(), nbOfPModes());
+      DMat DLsad = Lsad;
+      ComplexEigenSolver<DMat> ces(DLsad);
+      DVec eigLsad = ces.eigenvalues().real();
+      //cout << endl << "Sp A : " << ces.eigenvalues().real().adjoint() << endl;
+      double refSpGap = fabs(eigLsad[0]);
+      /*for (int iOfVap = 1; iOfVap < (int)eigLsad.size(); iOfVap++)
+        if (fabs(eigLsad[iOfVap]) < refSpGap)
+          refSpGap = eigLsad[iOfVap];*/
+      
+      ofstream outRefZ(strRefZ);
+      if (!outRefZ.is_open())
+        throw runtime_error("Reference output file in strRefLinvZ cannot be open");
+      ofstream outRefLinvZ(strRefLinvZ);      
+      ofstream outRefSpGap(strRefSpGap, std::ofstream::app);
+      // Closing the file is very important if it is read right after !
+      outRefZ << setprecision(15); outRefZ << "# " << gamma_ << " " << nbOfQModes() << " " << nbOfPModes() << endl << Z; outRefZ.close();
+      outRefLinvZ << setprecision(15); outRefLinvZ << "# " << gamma_ << " " << nbOfQModes() << " " << nbOfPModes() << endl << refLinvZ; outRefLinvZ.close();
+      outRefSpGap << setprecision(15); outRefSpGap << gamma_<< " " << refSpGap << " " << dot(refLinvZ, Z) << endl; outRefSpGap.close();
+      
+      cout << "Reference written in " << strRefLinvZ << endl;
+    }
+    else
+    {    
 
+      
+      vector<int> dimensions;
+      
+      cout << "Reading reference in " << strRefZ << endl;
+      DVec refZ = scanTensor(strRefZ, dimensions);
+      cout << "Reading reference in " << strRefLinvZ << endl;
+      DVec refLinvZ = scanTensor(strRefLinvZ, dimensions);
+      /*ifstream inSpGap(strRefSpGap);
+      if (!inSpGap.is_open())
+        throw runtime_error(strRefSpGap+" is not a valid path !");*/
+      cout << "Reading reference in " << strRefSpGap << endl;
+      map<double, double> gammaToSpGap = scanMap(strRefSpGap);
+      //double refSpGap = readItem(inSpGap);      
+      if (gammaToSpGap.find(gamma_) == gammaToSpGap.end())
+        throw runtime_error("gamma = "+doubleToString(gamma_)+" not found in refSpGap !");
+      double refSpGap = gammaToSpGap[gamma_];
+      int refNbOfQModes = dimensions[0];
+      int refNbOfPModes = dimensions[1];
+      
+      cout << "Reference solution : " << refNbOfQModes << " x " << refNbOfPModes << endl;
+      if (refNbOfQModes < nbOfQModes() || refNbOfPModes < nbOfPModes())
+        throw runtime_error("The reference solution must be bigger !");
+      
+      DMat refLinvZMat = reshape(refLinvZ, refNbOfQModes, refNbOfPModes);
+      DMat truncRefLinvZMat = refLinvZMat.topLeftCorner(nbOfQModes(), nbOfPModes());
+      DVec truncRefLinvZ = reshape(truncRefLinvZMat, 1, nbOfQModes() * nbOfPModes());
+      
+      cout << "Starting to solve" << endl;
+      DVec LinvZ = solveWithSaddleAndGuess(Leq(), Z, truncRefLinvZ, SU_);
+      
+      DMat LinvZMat = reshape(LinvZ, nbOfQModes(), nbOfPModes());
+      cout << "Solved !" << endl;
+      
+      DMat approxErrorMat = refLinvZMat; approxErrorMat.topLeftCorner(nbOfQModes(), nbOfPModes()) = DMat::Zero(nbOfQModes(), nbOfPModes()); // Xref - Pi Xref
+      DMat consistErrorMat = LinvZMat - refLinvZMat.topLeftCorner(nbOfQModes(), nbOfPModes());   // X - Pi Xref
+      
+      /*DVec truncLinvZ= DVec::Zero(refNbOfQModes*refNbOfPModes); 
+      truncLinvZTrunc.head(nbOfQModes()* nbOfPModes()) = LinvZ;
+      DVec consistImErrorMat = refL*/
+      
+      double approxError = approxErrorMat.norm();
+      double consistError = consistErrorMat.norm();
+      double totalError = sqrt(pow(approxError, 2) + pow(consistError, 2));
+      double mobilityError = dot(refLinvZ, refZ) - dot(LinvZ, Z);
+      cout << "Reference mobility : " << dot(refLinvZ, refZ) << endl;
+      
+      double spGap = refSpGap;
+      //if (false)
+        spGap = computeSpectralGap(Lsad);
+      double spGapError = refSpGap - spGap;
+      cout << setprecision(15);
+      cout << "spGapError = " << refSpGap << " - " << spGap << " = " << spGapError << endl;
+
+      
+      ofstream outError(outputFolderName()+"errors.txt", std::ofstream::app);
+      outError << gamma_ << " " << nbOfQModes() << " " << nbOfPModes() << " " << approxError << " " << consistError << " " << totalError << " " << mobilityError << " " << spGap << " " << spGapError << endl;;
+    } 
+  }
 
 
 }

@@ -99,13 +99,13 @@ namespace simol
 
       // FUNCTION CARACTERIZATION
 
-      virtual double basisFunction(System const& syst, int iOfFunction = 0) const = 0;
+      virtual double value(System const& syst) const = 0;
 
 
-      virtual double laplacianQ(System const& syst, int iOfParticle = 0, int iOfFunction = 0) const = 0;
+      /*virtual double laplacianQ(System const& syst, int iOfParticle = 0, int iOfFunction = 0) const = 0;
       virtual DVec gradientQ(System const& syst, int iOfParticle = 0, int iOfFunction = 0) const = 0;
       virtual double laplacianP(System const& syst, int iOfParticle = 0, int iOfFunction = 0) const = 0;
-      virtual DVec gradientP(System const& syst, int iOfParticle = 0, int iOfFunction = 0) const = 0;
+      virtual DVec gradientP(System const& syst, int iOfParticle = 0, int iOfFunction = 0) const = 0;*/
       
 
       virtual void display(long int iOfStep);
@@ -122,11 +122,11 @@ namespace simol
   {
     public:
       SinusControlVariate(const Input& input, int idObs, shared_ptr<CVBasis> cvBasis0);
-      double basisFunction(System const& syst, int iOfFunction = 0) const;
-      virtual double laplacianQ(System const& syst, int iOfParticle = 0, int iOfFunction = 0) const;
+      double value(System const& syst) const;
+      /*virtual double laplacianQ(System const& syst, int iOfParticle = 0, int iOfFunction = 0) const;
       virtual DVec gradientQ(System const& syst, int iOfParticle = 0, int iOfFunction = 0) const;
       virtual double laplacianP(System const& syst, int iOfParticle = 0, int iOfFunction = 0) const;
-      virtual DVec gradientP(System const& syst, int iOfParticle = 0, int iOfFunction = 0) const;
+      virtual DVec gradientP(System const& syst, int iOfParticle = 0, int iOfFunction = 0) const;*/
   };
 
   class BasisControlVariate : public ControlVariate
@@ -141,11 +141,11 @@ namespace simol
       double const& cvCoeffs(int i) const;
       double& cvCoeffs(int i);
       
-      double basisFunction(System const& syst, int iOfFunction = 0) const;
-      virtual double laplacianQ(System const& syst, int iOfParticle = 0, int iOfFunction = 0) const;
+      double value(System const& syst) const;
+      /*virtual double laplacianQ(System const& syst, int iOfParticle = 0, int iOfFunction = 0) const;
       virtual DVec gradientQ(System const& syst, int iOfParticle = 0, int iOfFunction = 0) const;
       virtual double laplacianP(System const& syst, int iOfParticle = 0, int iOfFunction = 0) const;
-      virtual DVec gradientP(System const& syst, int iOfParticle = 0, int iOfFunction = 0) const;
+      virtual DVec gradientP(System const& syst, int iOfParticle = 0, int iOfFunction = 0) const;*/
   };
 
   class ExpFourierHermiteControlVariate : public BasisControlVariate
@@ -160,7 +160,18 @@ namespace simol
       virtual void displayGradQMap(ofstream& out) const;
       virtual void displayGradPMap(ofstream& out) const;*/
   };
-
+  
+  class HermiteHermiteControlVariate : public BasisControlVariate
+  {
+    public:
+      HermiteHermiteControlVariate(const Input& input, int idObs, shared_ptr<CVBasis> cvBasis0);
+  };
+  
+  class ExpHermiteHermiteControlVariate : public BasisControlVariate
+  {
+    public:
+      ExpHermiteHermiteControlVariate(const Input& input, int idObs, shared_ptr<CVBasis> cvBasis0);
+  };
 }
 
 #endif

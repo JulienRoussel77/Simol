@@ -9,33 +9,37 @@ namespace simol
   {
     public:
       LangevinGalerkin(Input const& input);
-
-      virtual void computeExpToTrigTens();
+      virtual void createOperators();
+  
+      //virtual void computeExpToTrigTens();
       virtual void createLthm0();
       virtual void createLthm();
       virtual void compute() = 0;
-      virtual DVec CVcoeffsVec() const = 0;
+      virtual DVec CVcoeffsVec() const;
+      virtual DVec CVObservable() const = 0;
+      virtual DVec solveResilient(const SMat& A, const DVec& Y) const;
   };
   
   class PeriodicLangevinGalerkin : public LangevinGalerkin
   {
-    public:
-      PeriodicLangevinGalerkin(Input const& input);
+  public:
+    PeriodicLangevinGalerkin(Input const& input);
 
-      virtual void compute();
-      DVec CVcoeffsVec() const;
+    //maxOfFourier_((nbOfQModes_ + 1) / 2),  //ex : 3
+    virtual void compute();
+    virtual DVec CVObservable() const;
   };
   
   class ColloidLangevinGalerkin : public LangevinGalerkin
   {
-    public:
-      ColloidLangevinGalerkin(Input const& input);
+  public:
+    ColloidLangevinGalerkin(Input const& input);
 
-      virtual void compute();
-      DVec CVcoeffsVec() const;
+    virtual void compute();
+    virtual DVec CVObservable() const;
   };
 
-  class BoundaryLangevinGalerkin : public Galerkin
+  /*class BoundaryLangevinGalerkin : public Galerkin
   {
       //SMat SId_;
     public:
@@ -43,14 +47,14 @@ namespace simol
       int iTens(int iOfFourier2, int iOfHermite, int iOfParticle) const;
       SMat PMatToTens(SMat const& PMat, int iOfParticleP);
       SMat doubleMatToTens(SMat const& QMat, SMat const& PMat, int iOfParticleQ, int iOfParticleP);
-      virtual void computeExpToTrigTens();
+      //virtual void computeExpToTrigTens();
       void createLham();
       virtual void createLthm0();
       virtual void createLthm();
 
       virtual void compute();
       DVec CVcoeffsVec() const {throw runtime_error("CVcoeffs not implemented for the chain !");}
-  };
+  };*/
 
 
 }

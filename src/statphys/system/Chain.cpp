@@ -50,6 +50,22 @@ namespace simol
     }
   }
   
+  ///
+  ///Computes the instant value of the observable length
+  double Chain::length() const
+  {
+    // /!\ Warning : the chain length is computed assuming it is not attached...
+    DVec r12 = getParticle(0).position() - getParticle(nbOfParticles()-1).position();
+    return r12.norm();
+  }
+  
+  ///
+  ///Draw a distance or a bending under the invariant measure at inverse temperature "localBeta"
+  double Chain::drawPotLaw(double localBeta)
+  {
+    return pairPotential_->drawLaw(localBeta, rng_);
+  }
+  
 
 
   //###### BiChain ######
@@ -64,14 +80,15 @@ namespace simol
   {
     cout << " - Sampling the positions..." << endl;
     double alpha, localTemp, localDist;
+    double refPosition = 0;
     for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
     {
       alpha = iOfParticle / (double) nbOfParticles();
       localTemp = (1 - alpha) * dynaPara.temperatureLeft() + alpha * dynaPara.temperatureRight();
       localDist = drawPotLaw(1 / localTemp);
-      double prevPosition = (iOfParticle==0)?0:getParticle(iOfParticle - 1).position(0);
 
-      getParticle(iOfParticle).position(0) = prevPosition + localDist;
+      refPosition += localDist;
+      getParticle(iOfParticle).position(0) = refPosition;
     }
   }
 
@@ -87,7 +104,7 @@ namespace simol
     
     //for (ParticleIterator it = begin(); !finished(it); ++it)
     for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
-      getParticle(iOfParticle).resetForce(potential());
+      getParticle(iOfParticle).resetForce(pairPotential());
     
     for (ParticlePairIterator it = pairBegin(); !pairFinished(it); incrementePairIterator(it))
       interaction(it.particle1(), it.particle2());
@@ -143,9 +160,9 @@ namespace simol
   {
     DVec delta = particle3.position() - 2 * particle2.position() + particle1.position();
     //double d12 = r12.norm();
-    double energy123 = potential(delta);
-    DVec force123 = potentialForce(delta);    // = - v'(r_2)
-    double lapla123 = laplacian(delta);
+    double energy123 = pairPotential()(delta);
+    DVec force123 = pairPotential().potentialForce(delta);    // = - v'(r_2)
+    double lapla123 = pairPotential().laplacian(delta);
 
     particle2.potentialEnergy() = energy123;
     particle1.force() += force123;
@@ -159,7 +176,7 @@ namespace simol
   {
     //std::cout << "TriChain::computeAllForces" << std::endl;
     for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
-      getParticle(iOfParticle).resetForce(potential());
+      getParticle(iOfParticle).resetForce(pairPotential());
     //for (auto&& particle : configuration_)
     //  dyna.computeForce(particle);
     triInteraction(getParticle(-2), getParticle(-1), getParticle(0));

@@ -51,8 +51,8 @@ namespace simol
       if (data["Output"]["ParametersName"].Type() == YAML::NodeType::Scalar)
         vecParameters = vector<string>(1, data["Output"]["ParametersName"].as<string>());
       else if (data["Output"]["ParametersName"].Type() == YAML::NodeType::Sequence)
-      for (int iOfVec = 0; iOfVec < (int)data["Output"]["ParametersName"].size(); iOfVec++)
-        vecParameters = data["Output"]["ParametersName"].as<std::vector<string>>();
+      //for (int iOfVec = 0; iOfVec < (int)data["Output"]["ParametersName"].size(); iOfVec++)
+      vecParameters = data["Output"]["ParametersName"].as<std::vector<string>>();
       
       for (int iOfVec = 0; iOfVec < (int)vecParameters.size(); iOfVec++)
       {
@@ -68,7 +68,7 @@ namespace simol
         else if (vecParameters[iOfVec] == "seed")     name += doubleToString(seed());
         else if (vecParameters[iOfVec] == "potAlpha") name += doubleToString(potentialAlpha());
         else if (vecParameters[iOfVec] == "potBeta")  name += doubleToString(potentialBeta());
-	else if (vecParameters[iOfVec] == "MTSfrequency")  name += doubleToString(MTSfrequency());
+        else if (vecParameters[iOfVec] == "MTSfrequency")  name += doubleToString(MTSfrequency());
         else throw std::runtime_error(vecParameters[iOfVec] + " is not a parameter name !");
       }
       name += "/";
@@ -250,7 +250,7 @@ namespace simol
   {return (dynamicsName() == "Overdamped" && systemName() == "Isolated");}
   
   bool Input::doLength() const
-  {return systemName() == "Isolated";}
+  {return (systemName() == "Isolated") || (systemName() == "Chain") || (systemName() == "Colloid");}
   
   bool Input::doMidFlow() const
   {return dynamicsName() == "BoundaryLangevin";}

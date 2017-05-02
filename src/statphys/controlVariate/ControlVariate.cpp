@@ -18,6 +18,10 @@ namespace simol
       return new SinusControlVariate(input, idObs, cvBasis0);
     else if (input.controlVariateName() == "ExpFourierHermite")
       return new ExpFourierHermiteControlVariate(input, idObs, cvBasis0);
+    else if(input.controlVariateName() == "HermiteHermite")
+      return new HermiteHermiteControlVariate(input, idObs, cvBasis0);
+    else if(input.controlVariateName() == "ExpHermiteHermite")
+      return new ExpHermiteHermiteControlVariate(input, idObs, cvBasis0);
     else
       std::cout << input.controlVariateName() << " is not a valid control variate !" << std::endl;
     return 0;
@@ -46,9 +50,11 @@ namespace simol
     else if (input.controlVariateCoeffsPath() != "None")
     {
       cout << "CVcoeffs from file !" << endl;
-      throw runtime_error("Reading CV coefficients from a file is not fixed yet !");
+      //throw runtime_error("Reading CV coefficients from a file is not fixed yet !");
       std::string coeffsPath = input.outputFolderName() + input.controlVariateCoeffsPath();
-      ifstream file(coeffsPath);
+      //ifstream file(coeffsPath);
+      vector<int> dimensions;
+      cvBasis().cvCoeffs_ = make_shared<DVec>(scanTensor(coeffsPath, dimensions));
       //coeffsVec_ = SMat(coeffsPath, getNbOfLines(file));
     }
     else
@@ -347,13 +353,13 @@ namespace simol
     ControlVariate(input, idObs, cvBasis0, 1)
   {}
 
-  double SinusControlVariate::basisFunction(System const& syst, int /*iOfFunction*/) const
+  double SinusControlVariate::value(System const& syst) const
   {
     double q = syst(0).position(0);
     return sin(2 * M_PI * q);
   }
 
-  DVec SinusControlVariate::gradientQ(System const& syst, int /*iOfParticle*/, int /*iOfFunction*/) const
+  /*DVec SinusControlVariate::gradientQ(System const& syst, int iOfParticle, int iOfFunction) const
   {
     double q = syst(0).position(0);
     DVec grad(dimension_);
@@ -361,22 +367,22 @@ namespace simol
     return grad;
   }
 
-  double SinusControlVariate::laplacianQ(System const& syst, int /*iOfParticle*/, int /*iOfFunction*/) const
+  double SinusControlVariate::laplacianQ(System const& syst, int iOfParticle, int iOfFunction) const
   {
     double q = syst(0).position(0);
     return - pow (2 * M_PI, 2) * sin(2 * M_PI * q);
   }
 
 
-  double SinusControlVariate::laplacianP(System const&, int /*iOfParticle*/, int /*iOfFunction*/) const
+  double SinusControlVariate::laplacianP(System const&, int iOfParticle, int iOfFunction) const
   {
     return 0;
   }
 
-  DVec SinusControlVariate::gradientP(System const&, int /*iOfParticle*/, int /*iOfFunction*/) const
+  DVec SinusControlVariate::gradientP(System const&, int iOfParticle, int iOfFunction) const
   {
     return DVec(dimension_);
-  }
+  }*/
 
 
   //#####BasisControlVariate#####
@@ -413,33 +419,33 @@ namespace simol
     return (*cvBasis().cvCoeffs_)(i);
   }
 
-  double BasisControlVariate::basisFunction(System const&, int /*iOfFunction*/) const
+  double BasisControlVariate::value(System const&) const
   {
     return dot(cvCoeffs(), basisValues());
   }
 
-  DVec BasisControlVariate::gradientQ(System const& syst, int iOfParticle, int /*iOfFunction*/) const
+  /*DMat BasisControlVariate::gradientQ(System const& syst, int iOfParticle, int iOfFunction) const
   {
     //cout << "BasisControlVariate::gradientQ" << endl;
-    DVec result(1, 0);
+    DMat result = DMat::Zero(syst.dimension(), syst.nbOfParticles());
     
-    for (int i=0; i < (int)cvCoeffs().size(); i++)
-      result += cvCoeffs(i) * cvBasis().basis_->gradientQ(syst, iOfParticle, i);
+    for (int iOfFunction=0; iOfFunction < (int)cvCoeffs().size(); iOfFunction++)
+      result += cvCoeffs(iOfFunction) * cvBasis().basis_->gradientQ(syst, iOfFunction);
       
     return result;
   }
 
-  double BasisControlVariate::laplacianQ(System const& syst, int iOfParticle, int /*iOfFunction*/) const
+  double BasisControlVariate::laplacianQ(System const& syst, int iOfFunction) const
   {
     double result = 0;
 
-    for (int i=0; i < (int)cvCoeffs().size(); i++)
-      result += cvCoeffs(i) * cvBasis().basis_->laplacianQ(syst, iOfParticle, i);
+    for (int iOfFunction=0; iOfFunction < (int)cvCoeffs().size(); iOfFunction++)
+      result += cvCoeffs(iOfFunction) * cvBasis().laplacianQ(syst, iOfFunction);
 
     return result;
   }
 
-  DVec BasisControlVariate::gradientP(System const& syst, int iOfParticle, int /*iOfFunction*/) const
+  DVec BasisControlVariate::gradientP(System const& syst, int iOfFunction) const
   {
     DVec result(1, 0);
     
@@ -450,7 +456,7 @@ namespace simol
     return result;
   }
 
-  double BasisControlVariate::laplacianP(System const& syst, int iOfParticle, int /*iOfFunction*/) const
+  double BasisControlVariate::laplacianP(System const& syst, int iOfParticle, int iOfFunction) const
   {
     double result = 0;
 
@@ -458,7 +464,7 @@ namespace simol
       result += cvCoeffs(i) * cvBasis().basis_->laplacianP(syst, iOfParticle, i);
     //cout << "laplacianP = " << result << endl;
     return result;
-  }
+  }*/
 
 
 
@@ -500,53 +506,15 @@ namespace simol
       out << endl;
     }
     cout << "end displayMap" << endl;
-  }
-
-  void ExpFourierHermiteControlVariate::displayGradQMap(ofstream& out) const
-  {
-    cout << "displayGradQMap" << endl;
-    vector<Particle*> conf(1, new Particle(0, 0, 0));
-    //conf[0] = Particle(0,0,0);
-    out << nbP_ + 1 << " ";
-    for (double p = -pMax_; p < pMax_; p += deltaP_)
-      out << p << " ";
-    out << endl;
-    for (double q = -M_PI; q < M_PI; q += deltaQ_)
-    {
-      out << q << " ";
-      for (double p = -pMax_; p < pMax_; p += deltaP_)
-      {
-        conf[0]->position() = DVec::Constant(1, q);
-        conf[0]->momentum() = DVec::Constant(1, p);
-        out << gradientQ(conf, 0) << " ";
-      }
-      out << endl;
-    }
-    cout << "end displayMap" << endl;
-  }
-
-  void ExpFourierHermiteControlVariate::displayGradPMap(ofstream& out) const
-  {
-    cout << "displayGradPMap" << endl;
-    vector<Particle*> conf(1, new Particle(0, 0, 0));
-    //nf[0] = Particle(0,0,0);
-    out << nbP_ + 1 << " ";
-    for (double p = -pMax_; p < pMax_; p += deltaP_)
-      out << p << " ";
-    out << endl;
-    for (double q = -M_PI; q < M_PI; q += deltaQ_)
-    {
-      out << q << " ";
-      for (double p = -pMax_; p < pMax_; p += deltaP_)
-      {
-        conf[0]->position() = DVec::Constant(1, q);
-        conf[0]->momentum() = DVec::Constant(1, p);
-        out << gradientP(conf, 0) << " ";
-      }
-      out << endl;
-    }
-    cout << "end displayMap" << endl;
   }*/
+  
+  HermiteHermiteControlVariate::HermiteHermiteControlVariate(Input const& input, int idObs, shared_ptr<CVBasis> cvBasis0):
+    BasisControlVariate(input, idObs, cvBasis0)
+  {}
+  
+  ExpHermiteHermiteControlVariate::ExpHermiteHermiteControlVariate(Input const& input, int idObs, shared_ptr<CVBasis> cvBasis0):
+    BasisControlVariate(input, idObs, cvBasis0)
+  {}
 
 }
 

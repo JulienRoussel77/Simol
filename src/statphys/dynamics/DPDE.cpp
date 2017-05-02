@@ -15,6 +15,7 @@ namespace simol
     cutOff_(input.cutOffRatio()*input.potentialSigma()),
     rejectionRate_(0),
     doMetropolis_(input.doMetropolis()),
+    doProjectionDPDE_(input.doProjectionDPDE()),
     MTSfrequency_(input.MTSfrequency()),
     initialInternalTemperature_(input.initialInternalTemperature()),
     rejectionCountFD_(0),
@@ -81,6 +82,16 @@ namespace simol
   int& DPDE::MTSfrequency()
   {
     return MTSfrequency_;
+  }
+
+  bool& DPDE::doProjectionDPDE()
+  {
+    return doProjectionDPDE_;
+  }
+
+  const bool& DPDE::doProjectionDPDE() const
+  {
+    return doProjectionDPDE_;
   }
 
   //-- for 1D systems --
@@ -343,12 +354,42 @@ namespace simol
 	// accept/reject step
 	incrementTotalCountForRejectionFD();
 	acceptRejectRate(v12,v12_0,particle1.internalEnergy(),particle2.internalEnergy(),mu12,distance);
+	//---------------- MODIFIED ABERDEEN FEB. 13, 2017 --------------------
 	// check whether Metropolis required
-	double U = -1; // in order to accept even if energies are negative...
+	// double U = -1; // in order to accept even if energies are negative...
+	// if (doMetropolis_)
+	//   U = rng_->scalarUniform();
+	// if (U > rejectionRate())
+	//   {
+	//     //-- reject the move --
+	//     incrementRejectionFD();
+	//     particle1.momentum() = old_momentum_1;
+	//     particle2.momentum() = old_momentum_2;
+	//   }
+	// else 
+	//   {
+	//     //-- update internal energies --
+	//     double internal_energy_variation = mu12*( pow(v12,2)-pow(v12_0,2) )/4;
+	//     particle1.internalEnergy() -= internal_energy_variation;
+	//     particle2.internalEnergy() -= internal_energy_variation;
+	//   }
+	//---------------- END OF PREVIOUS ROUTINE --------------------
+	bool doRejection = true;
+ 	double U = -1;
 	if (doMetropolis_)
-	  U = rng_->scalarUniform();
-	if (U > rejectionRate())
 	  {
+	    U = rng_->scalarUniform();
+	    if (U < rejectionRate())
+	      doRejection = false;
+	  }
+	else
+	  {
+	    if (rejectionRate() > 0)
+	      doRejection = false;
+	  }
+	if (doRejection)
+	  {
+	    //cout << "FD :" << doRejection << " : " << rejectionRate() << ", " << U << endl; 
 	    //-- reject the move --
 	    incrementRejectionFD();
 	    particle1.momentum() = old_momentum_1;
@@ -422,11 +463,34 @@ namespace simol
     	  }
 	// actual acceptance/rejection step
     	incrementTotalCountForRejectionThermal();
-	double U = -1;  // in order to accept even if energies are negative...
-	if (doMetropolis_)
-	  U = rng_->scalarUniform();
-	if (U > rejectionRate())
-    	  {
+	//---------------- MODIFIED ABERDEEN FEB. 13, 2017 --------------------
+	// double U = -1;  // in order to accept even if energies are negative...
+	// if (doMetropolis_)
+	//   U = rng_->scalarUniform();
+	// if (U > rejectionRate())
+    	//   {
+	//     //-- reject the move --
+    	//     incrementRejectionThermal();
+    	//     particle1.internalEnergy() = old_internalEnergy_1;
+    	//     particle2.internalEnergy() = old_internalEnergy_2;
+    	//   }
+	//---------------- END OF PREVIOUS ROUTINE --------------------
+	bool doRejection = true;
+	double U = -1;
+ 	if (doMetropolis_)
+	  {
+	    U = rng_->scalarUniform();
+	    if (U < rejectionRate())
+	      doRejection = false;
+	  }
+	else
+	  {
+	    if (rejectionRate() > 0)
+	      doRejection = false;
+	  }
+	if (doRejection)
+	  {
+	    //cout << "TC : " << doRejection << " : " << rejectionRate() << ", " << U << endl; 
 	    //-- reject the move --
     	    incrementRejectionThermal();
     	    particle1.internalEnergy() = old_internalEnergy_1;

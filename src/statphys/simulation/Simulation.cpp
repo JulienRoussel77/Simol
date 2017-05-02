@@ -12,6 +12,8 @@ namespace simol
       return new TriChain(input);
     else if (input.systemName() == "NBody")
       return new NBody(input);
+    else if (input.systemName() == "Colloid")
+      return new Colloid(input, 2);
     else 
       throw std::runtime_error(input.systemName() + " is not a valid system name !");
   }
@@ -44,8 +46,11 @@ namespace simol
   void simulate(Overdamped& dyna, System& syst)
   {
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
+    {
+      //cout << iOfParticle << " " << syst(iOfParticle).position().adjoint() << " " << syst(iOfParticle).momentum().adjoint() << " " << syst(iOfParticle).force().adjoint() << endl;
       dyna.updatePosition(syst(iOfParticle));
-    
+      //cout << iOfParticle << " " << syst(iOfParticle).position().adjoint() << " " << syst(iOfParticle).momentum().adjoint() << " " << syst(iOfParticle).force().adjoint() << endl;
+    }
     syst.computeAllForces();
   }
   
@@ -98,6 +103,30 @@ namespace simol
         dyna.updateMomentaExchange(syst(iOfParticle), syst(iOfParticle + 1));
   }
   
+  /*//----------- Colloid -----------------
+  
+  /!\ The System variable cannot be specialized, called with a pointer...
+    void thermalize(Dynamics& dyna, System& syst)
+  {
+    //for (auto&& particle : configuration_)
+    //dyna.updateBefore(particle);
+    for (int i = 0; i < syst.nbOfParticles(); i++)
+      dyna.verletFirstPart(syst(i));
+
+    syst.computeAllForces();
+
+    for (int i = 0; i < syst.nbOfParticles(); i++)
+      dyna.verletSecondPart(syst(i));
+
+    for (int i = 0; i < syst.nbOfParticles(); i++)
+    {
+      double localTemperature = dyna.temperatureLeft() + i * dyna.deltaTemperature() / syst.nbOfParticles();
+      dyna.updateOrsteinUhlenbeck(syst(0), 1 / localTemperature);
+    }
+  }*/
+  
+  //----------- Ouputs ------------------
+  
   void computeOutput(Dynamics const& dyna, System const& syst, Output& output, long int iOfStep)
   {
     // #### faire un output.obsMidFlow().updateBoundaryLangevin(syst, dyna.betaLeft(), dyna.betaRight(), dyna.gamma()); ####
@@ -108,7 +137,16 @@ namespace simol
     if (output.obsPressure_) dyna.computePressure(output, syst);
     if (output.obsInternalEnergy_) dyna.computeInternalEnergy(output, syst);
     if (output.obsInternalTemperature_) dyna.computeInternalTemperature(output, syst);
-    if (output.obsLength_) output.length() = syst(0).position(0);
+    if (output.obsLength_) output.length() = syst.length();
+    /*{
+      if (syst.nbOfParticles() == 1)
+        output.length() = syst(0).position(0);
+      else
+      {
+        DVec r12 = syst(0).position() - syst(1).position();
+        output.length() = r12.norm();
+      }
+    }*/
     if (output.obsVelocity_) output.velocity() = syst(0).velocity(0);
     if (output.obsForce_) output.force() = syst(0).force(0);
     dyna.getThermo(output);
@@ -127,7 +165,7 @@ namespace simol
   void computeControlVariate(Dynamics const& dyna, System const& syst, Output& output)
   {
     output.cvBasis_->computeValueBasis(syst);
-    dyna.computeGeneratorOnBasis(*output.cvBasis_, syst);
+    dyna.computeGeneratorOnBasis(output.cvBasis_, syst);
   }
   
   //------------------- writeOutput and its specifications by dynamics ---------------------------
@@ -166,5 +204,7 @@ namespace simol
     if (output.doFinalFlow()) output.displayFinalFlow(syst.potParameter1(), syst.potParameter2());
     if (output.doFinalVelocity()) output.displayFinalVelocity();
   }
+  
+
 
 }

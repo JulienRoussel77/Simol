@@ -108,8 +108,8 @@ double computeSpectralGap(SMat const& A)
     
   double tol = 1e-15;
   int nbOfIter = 0;
-  //Eigen::SparseLU<SMat> solver(A);
-  Eigen::GMRES<SMat, Eigen::IncompleteLUT<double>> solver(A); //solver.setTolerance(1e-15);
+  Eigen::SparseLU<SMat> solver(A);
+  //Eigen::GMRES<SMat, Eigen::IncompleteLUT<double>> solver(A); //solver.setTolerance(1e-15);
   //Eigen::GMRES<SMat, Eigen::IdentityPreconditioner> solver(A);
   //Eigen::BiCGSTAB<SMat, Eigen::IncompleteLUT<double>> solver(A);
 
@@ -122,8 +122,8 @@ double computeSpectralGap(SMat const& A)
   while (fabs(eigValDiff) > tol && (fabs(eigValDiff) < fabs(prevEigValDiff) || nbOfIter < 100))
   {
     Y = X / eigVal;
-    //X = solver.solve(Y);
-    X = solver.solveWithGuess(Y, Y * eigVal);
+    X = solver.solve(Y);
+    //X = solver.solveWithGuess(Y, Y * eigVal);
     //std::cout << "#iterations:     " << solver.iterations() << std::endl;
     //std::cout << "estimated error: " << solver.error()      << std::endl;
     DVec Xdiff = X - Y*eigVal;
@@ -134,6 +134,7 @@ double computeSpectralGap(SMat const& A)
     
     cout << nbOfIter << " : eigVal = " << eigVal << ", " << eigValDiff << " > " << tol << " / XdiffNorm = " << Xdiff.norm() << endl;
   }
+  cout << setprecision(3) << "Smallest eigenvector :" << endl << X/eigVal << endl;
   if (fabs(eigValDiff) > tol)
     cout << "##################### !! Simulation not converged !! #########################" << endl;
   cout << "Lanczos algo : " << nbOfIter << " iterations" << endl;

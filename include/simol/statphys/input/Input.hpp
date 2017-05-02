@@ -1,7 +1,12 @@
 #ifndef SIMOL_INPUT_HPP
 #define SIMOL_INPUT_HPP
 
+// Disables certain warnings when including the following files
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #include<yaml-cpp/yaml.h>
+#pragma GCC diagnostic pop
+
 #include <getopt.h>
 //#include "simol/core/linalg/Vector.hpp"
 #include "simol/core/io/CommandLine.hpp"
@@ -60,12 +65,19 @@ namespace simol
 
     //-- Potential --
     string potentialName() const;
+    string externalPotentialName() const;
+    string pairPotentialName() const;
+    string firstPotentialName() const;
+    string secondPotentialName() const;
+    string galerkinPotentialName() const;
+    double interactionRatio() const;
     //Sinus
     double amplitude() const;
     //DoubleWell
     double height() const;
     double interWell() const;
     //Harmonic
+    double potentialCenter() const;
     double potentialStiffness() const;
     double potentialAlpha() const;
     double potentialBeta() const;
@@ -80,6 +92,7 @@ namespace simol
     double gamma() const;
     double temperature() const;
     bool doMetropolis() const;
+    bool doProjectionDPDE() const;
     bool doMTS() const;
     //double temperatureLeft() const;
     //double temperatureRight() const;
@@ -87,7 +100,7 @@ namespace simol
     //double betaLeft() const;
     //double betaRight() const;
     double deltaTemperature() const;
-    double externalForce() const;
+    double nonEqForce() const;
     double tauBending() const;
     double xi() const;
     int seed() const;
@@ -146,11 +159,15 @@ namespace simol
     bool doGalerkinCV() const;
     bool isGalerkin() const;
     string galerkinElts() const;
-    int nbOfFourier() const;
-    int nbOfHermite() const;
+    int nbOfQModes() const;
+    int nbOfPModes() const;
     bool doGalerkinNonequilibrium() const;
     bool doComputeRef() const;
     bool fitModiFlow() const;
+    double omegaHermite() const;
+    double integrationStep() const;
+    double integrationQMin() const;
+    double integrationLength() const;
   };
 
 

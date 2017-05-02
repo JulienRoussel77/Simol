@@ -25,9 +25,9 @@ namespace simol
     constGamma_(input.gamma()),
     constXi_(input.xi()),
     constTauBending_(input.tauBending()),
-    constExternalForce_(input.externalForce()),
-    constNbOfFourier_(input.nbOfFourier()),
-    constNbOfHermite_(input.nbOfHermite()),
+    constNonEqForce_(input.nonEqForce()),
+    constNbOfQModes_(input.nbOfQModes()),
+    constNbOfPModes_(input.nbOfPModes()),
     totalEnergy_(0),
     totalVirial_(0),
     temperature_(0),
@@ -73,23 +73,23 @@ namespace simol
     
     if (input.doOutThermo())
       {
-	//-- instantaneous values --
-	outThermo_       = std::make_shared<ofstream>(input.outputFolderName() + "thermo.txt");
-	if (obsKineticEnergy_)
-	  {
-	    if (doDPDE_)
-	      outThermo() << "# 1:time  2:kineticEnergy  3:potentialEnergy  4:totalEnergy  5:temperature 6:pressure 7:internalEnergy 8:fieldForInternalTemperature 9:negativeEnergiesCountFD 10:negativeEnergiesCountThermal" << endl;
-	    else
-	      outThermo() << "# 1:time  2:kineticEnergy  3:potentialEnergy  4:totalEnergy  5:temperature 6:pressure" << endl;
-	  }
-	else
-	  outThermo() << "# 1:time  2:potentialEnergy  3:totalEnergy  4:temperature 5:pressure" << endl;
-	//-- current estimates of averages --
-	outMeanThermo_       = std::make_shared<ofstream>(input.outputFolderName() + "meanThermo.txt");
-	if (doDPDE_)
-	  outMeanThermo() << "# 1:time  2:potentialEnergy  3:kineticEnergy  4:temperature 5:pressure 6:internalEnergy 7:internalTemperature 8:averageRejectionRateFD 9:negativeEnergiesCountFD 10:averageRejectionRateThermal 11:negativeEnergiesCountThermal" << endl;
-	else
-	  outMeanThermo() << "# 1:time  2:potentialEnergy  3:kineticEnergy  4:temperature 5:pressure" << endl;
+        //-- instantaneous values --
+        outThermo_       = std::make_shared<ofstream>(input.outputFolderName() + "thermo.txt");
+        if (obsKineticEnergy_)
+          {
+            if (doDPDE_)
+              outThermo() << "# 1:time  2:kineticEnergy  3:potentialEnergy  4:totalEnergy  5:temperature 6:pressure 7:internalEnergy 8:fieldForInternalTemperature 9:negativeEnergiesCountFD 10:negativeEnergiesCountThermal" << endl;
+            else
+              outThermo() << "# 1:time  2:kineticEnergy  3:potentialEnergy  4:totalEnergy  5:temperature 6:pressure" << endl;
+          }
+        else
+          outThermo() << "# 1:time  2:potentialEnergy  3:totalEnergy  4:temperature 5:pressure" << endl;
+        //-- current estimates of averages --
+        outMeanThermo_       = std::make_shared<ofstream>(input.outputFolderName() + "meanThermo.txt");
+        if (doDPDE_)
+          outMeanThermo() << "# 1:time  2:potentialEnergy  3:kineticEnergy  4:temperature 5:pressure 6:internalEnergy 7:internalTemperature 8:averageRejectionRateFD 9:negativeEnergiesCountFD 10:averageRejectionRateThermal 11:negativeEnergiesCountThermal" << endl;
+        else
+          outMeanThermo() << "# 1:time  2:potentialEnergy  3:kineticEnergy  4:temperature 5:pressure" << endl;
       }
 
     if (input.doOutParticles())
@@ -132,7 +132,8 @@ namespace simol
     cout << " Simulation of : " << endl;
     cout << "    System    : " << input.systemName() << endl;
     cout << "    Dynamics  : " << input.dynamicsName() << endl;
-    cout << "    Potential : " << input.potentialName() << endl;
+    cout << "    ExternalPotential : " << input.externalPotentialName() << endl;
+    cout << "    PairPotential : " << input.pairPotentialName() << endl;
     cout << endl;
     cout << " Number of particles  : " << nbOfParticles_ << endl;
     if (nbOfSteps_ < 1e6)
@@ -143,12 +144,17 @@ namespace simol
     //-- specific screen outputs --
     if (input.dynamicsName() == "DPDE")
       {
+	cout << endl;
 	if (input.MTSfrequency() != 1)
 	  cout << " -- Multiple timestepping (stoch. part DPDE): " << input.MTSfrequency() << endl;
 	if (input.doMetropolis())
 	  cout << " With Metropolis correction" << endl;
 	else 
 	  cout << " No Metropolis correction" << endl;
+	if (input.doProjectionDPDE())
+	  cout << " With projection for energies" << endl;
+	else 
+	  cout << " No projection" << endl;
 	cout << endl;
 	if (input.heatCapacityEinstein() > input.heatCapacity())
 	  {
@@ -169,10 +175,10 @@ namespace simol
 	  }
       }
     if (input.systemName() == "NBody" && input.doCellMethod())
-    {
-      cout << endl;
-      cout << " Using the method of cells " << endl;
-    }
+      {
+	cout << endl;
+	cout << " Using the method of cells " << endl;
+      }
     cout << " Period between light outputs    : " << input.printPeriodTime() << endl;
     cout << " Period between heavy outputs    : " << input.printLongPeriodTime() << endl;
     cout << endl;
@@ -511,6 +517,9 @@ namespace simol
                      << " " << syst(iOfParticle).energy()
                      << " " << syst(iOfParticle).force().transpose()
                      << endl; 
+                     
+    //ofstream test("distance", std::ofstream::app);
+    //test << (syst(1).position() - syst(0).position()).norm() << endl;                 
   }
   
   ///
@@ -539,9 +548,9 @@ namespace simol
                         << " " << setw(5) << timeStep()
                         << " " << setw(6) << nbOfParticles()
                         << " " << setw(4) << constTemperature_
-                        << " " << setw(6) << constExternalForce_
-                        << " " << setw(3) << constNbOfFourier_
-                        << " " << setw(3) << constNbOfHermite_
+                        << " " << setw(6) << constNonEqForce_
+                        << " " << setw(3) << constNbOfQModes_
+                        << " " << setw(3) << constNbOfPModes_
                         << " " << setw(12) << obsVelocity().mean()
                         << " " << setw(12) << obsVelocity().variance()
                         << " " << setw(12) << obsVelocity().varOfVar()

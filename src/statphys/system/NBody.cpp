@@ -6,6 +6,31 @@ namespace simol
   //--------------- particle pair iterators ------------
   
   
+  /*ParticlePairIterator NBody::pairBegin()
+  {
+    if (nbOfParticles() < 2) throw runtime_error("Cannot initialize a Particle Pair Iterator if the system has 0 or 1 particle!");
+    ParticlePairIterator iter = ParticlePairIterator();
+    int iOfCell = 0;
+    iter.it1_ = cell(0).members().begin();
+    // Look for the first non empty cell
+    while (iter.it1_ == cell(iOfCell).members().end())
+    {
+      iOfCell++;
+      iter.it1_ = cell(iOfCell).members().begin();
+    }
+    iOfCell1_ = iOfCell;
+    iter.it2_ = std::next(iter.it1_, 1);
+    int iOfNeighbour = 1;
+    // If the first cell has a single particle, look for the next non empty cell
+    while (iter.it2_ == cell(iOfCell).members().end())
+    {
+      iOfCell++;
+      iter.it2_ = cell(iOfCell).members().begin();
+    }
+    iter.endIt2_ = cell(iOfCell).members().end();
+    return iter;
+  }*/
+  
   ParticlePairIterator NBody::pairBegin()
   {
     if (nbOfParticles() < 2) throw runtime_error("Cannot initialize a Particle Pair Iterator if the system has 0 or 1 particle!");
@@ -18,14 +43,12 @@ namespace simol
       iOfCell++;
       iter.it1_ = cell(iOfCell).members().begin();
     }
-    iter.it2_ = std::next(iter.it1_, 1);
-    // If the first cell has a single particle, look for the next non empty cell
-    while (iter.it2_ == cell(iOfCell).members().end())
-    {
-      iOfCell++;
-      iter.it2_ = cell(iOfCell).members().begin();
-    }
-    iter.endIt2_ = cell(iOfCell).members().end();
+    iter.iOfCell1_ = iOfCell;
+    iter.it2_ = iter.it1_;
+    iter.iOfNeighbor2() = 0;
+    iter.endIt2() = cell(iOfCell).members().end();
+    
+    incrementePairIterator(iter);
     return iter;
   }
   
@@ -156,7 +179,6 @@ namespace simol
     for (int iOfParticle = 0; iOfParticle < input.nbOfParticles(); iOfParticle++)
       configuration_[iOfParticle] = new Particle(input.mass(), input.initialPosition(iOfParticle), input.initialMomentum(iOfParticle), input.initialInternalEnergy(iOfParticle));
 
-
     //-- initialize the cells --
     if (doCells_)
     {
@@ -223,8 +245,8 @@ namespace simol
   int NBody::returnIndexCell(int i1, int i2, int i3) const
   {
               int indexCell  = intModulo(i1, nbOfCellsPerDimension_);
-    if (i2 != -1) indexCell += intModulo(i2, nbOfCellsPerDimension_) * nbOfCellsPerDimension_;
-    if (i3 != -1) indexCell += intModulo(i3, nbOfCellsPerDimension_) * pow(nbOfCellsPerDimension_, 2);
+    if (i2 != -1) indexCell = indexCell * nbOfCellsPerDimension_ + intModulo(i2, nbOfCellsPerDimension_);
+    if (i3 != -1) indexCell = indexCell * nbOfCellsPerDimension_ + intModulo(i3, nbOfCellsPerDimension_);
     return indexCell;
   }
   
@@ -315,7 +337,10 @@ namespace simol
     double latticeSize = latticeParameter();
 
     for (int i = 0; i < nbOfParticles(); i++)
+    {
       getParticle(i).momentum() = drawMomentum(dynaPara.beta(), getParticle(i).mass());
+      getParticle(i).countdown() = i;
+    }
     //-- initialization on a cubic lattice --
     if (Dim == 2)
     {
@@ -350,14 +375,14 @@ namespace simol
   void NBody::computeAllForces()
   {
     for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
-      getParticle(iOfParticle).resetForce(potential());
+      getParticle(iOfParticle).resetForce(externalPotential());
     if (doCells_)
     {
       //-- reinitialize cells before looping on the pair interactions --
       reinitializeCells();
       //-- compute the interactions --
       for (ParticlePairIterator it = pairBegin(); !pairFinished(it); incrementePairIterator(it))
-	interaction(it.particle1(), it.particle2());
+        interaction(it.particle1(), it.particle2());
     }
     else
     {
@@ -376,11 +401,11 @@ namespace simol
     DVec r12 = periodicImage(particle1.position() - particle2.position());
     double distance = r12.norm();
     // compute energy
-    double energy12 = potential(distance);
+    double energy12 = pairPotential()(distance);
     particle1.potentialEnergy() += energy12 / 2;
     particle2.potentialEnergy() += energy12 / 2;
     // compute forces
-    double force12 = potentialForce(distance)(0);
+    double force12 = pairPotential().potentialForce(distance)(0);
     r12 /= distance;
     particle1.force() += force12 * r12;
     particle2.force() -= force12 * r12;

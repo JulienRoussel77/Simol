@@ -8,10 +8,10 @@ const double defaultSeed = 0;
 const double defaultGamma = 1;
 const double defaultXi = 0;
 const double defaultDeltaTemperature = 0;
-const double defaultExternalForce = 0;
 const double defaultTauBending = 0;
 const double defaultKappa = 0; 
 const int    defaultMTSfrequency = 1;
+const double defaultNonEqForce = 0;
 
 namespace simol
 {
@@ -66,6 +66,15 @@ namespace simol
       return false;
   }
 
+  bool Input::doProjectionDPDE() const
+  {
+    if (data["Dynamics"]["Projection DPDE"] && data["Dynamics"]["Projection DPDE"].as<string>() == "yes")
+      return true;
+    else
+      return false;
+  }
+
+
   /*double Input::betaLeft() const
   {
     if (data["Dynamics"]["BetaLeft"])
@@ -91,13 +100,6 @@ namespace simol
     else return defaultDeltaTemperature;
   }
 
-  double Input::externalForce() const
-  {
-    if (data["Dynamics"]["Force"])
-      return data["Dynamics"]["Force"].as<double>();
-    else return defaultExternalForce;
-  }
-
   double Input::tauBending() const
   {
     if (data["Dynamics"]["Tau"])
@@ -121,13 +123,20 @@ namespace simol
     else
       return defaultSeed;
   }
+  
+  double Input::nonEqForce() const
+  {
+    if (data["Dynamics"]["NonEqForce"])
+      return data["Dynamics"]["NonEqForce"].as<double>();
+    else return defaultNonEqForce;
+  }
 
   double Input::eta() const
   {
     if (sameLetters(dynamicsName(), "BoundaryLangevin"))
       return deltaTemperature();
     else
-      return externalForce();
+      return nonEqForce();
   }
 
   double Input::kappa() const

@@ -57,6 +57,10 @@ namespace simol
       double& energyLapla();
       int const& countdown() const;
       int& countdown();
+      
+      //-- currently specific for colloids --
+      int const & type() const;
+      int & type();
 
     private:
 
@@ -70,6 +74,7 @@ namespace simol
       int countdown_;
       double internalEnergy_;
       double virial_;   // to compute pressure
+      int type_; // for simulations with several populations, like a colloid
   };
 
 

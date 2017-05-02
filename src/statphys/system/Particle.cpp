@@ -19,7 +19,8 @@ namespace simol
     energyLapla_(0),
     countdown_(0),
     internalEnergy_(internalEnergy0),
-    virial_(0)
+    virial_(0),
+    type_(0)
   {}
 
   Particle::Particle(int dimension) :
@@ -41,7 +42,7 @@ namespace simol
   void Particle::resetForce(Potential const& pot)
   {
     potentialEnergy_ = 0;
-    force_ = pot.externalForce();
+    force_ = pot.nonEqForce();
     virial_ = 0;
   }
 
@@ -145,6 +146,12 @@ namespace simol
 
   int& Particle::countdown()
   {return countdown_;}
+  
+  int const& Particle::type() const
+  {return type_;}
+
+  int& Particle::type()
+  {return type_;}
 
 }
 

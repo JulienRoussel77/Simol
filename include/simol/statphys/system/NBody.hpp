@@ -57,11 +57,11 @@ namespace simol
     bool doCells() const {return doCells_;}
 
     virtual DVec periodicImage(DVec const& vecDistance) const;
-    void samplePositions(DynamicsParameters const& dynaPara);
-    void computeAllForces();
+    virtual void samplePositions(DynamicsParameters const& dynaPara);
+    virtual void computeAllForces();
     int nbOfParticlesPerDimension() const;
     double latticeParameter() const;
-    void interaction(Particle& particle1, Particle& particle2) const;
+    virtual void interaction(Particle& particle1, Particle& particle2) const;
   
     //--- for cell method ---
     void reinitializeCells();

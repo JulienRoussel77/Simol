@@ -16,7 +16,7 @@ namespace simol
 
   // /!\ a changer dans le cas N != 1
   ///After refers to the fact that this step comes after the forces update
-  ///Proceeds to a Euler-Maruyama scheme (in comment the second order is available)
+  ///Proceeds to an Euler-Maruyama scheme (in comment the second order is available)
   void Overdamped::updatePosition(Particle& particle)
   {
     particle.position() += timeStep_ * particle.force() + sqrt(2 * timeStep_ / beta_) * rng_->gaussian();
@@ -41,17 +41,30 @@ namespace simol
   
   ///Applies the generator of this dynamics to the basis functions of the CV
   ///Evaluate at the current state of "conifguration"
-  void Overdamped::computeGeneratorOnBasis(CVBasis& cvBasis, System const& syst) const
+  void Overdamped::computeGeneratorOnBasis(shared_ptr<CVBasis> cvBasis, System const& syst) const
   {
-    cvBasis.generatorOnBasisValues_ = DVec::Zero(cvBasis.totalNbOfElts());
+    /*cout << "computeGeneratorOnBasis : totalNbOfElts = " << cvBasis->totalNbOfElts() << endl;
+    //cout << "p : " << endl << cvBasis->pVariable(syst) << endl;
+    cout << "r : " << endl << cvBasis->qVariable(syst) << endl;
+    cout << "f : " << endl << cvBasis->forces(syst) << endl;*/
+    cvBasis->generatorOnBasisValues_ = DVec::Zero(cvBasis->totalNbOfElts());
     //DVec result = DVec::Zero(nbOfFunctions());
-    for (int iOfFunction = 0; iOfFunction < cvBasis.totalNbOfElts(); iOfFunction++)
-      for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
-        cvBasis.generatorOnBasisValues_(iOfFunction) += cvBasis.basis_->laplacianQ(syst, iOfParticle, iOfFunction) / beta()
-                               + dot(syst(iOfParticle).force(), cvBasis.basis_->gradientQ(syst, iOfParticle, iOfFunction));
+    for (int iOfFunction = 0; iOfFunction < cvBasis->totalNbOfElts(); iOfFunction++)
+    {
+      //for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
+      cvBasis->generatorOnBasisValues_(iOfFunction) += cvBasis->laplacianQ(syst, iOfFunction) / beta()
+                               + dot(cvBasis->forces(syst), cvBasis->gradientQ(syst, iOfFunction));
+      //cvBasis->generatorOnBasisValues_(iOfFunction) += (cvBasis->forces(syst))(0,0);                        
+      //cvBasis->generatorOnBasisValues_(iOfFunction) += (cvBasis->gradientQ(syst, iOfFunction))(0,0);
+      /*cout << "--iOfFunction : " << iOfFunction << endl;
+      cout << "--laplacianQ : " << cvBasis->laplacianQ(syst, iOfFunction) << endl;
+      cout << "--gradientQ : " << cvBasis->gradientQ(syst, iOfFunction) << endl;*/
+    }
+    //ofstream test("testest", std::ofstream::app);
+    //test << cvBasis->qVariable(syst) << " " << cvBasis->forces(syst) << endl;
                    
     //ofstream tempOut("generatorOnBasis.txt", std::ofstream::app);
-    //tempOut << syst(0).position(0) << " " << syst(0).force(0) << " " << dot(*cvBasis.cvCoeffs_, cvBasis.generatorOnBasisValues_) << endl;
+    //tempOut << syst(0).position(0) << " " << syst(0).force(0) << " " << dot(*cvBasis->cvCoeffs_, cvBasis->generatorOnBasisValues_) << endl;
   }
 
 }

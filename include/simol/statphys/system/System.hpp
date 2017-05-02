@@ -103,21 +103,26 @@ namespace simol
     //-- potential and forces --
     virtual DVec periodicImage(DVec const& vecDistance) const {return vecDistance;}
     virtual void computeAllForces();
-    Potential& potential();
-    Potential const& potential() const;
-    void interaction(Particle& particle1, Particle& particle2) const;
-    double potential(DVec const& position) const;
-    double potential(const double& position) const;
-    DVec totalForce(DVec const& position) const;
-    DVec totalForce(double position) const;
-    DVec potentialForce(DVec const & position) const;
-    DVec potentialForce(double position) const;
-    DVec& externalForce() ;
-    DVec const& externalForce() const;
-    double& externalForce(const int& i);
-    double const& externalForce(const int& i) const;
+    Potential& externalPotential();
+    Potential const& externalPotential() const;
+    Potential& pairPotential();
+    Potential const& pairPotential() const;
+    virtual void interaction(Particle& particle1, Particle& particle2) const;
+    double externalPotential(DVec const& position, int type = 0) const;
+    double externalPotential(const double& position, int type = 0) const;
+    /*DVec totalForce(DVec const& position, int type = 0) const;
+    DVec totalForce(double position, int type = 0) const;*/
+    DVec externalForce(DVec const & position, int type = 0) const;
+    DVec externalForce(double position, int type = 0) const;
+    //DVec& externalForce() ;
+    //DVec const& externalForce() const;
+    //double& externalForce(const int& i);
+    //double const& externalForce(const int& i) const;
     double const& potParameter1() const;
     double const& potParameter2() const;
+    
+    DMat forces() const;
+    DMat momenta() const;
 
     //-- sampling of initial configurations --
     virtual DVec drawMomentum(double localBeta, double mass);
@@ -128,10 +133,12 @@ namespace simol
 
     // currently specific to chains
     virtual double boundaryPotEnergy() const;
-    double laplacian(DVec const& position) const;
+    //double laplacian(DVec const& position, int type = 0) const;
     
     virtual void samplePositions(DynamicsParameters const& dynaPara);
     virtual void sampleMomenta(DynamicsParameters const& dynaPara);
+    
+    virtual double length() const;
 
   //protected:
   public:
@@ -141,7 +148,8 @@ namespace simol
     //list<Particle> configuration_;
     string settingsPath_;
     std::shared_ptr<RNG> rng_;
-    Potential* potential_;
+    Potential* externalPotential_;
+    Potential* pairPotential_;
     bool doSetting_;
   };
 

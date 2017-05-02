@@ -6,36 +6,53 @@ namespace simol
 {
   LangevinGalerkin::LangevinGalerkin(Input const& input):
     Galerkin(input)
+  {}
+  
+  ///
+  ///Should be called in all the constructors of the daughters of LangevinGalerkin
+  /// /!\ By convention for the operators the variables are in the order (p,q) and for the states the variables are (q,p)
+  /// /!\ L_ij = < e_i, -calL e_j > is a positive matrix !
+  void LangevinGalerkin::createOperators()
   {
-    double totalTime = clock();
-    computeExpToTrigTens();
-    //cout << "- computeExp : " << clock() - totalTime << endl; totalTime = clock();
-    SMat PQt = kron(tP_, Q_);
+    Q_ = tensorBasis(0)->gradMatrix();
+    Qt_ = Q_.adjoint();
+    display(Q_, outputFolderName()+"Q");
+    
+    P_ = tensorBasis(1)->gradMatrix();
+    /*for (int iOfHermite = 1; iOfHermite < nbOfPModes_; iOfHermite++)
+      P_.insert(iOfHermite - 1, iOfHermite) = sqrt(beta_ * iOfHermite);*/
+    Pt_ = P_.adjoint();
+    display(P_, outputFolderName()+"P");
+    
+    SMat PQt = kron(P_, Qt_);
     SMat PtQ = PQt.transpose();
-    Lham_ = -PQt + PtQ;   // The matricies and the operators have opposite signs
-    //Lham_ = kron(Q_, tP_) - kron(tQ_, P_);
-    //display(Lham_, "output/Galerkin/Langevin/Lham");
+    Lham_ = PQt - PtQ;   // The matrices and the operators have opposite signs
     createLthm();
-    //cout << "- Lham and Lthm : " << clock() - totalTime << endl; totalTime = clock();
-    //display(Lthm_, "output/Galerkin/Langevin/Lthm");
+    display(Lthm0_, outputFolderName()+"Lthm0");
     Leq_  = Lham_ + gamma_ * Lthm_;
-    //cout << "- Leq : " << clock() - totalTime << endl; totalTime = clock();
-    //Lrep_ = kron(SMat::Identity(nbOfFourier_) , P_);
     Lrep_ = -kron(P_, SIdQ_);
     Leta_ = Leq_ + externalForce_ * Lrep_;
-    cout << "- LangevinGalerkin : " << clock() - totalTime << endl; totalTime = clock();
+    display(Leq_, outputFolderName()+"Leq");
+    
+    SU_ = tensorBasis()->basisMeans();
+    cout << "Leq : " << Leq_.rows() << " " << Leq_.cols() << endl;
+    SMat Lsad = shapeSaddle(Leq_, SU_);
+    display(Lsad, outputFolderName()+"Lsad");
+    cout << "Lsad : " << Lsad.rows() << " " << Lsad.cols() << endl;
+    display(tensorBasis_->gramMatrix(), outputFolderName()+"gramMat");
+    display(tensorBasis(0)->gramMatrix(), outputFolderName()+"qGramMat");
+    display(tensorBasis(1)->gramMatrix(), outputFolderName()+"pGramMat");
+    
+    //cout << "Leq spectral gap : " << computeSpectralGap(Leq_) << endl;
+    //cout << "Lsad spectral gap : " << computeSpectralGap(Lsad) << endl;
   }
   
   ///
   /// The matricies Leq, Leta are positive !
   void LangevinGalerkin::createLthm0()
   {
-    basis_(1)->laplacianMatrix(Lthm0_);
+    Lthm0_ = tensorBasis(1)->laplacianMatrix();
     Lthm0_ /= beta_;
-    /*cout << "createLthm0" << endl;
-    for (int iOfHermite = 1; iOfHermite < (int)nbOfHermite_; iOfHermite++)
-      Lthm0_(iOfHermite, iOfHermite) = - iOfHermite;
-    cout << "end createLthm0" << endl;*/
   }
 
   void LangevinGalerkin::createLthm()
@@ -43,155 +60,179 @@ namespace simol
     createLthm0();
     Lthm_ = kron(Lthm0_, SIdQ_);
   }
-
-  void LangevinGalerkin::computeExpToTrigTens()
+  
+  ///
+  ///Returns the control variate in the Galerkin basis
+  DVec LangevinGalerkin::CVcoeffsVec() const
   {
-    trigToExpTens_ = kron(SIdP_, trigToExpMat_);
-    expToTrigTens_ = kron(SIdP_, expToTrigMat_);
+    if (doNonequilibrium())
+    {
+      throw runtime_error("Nonequilibrium Galerkin not implemented !");
+      cout << "Computing the control variate by a nonequilibrium LLT" << endl;
+      SMat Keta = Leta_.transpose() * Leta_;
+      //DVec CV = -solve(Keta, Leta_.transpose() * gettGiHj(0,1));
+      DVec CV = -solve(Keta, Leta_.transpose() * CVObservable());
+      return CV;
+    }
+    else
+    {
+      DVec rObs = CVObservable();
+      DVec LinvRObs = solveResilient(Leq(), rObs);
+      return LinvRObs;
+    }
+  }
+  
+  
+  
+  ///
+  ///Finds the eigenvectors of S corresponding to eigenvectors > tol and solves AX=Y on the spanned subspace
+  DVec LangevinGalerkin::solveResilient(const SMat& A, const DVec& Y) const
+  {    
+    double tol = 1e-6;
+    DMat C = computeConstraints(tol);
+    SMat S = tensorBasis()->gramMatrix();
+    DVec X = solveWithSaddle(A, S*Y, C);
+    cout << "X = " << endl << reshape(X, nbOfQModes(), nbOfPModes()) << endl;
+    return X;
   }
   
   //### PeriodicLangevinGalerkin ###
   
   PeriodicLangevinGalerkin::PeriodicLangevinGalerkin(Input const& input):
     LangevinGalerkin(input)
-  {}
+  {
+    tensorBasis_ = new ExpFourierHermiteBasis(input, *potential_);
+    createOperators();
+  }
   
   void PeriodicLangevinGalerkin::compute()
   {
 
     //DMat DLeq(Leq_);
-    display(Leq_, "output/Galerkin/Langevin/Leq");
+    display(Leq_, outputFolderName()+"Leq");
 
     cout << "Computing DLeqInv..."; cout.flush();
     //DMat LeqInv = invWithSaddle(DLeq);
-    DMat DLeqInv = invWithSaddle(DMat(Leq_));
+    //DVec U = tensorBasis()->basisMeans();
+    DMat DLeqInv = invWithSaddle(DMat(Leq_), SU_);
     
 
     cout << "############ LeqInv ############" << endl;
-    display(DLeqInv, "output/Galerkin/Langevin/DLeqInv");
-
-
+    display(DLeqInv, outputFolderName()+"DLeqInv");
+    
     DVec H1Trig = DVec::Zero(sizeOfBasis_);
     H1Trig(iTens(0, 1)) = 1;
+    
+    //Map<DMat, Eigen::Aligned> H1TrigMat(H1Trig, nbOfQModes_, nbOfPModes_);
+    DMat H1TrigMat = reshape(H1Trig, nbOfQModes_, nbOfPModes_);
 
-    //Map<DMat, Eigen::Aligned> H1TrigMat(H1Trig, nbOfFourier_, nbOfHermite_);
-    DMat H1TrigMat = reshape(H1Trig, nbOfFourier_, nbOfHermite_);
-
-    //DMat H1Mat = trigToExpMat_ * H1TrigMat;
-    //DVec H1 = reshape(H1Mat, nbOfFourier_ * nbOfHermite_, 1);
-
-    DVec H1 = trigToExpTens_ * H1Trig;
-
-
-    /*DVec H1(sizeOfBasis_);
-    for (int iOfFourier2=0; iOfFourier2 <= 2*maxOfFourier_; iOfFourier2++)
-      H1(iTens(iOfFourier2, 1)) = expFourierMeans_[iOfFourier2];*/
+    DVec H1 = tensorBasis()->getPartialElement(1,1);
 
     cout << "############ H1Mat ############" << endl;
-    display(gettGiHj(0, 1), "output/Galerkin/H1");
-    //DMat H1Mat = reshape(gettGiHj(0,1), nbOfFourier_, nbOfHermite_);
-    DMat H1Mat = reshape(gettGiHj(0, 1), nbOfFourier_, nbOfHermite_);
-    display(H1Mat, "output/Galerkin/Langevin/H1Mat");
+    display(H1, outputFolderName()+"H1");
+    //DMat H1Mat = reshape(gettGiHj(0,1), nbOfQModes_, nbOfPModes_);
+    DMat H1Mat = reshape(H1, nbOfQModes_, nbOfPModes_);
+    display(H1Mat, outputFolderName()+"H1Mat");
 
-    display(H1Trig, "output/Galerkin/Langevin/H1Trig");
-    display(H1TrigMat, "output/Galerkin/Langevin/H1TrigMat");
+    display(H1Trig, outputFolderName()+"H1Trig");
+    display(H1TrigMat, outputFolderName()+"H1TrigMat");
+    
+    DVec LinvH1 = solveWithSaddle(Leq(), H1, SU_);
+    //display(LinvH1, outputFolderName()+"LinvH1");
+    DMat LinvH1Mat = reshape(LinvH1, nbOfQModes_, nbOfPModes_);
+    display(LinvH1Mat, outputFolderName()+"LinvH1Mat");
+    
+    DVec LLinvH1 = Leq() * H1;
+    //display(LLinvH1, outputFolderName()+"LLinvH1");
+    DMat LLinvH1Mat = reshape(LLinvH1, nbOfQModes_, nbOfPModes_);
+    display(LLinvH1Mat, outputFolderName()+"LLinvH1Mat");
 
-
-    display(gettGiHj(0, 0), "output/Galerkin/Langevin/G0Trig");
-
-    DMat G0Mat = reshape(gettGiHj(0, 0), nbOfFourier_, nbOfHermite_);
-    display(G0Mat, "output/Galerkin/Langevin/G0Mat");
-    DMat LG0Mat = reshape(getLtGiHj(0, 0), nbOfFourier_, nbOfHermite_);
-    display(LG0Mat, "output/Galerkin/Langevin/LG0Mat");
-
-    display(gettGiHj(1, 2), "output/Galerkin/Langevin/G1H2Trig");
-    display(getLtGiHj(1, 2), "output/Galerkin/Langevin/LG1H2Trig");
-
-    display(getLtGiHj(0, 1), "output/Galerkin/Langevin/LH1");
-    DVec LinvH1 = getLinvtGiHj(0, 1);
-    display(LinvH1, "output/Galerkin/Langevin/LinvH1");
-
-    //double lambda = LinvH1Sad(sizeOfBasis_);
-
-    //cout << "############ lambda ############" << endl;
-    //cout << lambda << endl << endl;
-
-    DMat LinvH1Mat = reshape(LinvH1, nbOfFourier_, nbOfHermite_);
-
-    cout << "############ LinvH1Mat ############" << endl;
-    display(LinvH1Mat, "output/Galerkin/Langevin/LinvH1Mat");
-
-    DMat LinvH1MatTrig = convertToTrigBasis(LinvH1Mat);
-    display(LinvH1MatTrig, "output/Galerkin/Langevin/LinvH1MatTrig");
-
-    DVec H1back = Leq_ * LinvH1;
-    DMat H1backMat = reshape(H1back, nbOfFourier_, nbOfHermite_);
-    display(H1backMat, "output/Galerkin/Langevin/H1backMat");
-
-    /*cx_vec eigvalLeq;
-    cx_mat eigvecLeq;
-    eig_gen(eigvalLeq, eigvecLeq, -DLeq);*/
-
-    //DMat DLeqW = Leq_.wrapped_;
-    //EigenSolver<MatrixXd> eigSol(DMat(Leq_));
-
-    /*/eigs_gen(eigvalLeq, eigvecLeq, Leq_, 20);
-
-    ofstream out_eigvalLeq("output/Galerkin/eigvalLeq");
-    //out_eigvalLeq << eigvalLeq << endl;
-    displayCplx(eigvalLeq, out_eigvalLeq);*/
-
-    double varOfH1 = -2 * dot(gettGiHj(0, 1), LinvH1);
+    double varOfH1 = 2 * dot(H1, LinvH1);
     cout << "varOfH1 = " << varOfH1 << endl;
     cout << "conductivity = " << .5 * varOfH1 << endl;
 
-    DVec LinvL1LinvH1 = solveWithSaddle(Leq_, Lrep_ * LinvH1);
+    DVec LinvL1LinvH1 = solveWithSaddle(Leq_, Lrep_ * LinvH1, SU_);
     //double varCoeff = -.5 * dot( Lrep_ * LinvH1, LeqInv * Lrep_ * LinvH1);
-    double varCoeff = -2 * dot( Lrep_ * LinvH1, LinvL1LinvH1);
+    double varCoeff = 2 * dot( Lrep_ * LinvH1, LinvL1LinvH1);
     cout << "varCoeff = " << varCoeff << endl;
   }
   
-  ///
-  ///Returns the control variate in the Galerkin basis
-  DVec PeriodicLangevinGalerkin::CVcoeffsVec() const
+  DVec PeriodicLangevinGalerkin::CVObservable() const
   {
-    if (doNonequilibrium())
-    {
-      cout << "Computing the control variate by a nonequilibrium LLT" << endl;
-      SMat Keta = Leta_.transpose() * Leta_;
-      DVec CV = -solve(Keta, Leta_.transpose() * gettGiHj(0,1));
-      return CV;
-    }
-    else
-    {
-      cout << "Computing the control variate by an equilibrium LLT" << endl;
-      //SMat Keq = Leq_.transpose() * Leq_;
-      //return -solve(Keq, Leq_.transpose() * gettGiHj(0,1));
-      
-      Eigen::BiCGSTAB<SMat> solver(Leq_);
-      return -solver.solve(-projectionOrthoG(gettGiHj(0,1)));
-    }
+    return tensorBasis()->getPartialElement(1,1);
   }
+  
+
   
   //### ColloidLangevinGalerkin
   
   ColloidLangevinGalerkin::ColloidLangevinGalerkin(Input const& input):
     LangevinGalerkin(input)
-  {}
+  {
+    tensorBasis_ = new HermiteHermiteBasis(input, *potential_);
+    createOperators();
+  }
   
   ///
   ///
   void ColloidLangevinGalerkin::compute()
   {
-    throw runtime_error("ColloidLangevinGalerkin::compute() not defined !");
+    display(Leq_, outputFolderName()+"Leq");
+
+    cout << "Computing DLeqInv..."; cout.flush();
+    DVec SU = tensorBasis()->gramMatrix() * tensorBasis()->basisMeans();
+    DMat DLeqInv = invWithSaddle(DMat(Leq_), SU_);
+    
+    DMat Lsad = shapeSaddle(Leq_, SU_);
+    display(Lsad, outputFolderName()+"Lsad");
+
+    cout << "############ LeqInv ############" << endl;
+    display(DLeqInv, outputFolderName()+"DLeqInv");
+
+
+    DVec rObs = CVObservable();
+    //rObs(0) = -2;
+    //DVec rObs = DVec::Zero(sizeOfBasis());
+    DMat rObsMat = reshape(rObs, nbOfQModes_, nbOfPModes_);
+    display(rObsMat, outputFolderName()+"rObsMat");
+    
+    /*SMat qGramMat(nbOfQModes(), nbOfQModes());  // /!\ qGramMat should be dense !
+    tensorBasis(0)->gramMatrix(qGramMat);
+    display(qGramMat, outputFolderName()+"qGramMat");
+    SMat gramMat = kron(qGramMat, SIdP_);*/
+    
+    cout << "rObs : " << endl << reshape(rObs, nbOfQModes(), nbOfPModes()) << endl;
+    DVec LinvRObs = solveResilient(Leq(), rObs);
+    
+    //DVec Xexact = kron(tensorBasis(1)->getMonome0(), tensorBasis(0)->getMonome1());
+    
+    /*SMat gramMat = tensorBasis_->gramMatrix();
+    display(tensorBasis(0)->gramMatrix(), outputFolderName()+"qGramMat");
+    DVec qMeans = tensorBasis(0)->basisMeans();
+    display(qMeans, outputFolderName()+"qMeans");
+    DVec pMeans = tensorBasis(1)->basisMeans();
+    display(pMeans, outputFolderName()+"pMeans");
+    DVec SR = gramMat * rObs;
+    display(SR, outputFolderName()+"SR");
+    
+    DVec LinvRObs = solveWithSaddle(Leq(), gramMat * rObs, SU);
+    //cout << "solution vec" << endl << LinvRObs << endl;*/
+    
+    DMat LinvRObsMat = reshape(LinvRObs, nbOfQModes_, nbOfPModes_);
+    display(LinvRObsMat, outputFolderName()+"LinvRObsMat");
+    
+    DVec LLinvRObs = Leq() * LinvRObs;
+    DMat LLinvRObsMat = reshape(LLinvRObs, nbOfQModes_, nbOfPModes_);
+    cout << "L of solution mat" << endl << LLinvRObsMat << endl;
+  }
+  
+  DVec ColloidLangevinGalerkin::CVObservable() const
+  {
+    cout << "ColloidLangevinGalerkin::CVObservable" << endl;
+    //return tensorBasis()->getBasisElement(1,0) / sqrt(tensorBasis(0)->omega());
+    return kron(tensorBasis(1)->getMonome0(), tensorBasis(0)->getMonome1());
   }
 
-  ///
-  ///Returns the control variate in the Galerkin basis
-  DVec ColloidLangevinGalerkin::CVcoeffsVec() const
-  {
-    throw runtime_error("ColloidLangevinGalerkin::CVcoeffsVec() not defined !");
-  }
   
   
   //#### BoundaryLangevinGalerkin ####
@@ -213,115 +254,5 @@ namespace simol
     for (int i = 1; i < power; i++)
       temp = kron(temp, A);
     return temp;
-  }
-
-  SMat BoundaryLangevinGalerkin::PMatToTens(SMat const& PMat, int iOfParticleP)
-  {
-    assert(iOfParticleP < nbOfParticles_);
-    //SMat tempId = speye(PMat.rows(), PMat.cols());
-    SMat res = DMat::Identity(1, 1).sparseView();
-    for (int i = 0; i < nbOfParticles_; i++)
-    {
-      res = kron(res, SIdQ_);
-      if (i == iOfParticleP) res = kron(res, PMat);
-      else res = kron(res, SIdP_);
-    }
-    return res;
-  }
-
-  ///
-  ///Creates the tensor of size sizeOfBasis X sizeOfBasis that is identity
-  ///except for indices iOfParticleQ and iOfParticleP
-  SMat BoundaryLangevinGalerkin::doubleMatToTens(SMat const& QMat, SMat const& PMat, int iOfParticleQ, int iOfParticleP)
-  {
-    cout << "doubleMatToTens(SMat const& QMat, SMat const& PMat, int iOfParticleQ, int iOfParticleP)" << endl;
-    /*assert(iOfVariableA < iOfVariableB);
-    assert(iOfVariableB < nbOfVariables);
-    assert(A.size() == B.size());*/
-    //SMat tempId = speye(A.rows(), A.cols());
-    SMat res = DMat::Identity(1, 1).sparseView();
-    for (int i = 0; i < nbOfParticles_; i++)
-    {
-      if (i == iOfParticleQ) res = kron(res, QMat);
-      else res = kron(res, SIdQ_);
-      if (i == iOfParticleP) res = kron(res, PMat);
-      else res = kron(res, SIdP_);
-    }
-    cout << "res : " << res.rows() << " x " << res.cols() << endl;
-    return res;
-  }
-
-  //psi = (1,1  1,2  ...  1,N_H  2,1 ... )
-  //N_H blocks of size N_G (we concatene the columns of the matrix)
-  //Allows to access elements involving a single particle !
-  int BoundaryLangevinGalerkin::iTens(int iOfFourier2, int iOfHermite, int iOfParticle) const
-  {
-    assert(iOfFourier2 < nbOfFourier_ && iOfHermite < nbOfHermite_ && iOfParticle < nbOfParticles_);
-    return pow(nbOfFourier_ * nbOfHermite_ , iOfParticle) * ( nbOfFourier_ * iOfHermite + iOfFourier2);
-  }
-
-
-  BoundaryLangevinGalerkin::BoundaryLangevinGalerkin(Input const& input):
-    Galerkin(input)
-  {
-    computeExpToTrigTens();
-    
-    createLham();
-    createLthm();
-
-    Leq_ = Lham_ + gamma_ * Lthm_;
-  }
-  
-  void BoundaryLangevinGalerkin::createLthm0()
-  {
-    cout << "createLthm0" << endl;
-    for (int iOfHermite = 1; iOfHermite < (int)nbOfHermite_; iOfHermite++)
-      Lthm0_.insert(iOfHermite, iOfHermite) = -beta_ * iOfHermite;
-    cout << "end createLthm0" << endl;
-  }
-
-  void BoundaryLangevinGalerkin::createLham()
-  {
-    cout << "BoundaryLangevinGalerkin::createLham()" << endl;
-    //Lham_ = arma::zeros(sizeOfBasis_, sizeOfBasis_);
-    for (int i = 0; i < nbOfParticles_; i++)
-    {
-      Lham_ += doubleMatToTens(Q_, tP_, i, i);
-      if (i > 0) Lham_ -= doubleMatToTens(Q_, tP_, i, i - 1);
-      Lham_ -= doubleMatToTens(tQ_, P_, i, i);
-      if (i < nbOfParticles_ - 1) Lham_ += doubleMatToTens(Q_, tP_, i + 1, i);
-    }
-    Lham_ /= beta_;
-    display(Lham_, "output/Galerkin/Lham");
-    cout << "end BoundaryLangevinGalerkin::createLham()" << endl;
-  }
-
-  void BoundaryLangevinGalerkin::createLthm()
-  {
-    createLthm0();
-    //SMat Lthm1_ = kron(SIdQ_, Lthm0_);
-    //Lthm_ = arma::zeros(sizeOfBasis_, sizeOfBasis_);
-    for (int i = 0; i < nbOfParticles_; i++)
-    {
-      //cout << i << " < " << nbOfParticles_ << endl;
-      Lthm_ += PMatToTens(Lthm0_, i);
-    }
-    Lthm_ /= beta_;
-    display(Lthm_, "output/Galerkin/Lthm");
-  }
-
-  void BoundaryLangevinGalerkin::computeExpToTrigTens()
-  {
-    trigToExpTens_ = kron(trigToExpMat_, SIdP_);
-    trigToExpTens_ = tensorPower(trigToExpTens_, nbOfParticles_);
-    expToTrigTens_ = kron(expToTrigMat_, SIdP_);
-    expToTrigTens_ = tensorPower(expToTrigTens_, nbOfParticles_);
-    
-    display(trigToExpTens_, "output/Galerkin/trigToExpTens");
-  }
-
-
-  void BoundaryLangevinGalerkin::compute()
-  {
   }
 }

@@ -24,14 +24,16 @@ namespace simol
     configuration_(nbOfParticles_, nullptr),
     doSetting_(input.doSetting())
   {
-    potential_ = createPotential(input);
+    externalPotential_ = createPotential(input, input.externalPotentialName());
+    pairPotential_ = createPotential(input, input.pairPotentialName());    
   }
 
   ///
   ///Destructor
   System::~System()
   {
-    delete potential_;
+    if (externalPotential_) delete externalPotential_;
+    if (pairPotential_) delete pairPotential_;
     for (int iOfParticle = 0; iOfParticle < (int)configuration_.size(); iOfParticle++)
       delete configuration_[iOfParticle];
   }
@@ -102,68 +104,95 @@ namespace simol
   }
 
   //----------------- Potential and forces ---------------
-
   ///
   ///Returns by value the potential of the dynamics
-  Potential& System::potential() {return *potential_;}
+  Potential& System::externalPotential() {return *externalPotential_;}
   ///
   ///Returns by const value the potential of the dynamics
-  Potential const& System::potential() const {return *potential_;}
+  Potential const& System::externalPotential() const {return *externalPotential_;}
+  ///
+  ///Returns by value the potential of the dynamics
+  Potential& System::pairPotential() {return *pairPotential_;}
+  ///
+  ///Returns by const value the potential of the dynamics
+  Potential const& System::pairPotential() const {return *pairPotential_;}
   ///
   ///Evaluate the potential for the vector "position"
-  double System::potential(DVec const& position) const {return (*potential_)(position);}
+  double System::externalPotential(DVec const& position, int type) const {return (*externalPotential_)(position, type);}
   ///
   ///Evaluate the potential for the scalar "position"
-  double System::potential(const double& distance) const {return (*potential_)(distance);}
-  ///
+  double System::externalPotential(const double& distance, int type) const {return (*externalPotential_)(distance, type);}
+  /*///
   ///Evaluate the force for the scalar "position" (potential and external terms)
-  DVec System::totalForce(DVec const& position) const
+  DVec System::totalForce(DVec const& position, int type) const
   {
-    return potential_->totalForce(position);
+    return potential_->totalForce(position, type);
+  }*/
+
+  /*DVec System::potentialForce(DVec const& position, int type) const
+  {
+    return - potential_->gradient(position, type);
   }
 
-  DVec System::potentialForce(DVec const& position) const
+  DVec System::potentialForce(double position, int type) const
   {
-    return - potential_->gradient(position);
-  }
-
-  DVec System::potentialForce(double position) const
-  {
-    return - potential_->gradient(position);
-  }
-  ///
+    return - potential_->gradient(position, type);
+  }*/
+  
+  /*///
   ///Evaluate the force for the scalar "position" (potential and external terms)
-  DVec System::totalForce(double position) const
+  DVec System::totalForce(double position, int type) const
   {
-    return potential_->totalForce(position);
-  }
-  ///
+    return potential_->totalForce(position, type);
+  }*/
+  
+  /*///
   ///Evaluate the laplacian of the potential for the vector "position"
-  double System::laplacian(DVec const& position) const
+  double System::laplacian(DVec const& position, int type) const
   {
-    return potential_->laplacian(position);
-  }
+    return potential_->laplacian(position, type);
+  }*/
 
-  ///
+  /*///
   ///Read-only accessor for the external force
-  DVec const& System::externalForce() const {return potential_->externalForce();}
+  DVec const& System::externalForce() const {return externalPotential_->force();}
   ///
   ///Write-read accessor for the external force
-  DVec& System::externalForce() {return potential_->externalForce();}
-  ///
+  DVec& System::externalForce() {return externalPotential_->force();}*/
+  /*///
   ///Read-only accessor for the i-th component of the external force
   double const& System::externalForce(int const& i) const {return potential_->externalForce(i);}
   ///
   ///Write-read accessor for the i-th component of the external force
-  double& System::externalForce(int const& i) {return potential_->externalForce(i);}
+  double& System::externalForce(int const& i) {return potential_->externalForce(i);}*/
   
   ///
   ///Read-only accessor for the first parameter of the potential
-  double const& System::potParameter1() const {return potential_->parameter1();}
+  double const& System::potParameter1() const {return pairPotential_->parameter1();}
   
   ///
   ///Read-only accessor for the first parameter of the potential
-  double const& System::potParameter2() const {return potential_->parameter2();}
+  double const& System::potParameter2() const {return pairPotential_->parameter2();}
+  
+  ///
+  /// Returns a matrix containing the force vectors of all the particles
+  DMat System::forces() const
+  {
+    DMat F = DMat::Zero(dimension(), nbOfParticles());
+    for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
+      F.col(iOfParticle) = getParticle(iOfParticle).force();
+    return F;
+  }
+  
+  ///
+  /// Returns a matrix containing the momenta vectors of all the particles
+  DMat System::momenta() const
+  {
+    DMat P = DMat::Zero(dimension(), nbOfParticles());
+    for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
+      P.col(iOfParticle) = getParticle(iOfParticle).momentum();
+    return P;
+  }
 
   ///
   ///Draw a momentum under the invariant measure at inverse temperature "localBeta"
@@ -175,7 +204,7 @@ namespace simol
   ///Draw a distance or a bending under the invariant measure at inverse temperature "localBeta"
   double System::drawPotLaw(double localBeta)
   {
-    return potential_->drawLaw(localBeta, rng_);
+    return externalPotential_->drawLaw(localBeta, rng_);
   }
   
   void System::samplePositions(DynamicsParameters const&)
@@ -207,9 +236,9 @@ namespace simol
   void System::interaction(Particle& particle1, Particle& particle2) const
   {
     DVec r12 = particle2.position() - particle1.position();
-    double energy12 = potential(r12);
-    DVec force12 = potentialForce(r12);    // = - v'(q_2 - q_1)
-    double lapla12 = laplacian(r12);  // v"(q_2 - q_1)
+    double energy12 = pairPotential()(r12);
+    DVec force12 = pairPotential_->potentialForce(r12);    // = - v'(q_2 - q_1)
+    double lapla12 = pairPotential_->laplacian(r12);  // v"(q_2 - q_1)
 
     particle1.potentialEnergy() = energy12;
     particle1.force() -= force12;
@@ -230,10 +259,17 @@ namespace simol
     for (int iOfNode = 0; iOfNode < nbIntegrationNodes; iOfNode++)
     {
       deltaQ(0) = - 4 + iOfNode * step;
-      repFunc += exp(-localBeta * potential(deltaQ));
-      qInteg += deltaQ(0) * exp(-localBeta * potential(deltaQ));
+      repFunc += exp(-localBeta * externalPotential(deltaQ));
+      qInteg += deltaQ(0) * exp(-localBeta * externalPotential(deltaQ));
     }
     return qInteg / repFunc;
+  }
+  
+  ///
+  ///Computes the instant value of the observable length
+  double System::length() const
+  {
+    return getParticle(0).position(0);
   }
   
 

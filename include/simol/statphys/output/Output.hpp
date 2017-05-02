@@ -200,9 +200,9 @@ namespace simol
     double constGamma_;
     double constXi_;
     double constTauBending_;
-    double constExternalForce_;
-    int constNbOfFourier_;
-    int constNbOfHermite_;
+    double constNonEqForce_;
+    int constNbOfQModes_;
+    int constNbOfPModes_;
     
   protected:
 
