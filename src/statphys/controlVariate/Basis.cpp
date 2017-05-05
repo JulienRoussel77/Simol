@@ -227,6 +227,7 @@ namespace simol
     QBasis(input, potential0),
     expFourierCoeffs_(DVec::Zero(2 * nbOfElts_))
   {
+    assert(nbOfElts() % 2 == 1);
     /*cout << "nb :" << nbOfElts0 << endl;
     cout << "Constructor expFourierCoeffs_ : " << endl << expFourierCoeffs_ << endl << endl;
     cout << "zero :" << DVec::Zero(2 * nbOfElts0)<< endl << endl;*/

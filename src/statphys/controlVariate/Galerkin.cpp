@@ -247,7 +247,6 @@ namespace simol
     tensorBasis_(nullptr),
     outputFolderName_(input.outputFolderName())
   {
-    assert(nbOfQModes_ % 2 == 1);
     cout << endl << "Number of modes : " << nbOfQModes_ << " x " << nbOfPModes_ << endl;
     cout << "Output written in " << outputFolderName() << endl;
     SIdQ_.setIdentity();
