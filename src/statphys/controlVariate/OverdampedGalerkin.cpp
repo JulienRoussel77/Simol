@@ -92,7 +92,7 @@ namespace simol
     //cout << "Eigenvectors of S :" << endl << vepS << endl;
     DMat C(DMat::Zero(sizeOfBasis(), sizeOfBasis()));
     C.col(0) = tensorBasis_->basisMeans();
-    double tol = 1e-6;
+    double tol = 1e-9;
     int nbOfSmall = 1;    
 
     ofstream outSpGramMat(outputFolderName()+"spGramMat", ofstream::app);

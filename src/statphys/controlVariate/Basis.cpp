@@ -929,7 +929,8 @@ namespace simol
       polyCoeffs_(DMat::Zero(nbOfElts_, nbOfElts_))
   {
     polyCoeffs_(0, 0) = 1;
-    polyCoeffs_(1, 1) = sqrt(beta_);
+    if (nbOfElts_ > 0)
+      polyCoeffs_(1, 1) = sqrt(beta_);
     for (int iOfElt = 2; iOfElt < (int)nbOfElts_; iOfElt++)
       for (int iOfCoeff = 0; iOfCoeff <= iOfElt; iOfCoeff++)
         polyCoeffs_(iOfElt, iOfCoeff) = (iOfCoeff ? (sqrt(beta_ / iOfElt) * polyCoeffs_(iOfElt - 1, iOfCoeff - 1)) : 0) - sqrt((iOfElt - 1) / (double)iOfElt) * polyCoeffs_(iOfElt - 2, iOfCoeff);
