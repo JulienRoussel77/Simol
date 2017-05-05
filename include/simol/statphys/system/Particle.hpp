@@ -47,6 +47,8 @@ namespace simol
       double & virial();
       DVec velocity() const;
       double velocity(int iOfDim) const;
+      DVec const& oldGaussian() const;
+      DVec& oldGaussian();
 
       //-- currently specific for chains --
       DVec const& energyGrad() const;
@@ -75,6 +77,7 @@ namespace simol
       double internalEnergy_;
       double virial_;   // to compute pressure
       int type_; // for simulations with several populations, like a colloid
+      DVec oldGaussian_; // contains the last drawn gaussian, useful for some numerical schemes
   };
 
 

@@ -17,6 +17,7 @@ namespace simol
   
   bool Input::doCVObservable(int idObs) const
   {
+    //cout << "doCVObservable : " << nameOfObs(idObs) << " =?= " << CVObservable() << endl;
     return nameOfObs(idObs) == CVObservable();
   }
 

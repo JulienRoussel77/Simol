@@ -87,6 +87,9 @@ namespace simol
     virtual Cell const& cell(int const&) const {throw std::runtime_error("Cell only exist for NBody !");}
     virtual Cell & cell(int const&) {throw std::runtime_error("Cell only exist for NBody !");}
     virtual void reinitializeCells() {}
+    virtual double periodicImage(double position) const;
+    virtual DVec periodicImage(DVec const& vecDistance) const;
+    virtual DVec periodicDistance(DVec const& vecDistance) const;
 
     //-- random numbers --
     const std::shared_ptr<RNG>& rng() const;
@@ -101,7 +104,7 @@ namespace simol
     virtual Cell& getCell2(ParticlePairIterator const&) {return cell(0);}
 
     //-- potential and forces --
-    virtual DVec periodicImage(DVec const& vecDistance) const {return vecDistance;}
+
     virtual void computeAllForces();
     Potential& externalPotential();
     Potential const& externalPotential() const;
@@ -151,6 +154,7 @@ namespace simol
     Potential* externalPotential_;
     Potential* pairPotential_;
     bool doSetting_;
+    double domainSize_;
   };
 
 

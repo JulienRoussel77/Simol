@@ -212,13 +212,9 @@ namespace simol
     else
     {
       if (!cvBasis().cvCoeffs_) throw std::runtime_error("cvCoeffs is supposed to be initialized here !");
-      /*cout << "---------generatorOnBasisValues--------------" << endl;
-      cout << generatorOnBasisValues() << endl;
-      cout << "-----------------------------------------------" << endl;
-      cout << "---------coeffsVec--------------" << endl;
-      cout << coeffsVec_ << endl;
-      cout << "-----------------------------------------------" << endl;
-      cout << "---------> " << dot(coeffsVec_, generatorOnBasisValues()) << endl;*/
+      //cout << "---------> " << observable << " + " << dot(*cvBasis().cvCoeffs_, generatorOnBasisValues()) << endl;
+      //cout << "---------> " << *cvBasis().cvCoeffs_ << " X " << generatorOnBasisValues() << endl;
+      //cout << "ControlVariate::appendToBetter : " << observable + dot(*cvBasis().cvCoeffs_, generatorOnBasisValues()) << endl;
       autocoStatsBetter_.append(observable + dot(*cvBasis().cvCoeffs_, generatorOnBasisValues()), iOfStep);
     }
 
@@ -421,7 +417,23 @@ namespace simol
 
   double BasisControlVariate::value(System const&) const
   {
+    //cout << "BasisControlVariate::value : " << dot(cvCoeffs(), basisValues()) << endl;
     return dot(cvCoeffs(), basisValues());
+  }
+  
+   void BasisControlVariate::display(long int iOfStep)
+  {
+    outFlux() << iOfStep * timeStep()
+        << " " << lastValue()
+        << " " << mean()
+        << " " << variance()
+        << " " << varOfVar()
+        << " " << lastValueBetter()
+        << " " << meanBetter()
+        << " " << varBetter()
+        << " " << varOfVarBetter()
+        << " " << dot(*cvBasis().cvCoeffs_, basisValues())
+        << endl;
   }
 
   /*DMat BasisControlVariate::gradientQ(System const& syst, int iOfParticle, int iOfFunction) const

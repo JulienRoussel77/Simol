@@ -56,7 +56,6 @@ namespace simol
     Cell & cell(int const& iOfCell) {return cells_[iOfCell];}
     bool doCells() const {return doCells_;}
 
-    virtual DVec periodicImage(DVec const& vecDistance) const;
     virtual void samplePositions(DynamicsParameters const& dynaPara);
     virtual void computeAllForces();
     int nbOfParticlesPerDimension() const;
@@ -68,13 +67,13 @@ namespace simol
     void findNeighboringCells();
     int findIndex(DVec const& pos) const;
     int returnIndexCell(int i1, int i2 = -1, int i3 = -1) const;
-    double periodicPosition(double x) const;
-
+    //double periodicPosition(double x) const;
+    //DVec periodicPosition(DVec const& position) const;
+  
   //protected:
   public:
     int nbOfParticlesPerDimension_;
     double latticeParameter_;
-    double domainSize_;
 
     //--- for cell method ---
     bool doCells_;

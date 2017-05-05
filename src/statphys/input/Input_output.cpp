@@ -276,7 +276,15 @@ namespace simol
   bool Input::doOutChain() const
   {return dynamicsName() == "BoundaryLangevin";}
   
-
+  bool Input::doFinalLength() const
+  {
+    /*if (data["Output"]["DoFinalVelocity"])
+      if (sameLetters(data["Output"]["DoFinalVelocity"].as<string>(), "yes"))
+        return true;
+    return false;*/
+    return (systemName() == "Isolated" || systemName() == "Colloid");
+  }  
+  
   bool Input::doFinalVelocity() const
   {
     /*if (data["Output"]["DoFinalVelocity"])
@@ -285,6 +293,7 @@ namespace simol
     return false;*/
     return (dynamicsName() != "Overdamped" && systemName() == "Isolated");
   }  
+  
   bool Input::doFinalFlow() const
   {
     /*if (data["Output"]["DoFinalFlow"])

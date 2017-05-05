@@ -7,6 +7,7 @@
 #include "simol/statphys/system/NBody.hpp"
 #include "simol/statphys/system/Colloid.hpp"
 #include "simol/statphys/system/Chain.hpp"
+#include "simol/statphys/system/Bicolor.hpp"
 #include "simol/statphys/controlVariate/ControlVariate.hpp"
 
 #include "simol/statphys/dynamics/BoundaryLangevin.hpp"
@@ -102,7 +103,7 @@ namespace simol
       computeOutput(dynamics_, *system_, output_, iOfStep);
       writeOutput(dynamics_, *system_, output_, iOfStep);
 
-      //---- update the system_em by the numerical integration ---
+      //---- update the system_ by the numerical integration ---
       simulate(dynamics_, *system_);
       if (output_.hasControlVariate()) system_->computeAllForces();
     }
@@ -125,6 +126,9 @@ namespace simol
       syst.samplePositions(dyna.parameters());
       sampleInternalEnergies(dyna, syst);
     }
+    
+    for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
+      syst(iOfParticle).oldGaussian() = syst.rng()->gaussian();
 
     cout << " - Thermalization (" << dyna.thermalizationNbOfSteps() << " steps)..." << endl;
 

@@ -22,10 +22,12 @@ namespace simol
     nbOfParticles_(input.nbOfParticles()),
     //configuration_(input.nbOfParticles(), new Particle(dimension_)),
     configuration_(nbOfParticles_, nullptr),
-    doSetting_(input.doSetting())
+    doSetting_(input.doSetting()),
+    domainSize_(std::numeric_limits<double>::infinity())
   {
     externalPotential_ = createPotential(input, input.externalPotentialName());
-    pairPotential_ = createPotential(input, input.pairPotentialName());    
+    pairPotential_ = createPotential(input, input.pairPotentialName());
+    if (externalPotential_) domainSize_ = externalPotential_->domainSize();
   }
 
   ///
@@ -69,6 +71,29 @@ namespace simol
   const int& System::nbOfParticles() const
   {
     return nbOfParticles_;
+  }
+  
+  ///
+  /// return position x in the interval [0,domainSize_)
+  double System::periodicImage(double x) const
+  {
+    return x - floor(x / domainSize_) * domainSize_;
+  }
+  
+  ///
+  /// return position x in the domain [0,domainSize_)^dim
+  DVec System::periodicImage(DVec const& position) const
+  {
+    if (domainSize_ == std::numeric_limits<double>::infinity()) return position;
+    DVec periodicPos = position;
+    for (int iOfDim = 0; iOfDim < dimension(); iOfDim++)
+      periodicPos[iOfDim] = periodicImage(position[iOfDim]);
+    return periodicPos;
+  }
+  
+  DVec System::periodicDistance(DVec const& vecDistance) const
+  {
+    return vecDistance - rint(vecDistance / domainSize_) * domainSize_;
   }
 
   //-------------- Random numbers ----------------

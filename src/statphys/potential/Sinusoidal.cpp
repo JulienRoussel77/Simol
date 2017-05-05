@@ -7,7 +7,9 @@ namespace simol
     Potential(input),
     amplitude_(input.amplitude()),
     pulsation_(2 * M_PI / input.length())
-  {}
+  {
+    domainSize() = 2 * M_PI /pulsation_;
+  }
   
   const double& Sinusoidal::parameter1() const
   {

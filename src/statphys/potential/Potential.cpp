@@ -15,7 +15,8 @@ namespace simol
 
   Potential::Potential(Input const & input):
     nonEqForce_(DVec::Zero(input.dimension())),
-    center_(input.potentialCenter())
+    center_(input.potentialCenter()),
+    domainSize_(std::numeric_limits<double>::infinity())
   {
     nonEqForce_(0) = input.nonEqForce();
     //if (nonEqForce_(0) != 0)
@@ -57,6 +58,13 @@ namespace simol
   {
     throw std::runtime_error("parameter2 not defined for this potential");
   }
+  
+  const double& Potential::domainSize() const
+  {return domainSize_;}
+  
+  double& Potential::domainSize()
+  {return domainSize_;}
+      
 
   double Potential::operator()(DVec const& position) const
   {
@@ -217,7 +225,9 @@ namespace simol
       //cout << iOfNode << " " << q << " " << exp(-localBeta * value(q, type)) << " " << partitionFunction << endl;
     }
     partitionFunction *= step;
-    double objective = rng->scalarUniform() * partitionFunction / step;
+    double randVal = rng->scalarUniform();
+    cout << "Inverse transform method : U = " << randVal << endl;
+    double objective = randVal * partitionFunction / step;
     double cumulant = 0;
     for (int iOfNode = 0; iOfNode < nbOfNodes; iOfNode++)
     {
@@ -226,6 +236,7 @@ namespace simol
       if (cumulant >= objective)
         return q + step/2;
     }
+    return qMin + nbOfNodes * step;
   }
   
   double Potential::harmonicForce(double /*dist*/) const

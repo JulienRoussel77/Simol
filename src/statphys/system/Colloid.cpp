@@ -29,7 +29,7 @@ namespace simol
     //cout << particle1.type() << " x " << particle2.type() << " -> " << interactionType << endl;
     // take closest periodic image
     //if (particle1.type() != particle2.type()) return;
-    DVec r12 = periodicImage(particle1.position() - particle2.position());
+    DVec r12 = periodicDistance(particle1.position() - particle2.position());
     //DVec r12 = particle1.position() - particle2.position();
     double distance = r12.norm();
     r12 /= distance;
@@ -96,7 +96,8 @@ namespace simol
   ///Computes the instant value of the observable length
   double Colloid::length() const
   {
-    DVec r12 = periodicImage(getParticle(0).position() - getParticle(1).position());
+    DVec r12 = periodicDistance(getParticle(0).position() - getParticle(1).position());
+    //cout << periodicImage(getParticle(0).position()).adjoint() << " <-> " << periodicImage(getParticle(1).position()).adjoint() << " = " << r12.norm() << endl;
     return r12.norm();
   }
   

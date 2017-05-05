@@ -56,6 +56,8 @@ namespace simol
     bool isOfFixedVolum() const;
     // NBody
     bool restart() const;
+    // Bicolor
+    double fixedVelocity() const;
 
     //-- Time --
     double timeStep() const;
@@ -145,7 +147,8 @@ namespace simol
     bool doOutXMakeMol() const;
     bool doOutBackUp() const;
     bool doOutChain() const;
-        
+    
+    bool doFinalLength() const;    
     bool doFinalVelocity() const;
     bool doFinalFlow() const;
     

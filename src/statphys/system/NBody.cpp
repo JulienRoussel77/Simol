@@ -170,10 +170,11 @@ namespace simol
     System(input),
     nbOfParticlesPerDimension_(input.nbOfParticlesPerDimension()),
     latticeParameter_(input.latticeParameter()),
-    domainSize_(input.latticeParameter()*input.nbOfParticlesPerDimension()),
     doCells_(input.doCellMethod()),
     Rcut_(input.cutOffRatio()*input.potentialSigma())
   {
+    domainSize_ = input.latticeParameter()*input.nbOfParticlesPerDimension();
+    
     //-- initialise the configuration by initializing the particles, intial__ reads the restart file if it exists --
     assert(configuration_.size() > 1);
     for (int iOfParticle = 0; iOfParticle < input.nbOfParticles(); iOfParticle++)
@@ -214,25 +215,18 @@ namespace simol
   {
     return latticeParameter_;
   }
-  
-  ///
-  /// return position x in the interval [0,domainSize_)
-  double NBody::periodicPosition(double x) const
-  {
-    return x - floor(x / domainSize_) * domainSize_;
-  }
 
   ///
   /// find the index of the cell in which a particle is
   int NBody::findIndex(DVec const& pos) const
   {
-    int i1 = floor(periodicPosition(pos(0)) / cellSize_);
-    int i2 = floor(periodicPosition(pos(1)) / cellSize_);
+    int i1 = floor(periodicImage(pos(0)) / cellSize_);
+    int i2 = floor(periodicImage(pos(1)) / cellSize_);
     if (dimension_ == 2)
       return returnIndexCell(i1, i2);
     else if (dimension_ == 3)
     {
-      int i3 = floor(periodicPosition(pos(2)) / cellSize_);
+      int i3 = floor(periodicImage(pos(2)) / cellSize_);
       return returnIndexCell(i1, i2, i3);
     }
     else
@@ -305,11 +299,6 @@ namespace simol
         }
       }
     }
-  }
-  
-  DVec NBody::periodicImage(DVec const& vecDistance) const
-  {
-    return vecDistance - rint(vecDistance / domainSize_) * domainSize_;
   }
 
   ///
@@ -398,7 +387,7 @@ namespace simol
   void NBody::interaction(Particle& particle1, Particle& particle2) const
   {
     // take closest periodic image
-    DVec r12 = periodicImage(particle1.position() - particle2.position());
+    DVec r12 = periodicDistance(particle1.position() - particle2.position());
     double distance = r12.norm();
     // compute energy
     double energy12 = pairPotential()(distance);

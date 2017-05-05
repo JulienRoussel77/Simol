@@ -133,7 +133,7 @@ namespace simol
   {
     DVec variables = DVec::Zero(2);
     DVec r01np = syst(1).position() - syst(0).position();
-    DVec r01 = syst.periodicImage(r01np);
+    DVec r01 = syst.periodicDistance(r01np);
     double d01 = r01.norm();
     DVec p01 = syst(1).momentum() - syst(0).momentum();
     variables(0) = d01;
@@ -145,7 +145,7 @@ namespace simol
   {
     DMat distanceMat = DVec::Zero(1);
     DVec r01np = syst(1).position() - syst(0).position();
-    DVec r01 = syst.periodicImage(r01np);
+    DVec r01 = syst.periodicDistance(r01np);
     distanceMat(0,0) = r01.norm();
     return distanceMat;
   }
@@ -154,7 +154,7 @@ namespace simol
   {
     DMat momentumMat = DVec::Zero(1);
     DVec r01np = syst(1).position() - syst(0).position();
-    DVec r01 = syst.periodicImage(r01np);
+    DVec r01 = syst.periodicDistance(r01np);
     double d01 = r01.norm();
     momentumMat(0,0) = dot(syst(1).momentum() - syst(0).momentum(), r01) / d01;
     return momentumMat;
@@ -164,7 +164,7 @@ namespace simol
   {
     DMat forcesMat = DVec::Zero(1);
     DVec r01np = syst(1).position() - syst(0).position();
-    DVec r01 = syst.periodicImage(r01np);
+    DVec r01 = syst.periodicDistance(r01np);
     double d01 = r01.norm();
     forcesMat(0,0) = dot(syst(1).force() - syst(0).force(), r01) / (2*d01) + (syst.dimension()-1) / d01;
     //cout << r01.adjoint() << " -> "  << (syst(1).force() - syst(0).force()).adjoint() << endl;

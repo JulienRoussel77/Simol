@@ -107,7 +107,7 @@ namespace simol
       }
     }
     // Becareful the block function does not work "in place"
-    DMat Ctemp = C.leftCols(nbOfSmall); 
+    DMat Ctemp = C.leftCols(nbOfSmall);
     C = Ctemp;
     //cout << "C = " << endl << C << endl;
     //cout << "S = " << endl << S << endl;

@@ -142,6 +142,7 @@ namespace simol
       double& cvCoeffs(int i);
       
       double value(System const& syst) const;
+      virtual void display(long int iOfStep);
       /*virtual double laplacianQ(System const& syst, int iOfParticle = 0, int iOfFunction = 0) const;
       virtual DVec gradientQ(System const& syst, int iOfParticle = 0, int iOfFunction = 0) const;
       virtual double laplacianP(System const& syst, int iOfParticle = 0, int iOfFunction = 0) const;

@@ -333,7 +333,7 @@ namespace simol
     DVec old_momentum_1 = particle1.momentum();
     DVec old_momentum_2 = particle2.momentum();
     // compute the unit vector e12 of line of centers and the distance (as above) 
-    DVec r12 = syst.periodicImage(particle1.position() - particle2.position());
+    DVec r12 = syst.periodicDistance(particle1.position() - particle2.position());
     double distance = r12.norm();
     // if the distance is not below the cutoff, nothing has to be done
     if (distance < cutOff_)
@@ -435,7 +435,7 @@ namespace simol
     double old_internalEnergy_1 = particle1.internalEnergy();
     double old_internalEnergy_2 = particle2.internalEnergy();
     // compute the distance 
-    DVec r12 = syst.periodicImage(particle1.position() - particle2.position());
+    DVec r12 = syst.periodicDistance(particle1.position() - particle2.position());
     double distance = r12.norm();
     if (distance < cutOff_)
       {

@@ -44,6 +44,8 @@ namespace simol
   {
     if (data["System"]["NumberPerDimension"])
       return data["System"]["NumberPerDimension"].as<int>();
+    //else if (data["System"]["NumberPerDimensionVec"])
+    //  return data["System"]["NumberPerDimensionVec"].as<std::vector<int>>()[iOfDim];
     else return defaultNbOfParticlesPerDimension;
   }
 
@@ -187,11 +189,15 @@ namespace simol
     
     return "";
   }
-
-  /*string Input::restartFileName() const
+  
+  //-- Bicolor -------
+  
+  double Input::fixedVelocity() const
   {
-    string name = data["System"]["InitialConditions"].as<string>();
-    return name;
-  }*/
+    if (data["System"]["FixedVelocity"])
+      return data["System"]["FixedVelocity"].as<double>();
+    
+    return 0;
+  }
 
 }

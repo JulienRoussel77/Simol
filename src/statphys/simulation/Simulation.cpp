@@ -14,6 +14,8 @@ namespace simol
       return new NBody(input);
     else if (input.systemName() == "Colloid")
       return new Colloid(input, 2);
+    else if (input.systemName() == "Bicolor")
+      return new Bicolor(input);
     else 
       throw std::runtime_error(input.systemName() + " is not a valid system name !");
   }
@@ -202,6 +204,7 @@ namespace simol
     output.finalDisplayCorrelations();    
     if (output.doOutChain()) output.finalChainDisplay();
     if (output.doFinalFlow()) output.displayFinalFlow(syst.potParameter1(), syst.potParameter2());
+    if (output.doFinalLength()) output.displayFinalLength();
     if (output.doFinalVelocity()) output.displayFinalVelocity();
   }
   

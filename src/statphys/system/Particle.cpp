@@ -20,7 +20,8 @@ namespace simol
     countdown_(0),
     internalEnergy_(internalEnergy0),
     virial_(0),
-    type_(0)
+    type_(0),
+    oldGaussian_(DVec::Zero(dimension()))
   {}
 
   Particle::Particle(int dimension) :
@@ -120,6 +121,12 @@ namespace simol
   
   double Particle::velocity(int iOfDim) const
   {return momentum_(iOfDim) / mass_;}
+  
+  DVec const& Particle::oldGaussian() const
+  { return oldGaussian_; }
+
+  DVec& Particle::oldGaussian()
+  { return oldGaussian_; }
 
   //---- currently specific to chains -----
 

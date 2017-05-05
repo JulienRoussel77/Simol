@@ -95,12 +95,13 @@ namespace simol
     if (input.doOutParticles())
     {
       outParticles_ = std::make_shared<ofstream>(input.outputFolderName() + "particles.txt");
-      outParticles() << "# time index position momentum kineticEnergy potentialEnergy energy force" << endl;
+      outParticles() << "# time index position momentum kineticEnergy potentialEnergy energy force type" << endl;
     }
-    if (input.doOutXMakeMol()) outXMakeMol_ = std::make_shared<ofstream>(input.outputFolderName() + "xmakemol.xyz");
-    if (input.doOutBackUp()) outBackUp_ = std::make_shared<ofstream>(input.outputFolderName() + "backUp.txt");
+    if (input.doOutXMakeMol()) outXMakeMol_        = std::make_shared<ofstream>(input.outputFolderName() + "xmakemol.xyz");
+    if (input.doOutBackUp()) outBackUp_            = std::make_shared<ofstream>(input.outputFolderName() + "backUp.txt");
     
-    if (input.doFinalVelocity()) outFinalVelocity_     = std::make_shared<ofstream>(input.simuTypeName() + "finalVelocity.txt", std::ofstream::app);
+    if (input.doFinalLength()) outFinalLength_ = std::make_shared<ofstream>(input.simuTypeName() + "finalLength.txt", std::ofstream::app);
+    if (input.doFinalVelocity()) outFinalVelocity_ = std::make_shared<ofstream>(input.simuTypeName() + "finalVelocity.txt", std::ofstream::app);
     if (input.doFinalFlow()) outFinalFlow_         = std::make_shared<ofstream>(input.simuTypeName() + "finalFlow.txt", std::ofstream::app);
     if (input.doOutChain()) 
     {
@@ -510,12 +511,13 @@ namespace simol
     for (int iOfParticle = 0; iOfParticle < nbOfParticles_; iOfParticle++)
       outParticles() << iOfStep * timeStep()
                      << " " << iOfParticle
-                     << " " << syst(iOfParticle).position().transpose()
+                     << " " << syst.periodicImage(syst(iOfParticle).position()).transpose()
                      << " " << syst(iOfParticle).momentum().transpose()
                      << " " << syst(iOfParticle).kineticEnergy()
                      << " " << syst(iOfParticle).potentialEnergy()
                      << " " << syst(iOfParticle).energy()
                      << " " << syst(iOfParticle).force().transpose()
+                     << " " << syst(iOfParticle).type()
                      << endl; 
                      
     //ofstream test("distance", std::ofstream::app);
@@ -542,7 +544,22 @@ namespace simol
   
   // ------------ final outputs ----------------
   
-    void Output::displayFinalVelocity()
+    void Output::displayFinalLength()
+  {
+    outFinalLength() << std::left << setw(10) << finalTime()
+                        << " " << setw(5) << timeStep()
+                        << " " << setw(6) << nbOfParticles()
+                        << " " << setw(4) << constTemperature_
+                        << " " << setw(6) << constNonEqForce_
+                        << " " << setw(3) << constNbOfQModes_
+                        << " " << setw(3) << constNbOfPModes_
+                        << " " << setw(12) << obsLength().mean()
+                        << " " << setw(12) << obsLength().variance()
+                        << " " << setw(12) << obsLength().varOfVar()
+                        << std::endl;
+  }
+  
+  void Output::displayFinalVelocity()
   {
     outFinalVelocity() << std::left << setw(10) << finalTime()
                         << " " << setw(5) << timeStep()

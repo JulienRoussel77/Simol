@@ -34,6 +34,7 @@ namespace simol
     ofstream & outXMakeMol() {return *outXMakeMol_;}
     ofstream & outBackUp() {return *outBackUp_;}
     ofstream & outFinalFlow() {return *outFinalFlow_;}
+    ofstream & outFinalLength() {return *outFinalLength_;}
     ofstream & outFinalVelocity() {return *outFinalVelocity_;}
     ofstream & outMeanThermo() {return *outMeanThermo_;}
     ofstream & outChainVelocities() {return *outChainVelocities_;}
@@ -66,6 +67,7 @@ namespace simol
     bool doOutBackUp() const {return (bool)outBackUp_;}
     bool doOutChain() const {return (bool)outProfile_;}
     
+    bool doFinalLength() const {return (bool)outFinalLength_;}
     bool doFinalVelocity() const {return (bool)outFinalVelocity_;}
     bool doFinalFlow() const {return (bool)outFinalFlow_;}
     
@@ -114,6 +116,7 @@ namespace simol
     void displayThermoVariables(long int iOfStep);
     void displayParticles(System const& syst, long int iOfStep);
     void finalDisplayCorrelations();
+    void displayFinalLength();
     void displayFinalVelocity();
 
     //-- for NBody systems --
@@ -172,6 +175,7 @@ namespace simol
     std::shared_ptr<ofstream> outBackUp_;
 
     //-- average velocity for Isolated --
+    std::shared_ptr<ofstream> outFinalLength_;
     std::shared_ptr<ofstream> outFinalVelocity_;
 
     //-- control variate outputs --
@@ -219,7 +223,7 @@ namespace simol
     //-- parametrization of outputs --
     int decorrelationNbOfSteps_;
     int nbOfAutocoPts_;
-    bool doFinalFlow_, doFinalVelocity_,doDPDE_;
+    bool doFinalFlow_, doFinalLength_, doFinalVelocity_, doDPDE_;
     bool fitModifFlow_;
     
   public:

@@ -22,6 +22,8 @@ namespace simol
       double const& nonEqForce(const int& i) const;
       virtual double const& parameter1() const;
       virtual double const& parameter2() const;
+      virtual const double& domainSize() const;
+      virtual double& domainSize();
       
       virtual double operator()(DVec const & position) const;
       virtual double operator()(double position) const;
@@ -70,6 +72,7 @@ namespace simol
       Potential();
       DVec nonEqForce_;
       double center_;
+      double domainSize_;
   };
 
 }
