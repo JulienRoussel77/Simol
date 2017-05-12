@@ -168,7 +168,9 @@ namespace simol
     double d01 = r01.norm();
     forcesMat(0,0) = dot(syst(1).force() - syst(0).force(), r01) / (2*d01) + (syst.dimension()-1) / d01;
     //cout << r01.adjoint() << " -> "  << (syst(1).force() - syst(0).force()).adjoint() << endl;
-    //cout << d01 << " -> " << (syst(1).force() - syst(0).force()).norm() << endl;
+    //cout  << d01 << " -> " << (syst(1).force() - syst(0).force()).norm() << endl;
+    //ofstream test("test", std::ofstream::app);
+    //test << d01 << " -> " << (syst(1).force() - syst(0).force()).norm() << endl;
     return forcesMat;
   }
   

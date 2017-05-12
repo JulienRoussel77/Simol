@@ -35,6 +35,19 @@ namespace simol
       Potential* secondPot_;
       double interactionRatio_;
   };
+  
+  class NoPotential : public Potential
+  {
+  public:
+    NoPotential(Input const& input);
+    double operator()(double /*position*/) const {return 0;}
+    DVec gradient(double /*position*/) const {return DVec::Zero(dimension());}
+    //DVec potentialForce(double /*position*/, int /*type*/) const {return DVec::Zero(1);};
+    //DVec potentialForce(double position) const;
+    
+    virtual double shiftToHarmonic(int /*type*/) const {return 0;};
+    virtual double drawLaw(double /*localBeta*/, std::shared_ptr<RNG>& /*rng*/, int /*type*/) const {return 0;}
+  };
 
 }
 

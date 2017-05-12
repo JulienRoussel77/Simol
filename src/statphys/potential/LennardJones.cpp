@@ -18,22 +18,22 @@ namespace simol
     splineRatio_(input.splineRatio()),
     splineRadius_(input.splineRatio()*cutOffRadius_),
     A_spline_(untruncated(splineRadius_)),
-    B_spline_(untruncatedDerivative(splineRadius_) * (1 - splineRadius_))
+    B_spline_(-untruncatedDerivative(splineRadius_) *cutOffRadius_* (1 - splineRatio_)),
+    C3_spline_(B_spline_ - 2*A_spline_),
+    C4_spline_(3*A_spline_ - B_spline_)
   {}
 
   //-- functions for spline: Q(r) = P(x) --
   double LennardJones::splineFunction(double dist) const
-  {
-    double reducedDist = (dist / cutOffRadius_ - 1) / (1 - splineRatio_);
-    return pow(reducedDist, 2) * (A_spline_ * (3 + 2 * reducedDist) + B_spline_ * (1 + reducedDist));
-    //return pow(reducedDist,2)*(A_spline_*reducedDist+B_spline_);
+  {    
+    double reducedDist = (1 - dist / cutOffRadius_) / (1 - splineRatio_);
+    return pow(reducedDist, 2) * (C3_spline_*reducedDist + C4_spline_);
   }
 
   double LennardJones::splineFunctionDerivative(double dist) const
   {
-    double reducedDist = (dist / cutOffRadius_ - 1) / (1 - splineRatio_);
-    double ff = reducedDist * (6 * A_spline_ * (1 + reducedDist) + B_spline_ * (3 * reducedDist + 2));
-    return ff / cutOffRadius_ / (1 - splineRatio_);
+    double reducedDist = (1 - dist / cutOffRadius_) / (1 - splineRatio_);
+    return -reducedDist / (cutOffRadius_*(1-splineRatio_)) * (3*C3_spline_ * reducedDist + 2*C4_spline_);
   }
 
   //-- untruncated LennardJones potential --
@@ -72,5 +72,28 @@ namespace simol
     double norm = -24 * epsilon_/ sigma_ * (2*pow(sigma_/dist,13)-pow(sigma_/dist,7));
     return norm * distVec / dist;
   }*/
+  
+  
+  
+  LennardJonesRep::LennardJonesRep(Input const & input):
+    LennardJones(input)
+  {
+    cutOffRadius_ = sigma_ * pow(2, 1/6.);
+    A_spline_ = untruncated(cutOffRadius_);
+  }
+  
+  double LennardJonesRep::operator()(double dist) const
+  {
+    if (dist < cutOffRadius_)
+      return untruncated(dist) - A_spline_;
+    else return 0;
+  }
+
+  DVec LennardJonesRep::gradient(double dist) const
+  {
+    if (dist < cutOffRadius_)
+      return DVec::Constant(1, untruncatedDerivative(dist));
+    else return DVec::Constant(1, 0);
+  }
 
 }

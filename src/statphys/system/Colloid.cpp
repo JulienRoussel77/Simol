@@ -40,7 +40,11 @@ namespace simol
     particle2.potentialEnergy() += energy12 / 2;
     // compute forces
     double force12 = pairPotential().potentialForce(distance, interactionType)(0);
-
+    /*if (interactionType == 0)
+    {
+      ofstream test("test", std::ofstream::app);
+      test << distance << " " << energy12 << " " << force12 << endl;
+    }*/
     particle1.force() += force12 * r12;
     particle2.force() -= force12 * r12;
     // compute pressure, based on the Virial formula for the potential part: P_pot = -\sum_{i < j} r_ij v'(r_ij) / d|Vol|; will divide by d|Vol| at the end
@@ -48,7 +52,7 @@ namespace simol
     particle2.virial() += 0.5 * force12 * distance;
     
     //cout << "inter : " << distance << " " << energy12 << " " << force12 << endl;
-    //cout << "--> " << particle1.position().adjoint() << " v " << particle2.position().adjoint() << " -> f= " << particle1.force().adjoint() << endl;
+    //cout << "--> " << particle1.position().adjoint() << " v " << particle2.position().adjoint() << " -> distance = " << distance << endl;
   }
   
   void Colloid::samplePositions(DynamicsParameters const& dynaPara)
@@ -77,18 +81,25 @@ namespace simol
     //  cout << "1 : i " << iOfParticle << " " << getParticle(iOfParticle).type() << endl;
 
     for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
-      getParticle(iOfParticle).resetForce(pairPotential());
+      getParticle(iOfParticle).resetForce(externalPotential());
     
     //for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
     //  cout << "2 : i " << iOfParticle << ", p " << getParticle(iOfParticle).position().adjoint() << ", e " << getParticle(iOfParticle).potentialEnergy() << ", f " << getParticle(iOfParticle).force().adjoint() << endl;
     
-    
-    for (ParticlePairIterator it = pairBegin(); !pairFinished(it); incrementePairIterator(it))
-      interaction(it.particle1(), it.particle2());
-    
-    
-    //for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
-    //  cout << "3 : i " << iOfParticle << ", p " << getParticle(iOfParticle).position().adjoint() << ", e " << getParticle(iOfParticle).potentialEnergy() << ", f " << getParticle(iOfParticle).force().adjoint() << endl;
+    if (doCells_)
+    {
+      //-- reinitialize cells before looping on the pair interactions --
+      reinitializeCells();
+      for (ParticlePairIterator it = pairBegin(); !pairFinished(it); incrementePairIterator(it))
+        interaction(it.particle1(), it.particle2());
+    }
+    else
+    {
+      //-- no cell method: std double loop --
+      for (int i = 0; i < nbOfParticles(); i++)
+        for (int j = i + 1; j < nbOfParticles(); j++)
+          interaction(getParticle(i), getParticle(j));
+    } 
 
   }
   

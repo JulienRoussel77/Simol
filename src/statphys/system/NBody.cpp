@@ -185,7 +185,8 @@ namespace simol
     {
       // creation of the cells (only if more than 3 per direction)
       nbOfCellsPerDimension_ = floor(domainSize_ / Rcut_ );
-      assert(nbOfCellsPerDimension_ >= 3);
+      if (nbOfCellsPerDimension_ < 3)
+        throw runtime_error("There must be at least 3 cells per direction ! Disable the cells and rerun.");
       cellSize_ = domainSize_ / nbOfCellsPerDimension_;
       nbOfCells_ = pow(nbOfCellsPerDimension_, dimension_);
       cells_ = vector<Cell>(nbOfCells_, Cell());
@@ -336,8 +337,8 @@ namespace simol
       for (int i = 0; i < NbPartDim; i++)
         for (int j = 0; j < NbPartDim; j++)
         {
-          getParticle(i * NbPartDim + j).position(0) = i * latticeSize;
-          getParticle(i * NbPartDim + j).position(1) = j * latticeSize;
+          getParticle(i * NbPartDim + j).position(0) = (i+.5) * latticeSize;
+          getParticle(i * NbPartDim + j).position(1) = (j+.5) * latticeSize;
         }
     }
     else if (Dim == 3)
@@ -347,9 +348,9 @@ namespace simol
         for (int j = 0; j < NbPartDim; j++)
           for (int k = 0; k < NbPartDim; k++)
           {
-            getParticle(i * NbPartDim2 + j * NbPartDim + k).position(0) = i * latticeSize;
-            getParticle(i * NbPartDim2 + j * NbPartDim + k).position(1) = j * latticeSize;
-            getParticle(i * NbPartDim2 + j * NbPartDim + k).position(2) = k * latticeSize;
+            getParticle(i * NbPartDim2 + j * NbPartDim + k).position(0) = (i+.5) * latticeSize;
+            getParticle(i * NbPartDim2 + j * NbPartDim + k).position(1) = (j+.5) * latticeSize;
+            getParticle(i * NbPartDim2 + j * NbPartDim + k).position(2) = (k+.5) * latticeSize;
           }
     }
     else
@@ -365,6 +366,7 @@ namespace simol
   {
     for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
       getParticle(iOfParticle).resetForce(externalPotential());
+    
     if (doCells_)
     {
       //-- reinitialize cells before looping on the pair interactions --
@@ -401,6 +403,8 @@ namespace simol
     // compute pressure, based on the Virial formula for the potential part: P_pot = -\sum_{i < j} r_ij v'(r_ij) / d|Vol|; will divide by d|Vol| at the end
     particle1.virial() += 0.5 * force12 * distance;
     particle2.virial() += 0.5 * force12 * distance;
+    //cout << particle1.position().adjoint() << " <-> " << particle2.position().adjoint() << " : " << distance << endl;
+    //cout << force12 << " " << energy12 << endl;
   }
 
 

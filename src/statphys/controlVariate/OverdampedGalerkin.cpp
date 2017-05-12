@@ -195,6 +195,8 @@ namespace simol
     tensorBasis_ = new ExpHermiteHermiteBasis(input, *potential_);
 
     createOperators();
+    if (input.temperature() != 1)
+      throw runtime_error("Temperature != 1 not implemented !");
   }
   
   void ColloidOverdampedGalerkin::compute()

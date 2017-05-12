@@ -16,11 +16,15 @@ namespace simol
   Potential::Potential(Input const & input):
     nonEqForce_(DVec::Zero(input.dimension())),
     center_(input.potentialCenter()),
-    domainSize_(std::numeric_limits<double>::infinity())
+    domainSize_(std::numeric_limits<double>::infinity()),
+    dimension_(input.dimension())
   {
     nonEqForce_(0) = input.nonEqForce();
     //if (nonEqForce_(0) != 0)
     // cout << "nonEqForce = " << nonEqForce_ << endl;
+    cout << "Potential::Potential" << endl;
+    cout << nonEqForce_ << endl;
+    cout << nonEqForce().adjoint() << endl;
     
   }
 
@@ -65,6 +69,9 @@ namespace simol
   double& Potential::domainSize()
   {return domainSize_;}
       
+  const int& Potential::dimension() const
+  {return dimension_;}   
+      
 
   double Potential::operator()(DVec const& position) const
   {
@@ -75,7 +82,7 @@ namespace simol
   double Potential::operator()(double position) const
   {
     //cout << "Potential::operator()(double position)" << endl;
-    return operator()(DVec::Constant(1,1,position));
+    return operator()(DVec::Constant(dimension(), position));
     //return operator()(DVec::Constant(1,1, position));
   }
 
@@ -108,7 +115,7 @@ namespace simol
 
   DVec Potential::gradient(double position) const
   {
-    return -gradient(DVec::Constant(1,1, position));
+    return -gradient(DVec::Constant(dimension(), position));
   }
 
   DVec Potential::totalForce(DVec const& position) const
@@ -138,7 +145,7 @@ namespace simol
 
   double Potential::laplacian(double position) const
   {
-    return laplacian(DVec::Constant(1,1, position));
+    return laplacian(DVec::Constant(dimension(), position));
   }
   
   ///

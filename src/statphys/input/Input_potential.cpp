@@ -101,7 +101,7 @@ namespace simol
 
   double Input::splineRatio() const
   {
-    if (data["Potential"]["SplineRation"])
+    if (data["Potential"]["SplineRatio"])
       return data["Potential"]["SplineRatio"].as<double>();
     else
       return defaultSplineRatio;

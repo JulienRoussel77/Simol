@@ -40,10 +40,11 @@ namespace simol
   double const & Particle::mass() const
   { return mass_; }
 
-  void Particle::resetForce(Potential const& pot)
+  void Particle::resetForce(Potential const& externalPot)
   {
-    potentialEnergy_ = 0;
-    force_ = pot.nonEqForce();
+    potentialEnergy_ = externalPot.value(position());
+    //force_ = pot.nonEqForce();
+    force_ = externalPot.totalForce(position());
     virial_ = 0;
   }
 

@@ -12,7 +12,7 @@ namespace simol
       LennardJones(Input const& input);
       double operator()(double dist) const;
       DVec gradient(double dist) const;
-    private:
+    protected:
       double splineFunction(double reducedDist) const;
       double splineFunctionDerivative(double dist) const;
       double untruncated(double dist) const;
@@ -25,6 +25,16 @@ namespace simol
       double splineRadius_;
       double A_spline_;
       double B_spline_;
+      double C3_spline_;
+      double C4_spline_;
+  };
+  
+  class LennardJonesRep : public LennardJones
+  {
+  public:
+    LennardJonesRep(Input const& input);
+    double operator()(double dist) const;
+    DVec gradient(double dist) const;
   };
 
 }

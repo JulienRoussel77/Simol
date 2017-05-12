@@ -24,6 +24,7 @@ namespace simol
       virtual double const& parameter2() const;
       virtual const double& domainSize() const;
       virtual double& domainSize();
+      virtual int const& dimension() const;
       
       virtual double operator()(DVec const & position) const;
       virtual double operator()(double position) const;
@@ -73,6 +74,7 @@ namespace simol
       DVec nonEqForce_;
       double center_;
       double domainSize_;
+      int dimension_;
   };
 
 }

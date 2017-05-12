@@ -6,7 +6,7 @@ namespace simol
   Potential* createPotential(Input const& input, string potName)
   {
     if (potName == "None")
-      return nullptr;
+      return new NoPotential(input);
     else if (potName == "Sinusoidal")
       return new Sinusoidal(input);
     else if (potName == "SumSinusoidal")
@@ -25,6 +25,8 @@ namespace simol
       return new SpaceSinus(input);
     else if (potName == "LennardJones")
       return new LennardJones(input);
+    else if (potName == "LennardJonesRep")
+      return new LennardJonesRep(input);
     else if (potName == "SoftDPD")
       return new SoftDPD(input);
     else if (potName == "TwoTypes")
@@ -35,8 +37,6 @@ namespace simol
       return new DoubleWellFE(input);
     else
       throw runtime_error(potName +" is not a valid potential !");
-
-    return 0;
   }
 
   /*Potential* createPotential(Input const& input)
@@ -68,7 +68,7 @@ namespace simol
     if (type == 0)
       return firstPot_->value(position);
     else if (type == 1)
-      return interactionRatio_ * secondPot_->value(position);
+      return interactionRatio_ * firstPot_->value(position);
     else if (type == 2)
       return secondPot_->value(position);
     else
@@ -80,7 +80,7 @@ namespace simol
     if (type == 0)
       return firstPot_->gradient(position);
     else if (type == 1)
-      return interactionRatio_ * secondPot_->gradient(position);
+      return interactionRatio_ * firstPot_->gradient(position);
     else if (type == 2)      
       return secondPot_->gradient(position);
     else
@@ -126,10 +126,15 @@ namespace simol
   
   double TwoTypes::drawLaw(double localBeta, std::shared_ptr<RNG>& rng, int type) const
   {
-    if (type == 0)
+    if (type < 2)
       return firstPot_->drawLaw(localBeta, rng, type);
     else
       return secondPot_->drawLaw(localBeta, rng, type);
   }
+  
+  
+  NoPotential::NoPotential(Input const& input):
+    Potential(input)
+  {}
 
 }
