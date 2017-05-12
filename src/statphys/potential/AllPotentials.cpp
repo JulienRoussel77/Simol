@@ -25,8 +25,8 @@ namespace simol
       return new SpaceSinus(input);
     else if (potName == "LennardJones")
       return new LennardJones(input);
-    else if (potName == "LennardJonesRep")
-      return new LennardJonesRep(input);
+    else if (potName == "WCA")
+      return new WCA(input);
     else if (potName == "SoftDPD")
       return new SoftDPD(input);
     else if (potName == "TwoTypes")

@@ -29,10 +29,10 @@ namespace simol
       double C4_spline_;
   };
   
-  class LennardJonesRep : public LennardJones
+  class WCA : public LennardJones
   {
   public:
-    LennardJonesRep(Input const& input);
+    WCA(Input const& input);
     double operator()(double dist) const;
     DVec gradient(double dist) const;
   };

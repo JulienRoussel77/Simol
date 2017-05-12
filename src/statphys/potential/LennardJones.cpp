@@ -75,21 +75,21 @@ namespace simol
   
   
   
-  LennardJonesRep::LennardJonesRep(Input const & input):
+  WCA::WCA(Input const & input):
     LennardJones(input)
   {
     cutOffRadius_ = sigma_ * pow(2, 1/6.);
     A_spline_ = untruncated(cutOffRadius_);
   }
   
-  double LennardJonesRep::operator()(double dist) const
+  double WCA::operator()(double dist) const
   {
     if (dist < cutOffRadius_)
       return untruncated(dist) - A_spline_;
     else return 0;
   }
 
-  DVec LennardJonesRep::gradient(double dist) const
+  DVec WCA::gradient(double dist) const
   {
     if (dist < cutOffRadius_)
       return DVec::Constant(1, untruncatedDerivative(dist));
