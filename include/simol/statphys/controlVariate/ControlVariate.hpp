@@ -82,6 +82,11 @@ namespace simol
       virtual DVec correlationB2() const;
       virtual double correlationB2(int iOfFunction) const;
       
+      virtual double correlationBetterAtSpan(int iOfSpan) const;
+      virtual double unbiasedCorrelationBetterAtSpan(int iOfSpan) const;
+      virtual double varCorrelationBetterAtSpan(int iOfSpan) const;
+      virtual double stdDevCorrelationBetterAtSpan(int iOfSpan) const;
+      
       const double& basisValue(int iOfFunction) const;
       const DVec& basisValues() const;
       const double& generatorOnBasisValue(int iOfFunction) const;
@@ -109,7 +114,9 @@ namespace simol
       
 
       virtual void display(long int iOfStep);
-
+      void displayFinalValues(ofstream& out);
+      void displayCorrelations(long int iOfStep);
+  
       // TEMP
 
       /*virtual void displayMap(ofstream&) const {};

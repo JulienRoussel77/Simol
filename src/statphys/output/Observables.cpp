@@ -181,6 +181,13 @@ namespace simol
              << " " << varOfVar() << endl;
   }
   
+  void Observable::displayFinalValues(ofstream& out)
+  {
+    out << mean()
+        << " " << variance()
+        << " " << varOfVar() << endl;
+  }
+  
   void Observable::displayCorrelations(long int iOfStep)
   {
     //cout << "Velocity : The correlation in 0 is " << floor((2 * obsVelocity().unbiasedCorrelationAtSpan(0) * decorrelationTime() / nbOfAutocoPts()) / obsVelocity().variance() * 10000)/100 << "% of the variance" << endl;

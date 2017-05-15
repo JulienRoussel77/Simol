@@ -553,10 +553,13 @@ namespace simol
                         << " " << setw(6) << constNonEqForce_
                         << " " << setw(3) << constNbOfQModes_
                         << " " << setw(3) << constNbOfPModes_
-                        << " " << setw(12) << obsLength().mean()
+                        << " " << setw(12);
+    
+    obsLength().displayFinalValues(outFinalLength());                 
+                        /*<< " " << setw(12) << obsLength().mean()
                         << " " << setw(12) << obsLength().variance()
                         << " " << setw(12) << obsLength().varOfVar()
-                        << std::endl;
+                        << std::endl;*/
   }
   
   void Output::displayFinalVelocity()
@@ -568,10 +571,13 @@ namespace simol
                         << " " << setw(6) << constNonEqForce_
                         << " " << setw(3) << constNbOfQModes_
                         << " " << setw(3) << constNbOfPModes_
-                        << " " << setw(12) << obsVelocity().mean()
+                        << " " << setw(12);    
+    obsLength().displayFinalValues(outFinalVelocity());  
+    
+                        /*<< " " << setw(12) << obsVelocity().mean()
                         << " " << setw(12) << obsVelocity().variance()
                         << " " << setw(12) << obsVelocity().varOfVar()
-                        << std::endl;
+                        << std::endl;*/
   }
 
   void Output::finalDisplayCorrelations()

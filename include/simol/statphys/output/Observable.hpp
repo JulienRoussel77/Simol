@@ -79,11 +79,12 @@ namespace simol
       virtual void updateLangevin(System const&, double /*beta*/, double /*gamma*/){};
       virtual void updateBoundaryLangevin(System const&, double /*betaLeft*/, double /*betaRight*/, double /*gamma*/){};
 
-      bool doOutput(long int iOfStep) const;
+      virtual bool doOutput(long int iOfStep) const;
       //bool doFinal() const;
       virtual void display(long int iOfStep);
-      //virtual void finalDisplay(vector<double> parameters);
-      void displayCorrelations(long int iOfStep);
+      virtual void displayFinalValues(ofstream& out);
+
+      virtual void displayCorrelations(long int iOfStep);
   };
 }
 

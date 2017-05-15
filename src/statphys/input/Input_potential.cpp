@@ -149,7 +149,7 @@ namespace simol
   }
 
   ///
-  /// The value by default is such that the potential is convexe
+  /// The value by default is such that the potential is convex
   double Input::potentialBeta() const
   {
     if (data["Potential"]["Beta"])

@@ -43,8 +43,9 @@ namespace simol
     m3_ /= qRepartitionFct_;
     m4_ /= qRepartitionFct_;
     
-    double harmonicFirstOrder = (alpha_ * (pow(m2_, 2) - m1_*m3_) + beta_ * (m2_ * m3_ - m1_ * m4_)) / (m2_ - pow(m1_, 2));
+    //double harmonicFirstOrder = (alpha_ * (pow(m2_, 2) - m1_*m3_) + beta_ * (m2_ * m3_ - m1_ * m4_)) / (m2_ - pow(m1_, 2));
     harmonicStiffness_ = stiffness_ + (alpha_ * (m3_ - m1_*m2_) + beta_ * (m4_ - m1_ * m3_)) / (m2_ - pow(m1_, 2));
+    double harmonicFirstOrder = (stiffness_ - harmonicStiffness_) * m1_ + alpha_ * m2_ + beta_ * m3_;
     harmonicEquilibrium_ = - harmonicFirstOrder / harmonicStiffness_;
   }
 

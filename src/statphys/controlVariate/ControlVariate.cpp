@@ -132,6 +132,28 @@ namespace simol
     return statsB2_.integratedCorrelation(iOfFunction);
   }
   
+  double ControlVariate::correlationBetterAtSpan(int iOfSpan) const
+  {
+    return autocoStatsBetter_.correlationAtSpan(iOfSpan);
+  }
+  
+  double ControlVariate::unbiasedCorrelationBetterAtSpan(int iOfSpan) const
+  {
+    //return autocoStats_(iOfSpan) - pow(meanObservable(), 2);
+    return autocoStatsBetter_.unbiasedCorrelationAtSpan(iOfSpan);
+  }
+  
+  double ControlVariate::varCorrelationBetterAtSpan(int iOfSpan) const
+  {
+    return autocoStatsBetter_.varCorrelationAtSpan(iOfSpan);
+  }
+
+  double ControlVariate::stdDevCorrelationBetterAtSpan(int iOfSpan) const
+  {
+    return autocoStatsBetter_.stdDevCorrelationAtSpan(iOfSpan);
+  }
+  
+  
   
   
   CVBasis const& ControlVariate::cvBasis() const
@@ -339,6 +361,37 @@ namespace simol
         outFlux() << " " << -correlationB2()(iOfFunction);  //22-23
     }
     outFlux() << endl;
+  }
+  
+  void ControlVariate::displayFinalValues(ofstream& out)
+  {
+    out << mean()
+        << " " << variance()
+        << " " << varOfVar() 
+        << " " << meanBetter()
+        << " " << varBetter()
+        << " " << varOfVarBetter()
+        << endl;
+  }
+  
+  void ControlVariate::displayCorrelations(long int iOfStep)
+  {
+    //cout << "Velocity : The correlation in 0 is " << floor((2 * obsVelocity().unbiasedCorrelationAtSpan(0) * decorrelationTime() / nbOfAutocoPts()) / obsVelocity().variance() * 10000)/100 << "% of the variance" << endl;
+    //cout << "SumFlow : The correlation in 0 is " << floor((2 * obsSumFlow().unbiasedCorrelationAtSpan(0) * decorrelationTime() / nbOfAutocoPts()) / obsSumFlow().variance() * 10000)/100 << "% of the variance" << endl;
+    //cout << "ModiFlow : The correlation in 0 is " << floor((2 * obsModiFlow().unbiasedCorrelationAtSpan(0) * decorrelationTime() / nbOfAutocoPts()) / obsModiFlow().variance() * 10000)/100 << "% of the variance" << endl;
+       
+    //cout << "Velocity : The correlation in 0 is " << floor((2 * obsVelocity().unbiasedCorrelationAtSpan(0) * decorrelationTime() / nbOfAutocoPts()) / obsVelocity().variance() * 10000)/100 << "% of the variance" << endl;
+    outFluxCorrelation() << "# The correlation in iOfSpan = 0 is " << floor((2 * unbiasedCorrelationAtSpan(0) * decorrelationTime() / nbOfAutocoPts()) / variance() * 10000)/100 << "% of the variance" << endl;
+    outFluxCorrelation() << "# The correlation in iOfSpan = 0 is " << floor((2 * unbiasedCorrelationBetterAtSpan(0) * decorrelationTime() / nbOfAutocoPts()) / varBetter() * 10000)/100 << "% of the better variance" << endl;
+    
+    for (int iOfSpan = 0; iOfSpan < nbOfAutocoPts(); iOfSpan++)
+    {
+      outFluxCorrelation() << iOfSpan * autocoPtsPeriod()
+                       << " " << unbiasedCorrelationAtSpan(iOfSpan)
+                       << " " << sqrt(varCorrelationAtSpan(iOfSpan) / (iOfStep * timeStep()))
+                       << " " << unbiasedCorrelationBetterAtSpan(iOfSpan)
+                       << " " << sqrt(varCorrelationBetterAtSpan(iOfSpan) / (iOfStep * timeStep())) << endl;
+    }
   }
 
 
