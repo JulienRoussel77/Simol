@@ -54,11 +54,9 @@ namespace simol
     //cout << "operator : " << stiffness_ << " " << distance << " " <<alpha_ << " " << beta_ << " " << stiffness_ / 2 * pow(distance, 2) + alpha_ / 3 * pow(distance, 3) + beta_ / 4 * pow(distance, 4) << endl;
     return stiffness_ / 2 * pow(distance, 2) + alpha_ / 3 * pow(distance, 3) + beta_ / 4 * pow(distance, 4); }
 
-  DVec FPU::gradient(double distance) const
+  double FPU::scalarGradient(double distance) const
   {
-    DVec deriv(1);
-    deriv(0) = stiffness_ * distance + alpha_ * pow(distance, 2) + beta_ * pow(distance, 3);
-    return deriv;
+    return stiffness_ * distance + alpha_ * pow(distance, 2) + beta_ * pow(distance, 3);
   }
 
   double FPU::laplacian(double distance) const

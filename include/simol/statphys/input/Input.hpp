@@ -52,6 +52,7 @@ namespace simol
     DVec initialPosition(int const& iOfParticle = 0) const;
     DVec initialMomentum(int const& iOfParticle = 0) const;
     double initialInternalEnergy(int const& iOfParticle = 0) const;
+    string systemSubtype() const;
     //Chain
     bool isOfFixedVolum() const;
     // NBody
@@ -116,7 +117,7 @@ namespace simol
 
     //-- Output --
     string simuTypeName() const;
-    string parametersName() const;
+    //string parametersName() const;
     string outputFolderName() const;
     int decorrelationNbOfSteps() const;
     double decorrelationTime() const;

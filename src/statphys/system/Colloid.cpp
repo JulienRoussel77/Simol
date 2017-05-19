@@ -39,7 +39,7 @@ namespace simol
     particle1.potentialEnergy() += energy12 / 2;
     particle2.potentialEnergy() += energy12 / 2;
     // compute forces
-    double force12 = pairPotential().potentialForce(distance, interactionType)(0);
+    double force12 = pairPotential().scalarPotentialForce(distance, interactionType);
     /*if (interactionType == 0)
     {
       ofstream test("test", std::ofstream::app);

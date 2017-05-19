@@ -10,8 +10,9 @@ namespace simol
   {
     public:
       LennardJones(Input const& input);
+      virtual string classname() const {return "Lennard Jones";}
       double operator()(double dist) const;
-      DVec gradient(double dist) const;
+      double scalarGradient(double dist) const;
     protected:
       double splineFunction(double reducedDist) const;
       double splineFunctionDerivative(double dist) const;
@@ -33,8 +34,9 @@ namespace simol
   {
   public:
     WCA(Input const& input);
+    virtual string classname() const {return "WCA";}
     double operator()(double dist) const;
-    DVec gradient(double dist) const;
+    double scalarGradient(double dist) const;
   };
 
 }

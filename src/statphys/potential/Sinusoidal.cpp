@@ -37,9 +37,9 @@ namespace simol
     return amplitude_ * (1 - cos(pulsation_ * position));
   }
 
-  DVec Sinusoidal::gradient(double position) const
+  double Sinusoidal::scalarGradient(double position) const
   {
-    return DVec::Constant(1,1, amplitude_ * pulsation_ * sin(pulsation_ * position));
+    return amplitude_ * pulsation_ * sin(pulsation_ * position);
   }
 
   double Sinusoidal::laplacian(double position) const

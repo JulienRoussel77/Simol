@@ -244,7 +244,7 @@ namespace simol
     trigToExpTens_(sizeOfBasis_, sizeOfBasis_),
     expToTrigTens_(sizeOfBasis_, sizeOfBasis_),
     potential_(createPotential(input, input.galerkinPotentialName())),
-    tensorBasis_(nullptr),
+    //tensorBasis_(nullptr),
     outputFolderName_(input.outputFolderName())
   {
     cout << endl << "Number of modes : " << nbOfQModes_ << " x " << nbOfPModes_ << endl;

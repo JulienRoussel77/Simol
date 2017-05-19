@@ -11,6 +11,7 @@
 #include "SpaceSinus.hpp"
 #include "SumSinusoidal.hpp"
 #include "SoftDPD.hpp"
+#include "Drift.hpp"
 
 namespace simol
 {
@@ -22,10 +23,11 @@ namespace simol
   {
     public:
       TwoTypes(Input const& input);
+      virtual string classname() const {return "TwoTypes";}
       double operator()(double position, int type) const;
-      DVec gradient(double position, int type) const;
-      DVec gradient(double position) const;
-      DVec potentialForce(double position, int type) const;
+      double scalarGradient(double position, int type) const;
+      double scalarGradient(double position) const;
+      double scalarPotentialForce(double position, int type) const;
       //DVec potentialForce(double position) const;
       
       virtual double shiftToHarmonic(int type) const;
@@ -40,8 +42,12 @@ namespace simol
   {
   public:
     NoPotential(Input const& input);
-    double operator()(double /*position*/) const {return 0;}
-    DVec gradient(double /*position*/) const {return DVec::Zero(dimension());}
+    virtual string classname() const {return "NoPotential";}
+    virtual double operator()(DVec const& /*position*/) const;
+    virtual double operator()(double /*position*/) const;
+    virtual DVec gradient(DVec const& /*position*/) const;
+    virtual double scalarGradient(double /*position*/) const;
+
     //DVec potentialForce(double /*position*/, int /*type*/) const {return DVec::Zero(1);};
     //DVec potentialForce(double position) const;
     

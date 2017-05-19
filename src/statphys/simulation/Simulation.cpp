@@ -73,7 +73,6 @@ namespace simol
   
   void simulate(Langevin& dyna, System& syst)
   {
-
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
       dyna.verletFirstPart(syst(iOfParticle));
     syst.computeAllForces();
@@ -140,17 +139,8 @@ namespace simol
     if (output.obsInternalEnergy_) dyna.computeInternalEnergy(output, syst);
     if (output.obsInternalTemperature_) dyna.computeInternalTemperature(output, syst);
     if (output.obsLength_) output.length() = syst.length();
-    /*{
-      if (syst.nbOfParticles() == 1)
-        output.length() = syst(0).position(0);
-      else
-      {
-        DVec r12 = syst(0).position() - syst(1).position();
-        output.length() = r12.norm();
-      }
-    }*/
-    if (output.obsVelocity_) output.velocity() = syst(0).velocity(0);
-    if (output.obsForce_) output.force() = syst(0).force(0);
+    if (output.obsVelocity_) output.velocity() = syst.velocity();
+    if (output.obsForce_) output.force() = syst.force();
     dyna.getThermo(output);
     
     if (output.hasControlVariate()) computeControlVariate(dyna, syst, output);

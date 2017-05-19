@@ -23,11 +23,16 @@ namespace simol
     //configuration_(input.nbOfParticles(), new Particle(dimension_)),
     configuration_(nbOfParticles_, nullptr),
     doSetting_(input.doSetting()),
-    domainSize_(std::numeric_limits<double>::infinity())
+    domainSize_(std::numeric_limits<double>::infinity()),
+    systemSubtype_(input.systemSubtype())
   {
     externalPotential_ = createPotential(input, input.externalPotentialName());
     pairPotential_ = createPotential(input, input.pairPotentialName());
     if (externalPotential_) domainSize_ = externalPotential_->domainSize();
+    
+    cout << "System::System" << endl;
+    cout << "externalPotential_ : " << externalPotential_->classname() << endl;
+    cout << "pairPotential_ : " << pairPotential_->classname() << endl;
   }
 
   ///
@@ -71,6 +76,11 @@ namespace simol
   const int& System::nbOfParticles() const
   {
     return nbOfParticles_;
+  }
+  
+  const string& System::systemSubtype() const
+  {
+    return systemSubtype_;
   }
   
   ///
@@ -297,7 +307,19 @@ namespace simol
     return getParticle(0).position(0);
   }
   
+  ///
+  ///Computes the instant value of the observable velocity
+  double System::velocity() const
+  {
+    return getParticle(0).velocity(0);
+  }
 
+  ///
+  ///Computes the instant value of the observable force
+  double System::force() const
+  {
+    return getParticle(0).force(0);
+  }
 }
 
 #endif

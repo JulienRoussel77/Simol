@@ -14,7 +14,7 @@ namespace simol
     Bicolor(Input const& input);
     double const& fixedVelocity() const {return fixedVelocity_;}
     virtual void computeAllForces();
-    
+    virtual double velocity() const;
   };
   
 }

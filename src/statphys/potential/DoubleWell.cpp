@@ -27,9 +27,9 @@ namespace simol
     return 0;
   }
 
-  DVec DoubleWell::gradient(double position) const
+  double DoubleWell::scalarGradient(double position) const
   {
-    return DVec::Constant(1,1, 4 * coeff_ * (position - center_) * (position - center_ - interWell_ / 2) * (position - center_ + interWell_ / 2));
+    return 4 * coeff_ * (position - center_) * (position - center_ - interWell_ / 2) * (position - center_ + interWell_ / 2);
   }
   
   double DoubleWell::laplacian(double position) const
@@ -80,9 +80,9 @@ namespace simol
     return -(dimension_-1)/2 * (extendedLog(position) - extendedLog(2*center_ - position));
   }
 
-  DVec DoubleWellFE::gradient(double distance) const
+  double DoubleWellFE::scalarGradient(double distance) const
   {
-    return DoubleWell::gradient(distance) - DVec::Constant(1,1, (dimension_-1) / distance);
+    return DoubleWell::scalarGradient(distance) - (dimension_-1) / distance;
     //return DVec::Constant(1, stiffness_ * (distance - sigmaPot_));
   }
 

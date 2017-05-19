@@ -16,6 +16,7 @@ namespace simol
     public:
       virtual ~Potential() {};
       Potential(Input const& input);
+      virtual string classname() const {return "Potential";}
       DVec& nonEqForce() ;
       DVec const& nonEqForce() const;
       double& nonEqForce(const int& i);
@@ -31,11 +32,11 @@ namespace simol
       virtual double value(DVec const& position) const;
       virtual double value(double position) const;
       virtual DVec gradient(DVec const & position) const;
-      virtual DVec gradient(double position) const;
+      virtual double scalarGradient(double position) const;
       virtual DVec totalForce(DVec const & position) const;
-      virtual DVec totalForce(double position) const;
+      //virtual DVec totalForce(double position) const;
       virtual DVec potentialForce(DVec const & position) const;
-      virtual DVec potentialForce(double position) const;
+      virtual double scalarPotentialForce(double position) const;
       virtual double laplacian(DVec const & position) const;
       virtual double laplacian(double position) const;
       
@@ -49,11 +50,11 @@ namespace simol
       virtual double symmetricValue(double position) const;
       virtual double skewsymmetricValue(double position) const;
       virtual DVec gradient(DVec const & position, int type) const;
-      virtual DVec gradient(double position, int type) const;
+      virtual double scalarGradient(double position, int type) const;
       virtual DVec totalForce(DVec const & position, int type) const;
-      virtual DVec totalForce(double position, int type) const;
+      //virtual DVec totalForce(double position, int type) const;
       virtual DVec potentialForce(DVec const & position, int type) const;
-      virtual DVec potentialForce(double position, int type) const;
+      virtual double scalarPotentialForce(double position, int type) const;
       virtual double laplacian(DVec const & position, int type) const;
       virtual double laplacian(double position, int type) const;
       

@@ -13,7 +13,7 @@ namespace simol
       virtual double operator()(double position) const;
       virtual double symmetricValue(double position) const;
       virtual double skewsymmetricValue(double position) const;
-      virtual DVec gradient(double position) const;
+      virtual double scalarGradient(double position) const;
       virtual double laplacian(double position) const;
       virtual double drawLaw(double localBeta, std::shared_ptr<RNG>& rng_, int type) const;
       virtual DVec polyCoeffs() const;
@@ -31,7 +31,7 @@ namespace simol
       virtual double operator()(double position) const;
       virtual double symmetricValue(double position) const;
       virtual double skewsymmetricValue(double position) const;
-      virtual DVec gradient(double position) const;
+      virtual double scalarGradient(double position) const;
       virtual double laplacian(double position) const;
       //virtual DVec polynomialCoeffs() const;
       virtual double inverseCoeff() const;

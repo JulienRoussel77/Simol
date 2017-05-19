@@ -389,22 +389,28 @@ namespace simol
   void NBody::interaction(Particle& particle1, Particle& particle2) const
   {
     // take closest periodic image
+    /*cout << "####################" << endl;
+    cout << particle1.position().adjoint() << " <-> " << particle2.position().adjoint() << endl;*/
     DVec r12 = periodicDistance(particle1.position() - particle2.position());
+    //cout << r12.adjoint() << endl;
     double distance = r12.norm();
+    /*cout << distance << endl;
+    cout << particle1.force().adjoint() << endl;
+    cout << "####################" << endl;*/
+
     // compute energy
     double energy12 = pairPotential()(distance);
     particle1.potentialEnergy() += energy12 / 2;
     particle2.potentialEnergy() += energy12 / 2;
     // compute forces
-    double force12 = pairPotential().potentialForce(distance)(0);
+    double force12 = pairPotential().scalarPotentialForce(distance);
     r12 /= distance;
     particle1.force() += force12 * r12;
     particle2.force() -= force12 * r12;
     // compute pressure, based on the Virial formula for the potential part: P_pot = -\sum_{i < j} r_ij v'(r_ij) / d|Vol|; will divide by d|Vol| at the end
     particle1.virial() += 0.5 * force12 * distance;
     particle2.virial() += 0.5 * force12 * distance;
-    //cout << particle1.position().adjoint() << " <-> " << particle2.position().adjoint() << " : " << distance << endl;
-    //cout << force12 << " " << energy12 << endl;
+    //cout << distance << " -> " << force12 << " " << energy12 << endl;
   }
 
 

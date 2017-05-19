@@ -201,7 +201,7 @@ namespace simol
 
   double QBasis::potDeriv(double variable) const
   {
-    return (potential_->gradient(variable))(0);
+    return (potential_->scalarGradient(variable));
   }
 
   double QBasis::potLapla(double variable) const
@@ -762,17 +762,17 @@ namespace simol
   
   double ExpHermiteBasis::potentialW(double variable) const
   {
-    return potential_->value(variable) - omega()/2 * pow(variable-center(),2);
+    return potential(variable) - omega()/2 * pow(variable-center(),2);
   }
 
   double ExpHermiteBasis::potWDeriv(double variable) const
   {
-    return (potential_->gradient(variable))(0) - omega() * (variable-center());
+    return (potDeriv(variable)) - omega() * (variable-center());
   }
 
   double ExpHermiteBasis::potWLapla(double variable) const
   {
-    return potential_->laplacian(variable) - omega();
+    return potLapla(variable) - omega();
   }
   
   

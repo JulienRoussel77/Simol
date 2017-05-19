@@ -57,13 +57,13 @@ namespace simol
     else return 0;
   }
 
-  DVec LennardJones::gradient(double dist) const
+  double LennardJones::scalarGradient(double dist) const
   {
     if (dist < splineRadius_)
-      return DVec::Constant(1, untruncatedDerivative(dist));
+      return untruncatedDerivative(dist);
     else if (dist < cutOffRadius_)
-      return DVec::Constant(1, splineFunctionDerivative(dist));
-    else return DVec::Constant(1, 0);
+      return splineFunctionDerivative(dist);
+    else return 0;
   }
 
   /*DVec LennardJones::gradient(vector<double> const& distVec) const
@@ -89,11 +89,11 @@ namespace simol
     else return 0;
   }
 
-  DVec WCA::gradient(double dist) const
+  double WCA::scalarGradient(double dist) const
   {
     if (dist < cutOffRadius_)
-      return DVec::Constant(1, untruncatedDerivative(dist));
-    else return DVec::Constant(1, 0);
+      return untruncatedDerivative(dist);
+    else return 0;
   }
 
 }

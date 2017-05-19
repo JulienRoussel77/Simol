@@ -27,16 +27,26 @@ namespace simol
 
   string Input::simuTypeName() const
   {
+    string name = "output/";
     if (data["Output"]["SimuTypeName"]
+        && sameLetters(data["Output"]["SimuTypeName"].as<string>(), "yes"))
+      name += dynamicsName() + "/" + systemName() + "/" + potentialName() + "/";
+    if (data["Output"]["FolderName"])
+      name += data["Output"]["FolderName"].as<string>() + "/";
+
+    return name;
+    
+    
+    /*if (data["Output"]["SimuTypeName"]
         && sameLetters(data["Output"]["SimuTypeName"].as<string>(), "yes"))
       //return "../../../output/" + dynamicsName() + "/" + systemName() + "/" + potentialName() + "/";
       return "output/" + dynamicsName() + "/" + systemName() + "/" + potentialName() + "/";
     else
       //return "../../../output/";
-      return "output/";
+      return "output/";*/
   }
 
-  string Input::parametersName() const
+  string Input::outputFolderName() const
   {
     string name = simuTypeName();
 
@@ -90,7 +100,7 @@ namespace simol
     return name;
   }
 
-  string Input::outputFolderName() const
+  /*string Input::outputFolderName() const
   {
     string name = parametersName();
 
@@ -98,7 +108,7 @@ namespace simol
       name += data["Output"]["FolderName"].as<string>() + "/";
 
     return name;
-  }
+  }*/
 
   ///
   ///Returns the a number of steps
@@ -244,7 +254,7 @@ namespace simol
   {return dynamicsName() == "DPDE";}
   
   bool Input::doVelocity() const
-  {return (dynamicsName() != "Overdamped" && systemName() == "Isolated");}
+  {return (dynamicsName() != "Overdamped" && (systemName() == "Isolated" || systemName() == "Bicolor"));}
   
   bool Input::doForce() const
   {return (dynamicsName() == "Overdamped" && systemName() == "Isolated");}
@@ -282,7 +292,9 @@ namespace simol
       if (sameLetters(data["Output"]["DoFinalVelocity"].as<string>(), "yes"))
         return true;
     return false;*/
-    return (systemName() == "Isolated" || systemName() == "Colloid");
+    
+    //return (systemName() == "Isolated" || systemName() == "Colloid");
+    return doLength();
   }  
   
   bool Input::doFinalVelocity() const
@@ -291,7 +303,9 @@ namespace simol
       if (sameLetters(data["Output"]["DoFinalVelocity"].as<string>(), "yes"))
         return true;
     return false;*/
-    return (dynamicsName() != "Overdamped" && systemName() == "Isolated");
+    
+    //return (dynamicsName() != "Overdamped" && (systemName() == "Isolated" || systemName() == "Bicolor"));
+    return doVelocity();
   }  
   
   bool Input::doFinalFlow() const

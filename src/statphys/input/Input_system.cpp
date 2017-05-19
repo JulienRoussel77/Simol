@@ -156,6 +156,14 @@ namespace simol
     return false;
   }
   
+  string Input::systemSubtype() const
+  {
+    if (data["System"]["Subtype"])
+      return data["System"]["Subtype"].as<string>();
+
+    return "None";
+  }
+  
   //-- for DPDE --
   double Input::heatCapacity() const
   {

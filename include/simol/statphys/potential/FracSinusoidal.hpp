@@ -11,7 +11,7 @@ namespace simol
     public:
       FracSinusoidal(Input const& input);
       double operator()(double position) const;
-      DVec gradient(double position) const;
+      double scalarGradient(double position) const;
       virtual double laplacian(double position) const;
 
 

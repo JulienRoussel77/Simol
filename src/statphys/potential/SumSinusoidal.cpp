@@ -16,13 +16,11 @@ namespace simol
                          + cos(3 * pulsation_ * position) / 3);
   }
 
-  DVec SumSinusoidal::gradient(double position) const
+  double SumSinusoidal::scalarGradient(double position) const
   {
-    DVec deriv(1);
-    deriv(0) = amplitude_ * pulsation_ * (cos(pulsation_ * position)
+    return amplitude_ * pulsation_ * (cos(pulsation_ * position)
                                           - 2 * sin(2 * pulsation_ * position)
                                           - sin(3 * pulsation_ * position));
-    return deriv;
   }
 
 

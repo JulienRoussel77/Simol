@@ -14,9 +14,10 @@ namespace simol
   {
     public:
       FPU(Input const& input);
+      virtual string classname() const {return "FPU";}
       void computeHarmonic();
       double operator()(double position) const;
-      DVec gradient(double position) const;
+      double scalarGradient(double position) const;
       double laplacian(double position) const;
       virtual double shiftToHarmonic() const;
       

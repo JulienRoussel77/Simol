@@ -82,6 +82,7 @@ namespace simol
     //virtual Particle const& getMember(const int& iOfCell, const int& iOfMember) const {return getParticle(iOfMember);}
     const int& dimension() const;
     int const& nbOfParticles() const;
+    string const& systemSubtype() const;
     
     virtual bool doCells() const {return false;}
     virtual Cell const& cell(int const&) const {throw std::runtime_error("Cell only exist for NBody !");}
@@ -142,7 +143,8 @@ namespace simol
     virtual void sampleMomenta(DynamicsParameters const& dynaPara);
     
     virtual double length() const;
-
+    virtual double velocity() const;
+    virtual double force() const;
   //protected:
   public:
     int dimension_;
@@ -155,6 +157,7 @@ namespace simol
     Potential* pairPotential_;
     bool doSetting_;
     double domainSize_;
+    string systemSubtype_;
   };
 
 

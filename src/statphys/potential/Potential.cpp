@@ -23,8 +23,7 @@ namespace simol
     //if (nonEqForce_(0) != 0)
     // cout << "nonEqForce = " << nonEqForce_ << endl;
     cout << "Potential::Potential" << endl;
-    cout << nonEqForce_ << endl;
-    cout << nonEqForce().adjoint() << endl;
+    cout << "nonEqForce : " << nonEqForce().adjoint() << endl;
     
   }
 
@@ -73,16 +72,18 @@ namespace simol
   {return dimension_;}   
       
 
-  double Potential::operator()(DVec const& position) const
+  double Potential::operator()(DVec const& /*position*/) const
   {
+    throw runtime_error("Potential::operator()(DVec const& position) not implemented !");
     //cout << "Potential::operator()(DVec const& position)" << endl;
-    return operator()(position(0));
+    //return operator()(position(0));
   }
 
-  double Potential::operator()(double position) const
+  double Potential::operator()(double /*position*/) const
   {
+    throw runtime_error("Potential::operator()(double position) not implemented !");
     //cout << "Potential::operator()(double position)" << endl;
-    return operator()(DVec::Constant(dimension(), position));
+    //return operator()(DVec::Constant(dimension(), position));
     //return operator()(DVec::Constant(1,1, position));
   }
 
@@ -110,32 +111,43 @@ namespace simol
 
   DVec Potential::gradient(DVec const& position) const
   {
-    return gradient(position(0));
+    //throw runtime_error("Potential::gradient(DVec const& position) not implemented !");
+    //cout << "Potential::gradient(DVec const& position)" << endl;
+    return DVec::Constant(1, 1, scalarGradient(position(0)));
   }
 
-  DVec Potential::gradient(double position) const
+  double Potential::scalarGradient(double /*position*/) const
   {
-    return -gradient(DVec::Constant(dimension(), position));
+    throw runtime_error("Potential::scalarGradient(double position) not implemented !");
+    //cout << "Potential::gradient(double position)" << endl;
+    //return gradient(DVec::Constant(dimension(), position));
   }
 
   DVec Potential::totalForce(DVec const& position) const
   {
+    //cout << "Potential::totalForce" << endl;
+    //cout << nonEqForce_ << " - " << gradient(position) << " = " << nonEqForce_ - gradient(position) << endl;
     return nonEqForce_ - gradient(position);
   }
 
-  DVec Potential::totalForce(double position) const
+  /*double Potential::scalarTotalForce(double position) const
   {
     return nonEqForce_ - gradient(position);
-  }
+  }*/
 
   DVec Potential::potentialForce(DVec const& position) const
   {
     return - gradient(position);
   }
 
-  DVec Potential::potentialForce(double position) const
+  /*DVec Potential::potentialForce(double position) const
   {
     return - gradient(position);
+  }*/
+  
+  double Potential::scalarPotentialForce(double position) const
+  {
+    return - scalarGradient(position);
   }
 
   double Potential::laplacian(DVec const& position) const
@@ -171,16 +183,16 @@ namespace simol
   {return value(position);}
   DVec Potential::gradient(DVec const & position, int /*type*/) const
   {return gradient(position);}
-  DVec Potential::gradient(double position, int /*type*/) const
-  {return gradient(position);}
+  double Potential::scalarGradient(double position, int /*type*/) const
+  {return scalarGradient(position);}
   DVec Potential::totalForce(DVec const & position, int /*type*/) const
   {return totalForce(position);}
-  DVec Potential::totalForce(double position, int /*type*/) const
-  {return totalForce(position);}
+  /*DVec Potential::totalForce(double position, int type) const
+  {return totalForce(position);}*/
   DVec Potential::potentialForce(DVec const & position, int /*type*/) const
   {return potentialForce(position);}
-  DVec Potential::potentialForce(double position, int /*type*/) const
-  {return potentialForce(position);}
+  double Potential::scalarPotentialForce(double position, int /*type*/) const
+  {return scalarPotentialForce(position);}
   double Potential::laplacian(DVec const & position, int /*type*/) const
   {return laplacian(position);}
   double Potential::laplacian(double position, int /*type*/) const

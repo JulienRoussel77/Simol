@@ -11,7 +11,7 @@ namespace simol
     public:
       Rotor(Input const& input);
       double operator()(double position) const;
-      DVec gradient(double position) const;
+      double scalarGradient(double position) const;
       double laplacian(double position) const;
       double drawLaw(double localBeta, std::shared_ptr<RNG>& rng_) const;
   };

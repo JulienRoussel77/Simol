@@ -28,9 +28,9 @@ namespace simol
     return 0;
   }
 
-  DVec Harmonic::gradient(double distance) const
+  double Harmonic::scalarGradient(double distance) const
   {
-    return DVec::Constant(1,1,stiffness_ * (distance - center_));
+    return stiffness_ * (distance - center_);
     //return DVec::Constant(1, stiffness_ * (distance - sigmaPot_));
   }
 
@@ -76,9 +76,9 @@ namespace simol
     return -(dimension_-1)/2 * (extendedLog(position) - extendedLog(2*center_ - position));
   }
 
-  DVec HarmonicFE::gradient(double distance) const
+  double HarmonicFE::scalarGradient(double distance) const
   {
-    return Harmonic::gradient(distance) - DVec::Constant(1,1, (dimension_-1) / distance);
+    return Harmonic::scalarGradient(distance) - (dimension_-1) / distance;
     //return DVec::Constant(1, stiffness_ * (distance - sigmaPot_));
   }
 

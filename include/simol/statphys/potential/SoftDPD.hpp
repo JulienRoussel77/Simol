@@ -10,8 +10,8 @@ namespace simol
   {
   public:
     SoftDPD(Input const& input);
-      double operator()(double dist) const;
-    DVec gradient(double dist) const;
+    double operator()(double dist) const;
+    double scalarGradient(double dist) const;
   private:
     
     double epsilon_;

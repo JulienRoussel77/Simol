@@ -572,7 +572,7 @@ namespace simol
                         << " " << setw(3) << constNbOfQModes_
                         << " " << setw(3) << constNbOfPModes_
                         << " " << setw(12);    
-    obsLength().displayFinalValues(outFinalVelocity());  
+    obsVelocity().displayFinalValues(outFinalVelocity());  
     
                         /*<< " " << setw(12) << obsVelocity().mean()
                         << " " << setw(12) << obsVelocity().variance()

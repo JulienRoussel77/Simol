@@ -22,7 +22,10 @@ namespace simol
     virial_(0),
     type_(0),
     oldGaussian_(DVec::Zero(dimension()))
-  {}
+  {
+    cout << "Particle::Particle" << endl;
+    cout << force_.adjoint() << " dim = " << dimension() << " Z : " << DVec::Zero(dimension()) << endl;
+  }
 
   Particle::Particle(int dimension) :
     Particle(0, DVec::Zero(dimension), DVec::Zero(dimension))
@@ -42,10 +45,13 @@ namespace simol
 
   void Particle::resetForce(Potential const& externalPot)
   {
+    //cout << position().adjoint() << " force : " << force().adjoint() << endl;
     potentialEnergy_ = externalPot.value(position());
     //force_ = pot.nonEqForce();
-    force_ = externalPot.totalForce(position());
+    //cout << "externalPot = " << externalPot.classname() << endl;
+    force_ = externalPot.totalForce(position(), type());
     virial_ = 0;
+    //cout << position().adjoint() << " force : " << force().adjoint() << endl;
   }
 
   //--- primary variables ----

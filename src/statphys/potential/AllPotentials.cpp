@@ -35,6 +35,8 @@ namespace simol
       return new HarmonicFE(input);
     else if (potName == "DoubleWellFE")
       return new DoubleWellFE(input);
+    else if (potName == "Drift")
+      return new Drift(input);
     else
       throw runtime_error(potName +" is not a valid potential !");
   }
@@ -75,26 +77,26 @@ namespace simol
       throw runtime_error("Potential type int invalid !");
   }
 
-  DVec TwoTypes::gradient(double position, int type) const
+  double TwoTypes::scalarGradient(double position, int type) const
   {
     if (type == 0)
-      return firstPot_->gradient(position);
+      return firstPot_->scalarGradient(position);
     else if (type == 1)
-      return interactionRatio_ * firstPot_->gradient(position);
+      return interactionRatio_ * firstPot_->scalarGradient(position);
     else if (type == 2)      
-      return secondPot_->gradient(position);
+      return secondPot_->scalarGradient(position);
     else
       throw runtime_error("Potential type int invalid !");
   }
   
-  DVec TwoTypes::gradient(double /*position*/) const
+  double TwoTypes::scalarGradient(double /*position*/) const
   {
     throw runtime_error("An interaction type should be specified for a call to a TwoTypes potential !");
   }
   
-  DVec TwoTypes::potentialForce(double position, int type) const
+  double TwoTypes::scalarPotentialForce(double position, int type) const
   {
-    return -gradient(position, type);
+    return -scalarGradient(position, type);
   }
   
   /*DVec TwoTypes::potentialForce(double position, int type) const
@@ -136,5 +138,23 @@ namespace simol
   NoPotential::NoPotential(Input const& input):
     Potential(input)
   {}
+    
+  double NoPotential::operator()(DVec const& /*position*/) const 
+  {return 0;}
+  
+  double NoPotential::operator()(double /*position*/) const 
+  {return 0;}
+  
+  DVec NoPotential::gradient(DVec const& /*position*/) const
+  {
+    //cout << "NoPotential::gradient(double /*position*/) : " << DVec::Zero(dimension()).adjoint() << endl;
+    return DVec::Zero(dimension());
+  }
+  
+  double NoPotential::scalarGradient(double /*position*/) const
+  {
+    //cout << "NoPotential::gradient(double /*position*/) : " << DVec::Zero(dimension()).adjoint() << endl;
+    return 0;
+  }
 
 }
