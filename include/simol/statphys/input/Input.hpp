@@ -57,8 +57,6 @@ namespace simol
     bool isOfFixedVolum() const;
     // NBody
     bool restart() const;
-    // Bicolor
-    double fixedVelocity() const;
 
     //-- Time --
     double timeStep() const;
@@ -104,6 +102,7 @@ namespace simol
     //double betaRight() const;
     double deltaTemperature() const;
     double nonEqForce() const;
+    double drift() const;
     double tauBending() const;
     double xi() const;
     int seed() const;
@@ -142,6 +141,7 @@ namespace simol
     bool doMidFlow() const;
     bool doSumFlow() const;
     bool doModiFlow() const;
+    bool doLagrangeMultiplier() const;
     
     bool doOutThermo() const;
     bool doOutParticles() const;
@@ -152,6 +152,7 @@ namespace simol
     bool doFinalLength() const;    
     bool doFinalVelocity() const;
     bool doFinalFlow() const;
+    bool doFinalLagrangeMultiplier() const;
     
     bool doOutVelocitiesGenerator() const;
     

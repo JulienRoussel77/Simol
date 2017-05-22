@@ -22,10 +22,7 @@ namespace simol
     virial_(0),
     type_(0),
     oldGaussian_(DVec::Zero(dimension()))
-  {
-    cout << "Particle::Particle" << endl;
-    cout << force_.adjoint() << " dim = " << dimension() << " Z : " << DVec::Zero(dimension()) << endl;
-  }
+  {}
 
   Particle::Particle(int dimension) :
     Particle(0, DVec::Zero(dimension), DVec::Zero(dimension))

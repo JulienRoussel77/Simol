@@ -197,15 +197,5 @@ namespace simol
     
     return "";
   }
-  
-  //-- Bicolor -------
-  
-  double Input::fixedVelocity() const
-  {
-    if (data["System"]["FixedVelocity"])
-      return data["System"]["FixedVelocity"].as<double>();
-    
-    return 0;
-  }
 
 }

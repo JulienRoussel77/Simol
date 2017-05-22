@@ -12,6 +12,7 @@ const double defaultTauBending = 0;
 const double defaultKappa = 0; 
 const int    defaultMTSfrequency = 1;
 const double defaultNonEqForce = 0;
+const double defaultDrift= 0;
 
 namespace simol
 {
@@ -137,6 +138,13 @@ namespace simol
       return deltaTemperature();
     else
       return nonEqForce();
+  }
+  
+  double Input::drift() const
+  {
+    if (data["Dynamics"]["Drift"])
+      return data["Dynamics"]["Drift"].as<double>();
+    else return defaultDrift;
   }
 
   double Input::kappa() const

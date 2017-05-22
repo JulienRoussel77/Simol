@@ -9,12 +9,12 @@ namespace simol
 
   class Bicolor : public NBody
   {
-    double fixedVelocity_;
   public:
     Bicolor(Input const& input);
-    double const& fixedVelocity() const {return fixedVelocity_;}
     virtual void computeAllForces();
     virtual double velocity() const;
+    virtual double force() const;
+    virtual void enforceConstraint(double& lagrangeMultiplier, double fixedVelocity);
   };
   
 }

@@ -53,6 +53,16 @@ namespace simol
     cout << "||||||||||||||OK---------------------" <<endl << endl;*/
   }
   
+  
+  
+  ///Constructor for the Constrained Langevin Dynamics with thermostats everywhere
+  ConstrainedLangevin::ConstrainedLangevin(Input const& input):
+    Langevin(input),
+    drift_(input.drift())
+  {
+    cout << "drift_ = " << drift_ << endl;
+  }
+  
 
 
 }

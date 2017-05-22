@@ -52,12 +52,13 @@ namespace simol
   void thermalize(BoundaryLangevin& dyna, System& syst);
   void thermalize(DPDE& dyna, System& syst);
   
-  void simulate(Dynamics& dyna        , System& syst);
-  void simulate(Overdamped& dyna      , System& syst);
-  void simulate(LangevinBase& dyna    , System& syst);
-  void simulate(Langevin& dyna        , System& syst);
-  void simulate(BoundaryLangevin& dyna, System& syst);
-  void simulate(DPDE& dyna            , System& syst);
+  void simulate(Dynamics& dyna           , System& syst);
+  void simulate(Overdamped& dyna         , System& syst);
+  void simulate(LangevinBase& dyna       , System& syst);
+  void simulate(Langevin& dyna           , System& syst);
+  void simulate(ConstrainedLangevin& dyna, System& syst);
+  void simulate(BoundaryLangevin& dyna   , System& syst);
+  void simulate(DPDE& dyna               , System& syst);
   
   void computeOutput(Dynamics const& dyna, System const& syst, Output& output, long int iOfStep);
   void computeControlVariate(Dynamics const& dyna, System const& syst, Output& output);

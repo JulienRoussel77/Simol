@@ -82,6 +82,10 @@ namespace simol
       
       virtual void computeGeneratorOnBasis(shared_ptr<CVBasis>, System const&) const {};
       
+      
+      virtual double& lagrangeMultiplier() {throw runtime_error("resetConstraint not implemented for this system !");}
+      virtual const double& lagrangeMultiplier() const {throw runtime_error("resetConstraint not implemented for this system !");}
+      
       //-- output functions --
       virtual void computeKineticEnergy(Output& output, System const& syst) const;
       virtual void computePotentialEnergy(Output& output, System const& syst) const;

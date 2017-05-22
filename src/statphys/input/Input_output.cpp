@@ -79,6 +79,7 @@ namespace simol
         else if (vecParameters[iOfVec] == "potAlpha") name += doubleToString(potentialAlpha());
         else if (vecParameters[iOfVec] == "potBeta")  name += doubleToString(potentialBeta());
         else if (vecParameters[iOfVec] == "MTSfrequency")  name += doubleToString(MTSfrequency());
+        else if (vecParameters[iOfVec] == "drift")  name += doubleToString(drift());
         else throw std::runtime_error(vecParameters[iOfVec] + " is not a parameter name !");
       }
       name += "/";
@@ -212,6 +213,7 @@ namespace simol
       case idMidFlow : return "midFlow";
       case idSumFlow : return "sumFlow";
       case idModiFlow : return "modiFlow";
+      case idLagrangeMultiplier: return "lagrangeMultiplier";
       default : throw std::runtime_error("This observable id corresponds to no observable !");
     }
   }
@@ -231,6 +233,7 @@ namespace simol
       case idMidFlow : return doMidFlow();
       case idSumFlow : return doSumFlow();
       case idModiFlow : return doModiFlow();
+      case idLagrangeMultiplier: return doLagrangeMultiplier();
       default : throw std::runtime_error("doObs not defined for this observable id !");
     }
   }
@@ -270,6 +273,9 @@ namespace simol
   
   bool Input::doModiFlow() const
   {return dynamicsName() == "BoundaryLangevin";}
+  
+  bool Input::doLagrangeMultiplier() const
+  {return dynamicsName() == "ConstrainedLangevin";}
   
   bool Input::doOutThermo() const
   {return true;}  
@@ -317,6 +323,10 @@ namespace simol
     return dynamicsName() == "BoundaryLangevin"; 
   }  
   
+  bool Input::doFinalLagrangeMultiplier() const
+  {
+    return dynamicsName() == "ConstrainedLangevin"; 
+  }  
   
   bool Input::doOutVelocitiesGenerator() const
   {return controlVariateName() != "None";}

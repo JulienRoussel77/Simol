@@ -108,6 +108,7 @@ const int idLength = 7;
 const int idMidFlow = 8;
 const int idSumFlow = 9;
 const int idModiFlow = 10;
-const int nbOfIdObs = 11;
+const int idLagrangeMultiplier = 11;
+const int nbOfIdObs = 12;
 
 #endif

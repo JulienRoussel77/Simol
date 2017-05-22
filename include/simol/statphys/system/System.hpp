@@ -139,6 +139,9 @@ namespace simol
     virtual double boundaryPotEnergy() const;
     //double laplacian(DVec const& position, int type = 0) const;
     
+    // currently specific to bicolor systems
+    virtual void enforceConstraint(double& /*lagrangeMultiplier*/, double /*fixedVelocity*/) {throw runtime_error("enforceConstraint not implemented for this system !");}
+    
     virtual void samplePositions(DynamicsParameters const& dynaPara);
     virtual void sampleMomenta(DynamicsParameters const& dynaPara);
     

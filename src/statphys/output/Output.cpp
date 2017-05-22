@@ -28,6 +28,7 @@ namespace simol
     constNonEqForce_(input.nonEqForce()),
     constNbOfQModes_(input.nbOfQModes()),
     constNbOfPModes_(input.nbOfPModes()),
+    constDrift_(input.drift()),
     totalEnergy_(0),
     totalVirial_(0),
     temperature_(0),
@@ -35,6 +36,7 @@ namespace simol
     nbOfAutocoPts_(input.nbOfAutocoPts()),
     doFinalFlow_(input.doFinalFlow()),
     doFinalVelocity_(input.doFinalVelocity()),
+    doFinalLagrangeMultiplier_(input.doFinalLagrangeMultiplier()),
     doDPDE_(input.doDPDE()),
     fitModifFlow_(input.fitModiFlow()),
     obsKineticEnergy_(nullptr),
@@ -48,6 +50,7 @@ namespace simol
     obsMidFlow_(nullptr),
     obsSumFlow_(nullptr),
     obsModiFlow_(nullptr),
+    obsLagrangeMultiplier_(nullptr),
     observables_(),
     kinTempProfile_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts(), nbOfParticles_-1),
     potTempTopProfile_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts(), nbOfParticles_-1),
@@ -103,6 +106,7 @@ namespace simol
     if (input.doFinalLength()) outFinalLength_ = std::make_shared<ofstream>(input.simuTypeName() + "finalLength.txt", std::ofstream::app);
     if (input.doFinalVelocity()) outFinalVelocity_ = std::make_shared<ofstream>(input.simuTypeName() + "finalVelocity.txt", std::ofstream::app);
     if (input.doFinalFlow()) outFinalFlow_         = std::make_shared<ofstream>(input.simuTypeName() + "finalFlow.txt", std::ofstream::app);
+    if (input.doFinalLagrangeMultiplier()) outFinalLagrangeMultiplier_= std::make_shared<ofstream>(input.simuTypeName() + "finalLagrangeMultiplier.txt", std::ofstream::app);
     if (input.doOutChain()) 
     {
       outFinalProfile_      = std::make_shared<ofstream>(input.outputFolderName() + "finalProfile.txt");
@@ -212,6 +216,7 @@ namespace simol
       case idMidFlow : return obsMidFlow_;
       case idSumFlow : return obsSumFlow_;
       case idModiFlow : return obsModiFlow_;
+      case idLagrangeMultiplier: return obsLagrangeMultiplier_;
       default : throw std::runtime_error("This observable id corresponds to no observable !");
     }
   }
@@ -335,6 +340,12 @@ namespace simol
   double& Output::force()
   {return obsForce().currentValue();}
   
+  const double& Output::lagrangeMultiplier() const
+  {return obsLagrangeMultiplier().currentValue();}
+  
+  double& Output::lagrangeMultiplier()
+  {return obsLagrangeMultiplier().currentValue();}
+  
   const double& Output::totalEnergy() const
   {return totalEnergy_;}
   
@@ -392,6 +403,10 @@ namespace simol
   {return *obsModiFlow_;}
   Observable const& Output::obsModiFlow() const
   {return *obsModiFlow_;}
+  Observable& Output::obsLagrangeMultiplier()
+  {return *obsLagrangeMultiplier_;}
+  Observable const& Output::obsLagrangeMultiplier() const
+  {return *obsLagrangeMultiplier_;}
     
 
   const double& Output::timeStep() const
@@ -573,6 +588,22 @@ namespace simol
                         << " " << setw(3) << constNbOfPModes_
                         << " " << setw(12);    
     obsVelocity().displayFinalValues(outFinalVelocity());  
+    
+                        /*<< " " << setw(12) << obsVelocity().mean()
+                        << " " << setw(12) << obsVelocity().variance()
+                        << " " << setw(12) << obsVelocity().varOfVar()
+                        << std::endl;*/
+  }
+  
+  void Output::displayFinalLagrangeMultiplier()
+  {
+    outFinalLagrangeMultiplier() << std::left << setw(10) << finalTime()
+                        << " " << setw(5) << timeStep()
+                        << " " << setw(6) << nbOfParticles()
+                        << " " << setw(4) << constTemperature_
+                        << " " << setw(6) << constDrift_
+                        << " " << setw(12);    
+    obsLagrangeMultiplier().displayFinalValues(outFinalLagrangeMultiplier());  
     
                         /*<< " " << setw(12) << obsVelocity().mean()
                         << " " << setw(12) << obsVelocity().variance()

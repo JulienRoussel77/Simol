@@ -36,6 +36,7 @@ namespace simol
     ofstream & outFinalFlow() {return *outFinalFlow_;}
     ofstream & outFinalLength() {return *outFinalLength_;}
     ofstream & outFinalVelocity() {return *outFinalVelocity_;}
+    ofstream & outFinalLagrangeMultiplier() {return *outFinalLagrangeMultiplier_;}
     ofstream & outMeanThermo() {return *outMeanThermo_;}
     ofstream & outChainVelocities() {return *outChainVelocities_;}
     ofstream & outBeam() {return *outBeam_;}
@@ -69,6 +70,7 @@ namespace simol
     
     bool doFinalLength() const {return (bool)outFinalLength_;}
     bool doFinalVelocity() const {return (bool)outFinalVelocity_;}
+    bool doFinalLagrangeMultiplier() const {return (bool)outFinalLagrangeMultiplier_;}
     bool doFinalFlow() const {return (bool)outFinalFlow_;}
     
     //-- fields to output --
@@ -94,6 +96,8 @@ namespace simol
     double& totalEnergy();
     const double& temperature() const;
     double& temperature();
+    const double& lagrangeMultiplier() const;
+    double& lagrangeMultiplier();
     //double temperature() const;
     //double pressure() const;
     const double& rejectionCountFD() const;
@@ -135,6 +139,9 @@ namespace simol
     void displayProfile(long int iOfStep);
     void finalChainDisplay();
     void displayFinalFlow(double parameter1=0, double parameter2=0);
+    
+    //-------------- ConstrainedLangevin ----------------
+    void displayFinalLagrangeMultiplier();
 
     //------------- pour DPDE ---------------
     //void finalDisplayCorrelationsDPDE();
@@ -161,6 +168,8 @@ namespace simol
     Observable const& obsSumFlow() const;
     Observable& obsModiFlow();
     Observable const& obsModiFlow() const;
+    Observable& obsLagrangeMultiplier();
+    Observable const& obsLagrangeMultiplier() const;
 
     bool hasControlVariate() const;
   protected:
@@ -177,6 +186,7 @@ namespace simol
     //-- average velocity for Isolated --
     std::shared_ptr<ofstream> outFinalLength_;
     std::shared_ptr<ofstream> outFinalVelocity_;
+    std::shared_ptr<ofstream> outFinalLagrangeMultiplier_;
 
     //-- control variate outputs --
     std::shared_ptr<ofstream> outVelocitiesGenerator_;
@@ -207,6 +217,7 @@ namespace simol
     double constNonEqForce_;
     int constNbOfQModes_;
     int constNbOfPModes_;
+    double constDrift_;
     
   protected:
 
@@ -223,7 +234,7 @@ namespace simol
     //-- parametrization of outputs --
     int decorrelationNbOfSteps_;
     int nbOfAutocoPts_;
-    bool doFinalFlow_, doFinalLength_, doFinalVelocity_, doDPDE_;
+    bool doFinalFlow_, doFinalLength_, doFinalVelocity_, doFinalLagrangeMultiplier_, doDPDE_;
     bool fitModifFlow_;
     
   public:
@@ -242,6 +253,7 @@ namespace simol
     Observable* obsMidFlow_;
     Observable* obsSumFlow_;
     Observable* obsModiFlow_;
+    Observable* obsLagrangeMultiplier_;
     
     vector<Observable*> observables_;
 

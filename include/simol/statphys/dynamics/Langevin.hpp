@@ -17,6 +17,21 @@ namespace simol
     protected:
       double sigma_;
   };
+  
+  
+  class ConstrainedLangevin : public Langevin
+  {
+    public:
+      ConstrainedLangevin(Input const& input);
+      virtual double& lagrangeMultiplier() {return lagrangeMultiplier_;}
+      virtual const double& lagrangeMultiplier() const {return lagrangeMultiplier_;}
+      virtual double& drift() {return drift_;}
+      virtual const double& drift() const {return drift_;}
+      virtual string dynamicsName() const {return "ConstrainedLangevin";}
+    protected:
+      double lagrangeMultiplier_;
+      double drift_;
+  };
 
 }
 

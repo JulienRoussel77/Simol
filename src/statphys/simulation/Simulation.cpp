@@ -83,6 +83,28 @@ namespace simol
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
       dyna.updateOrsteinUhlenbeck(syst(iOfParticle), dyna.beta());
   }
+    
+  //------------- Constrained Langevin --------------------
+  
+  void simulate(ConstrainedLangevin& dyna, System& syst)
+  {
+    dyna.lagrangeMultiplier() = 0;
+    for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
+      dyna.verletFirstPart(syst(iOfParticle));
+    syst.enforceConstraint(dyna.lagrangeMultiplier(), dyna.drift());
+    
+    syst.computeAllForces();
+
+    for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
+      dyna.verletSecondPart(syst(iOfParticle));
+    syst.enforceConstraint(dyna.lagrangeMultiplier(), dyna.drift());
+    
+    for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
+      dyna.updateOrsteinUhlenbeck(syst(iOfParticle), dyna.beta());
+    syst.enforceConstraint(dyna.lagrangeMultiplier(), dyna.drift());
+    
+    dyna.lagrangeMultiplier() /= dyna.timeStep();
+  }
   
   //------------ BoundaryLangevin ---------------
   
@@ -141,6 +163,7 @@ namespace simol
     if (output.obsLength_) output.length() = syst.length();
     if (output.obsVelocity_) output.velocity() = syst.velocity();
     if (output.obsForce_) output.force() = syst.force();
+    if (output.obsLagrangeMultiplier_) output.lagrangeMultiplier() = dyna.lagrangeMultiplier();
     dyna.getThermo(output);
     
     if (output.hasControlVariate()) computeControlVariate(dyna, syst, output);
