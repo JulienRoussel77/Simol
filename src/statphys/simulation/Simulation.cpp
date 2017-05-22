@@ -219,6 +219,7 @@ namespace simol
     if (output.doFinalFlow()) output.displayFinalFlow(syst.potParameter1(), syst.potParameter2());
     if (output.doFinalLength()) output.displayFinalLength();
     if (output.doFinalVelocity()) output.displayFinalVelocity();
+    if (output.doFinalLagrangeMultiplier()) output.displayFinalLagrangeMultiplier();
   }
   
 
