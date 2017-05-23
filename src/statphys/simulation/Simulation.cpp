@@ -103,7 +103,7 @@ namespace simol
       dyna.updateOrsteinUhlenbeck(syst(iOfParticle), dyna.beta());
     syst.enforceConstraint(dyna.lagrangeMultiplier(), dyna.drift());
     
-    dyna.lagrangeMultiplier() /= dyna.timeStep();
+    dyna.lagrangeMultiplier() /= dyna.timeStep() / sqrt((double) syst.nbOfParticles());
   }
   
   //------------ BoundaryLangevin ---------------

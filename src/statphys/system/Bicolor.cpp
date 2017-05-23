@@ -94,14 +94,15 @@ namespace simol
     if (systemSubtype() == "OneDrift" || systemSubtype() == "None")
       return getParticle(0).velocity(0);
     else if (systemSubtype() == "TwoDrifts")
-      return getParticle(0).velocity(0) + getParticle(1).velocity(0);
+      return (getParticle(0).velocity(0) + getParticle(1).velocity(0))/sqrt(2.);
     else if (systemSubtype() == "ColorDrift" || systemSubtype() == "NortonColorDrift")
     {
       double sumVelocity = 0;
       for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
         sumVelocity += getParticle(iOfParticle).type() * getParticle(iOfParticle).velocity(0);
       //return sumVelocity;
-      return (sumVelocity + nbOfParticles()/(nbOfParticles()-1)) * (nbOfParticles()-1) / pow(nbOfParticles(), 2);
+      sumVelocity /= sqrt((double) nbOfParticles());
+      return (sumVelocity + 1/(nbOfParticles()-1.)) * (nbOfParticles()-1.) / nbOfParticles();
     }
     else
       throw runtime_error(systemSubtype() + " is not a valid system subtype in Bicolor::velocity() !");
@@ -114,13 +115,14 @@ namespace simol
     if (systemSubtype() == "OneDrift" || systemSubtype() == "None")
       return getParticle(0).force(0);
     else if (systemSubtype() == "TwoDrifts")
-      return getParticle(0).force(0) + getParticle(1).force(0);
+      return (getParticle(0).force(0) + getParticle(1).force(0))/sqrt(2.);
     else if (systemSubtype() == "ColorDrift" || systemSubtype() == "NortonColorDrift")
     {
-      double sumVelocity = 0;
+      double sumForces = 0;
       for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
-        sumVelocity += getParticle(iOfParticle).type() * getParticle(iOfParticle).force(0);
-      return sumVelocity;
+        sumForces += getParticle(iOfParticle).type() * getParticle(iOfParticle).force(0);
+      sumForces /= sqrt((double) nbOfParticles());
+      return sumForces;
     }
     else
       throw runtime_error(systemSubtype() + " is not a valid system subtype in Bicolor::force() !");

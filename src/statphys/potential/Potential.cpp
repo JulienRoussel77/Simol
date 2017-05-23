@@ -19,7 +19,12 @@ namespace simol
     domainSize_(std::numeric_limits<double>::infinity()),
     dimension_(input.dimension())
   {
-    nonEqForce_(0) = input.nonEqForce();
+    if (input.systemSubtype() == "TwoDrifts")
+      nonEqForce_(0) = input.nonEqForce() / sqrt(2.);
+    else if (input.systemSubtype() == "ColorDrift")
+      nonEqForce_(0) = input.nonEqForce() / sqrt((double) input.nbOfParticles());
+    else
+      nonEqForce_(0) = input.nonEqForce();
     //if (nonEqForce_(0) != 0)
     // cout << "nonEqForce = " << nonEqForce_ << endl;
     cout << "Potential::Potential" << endl;
