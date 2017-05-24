@@ -17,7 +17,7 @@ namespace simol
       virtual bool doMomentaExchange() const;
       virtual void initializeCountdown(Particle& particle);
       virtual void updateMomentaExchange(Particle& particle1, Particle& particle2);
-      void updateOrsteinUhlenbeck(Particle& particle, double localBeta);
+      virtual void updateOrsteinUhlenbeck(Particle& particle, double localBeta, double localTimeStep);
       virtual void getThermo(Output& output) const;
       virtual void getPressure(Output& output) const;
     protected:

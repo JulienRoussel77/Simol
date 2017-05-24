@@ -81,7 +81,7 @@ namespace simol
       dyna.verletSecondPart(syst(iOfParticle));
 
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
-      dyna.updateOrsteinUhlenbeck(syst(iOfParticle), dyna.beta());
+      dyna.updateOrsteinUhlenbeck(syst(iOfParticle), dyna.beta(), dyna.timeStep());
   }
     
   //------------- Constrained Langevin --------------------
@@ -89,6 +89,11 @@ namespace simol
   void simulate(ConstrainedLangevin& dyna, System& syst)
   {
     dyna.lagrangeMultiplier() = 0;
+    
+    for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
+      dyna.updateOrsteinUhlenbeck(syst(iOfParticle), dyna.beta(), dyna.timeStep()/2);
+    syst.enforceConstraint(dyna.lagrangeMultiplier(), dyna.drift());
+      
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
       dyna.verletFirstPart(syst(iOfParticle));
     syst.enforceConstraint(dyna.lagrangeMultiplier(), dyna.drift());
@@ -100,7 +105,7 @@ namespace simol
     syst.enforceConstraint(dyna.lagrangeMultiplier(), dyna.drift());
     
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
-      dyna.updateOrsteinUhlenbeck(syst(iOfParticle), dyna.beta());
+      dyna.updateOrsteinUhlenbeck(syst(iOfParticle), dyna.beta(), dyna.timeStep()/2);
     syst.enforceConstraint(dyna.lagrangeMultiplier(), dyna.drift());
     
     dyna.lagrangeMultiplier() /= dyna.timeStep() / sqrt((double) syst.nbOfParticles());
@@ -118,8 +123,8 @@ namespace simol
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
       dyna.verletSecondPart(syst(iOfParticle));
 
-    dyna.updateOrsteinUhlenbeck(syst.getParticle(0), dyna.betaLeft());
-    dyna.updateOrsteinUhlenbeck(syst.getParticle(syst.nbOfParticles() - 1), dyna.betaRight());
+    dyna.updateOrsteinUhlenbeck(syst.getParticle(0), dyna.betaLeft(), dyna.timeStep());
+    dyna.updateOrsteinUhlenbeck(syst.getParticle(syst.nbOfParticles() - 1), dyna.betaRight(), dyna.timeStep());
 
     if (dyna.doMomentaExchange())
       for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles() - 1; iOfParticle++)

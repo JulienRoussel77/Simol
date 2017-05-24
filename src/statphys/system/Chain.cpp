@@ -70,6 +70,9 @@ namespace simol
 
   //###### BiChain ######
 
+  ///
+  /// Construct a Chain with nearest-neighbor interactions
+  /// The 0 means that there is 0 "wall particles" : the ends are free
   BiChain::BiChain(Input const& input):
     Chain(input, 0)
   {}
@@ -95,23 +98,32 @@ namespace simol
 
 
   void BiChain::computeAllForces()
-  {
-    //std::cout << "BiChain::computeAllForces" << std::endl;
-    //for (auto && particle : configuration_)
-    //  particle.resetForce(potential());
-    //for (int i = 0; i < nbOfParticles() - 1; i++)
-    // interaction(configuration_[i], configuration_[i + 1]);
+  {    
+    //for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
+    //  getParticle(iOfParticle).resetForce(pairPotential());
     
-    //for (ParticleIterator it = begin(); !finished(it); ++it)
-    for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
-      getParticle(iOfParticle).resetForce(pairPotential());
+    getParticle(-nbOfWallParticles_).force(0) = 0; // Only reset the first particle to gain time
     
     for (ParticlePairIterator it = pairBegin(); !pairFinished(it); incrementePairIterator(it))
       interaction(it.particle1(), it.particle2());
   }
 
 
+  ///Computes the force and the energy associated to this pair interaction, and updates these 2 fields
+  ///The first 2 derivates of the potential are stored in "particle2"
+  void BiChain::interaction(Particle& particle1, Particle& particle2) const
+  {
+    double r12 = particle2.position(0) - particle1.position(0);
+    double energy12 = pairPotential()(r12);
+    double force12 = pairPotential_->scalarPotentialForce(r12);    // = - v'(q_2 - q_1)
+    double lapla12 = pairPotential_->laplacian(r12);  // v"(q_2 - q_1)
 
+    particle1.potentialEnergy() = energy12;
+    particle1.force(0) -= force12;
+    particle2.force(0) = force12;    // /!\ Becareful here we assume that the particles are visited in a certain order
+    particle1.energyGrad(0) = -force12;    // v'(q_2 - q_1)
+    particle1.energyLapla() = lapla12;    // v"(q_2 - q_1)
+  }
 
   //###### TriChain ######
 

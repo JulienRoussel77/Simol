@@ -47,10 +47,12 @@ namespace simol
     harmonicStiffness_ = stiffness_ + (alpha_ * (m3_ - m1_*m2_) + beta_ * (m4_ - m1_ * m3_)) / (m2_ - pow(m1_, 2));
     double harmonicFirstOrder = (stiffness_ - harmonicStiffness_) * m1_ + alpha_ * m2_ + beta_ * m3_;
     harmonicEquilibrium_ = - harmonicFirstOrder / harmonicStiffness_;
+    cout << "harmonic potential computed !" << endl;
   }
 
   double FPU::operator()(double distance) const
   { 
+    //cout << "FPU::operator()(double distance)" << endl;
     //cout << "operator : " << stiffness_ << " " << distance << " " <<alpha_ << " " << beta_ << " " << stiffness_ / 2 * pow(distance, 2) + alpha_ / 3 * pow(distance, 3) + beta_ / 4 * pow(distance, 4) << endl;
     return stiffness_ / 2 * pow(distance, 2) + alpha_ / 3 * pow(distance, 3) + beta_ / 4 * pow(distance, 4); }
 

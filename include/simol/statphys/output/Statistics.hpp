@@ -34,11 +34,11 @@ namespace simol
   ///The variance is computed using a recursive formula so only a few scalar need to be stocked  
   class IIDStats : public Statistics
   {
-    DMat iidVar_;
+    DMat sumVar_; // We store a cumulated version of the variance to avoid numerical instabilities
   public:
     IIDStats(int nbRows = 1, int nbCols = 1);
     void append(double value, int i = 0, int j = 0);
-    const double& variance(int i = 0, int j = 0 ) const;
+    double variance(int i = 0, int j = 0 ) const;
     double stdDev(int i = 0, int j = 0) const;
   };
   

@@ -38,6 +38,7 @@ namespace simol
       
       virtual void samplePositions(DynamicsParameters const& dynaPara);
       void computeAllForces();
+      void interaction(Particle& particle1, Particle& particle2) const;
       //virtual void computeProfile(Output& output, long int iOfStep) const;
     protected:
       //Particle ancorParticle_;

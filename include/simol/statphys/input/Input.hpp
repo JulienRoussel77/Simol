@@ -120,11 +120,14 @@ namespace simol
     string outputFolderName() const;
     int decorrelationNbOfSteps() const;
     double decorrelationTime() const;
+    int shortDecorrelationNbOfSteps() const;
+    double shortDecorrelationTime() const;
     int printPeriodNbOfSteps() const;
     double printPeriodTime() const;
     int printLongPeriodNbOfSteps() const;
     double printLongPeriodTime() const;
     int nbOfAutocoPts() const;
+    int nbOfShortAutocoPts() const;
     
     // -- observables --
     string nameOfObs(int idObs) const;

@@ -24,10 +24,9 @@ namespace simol
   void Isolated::computeAllForces()
   {
     getParticle().resetForce(externalPotential());
-    DVec position = getParticle().position();
-    getParticle().potentialEnergy() = externalPotential(position);
-    //getParticle().force() = totalForce(getParticle().position());
-    getParticle().force() = externalPotential().potentialForce(position);
+    //DVec position = getParticle().position();
+    //getParticle().potentialEnergy() = externalPotential(position);
+    //getParticle().force() = externalPotential().potentialForce(position);
   }
   
   

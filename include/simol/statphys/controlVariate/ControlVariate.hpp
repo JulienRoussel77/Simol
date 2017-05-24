@@ -29,6 +29,8 @@ namespace simol
       
       bool doEstimateCvCoeffs_;
       
+      int CVDecorrelationNbOfSteps_, CVNbOfAutocoPts_;
+      
       AutocorrelationStats autocoStatsBetter_;
       
       Statistics statsGeneratorOnBasis_;
@@ -55,6 +57,8 @@ namespace simol
       virtual int nbOfFunctionPairs() const;
       virtual int nbOfFourier() const;
       virtual int nbOfHermite() const;
+      virtual int CVDecorrelationNbOfSteps() const;
+      virtual int CVNbOfAutocoPts() const;
       CVBasis const& cvBasis() const;
       CVBasis& cvBasis();
 

@@ -33,7 +33,9 @@ namespace simol
     totalVirial_(0),
     temperature_(0),
     decorrelationNbOfSteps_(input.decorrelationNbOfSteps()),
+    shortDecorrelationNbOfSteps_(input.shortDecorrelationNbOfSteps()),
     nbOfAutocoPts_(input.nbOfAutocoPts()),
+    nbOfShortAutocoPts_(input.nbOfShortAutocoPts()),
     doFinalFlow_(input.doFinalFlow()),
     doFinalVelocity_(input.doFinalVelocity()),
     doFinalLagrangeMultiplier_(input.doFinalLagrangeMultiplier()),
@@ -60,7 +62,10 @@ namespace simol
     cvBasis_(cvBasis0)
   {    
     for (int idObs = 0; idObs < nbOfIdObs; idObs++)
-      addObservable(input, idObs);
+      if (idObs == idModiFlow || idObs == idMidFlow)
+        addObservable(input, idObs, shortDecorrelationNbOfSteps(), nbOfShortAutocoPts());
+      else
+        addObservable(input, idObs, decorrelationNbOfSteps(), nbOfAutocoPts());
     
     /*if (input.doKineticEnergy()) obsKineticEnergy_ = addObservable(input, "kineticEnergy.txt");
     if (input.doPotentialEnergy()) obsPotentialEnergy_ = addObservable(input, "potentialEnergy.txt");
@@ -228,7 +233,7 @@ namespace simol
     return obsPtr;
   }*/
   
-  void Output::addObservable(const Input& input, int idObs)
+  void Output::addObservable(const Input& input, int idObs, int decorrelationNbOfSteps0, int nbOfAutocoPts0)
   {
     /*Observable* obsPtr = new Observable(input, outPath);
     observables_.push_back(obsPtr);
@@ -237,7 +242,7 @@ namespace simol
     Observable* obsPtr = nullptr;
     if (input.doObservable(idObs))
     {
-      if (!input.doCVObservable(idObs)) obsPtr = new Observable(input, idObs);
+      if (!input.doCVObservable(idObs)) obsPtr = new Observable(input, idObs, decorrelationNbOfSteps0, nbOfAutocoPts0);
       else obsPtr = createControlVariate(input, idObs, cvBasis_);
       getObservablePtr(idObs) = obsPtr;
       observables_.push_back(obsPtr);
@@ -415,20 +420,32 @@ namespace simol
   double& Output::timeStep()
   {return timeStep_;}
 
-  int & Output::decorrelationNbOfSteps()
-  {return decorrelationNbOfSteps_;}
+  /*int & Output::decorrelationNbOfSteps()
+  {return decorrelationNbOfSteps_;}*/
 
   const int& Output::decorrelationNbOfSteps() const
   {return decorrelationNbOfSteps_;}
 
   double Output::decorrelationTime() const
   {return decorrelationNbOfSteps() * timeStep();}
+  
+  const int& Output::shortDecorrelationNbOfSteps() const
+  {return shortDecorrelationNbOfSteps_;}
+
+  double Output::shortDecorrelationTime() const
+  {return shortDecorrelationNbOfSteps() * timeStep();}
 
   const int& Output::nbOfAutocoPts() const
   {return nbOfAutocoPts_;}
 
   double Output::autocoPtsPeriod() const
   {return decorrelationTime() / nbOfAutocoPts();}
+  
+  const int& Output::nbOfShortAutocoPts() const
+  {return nbOfShortAutocoPts_;}
+
+  double Output::shortAutocoPtsPeriod() const
+  {return shortDecorrelationTime() / nbOfAutocoPts();}
 
   //---- specific for DPDE -----
   

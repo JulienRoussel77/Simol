@@ -8,7 +8,7 @@ using std::max;
 
 const int defaultPrintPeriod = 0;
 const int defaultPrintLongPeriod = 0;
-const int maxNbOfAutocoPts = 1000;
+const int maxNbOfAutocoPts = 200;
 const int defaultDecorrelationTime = 0;
 
 namespace simol
@@ -135,6 +135,31 @@ namespace simol
   {
     return decorrelationNbOfSteps() * timeStep();
   }
+  
+  ///
+  ///Returns the a number of steps
+  int Input::shortDecorrelationNbOfSteps() const
+  {
+    // This static bools prevents from giving several times the same warning
+    static bool warningGiven = false;
+    double decoTime;
+    if (data["Output"]["ShortDecorrelationTime"]) decoTime = data["Output"]["ShortDecorrelationTime"].as<double>();  // decorrelation time not truncated
+    else decoTime = decorrelationTime();
+    int decoNb = (int)(decoTime / timeStep());
+    double decoTrunc = decoNb * timeStep();                 // decorrelation time truncated
+    if (!warningGiven && (decoTime != decoTrunc))           //sends a warning the first time the function is called
+    {
+      warningGiven = true;
+      cout << "#### /!\\ ShortDecorrelationTime truncated to " << decoTrunc << " ####" << endl;
+    }
+    return decoNb;
+  }
+  ///
+  ///Returns the truncated decorrelation time, which is a multiple of the one given in input
+  double Input::shortDecorrelationTime() const
+  {
+    return shortDecorrelationNbOfSteps() * timeStep();
+  }
 
   int Input::printPeriodNbOfSteps() const
   {
@@ -191,6 +216,13 @@ namespace simol
   int Input::nbOfAutocoPts() const
   {
     return min(maxNbOfAutocoPts, (int)decorrelationNbOfSteps());
+  }
+  
+  /// Contains the number of values in an autocorrelation LongPeriod
+  /// /!\ Causes a memory crash for the larger chains if too big
+  int Input::nbOfShortAutocoPts() const
+  {
+    return min(maxNbOfAutocoPts, (int)shortDecorrelationNbOfSteps());
   }
   
   

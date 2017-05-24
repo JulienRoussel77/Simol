@@ -85,23 +85,35 @@ namespace simol
   
   IIDStats::IIDStats(int nbRows, int nbCols):
     Statistics(nbRows, nbCols),
-    iidVar_(nbRows, nbCols)
+    sumVar_(nbRows, nbCols)
   {
-    iidVar_.fill(0);
+    sumVar_.fill(0);
   };
   
   void IIDStats::append(double value, int i, int j)
   {
     lastValue_(i, j) = value;
+    nbValues_(i, j)++;
+    double prevMean = mean();
+    sumValues_(i, j) += value;
+    sumVar_(i,j) = sumVar_(i,j) + (value - prevMean) * (value - mean());    
+    
+    /*lastValue_(i, j) = value;
     double tempTerm = iidVar_(i,j) + pow(mean(), 2);
     nbValues_(i, j)++;
     sumValues_(i, j) += value;
-    iidVar_(i,j) = tempTerm - pow(mean(), 2) + (pow(value, 2) - tempTerm) / nbValues_(i, j);
+    iidVar_(i,j) = tempTerm - pow(mean(), 2) + (pow(value, 2) - tempTerm) / nbValues_(i, j);*/
   }
   
-  const double& IIDStats::variance(int i, int j) const
+  double IIDStats::variance(int i, int j) const
   {
-    return iidVar_(i, j);
+    if (nbValues_(i, j) == 1)
+      return 0;
+    else
+    {
+      //cout << sumVar_(i, j) << " / " << nbValues_(i, j)-1 << " = " << sumVar_(i, j) / (nbValues_(i, j)-1) << endl;
+      return sumVar_(i, j) / (nbValues_(i, j)-1.);
+    }
   }
   
   double IIDStats::stdDev(int i, int j) const

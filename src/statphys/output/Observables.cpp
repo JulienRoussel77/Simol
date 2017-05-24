@@ -15,11 +15,11 @@ namespace simol
     return new Observable(input);
   }*/
 
-  Observable::Observable(Input const& input, int idObs):
-    decorrelationNbOfSteps_(input.decorrelationNbOfSteps()),
+  Observable::Observable(Input const& input, int idObs, int decorrelationNbOfSteps0, int nbOfAutocoPts0):
+    decorrelationNbOfSteps_(decorrelationNbOfSteps0),
     timeStep_(input.timeStep()),
     printPeriodNbOfSteps_(input.printPeriodNbOfSteps()),
-    nbOfAutocoPts_(input.nbOfAutocoPts()),
+    nbOfAutocoPts_(nbOfAutocoPts0),
     currentValue_(0),
     autocoStats_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts()),
     outPath_(input.nameOfObs(idObs)+".txt"),
@@ -199,6 +199,7 @@ namespace simol
     
     for (int iOfSpan = 0; iOfSpan < nbOfAutocoPts(); iOfSpan++)
     {
+      //cout << sqrt(varCorrelationAtSpan(iOfSpan)) << " / " << sqrt(iOfStep * timeStep()) << " = " << sqrt(varCorrelationAtSpan(iOfSpan) / (iOfStep * timeStep())) << endl;
       outFluxCorrelation() << iOfSpan * autocoPtsPeriod()
                        << " " << unbiasedCorrelationAtSpan(iOfSpan)
                        << " " << sqrt(varCorrelationAtSpan(iOfSpan) / (iOfStep * timeStep())) << endl;

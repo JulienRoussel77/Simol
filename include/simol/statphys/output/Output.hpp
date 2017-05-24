@@ -24,7 +24,7 @@ namespace simol
       
     //Observable* addObservable(const Input& input, const string& outPath);
     Observable*& getObservablePtr(int idObs);
-    void addObservable(const Input& input, int idObs);
+    void addObservable(const Input& input, int idObs, int decorrelationNbOfSteps0, int nbOfAutocoPts0);
     //Observable* addControlVariate(const Input& input, const string& outPath, Galerkin* galerkin);
     //void setControlVariates(Input& input, Potential& potential, Galerkin* galerkin);
     
@@ -112,9 +112,13 @@ namespace simol
     //-- parametrization of outputs --
     int const& nbOfAutocoPts() const;
     double autocoPtsPeriod() const;
+    int const& nbOfShortAutocoPts() const;
+    double shortAutocoPtsPeriod() const;
     int const& decorrelationNbOfSteps() const;
-    int& decorrelationNbOfSteps();
+    //int& decorrelationNbOfSteps();
     double decorrelationTime() const;
+    int const& shortDecorrelationNbOfSteps() const;
+    double shortDecorrelationTime() const;
 
     //-- actual outputing functions --
     void displayThermoVariables(long int iOfStep);
@@ -232,8 +236,9 @@ namespace simol
     double negativeEnergiesCountThermal_;
 
     //-- parametrization of outputs --
-    int decorrelationNbOfSteps_;
-    int nbOfAutocoPts_;
+    int decorrelationNbOfSteps_, shortDecorrelationNbOfSteps_;
+    
+    int nbOfAutocoPts_, nbOfShortAutocoPts_;
     bool doFinalFlow_, doFinalLength_, doFinalVelocity_, doFinalLagrangeMultiplier_, doDPDE_;
     bool fitModifFlow_;
     

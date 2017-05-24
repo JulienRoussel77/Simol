@@ -13,7 +13,7 @@ namespace simol
   Observable* createControlVariate(Input const& input, int idObs, shared_ptr<CVBasis> cvBasis0)
   {
     if (input.controlVariateName() == "None")
-      return new Observable(input, idObs);
+      return new Observable(input, idObs, input.shortDecorrelationNbOfSteps(), input.nbOfShortAutocoPts());
     if (input.controlVariateName() == "Sinus")
       return new SinusControlVariate(input, idObs, cvBasis0);
     else if (input.controlVariateName() == "ExpFourierHermite")
@@ -29,15 +29,17 @@ namespace simol
 
 
   ControlVariate::ControlVariate(Input const& input, int idObs, shared_ptr<CVBasis> cvBasis0, int nbOfFunctions):
-    Observable(input, idObs),
+    Observable(input, idObs, input.shortDecorrelationNbOfSteps(), input.nbOfShortAutocoPts()),
     dimension_(input.dimension()),
     nbOfFunctions_(nbOfFunctions),
     nbOfFunctionPairs_(pow(nbOfFunctions_, 2)),
     doEstimateCvCoeffs_(false),
-    autocoStatsBetter_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts()),
+    CVDecorrelationNbOfSteps_(input.shortDecorrelationNbOfSteps()),
+    CVNbOfAutocoPts_(input.nbOfShortAutocoPts()),
+    autocoStatsBetter_(CVDecorrelationNbOfSteps(), timeStep(), CVNbOfAutocoPts()),
     statsGeneratorOnBasis_(nbOfFunctions_),
     statsB1_(nbOfFunctions_),
-    statsB2_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts(), nbOfFunctions_),
+    statsB2_(CVDecorrelationNbOfSteps(), timeStep(), CVNbOfAutocoPts(), nbOfFunctions_),
     statsD_(nbOfFunctions_, nbOfFunctions_),
     lastA_(nbOfFunctions_),
     cvBasis_(cvBasis0)
@@ -94,7 +96,14 @@ namespace simol
   int ControlVariate::nbOfHermite() const
   {return 0;}
   
-
+  int ControlVariate::CVDecorrelationNbOfSteps() const
+  {return CVDecorrelationNbOfSteps_;}
+  
+  int ControlVariate::CVNbOfAutocoPts() const
+  {return CVNbOfAutocoPts_;}
+  
+  
+  
   
 
   double ControlVariate::lastValueBetter() const
@@ -384,13 +393,22 @@ namespace simol
     outFluxCorrelation() << "# The correlation in iOfSpan = 0 is " << floor((2 * unbiasedCorrelationAtSpan(0) * decorrelationTime() / nbOfAutocoPts()) / variance() * 10000)/100 << "% of the variance" << endl;
     outFluxCorrelation() << "# The correlation in iOfSpan = 0 is " << floor((2 * unbiasedCorrelationBetterAtSpan(0) * decorrelationTime() / nbOfAutocoPts()) / varBetter() * 10000)/100 << "% of the better variance" << endl;
     
-    for (int iOfSpan = 0; iOfSpan < nbOfAutocoPts(); iOfSpan++)
+    for (int iOfSpan = 0; iOfSpan < CVNbOfAutocoPts(); iOfSpan++)
     {
       outFluxCorrelation() << iOfSpan * autocoPtsPeriod()
                        << " " << unbiasedCorrelationAtSpan(iOfSpan)
                        << " " << sqrt(varCorrelationAtSpan(iOfSpan) / (iOfStep * timeStep()))
                        << " " << unbiasedCorrelationBetterAtSpan(iOfSpan)
                        << " " << sqrt(varCorrelationBetterAtSpan(iOfSpan) / (iOfStep * timeStep())) << endl;
+    }
+    
+    for (int iOfSpan = nbOfAutocoPts(); iOfSpan < nbOfAutocoPts(); iOfSpan++)
+    {
+      outFluxCorrelation() << iOfSpan * autocoPtsPeriod()
+                       << " " << unbiasedCorrelationAtSpan(iOfSpan)
+                       << " " << sqrt(varCorrelationAtSpan(iOfSpan) / (iOfStep * timeStep()))
+                       << " " << 0
+                       << " " << 0 << endl;
     }
   }
 

@@ -52,11 +52,13 @@ namespace simol
 
   ///
   ///Analytical integration of an Orstein-Uhlenbeck process of inverse T "localBeta"
-  void LangevinBase::updateOrsteinUhlenbeck(Particle& particle, double localBeta)
+  void LangevinBase::updateOrsteinUhlenbeck(Particle& particle, double localBeta, double localTimeStep)
   {
-    double alpha = exp(- gamma() / particle.mass() * timeStep_);
+    double alpha = exp(- gamma() / particle.mass() * localTimeStep);
     particle.momentum() = alpha * particle.momentum() + sqrt((1 - pow(alpha, 2)) / localBeta * particle.mass()) * rng_->gaussian();
   }
+  
+  
   
   void LangevinBase::getThermo(Output& output) const
   {

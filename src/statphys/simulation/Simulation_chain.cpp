@@ -21,7 +21,7 @@ namespace simol
     for (int i = 0; i < syst.nbOfParticles(); i++)
     {
       double localTemperature = dyna.temperatureLeft() + i * dyna.deltaTemperature() / syst.nbOfParticles();
-      dyna.updateOrsteinUhlenbeck(syst(0), 1 / localTemperature);
+      dyna.updateOrsteinUhlenbeck(syst(0), 1 / localTemperature, dyna.timeStep());
     }
   }
   

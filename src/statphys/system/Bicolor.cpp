@@ -102,7 +102,7 @@ namespace simol
         sumVelocity += getParticle(iOfParticle).type() * getParticle(iOfParticle).velocity(0);
       //return sumVelocity;
       sumVelocity /= sqrt((double) nbOfParticles());
-      return (sumVelocity + 1/(nbOfParticles()-1.)) * (nbOfParticles()-1.) / nbOfParticles();
+      return (sumVelocity + externalPotential_->nonEqForce(0) /(nbOfParticles()-1.)) * (nbOfParticles()-1.) / nbOfParticles();
     }
     else
       throw runtime_error(systemSubtype() + " is not a valid system subtype in Bicolor::velocity() !");
