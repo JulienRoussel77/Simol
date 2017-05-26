@@ -99,7 +99,8 @@ namespace simol
     dyna.lagrangeMultiplier() += (1-alpha) * dyna.drift();
     double trash=0;
     syst.enforceConstraint(trash, dyna.drift());
-      
+    //syst.enforceConstraint(dyna.lagrangeMultiplier(), dyna.drift());
+    
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
       dyna.updateMomentum(syst(iOfParticle));
     syst.enforceConstraint(dyna.lagrangeMultiplier(), dyna.drift());
@@ -119,8 +120,9 @@ namespace simol
     // We analiticaly retermine the non-martingale part of the Lagrange multiplier
     dyna.lagrangeMultiplier() += (1-alpha) * dyna.drift();
     syst.enforceConstraint(trash, dyna.drift());
+    //syst.enforceConstraint(dyna.lagrangeMultiplier(), dyna.drift());
     
-    dyna.lagrangeMultiplier() /= dyna.timeStep() / sqrt((double) syst.nbOfParticles());
+    dyna.lagrangeMultiplier() /= dyna.timeStep();
   }
   
   //------------ BoundaryLangevin ---------------

@@ -71,18 +71,22 @@ namespace simol
     double relativeDrift = 0;
     for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
       relativeDrift += getParticle(iOfParticle).type() * getParticle(iOfParticle).velocity(0);
+    relativeDrift /= sqrt((double) nbOfParticles());
     
-    //cout << "relativeDrift = " << relativeDrift << " compatred to drift = " << drift << endl;
+    //cout << "relativeDrift before = " << relativeDrift << " compared to drift = " << drift << endl;
     
-    double localLagrangeMultiplier = drift - relativeDrift / nbOfParticles();
-    lagrangeMultiplier += localLagrangeMultiplier;
+    double localLagrangeMultiplier = drift - relativeDrift;
+
     for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
-      getParticle(iOfParticle).momentum(0) += localLagrangeMultiplier * getParticle(iOfParticle).mass() * getParticle(iOfParticle).type();
+      getParticle(iOfParticle).momentum(0) += localLagrangeMultiplier / sqrt((double) nbOfParticles()) * getParticle(iOfParticle).mass() * getParticle(iOfParticle).type();
     
-    relativeDrift = 0;
+    lagrangeMultiplier += localLagrangeMultiplier;
+    
+    /*relativeDrift = 0;
     for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
       relativeDrift += getParticle(iOfParticle).type() * getParticle(iOfParticle).velocity(0);
-    //cout << "relativeDrift = " << relativeDrift << " should be N X D = " << nbOfParticles()*drift << endl;
+    relativeDrift /= sqrt((double) nbOfParticles());
+    cout << "relativeDrift after = " << relativeDrift << " compared to drift = " << drift << endl;*/
   }
 
   

@@ -157,49 +157,7 @@ namespace simol
   ///
   ///Evaluate the potential for the scalar "position"
   double System::externalPotential(const double& distance, int type) const {return (*externalPotential_)(distance, type);}
-  /*///
-  ///Evaluate the force for the scalar "position" (potential and external terms)
-  DVec System::totalForce(DVec const& position, int type) const
-  {
-    return potential_->totalForce(position, type);
-  }*/
-
-  /*DVec System::potentialForce(DVec const& position, int type) const
-  {
-    return - potential_->gradient(position, type);
-  }
-
-  DVec System::potentialForce(double position, int type) const
-  {
-    return - potential_->gradient(position, type);
-  }*/
   
-  /*///
-  ///Evaluate the force for the scalar "position" (potential and external terms)
-  DVec System::totalForce(double position, int type) const
-  {
-    return potential_->totalForce(position, type);
-  }*/
-  
-  /*///
-  ///Evaluate the laplacian of the potential for the vector "position"
-  double System::laplacian(DVec const& position, int type) const
-  {
-    return potential_->laplacian(position, type);
-  }*/
-
-  /*///
-  ///Read-only accessor for the external force
-  DVec const& System::externalForce() const {return externalPotential_->force();}
-  ///
-  ///Write-read accessor for the external force
-  DVec& System::externalForce() {return externalPotential_->force();}*/
-  /*///
-  ///Read-only accessor for the i-th component of the external force
-  double const& System::externalForce(int const& i) const {return potential_->externalForce(i);}
-  ///
-  ///Write-read accessor for the i-th component of the external force
-  double& System::externalForce(int const& i) {return potential_->externalForce(i);}*/
   
   ///
   ///Read-only accessor for the first parameter of the potential
