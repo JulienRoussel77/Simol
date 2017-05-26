@@ -92,6 +92,13 @@ namespace simol
       reinitializeCells();
       for (ParticlePairIterator it = pairBegin(); !pairFinished(it); incrementePairIterator(it))
         interaction(it.particle1(), it.particle2());
+      
+      // When the two dimer particles are not in neighboring cells we make them interact
+      int iOfCell0 = findIndex(getParticle(0).position());
+      vector<int>* indexNeigh0 = &cell(iOfCell0).indexNeighbors();
+      int iOfCell1 = findIndex(getParticle(1).position());
+      if (std::find(indexNeigh0->begin(), indexNeigh0->end(), iOfCell1) == indexNeigh0->end())
+        interaction(getParticle(0), getParticle(1));
     }
     else
     {

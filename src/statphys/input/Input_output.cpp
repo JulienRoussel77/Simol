@@ -80,6 +80,10 @@ namespace simol
         else if (vecParameters[iOfVec] == "potBeta")  name += doubleToString(potentialBeta());
         else if (vecParameters[iOfVec] == "MTSfrequency")  name += doubleToString(MTSfrequency());
         else if (vecParameters[iOfVec] == "drift")  name += doubleToString(drift());
+        else if (vecParameters[iOfVec] == "a")  name += doubleToString(latticeParameter());
+        else if (vecParameters[iOfVec] == "sol")  name += doubleToString(interactionRatio());
+        else if (vecParameters[iOfVec] == "K")  name += doubleToString(nbOfQModes());
+        else if (vecParameters[iOfVec] == "L")  name += doubleToString(nbOfPModes());
         else throw std::runtime_error(vecParameters[iOfVec] + " is not a parameter name !");
       }
       name += "/";
@@ -315,8 +319,8 @@ namespace simol
   bool Input::doOutParticles() const
   {return true;}  
   
-  bool Input::doOutXMakeMol() const
-  {return systemName() == "NBody";}    
+  bool Input::doXMakeMol() const
+  {return systemName() == "NBody" || systemName() == "Bicolor" || systemName() == "Colloid";}    
   
   bool Input::doOutBackUp() const
   {return true;}

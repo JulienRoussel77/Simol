@@ -148,7 +148,7 @@ namespace simol
     
     bool doOutThermo() const;
     bool doOutParticles() const;
-    bool doOutXMakeMol() const;
+    bool doXMakeMol() const;
     bool doOutBackUp() const;
     bool doOutChain() const;
     

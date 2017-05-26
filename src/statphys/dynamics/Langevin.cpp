@@ -63,6 +63,17 @@ namespace simol
     cout << "drift_ = " << drift_ << endl;
   }
   
+  /*void ConstrainedLangevin::halfUpdateOrsteinUhlenbeck(System& syst) const
+  {
+    // Becareful here we assume that all the particles share the same mass !
+    double alpha = exp(- gamma() / syst(0).mass() * timeStep()/2);
+    double localLagrangeMultiplier = 0;
+    for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
+    {
+      localLagrangeMultiplier += 
+      syst(iOfParticle).momentum() = alpha * particle.momentum() + sqrt((1 - pow(alpha, 2)) / localBeta * particle.mass()) * rng_->gaussian();
+  }*/
+  
 
 
 }

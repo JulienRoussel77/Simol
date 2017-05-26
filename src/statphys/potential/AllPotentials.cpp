@@ -141,13 +141,13 @@ namespace simol
     
   double NoPotential::operator()(DVec const& /*position*/) const 
   {
-    cout << "NoPotential::operator()(DVec const& position)" << endl;
+    //cout << "NoPotential::operator()(DVec const& position)" << endl;
     return 0;
   }
   
   double NoPotential::operator()(double /*position*/) const 
   {
-    cout << "NoPotential::operator()(double position)" << endl;
+    //cout << "NoPotential::operator()(double position)" << endl;
     return 0;    
   }
   

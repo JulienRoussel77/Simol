@@ -66,10 +66,10 @@ namespace simol
       double const& externalForce(const int& i) const;
 
       //-- for numerical integration --
-      void verletFirstPart(Particle& particle);
-      void verletSecondPart(Particle& particle);
-      //virtual void updateBefore(Particle& particle);
-      //virtual void updateAfter(Particle& particle);
+      void verletFirstPart(Particle& particle) const;
+      void verletSecondPart(Particle& particle) const;
+      void updateMomentum(Particle& particle) const;
+      void updatePosition(Particle& particle) const;
       virtual bool doMomentaExchange() const {return false;};
       virtual void updateMomentaExchange(Particle& /*particle1*/, Particle& /*particle2*/) {assert(false);};
       virtual void bending(Particle& /*particle1*/, Particle& /*particle2*/) const {};

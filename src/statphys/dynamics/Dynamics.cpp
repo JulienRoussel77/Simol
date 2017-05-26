@@ -99,7 +99,7 @@ namespace simol
 
   ///
   ///Standard first part of the numerical integration : half upadate on "p" and update on "q"
-  void Dynamics::verletFirstPart(Particle& particle)
+  void Dynamics::verletFirstPart(Particle& particle) const
   {
     particle.momentum() += timeStep_ * particle.force() / 2;
     particle.position() += timeStep_ * particle.momentum() / particle.mass();
@@ -107,9 +107,19 @@ namespace simol
 
   ///
   ///Standard second part of the numerical integration : half upadate on "p"
-  void Dynamics::verletSecondPart(Particle& particle)
+  void Dynamics::verletSecondPart(Particle& particle) const
   {
     particle.momentum() += timeStep_ * particle.force() / 2;
+  }
+  
+  void Dynamics::updateMomentum(Particle& particle) const
+  {
+    particle.momentum() += timeStep_ * particle.force() / 2;
+  }
+  
+  void Dynamics::updatePosition(Particle& particle) const
+  {
+    particle.position() += timeStep_ * particle.momentum() / particle.mass();
   }
   
   

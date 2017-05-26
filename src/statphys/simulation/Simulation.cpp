@@ -92,12 +92,20 @@ namespace simol
     
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
       dyna.updateOrsteinUhlenbeck(syst(iOfParticle), dyna.beta(), dyna.timeStep()/2);
-    syst.enforceConstraint(dyna.lagrangeMultiplier(), dyna.drift());
+    
+    // Becareful here we assume that all the particles share the same mass !
+    // We analiticaly retermine the non-martingale part of the Lagrange multiplier
+    double alpha = exp(- dyna.gamma() / syst(0).mass() * dyna.timeStep()/2);
+    dyna.lagrangeMultiplier() += (1-alpha) * dyna.drift();
+    double trash=0;
+    syst.enforceConstraint(trash, dyna.drift());
       
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
-      dyna.verletFirstPart(syst(iOfParticle));
+      dyna.updateMomentum(syst(iOfParticle));
     syst.enforceConstraint(dyna.lagrangeMultiplier(), dyna.drift());
     
+    for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
+      dyna.updatePosition(syst(iOfParticle));
     syst.computeAllForces();
 
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
@@ -106,7 +114,11 @@ namespace simol
     
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
       dyna.updateOrsteinUhlenbeck(syst(iOfParticle), dyna.beta(), dyna.timeStep()/2);
-    syst.enforceConstraint(dyna.lagrangeMultiplier(), dyna.drift());
+    
+    // Becareful here we assume that all the particles share the same mass !
+    // We analiticaly retermine the non-martingale part of the Lagrange multiplier
+    dyna.lagrangeMultiplier() += (1-alpha) * dyna.drift();
+    syst.enforceConstraint(trash, dyna.drift());
     
     dyna.lagrangeMultiplier() /= dyna.timeStep() / sqrt((double) syst.nbOfParticles());
   }
@@ -208,7 +220,7 @@ namespace simol
     if (output.doLongPeriodOutput(iOfStep))
     {
       if (output.doOutParticles()) output.displayParticles(syst, iOfStep);
-      if (output.doOutXMakeMol()) output.displayXMakeMol(syst, iOfStep);   
+      if (output.doXMakeMol()) output.displayXMakeMol(syst, iOfStep);   
       if (output.doOutBackUp()) output.displayBackUp(syst, iOfStep);
       if (output.doOutChain()) output.displayProfile(iOfStep);
     }

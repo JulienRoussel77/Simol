@@ -40,6 +40,7 @@ namespace simol
     doFinalVelocity_(input.doFinalVelocity()),
     doFinalLagrangeMultiplier_(input.doFinalLagrangeMultiplier()),
     doDPDE_(input.doDPDE()),
+    doXMakeMol_(input.doXMakeMol()),
     fitModifFlow_(input.fitModiFlow()),
     obsKineticEnergy_(nullptr),
     obsPotentialEnergy_(nullptr),
@@ -105,7 +106,7 @@ namespace simol
       outParticles_ = std::make_shared<ofstream>(input.outputFolderName() + "particles.txt");
       outParticles() << "# time index position momentum kineticEnergy potentialEnergy energy force type" << endl;
     }
-    if (input.doOutXMakeMol()) outXMakeMol_        = std::make_shared<ofstream>(input.outputFolderName() + "xmakemol.xyz");
+    if (input.doXMakeMol()) outXMakeMol_        = std::make_shared<ofstream>(input.outputFolderName() + "xmakemol.xyz");
     if (input.doOutBackUp()) outBackUp_            = std::make_shared<ofstream>(input.outputFolderName() + "backUp.txt");
     
     if (input.doFinalLength()) outFinalLength_ = std::make_shared<ofstream>(input.simuTypeName() + "finalLength.txt", std::ofstream::app);
@@ -152,43 +153,43 @@ namespace simol
       cout << " Number of steps      : " << nbOfSteps_ / 1e6 << "e6" << endl;
     cout << " Time step            : " << timeStep_ << endl;
     //-- specific screen outputs --
-    if (input.dynamicsName() == "DPDE")
+    if (doDPDE())
+    {
+      cout << endl;
+      if (input.MTSfrequency() != 1)
+        cout << " -- Multiple timestepping (stoch. part DPDE): " << input.MTSfrequency() << endl;
+      if (input.doMetropolis())
+        cout << " With Metropolis correction" << endl;
+      else 
+        cout << " No Metropolis correction" << endl;
+      if (input.doProjectionDPDE())
+        cout << " With projection for energies" << endl;
+      else 
+        cout << " No projection" << endl;
+      cout << endl;
+      if (input.heatCapacityEinstein() > input.heatCapacity())
       {
-	cout << endl;
-	if (input.MTSfrequency() != 1)
-	  cout << " -- Multiple timestepping (stoch. part DPDE): " << input.MTSfrequency() << endl;
-	if (input.doMetropolis())
-	  cout << " With Metropolis correction" << endl;
-	else 
-	  cout << " No Metropolis correction" << endl;
-	if (input.doProjectionDPDE())
-	  cout << " With projection for energies" << endl;
-	else 
-	  cout << " No projection" << endl;
-	cout << endl;
-	if (input.heatCapacityEinstein() > input.heatCapacity())
-	  {
-	    cout << " -- blended Einstein model for micro EOS " << endl; 
-	    cout << " Baseline heat capacity        : " << input.heatCapacity() << endl;
-	    cout << " Limiting heat capacity        : " << input.heatCapacityEinstein() << endl;
-	    cout << " Einstein temperature          : " << input.einsteinTemperature() << endl;
-	  }
-	else
-	  {
-	    cout << " -- classical micro EOS " << endl;
-	    cout << " Heat capacity        : " << input.heatCapacity() << endl;
-	  }
-	if ( (input.initialInternalTemperature() != input.temperature()) & (input.thermalizationNbOfSteps() > 0) )
-	  {
-	    cout << endl;
-	    cout << " NONEQUILIBRIUM equilibration dynamics" << endl;
-	  }
+        cout << " -- blended Einstein model for micro EOS " << endl; 
+        cout << " Baseline heat capacity        : " << input.heatCapacity() << endl;
+        cout << " Limiting heat capacity        : " << input.heatCapacityEinstein() << endl;
+        cout << " Einstein temperature          : " << input.einsteinTemperature() << endl;
       }
+      else
+      {
+        cout << " -- classical micro EOS " << endl;
+        cout << " Heat capacity        : " << input.heatCapacity() << endl;
+      }
+      if ( (input.initialInternalTemperature() != input.temperature()) & (input.thermalizationNbOfSteps() > 0) )
+      {
+        cout << endl;
+        cout << " NONEQUILIBRIUM equilibration dynamics" << endl;
+      }
+    }
     if (input.systemName() == "NBody" && input.doCellMethod())
-      {
-	cout << endl;
-	cout << " Using the method of cells " << endl;
-      }
+    {
+      cout << endl;
+      cout << " Using the method of cells " << endl;
+    }
     cout << " Period between light outputs    : " << input.printPeriodTime() << endl;
     cout << " Period between heavy outputs    : " << input.printLongPeriodTime() << endl;
     cout << endl;
@@ -197,7 +198,6 @@ namespace simol
     for (int iOfObs = 0; iOfObs < nbOfObservables(); iOfObs++)
       cout << "  " << observables(iOfObs)->outPath();
     cout << endl << endl;
-
   }
   
   Output::~Output()

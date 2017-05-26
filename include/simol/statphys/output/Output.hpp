@@ -64,7 +64,8 @@ namespace simol
     
     //-- test if a feature is activated --
     bool doOutParticles() const {return (bool)outParticles_;}    
-    bool doOutXMakeMol() const {return (bool)outXMakeMol_;}    
+    bool doDPDE() const {return doDPDE_;} 
+    bool doXMakeMol() const {return doXMakeMol_;}    
     bool doOutBackUp() const {return (bool)outBackUp_;}
     bool doOutChain() const {return (bool)outProfile_;}
     
@@ -239,7 +240,7 @@ namespace simol
     int decorrelationNbOfSteps_, shortDecorrelationNbOfSteps_;
     
     int nbOfAutocoPts_, nbOfShortAutocoPts_;
-    bool doFinalFlow_, doFinalLength_, doFinalVelocity_, doFinalLagrangeMultiplier_, doDPDE_;
+    bool doFinalFlow_, doFinalLength_, doFinalVelocity_, doFinalLagrangeMultiplier_, doDPDE_, doXMakeMol_;
     bool fitModifFlow_;
     
   public:
