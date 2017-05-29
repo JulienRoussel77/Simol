@@ -17,6 +17,7 @@ namespace simol
       virtual ~Potential() {};
       Potential(Input const& input);
       virtual string classname() const {return "Potential";}
+      double const& nonEqAmplitude() const;
       DVec& nonEqForce() ;
       DVec const& nonEqForce() const;
       double& nonEqForce(const int& i);
@@ -72,6 +73,7 @@ namespace simol
       virtual double inverseCoeff() const;
     protected:
       Potential();
+      double nonEqAmplitude_;
       DVec nonEqForce_;
       double center_;
       double domainSize_;

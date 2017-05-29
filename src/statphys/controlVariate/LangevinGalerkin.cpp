@@ -31,7 +31,7 @@ namespace simol
     display(Lthm0_, outputFolderName()+"Lthm0");
     Leq_  = Lham_ + gamma_ * Lthm_;
     Lrep_ = -kron(P_, SIdQ_);
-    Leta_ = Leq_ + externalForce_ * Lrep_;
+    Leta_ = Leq_ + nonEqAmplitude_ * Lrep_;
     display(Leq_, outputFolderName()+"Leq");
     
     SU_ = tensorBasis()->basisMeans();

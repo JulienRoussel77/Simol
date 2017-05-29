@@ -18,7 +18,7 @@ namespace simol
     Leq_ /= beta_;
     
     Lrep_ = tensorBasis(0)->gradMatrix();
-    Leta_ = Leq_ - externalForce_ * Lrep_;
+    Leta_ = Leq_ - nonEqAmplitude_ * Lrep_;
     
     // U is the componants of 1 in the basis and SU is the scalar products of 1 with these elements
     SU_ = tensorBasis()->basisMeans();

@@ -14,22 +14,32 @@ namespace simol
   Potential::Potential(){}
 
   Potential::Potential(Input const & input):
+    nonEqAmplitude_(input.nonEqAmplitude()),
     nonEqForce_(DVec::Zero(input.dimension())),
     center_(input.potentialCenter()),
     domainSize_(std::numeric_limits<double>::infinity()),
     dimension_(input.dimension())
   {
+    // /!\ Here the amplitude of the drift scales with N !
     if (input.systemSubtype() == "TwoDrifts")
-      nonEqForce_(0) = input.nonEqForce() / sqrt(2.);
+      nonEqForce_(0) = nonEqAmplitude() / sqrt(2.);
     else if (input.systemSubtype() == "ColorDrift")
-      nonEqForce_(0) = input.nonEqForce() / sqrt((double) input.nbOfParticles());
+      nonEqForce_(0) = nonEqAmplitude() / sqrt((double) input.nbOfParticles());
     else
-      nonEqForce_(0) = input.nonEqForce();
+      nonEqForce_(0) = nonEqAmplitude();
     //if (nonEqForce_(0) != 0)
     // cout << "nonEqForce = " << nonEqForce_ << endl;
     cout << "Potential::Potential" << endl;
+    cout << "nonEqAmplitude : " << nonEqAmplitude() << endl;
     cout << "nonEqForce : " << nonEqForce().adjoint() << endl;
     
+  }
+  
+  ///
+  ///Read-only accessor for the external force amplitude
+  double const& Potential::nonEqAmplitude() const
+  {
+    return nonEqAmplitude_;
   }
 
   ///

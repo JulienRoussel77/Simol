@@ -25,7 +25,7 @@ namespace simol
     constGamma_(input.gamma()),
     constXi_(input.xi()),
     constTauBending_(input.tauBending()),
-    constNonEqForce_(input.nonEqForce()),
+    constNonEqAmplitude_(input.nonEqAmplitude()),
     constNbOfQModes_(input.nbOfQModes()),
     constNbOfPModes_(input.nbOfPModes()),
     constDrift_(input.drift()),
@@ -582,7 +582,7 @@ namespace simol
                         << " " << setw(5) << timeStep()
                         << " " << setw(6) << nbOfParticles()
                         << " " << setw(4) << constTemperature_
-                        << " " << setw(6) << constNonEqForce_
+                        << " " << setw(6) << constNonEqAmplitude_
                         << " " << setw(3) << constNbOfQModes_
                         << " " << setw(3) << constNbOfPModes_
                         << " " << setw(12);
@@ -600,7 +600,7 @@ namespace simol
                         << " " << setw(5) << timeStep()
                         << " " << setw(6) << nbOfParticles()
                         << " " << setw(4) << constTemperature_
-                        << " " << setw(6) << constNonEqForce_
+                        << " " << setw(6) << constNonEqAmplitude_
                         << " " << setw(3) << constNbOfQModes_
                         << " " << setw(3) << constNbOfPModes_
                         << " " << setw(12);    
@@ -612,13 +612,18 @@ namespace simol
                         << std::endl;*/
   }
   
+  ///
+  /// This output is such that the mobility can be estimated as the unbiased drift divided by the mean Lagrange multiplier
   void Output::displayFinalLagrangeMultiplier()
   {
+    double finalMeanLM = obsLagrangeMultiplier().mean();
+    double unbiasedDrift = ((nbOfParticles() - 1) * constDrift_ + finalMeanLM / constGamma_ ) / nbOfParticles();
     outFinalLagrangeMultiplier() << std::left << setw(10) << finalTime()
                         << " " << setw(5) << timeStep()
                         << " " << setw(6) << nbOfParticles()
                         << " " << setw(4) << constTemperature_
                         << " " << setw(6) << constDrift_
+                        << " " << setw(9) << unbiasedDrift
                         << " " << setw(12);    
     obsLagrangeMultiplier().displayFinalValues(outFinalLagrangeMultiplier());  
     

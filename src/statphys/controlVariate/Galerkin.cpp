@@ -235,7 +235,7 @@ namespace simol
     beta_(input.beta()),
     gamma_(input.gamma()),
     amplitude_(input.amplitude()),
-    externalForce_(input.nonEqForce()),
+    nonEqAmplitude_(input.nonEqAmplitude()),
     doNonequilibrium_(input.doGalerkinNonequilibrium()),
     nbOfIntegrationNodes_(1000),
     //expFourierMeans_(2 * nbOfQModes_, 0),

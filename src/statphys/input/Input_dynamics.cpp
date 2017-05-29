@@ -11,7 +11,7 @@ const double defaultDeltaTemperature = 0;
 const double defaultTauBending = 0;
 const double defaultKappa = 0; 
 const int    defaultMTSfrequency = 1;
-const double defaultNonEqForce = 0;
+const double defaultNonEqAmplitude = 0;
 const double defaultDrift= 0;
 
 namespace simol
@@ -125,11 +125,12 @@ namespace simol
       return defaultSeed;
   }
   
-  double Input::nonEqForce() const
+  double Input::nonEqAmplitude() const
   {
-    if (data["Dynamics"]["NonEqForce"])
-      return data["Dynamics"]["NonEqForce"].as<double>();
-    else return defaultNonEqForce;
+    if (data["Dynamics"]["NonEqForce"]) throw runtime_error("Change NonEqForce to NonEqAmplitude !");
+    if (data["Dynamics"]["NonEqAmplitude"])
+      return data["Dynamics"]["NonEqAmplitude"].as<double>();
+    else return defaultNonEqAmplitude;
   }
 
   double Input::eta() const
@@ -137,7 +138,7 @@ namespace simol
     if (sameLetters(dynamicsName(), "BoundaryLangevin"))
       return deltaTemperature();
     else
-      return nonEqForce();
+      return nonEqAmplitude();
   }
   
   double Input::drift() const

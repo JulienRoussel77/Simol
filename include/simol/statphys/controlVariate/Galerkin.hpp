@@ -32,7 +32,7 @@ namespace simol
       SMat Leq_, Leta_;
       double beta_, gamma_;
       double amplitude_;
-      double externalForce_;
+      double nonEqAmplitude_;
       bool doNonequilibrium_;
       int nbOfIntegrationNodes_;
       DMat trigToExpMat_, expToTrigMat_;

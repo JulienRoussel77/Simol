@@ -101,7 +101,7 @@ namespace simol
     //double betaLeft() const;
     //double betaRight() const;
     double deltaTemperature() const;
-    double nonEqForce() const;
+    double nonEqAmplitude() const;
     double drift() const;
     double tauBending() const;
     double xi() const;
