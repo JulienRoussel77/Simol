@@ -8,7 +8,7 @@ namespace simol
   class OverdampedGalerkin : public Galerkin
   {
   public:
-    OverdampedGalerkin(Input const& input);
+    OverdampedGalerkin(Input const& input, shared_ptr<CVBasis> cvBasis0);
     virtual void createOperators();
     virtual DVec solveResilient(const SMat& A, const DVec& Y) const;
     
@@ -22,7 +22,7 @@ namespace simol
   class PeriodicOverdampedGalerkin : public OverdampedGalerkin
   {
   public:
-    PeriodicOverdampedGalerkin(Input const& input);
+    PeriodicOverdampedGalerkin(Input const& input, shared_ptr<CVBasis> cvBasis0);
     
     //DVec getGradV() const;
     virtual void compute();
@@ -32,7 +32,7 @@ namespace simol
   class ColloidOverdampedGalerkin : public OverdampedGalerkin
   {
   public:
-    ColloidOverdampedGalerkin(Input const& input);
+    ColloidOverdampedGalerkin(Input const& input, shared_ptr<CVBasis> cvBasis0);
     
     virtual void compute();
     virtual DVec CVObservable() const;

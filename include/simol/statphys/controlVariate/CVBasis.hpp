@@ -8,29 +8,32 @@
   
 namespace simol
 {
+  class CVBasis;
+  shared_ptr<CVBasis> createCVBasis(Input const& input);
+  
   /// Structure containing a basis type
   /// basisValues_ is a vector containing the values of the basis functions e_k(q,p)
   /// generatorOnBasisValues_ is a vector containing the values of the functions (L e_k)(q,p)
   class CVBasis
   {
+    friend shared_ptr<CVBasis> createCVBasis(Input const& input);
   public:
-    CVBasis();
-    //CVBasis(Input const& input);
-    CVBasis(TensorBasis* basis0, shared_ptr<DVec> cvCoeffs0);
+    CVBasis(Input const& input);
     ~CVBasis();
     int const& totalNbOfElts() const;
-    virtual DMat qVariable(System const& syst) const;
-    virtual DMat pVariable(System const& syst) const;
-    virtual DMat forces(System const& syst) const;
-    virtual DVec basisVariables(System const& syst) const = 0;
-    virtual void computeValueBasis(System const& syst);
-    virtual DMat gradientQ(System const& syst, int iOfFunction);
-    virtual DMat gradientP(System const& syst, int iOfFunction);
-    virtual double laplacianQ(System const& syst, int iOfFunction);
-    virtual double laplacianP(System const& syst, int iOfFunction);
+    virtual DMat qVariable(const System& syst) const;
+    virtual DMat pVariable(const System& syst) const;
+    virtual DMat forces(const System& syst) const;
+    virtual DVec basisVariables(const System& syst) const = 0;
+    virtual void computeValueBasis(const System& syst);
+    virtual DMat gradientQ(const System& syst, int iOfFunction);
+    virtual DMat gradientP(const System& syst, int iOfFunction);
+    virtual double laplacianQ(const System& syst, int iOfFunction);
+    virtual double laplacianP(const System& syst, int iOfFunction);
     
+    Potential* potential_;
+    TensorBasis* tensorBasis_;
     int totalNbOfElts_;
-    TensorBasis* basis_;
     shared_ptr<DVec> cvCoeffs_;
     
     DVec basisValues_;
@@ -42,8 +45,8 @@ namespace simol
   class IsolatedCVBasis : public CVBasis
   {
   public:
-    IsolatedCVBasis(TensorBasis* basis0, shared_ptr<DVec> cvCoeffs0);
-    virtual DVec basisVariables(System const& syst) const;
+    IsolatedCVBasis(const Input& input);
+    virtual DVec basisVariables(const System& syst) const;
   };
   
   /// CVBasis adapted to the case of a colloid, builds the N dimensional gradient from the derivatives of the basis
@@ -51,15 +54,15 @@ namespace simol
   class ColloidCVBasis : public CVBasis
   {
   public:
-    ColloidCVBasis(TensorBasis* basis0, shared_ptr<DVec> cvCoeffs0);
-    virtual DMat qVariable(System const& syst) const;
-    virtual DMat pVariable(System const& syst) const;
-    virtual DMat forces(System const& syst) const;
-    virtual DVec basisVariables(System const& syst) const;   
-    /*virtual DMat gradientQ(System const& syst, int iOfFunction);
-    virtual DMat gradientP(System const& syst, int iOfFunction);
-    virtual double laplacianQ(System const& syst, int iOfFunction);
-    virtual double laplacianP(System const& syst, int iOfFunction);*/
+    ColloidCVBasis(const Input& input);
+    virtual DMat qVariable(const System& syst) const;
+    virtual DMat pVariable(const System& syst) const;
+    virtual DMat forces(const System& syst) const;
+    virtual DVec basisVariables(const System& syst) const;   
+    /*virtual DMat gradientQ(const System& syst, int iOfFunction);
+    virtual DMat gradientP(const System& syst, int iOfFunction);
+    virtual double laplacianQ(const System& syst, int iOfFunction);
+    virtual double laplacianP(const System& syst, int iOfFunction);*/
   };
 }
 #endif

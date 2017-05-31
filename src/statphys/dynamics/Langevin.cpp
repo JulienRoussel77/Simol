@@ -7,7 +7,7 @@ namespace simol
     LangevinBase(input)
   {
     //galerkin_ = createLangevinGalerkin(input);
-    galerkin_ = createGalerkin(input);
+    //galerkin_ = createGalerkin(input);
   }
 
 
@@ -32,8 +32,8 @@ namespace simol
   void Langevin::computeGeneratorOnBasis(shared_ptr<CVBasis> cvBasis, System const& syst) const
   {
     cvBasis->generatorOnBasisValues_ = DVec::Zero(cvBasis->totalNbOfElts());
-    cout << "p : " << endl << cvBasis->pVariable(syst) << endl;
-    cout << "f : " << endl << cvBasis->forces(syst) << endl;
+    //cout << "p : " << endl << cvBasis->pVariable(syst) << endl;
+    //cout << "f : " << endl << cvBasis->forces(syst) << endl;
     for (int iOfFunction = 0; iOfFunction < cvBasis->totalNbOfElts(); iOfFunction++)
       //for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
     {
@@ -42,10 +42,10 @@ namespace simol
                               + gamma() * (- dot(cvBasis->pVariable(syst) , cvBasis->gradientP(syst, iOfFunction))
                                         + cvBasis->laplacianP(syst, iOfFunction) / beta() );
 
-      cout << "--iOfFunction : " << iOfFunction << endl;                        
+      /*cout << "--iOfFunction : " << iOfFunction << endl;                        
       cout << "--gradQ : " << endl << cvBasis->gradientQ(syst, iOfFunction) << endl;
       cout << "--gradP : " << endl << cvBasis->gradientP(syst, iOfFunction) << endl;
-      cout << "--laplaP : " << endl << cvBasis->laplacianP(syst, iOfFunction) << endl;
+      cout << "--laplaP : " << endl << cvBasis->laplacianP(syst, iOfFunction) << endl;*/
     }
     /*ofstream geneOnBasis("output/Langevin/Isolated/DoubleWell/HermiteHermite/geneOnBasis", std::ofstream::app);
     geneOnBasis << syst(0).position(0) << " " << syst(0).momentum(0) << " " << cvBasis->generatorOnBasisValues_(0) << " " << cvBasis->basisValues_[0] << endl;

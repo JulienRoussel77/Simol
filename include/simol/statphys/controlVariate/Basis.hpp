@@ -42,11 +42,10 @@ namespace simol
   //DTVec product(DMat& A, DTVec& X, int iOfVariable);
 
   //class Basis;
-  //Basis* createBasis(Input const& input, Potential& potential);
+  
   
   class Basis
   {
-  //friend   Basis* createBasis(Input const& input, Potential& potential);
   protected:
     int nbOfElts_;
     DVec basisMeans_;
@@ -99,7 +98,7 @@ namespace simol
     double qRepartitionFct_, basisCoefficient_;
     DVec measureMomenta_;
   public:
-    QBasis(Input const& input, Potential& potential0);
+    QBasis(Input const& input, Potential* potential0);
     virtual double length() const = 0;
     
     virtual double potential(double variable) const;
@@ -118,7 +117,7 @@ namespace simol
     DVec expFourierCoeffs_;
     DMat trigToExpMat_, expToTrigMat_;
   public:
-    ExpFourierBasis(Input const& input, Potential& potential);
+    ExpFourierBasis(Input const& input, Potential* potential);
     
     virtual double length() const;
     virtual DVec const& expFourierCoeffs() const;
@@ -149,7 +148,7 @@ namespace simol
     double omega_;
     DMat polyCoeffs_;
   public:
-    HermiteQBasis(Input const& input, Potential& potential0);
+    HermiteQBasis(Input const& input, Potential* potential0);
     virtual double length() const;
     virtual void computeMeasureMomenta();
     virtual void computeBasisMeans();
@@ -184,7 +183,7 @@ namespace simol
     DMat productXMat_, productWdMat_, productWddMat_;
     DMat largerProductWdMat_;
   public:    
-    ExpHermiteBasis(Input const& input, Potential& potential);
+    ExpHermiteBasis(Input const& input, Potential* potential);
     
     virtual double length() const;
     double const& center() const;
@@ -232,8 +231,12 @@ namespace simol
     virtual DVec getMonome1() const;
   };
 
+  class TensorBasis;
+  TensorBasis* createTensorBasis(Input const& input, Potential* potential);
+  
   class TensorBasis
   {
+    friend TensorBasis* createTensorBasis(Input const& input, Potential* potential);
   public:
   //protected:
     vector<Basis*> bases_;
@@ -303,7 +306,7 @@ namespace simol
   class ExpFourierHermiteBasis : public QPBasis
   {
   public:
-    ExpFourierHermiteBasis(Input const& input, Potential& potential);
+    ExpFourierHermiteBasis(Input const& input, Potential* potential);
 
     /*virtual DVec const& gVector() const;
     virtual double gVector(int iOfElt) const;
@@ -314,13 +317,13 @@ namespace simol
   class HermiteHermiteBasis : public QPBasis
   {
   public:
-    HermiteHermiteBasis(Input const& input, Potential& potential);
+    HermiteHermiteBasis(Input const& input, Potential* potential);
   };
   
   class ExpHermiteHermiteBasis : public QPBasis
   {
   public:
-    ExpHermiteHermiteBasis(Input const& input, Potential& potential);
+    ExpHermiteHermiteBasis(Input const& input, Potential* potential);
   };
 
 

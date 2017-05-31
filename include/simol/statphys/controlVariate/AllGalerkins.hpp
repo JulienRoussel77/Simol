@@ -8,7 +8,7 @@
 namespace simol
 {
 
-  Galerkin* createGalerkin(Input const& input);
+  Galerkin* createGalerkin(const Input& input, shared_ptr<CVBasis> cvBasis0);
 
 }
 

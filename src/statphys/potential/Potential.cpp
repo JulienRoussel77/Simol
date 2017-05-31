@@ -90,14 +90,14 @@ namespace simol
   double Potential::operator()(DVec const& position) const
   {
     //throw runtime_error("Potential::operator()(DVec const& position) not implemented for "<< classname() << " !");
-    //cout << "Potential::operator()(DVec const& position)" << endl;
+    //cout << "Potential::operator()(DVec const& position) for " << classname() << endl;
     return operator()(position(0));
   }
 
   double Potential::operator()(double position) const
   {
     //throw runtime_error("Potential::operator()(double position) not implemented for "<< classname() << " !");
-    //cout << "Potential::operator()(double position)" << endl;
+    //cout << "Potential::operator()(double position) for " << classname() << endl;
     return operator()(DVec::Constant(dimension(), position));
     //return operator()(DVec::Constant(1,1, position));
   }

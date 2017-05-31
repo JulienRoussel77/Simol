@@ -17,8 +17,9 @@ namespace simol
 
   class Galerkin
   {
-
     protected:
+      shared_ptr<CVBasis> cvBasis_;
+      TensorBasis* tensorBasis_;
       int nbOfParticles_;
       int nbOfQModes_, nbOfPModes_;
       int sizeOfBasis_;
@@ -38,13 +39,12 @@ namespace simol
       DMat trigToExpMat_, expToTrigMat_;
       SMat trigToExpTens_, expToTrigTens_;
       Potential* potential_;
-      TensorBasis* tensorBasis_;
       DVec SU_;
       
       string outputFolderName_;
       //Basis* basis_;
     public:
-      Galerkin(Input const& input);
+      Galerkin(Input const& input, shared_ptr<CVBasis> cvBasis0);
       virtual ~Galerkin();
 
       virtual int nbOfVariables() const;
@@ -87,6 +87,7 @@ namespace simol
       DMat invWithSaddle(const SMat& A, const DMat& C) const;
       DMat invWithSaddle(const DMat& A, const DMat& C) const;
       
+      virtual void computeCVBasisCoeffs();
       Eigen::EigenSolver<Eigen::MatrixXd> getEigenSolver() const;
 
       DVec projectionOrthoG(DVec const& X) const;
@@ -97,7 +98,6 @@ namespace simol
       
       virtual DVec CVObservable() const = 0;
       virtual DVec CVcoeffsVec() const = 0;
-      shared_ptr<CVBasis> createCvBasis(Input const& input);
         
       void computeEigen() const;
   };

@@ -8,7 +8,7 @@ namespace simol
   class LangevinGalerkin : public Galerkin
   {
     public:
-      LangevinGalerkin(Input const& input);
+      LangevinGalerkin(Input const& input, shared_ptr<CVBasis> cvBasis0);
       virtual void createOperators();
   
       //virtual void computeExpToTrigTens();
@@ -23,7 +23,7 @@ namespace simol
   class PeriodicLangevinGalerkin : public LangevinGalerkin
   {
   public:
-    PeriodicLangevinGalerkin(Input const& input);
+    PeriodicLangevinGalerkin(Input const& input, shared_ptr<CVBasis> cvBasis0);
 
     //maxOfFourier_((nbOfQModes_ + 1) / 2),  //ex : 3
     virtual void compute();
@@ -33,7 +33,7 @@ namespace simol
   class ColloidLangevinGalerkin : public LangevinGalerkin
   {
   public:
-    ColloidLangevinGalerkin(Input const& input);
+    ColloidLangevinGalerkin(Input const& input, shared_ptr<CVBasis> cvBasis0);
 
     virtual void compute();
     virtual DVec CVObservable() const;

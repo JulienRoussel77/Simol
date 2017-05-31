@@ -20,8 +20,7 @@ namespace simol
     thermalizationNbOfSteps_(input.thermalizationNbOfSteps()),
     burninNbOfSteps_(input.burninNbOfSteps()),
     beta_(input.beta()),
-    temperature_(1 / beta_),
-    galerkin_(nullptr)
+    temperature_(1 / beta_)
   {}
 
 
@@ -84,9 +83,6 @@ namespace simol
   ///Read-only access for the inverse temperature
   double const& Dynamics::betaRight() const {return beta_;}
 
-  ///
-  ///Returns the pointer of the Galerkin instance of *this
-  Galerkin* Dynamics::galerkin() {return galerkin_;}
 
   /*shared_ptr<CVBasis> Dynamics::cvBasis() 
   {
@@ -173,7 +169,7 @@ namespace simol
     output.obsInternalTemperature().currentValue() /= syst.nbOfParticles();
   }
   
- 
+
 
 }
 #endif

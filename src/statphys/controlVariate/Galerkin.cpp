@@ -213,7 +213,9 @@ namespace simol
 
   using namespace Eigen;
 
-  Galerkin::Galerkin(Input const& input):       //ex : [0:4]
+  Galerkin::Galerkin(Input const& input, shared_ptr<CVBasis> cvBasis0):       //ex : [0:4]
+    cvBasis_(cvBasis0),
+    tensorBasis_(cvBasis_->tensorBasis_),
     nbOfParticles_(input.nbOfParticles()),
     nbOfQModes_(input.nbOfQModes()),  //ex : 5
     nbOfPModes_(input.nbOfPModes()),
@@ -243,14 +245,17 @@ namespace simol
     expToTrigMat_(DMat::Zero(nbOfQModes_, nbOfQModes_)),
     trigToExpTens_(sizeOfBasis_, sizeOfBasis_),
     expToTrigTens_(sizeOfBasis_, sizeOfBasis_),
-    potential_(createPotential(input, input.galerkinPotentialName())),
-    //tensorBasis_(nullptr),
+    potential_(cvBasis_->potential_),
     outputFolderName_(input.outputFolderName())
   {
+    if (input.temperature() != 1)
+      throw runtime_error("Temperature != 1 not implemented !");
+      
     cout << endl << "Number of modes : " << nbOfQModes_ << " x " << nbOfPModes_ << endl;
     cout << "Output written in " << outputFolderName() << endl;
     SIdQ_.setIdentity();
     SIdP_.setIdentity();
+    
     
     //cout << "GalerkinPotential : " << input.secondPotentialName() << endl;
     //cout << potential_->value(-1) << " " << potential_->value(0) << " " << potential_->value(1) << " " << endl;
@@ -320,7 +325,15 @@ namespace simol
   }
 
 
- 
+ void Galerkin::computeCVBasisCoeffs()
+ {
+   cout << "Galerkin::computeCVBasisCoeffs" << endl;
+   if (!cvBasis_->cvCoeffs_)
+   {
+     cout << "CVcoeffs computed by Galerkin !" << endl;
+     cvBasis_->cvCoeffs_ = make_shared<DVec>(CVcoeffsVec());
+   }
+ }
   
   EigenSolver<MatrixXd> Galerkin::getEigenSolver() const
   {
@@ -328,39 +341,6 @@ namespace simol
     //DMat DLeq(Leq_);
     DMat DLeta(Leta_);
     return EigenSolver<MatrixXd>(DLeta);
-  }
-  
-  shared_ptr<CVBasis> Galerkin::createCvBasis(Input const& input)
-  {
-    TensorBasis* tensBasis = tensorBasis_;
-    shared_ptr<DVec> cvcoeffs = make_shared<DVec>(CVcoeffsVec());
-    //return new IsolatesCVBasis(dynamic_cast<TensorBasis*>(tensorBasis_), make_shared<DVec>(CVcoeffsVec()));
-    
-    if (input.systemName() == "Colloid")
-      return make_shared<ColloidCVBasis>(tensBasis, cvcoeffs);
-    else
-      return make_shared<IsolatedCVBasis>(tensBasis, cvcoeffs);
-      
-    /*if (input.doGalerkinCV())
-    {
-        if (input.dynamicsName() == "Overdamped")
-        {
-          if (input.potentialName() == "Sinusoidal") return new PeriodicOverdampedGalerkin(input);
-          else if (input.potentialName() == "DoubleWell" || input.potentialName() == "Harmonic" || input.potentialName() == "TwoTypes") return new ColloidOverdampedGalerkin(input);
-          else throw runtime_error("This potential matches no Galerkin method !");
-        }
-        else if (input.dynamicsName() == "Langevin")
-        {
-          if (input.potentialName() == "Sinusoidal") return new PeriodicLangevinGalerkin(input);
-          else if (input.potentialName() == "DoubleWell" || input.potentialName() == "Harmonic") return new ColloidLangevinGalerkin(input);
-          else throw runtime_error("This potential matches no Galerkin method !");
-        }
-        //else if (input.dynamicsName() == "BoundaryLangevin") return new BoundaryLangevinGalerkin(input);
-        else throw runtime_error("This dynamics matches no Galerkin method !");
-      }
-    else
-      return nullptr;
-  }*/
   }
   
   ///

@@ -16,8 +16,8 @@
 namespace simol
 {
   Potential* createPotential(Input const& input, string potName);
-  Potential* createPotential(Input const& input);
-  Potential* createGalerkinPotential(Input const& input);
+  //Potential* createPotential(Input const& input);
+  //Potential* createGalerkinPotential(Input const& input);
   
   class TwoTypes : public Potential
   {

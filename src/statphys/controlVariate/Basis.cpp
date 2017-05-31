@@ -87,7 +87,7 @@ namespace simol
 
 
   
-  
+
 
   Basis::Basis(int nbOfElts0, double beta0):
     nbOfElts_(nbOfElts0),
@@ -184,9 +184,9 @@ namespace simol
   
   // ##### QBasis ####
   
-  QBasis::QBasis(Input const& input, Potential& potential0):
+  QBasis::QBasis(Input const& input, Potential* potential0):
     Basis(input.nbOfQModes(), input.beta()),
-    potential_(&potential0),
+    potential_(potential0),
     integrationStep_(input.integrationStep()),
     qRepartitionFct_(0),
     basisCoefficient_(0),
@@ -223,7 +223,7 @@ namespace simol
   
   // #### ExpFourierBasis ####
   
-  ExpFourierBasis::ExpFourierBasis(Input const& input, Potential& potential0):
+  ExpFourierBasis::ExpFourierBasis(Input const& input, Potential* potential0):
     QBasis(input, potential0),
     expFourierCoeffs_(DVec::Zero(2 * nbOfElts_))
   {
@@ -418,7 +418,7 @@ namespace simol
   ///
   ///Builds the basis composed of the Hermite polynomials
   ///The measure is any nu so that the basis is not orthonormal
-  HermiteQBasis::HermiteQBasis(Input const& input, Potential& potential0)
+  HermiteQBasis::HermiteQBasis(Input const& input, Potential* potential0)
     : QBasis(input, potential0),
       length_(input.integrationLength()),
       qMin_(input.integrationQMin()),
@@ -617,7 +617,7 @@ namespace simol
   
   // #### ExpHermiteBasis ####
   
-  ExpHermiteBasis::ExpHermiteBasis(Input const& input, Potential& potential0):
+  ExpHermiteBasis::ExpHermiteBasis(Input const& input, Potential* potential0):
     QBasis(input, potential0),
     length_(input.integrationLength()),
     qMin_(input.integrationQMin()),
@@ -999,6 +999,22 @@ namespace simol
     vec[1] = 1/sqrt(beta_);
     return vec;
   }
+  
+  
+  
+  TensorBasis* createTensorBasis(const Input& input, Potential* potential0)
+  {
+    if (input.galerkinElts() == "None")
+      return nullptr;
+    else if (input.galerkinElts() == "HermiteHermite")
+      return new HermiteHermiteBasis(input, potential0);
+    else if (input.galerkinElts() == "ExpHermiteHermite")
+      return new ExpHermiteHermiteBasis(input, potential0);
+    else if (input.galerkinElts() == "ExpFourierHermite")
+      return new ExpFourierHermiteBasis(input, potential0);
+    else
+      throw runtime_error(input.galerkinElts() + " is not a valid basis !");
+  }
 
   TensorBasis::TensorBasis(int nbOfVariables0):
     bases_(nbOfVariables0)
@@ -1236,9 +1252,10 @@ namespace simol
 
   // #### ExpFourierHermiteBasis ####
 
-  ExpFourierHermiteBasis::ExpFourierHermiteBasis(Input const& input, Potential& potential):
+  ExpFourierHermiteBasis::ExpFourierHermiteBasis(Input const& input, Potential* potential):
     QPBasis()
   {
+    cout << "ExpFourierHermiteBasis for " << potential->classname() << endl;
     bases_[0] = new ExpFourierBasis(input, potential);
     bases_[1] = new HermiteBasis(input);
   }
@@ -1250,7 +1267,7 @@ namespace simol
   
   // #### HermiteHermiteBasis ####
     
-  HermiteHermiteBasis::HermiteHermiteBasis(Input const& input, Potential& potential):
+  HermiteHermiteBasis::HermiteHermiteBasis(Input const& input, Potential* potential):
     QPBasis()
   {
     bases_[0] = new HermiteQBasis(input, potential);
@@ -1259,7 +1276,7 @@ namespace simol
   
     // #### ExpHermiteHermiteBasis ####
     
-  ExpHermiteHermiteBasis::ExpHermiteHermiteBasis(Input const& input, Potential& potential):
+  ExpHermiteHermiteBasis::ExpHermiteHermiteBasis(Input const& input, Potential* potential):
     QPBasis()
   {
     bases_[0] = new ExpHermiteBasis(input, potential);

@@ -411,6 +411,10 @@ namespace simol
     particle1.virial() += 0.5 * force12 * distance;
     particle2.virial() += 0.5 * force12 * distance;
     //cout << distance << " -> " << force12 << " " << energy12 << endl;
+
+    //ofstream pairs("pairs.txt", std::ofstream::app);
+    //pairs << distance << endl;
+    
   }
 
 

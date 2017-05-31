@@ -31,9 +31,13 @@ namespace simol
     if (data["Output"]["SimuTypeName"]
         && sameLetters(data["Output"]["SimuTypeName"].as<string>(), "yes"))
       name += dynamicsName() + "/" + systemName() + "/" + potentialName() + "/";
+    
     if (data["Output"]["FolderName"])
       name += data["Output"]["FolderName"].as<string>() + "/";
 
+    //if (controlVariateName() != "None")
+    //  name += controlVariateName() + "/";
+    
     return name;
     
     
@@ -49,9 +53,6 @@ namespace simol
   string Input::outputFolderName() const
   {
     string name = simuTypeName();
-
-    if (controlVariateName() != "None")
-      name += controlVariateName() + "/";
     
     if (data["Output"]["ParametersName"])
     {

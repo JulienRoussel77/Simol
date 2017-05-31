@@ -35,7 +35,8 @@ namespace simol
   {
     cout << "scanTensor" << endl;
     ifstream inTensor(path);
-    assert(inTensor.is_open());
+    if (!inTensor.is_open())
+      throw runtime_error("scanTensor couldn't read from " << path << "!" << endl;
     string str;
     int dim;
       
@@ -54,7 +55,8 @@ namespace simol
       tensor[iOfVal] = value;
       iOfVal++;
     }
-    assert(iOfVal == nbOfValues);
+    if (iOfVal != nbOfValues)
+      throw runtime_error("In file " << path << " the header dimensions are not compatible with the numer of lines!");
     return tensor;
   }
   
@@ -63,7 +65,7 @@ namespace simol
     cout << "Reading the spectral gaps :" << endl;
     ifstream inMap(path);
     if (!inMap.is_open())
-      throw runtime_error(path+" is not a valid path !");
+      throw runtime_error(path+" is not a valid path!");
     string str;
     inMap >> str >> str >> str;
     double key, value;

@@ -5,6 +5,7 @@ namespace simol
   
   Potential* createPotential(Input const& input, string potName)
   {
+    cout << "createPotential for " + potName << endl;
     if (potName == "None")
       return new NoPotential(input);
     else if (potName == "Sinusoidal")

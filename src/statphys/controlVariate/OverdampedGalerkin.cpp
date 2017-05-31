@@ -6,8 +6,8 @@ namespace simol
  
   //########## OverdampedGalerkin #########
   
-  OverdampedGalerkin::OverdampedGalerkin(Input const& input):
-    Galerkin(input)
+  OverdampedGalerkin::OverdampedGalerkin(Input const& input, shared_ptr<CVBasis> cvBasis0):
+    Galerkin(input, cvBasis0)
   {}
   
   ///
@@ -118,12 +118,12 @@ namespace simol
   
   // #### PeriodicOverdampedGalerkin ####
   
-  PeriodicOverdampedGalerkin::PeriodicOverdampedGalerkin(Input const& input):
-    OverdampedGalerkin(input)
+  PeriodicOverdampedGalerkin::PeriodicOverdampedGalerkin(Input const& input, shared_ptr<CVBasis> cvBasis0):
+    OverdampedGalerkin(input, cvBasis0)
   {    
-    tensorBasis_ = new ExpFourierHermiteBasis(input, *potential_);
-    
+    //tensorBasis_ = new ExpFourierHermiteBasis(input, *potential_);    
     createOperators();
+    computeCVBasisCoeffs();
   }
   
   void PeriodicOverdampedGalerkin::compute()
@@ -188,15 +188,11 @@ namespace simol
   
   // #### ColloidOverdampedGalerkin ####
   
-  ColloidOverdampedGalerkin::ColloidOverdampedGalerkin(Input const& input):
-    OverdampedGalerkin(input)
+  ColloidOverdampedGalerkin::ColloidOverdampedGalerkin(Input const& input, shared_ptr<CVBasis> cvBasis0):
+    OverdampedGalerkin(input, cvBasis0)
   {    
-    //tensorBasis_ = new HermiteHermiteBasis(input, *potential_);
-    tensorBasis_ = new ExpHermiteHermiteBasis(input, *potential_);
-
     createOperators();
-    if (input.temperature() != 1)
-      throw runtime_error("Temperature != 1 not implemented !");
+    computeCVBasisCoeffs();
   }
   
   void ColloidOverdampedGalerkin::compute()

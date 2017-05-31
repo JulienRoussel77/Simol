@@ -19,7 +19,7 @@ namespace simol
 
   public:
 
-    Output(Input const& input, shared_ptr<CVBasis> cvBasis0=nullptr);
+    Output(Input const& input, shared_ptr<CVBasis> cvBasis0);
     virtual ~Output();
       
     //Observable* addObservable(const Input& input, const string& outPath);

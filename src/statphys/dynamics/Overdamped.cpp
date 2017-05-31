@@ -10,7 +10,7 @@ namespace simol
     Dynamics(input)
   {
     //galerkin_ = createOverdampedGalerkin(input);
-    galerkin_ = createGalerkin(input);
+    //galerkin_ = createGalerkin(input);
   }
  
 

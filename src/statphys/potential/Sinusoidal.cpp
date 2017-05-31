@@ -8,6 +8,7 @@ namespace simol
     amplitude_(input.amplitude()),
     pulsation_(2 * M_PI / input.length())
   {
+    cout << "Sinusoidal::Sinusoidal" << endl;
     domainSize() = 2 * M_PI /pulsation_;
   }
   

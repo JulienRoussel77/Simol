@@ -3,22 +3,39 @@
 
 namespace simol
 {
-  /*CVBasis::CVBasis(Input const& input):
-    nbOfFunctions_(input.nbOfFourier()*input.nbOfHermite()),
-    basis_(createBasis(input)),,
-    basisValues_(input.nbOfFourier() * input.nbOfHermite()),
-    generatorOnBasisValues_(input.nbOfFourier() * input.nbOfHermite())
-  {}*/
+  shared_ptr<CVBasis> createCVBasis(Input const& input)
+  {
+    if (input.galerkinElts() == "None")
+      return nullptr;
+    else if (input.systemName() == "Colloid")
+      return make_shared<ColloidCVBasis>(input);
+    else if (input.systemName() == "Isolated")
+      return make_shared<IsolatedCVBasis>(input);
+    else 
+      throw runtime_error("createCVBasis does not know wat CVBasis should be built !");
+  }
   
-  CVBasis::CVBasis(TensorBasis* basis0, shared_ptr<DVec> cvCoeffs0):
-    totalNbOfElts_(basis0->totalNbOfElts()),
-    basis_(basis0),
-    cvCoeffs_(cvCoeffs0),
+  CVBasis::CVBasis(const Input& input):
+    potential_(createPotential(input, input.galerkinPotentialName())),
+    tensorBasis_(createTensorBasis(input, potential_)),
+    totalNbOfElts_(tensorBasis_?tensorBasis_->totalNbOfElts():0),
+    cvCoeffs_(nullptr),
     basisValues_(totalNbOfElts_),
     generatorOnBasisValues_(totalNbOfElts_)
   {
-    //cout << "cvCoeffs : " << endl << reshape(*cvCoeffs0, basis_->nbOfElts(0), basis_->nbOfElts(1)) << endl;
+    cout << "Galerkin Potential : " << potential_->classname() << endl;
+    if (input.controlVariateCoeffsPath() != "None")
+    {
+      cout << "CVcoeffs from file !" << endl;
+      //throw runtime_error("Reading CV coefficients from a file is not fixed yet !");
+      std::string coeffsPath = input.outputFolderName() + input.controlVariateCoeffsPath();
+      //ifstream file(coeffsPath);
+      vector<int> dimensions;
+      cvCoeffs_ = make_shared<DVec>(scanTensor(coeffsPath, dimensions));
+      //coeffsVec_ = SMat(coeffsPath, getNbOfLines(file));
+    }
   }
+
   
   CVBasis::~CVBasis()
   {
@@ -65,34 +82,36 @@ namespace simol
   {
     DVec variables = basisVariables(syst);
     for (int iOfElt = 0; iOfElt < totalNbOfElts(); iOfElt++)
-      basisValues_(iOfElt) = basis_->value(variables, iOfElt); 
+      basisValues_(iOfElt) = tensorBasis_->value(variables, iOfElt); 
   }
   
   DMat CVBasis::gradientQ(System const& syst, int iOfFunction)
   {
-    return basis_->gradientQ(basisVariables(syst), iOfFunction);    
+    return tensorBasis_->gradientQ(basisVariables(syst), iOfFunction);    
   }
   
   DMat CVBasis::gradientP(System const& syst, int iOfFunction)
   {
-    return basis_->gradientP(basisVariables(syst), iOfFunction);    
+    return tensorBasis_->gradientP(basisVariables(syst), iOfFunction);    
   }
   
   double CVBasis::laplacianQ(System const& syst, int iOfFunction)
   {
-    return basis_->laplacianQ(basisVariables(syst), iOfFunction);
+    return tensorBasis_->laplacianQ(basisVariables(syst), iOfFunction);
   }
   
   double CVBasis::laplacianP(System const& syst, int iOfFunction)
   {
-    return basis_->laplacianP(basisVariables(syst), iOfFunction);    
+    return tensorBasis_->laplacianP(basisVariables(syst), iOfFunction);    
   }
   
-  
-  
-  IsolatedCVBasis::IsolatedCVBasis(TensorBasis* basis0, shared_ptr<DVec> cvCoeffs0):
-    CVBasis(basis0, cvCoeffs0)
+  IsolatedCVBasis::IsolatedCVBasis(const Input& input):
+    CVBasis(input)
   {}
+  
+  /*IsolatedCVBasis::IsolatedCVBasis(TensorBasis* basis0, shared_ptr<DVec> cvCoeffs0):
+    CVBasis(basis0, cvCoeffs0)
+  {}*/
   
   DVec IsolatedCVBasis::basisVariables(System const& syst) const
   {
@@ -102,31 +121,33 @@ namespace simol
     return variables;
   }
   
-
+  ColloidCVBasis::ColloidCVBasis(const Input& input):
+    CVBasis(input)
+  {}
 
   
-  ColloidCVBasis::ColloidCVBasis(TensorBasis* basis0, shared_ptr<DVec> cvCoeffs0):
+  /*ColloidCVBasis::ColloidCVBasis(TensorBasis* basis0, shared_ptr<DVec> cvCoeffs0):
     CVBasis(basis0, cvCoeffs0)
-  {}
+  {}*/
   
   /*DMat ColloidCVBasis::gradientQ(System const& syst, int iOfFunction)
   {
-    return 2*basis_->gradientQ(basisVariables(syst), iOfFunction);    
+    return 2*tensorBasis_->gradientQ(basisVariables(syst), iOfFunction);    
   }
   
   DMat ColloidCVBasis::gradientP(System const& syst, int iOfFunction)
   {
-    return 2*basis_->gradientP(basisVariables(syst), iOfFunction);    
+    return 2*tensorBasis_->gradientP(basisVariables(syst), iOfFunction);    
   }
   
   double ColloidCVBasis::laplacianQ(System const& syst, int iOfFunction)
   {
-    return 2*syst.dimension() * basis_->laplacianQ(basisVariables(syst), iOfFunction);
+    return 2*syst.dimension() * tensorBasis_->laplacianQ(basisVariables(syst), iOfFunction);
   }
   
   double ColloidCVBasis::laplacianP(System const& syst, int iOfFunction)
   {
-    return 2*syst.dimension() * basis_->laplacianP(basisVariables(syst), iOfFunction);    
+    return 2*syst.dimension() * tensorBasis_->laplacianP(basisVariables(syst), iOfFunction);    
   }*/
   
   DVec ColloidCVBasis::basisVariables(System const& syst) const

@@ -22,7 +22,6 @@ namespace simol
 
     public:
       Dynamics(Input const&  input);
-      virtual ~Dynamics() {if (galerkin_) delete galerkin_;};
       virtual string dynamicsName() const=0;
 
 
@@ -75,8 +74,8 @@ namespace simol
       virtual void bending(Particle& /*particle1*/, Particle& /*particle2*/) const {};
       
       //-- control variates --
-      Galerkin* galerkin();
-      shared_ptr<CVBasis> createCvBasis(Input const& input) {return galerkin_?(galerkin_->createCvBasis(input)):nullptr;}
+      //Galerkin* galerkin();
+      //shared_ptr<CVBasis> createCvBasis(Input const& input);
       //shared_ptr<CVBasis> cvBasis();
       //return CVBasis(dynamic_cast<TensorBasis*>(&basis_), make_shared<DVec>(CVcoeffsVec()));
       
@@ -102,7 +101,6 @@ namespace simol
       double beta_;
       double temperature_;
       std::shared_ptr<RNG> rng_;
-      Galerkin* galerkin_;
   };
 
 }

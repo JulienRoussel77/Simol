@@ -4,8 +4,8 @@
 
 namespace simol
 {
-  LangevinGalerkin::LangevinGalerkin(Input const& input):
-    Galerkin(input)
+  LangevinGalerkin::LangevinGalerkin(Input const& input, shared_ptr<CVBasis> cvBasis0):
+    Galerkin(input, cvBasis0)
   {}
   
   ///
@@ -78,6 +78,7 @@ namespace simol
     {
       DVec rObs = CVObservable();
       DVec LinvRObs = solveResilient(Leq(), rObs);
+      display(LinvRObs, outputFolderName()+"LinvRObs.txt");
       return LinvRObs;
     }
   }
@@ -98,11 +99,12 @@ namespace simol
   
   //### PeriodicLangevinGalerkin ###
   
-  PeriodicLangevinGalerkin::PeriodicLangevinGalerkin(Input const& input):
-    LangevinGalerkin(input)
+  PeriodicLangevinGalerkin::PeriodicLangevinGalerkin(Input const& input, shared_ptr<CVBasis> cvBasis0):
+    LangevinGalerkin(input, cvBasis0)
   {
-    tensorBasis_ = new ExpFourierHermiteBasis(input, *potential_);
+    //tensorBasis_ = new ExpFourierHermiteBasis(input, *potential_);
     createOperators();
+    computeCVBasisCoeffs();
   }
   
   void PeriodicLangevinGalerkin::compute()
@@ -166,11 +168,12 @@ namespace simol
   
   //### ColloidLangevinGalerkin
   
-  ColloidLangevinGalerkin::ColloidLangevinGalerkin(Input const& input):
-    LangevinGalerkin(input)
+  ColloidLangevinGalerkin::ColloidLangevinGalerkin(Input const& input, shared_ptr<CVBasis> cvBasis0):
+    LangevinGalerkin(input, cvBasis0)
   {
-    tensorBasis_ = new HermiteHermiteBasis(input, *potential_);
+    //tensorBasis_ = new HermiteHermiteBasis(input, *potential_);
     createOperators();
+    computeCVBasisCoeffs();
   }
   
   ///

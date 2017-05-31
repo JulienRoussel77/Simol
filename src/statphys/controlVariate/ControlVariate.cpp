@@ -44,7 +44,7 @@ namespace simol
     lastA_(nbOfFunctions_),
     cvBasis_(cvBasis0)
   {    
-    if (!cvBasis_) throw runtime_error("ControlVariate build without cvBasis !");
+    /*if (!cvBasis_) throw runtime_error("ControlVariate build without cvBasis !");
     if (cvBasis().cvCoeffs_)
     {
       cout << "CVcoeffs from Galerkin !" << endl;    
@@ -63,7 +63,9 @@ namespace simol
     {
       cout << "CVcoeffs estimated on the fly !" << endl;
       doEstimateCvCoeffs_ = true;
-    }
+    }*/
+    if (!cvBasis().cvCoeffs_)
+      doEstimateCvCoeffs_ = true;
   }
 
   int ControlVariate::nbOfFunctions() const
@@ -563,10 +565,10 @@ namespace simol
   }
 
   int ExpFourierHermiteControlVariate::nbOfFourier() const
-  {return cvBasis().basis_->nbOfElts(0);}
+  {return cvBasis().tensorBasis_->nbOfElts(0);}
 
   int ExpFourierHermiteControlVariate::nbOfHermite() const
-  {return cvBasis().basis_->nbOfElts(1);}
+  {return cvBasis().tensorBasis_->nbOfElts(1);}
 
   /*void ExpFourierHermiteControlVariate::displayMap(ofstream& out) const
   {

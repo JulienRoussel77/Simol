@@ -30,10 +30,13 @@ namespace simol
     protected:
       int dimension_;
       std::shared_ptr<RNG> rng_;
-      // /!\ System is stored as a System* so in all the library printName(*system_) will return "System" but system_->printName() will return "DaughterSystem"
+      // /!\ System is stored as a System* so in all the library: printName(*system_) will return "System" but system_->printName() will return "DaughterSystem"
       System* system_;
       D dynamics_;
+      shared_ptr<CVBasis> cvBasis_;
+      Galerkin* galerkin_;
       Output output_;
+      
   };
 
 
@@ -74,8 +77,13 @@ namespace simol
     rng_(std::make_shared<RNG>(RNG(input.seed(), input.dimension()))),
     system_(createSystem(input)),
     dynamics_(input),
-    output_(input, dynamics_.createCvBasis(input))
+    cvBasis_(createCVBasis(input)),
+    galerkin_(createGalerkin(input, cvBasis_)),
+    output_(input, cvBasis_)
   {
+    if (cvBasis_ && !cvBasis_->cvCoeffs_)
+      throw runtime_error("cvBasis_.cvCoeffs_ not initialized !");
+    
     if (input.dynamicsName() != dynamics_.dynamicsName()) 
       throw std::runtime_error("Dynamics generated incompatible with the input file !");
     system_->rng() = rng_;
