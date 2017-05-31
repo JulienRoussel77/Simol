@@ -36,7 +36,7 @@ namespace simol
     cout << "scanTensor" << endl;
     ifstream inTensor(path);
     if (!inTensor.is_open())
-      throw runtime_error("scanTensor couldn't read from " << path << "!" << endl;
+      throw runtime_error("scanTensor couldn't read from " + path + "!");
     string str;
     int dim;
       
@@ -56,7 +56,7 @@ namespace simol
       iOfVal++;
     }
     if (iOfVal != nbOfValues)
-      throw runtime_error("In file " << path << " the header dimensions are not compatible with the numer of lines!");
+      throw runtime_error("In file " + path + " the header dimensions are not compatible with the numer of lines!");
     return tensor;
   }
   
