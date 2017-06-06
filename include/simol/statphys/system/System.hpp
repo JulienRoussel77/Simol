@@ -88,7 +88,9 @@ namespace simol
     virtual Cell const& cell(int const&) const {throw std::runtime_error("Cell only exist for NBody !");}
     virtual Cell & cell(int const&) {throw std::runtime_error("Cell only exist for NBody !");}
     virtual void reinitializeCells() {}
+  private:
     virtual double periodicImage(double position) const;
+  public:
     virtual DVec periodicImage(DVec const& vecDistance) const;
     virtual DVec periodicDistance(DVec const& vecDistance) const;
 
@@ -148,8 +150,8 @@ namespace simol
     virtual double length() const;
     virtual double velocity() const;
     virtual double force() const;
-  //protected:
-  public:
+  protected:
+  //public:
     int dimension_;
     int nbOfParticles_;
     std::vector<Particle*> configuration_;

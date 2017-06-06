@@ -100,7 +100,6 @@ namespace simol
   {    
     //---- initialization (including burn-in) -----
     sampleSystem(dynamics_, *system_);
-
     //---- actual steps -----
     for (long int iOfStep  = 0; iOfStep < dynamics_.nbOfSteps(); ++iOfStep)
     {
@@ -111,7 +110,6 @@ namespace simol
       //--- write outputs if required ----
       computeOutput(dynamics_, *system_, output_, iOfStep);
       writeOutput(dynamics_, *system_, output_, iOfStep);
-
       //---- update the system_ by the numerical integration ---
       simulate(dynamics_, *system_);
       if (output_.hasControlVariate()) system_->computeAllForces();

@@ -221,13 +221,14 @@ namespace simol
   /// find the index of the cell in which a particle is
   int NBody::findIndex(DVec const& pos) const
   {
-    int i1 = floor(periodicImage(pos(0)) / cellSize_);
-    int i2 = floor(periodicImage(pos(1)) / cellSize_);
+    DVec perPos = periodicImage(pos);
+    int i1 = floor(perPos(0) / cellSize_);
+    int i2 = floor(perPos(1) / cellSize_);
     if (dimension_ == 2)
       return returnIndexCell(i1, i2);
     else if (dimension_ == 3)
     {
-      int i3 = floor(periodicImage(pos(2)) / cellSize_);
+      int i3 = floor(perPos(2) / cellSize_);
       return returnIndexCell(i1, i2, i3);
     }
     else

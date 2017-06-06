@@ -262,7 +262,7 @@ namespace simol
   ///Computes the instant value of the observable length
   double System::length() const
   {
-    return periodicImage(getParticle(0).position(0));
+    return periodicImage(getParticle(0).position())(0);
   }
   
   ///

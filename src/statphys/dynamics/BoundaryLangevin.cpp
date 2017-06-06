@@ -74,15 +74,15 @@ namespace simol
   
   void BoundaryLangevin::computeProfileBiChain(Output& output, System const& syst, long int iOfStep) const
   {    
-    double nu2 = pow(syst.pairPotential().harmonicFrequency() / output.constGamma_, 2);
+    double alpha2 = pow(syst.pairPotential().harmonicFrequency() / output.constGamma_, 2);
     
     static bool outbool = true;
     if (outbool)
-      cout << "refFlux = " << 2 * output.constDeltaTemperature_ * output.constGamma_ * nu2 / (2 * (1+nu2)) << endl;
+      cout << "refFlux = " << 2 * output.constDeltaTemperature_ * output.constGamma_ * alpha2 / (2 * (1+alpha2)) << endl;
     outbool = false;
     
     output.obsSumFlow().currentValue() = 0;
-    output.obsModiFlow().currentValue() = 2 * output.constDeltaTemperature_ * nu2;
+    output.obsModiFlow().currentValue() = 2 * output.constDeltaTemperature_ * alpha2;
     //cout << output.constGamma_ << " " << output.constDeltaTemperature_<< endl;
     assert(syst.nbOfParticles() % 2 == 0);
     int midNb = (syst.nbOfParticles() - 1) / 2;
@@ -92,8 +92,8 @@ namespace simol
     {
       //Particle& particle = configuration_[iOfParticle];
       double dist = syst(iOfParticle+1).position(0) - syst(iOfParticle).position(0);        // dist is r_iOfParticle
-      double distPrev = (iOfParticle == 0) ? (syst(0).momentum(0)/(output.constGamma_)) : (nu2*(syst(iOfParticle).position(0) - syst(iOfParticle-1).position(0) - syst.pairPotential().harmonicEquilibrium()));
-      double distNext = (iOfParticle == syst.nbOfParticles() - 2) ? (-syst(syst.nbOfParticles() - 1).momentum(0)/(output.constGamma_)) : (nu2*(syst(iOfParticle+2).position(0) - syst(iOfParticle+1).position(0) - syst.pairPotential().harmonicEquilibrium()));
+      double distPrev = (iOfParticle == 0) ? (syst(0).momentum(0)/(output.constGamma_)) : (alpha2*(syst(iOfParticle).position(0) - syst(iOfParticle-1).position(0) - syst.pairPotential().harmonicEquilibrium()));
+      double distNext = (iOfParticle == syst.nbOfParticles() - 2) ? (-syst(syst.nbOfParticles() - 1).momentum(0)/(output.constGamma_)) : (alpha2*(syst(iOfParticle+2).position(0) - syst(iOfParticle+1).position(0) - syst.pairPotential().harmonicEquilibrium()));
       
       //double distPrev = (iOfParticle == 0) ? 0 : (syst(iOfParticle).position(0) - syst(iOfParticle-1).position(0));
       //double distNext = (iOfParticle == syst.nbOfParticles() - 2) ? 0 : (syst(iOfParticle+2).position(0) - syst(iOfParticle+1).position(0));
@@ -131,7 +131,7 @@ namespace simol
       output.appendFlowProfile(flow, iOfStep, iOfParticle);
     }
     output.obsSumFlow().currentValue() /= (syst.nbOfParticles() - 1.);
-    output.obsModiFlow().currentValue() *= output.constGamma_ / (2 * (1+nu2));
+    output.obsModiFlow().currentValue() *= output.constGamma_ / (2 * (1+alpha2));
     
     //output.obsModiFlow().currentValue() /= syst.nbOfParticles();
     //cout << output.obsSumFlow().currentValue() << endl;

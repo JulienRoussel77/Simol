@@ -29,7 +29,7 @@ namespace simol
 
 
   ControlVariate::ControlVariate(Input const& input, int idObs, shared_ptr<CVBasis> cvBasis0, int nbOfFunctions):
-    Observable(input, idObs, input.shortDecorrelationNbOfSteps(), input.nbOfShortAutocoPts()),
+    Observable(input, idObs, input.decorrelationNbOfSteps(), input.nbOfShortAutocoPts()),
     dimension_(input.dimension()),
     nbOfFunctions_(nbOfFunctions),
     nbOfFunctionPairs_(pow(nbOfFunctions_, 2)),

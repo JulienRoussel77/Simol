@@ -30,7 +30,11 @@ namespace simol
     string name = "output/";
     if (data["Output"]["SimuTypeName"]
         && sameLetters(data["Output"]["SimuTypeName"].as<string>(), "yes"))
-      name += dynamicsName() + "/" + systemName() + "/" + potentialName() + "/";
+      name += dynamicsName() + "/" + systemName() + "/";
+    if (potentialName() == "TwoTypes")
+      name += firstPotentialName() + "/";
+    else
+      name += potentialName() + "/";
     
     if (data["Output"]["FolderName"])
       name += data["Output"]["FolderName"].as<string>() + "/";
