@@ -83,6 +83,16 @@ namespace simol
     return systemSubtype_;
   }
   
+  /*Potential* System::pairPotential()
+  {
+    return pairPotential_;
+  }
+  
+    Potential* System::externalPotential()
+  {
+    return externalPotential_;
+  }*/
+  
   ///
   /// return position x in the interval [0,domainSize_)
   double System::periodicImage(double x) const

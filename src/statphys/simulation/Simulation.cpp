@@ -235,7 +235,7 @@ namespace simol
   {
     output.finalDisplayCorrelations();    
     if (output.doOutChain()) output.finalChainDisplay();
-    if (output.doFinalFlow()) output.displayFinalFlow(syst.potParameter1(), syst.pairPotential_->harmonicFrequency());
+    if (output.doFinalFlow()) output.displayFinalFlow(syst.potParameter1(), syst.pairPotential().harmonicFrequency());
     if (output.doFinalLength()) output.displayFinalLength();
     if (output.doFinalVelocity()) output.displayFinalVelocity();
     if (output.doFinalLagrangeMultiplier()) output.displayFinalLagrangeMultiplier();
