@@ -163,6 +163,12 @@ namespace simol
 
   int& Particle::type()
   {return type_;}
+  
+  const double& Particle::bulkDriving() const
+  {return bulkDriving_;}
+
+  double& Particle::bulkDriving()
+  {return bulkDriving_;}
 
 }
 

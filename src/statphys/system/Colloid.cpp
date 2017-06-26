@@ -40,11 +40,11 @@ namespace simol
     particle2.potentialEnergy() += energy12 / 2;
     // compute forces
     double force12 = pairPotential().scalarPotentialForce(distance, interactionType);
-    /*if (interactionType == 0)
+    if (interactionType == 2)
     {
       ofstream test("test", std::ofstream::app);
       test << distance << " " << energy12 << " " << force12 << endl;
-    }*/
+    }
     particle1.force() += force12 * r12;
     particle2.force() -= force12 * r12;
     // compute pressure, based on the Virial formula for the potential part: P_pot = -\sum_{i < j} r_ij v'(r_ij) / d|Vol|; will divide by d|Vol| at the end
@@ -93,11 +93,16 @@ namespace simol
       for (ParticlePairIterator it = pairBegin(); !pairFinished(it); incrementePairIterator(it))
         interaction(it.particle1(), it.particle2());
       
+      
+      
       // When the two dimer particles are not in neighboring cells we make them interact
       int iOfCell0 = findIndex(getParticle(0).position());
       vector<int>* indexNeigh0 = &cell(iOfCell0).indexNeighbors();
       int iOfCell1 = findIndex(getParticle(1).position());
-      if (std::find(indexNeigh0->begin(), indexNeigh0->end(), iOfCell1) == indexNeigh0->end())
+      vector<int>* indexNeigh1 = &cell(iOfCell1).indexNeighbors();
+      if (iOfCell0 != iOfCell1 
+        && std::find(indexNeigh0->begin(), indexNeigh0->end(), iOfCell1) == indexNeigh0->end()
+        && std::find(indexNeigh1->begin(), indexNeigh1->end(), iOfCell0) == indexNeigh1->end())
         interaction(getParticle(0), getParticle(1));
     }
     else
@@ -107,7 +112,6 @@ namespace simol
         for (int j = i + 1; j < nbOfParticles(); j++)
           interaction(getParticle(i), getParticle(j));
     } 
-
   }
   
   ///

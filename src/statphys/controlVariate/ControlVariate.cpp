@@ -44,6 +44,8 @@ namespace simol
     lastA_(nbOfFunctions_),
     cvBasis_(cvBasis0)
   {    
+    cout << "decorrelationNbOfSteps : " << input.decorrelationNbOfSteps() << endl;
+    cout << "shortDecorrelationNbOfSteps : " << input.shortDecorrelationNbOfSteps() << endl;
     /*if (!cvBasis_) throw runtime_error("ControlVariate build without cvBasis !");
     if (cvBasis().cvCoeffs_)
     {

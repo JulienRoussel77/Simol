@@ -24,6 +24,10 @@ namespace simol
       
       virtual void computeGeneratorOnBasis(shared_ptr<CVBasis> cvBasis, System const& syst) const;
       
+      double leftHeatFlow(System const& syst, int iOfParticle) const;
+      double rightHeatFlow(System const& syst, int iOfParticle) const;
+      double heatFlow(System const& syst, int iOfParticle) const;
+      
       virtual void computeProfileBiChain(Output& output, System const& syst, long int iOfStep) const;
       virtual void computeProfileTriChain(Output& output, System const& syst, long int iOfStep) const;
     protected:

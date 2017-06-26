@@ -29,6 +29,7 @@ namespace simol
     constNbOfQModes_(input.nbOfQModes()),
     constNbOfPModes_(input.nbOfPModes()),
     constDrift_(input.drift()),
+    constBulkDriving_(input.bulkDriving()),
     totalEnergy_(0),
     totalVirial_(0),
     temperature_(0),
@@ -39,6 +40,7 @@ namespace simol
     doFinalFlow_(input.doFinalFlow()),
     doFinalVelocity_(input.doFinalVelocity()),
     doFinalLagrangeMultiplier_(input.doFinalLagrangeMultiplier()),
+    doFinalChainLagrangeMultiplier_(input.doFinalChainLagrangeMultiplier()),
     doDPDE_(input.doDPDE()),
     doXMakeMol_(input.doXMakeMol()),
     fitModifFlow_(input.fitModiFlow()),
@@ -55,11 +57,12 @@ namespace simol
     obsModiFlow_(nullptr),
     obsLagrangeMultiplier_(nullptr),
     observables_(),
-    kinTempProfile_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts(), nbOfParticles_-1),
-    potTempTopProfile_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts(), nbOfParticles_-1),
-    potTempBotProfile_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts(), nbOfParticles_-1),
-    bendistProfile_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts(), nbOfParticles_-1),
-    flowProfile_(decorrelationNbOfSteps(), timeStep(), nbOfAutocoPts(), nbOfParticles_-1),
+    kinTempProfile_(shortDecorrelationNbOfSteps(), timeStep(), nbOfShortAutocoPts(), nbOfParticles_),
+    potTempTopProfile_(shortDecorrelationNbOfSteps(), timeStep(), nbOfShortAutocoPts(), nbOfParticles_),
+    potTempBotProfile_(shortDecorrelationNbOfSteps(), timeStep(), nbOfShortAutocoPts(), nbOfParticles_),
+    bendistProfile_(shortDecorrelationNbOfSteps(), timeStep(), nbOfShortAutocoPts(), nbOfParticles_),
+    flowProfile_(shortDecorrelationNbOfSteps(), timeStep(), nbOfShortAutocoPts(), nbOfParticles_),
+    modiFlowProfile_(shortDecorrelationNbOfSteps(), timeStep(), nbOfShortAutocoPts(), nbOfParticles_),
     cvBasis_(cvBasis0)
   {    
     for (int idObs = 0; idObs < nbOfIdObs; idObs++)

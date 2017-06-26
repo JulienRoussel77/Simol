@@ -59,6 +59,8 @@ namespace simol
       double& energyLapla();
       int const& countdown() const;
       int& countdown();
+      double& bulkDriving();
+      double const& bulkDriving() const;
       
       //-- currently specific for colloids --
       int const & type() const;
@@ -78,6 +80,7 @@ namespace simol
       double virial_;   // to compute pressure
       int type_; // for simulations with several populations, like a colloid
       DVec oldGaussian_; // contains the last drawn gaussian, useful for some numerical schemes
+      double bulkDriving_;
   };
 
 

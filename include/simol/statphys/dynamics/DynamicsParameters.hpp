@@ -17,7 +17,8 @@ namespace simol
       betaLeft_(1/temperatureLeft_),
       betaRight_(1/temperatureRight_),
       tauBending_(input.tauBending()),
-      interactionRatio_(input.interactionRatio())
+      interactionRatio_(input.interactionRatio()),
+      bulkDriving_(input.bulkDriving())
     {}
     const double& temperature() const {return temperature_;}
     const double& temperatureLeft() const {return temperatureLeft_;}
@@ -28,6 +29,7 @@ namespace simol
     const double& betaRight() const {return betaRight_;}
     const double& tauBending() const {return tauBending_;}
     const double& interactionRatio() const {return interactionRatio_;}
+    const double& bulkDriving() const {return bulkDriving_;}
 
   private:
     double beta_;
@@ -39,6 +41,7 @@ namespace simol
     double betaRight_;
     double tauBending_;
     double interactionRatio_;
+    double bulkDriving_;
 
   };
 

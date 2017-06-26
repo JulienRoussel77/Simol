@@ -72,9 +72,12 @@ namespace simol
       //cout << "Leq : " << Leq().rows() << " " << Leq().cols() << endl << Leq() << endl;
       cout << "CVObs : " << CVObservable().rows() << " " << CVObservable().cols() << endl << CVObservable() << endl;
       cout << "--> norm = " << CVObservable().norm() << endl;
+      cout << "--> obs iid variance = " << pow(CVObservable().norm(), 2) << endl;
       cout << "Starting solveWithSaddle" << endl;
       DVec LinvObs = solveWithSaddle(Leq(), gramMat * CVObservable(), SU_);
       cout << "LinvObs : " << endl << LinvObs << endl;
+      cout << "--> obs asy variance = " << 2*dot(CVObservable(), LinvObs) << endl;
+      
       //return CVObservable();
       return LinvObs;
     }

@@ -107,6 +107,7 @@ namespace simol
     double xi() const;
     int seed() const;
     double eta() const;
+    double bulkDriving() const;
     double heatCapacity() const;          // used for DPDE dynamics
     double heatCapacityEinstein() const;  // used for DPDE dynamics
     double kappa() const;         // used for DPDE dynamics
@@ -156,6 +157,7 @@ namespace simol
     bool doFinalVelocity() const;
     bool doFinalFlow() const;
     bool doFinalLagrangeMultiplier() const;
+    bool doFinalChainLagrangeMultiplier() const;
     
     bool doOutVelocitiesGenerator() const;
     

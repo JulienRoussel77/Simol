@@ -43,6 +43,15 @@ namespace simol
     protected:
       //Particle ancorParticle_;
   };
+  
+  class BulkDrivenBiChain : public BiChain
+  {
+    public:
+      BulkDrivenBiChain(Input const& input);
+      
+      void computeAllForces();
+      void interaction(Particle& particle1, Particle& particle2) const;
+  };
 
   class TriChain : public Chain
   {

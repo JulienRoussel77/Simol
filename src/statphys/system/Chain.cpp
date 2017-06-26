@@ -92,7 +92,10 @@ namespace simol
 
       refPosition += localDist;
       getParticle(iOfParticle).position(0) = refPosition;
+      getParticle(iOfParticle).bulkDriving() = dynaPara.bulkDriving();      
     }
+    getParticle(0).bulkDriving() = 0;
+    getParticle(nbOfParticles()-1).bulkDriving() = 0;
   }
 
 
@@ -119,11 +122,36 @@ namespace simol
     double lapla12 = pairPotential_->laplacian(r12);  // v"(q_2 - q_1)
 
     particle1.potentialEnergy() = energy12;
-    particle1.force(0) -= force12;
-    particle2.force(0) = force12;    // /!\ Becareful here we assume that the particles are visited in a certain order
+    particle1.force(0) -= (1-particle1.bulkDriving())*force12;
+    particle2.force(0) = (1+particle1.bulkDriving())*force12;    // /!\ Becareful here we assume that the particles are visited in a certain order
     particle1.energyGrad(0) = -force12;    // v'(q_2 - q_1)
     particle1.energyLapla() = lapla12;    // v"(q_2 - q_1)
   }
+  
+  /*//###### BulkDrivenBichain ######
+  
+  ///
+  /// Construct a Chain with nearest-neighbor interactions
+  /// The 0 means that there is 0 "wall particles" : the ends are free
+  BulkDrivenBiChain::BulkDrivenBiChain(Input const& input):
+    BiChain(input)
+  {}
+  
+  ///Computes the force and the energy associated to this pair interaction, and updates these 2 fields
+  ///The first 2 derivates of the potential are stored in "particle2"
+  void BulkDrivenBiChain::interaction(Particle& particle1, Particle& particle2) const
+  {
+    double r12 = particle2.position(0) - particle1.position(0);
+    double energy12 = pairPotential()(r12);
+    double force12 = pairPotential_->scalarPotentialForce(r12);    // = - v'(q_2 - q_1)
+    double lapla12 = pairPotential_->laplacian(r12);  // v"(q_2 - q_1)
+
+    particle1.potentialEnergy() = energy12;
+    particle1.force(0) -= (1+particle1.bulkDriving())*force12;
+    particle2.force(0) = (1-particle2.bulkDriving())*force12;    // /!\ Becareful here we assume that the particles are visited in a certain order
+    particle1.energyGrad(0) = -force12;    // v'(q_2 - q_1)
+    particle1.energyLapla() = lapla12;    // v"(q_2 - q_1)
+  }*/
 
   //###### TriChain ######
 

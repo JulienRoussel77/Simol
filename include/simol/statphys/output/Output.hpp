@@ -69,10 +69,17 @@ namespace simol
     bool doOutBackUp() const {return (bool)outBackUp_;}
     bool doOutChain() const {return (bool)outProfile_;}
     
-    bool doFinalLength() const {return (bool)outFinalLength_;}
+    /*bool doFinalLength() const {return (bool)outFinalLength_;}
     bool doFinalVelocity() const {return (bool)outFinalVelocity_;}
     bool doFinalLagrangeMultiplier() const {return (bool)outFinalLagrangeMultiplier_;}
-    bool doFinalFlow() const {return (bool)outFinalFlow_;}
+    bool doFinalChainLagrangeMultiplier() const {return (bool)outFinalChainLagrangeMultiplier_ && ;}
+    bool doFinalFlow() const {return (bool)outFinalFlow_;}*/
+    
+    bool doFinalLength() const {return doFinalLength_;}
+    bool doFinalVelocity() const {return doFinalVelocity_;}
+    bool doFinalLagrangeMultiplier() const {return doFinalLagrangeMultiplier_;}
+    bool doFinalChainLagrangeMultiplier() const {return doFinalChainLagrangeMultiplier_;}
+    bool doFinalFlow() const {return doFinalFlow_;}
     
     //-- fields to output --
     const double& kineticEnergy() const;
@@ -138,12 +145,14 @@ namespace simol
     void appendPotTempBotProfile(double value, long int iOfStep, int iOfParticle);
     void appendBendistProfile(double value, long int iOfStep, int iOfParticle);
     void appendFlowProfile(double value, long int iOfStep, int iOfParticle);
+    void appendModiFlowProfile(double value, long int iOfStep, int iOfParticle);
     void writeProfile(ofstream & out_, long int iOfStep);
     void displayChainMomenta(System const& syst, long int iOfStep);
     void displayChainPositions(System const& syst, long int iOfStep);
     void displayProfile(long int iOfStep);
     void finalChainDisplay();
-    void displayFinalFlow(double parameter1=0, double parameter2=0);
+    void displayFinalFlow(double parameter1=0, double parameter2=0, double parameter3=0);
+    void displayFinalChainLagrangeMultiplier(double parameter1=0, double parameter2=0, double parameter3=0);
     
     //-------------- ConstrainedLangevin ----------------
     void displayFinalLagrangeMultiplier();
@@ -223,6 +232,7 @@ namespace simol
     int constNbOfQModes_;
     int constNbOfPModes_;
     double constDrift_;
+    double const constBulkDriving_;
     
   protected:
 
@@ -240,7 +250,7 @@ namespace simol
     int decorrelationNbOfSteps_, shortDecorrelationNbOfSteps_;
     
     int nbOfAutocoPts_, nbOfShortAutocoPts_;
-    bool doFinalFlow_, doFinalLength_, doFinalVelocity_, doFinalLagrangeMultiplier_, doDPDE_, doXMakeMol_;
+    bool doFinalFlow_, doFinalLength_, doFinalVelocity_, doFinalLagrangeMultiplier_, doFinalChainLagrangeMultiplier_, doDPDE_, doXMakeMol_;
     bool fitModifFlow_;
     
   public:
@@ -270,6 +280,7 @@ namespace simol
     AutocorrelationStats potTempBotProfile_;
     AutocorrelationStats bendistProfile_;
     AutocorrelationStats flowProfile_;
+    AutocorrelationStats modiFlowProfile_;
     
     shared_ptr<CVBasis> cvBasis_;
   };

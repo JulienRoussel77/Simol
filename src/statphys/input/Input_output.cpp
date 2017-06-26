@@ -149,6 +149,7 @@ namespace simol
   ///Returns the a number of steps
   int Input::shortDecorrelationNbOfSteps() const
   {
+    cout << "Input::shortDecorrelationNbOfSteps" << endl;
     // This static bools prevents from giving several times the same warning
     static bool warningGiven = false;
     double decoTime;
@@ -367,6 +368,11 @@ namespace simol
   bool Input::doFinalLagrangeMultiplier() const
   {
     return dynamicsName() == "ConstrainedLangevin"; 
+  }  
+  
+  bool Input::doFinalChainLagrangeMultiplier() const
+  {
+    return dynamicsName() == "ConstrainedBoundaryLangevin"; 
   }  
   
   bool Input::doOutVelocitiesGenerator() const

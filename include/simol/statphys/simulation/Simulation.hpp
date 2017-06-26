@@ -112,7 +112,7 @@ namespace simol
       writeOutput(dynamics_, *system_, output_, iOfStep);
       //---- update the system_ by the numerical integration ---
       simulate(dynamics_, *system_);
-      if (output_.hasControlVariate()) system_->computeAllForces();
+      //if (output_.hasControlVariate()) system_->computeAllForces();
     }
 
     //--- write final outputs ----
