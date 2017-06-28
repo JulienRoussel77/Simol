@@ -38,6 +38,7 @@ namespace simol
     nbOfAutocoPts_(input.nbOfAutocoPts()),
     nbOfShortAutocoPts_(input.nbOfShortAutocoPts()),
     doFinalFlow_(input.doFinalFlow()),
+    doFinalLength_(input.doFinalLength()),
     doFinalVelocity_(input.doFinalVelocity()),
     doFinalLagrangeMultiplier_(input.doFinalLagrangeMultiplier()),
     doFinalChainLagrangeMultiplier_(input.doFinalChainLagrangeMultiplier()),
@@ -112,11 +113,11 @@ namespace simol
     if (input.doXMakeMol()) outXMakeMol_        = std::make_shared<ofstream>(input.outputFolderName() + "xmakemol.xyz");
     if (input.doOutBackUp()) outBackUp_            = std::make_shared<ofstream>(input.outputFolderName() + "backUp.txt");
     
-    if (input.doFinalLength()) outFinalLength_ = std::make_shared<ofstream>(input.simuTypeName() + "finalLength.txt", std::ofstream::app);
-    if (input.doFinalVelocity()) outFinalVelocity_ = std::make_shared<ofstream>(input.simuTypeName() + "finalVelocity.txt", std::ofstream::app);
-    if (input.doFinalFlow()) outFinalFlow_         = std::make_shared<ofstream>(input.simuTypeName() + "finalFlow.txt", std::ofstream::app);
-    if (input.doFinalLagrangeMultiplier()) outFinalLagrangeMultiplier_= std::make_shared<ofstream>(input.simuTypeName() + "finalLagrangeMultiplier.txt", std::ofstream::app);
-    if (input.doOutChain()) 
+    if (doFinalLength()) outFinalLength_ = std::make_shared<ofstream>(input.simuTypeName() + "finalLength.txt", std::ofstream::app);
+    if (doFinalVelocity()) outFinalVelocity_ = std::make_shared<ofstream>(input.simuTypeName() + "finalVelocity.txt", std::ofstream::app);
+    if (doFinalFlow()) outFinalFlow_         = std::make_shared<ofstream>(input.simuTypeName() + "finalFlow.txt", std::ofstream::app);
+    if (doFinalLagrangeMultiplier()) outFinalLagrangeMultiplier_= std::make_shared<ofstream>(input.simuTypeName() + "finalLagrangeMultiplier.txt", std::ofstream::app);
+    if (doOutChain()) 
     {
       outFinalProfile_      = std::make_shared<ofstream>(input.outputFolderName() + "finalProfile.txt");
       outBeam_              = std::make_shared<ofstream>(input.outputFolderName() + "beamChain.txt");

@@ -8,7 +8,7 @@ namespace simol
     Potential(input),
     epsilon_(input.potentialEpsilon()),
     cutOffRadius_(input.cutOffRatio())
-   {}
+  {}
 
   /// -- distinguish the domains --
   ///This potential is not derivable in 0
