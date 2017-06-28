@@ -238,14 +238,15 @@ namespace simol
   ///The first 2 derivates of the potential are stored in "particle2"
   void System::interaction(Particle& particle1, Particle& particle2) const
   {
+    throw runtime_error("Check to System::interaction force signs !");
     DVec r12 = particle2.position() - particle1.position();
     double energy12 = pairPotential()(r12);
     DVec force12 = pairPotential_->potentialForce(r12);    // = - v'(q_2 - q_1)
     double lapla12 = pairPotential_->laplacian(r12);  // v"(q_2 - q_1)
 
     particle1.potentialEnergy() = energy12;
-    particle1.force() -= force12;
-    particle2.force() += force12;
+    particle1.force() += force12;
+    particle2.force() -= force12;
     particle1.energyGrad() = -force12;    // v'(q_2 - q_1)
     particle1.energyLapla() = lapla12;    // v"(q_2 - q_1)
   }

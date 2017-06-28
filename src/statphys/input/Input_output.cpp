@@ -83,6 +83,7 @@ namespace simol
         else if (vecParameters[iOfVec] == "seed")     name += doubleToString(seed());
         else if (vecParameters[iOfVec] == "potAlpha") name += doubleToString(potentialAlpha());
         else if (vecParameters[iOfVec] == "potBeta")  name += doubleToString(potentialBeta());
+        else if (vecParameters[iOfVec] == "c")  name += doubleToString(potentialCenter());
         else if (vecParameters[iOfVec] == "MTSfrequency")  name += doubleToString(MTSfrequency());
         else if (vecParameters[iOfVec] == "drift")  name += doubleToString(drift());
         else if (vecParameters[iOfVec] == "a")  name += doubleToString(latticeParameter());
@@ -302,7 +303,7 @@ namespace simol
   {return (dynamicsName() != "Overdamped" && (systemName() == "Isolated" || systemName() == "Bicolor"));}
   
   bool Input::doForce() const
-  {return (dynamicsName() == "Overdamped" && systemName() == "Isolated");}
+  {return (dynamicsName() == "Overdamped");}
   
   bool Input::doLength() const
   {return (systemName() == "Isolated") || (systemName() == "Chain") || (systemName() == "Colloid");}

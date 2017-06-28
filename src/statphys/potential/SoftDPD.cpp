@@ -10,7 +10,8 @@ namespace simol
     cutOffRadius_(input.cutOffRatio())
    {}
 
-  //-- distinguish the domains --
+  /// -- distinguish the domains --
+  ///This potential is not derivable in 0
   double SoftDPD::operator()(double dist) const
   {
     if (dist < cutOffRadius_)

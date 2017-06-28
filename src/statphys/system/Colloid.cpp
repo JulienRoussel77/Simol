@@ -24,13 +24,13 @@ namespace simol
   ///The first 2 derivates of the potential are stored in "particle2"
   void Colloid::interaction(Particle& particle1, Particle& particle2) const
   {
+    
     int interactionType = particle1.type() + particle2.type();
-    //if ((particle1.type() == 1) || (particle2.type() == 1))
-    //cout << particle1.type() << " x " << particle2.type() << " -> " << interactionType << endl;
+    if (interactionType == 2) return;
+    
     // take closest periodic image
-    //if (particle1.type() != particle2.type()) return;
-    DVec r12 = periodicDistance(particle1.position() - particle2.position());
-    //DVec r12 = particle1.position() - particle2.position();
+    DVec r12 = periodicDistance(particle2.position() - particle1.position());
+    //DVec r12 = particle2.position() - particle1.position();
     double distance = r12.norm();
     r12 /= distance;
     // compute energy
@@ -38,21 +38,42 @@ namespace simol
 
     particle1.potentialEnergy() += energy12 / 2;
     particle2.potentialEnergy() += energy12 / 2;
-    // compute forces
+    // compute forces (positive -> repulsive / negative -> attractive)
     double force12 = pairPotential().scalarPotentialForce(distance, interactionType);
-    if (interactionType == 2)
+    /*if (interactionType == 2)
     {
       ofstream test("test", std::ofstream::app);
       test << distance << " " << energy12 << " " << force12 << endl;
-    }
-    particle1.force() += force12 * r12;
-    particle2.force() -= force12 * r12;
-    // compute pressure, based on the Virial formula for the potential part: P_pot = -\sum_{i < j} r_ij v'(r_ij) / d|Vol|; will divide by d|Vol| at the end
-    particle1.virial() += 0.5 * force12 * distance;
-    particle2.virial() += 0.5 * force12 * distance;
+    }*/
+    particle1.force() -= force12 * r12;
+    particle2.force() += force12 * r12;
     
     //cout << "inter : " << distance << " " << energy12 << " " << force12 << endl;
     //cout << "--> " << particle1.position().adjoint() << " v " << particle2.position().adjoint() << " -> distance = " << distance << endl;
+    
+    //cout << particle1.type() << " x " << particle2.type() << " : " << distance << " " << force12 << endl;
+  }
+  
+  ///Computes the force and the energy associated to this pair interaction, and updates these 2 fields
+  ///The first 2 derivates of the potential are stored in "particle2"
+  ///Here the distance is not periodic !
+  void Colloid::nonPerInteraction(Particle& particle1, Particle& particle2) const
+  {
+    int interactionType = particle1.type() + particle2.type();
+    
+    //DVec r12 = periodicDistance(particle2.position() - particle1.position());
+    DVec r12 = particle2.position() - particle1.position();
+    double distance = r12.norm();
+    r12 /= distance;
+    // compute energy
+    double energy12 = pairPotential()(distance, interactionType);
+
+    particle1.potentialEnergy() += energy12 / 2;
+    particle2.potentialEnergy() += energy12 / 2;
+    // compute forces (positive -> repulsive / negative -> attractive)
+    double force12 = pairPotential().scalarPotentialForce(distance, interactionType);
+    particle1.force() -= force12 * r12;
+    particle2.force() += force12 * r12;
   }
   
   void Colloid::samplePositions(DynamicsParameters const& dynaPara)
@@ -74,6 +95,8 @@ namespace simol
     }
   }
   
+  
+  
   void Colloid::computeAllForces()
   {
     //cout << endl << "------------------computeAllForces----------------------" << endl;
@@ -93,17 +116,17 @@ namespace simol
       for (ParticlePairIterator it = pairBegin(); !pairFinished(it); incrementePairIterator(it))
         interaction(it.particle1(), it.particle2());
       
-      
+      nonPerInteraction(getParticle(0), getParticle(1));
       
       // When the two dimer particles are not in neighboring cells we make them interact
-      int iOfCell0 = findIndex(getParticle(0).position());
+      /*int iOfCell0 = findIndex(getParticle(0).position());
       vector<int>* indexNeigh0 = &cell(iOfCell0).indexNeighbors();
       int iOfCell1 = findIndex(getParticle(1).position());
       vector<int>* indexNeigh1 = &cell(iOfCell1).indexNeighbors();
       if (iOfCell0 != iOfCell1 
         && std::find(indexNeigh0->begin(), indexNeigh0->end(), iOfCell1) == indexNeigh0->end()
         && std::find(indexNeigh1->begin(), indexNeigh1->end(), iOfCell0) == indexNeigh1->end())
-        interaction(getParticle(0), getParticle(1));
+        interaction(getParticle(0), getParticle(1));*/
     }
     else
     {
@@ -116,11 +139,25 @@ namespace simol
   
   ///
   ///Computes the instant value of the observable length
+  ///This length is not periodized!
   double Colloid::length() const
   {
-    DVec r12 = periodicDistance(getParticle(0).position() - getParticle(1).position());
+    //DVec r01 = periodicDistance(getParticle(1).position() - getParticle(0).position());
+    DVec r01 = getParticle(1).position() - getParticle(0).position();
     //cout << periodicImage(getParticle(0).position()).adjoint() << " <-> " << periodicImage(getParticle(1).position()).adjoint() << " = " << r12.norm() << endl;
-    return r12.norm();
+    return r01.norm();
+  }
+  
+  ///
+  ///Computes the instant value of the observable force
+  /// positive -> repulsion / negative -> attraction
+  double Colloid::force() const
+  {
+    //DVec r01 = periodicDistance(getParticle(1).position() - getParticle(0).position());
+    DVec r01 = getParticle(1).position() - getParticle(0).position();
+    double d01 = r01.norm();
+    //cout << "Out force : " << d01 << " " << dot(getParticle(1).force() - getParticle(0).force(), r01) / (2*d01) << endl;
+    return dot(getParticle(1).force() - getParticle(0).force(), r01) / (2*d01);
   }
   
 }

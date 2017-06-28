@@ -153,8 +153,8 @@ namespace simol
   DVec ColloidCVBasis::basisVariables(System const& syst) const
   {
     DVec variables = DVec::Zero(2);
-    DVec r01np = syst(1).position() - syst(0).position();
-    DVec r01 = syst.periodicDistance(r01np);
+    DVec r01 = syst(1).position() - syst(0).position();
+    //DVec r01 = syst.periodicDistance(r01np);
     double d01 = r01.norm();
     DVec p01 = syst(1).momentum() - syst(0).momentum();
     variables(0) = d01;
@@ -165,8 +165,8 @@ namespace simol
   DMat ColloidCVBasis::qVariable(System const& syst) const
   {
     DMat distanceMat = DVec::Zero(1);
-    DVec r01np = syst(1).position() - syst(0).position();
-    DVec r01 = syst.periodicDistance(r01np);
+    DVec r01 = syst(1).position() - syst(0).position();
+    //DVec r01 = syst.periodicDistance(r01np);
     distanceMat(0,0) = r01.norm();
     return distanceMat;
   }
@@ -174,8 +174,8 @@ namespace simol
   DMat ColloidCVBasis::pVariable(System const& syst) const
   {
     DMat momentumMat = DVec::Zero(1);
-    DVec r01np = syst(1).position() - syst(0).position();
-    DVec r01 = syst.periodicDistance(r01np);
+    DVec r01 = syst(1).position() - syst(0).position();
+    //DVec r01 = syst.periodicDistance(r01np);
     double d01 = r01.norm();
     momentumMat(0,0) = dot(syst(1).momentum() - syst(0).momentum(), r01) / d01;
     return momentumMat;
@@ -184,14 +184,17 @@ namespace simol
   DMat ColloidCVBasis::forces(System const& syst) const
   {
     DMat forcesMat = DVec::Zero(1);
-    DVec r01np = syst(1).position() - syst(0).position();
-    DVec r01 = syst.periodicDistance(r01np);
+    DVec r01 = syst(1).position() - syst(0).position();
+    //DVec r01 = syst.periodicDistance(r01np);
     double d01 = r01.norm();
     forcesMat(0,0) = dot(syst(1).force() - syst(0).force(), r01) / (2*d01) + (syst.dimension()-1) / d01;
     //cout << r01.adjoint() << " -> "  << (syst(1).force() - syst(0).force()).adjoint() << endl;
     //cout  << d01 << " -> " << (syst(1).force() - syst(0).force()).norm() << endl;
+    
     //ofstream test("test", std::ofstream::app);
-    //test << d01 << " -> " << (syst(1).force() - syst(0).force()).norm() << endl;
+    //test << d01 << " " << dot(syst(1).force() - syst(0).force(), r01) / (2*d01) << " " << (syst.dimension()-1) / d01 << " " << dot(syst(1).force(), r01) / (2*d01) << " " << dot(-syst(0).force(), r01) / (2*d01) << endl;
+    
+    //cout << "CVB force : " << d01 << " " << dot(syst(1).force() - syst(0).force(), r01) / (2*d01) << endl;
     return forcesMat;
   }
   

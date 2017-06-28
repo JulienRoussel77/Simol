@@ -27,11 +27,6 @@ namespace simol
       nonEqForce_(0) = nonEqAmplitude() / sqrt((double) input.nbOfParticles());
     else
       nonEqForce_(0) = nonEqAmplitude();
-    //if (nonEqForce_(0) != 0)
-    // cout << "nonEqForce = " << nonEqForce_ << endl;
-    cout << "Potential::Potential" << endl;
-    cout << "nonEqAmplitude : " << nonEqAmplitude() << endl;
-    cout << "nonEqForce : " << nonEqForce().adjoint() << endl;
     
   }
   

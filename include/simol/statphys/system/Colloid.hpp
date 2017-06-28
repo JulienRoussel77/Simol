@@ -15,11 +15,12 @@ namespace simol
     int const& nbOfColloidParticles() const;
     int& nbOfColloidParticles();
     virtual void interaction(Particle& particle1, Particle& particle2) const;
+    virtual void nonPerInteraction(Particle& particle1, Particle& particle2) const;
     virtual void computeAllForces();
     virtual void samplePositions(DynamicsParameters const& dynaPara);
     
     virtual double length() const;
-    
+    virtual double force() const;
   };
   
 }

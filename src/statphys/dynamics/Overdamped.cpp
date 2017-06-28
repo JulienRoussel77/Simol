@@ -51,11 +51,12 @@ namespace simol
     cout << "f : " << endl << cvBasis->forces(syst) << endl;*/
     cvBasis->generatorOnBasisValues_ = DVec::Zero(cvBasis->totalNbOfElts());
     //DVec result = DVec::Zero(nbOfFunctions());
+    DMat forceMat = cvBasis->forces(syst);
     for (int iOfFunction = 0; iOfFunction < cvBasis->totalNbOfElts(); iOfFunction++)
     {
       //for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
       cvBasis->generatorOnBasisValues_(iOfFunction) += cvBasis->laplacianQ(syst, iOfFunction) / beta()
-                               + dot(cvBasis->forces(syst), cvBasis->gradientQ(syst, iOfFunction));
+                               + dot(forceMat, cvBasis->gradientQ(syst, iOfFunction));
       //cvBasis->generatorOnBasisValues_(iOfFunction) += (cvBasis->forces(syst))(0,0);                        
       //cvBasis->generatorOnBasisValues_(iOfFunction) += (cvBasis->gradientQ(syst, iOfFunction))(0,0);
       /*cout << "--iOfFunction : " << iOfFunction << endl;
@@ -63,7 +64,7 @@ namespace simol
       cout << "--gradientQ : " << cvBasis->gradientQ(syst, iOfFunction) << endl;*/
     }
     //ofstream test("testest", std::ofstream::app);
-    //test << cvBasis->qVariable(syst) << " " << cvBasis->forces(syst) << endl;
+    //test << cvBasis->qVariable(syst) << " " << forceMat << " " << cvBasis->basisValues_[0] << " " << cvBasis->gradientQ(syst, 0) << " " << cvBasis->laplacianQ(syst, 0) << endl;
                    
     //ofstream tempOut("generatorOnBasis.txt", std::ofstream::app);
     //tempOut << syst(0).position(0) << " " << syst(0).force(0) << " " << dot(*cvBasis->cvCoeffs_, cvBasis->generatorOnBasisValues_) << endl;
