@@ -138,6 +138,14 @@ namespace simol
     else
       return defaultPotentialCoeff;
   }
+  
+  double Input::potentialDimension() const
+  {
+    if (data["Potential"]["Dimension"])
+      return data["Potential"]["Dimension"].as<double>();
+    else
+      return dimension();
+  }
 
   //------- FPU ----------
   double Input::potentialAlpha() const

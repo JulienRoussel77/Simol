@@ -82,6 +82,7 @@ namespace simol
     double potentialStiffness() const;
     double potentialAlpha() const;
     double potentialBeta() const;
+    double potentialDimension() const;
     // Lennard Jones
     double potentialEpsilon() const;
     double potentialSigma() const;

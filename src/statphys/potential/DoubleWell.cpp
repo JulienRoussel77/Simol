@@ -62,7 +62,7 @@ namespace simol
   
   DoubleWellFE::DoubleWellFE(Input const & input):
     DoubleWell(input),
-    dimension_(input.dimension())
+    dimension_(input.potentialDimension())
   {}
   
   double DoubleWellFE::operator()(double distance) const

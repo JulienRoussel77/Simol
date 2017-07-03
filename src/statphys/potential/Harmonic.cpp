@@ -58,8 +58,11 @@ namespace simol
   
   HarmonicFE::HarmonicFE(Input const & input):
     Harmonic(input),
-    dimension_(input.dimension())
-  {}
+    dimension_(input.potentialDimension())
+  {
+    cout << "HarmonicFE::HarmonicFE" << endl;
+    cout << "dimension_ : " << dimension_ << endl;
+  }
   
   double HarmonicFE::operator()(double distance) const
   { 
