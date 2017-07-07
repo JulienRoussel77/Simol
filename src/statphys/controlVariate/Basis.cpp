@@ -623,6 +623,7 @@ namespace simol
     qMin_(input.integrationQMin()),
     omega_(input.omegaHermite()),
     center_(input.potentialCenter()),
+    epsilon_(input.galerkinEpsilon()),
     largerSize_(nbOfElts_ + potential_->polyCoeffs().rows()),
     largerBasisMeans_(DVec::Zero(largerSize_)),
     largerMeasureMomenta_(DVec::Zero(largerSize_)),
@@ -631,6 +632,7 @@ namespace simol
     productWdMat_(DMat::Zero(nbOfElts_, nbOfElts_)),
     productWddMat_(DMat::Zero(nbOfElts_, nbOfElts_))
   {
+    cout << "Potential is " << potential0->classname() << endl; 
     if (length_ == 0)
       throw runtime_error("The integration length is set to zero !");
     cout << "ExpHermiteBasis::ExpHermiteBasis" << endl;
@@ -688,45 +690,32 @@ namespace simol
     for (int iOfOrder = potWdDegree_; iOfOrder >= 0; iOfOrder--)
       largerProductWdMat_ = productXMat_ * largerProductWdMat_ + potWdPolyCoeffs[iOfOrder]*DMat::Identity(largerSize_, largerSize_);   
 
+    // Test if there is a non polynomial (logarithmic) part in the potential
     if (potential_->inverseCoeff())
     {
-      cout << "---------------" << center() << "----------" << endl;
       DMat A = productXMat_ - center() * DMat::Identity(largerSize_, largerSize_);
-      double epsilon = 1e-2;
+      //double epsilon = 1e-2;
       
       JacobiSVD<DMat> svdA(A, ComputeThinU | ComputeThinV);
       DMat Diag = DMat::Zero(A.rows(), A.cols());
       DMat DiagA = DMat::Zero(A.rows(), A.cols());
       for (int iOfCol = 0; iOfCol < A.cols(); iOfCol++)
       {
-        Diag(iOfCol, iOfCol) = pow(pow(epsilon, 2) + pow(svdA.singularValues()(iOfCol), 2), -.5);
+        Diag(iOfCol, iOfCol) = pow(pow(epsilon_, 2) + pow(svdA.singularValues()(iOfCol), 2), -.5);
         DiagA(iOfCol, iOfCol) = svdA.singularValues()(iOfCol);
       }
       //svdA.singularValues();
       cout << "Diag :" << endl << Diag << endl;
       cout << "DiagA :" << endl << DiagA << endl;
       //DMat inverseProductXMat = A.inverse();
-      cout << "DiffMat:" << endl << A - svdA.matrixU() * DiagA * svdA.matrixV().adjoint() << endl;
+      cout << "DiffMatNorm:"  << (A - svdA.matrixU() * DiagA * svdA.matrixV().adjoint()).norm() << endl;
       DMat inverseProductXMat = svdA.matrixU() * Diag * svdA.matrixV().adjoint();
       cout << "inverseProductXMat_ : " << endl << inverseProductXMat << endl;
       DMat absAMat = svdA.matrixU() * DiagA * svdA.matrixV().adjoint();
       
-      /*int largestSize = largerSize_ + 2;
-      DMat largestProductXMat = DMat::Zero(largestSize, largestSize);
-      for (int iOfElt = 0; iOfElt < largestSize; iOfElt++)
-      {
-        if (iOfElt!=0)            
-          largestProductXMat(iOfElt-1, iOfElt) = sqrt(iOfElt/(beta_*omega()));
-        if (iOfElt!=largestSize-1)  
-          largestProductXMat(iOfElt+1, iOfElt) = sqrt((iOfElt+1)/(beta_*omega()));
-      }
-      cout << "largestProductXMat : " << endl << largestProductXMat << endl;
-      DMat largestA = largestProductXMat - center() * DMat::Identity(largestSize, largestSize);
-      DMat largestInverseProductXMat = largestA.inverse();
-      cout << "diff inverse matrices :" << endl << inverseProductXMat - largestInverseProductXMat.topLeftCorner(largerSize_, largerSize_) << endl << endl;
-      */
-      cout << "product : " << endl << inverseProductXMat * (productXMat_ - center() * DMat::Identity(largerSize_, largerSize_))<< endl;
-      cout << "product2 : " << endl << absAMat * inverseProductXMat << endl;
+      cout << "productNorm : " << (inverseProductXMat * A - DMat::Identity(largerSize_, largerSize_)).norm() << endl;
+      //cout << "product2 : " << endl << absAMat * inverseProductXMat << endl;
+      cout << "largerProductWdMat_ : " << endl << largerProductWdMat_ << endl;
       largerProductWdMat_ += potential_->inverseCoeff() * inverseProductXMat;
     }
     productWdMat_ = largerProductWdMat_.topLeftCorner(nbOfElts(), nbOfElts());
@@ -734,7 +723,6 @@ namespace simol
     for (int iOfOrder = potWdDegree_-1; iOfOrder >= 0; iOfOrder--)
       tempMat = productXMat_ * tempMat + potWddPolyCoeffs[iOfOrder]*DMat::Identity(largerSize_, largerSize_);   
     productWddMat_ = tempMat.topLeftCorner(nbOfElts(), nbOfElts());
-    //cout << "productWdMat_ : " << endl << productWdMat_ << endl;
     cout << "largerProductWdMat_ : " << endl << largerProductWdMat_ << endl;
     
     computeMeasureMomenta();
@@ -839,9 +827,10 @@ namespace simol
     cout << "nu rep function : " << qRepartitionFct_ << endl;
     cout << "ratio = " << qRepartitionFct_ / gaussianRepFct << endl;
     largerMeasureMomenta_ *= integrationStep_;
+    cout << "largerMeasureMomenta_ before :" << endl << largerMeasureMomenta_ << endl;
     largerMeasureMomenta_ /= sqrt(gaussianRepFct*qRepartitionFct_);
     basisCoefficient_ = sqrt(qRepartitionFct_ / gaussianRepFct);
-    cout << "end computeMeasureMomenta :" << endl << largerMeasureMomenta_ << endl;
+    cout << "largerMeasureMomenta_ :" << endl << largerMeasureMomenta_ << endl;
     cout << "qRepartitionFct_ = " << qRepartitionFct_ << endl;
     measureMomenta_ = largerMeasureMomenta_.head(nbOfElts());
   }

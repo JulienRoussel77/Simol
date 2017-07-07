@@ -128,6 +128,7 @@ namespace simol
     double printPeriodTime() const;
     int printLongPeriodNbOfSteps() const;
     double printLongPeriodTime() const;
+    int autocoPtsBinSize() const;
     int nbOfAutocoPts() const;
     int nbOfShortAutocoPts() const;
     
@@ -179,6 +180,7 @@ namespace simol
     double integrationStep() const;
     double integrationQMin() const;
     double integrationLength() const;
+    double galerkinEpsilon() const;
   };
 
 

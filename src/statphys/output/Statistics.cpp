@@ -19,6 +19,16 @@ namespace simol
     nbValues_.fill(0);
     iidVar_.fill(0);
   };
+  
+  int Statistics::nbOfRows() const
+  {
+    return sumValues_.rows();
+  }
+  
+  int Statistics::nbOfCols() const
+  {
+    return sumValues_.cols();
+  }
 
   void Statistics::append(double value, int i, int j)
   {
@@ -120,6 +130,7 @@ namespace simol
   {
     return sqrt(variance(i,j));
   }
+  
   
   //###### CorrelationStats ######
 
@@ -266,7 +277,11 @@ namespace simol
   /// Returns an asymptotic variance: should be divided by the simulation time to obtain an error bar
   double CorrelationStats::varCorrelationAtSpan(int iOfSpan, int iOfObservable) const
   {
-    return statsCorrelation_.variance(iOfSpan, iOfObservable) * decorrelationTime();
+    if (iOfSpan < statsCorrelation_.nbOfRows())
+      return statsCorrelation_.variance(iOfSpan, iOfObservable) * decorrelationTime();
+    else
+      return std::numeric_limits<double>::quiet_NaN();
+      //return 0;
   }
   
   double CorrelationStats::stdDevCorrelationAtSpan(int iOfSpan, int iOfObservable) const
@@ -310,7 +325,11 @@ namespace simol
   
   double AutocorrelationStats::unbiasedCorrelationAtSpan(long int iOfSpan, int iOfObservable) const
   {
-    return statsCorrelation_.mean(iOfSpan, iOfObservable) - pow(mean(iOfObservable), 2);
+    if (iOfSpan < statsCorrelation_.nbOfRows())
+      return statsCorrelation_.mean(iOfSpan, iOfObservable) - pow(mean(iOfObservable), 2);
+    else
+      return std::numeric_limits<double>::quiet_NaN();
+      //return 0;
   }
   
   double AutocorrelationStats::integratedCorrelationUnbiased(int iOfObservable) const

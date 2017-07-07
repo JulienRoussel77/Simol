@@ -23,13 +23,6 @@ namespace simol
     Asad.rightCols(C.cols()) = C;
     Asad.bottomRows(C.cols()) = C.adjoint();
 
-    /*DVec SU = tensorBasis()->gramMatrix() * tensorBasis()->basisMeans();
-    cout << "SU :" << SU << endl << endl;
-    for (int iOfElt = 0; iOfElt < sizeOfBasis(); iOfElt++)
-    {
-      Asad(A.rows(), iOfElt) = SU(iOfElt);
-      Asad(iOfElt, A.cols()) = SU(iOfElt);
-    }*/
     return Asad;
   }
   
@@ -47,19 +40,14 @@ namespace simol
         int iOfA = it.row();
         double valOfA = it.value();
         coeffs.push_back(Trid(iOfA, jOfA, valOfA));
-        //Asad.insert(iOfA, jOfA) = valOfA;
       }
       
-    //DVec SU = tensorBasis()->gramMatrix() * tensorBasis()->basisMeans();
-    //cout << "SU :" << endl << SU << endl << endl;
     for (int iOfElt = 0; iOfElt < sizeOfBasis(); iOfElt++)
       for (int iOfCol = 0; iOfCol < C.cols(); iOfCol++)
         if (C(iOfElt, iOfCol) != 0)
         {
           coeffs.push_back(Trid(A.rows() + iOfCol, iOfElt, C(iOfElt, iOfCol)));
           coeffs.push_back(Trid(iOfElt, A.cols() + iOfCol, C(iOfElt, iOfCol)));
-          //coeffs.push_back(Trid(A.rows(), iTens(iOfQModes, 0), basisMean(0, iOfQModes)));
-          //coeffs.push_back(Trid(iTens(iOfQModes, 0), A.cols(), basisMean(0, iOfQModes)));
         }
     Asad.setFromTriplets(coeffs.begin(), coeffs.end());
     return Asad;
@@ -88,25 +76,12 @@ namespace simol
     SMat Acomp = A;
     Acomp.makeCompressed();
     Eigen::SparseLU<SMat > solver(Acomp);
-    /*solver.compute(Acomp);
-    if(solver.info()!=Eigen::Success) {
-      // decomposition failed
-      cout << "failed !" << endl;
-    }*/
     DVec X = solver.solve(Y);
     return X;
-    
-    //Eigen::BiCGSTAB<SMat> solver(A);
-    //solver.compute(A);
-    //DVec X = solver.solve(Y);
-    //if(solver.info() != Eigen::Success) throw runtime_error("System resolution failed !");
-    //return X;
   }
   
   DVec Galerkin::solveWithGuess(SMat const& A, DVec const& Y, DVec const& X0) const
   {
-    //SMat Acomp = A;
-    //Acomp.makeCompressed();
     Eigen::GMRES<SMat, Eigen::IncompleteLUT<double>> solver(A);
     DVec X = solver.solveWithGuess(Y, X0);
     if (solver.info() != Eigen::Success)

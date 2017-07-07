@@ -18,6 +18,8 @@ namespace simol
   public:
     Statistics(int nbRows = 1, int nbCols = 1);
     //virtual ~Statistics(){};
+    int nbOfRows() const;
+    int nbOfCols() const;
     virtual void append(double value, int i = 0, int j = 0);
     double mean(int i = 0, int j = 0) const;
     DVec meanVec(int i = 0) const;

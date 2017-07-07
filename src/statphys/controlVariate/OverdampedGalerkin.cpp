@@ -1,3 +1,4 @@
+
 #include "simol/statphys/controlVariate/OverdampedGalerkin.hpp"
 
 
@@ -34,7 +35,7 @@ namespace simol
   }
   
   DVec OverdampedGalerkin::CVcoeffsVec() const
-  {
+{
     //return basisMeans();
     //return getGradV();
     
@@ -76,6 +77,7 @@ namespace simol
       cout << "Starting solveWithSaddle" << endl;
       DVec LinvObs = solveWithSaddle(Leq(), gramMat * CVObservable(), SU_);
       cout << "LinvObs : " << endl << LinvObs << endl;
+      cout << "--> LinvObs norm = " << LinvObs.norm() << endl;
       cout << "--> obs asy variance = " << 2*dot(CVObservable(), LinvObs) << endl;
       
       //return CVObservable();

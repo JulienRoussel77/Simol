@@ -176,6 +176,7 @@ namespace simol
     double qMin_;
     double omega_;
     double center_;
+    double epsilon_;
     int largerSize_;
     DVec largerBasisMeans_, largerMeasureMomenta_;
     DMat polyCoeffs_;

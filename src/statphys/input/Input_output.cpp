@@ -150,7 +150,6 @@ namespace simol
   ///Returns the a number of steps
   int Input::shortDecorrelationNbOfSteps() const
   {
-    cout << "Input::shortDecorrelationNbOfSteps" << endl;
     // This static bools prevents from giving several times the same warning
     static bool warningGiven = false;
     double decoTime;
@@ -221,19 +220,29 @@ namespace simol
   {
     return printLongPeriodNbOfSteps() * timeStep();
   }
+  
+  ///
+  /// Number of successive iterations that are gathered for an autocorrelation point
+  /// If maxNbOfAutocoPts is not reached, returns 1
+  int Input::autocoPtsBinSize() const
+  {
+    return max(1, (int)decorrelationNbOfSteps()/maxNbOfAutocoPts);
+  }
 
   /// Contains the number of values in an autocorrelation LongPeriod
   /// /!\ Causes a memory crash for the larger chains if too big
   int Input::nbOfAutocoPts() const
   {
-    return min(maxNbOfAutocoPts, (int)decorrelationNbOfSteps());
+    return decorrelationNbOfSteps() / autocoPtsBinSize();
+    //return min(maxNbOfAutocoPts, (int)decorrelationNbOfSteps());
   }
   
   /// Contains the number of values in an autocorrelation LongPeriod
   /// /!\ Causes a memory crash for the larger chains if too big
   int Input::nbOfShortAutocoPts() const
   {
-    return min(maxNbOfAutocoPts, (int)shortDecorrelationNbOfSteps());
+    return shortDecorrelationNbOfSteps() / autocoPtsBinSize();
+    //return min(maxNbOfAutocoPts, (int)shortDecorrelationNbOfSteps());
   }
   
   

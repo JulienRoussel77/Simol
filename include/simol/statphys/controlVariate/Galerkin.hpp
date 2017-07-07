@@ -36,6 +36,7 @@ namespace simol
       double nonEqAmplitude_;
       bool doNonequilibrium_;
       int nbOfIntegrationNodes_;
+      double epsilon_;
       DMat trigToExpMat_, expToTrigMat_;
       SMat trigToExpTens_, expToTrigTens_;
       Potential* potential_;

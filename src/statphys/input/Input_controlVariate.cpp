@@ -36,6 +36,11 @@ namespace simol
       if (data["Galerkin"]["PotentialName"])
         return data["Galerkin"]["PotentialName"].as<string>();
 
+    if (externalPotentialName() == "Harmonic")
+      return "HarmonicFE";
+    if (externalPotentialName() == "DoubleWell")
+      return "DoubleWellFE";
+    
     return externalPotentialName();
   }
 
@@ -164,6 +169,15 @@ namespace simol
       if (data["Galerkin"]["Integration"])
         if (data["Galerkin"]["Integration"]["Length"])
           return data["Galerkin"]["Integration"]["Length"].as<double>();
+
+    return 0;
+  }
+  
+  double Input::galerkinEpsilon() const
+  {
+    if (data["Galerkin"])
+      if (data["Galerkin"]["Epsilon"])
+          return data["Galerkin"]["Epsilon"].as<double>();
 
     return 0;
   }
