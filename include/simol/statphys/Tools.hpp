@@ -95,7 +95,7 @@ DMat reshape(DVec const& u, int nbOfRows, int nbOfCols);
 DVec rint(DVec const& u);
 DVec polynomialDerivative(DVec const& P);
 DVec polynomialProduct(DVec const& P, DVec const& Q);
-double extendedLog(double value);
+//double extendedLog(double value);
 
 const int idKineticEnergy = 0;
 const int idPotentialEnergy = 1;

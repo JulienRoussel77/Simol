@@ -82,7 +82,7 @@ namespace simol
   {
     DVec variables = basisVariables(syst);
     for (int iOfElt = 0; iOfElt < totalNbOfElts(); iOfElt++)
-      basisValues_(iOfElt) = tensorBasis_->value(variables, iOfElt); 
+      basisValues_(iOfElt) = tensorBasis_->value(variables, iOfElt);
   }
   
   DMat CVBasis::gradientQ(System const& syst, int iOfFunction)

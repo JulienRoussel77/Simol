@@ -62,33 +62,39 @@ namespace simol
   
   DoubleWellFE::DoubleWellFE(Input const & input):
     DoubleWell(input),
-    dimension_(input.potentialDimension())
+    dimension_(input.potentialDimension()),
+    epsilon_(input.galerkinEpsilon())
   {}
+  
+  double DoubleWellFE::entropicPotential(double distance) const
+  {
+    return -(dimension_-1) * log( sqrt(pow(distance, 2) + pow(epsilon_, 2))/2 + distance/2);
+  }
   
   double DoubleWellFE::operator()(double distance) const
   { 
-    return DoubleWell::operator()(distance) - (dimension_-1) * extendedLog(distance);
+    return DoubleWell::operator()(distance) + entropicPotential(distance);
   }
   
   double DoubleWellFE::symmetricValue(double position) const
   {
-    return DoubleWell::operator()(position) - (dimension_-1)/2 * (extendedLog(position) + extendedLog(2*center_ - position));
+    return DoubleWell::operator()(position) + (entropicPotential(position)+entropicPotential(2*center_-position))/2;
   }
   
   double DoubleWellFE::skewsymmetricValue(double position) const
   {
-    return -(dimension_-1)/2 * (extendedLog(position) - extendedLog(2*center_ - position));
+    return (entropicPotential(position)-entropicPotential(2*center_-position))/2;
   }
 
   double DoubleWellFE::scalarGradient(double distance) const
   {
-    return DoubleWell::scalarGradient(distance) - (dimension_-1) / distance;
+    return DoubleWell::scalarGradient(distance) - (dimension_-1) / sqrt(pow(distance, 2) + pow(epsilon_, 2));
     //return DVec::Constant(1, stiffness_ * (distance - sigmaPot_));
   }
 
   double DoubleWellFE::laplacian(double distance) const
   {
-    return DoubleWell::laplacian(distance) + (dimension_-1) * pow(distance, -2);
+    return DoubleWell::laplacian(distance) + (dimension_-1) * distance * pow(pow(distance, 2) + pow(epsilon_, 2), -1.5);
   }
   
   double DoubleWellFE::inverseCoeff() const

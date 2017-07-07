@@ -84,12 +84,12 @@ DVec polynomialProduct(DVec const& P, DVec const& Q)
   return PQ;
 }
 
-double extendedLog(double value)
+/*double extendedLog(double value)
 {
   if (value > 0)
     return log(value);
   else
     return -std::numeric_limits<double>::infinity();
-}
+}*/
 
 

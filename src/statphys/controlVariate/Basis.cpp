@@ -800,23 +800,12 @@ namespace simol
       {
         if (iOfElt%2==0)
           largerMeasureMomenta_(iOfElt) += exp(iOfElt * logq - betaPotNeg) + exp(iOfElt * logq - betaPotPos);
-          //largerMeasureMomenta_(iOfElt) += exp(iOfElt * logq - betaPotNeg) * (1 + exp(betaPotNeg - betaPotPos));
-          //largerMeasureMomenta_(iOfElt) += exp(iOfElt * logq - betaPotNeg + log(1 + exp(-betaSkewPot)));
         else
         {
-          if (betaPotNeg == std::numeric_limits<double>::infinity())
-            largerMeasureMomenta_(iOfElt) += exp(iOfElt * logq - betaPotPos);
-          //largerMeasureMomenta_(iOfElt) += -exp(iOfElt * logq - betaPotNeg) + exp(iOfElt * logq - betaPotPos);
-          //largerMeasureMomenta_(iOfElt) += -exp(iOfElt * logq - betaPotNeg) * (1 - exp(betaPotNeg - betaPotPos));
-          else
-          {
-            if (betaSkewPot > 0)
-              //largerMeasureMomenta_(iOfElt) += -exp(iOfElt * logq - betaPotNeg + log(1 - exp(betaPotNeg - betaPotPos)));
-              largerMeasureMomenta_(iOfElt) += -exp(iOfElt * logq - betaPotNeg + log(1 - exp(-betaSkewPot)));
-            else if (betaSkewPot < 0)
-              //largerMeasureMomenta_(iOfElt) += exp(iOfElt * logq - betaPotNeg + log(-1 + exp(betaPotNeg - betaPotPos)));
-              largerMeasureMomenta_(iOfElt) += exp(iOfElt * logq - betaPotNeg + log(-1 + exp(-betaSkewPot)));
-          }
+          if (betaSkewPot > 0)
+            largerMeasureMomenta_(iOfElt) += -exp(iOfElt * logq - betaPotNeg + log(1 - exp(-betaSkewPot)));
+          else if (betaSkewPot < 0)
+            largerMeasureMomenta_(iOfElt) += exp(iOfElt * logq - betaPotNeg + log(-1 + exp(-betaSkewPot)));
         }
         //if (iOfElt == 0)
         //  cout << setprecision(16) << exp(iOfElt * logq - betaPotNeg) << " x " << (1 - exp(- betaSkewPot)) << " -> " << largerMeasureMomenta_(iOfElt) << endl;

@@ -30,6 +30,7 @@ namespace simol
     public:
       HarmonicFE(Input const& input);
       virtual string classname() const {return "HarmonicFE";}
+      double entropicPotential(double distance) const;
       virtual double operator()(double position) const;
       virtual double symmetricValue(double position) const;
       virtual double skewsymmetricValue(double position) const;
@@ -39,6 +40,7 @@ namespace simol
       virtual double inverseCoeff() const;
     private:
       double dimension_;
+      double epsilon_;
   };
 
 }

@@ -58,36 +58,39 @@ namespace simol
   
   HarmonicFE::HarmonicFE(Input const & input):
     Harmonic(input),
-    dimension_(input.potentialDimension())
+    dimension_(input.potentialDimension()),
+    epsilon_(input.galerkinEpsilon())
+  {}
+  
+  double HarmonicFE::entropicPotential(double distance) const
   {
-    cout << "HarmonicFE::HarmonicFE" << endl;
-    cout << "dimension_ : " << dimension_ << endl;
+    return -(dimension_-1) * log( sqrt(pow(distance, 2) + pow(epsilon_, 2))/2 + distance/2);
   }
   
   double HarmonicFE::operator()(double distance) const
   { 
-      return Harmonic::operator()(distance) - (dimension_-1) * extendedLog(distance);
+      return Harmonic::operator()(distance) + entropicPotential(distance);
   }
   
   double HarmonicFE::symmetricValue(double position) const
   {
-    return Harmonic::operator()(position) - (dimension_-1)/2 * (extendedLog(position) + extendedLog(2*center_ - position));
+    return Harmonic::operator()(position) + (entropicPotential(position)+entropicPotential(2*center_-position))/2;
   }
   
   double HarmonicFE::skewsymmetricValue(double position) const
   {
-    return -(dimension_-1)/2 * (extendedLog(position) - extendedLog(2*center_ - position));
+    return (entropicPotential(position)-entropicPotential(2*center_-position))/2;
   }
 
   double HarmonicFE::scalarGradient(double distance) const
   {
-    return Harmonic::scalarGradient(distance) - (dimension_-1) / distance;
+    return Harmonic::scalarGradient(distance) - (dimension_-1) / sqrt(pow(distance, 2) + pow(epsilon_, 2));
     //return DVec::Constant(1, stiffness_ * (distance - sigmaPot_));
   }
 
   double HarmonicFE::laplacian(double distance) const
   {
-    return Harmonic::laplacian(distance) + (dimension_-1) * pow(distance, -2);
+    return Harmonic::laplacian(distance) + (dimension_-1) * distance * pow(pow(distance, 2) + pow(epsilon_, 2), -1.5);
   }
   
   double HarmonicFE::inverseCoeff() const
