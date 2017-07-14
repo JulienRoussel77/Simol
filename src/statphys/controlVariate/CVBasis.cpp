@@ -5,7 +5,7 @@ namespace simol
 {
   shared_ptr<CVBasis> createCVBasis(Input const& input)
   {
-    if (input.galerkinElts() == "None")
+    if (input.basisElts() == "None")
       return nullptr;
     else if (input.systemName() == "Colloid")
       return make_shared<ColloidCVBasis>(input);
@@ -26,13 +26,14 @@ namespace simol
     cout << "Galerkin Potential : " << potential_->classname() << endl;
     if (input.controlVariateCoeffsPath() != "None")
     {
-      cout << "CVcoeffs from file !" << endl;
-      //throw runtime_error("Reading CV coefficients from a file is not fixed yet !");
-      std::string coeffsPath = input.outputFolderName() + input.controlVariateCoeffsPath();
-      //ifstream file(coeffsPath);
-      vector<int> dimensions;
-      cvCoeffs_ = make_shared<DVec>(scanTensor(coeffsPath, dimensions));
-      //coeffsVec_ = SMat(coeffsPath, getNbOfLines(file));
+      if (input.basisElts() == "QuadraticHermite")
+        cvCoeffs_ = make_shared<DVec>(DVec::Constant(1, 1, 1));
+      else{
+        cout << "CVcoeffs from file !" << endl;
+        std::string coeffsPath = input.outputFolderName() + input.controlVariateCoeffsPath();
+        vector<int> dimensions;
+        cvCoeffs_ = make_shared<DVec>(scanTensor(coeffsPath, dimensions));
+      }
     }
   }
 

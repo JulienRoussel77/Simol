@@ -64,5 +64,13 @@ namespace simol
     virtual double laplacianQ(const System& syst, int iOfFunction);
     virtual double laplacianP(const System& syst, int iOfFunction);*/
   };
+  
+  /*class ExactColloidCVBasis : public ColloidCVBasis
+  {
+  public:
+    double meshStep;
+    double xmin;
+    DVec 
+  };*/
 }
 #endif

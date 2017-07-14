@@ -57,6 +57,7 @@ namespace simol
       //for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
       cvBasis->generatorOnBasisValues_(iOfFunction) += cvBasis->laplacianQ(syst, iOfFunction) / beta()
                                + dot(forceMat, cvBasis->gradientQ(syst, iOfFunction));
+      
       //cvBasis->generatorOnBasisValues_(iOfFunction) += (cvBasis->forces(syst))(0,0);                        
       //cvBasis->generatorOnBasisValues_(iOfFunction) += (cvBasis->gradientQ(syst, iOfFunction))(0,0);
       /*cout << "--iOfFunction : " << iOfFunction << endl;

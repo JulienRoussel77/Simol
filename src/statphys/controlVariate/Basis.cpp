@@ -900,6 +900,69 @@ namespace simol
     return (productXMat_ * largerBasisMeans_).head(nbOfElts());
   }
   
+  
+  QuadraticBasis::QuadraticBasis(Input const& input, Potential* potential0):
+    QBasis(input, potential0),
+    meshStep_(0.001),
+    xmin_(0),
+    nbOfNodes_(1),
+    basisVal_(DVec::Zero(nbOfNodes_)),     // defined in x_n = n*dx
+    gradVal_(DVec::Zero(nbOfNodes_)),      // defined in x_n = n*dx
+    laplaVal_(DVec::Zero(nbOfNodes_-1)),   // defined in x_n = (n+1/2)*dx
+    dataPath_(input.outputFolderName()+ input.controlVariateCoeffsPath())
+  {
+    vector<int> dimensions;
+    gradVal_ = scanTensor(dataPath_, dimensions);
+    cout << dimensions[0] << " x " << dimensions[1] << endl;
+    int nbOfValues = dimensions[0]*dimensions[1];
+    nbOfNodes_ = nbOfValues;
+    basisVal_ = DVec::Zero(nbOfNodes_);
+    laplaVal_ = DVec::Zero(nbOfNodes_-1);
+    //laplaVal_[0] = 0;
+    for (int iOfNode = 0; iOfNode < nbOfNodes_-1; iOfNode++)
+      laplaVal_[iOfNode] = (gradVal_[iOfNode+1] - gradVal_[iOfNode]) / meshStep_;
+    
+    ofstream test("QuadCV.txt");
+    basisVal_[0] = 0;
+    for (int iOfNode = 0; iOfNode < nbOfNodes_-1; iOfNode++)
+    {
+      basisVal_[iOfNode+1] = basisVal_[iOfNode] + gradVal_[iOfNode] * meshStep_ + laplaVal_[iOfNode] * pow(meshStep_, 2)/2;
+      test << xmin_ + iOfNode*meshStep_ << " " << basisVal_[iOfNode] << " " << gradVal_[iOfNode] << " " << laplaVal_[iOfNode] << endl;
+    }
+  }
+  
+  int QuadraticBasis::indexOfNode(double position) const
+  {
+    return min((int)((position - xmin_)/meshStep_), nbOfNodes_-2);
+  }
+  
+  double QuadraticBasis::value(double variable, int) const
+  {
+    int iOfNode = indexOfNode(variable);
+    double deltaVariable = variable - (xmin_ + iOfNode * meshStep_);
+    //cout << variable << " " << basisVal_[iOfNode] << " " << basisVal_[iOfNode] + deltaVariable * gradVal_[iOfNode] + pow(deltaVariable, 2)/2 * laplaVal_[iOfNode] << endl;
+    return basisVal_[iOfNode] + deltaVariable * gradVal_[iOfNode] + pow(deltaVariable, 2)/2 * laplaVal_[iOfNode];
+  }
+  
+  DVec QuadraticBasis::gradient(double variable, int) const
+  {
+    int iOfNode = indexOfNode(variable);
+    double deltaVariable = variable - (xmin_ + iOfNode * meshStep_);
+    return DVec::Constant(1, 1, gradVal_[iOfNode] + deltaVariable * laplaVal_[iOfNode]);    
+  }
+  
+  double QuadraticBasis::laplacian(double variable, int) const
+  {
+    int iOfNode = indexOfNode(variable);
+    return laplaVal_[iOfNode];  
+  }
+  
+  
+  
+  
+  
+  
+  
 // #### HermiteBasis ####
 
   HermiteBasis::HermiteBasis(Input const& input)
@@ -982,16 +1045,18 @@ namespace simol
   
   TensorBasis* createTensorBasis(const Input& input, Potential* potential0)
   {
-    if (input.galerkinElts() == "None")
+    if (input.basisElts() == "None")
       return nullptr;
-    else if (input.galerkinElts() == "HermiteHermite")
+    else if (input.basisElts() == "HermiteHermite")
       return new HermiteHermiteBasis(input, potential0);
-    else if (input.galerkinElts() == "ExpHermiteHermite")
+    else if (input.basisElts() == "ExpHermiteHermite")
       return new ExpHermiteHermiteBasis(input, potential0);
-    else if (input.galerkinElts() == "ExpFourierHermite")
+    else if (input.basisElts() == "ExpFourierHermite")
       return new ExpFourierHermiteBasis(input, potential0);
+    else if (input.basisElts() == "QuadraticHermite")
+      return new QuadraticHermiteBasis(input, potential0);
     else
-      throw runtime_error(input.galerkinElts() + " is not a valid basis !");
+      throw runtime_error(input.basisElts() + " is not a valid basis !");
   }
 
   TensorBasis::TensorBasis(int nbOfVariables0):
@@ -1258,6 +1323,15 @@ namespace simol
     QPBasis()
   {
     bases_[0] = new ExpHermiteBasis(input, potential);
+    bases_[1] = new HermiteBasis(input);
+  }
+  
+  // #### QuadraticHermiteBasis ####
+    
+  QuadraticHermiteBasis::QuadraticHermiteBasis(Input const& input, Potential* potential):
+    QPBasis()
+  {
+    bases_[0] = new QuadraticBasis(input, potential);
     bases_[1] = new HermiteBasis(input);
   }
 

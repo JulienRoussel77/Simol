@@ -173,7 +173,7 @@ namespace simol
       virtual void displayGradPMap(ofstream& out) const;*/
   };
   
-  class HermiteHermiteControlVariate : public BasisControlVariate
+  /*class HermiteHermiteControlVariate : public BasisControlVariate
   {
     public:
       HermiteHermiteControlVariate(const Input& input, int idObs, shared_ptr<CVBasis> cvBasis0);
@@ -184,6 +184,12 @@ namespace simol
     public:
       ExpHermiteHermiteControlVariate(const Input& input, int idObs, shared_ptr<CVBasis> cvBasis0);
   };
+    
+  class QuadraticHermiteControlVariate : public BasisControlVariate
+  {
+    public:
+      QuadraticHermiteControlVariate(const Input& input, int idObs, shared_ptr<CVBasis> cvBasis0);
+  };*/
 }
 
 #endif

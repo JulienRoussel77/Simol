@@ -170,7 +170,7 @@ namespace simol
     string controlVariateCoeffsPath() const;
     bool doGalerkinCV() const;
     bool isGalerkin() const;
-    string galerkinElts() const;
+    string basisElts() const;
     int nbOfQModes() const;
     int nbOfPModes() const;
     bool doGalerkinNonequilibrium() const;

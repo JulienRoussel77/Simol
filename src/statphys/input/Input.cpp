@@ -41,8 +41,10 @@ namespace simol
     int dim;
       
     inTensor >> str >> str >> dim;
+    cout << "First dim is " << dim << endl;
     dimensions.push_back(dim);
     inTensor >> dim;
+    cout << "Second dim is " << dim << endl;
     dimensions.push_back(dim);
     
     int nbOfValues = dimensions[0]*dimensions[1];

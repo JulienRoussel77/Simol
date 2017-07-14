@@ -16,15 +16,20 @@ namespace simol
       return new Observable(input, idObs, input.decorrelationNbOfSteps(), input.nbOfAutocoPts());
     if (input.controlVariateName() == "Sinus")
       return new SinusControlVariate(input, idObs, cvBasis0);
-    else if (input.controlVariateName() == "ExpFourierHermite")
-      return new ExpFourierHermiteControlVariate(input, idObs, cvBasis0);
+    else if (input.controlVariateName() == "Basis")
+      return new BasisControlVariate(input, idObs, cvBasis0);
+    else
+      std::cout << input.controlVariateName() << " is not a valid control variate !" << std::endl;
+    return 0; 
+    
+      /*ExpFourierHermiteControlVariate(input, idObs, cvBasis0);
     else if(input.controlVariateName() == "HermiteHermite")
       return new HermiteHermiteControlVariate(input, idObs, cvBasis0);
     else if(input.controlVariateName() == "ExpHermiteHermite")
       return new ExpHermiteHermiteControlVariate(input, idObs, cvBasis0);
-    else
-      std::cout << input.controlVariateName() << " is not a valid control variate !" << std::endl;
-    return 0;
+    else if(input.controlVariateName() == "QuadraticHermite")
+      return new QuadraticHermiteControlVariate(input, idObs, cvBasis0);*/
+
   }
 
 
@@ -595,13 +600,17 @@ namespace simol
     cout << "end displayMap" << endl;
   }*/
   
-  HermiteHermiteControlVariate::HermiteHermiteControlVariate(Input const& input, int idObs, shared_ptr<CVBasis> cvBasis0):
+  /*HermiteHermiteControlVariate::HermiteHermiteControlVariate(Input const& input, int idObs, shared_ptr<CVBasis> cvBasis0):
     BasisControlVariate(input, idObs, cvBasis0)
   {}
   
   ExpHermiteHermiteControlVariate::ExpHermiteHermiteControlVariate(Input const& input, int idObs, shared_ptr<CVBasis> cvBasis0):
     BasisControlVariate(input, idObs, cvBasis0)
   {}
+  
+  QuadraticHermiteControlVariate::QuadraticHermiteControlVariate(Input const& input, int idObs, shared_ptr<CVBasis> cvBasis0):
+    BasisControlVariate(input, idObs, cvBasis0)
+  {}*/
 
 }
 

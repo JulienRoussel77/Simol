@@ -72,21 +72,19 @@ namespace simol
     return false;
   }
 
-  string Input::galerkinElts() const
+  string Input::basisElts() const
   {
-    if (data["Galerkin"])
-      if (data["Galerkin"]["Basis"])
-        if (data["Galerkin"]["Basis"]["Elements"])
-          return data["Galerkin"]["Basis"]["Elements"].as<string>();
+    if (data["Basis"])
+      if (data["Basis"]["Elements"])
+        return data["Basis"]["Elements"].as<string>();
     return "None";
   }
 
   int Input::nbOfQModes() const
   {
-    if (data["Galerkin"])
-      if (data["Galerkin"]["Basis"])
-        if (data["Galerkin"]["Basis"]["QModes"])
-          return data["Galerkin"]["Basis"]["QModes"].as<int>();
+    if (data["Basis"])
+        if (data["Basis"]["QModes"])
+          return data["Basis"]["QModes"].as<int>();
 
     return 0;
     //throw std::invalid_argument("Number of Fourier modes missing");
@@ -94,10 +92,9 @@ namespace simol
 
   int Input::nbOfPModes() const
   {
-    if(data["Galerkin"])
-      if(data["Galerkin"]["Basis"])
-        if(data["Galerkin"]["Basis"]["PModes"])
-          return data["Galerkin"]["Basis"]["PModes"].as<int>();
+    if(data["Basis"])
+      if(data["Basis"]["PModes"])
+        return data["Basis"]["PModes"].as<int>();
 
     return 0;
     //throw std::invalid_argument("Number of Hermite modes missing");
@@ -134,10 +131,9 @@ namespace simol
   
   double Input::omegaHermite() const
   {
-    if (data["Galerkin"])
-      if (data["Galerkin"]["Basis"])
-        if (data["Galerkin"]["Basis"]["Omega"])
-          return data["Galerkin"]["Basis"]["Omega"].as<double>();
+    if (data["Basis"])
+      if (data["Basis"]["Omega"])
+        return data["Basis"]["Omega"].as<double>();
 
     return 1;
     //throw std::invalid_argument("Number of Fourier modes missing");

@@ -76,18 +76,18 @@ namespace simol
     virtual DVec gradient(double variable, int iOfElt) const = 0;
     virtual double laplacian(double variable, int iOfElt) const = 0;
     
-    virtual double xY(int iOfEltLeft, int iOfEltRight) const = 0;
+    virtual double xY(int /*iOfEltLeft*/, int /*iOfEltRight*/) const {throw runtime_error("xY not defined !");};
     virtual void computeGramMatrix(); 
-    virtual double xGradY(int iOfElementLeft, int iOfElementRight) const = 0;
+    virtual double xGradY(int /*iOfElementLeft*/, int /*iOfElementRight*/) const {throw runtime_error("xGradY not defined !");};
     virtual void computeGradMatrix();
     //virtual double xGradStarY(int iOfElementLeft, int iOfElementRight) const;
-    virtual double xLaplacianY(int iOfElementLeft, int iOfElementRight) const = 0;
+    virtual double xLaplacianY(int /*iOfElementLeft*/, int /*iOfElementRight*/) const {throw runtime_error("xLaplacianY not defined !");};
     virtual void computeLaplacianMatrix();
     virtual double const& omega() const {throw runtime_error("omega not defined !");}
     virtual double const& beta() const {return beta_;}
     
-    virtual DVec getMonome0() const = 0;
-    virtual DVec getMonome1() const = 0;
+    virtual DVec getMonome0() const {throw runtime_error("getMonome0 not defined !");};
+    virtual DVec getMonome1() const {throw runtime_error("getMonome1 not defined !");};
   };
   
   class QBasis : public Basis
@@ -99,7 +99,7 @@ namespace simol
     DVec measureMomenta_;
   public:
     QBasis(Input const& input, Potential* potential0);
-    virtual double length() const = 0;
+    virtual double length() const {throw runtime_error("length not defined !");};
     
     virtual double potential(double variable) const;
     virtual double potDeriv(double variable) const;
@@ -108,7 +108,7 @@ namespace simol
     const double& amplitude() const;
     int nbOfIntegrationSteps() const;
    
-    virtual void computeBasisMeans() = 0;
+    virtual void computeBasisMeans() {throw runtime_error("computeBasisMeans not defined !");};
   };
 
   class ExpFourierBasis : public QBasis
@@ -214,6 +214,22 @@ namespace simol
     virtual DVec getMonome0() const;
     virtual DVec getMonome1() const;
   };
+  
+  class QuadraticBasis : public QBasis
+  {
+    double meshStep_;
+    double xmin_, xmax_;
+    int nbOfNodes_;
+    DVec basisVal_, gradVal_, laplaVal_;
+    string dataPath_;
+  public:
+    QuadraticBasis(Input const& input, Potential* potential0);
+    int indexOfNode(double position) const;
+    virtual double value(double variable, int iOfElt) const;
+    virtual DVec gradient(double variable, int iOfElt) const;
+    virtual double laplacian(double variable, int iOfElt) const;
+  };
+  
 
   class HermiteBasis : public Basis
   {
@@ -327,7 +343,11 @@ namespace simol
     ExpHermiteHermiteBasis(Input const& input, Potential* potential);
   };
 
-
+  class QuadraticHermiteBasis : public QPBasis
+  {
+  public:
+    QuadraticHermiteBasis(Input const& input, Potential* potential);
+  };
 }
 
 #endif
