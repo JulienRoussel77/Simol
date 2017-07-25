@@ -134,6 +134,8 @@ namespace simol
       for (int i = 0; i < nbOfParticles(); i++)
         for (int j = i + 1; j < nbOfParticles(); j++)
           interaction(getParticle(i), getParticle(j));
+        
+      nonPerInteraction(getParticle(0), getParticle(1));
     } 
   }
   

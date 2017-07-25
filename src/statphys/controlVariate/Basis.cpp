@@ -938,9 +938,15 @@ namespace simol
   
   double QuadraticBasis::value(double variable, int) const
   {
+    //cout << "-----" << endl;
     int iOfNode = indexOfNode(variable);
     double deltaVariable = variable - (xmin_ + iOfNode * meshStep_);
-    //cout << variable << " " << basisVal_[iOfNode] << " " << basisVal_[iOfNode] + deltaVariable * gradVal_[iOfNode] + pow(deltaVariable, 2)/2 * laplaVal_[iOfNode] << endl;
+    /*cout << variable << endl;
+    cout << iOfNode << endl;
+    cout << deltaVariable << endl;
+    cout << basisVal_[iOfNode] << endl;
+    cout << gradVal_[iOfNode] << endl;
+    cout << laplaVal_[iOfNode] << endl;*/
     return basisVal_[iOfNode] + deltaVariable * gradVal_[iOfNode] + pow(deltaVariable, 2)/2 * laplaVal_[iOfNode];
   }
   

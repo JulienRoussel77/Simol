@@ -68,6 +68,8 @@ namespace simol
   {
     if (data["System"]["Length"])
       return data["System"]["Length"].as<double>();
+    else if (data["System"]["LatticeParameter"])
+      return latticeParameter() * nbOfParticlesPerDimension();
     else
       return defaultLength;
   }
