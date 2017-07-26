@@ -229,6 +229,7 @@ namespace simol
     double constXi_;
     double constTauBending_;
     double constNonEqAmplitude_;
+    double constInteractionRatio_;
     int constNbOfQModes_;
     int constNbOfPModes_;
     double constDrift_;

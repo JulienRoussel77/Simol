@@ -160,6 +160,8 @@ namespace simol
     DVec p01 = syst(1).momentum() - syst(0).momentum();
     variables(0) = d01;
     variables(1) = dot(p01, r01)/d01;
+    if (!std::isfinite(d01))
+      throw runtime_error("The colloid distance is not valid : d = " + std::to_string(d01) + " !");
     return variables;
   }
   

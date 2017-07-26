@@ -26,6 +26,7 @@ namespace simol
     constXi_(input.xi()),
     constTauBending_(input.tauBending()),
     constNonEqAmplitude_(input.nonEqAmplitude()),
+    constInteractionRatio_(input.interactionRatio()),
     constNbOfQModes_(input.nbOfQModes()),
     constNbOfPModes_(input.nbOfPModes()),
     constDrift_(input.drift()),
@@ -587,6 +588,7 @@ namespace simol
                         << " " << setw(6) << nbOfParticles()
                         << " " << setw(4) << constTemperature_
                         << " " << setw(6) << constNonEqAmplitude_
+                        << " " << setw(6) << constInteractionRatio_
                         << " " << setw(3) << constNbOfQModes_
                         << " " << setw(3) << constNbOfPModes_
                         << " " << setw(12);
