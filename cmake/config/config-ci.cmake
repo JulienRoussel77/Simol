@@ -6,7 +6,7 @@
 
 #SET(CMAKE_C_COMPILER "${SIMOL_COMPILERS_ROOT}/bin/gcc" CACHE PATH "C compiler path") # REQUIRED
 #SET(CMAKE_CXX_COMPILER "${SIMOL_COMPILERS_ROOT}/bin/g++" CACHE PATH "C++ compiler path") # REQUIRED
-#SET(CMAKE_Fortran_COMPILER "${SIMOL_COMPILERS_ROOT}/bin/gfortran" CACHE PATH "Fortran compiler path") #REQUIRED
+SET(CMAKE_Fortran_COMPILER "gfortran" CACHE PATH "Fortran compiler path") #REQUIRED
 
 #####################
 # 3rd party libraries
