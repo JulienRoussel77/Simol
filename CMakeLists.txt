@@ -110,7 +110,7 @@ INCLUDE_DIRECTORIES(${ARMADILLO_INSTALL_DIR}/include)
 
 IF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SIMOL_CXX_FLAGS}  -Wall -Wextra -l/usr/local/bin/gfortran -Wno-deprecated -Wno-deprecated-declarations")
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SIMOL_CXX_FLAGS}  -Wall -Wextra -Wno-deprecated -Wno-deprecated-declarations")
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SIMOL_CXX_FLAGS}  -Werror=return-local-addr -Werror=comment -Werror=sign-compare -Werror=unused-variable -Werror=unused-but-set-variable -Werror=delete-non-virtual-dtor")
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
