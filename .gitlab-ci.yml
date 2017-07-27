@@ -1,10 +1,12 @@
 stages:
-- configure
+- build
 
-configure_job:
-    stage: configure
+build_job:
+    stage: build
+    tag: simol-osx10-clang
     script:
-    - mkdir -p build && cd build && cmake ..
+    - mkdir -p build
+    - cd build 
+    - cmake -D SIMOL_AUTO_INSTALL=true -D SIMOL_EXTERNAL_DIR=/Users/ci/external ..
     - make
-    - make install
 
