@@ -3,7 +3,8 @@ stages:
 
 build_job:
     stage: build
-    tags: simol-osx10-clang
+    tags: 
+    - simol-osx10-clang
     script:
     - mkdir -p build
     - cd build 
