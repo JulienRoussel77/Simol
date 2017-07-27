@@ -6,8 +6,9 @@ build_job:
     tags: 
     - simol-osx10-clang
     script:
+    - mv cmake/config/config-ci.cmake cmake/config/config.cmake
     - mkdir -p build
-    - cd build 
-    - cmake -D SIMOL_AUTO_INSTALL=true -D SIMOL_EXTERNAL_DIR=/Users/ci/external -D SIMOL_INSTALL_PREFIX=/Users/ci/installed_simol ..
+    - cd build
+    - cmake ..
     - make
 
