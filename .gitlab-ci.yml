@@ -8,6 +8,6 @@ build_job:
     script:
     - mkdir -p build
     - cd build 
-    - cmake -D SIMOL_AUTO_INSTALL=true -D SIMOL_EXTERNAL_DIR=/Users/ci/external ..
+    - cmake -D SIMOL_AUTO_INSTALL=true -D SIMOL_EXTERNAL_DIR=/Users/ci/external -D SIMOL_INSTALL_PREFIX=/Users/ci/installed_simol ..
     - make
 
