@@ -398,12 +398,12 @@ namespace simol
         //cosine times sinus   /!\ doing the test in this order avoids to read expFourierCoeff(-1)
         trigToExpMat_(2 * iOfFourier, 2 * jOfFourier - 1) =
           expFourierCoeff(2 * (iOfFourier + jOfFourier) - 1) / 2
-          + (!eps)?0:eps * expFourierCoeff(2 * abs(iOfFourier - jOfFourier) - 1) / 2;
+          + (!eps)?0:(eps * expFourierCoeff(2 * abs(iOfFourier - jOfFourier) - 1) / 2);
           
         //sinus times cosine
         trigToExpMat_(2 * iOfFourier - 1, 2 * jOfFourier) =
           expFourierCoeff(2 * (iOfFourier + jOfFourier) - 1) / 2
-          - (!eps)?0:eps * expFourierCoeff(2 * abs(iOfFourier - jOfFourier) - 1) / 2;
+          - (!eps)?0:eps * (expFourierCoeff(2 * abs(iOfFourier - jOfFourier) - 1) / 2);
       }
 
 
@@ -470,7 +470,7 @@ namespace simol
       double q = (iOfNode+1) * integrationStep_;
       double betaPotPos = beta_ * potential(q);
       double betaPotNeg = beta_ * potential(-q);
-      //double logq = (q!=0)?log(pow(q,2))/2:-1000;
+      //double logq = (q!=0)?(log(pow(q,2))/2:-1000);
       double logq = log(q);
       //cout << "q=" << q << " logq = " << logq << " betaPotPos=" << betaPotPos << " betaPotNeg=" << betaPotNeg<< endl;
       for (int iOfElt = 0; iOfElt < 2*nbOfElts()-1; iOfElt++)
@@ -975,9 +975,12 @@ namespace simol
     : Basis(input.nbOfPModes(), input.beta()),
       polyCoeffs_(DMat::Zero(nbOfElts_, nbOfElts_))
   {
+    cout << "nbOfElts = " << nbOfElts_ << endl;
     polyCoeffs_(0, 0) = 1;
-    if (nbOfElts_ > 0)
+    cout << "nbOfElts = " << nbOfElts_ << endl;
+    if (nbOfElts_ > 1)
       polyCoeffs_(1, 1) = sqrt(beta_);
+    cout << "nbOfElts = " << nbOfElts_ << endl;
     for (int iOfElt = 2; iOfElt < (int)nbOfElts_; iOfElt++)
       for (int iOfCoeff = 0; iOfCoeff <= iOfElt; iOfCoeff++)
         polyCoeffs_(iOfElt, iOfCoeff) = (iOfCoeff ? (sqrt(beta_ / iOfElt) * polyCoeffs_(iOfElt - 1, iOfCoeff - 1)) : 0) - sqrt((iOfElt - 1) / (double)iOfElt) * polyCoeffs_(iOfElt - 2, iOfCoeff);
