@@ -84,13 +84,13 @@ namespace simol
   double BoundaryLangevin::heatFlow(System const& syst, int iOfParticle) const
   {
       if (iOfParticle == 0)
-        return gamma() / syst(iOfParticle).mass() * (temperatureLeft() - pow(syst(iOfParticle).momentum(0), 2) / syst(iOfParticle).mass()) 
-                + rightHeatFlow(syst, iOfParticle);
+        return (gamma() / syst(iOfParticle).mass() * (temperatureLeft() - pow(syst(iOfParticle).momentum(0), 2) / syst(iOfParticle).mass()) 
+                + rightHeatFlow(syst, iOfParticle))/2;
       else if (iOfParticle == syst.nbOfParticles()-1)
-        return gamma() / syst(iOfParticle).mass() * ( - pow(syst(iOfParticle).momentum(0), 2) / syst(iOfParticle).mass() - temperatureRight()) 
-                + leftHeatFlow(syst, iOfParticle);
+        return (gamma() / syst(iOfParticle).mass() * ( - pow(syst(iOfParticle).momentum(0), 2) / syst(iOfParticle).mass() - temperatureRight()) 
+                + leftHeatFlow(syst, iOfParticle))/2;
       else
-        return leftHeatFlow(syst, iOfParticle) + rightHeatFlow(syst, iOfParticle);
+        return (leftHeatFlow(syst, iOfParticle) + rightHeatFlow(syst, iOfParticle))/2;
   }
   
   void BoundaryLangevin::computeProfileBiChain(Output& output, System const& syst, long int iOfStep) const
@@ -106,10 +106,11 @@ namespace simol
     outbool = false;
     
     output.obsSumFlow().currentValue() = 0;
-    output.obsModiFlow().currentValue() = 2 * nu * output.constDeltaTemperature_ * harOmega;
+    output.obsModiFlow().currentValue() = nu * output.constDeltaTemperature_ * harOmega / (1 + pow(nu, 2));
     //cout << output.constGamma_ << " " << output.constDeltaTemperature_<< endl;
     int midNb = (syst.nbOfParticles() - 1) / 2;
     output.obsMidFlow().currentValue() = heatFlow(syst, midNb);
+    //cout << "---------obsModiFlow = " << output.obsModiFlow().currentValue() << endl;
     
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
     {
@@ -142,7 +143,8 @@ namespace simol
         else
           speedRight = nu * harOmega * (syst(iOfParticle+2).position(0) - syst(iOfParticle+1).position(0));
         
-        modiFlow = (speedRight - speedLeft) * (syst(iOfParticle).energyGrad(0) - harmonicForce) / (2 * (1+pow(nu, 2)));
+        modiFlow = -(speedRight - speedLeft) * (syst(iOfParticle).energyGrad(0) - harmonicForce) / (2 * (1+pow(nu, 2)));
+        //cout << output.obsModiFlow().currentValue() << " + " << modiFlow << " = " << output.obsModiFlow().currentValue() + modiFlow << endl;
         output.obsModiFlow().currentValue() += modiFlow;
       }
 
@@ -156,62 +158,6 @@ namespace simol
     output.obsSumFlow().currentValue() /= (syst.nbOfParticles() - 2.);
     
   }
-  
-  /*void BoundaryLangevin::computeProfileBiChain(Output& output, System const& syst, long int iOfStep) const
-  {    
-    double alpha2 = pow(syst.pairPotential().harmonicFrequency() / output.constGamma_, 2);
-    
-    static bool outbool = true;
-    if (outbool)
-      cout << "refFlux = " << 2 * output.constDeltaTemperature_ * output.constGamma_ * alpha2 / (2 * (1+alpha2)) << endl;
-    outbool = false;
-    
-    output.obsSumFlow().currentValue() = 0;
-    output.obsModiFlow().currentValue() = 2 * output.constDeltaTemperature_ * alpha2;
-    //cout << output.constGamma_ << " " << output.constDeltaTemperature_<< endl;
-    assert(syst.nbOfParticles() % 2 == 0);
-    int midNb = (syst.nbOfParticles() - 1) / 2;
-    output.obsMidFlow().currentValue() = - syst(midNb).energyGrad(0) * syst(midNb).momentum(0);
-    
-    for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles()-1; iOfParticle++)
-    {
-      double flow, modiFlow;
-      if (iOfParticle == 0)
-      //Particle& particle = configuration_[iOfParticle];
-      double dist = syst(iOfParticle+1).position(0) - syst(iOfParticle).position(0);        // dist is r_iOfParticle
-      double distPrev = (iOfParticle == 0) ? (syst(0).momentum(0)/(output.constGamma_)) : (alpha2*(syst(iOfParticle).position(0) - syst(iOfParticle-1).position(0) - syst.pairPotential().harmonicEquilibrium()));
-      double distNext = (iOfParticle == syst.nbOfParticles() - 2) ? (-syst(syst.nbOfParticles() - 1).momentum(0)/(output.constGamma_)) : (alpha2*(syst(iOfParticle+2).position(0) - syst(iOfParticle+1).position(0) - syst.pairPotential().harmonicEquilibrium()));
-      
-      //double distPrev = (iOfParticle == 0) ? 0 : (syst(iOfParticle).position(0) - syst(iOfParticle-1).position(0));
-      //double distNext = (iOfParticle == syst.nbOfParticles() - 2) ? 0 : (syst(iOfParticle+2).position(0) - syst(iOfParticle+1).position(0));
-      
-      double harmonicForce = syst.pairPotential().harmonicForce(dist);
-
-
-        // flow is j_iOfParticle
-      double flow = heatFlow(syst, iOfParticle);
-      
-      if (iOfParticle != 0 && iOfParticle != syst.nbOfParticles()-1)
-        output.obsSumFlow().currentValue() += flow;
-      output.obsModiFlow().currentValue() += (distNext - distPrev) * (syst(iOfParticle).energyGrad(0) - harmonicForce);
-      
-
-      double potTempTop = pow(syst(iOfParticle).energyGrad(0) - syst(iOfParticle + 1).energyGrad(0), 2);
-      double potTempBot = syst(iOfParticle).energyLapla() + syst(iOfParticle + 1).energyLapla();
-      
-      output.appendBendistProfile(dist , iOfStep, iOfParticle);
-      output.appendKinTempProfile(2 * syst(iOfParticle).kineticEnergy(), iOfStep, iOfParticle);
-      output.appendPotTempTopProfile(potTempTop, iOfStep, iOfParticle);
-      output.appendPotTempBotProfile(potTempBot, iOfStep, iOfParticle);
-      output.appendFlowProfile(flow, iOfStep, iOfParticle);
-    }
-    output.obsSumFlow().currentValue() /= (syst.nbOfParticles() - 1.);
-    output.obsModiFlow().currentValue() *= output.constGamma_ / (2 * (1+alpha2));
-    
-    //output.obsModiFlow().currentValue() /= syst.nbOfParticles();
-    //cout << output.obsSumFlow().currentValue() << endl;
-  }*/
-  
   
   void BoundaryLangevin::computeProfileTriChain(Output& output, System const& syst, long int iOfStep) const
   {

@@ -68,18 +68,31 @@ namespace simol
     if (doNonequilibrium())
     {
       throw runtime_error("Nonequilibrium Galerkin not implemented !");
+      /*throw runtime_error("Nonequilibrium Galerkin not implemented !");
       cout << "Computing the control variate by a nonequilibrium LLT" << endl;
       SMat Keta = Leta_.transpose() * Leta_;
       //DVec CV = -solve(Keta, Leta_.transpose() * gettGiHj(0,1));
       DVec CV = -solve(Keta, Leta_.transpose() * CVObservable());
-      return CV;
+      return CV;*/
     }
     else
     {
-      DVec rObs = CVObservable();
+      /*DVec rObs = CVObservable();
       DVec LinvRObs = solveResilient(Leq(), rObs);
       display(LinvRObs, outputFolderName()+"LinvRObs.txt");
-      return LinvRObs;
+      return LinvRObs;*/
+      
+      SMat gramMat = tensorBasis()->gramMatrix();
+      cout << "CVObs : " << CVObservable().rows() << " " << CVObservable().cols() << endl << CVObservable() << endl;
+      cout << "--> norm = " << CVObservable().norm() << endl;
+      cout << "--> obs iid variance = " << pow(CVObservable().norm(), 2) << endl;
+      cout << "Starting solveWithSaddle" << endl;
+      DVec LinvObs = solveWithSaddle(Leq(), gramMat * CVObservable(), SU_);
+      cout << "LinvObs : " << endl << LinvObs << endl;
+      cout << "--> LinvObs norm = " << LinvObs.norm() << endl;
+      cout << "--> obs asy variance = " << 2*dot(CVObservable(), LinvObs) << endl;
+      
+      return LinvObs;
     }
   }
   

@@ -73,17 +73,6 @@ namespace simol
       else
         addObservable(input, idObs, decorrelationNbOfSteps(), nbOfAutocoPts());
     
-    /*if (input.doKineticEnergy()) obsKineticEnergy_ = addObservable(input, "kineticEnergy.txt");
-    if (input.doPotentialEnergy()) obsPotentialEnergy_ = addObservable(input, "potentialEnergy.txt");
-    if (input.doPressure()) obsPressure_ = addObservable(input, "pressure.txt");
-    if (input.doInternalEnergy()) obsInternalEnergy_ = addObservable(input, "internalEnergy.txt");
-    if (input.doInternalTemperature()) obsInternalTemperature_ = addObservable(input, "internalTemperature.txt");
-    if (input.doVelocity()) obsVelocity_ = addObservable(input, "velocity.txt");
-    if (input.doForce()) obsForce_ = addObservable(input, "force.txt");
-    if (input.doLength()) obsLength_ = addObservable(input, "length.txt");
-    if (input.doMidFlow())obsMidFlow_  = addObservable(input, "midFlow.txt");
-    if (input.doSumFlow()) obsSumFlow_ = addObservable(input, "sumFlow.txt");
-    if (input.doModiFlow()) obsModiFlow_ = addObservable(input, "modiFlow.txt");*/
     
     if (input.doOutThermo())
       {
@@ -243,7 +232,6 @@ namespace simol
     /*Observable* obsPtr = new Observable(input, outPath);
     observables_.push_back(obsPtr);
     return obsPtr;*/
-    
     Observable* obsPtr = nullptr;
     if (input.doObservable(idObs))
     {

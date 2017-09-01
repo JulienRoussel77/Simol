@@ -19,7 +19,7 @@ namespace simol
     else if (input.controlVariateName() == "Basis")
       return new BasisControlVariate(input, idObs, cvBasis0);
     else
-      std::cout << input.controlVariateName() << " is not a valid control variate !" << std::endl;
+      throw runtime_error(input.controlVariateName() + " is not a valid control variate !");
     return 0; 
     
       /*ExpFourierHermiteControlVariate(input, idObs, cvBasis0);

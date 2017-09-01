@@ -152,6 +152,8 @@ void displayCplx(const DVecCplx& X, ostream& out)
 void display(const DVec& A, string path)
 {
   ofstream out(path);
+  if (!out.is_open())
+    throw std::runtime_error("The output folder "+path+" does not seem to exist. Please add it manually.");
   //display(A, out);
   out << A;
 }
@@ -177,7 +179,8 @@ void display(const DMat& A, ostream& out)
 void display(const DMat& A, string path)
 {
   ofstream out(path);
-  assert(out.is_open());
+  if (!out.is_open())
+    throw std::runtime_error("The output folder "+path+" does not seem to exist. Please add it manually.");
   display(A, out);
 }
 
