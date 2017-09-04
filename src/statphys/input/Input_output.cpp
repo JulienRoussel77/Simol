@@ -91,6 +91,7 @@ namespace simol
         else if (vecParameters[iOfVec] == "K")  name += doubleToString(nbOfQModes());
         else if (vecParameters[iOfVec] == "L")  name += doubleToString(nbOfPModes());
         else if (vecParameters[iOfVec] == "bulk")  name += doubleToString(bulkDriving());
+        else if (vecParameters[iOfVec] == "DT")  name += doubleToString(deltaTemperature());
         else throw std::runtime_error(vecParameters[iOfVec] + " is not a parameter name !");
       }
       name += "/";

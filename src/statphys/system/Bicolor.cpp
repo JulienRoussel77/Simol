@@ -22,7 +22,7 @@ namespace simol
         getParticle(iOfParticle).type() = (iOfParticle < 2); 
     else if (systemSubtype() == "ColorDrift" || systemSubtype() == "NortonColorDrift")
       for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
-        getParticle(iOfParticle).type() = 2*(2*iOfParticle < nbOfParticles()) - 1;    
+        getParticle(iOfParticle).type() = 2*((2*iOfParticle) < nbOfParticles()) - 1;    
     else
       throw runtime_error(systemSubtype() + " is not a valid system subtype !");
   }

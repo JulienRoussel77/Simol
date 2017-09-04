@@ -139,7 +139,7 @@ namespace simol
   double Input::eta() const
   {
     if (sameLetters(dynamicsName(), "BoundaryLangevin"))
-      return beta() * deltaTemperature();
+      return 2*beta() * deltaTemperature()/(nbOfParticles()-1);
     else
       return nonEqAmplitude();
   }
