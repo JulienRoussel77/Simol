@@ -130,6 +130,7 @@ namespace simol
     double printLongPeriodTime() const;
     int autocoPtsBinSize() const;
     int nbOfAutocoPts() const;
+    int shortAutocoPtsBinSize() const;
     int nbOfShortAutocoPts() const;
     
     // -- observables --

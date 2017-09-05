@@ -107,7 +107,7 @@ namespace simol
     
     output.obsSumFlow().currentValue() = 0;
     output.obsModiFlow().currentValue() = nu * output.constDeltaTemperature_ * harOmega / (1 + pow(nu, 2));
-    //cout << output.constGamma_ << " " << output.constDeltaTemperature_<< endl;
+    //cout << nu << " " << output.constGamma_ << " " << output.constDeltaTemperature_ << " " << harOmega << endl;
     int midNb = (syst.nbOfParticles() - 1) / 2;
     output.obsMidFlow().currentValue() = heatFlow(syst, midNb);
     //cout << "---------obsModiFlow = " << output.obsModiFlow().currentValue() << endl;
@@ -133,15 +133,25 @@ namespace simol
         potTempBot = syst(iOfParticle).energyLapla();
         double harmonicForce = syst.pairPotential().harmonicForce(dist);
         
-        if (iOfParticle == 0)
+        /*if (iOfParticle == 0)
           speedLeft = nu * harOmega * syst.pairPotential().harmonicEquilibrium() - syst(0).momentum(0) / syst(0).mass();
         else
           speedLeft = nu * harOmega * (syst(iOfParticle).position(0) - syst(iOfParticle-1).position(0));
           
         if (iOfParticle == syst.nbOfParticles()-2)
-          speedRight = nu * harOmega * syst.pairPotential().harmonicEquilibrium() + syst(iOfParticle).momentum(0) / syst(0).mass();
+          speedRight = nu * harOmega * syst.pairPotential().harmonicEquilibrium() + syst(syst.nbOfParticles()-1).momentum(0) / syst(0).mass();
         else
-          speedRight = nu * harOmega * (syst(iOfParticle+2).position(0) - syst(iOfParticle+1).position(0));
+          speedRight = nu * harOmega * (syst(iOfParticle+2).position(0) - syst(iOfParticle+1).position(0));*/
+        
+        if (iOfParticle == 0)
+          speedLeft = -syst(0).momentum(0) / syst(0).mass();
+        else
+          speedLeft = -nu * harOmega * (syst(iOfParticle).position(0) - syst(iOfParticle-1).position(0) - syst.pairPotential().harmonicEquilibrium());
+          
+        if (iOfParticle == syst.nbOfParticles()-2)
+          speedRight = syst(syst.nbOfParticles()-1).momentum(0) / syst(0).mass();
+        else
+          speedRight = -nu * harOmega * (syst(iOfParticle+2).position(0) - syst(iOfParticle+1).position(0) - syst.pairPotential().harmonicEquilibrium());
         
         modiFlow = -(speedRight - speedLeft) * (syst(iOfParticle).energyGrad(0) - harmonicForce) / (2 * (1+pow(nu, 2)));
         //cout << output.obsModiFlow().currentValue() << " + " << modiFlow << " = " << output.obsModiFlow().currentValue() + modiFlow << endl;

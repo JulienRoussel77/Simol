@@ -239,11 +239,19 @@ namespace simol
     //return min(maxNbOfAutocoPts, (int)decorrelationNbOfSteps());
   }
   
+  ///
+  /// Number of successive iterations that are gathered for an autocorrelation point
+  /// If maxNbOfAutocoPts is not reached, returns 1
+  int Input::shortAutocoPtsBinSize() const
+  {
+    return max(1, (int)shortDecorrelationNbOfSteps()/maxNbOfAutocoPts);
+  }
+  
   /// Contains the number of values in an autocorrelation LongPeriod
   /// /!\ Causes a memory crash for the larger chains if too big
   int Input::nbOfShortAutocoPts() const
   {
-    return shortDecorrelationNbOfSteps() / autocoPtsBinSize();
+    return shortDecorrelationNbOfSteps() / shortAutocoPtsBinSize();
     //return min(maxNbOfAutocoPts, (int)shortDecorrelationNbOfSteps());
   }
   
