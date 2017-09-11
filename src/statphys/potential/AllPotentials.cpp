@@ -38,6 +38,8 @@ namespace simol
       return new DoubleWellFE(input);
     else if (potName == "Drift")
       return new Drift(input);
+    else if (potName == "Coulomb")
+      return new Coulomb(input);
     else
       throw runtime_error(potName +" is not a valid potential !");
   }

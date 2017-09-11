@@ -12,6 +12,7 @@
 #include "SumSinusoidal.hpp"
 #include "SoftDPD.hpp"
 #include "Drift.hpp"
+#include "Coulomb.hpp"
 
 namespace simol
 {

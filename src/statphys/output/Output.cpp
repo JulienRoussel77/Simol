@@ -146,6 +146,7 @@ namespace simol
     else
       cout << " Number of steps      : " << nbOfSteps_ / 1e6 << "e6" << endl;
     cout << " Time step            : " << timeStep_ << endl;
+    cout << " Simulation time      : " << nbOfSteps_*timeStep_ << endl;
     //-- specific screen outputs --
     if (doDPDE())
     {
