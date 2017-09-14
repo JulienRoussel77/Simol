@@ -164,7 +164,7 @@ namespace simol
     //double redMeanVelocity = 0;
     
     double instantFlux = computeSumFlow();
-    cout << "flux = " << instantFlux << endl;
+    //cout << "flux = " << instantFlux << endl;
     double sensibility = pow(getParticle(0).energyGrad(0), 2) + pow(getParticle(nbOfParticles()-2).energyGrad(0), 2);
     for (int iOfParticle = 1; iOfParticle < nbOfParticles()-1; iOfParticle++)
       sensibility += pow(getParticle(iOfParticle-1).energyGrad(0) + getParticle(iOfParticle).energyGrad(0), 2);
@@ -180,7 +180,7 @@ namespace simol
     
     lagrangeMultiplier += localLagrangeMultiplier;
     
-    cout << computeSumFlow() << "=?=" << flux << endl;
+    //cout << computeSumFlow() << "=?=" << flux << endl;
   }
 
   //###### TriChain ######
