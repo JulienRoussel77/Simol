@@ -39,9 +39,13 @@ namespace simol
       virtual void samplePositions(DynamicsParameters const& dynaPara);
       void computeAllForces();
       void interaction(Particle& particle1, Particle& particle2) const;
-      //virtual void computeProfile(Output& output, long int iOfStep) const;
+      double leftHeatFlow(int iOfParticle) const;
+      double rightHeatFlow(int iOfParticle) const;
+      double heatFlow(int iOfParticle) const;
+            
+      double computeSumFlow() const;
+      void enforceConstraint(double& lagrangeMultiplier, double flux, DynamicsParameters const& dynaPara);
     protected:
-      //Particle ancorParticle_;
   };
   
   class BulkDrivenBiChain : public BiChain
@@ -65,7 +69,7 @@ namespace simol
       virtual void samplePositions(DynamicsParameters const& dynaPara);
       void computeAllForces();
       virtual double boundaryPotEnergy() const;
-      //virtual void computeProfile(Output& output, long int iOfStep) const;
+      int& syst();
     protected:
       //Particle ancorParticle1_;
       //Particle ancorParticle2_;

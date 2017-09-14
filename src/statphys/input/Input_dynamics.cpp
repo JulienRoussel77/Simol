@@ -14,6 +14,7 @@ const int    defaultMTSfrequency = 1;
 const double defaultNonEqAmplitude = 0;
 const double defaultDrift= 0;
 const double defaultBulkDriving = 0;
+const double defaultFlux = 0;
 
 namespace simol
 {
@@ -156,6 +157,13 @@ namespace simol
     if (data["Dynamics"]["BulkDriving"])
       return data["Dynamics"]["BulkDriving"].as<double>();
     else return defaultBulkDriving;
+  }
+  
+  double Input::flux() const
+  {
+    if (data["Dynamics"]["Flux"])
+      return data["Dynamics"]["Flux"].as<double>();
+    else return defaultFlux;
   }
 
   double Input::kappa() const

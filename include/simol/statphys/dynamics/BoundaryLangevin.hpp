@@ -24,10 +24,6 @@ namespace simol
       
       virtual void computeGeneratorOnBasis(shared_ptr<CVBasis> cvBasis, System const& syst) const;
       
-      double leftHeatFlow(System const& syst, int iOfParticle) const;
-      double rightHeatFlow(System const& syst, int iOfParticle) const;
-      double heatFlow(System const& syst, int iOfParticle) const;
-      
       virtual void computeProfileBiChain(Output& output, System const& syst, long int iOfStep) const;
       virtual void computeProfileTriChain(Output& output, System const& syst, long int iOfStep) const;
     protected:
@@ -37,6 +33,21 @@ namespace simol
       double betaLeft_;
       double betaRight_;
       double tauBending_;
+  };
+  
+  
+  class ConstrainedBoundaryLangevin : public BoundaryLangevin
+  {
+    public:
+      ConstrainedBoundaryLangevin(Input const& input);
+      virtual double& lagrangeMultiplier() {return lagrangeMultiplier_;}
+      virtual const double& lagrangeMultiplier() const {return lagrangeMultiplier_;}
+      virtual double& flux() {return flux_;}
+      virtual const double& flux() const {return flux_;}
+      virtual string dynamicsName() const {return "ConstrainedBoundaryLangevin";}
+    protected:
+      double lagrangeMultiplier_;
+      double flux_;
   };
 
 }

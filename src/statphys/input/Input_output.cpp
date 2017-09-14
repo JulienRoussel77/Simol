@@ -328,16 +328,16 @@ namespace simol
   {return (systemName() == "Isolated") || (systemName() == "Chain") || (systemName() == "Colloid");}
   
   bool Input::doMidFlow() const
-  {return dynamicsName() == "BoundaryLangevin";}
+  {return dynamicsName() == "BoundaryLangevin" || dynamicsName() == "ConstrainedBoundaryLangevin";}
   
   bool Input::doSumFlow() const
-  {return dynamicsName() == "BoundaryLangevin";}
+  {return dynamicsName() == "BoundaryLangevin" || dynamicsName() == "ConstrainedBoundaryLangevin";}
   
   bool Input::doModiFlow() const
-  {return dynamicsName() == "BoundaryLangevin";}
+  {return dynamicsName() == "BoundaryLangevin" || dynamicsName() == "ConstrainedBoundaryLangevin";}
   
   bool Input::doLagrangeMultiplier() const
-  {return dynamicsName() == "ConstrainedLangevin";}
+  {return dynamicsName() == "ConstrainedLangevin" || dynamicsName() == "ConstrainedBoundaryLangevin";}
   
   bool Input::doOutThermo() const
   {return true;}  
@@ -352,7 +352,7 @@ namespace simol
   {return true;}
   
   bool Input::doOutChain() const
-  {return dynamicsName() == "BoundaryLangevin";}
+  {return dynamicsName() == "BoundaryLangevin" || dynamicsName() == "ConstrainedBoundaryLangevin";;}
   
   bool Input::doFinalLength() const
   {
@@ -382,18 +382,18 @@ namespace simol
       if (sameLetters(data["Output"]["DoFinalFlow"].as<string>(), "yes"))
         return true;
     return false;*/
-    return dynamicsName() == "BoundaryLangevin"; 
+    return dynamicsName() == "BoundaryLangevin" || dynamicsName() == "ConstrainedBoundaryLangevin";; 
   }  
   
   bool Input::doFinalLagrangeMultiplier() const
   {
-    return dynamicsName() == "ConstrainedLangevin"; 
+    return dynamicsName() == "ConstrainedLangevin" || dynamicsName() == "ConstrainedBoundaryLangevin"; 
   }  
   
-  bool Input::doFinalChainLagrangeMultiplier() const
+  /*bool Input::doFinalChainLagrangeMultiplier() const
   {
     return dynamicsName() == "ConstrainedBoundaryLangevin"; 
-  }  
+  }*/
   
   bool Input::doOutVelocitiesGenerator() const
   {return controlVariateName() != "None";}

@@ -61,6 +61,7 @@ namespace simol
   void simulate(Langevin& dyna           , System& syst);
   void simulate(ConstrainedLangevin& dyna, System& syst);
   void simulate(BoundaryLangevin& dyna   , System& syst);
+  void simulate(ConstrainedBoundaryLangevin& dyna, System& syst);
   void simulate(DPDE& dyna               , System& syst);
   
   void computeOutput(Dynamics const& dyna, System const& syst, Output& output, long int iOfStep);

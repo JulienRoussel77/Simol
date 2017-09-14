@@ -128,30 +128,60 @@ namespace simol
     particle1.energyLapla() = lapla12;    // v"(q_2 - q_1)
   }
   
-  /*//###### BulkDrivenBichain ######
-  
-  ///
-  /// Construct a Chain with nearest-neighbor interactions
-  /// The 0 means that there is 0 "wall particles" : the ends are free
-  BulkDrivenBiChain::BulkDrivenBiChain(Input const& input):
-    BiChain(input)
-  {}
-  
-  ///Computes the force and the energy associated to this pair interaction, and updates these 2 fields
-  ///The first 2 derivates of the potential are stored in "particle2"
-  void BulkDrivenBiChain::interaction(Particle& particle1, Particle& particle2) const
+  double BiChain::leftHeatFlow(int iOfLink) const
   {
-    double r12 = particle2.position(0) - particle1.position(0);
-    double energy12 = pairPotential()(r12);
-    double force12 = pairPotential_->scalarPotentialForce(r12);    // = - v'(q_2 - q_1)
-    double lapla12 = pairPotential_->laplacian(r12);  // v"(q_2 - q_1)
+    return - getParticle(iOfLink).momentum(0) / getParticle(iOfLink).mass() * getParticle(iOfLink).energyGrad(0);
+  }
+  
+  double BiChain::rightHeatFlow(int iOfLink) const
+  {
+    return - getParticle(iOfLink+1).momentum(0) / getParticle(iOfLink+1).mass() * getParticle(iOfLink).energyGrad(0);
+  }
+  
+  double BiChain::heatFlow(int iOfLink) const
+  {
+    /*if (iOfLink == -1)
+      return dynaPara.gamma() / getParticle(iOfLink).mass() * (dynaPara.temperatureLeft() - pow(getParticle(iOfLink).momentum(0), 2) / getParticle(iOfLink).mass());
+    else if (iOfLink == nbOfParticles()-1)
+      return dynaPara.gamma() / getParticle(iOfLink).mass() * ( - pow(getParticle(iOfLink).momentum(0), 2) / getParticle(iOfLink).mass() - dynaPara.temperatureRight());
+    else*/
+    return (leftHeatFlow(iOfLink) + rightHeatFlow(iOfLink))/2;
+  }
+  
+  double BiChain::computeSumFlow() const
+  {    
+    double sumFlow = 0;    
+    for (int iOfLink = 0; iOfLink < nbOfParticles()-1; iOfLink++)
+      sumFlow += heatFlow(iOfLink);      
+    return sumFlow / (nbOfParticles() - 1.);
+  }
+  
+  
+  
+  void BiChain::enforceConstraint(double& lagrangeMultiplier, double flux, DynamicsParameters const& dynaPara)
+  {
+    //double blueMeanVelocity = 0;
+    //double redMeanVelocity = 0;
+    
+    double instantFlux = computeSumFlow();
+    cout << "flux = " << instantFlux << endl;
+    double sensibility = pow(getParticle(0).energyGrad(0), 2) + pow(getParticle(nbOfParticles()-2).energyGrad(0), 2);
+    for (int iOfParticle = 1; iOfParticle < nbOfParticles()-1; iOfParticle++)
+      sensibility += pow(getParticle(iOfParticle-1).energyGrad(0) + getParticle(iOfParticle).energyGrad(0), 2);
+      
+    //cout << "flux before = " << flux << " compared to drift = " << drift << endl;
+    
+    double localLagrangeMultiplier = -(nbOfParticles()-1)*getParticle(0).mass()*dynaPara.temperature() * (instantFlux - flux) / sensibility;
 
-    particle1.potentialEnergy() = energy12;
-    particle1.force(0) -= (1+particle1.bulkDriving())*force12;
-    particle2.force(0) = (1-particle2.bulkDriving())*force12;    // /!\ Becareful here we assume that the particles are visited in a certain order
-    particle1.energyGrad(0) = -force12;    // v'(q_2 - q_1)
-    particle1.energyLapla() = lapla12;    // v"(q_2 - q_1)
-  }*/
+    getParticle(0).momentum(0) -= localLagrangeMultiplier * getParticle(0).energyGrad(0);
+    getParticle(nbOfParticles()-1).momentum(0) -= localLagrangeMultiplier * getParticle(nbOfParticles()-2).energyGrad(0);
+    for (int iOfParticle = 1; iOfParticle < nbOfParticles()-1; iOfParticle++)
+      getParticle(iOfParticle).momentum(0) -= localLagrangeMultiplier * (getParticle(iOfParticle-1).energyGrad(0) + getParticle(iOfParticle).energyGrad(0));
+    
+    lagrangeMultiplier += localLagrangeMultiplier;
+    
+    cout << computeSumFlow() << "=?=" << flux << endl;
+  }
 
   //###### TriChain ######
 
@@ -230,8 +260,5 @@ namespace simol
 
   double TriChain::boundaryPotEnergy() const
   {return getParticle(-2).potentialEnergy() + getParticle(-1).potentialEnergy();}
-
-
-
 
 }

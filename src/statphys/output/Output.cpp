@@ -42,7 +42,7 @@ namespace simol
     doFinalLength_(input.doFinalLength()),
     doFinalVelocity_(input.doFinalVelocity()),
     doFinalLagrangeMultiplier_(input.doFinalLagrangeMultiplier()),
-    doFinalChainLagrangeMultiplier_(input.doFinalChainLagrangeMultiplier()),
+    //doFinalChainLagrangeMultiplier_(input.doFinalChainLagrangeMultiplier()),
     doDPDE_(input.doDPDE()),
     doXMakeMol_(input.doXMakeMol()),
     fitModifFlow_(input.fitModiFlow()),

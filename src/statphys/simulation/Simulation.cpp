@@ -98,12 +98,12 @@ namespace simol
     double alpha = exp(- dyna.gamma() / syst(0).mass() * dyna.timeStep()/2);
     dyna.lagrangeMultiplier() += (1-alpha) * dyna.drift();
     double trash=0;
-    syst.enforceConstraint(trash, dyna.drift());
+    syst.enforceConstraint(trash, dyna.drift(), dyna.parameters());
     //syst.enforceConstraint(dyna.lagrangeMultiplier(), dyna.drift());
     
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
       dyna.updateMomentum(syst(iOfParticle));
-    syst.enforceConstraint(dyna.lagrangeMultiplier(), dyna.drift());
+    syst.enforceConstraint(dyna.lagrangeMultiplier(), dyna.drift(), dyna.parameters());
     
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
       dyna.updatePosition(syst(iOfParticle));
@@ -111,7 +111,7 @@ namespace simol
 
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
       dyna.verletSecondPart(syst(iOfParticle));
-    syst.enforceConstraint(dyna.lagrangeMultiplier(), dyna.drift());
+    syst.enforceConstraint(dyna.lagrangeMultiplier(), dyna.drift(), dyna.parameters());
     
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
       dyna.updateOrsteinUhlenbeck(syst(iOfParticle), dyna.beta(), dyna.timeStep()/2);
@@ -119,31 +119,13 @@ namespace simol
     // Becareful here we assume that all the particles share the same mass !
     // We analiticaly retermine the non-martingale part of the Lagrange multiplier
     dyna.lagrangeMultiplier() += (1-alpha) * dyna.drift();
-    syst.enforceConstraint(trash, dyna.drift());
+    syst.enforceConstraint(trash, dyna.drift(), dyna.parameters());
     //syst.enforceConstraint(dyna.lagrangeMultiplier(), dyna.drift());
     
     dyna.lagrangeMultiplier() /= dyna.timeStep();
   }
   
-  //------------ BoundaryLangevin ---------------
-  
-  void simulate(BoundaryLangevin& dyna, System& syst)
-  {
-    for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
-      dyna.verletFirstPart(syst(iOfParticle));
 
-    syst.computeAllForces();
-
-    for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
-      dyna.verletSecondPart(syst(iOfParticle));
-
-    dyna.updateOrsteinUhlenbeck(syst.getParticle(0), dyna.betaLeft(), dyna.timeStep());
-    dyna.updateOrsteinUhlenbeck(syst.getParticle(syst.nbOfParticles() - 1), dyna.betaRight(), dyna.timeStep());
-
-    if (dyna.doMomentaExchange())
-      for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles() - 1; iOfParticle++)
-        dyna.updateMomentaExchange(syst(iOfParticle), syst(iOfParticle + 1));
-  }
   
   /*//----------- Colloid -----------------
   

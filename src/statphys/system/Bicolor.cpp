@@ -63,7 +63,7 @@ namespace simol
     
   }
   
-  void Bicolor::enforceConstraint(double& lagrangeMultiplier, double drift)
+  void Bicolor::enforceConstraint(double& lagrangeMultiplier, double drift, DynamicsParameters const& /*dynaPara*/)
   {
     //double blueMeanVelocity = 0;
     //double redMeanVelocity = 0;
