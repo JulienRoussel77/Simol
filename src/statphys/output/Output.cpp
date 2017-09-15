@@ -611,9 +611,20 @@ namespace simol
   ///
   /// This output is such that the mobility can be estimated as the unbiased drift divided by the mean Lagrange multiplier
   void Output::displayFinalLagrangeMultiplier()
-  {
+  {              
     double finalMeanLM = obsLagrangeMultiplier().mean();
     double unbiasedDrift = ((nbOfParticles() - 1) * constDrift_ + finalMeanLM / constGamma_ ) / nbOfParticles();
+    
+    cout << outFinalLagrangeMultiplier_ << std::left << setw(10) << finalTime()
+                    << " " << setw(5) << timeStep()
+                    << " " << setw(6) << nbOfParticles()
+                    << " " << setw(4) << constTemperature_
+                    << " " << setw(6) << constDrift_
+                    << " " << setw(9) << unbiasedDrift
+                    << " " << setw(12) << obsLagrangeMultiplier().mean()
+                    << " " << setw(12) << obsLagrangeMultiplier().variance()
+                    << " " << setw(12) << obsLagrangeMultiplier().varOfVar();
+    
     outFinalLagrangeMultiplier() << std::left << setw(10) << finalTime()
                         << " " << setw(5) << timeStep()
                         << " " << setw(6) << nbOfParticles()

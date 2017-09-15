@@ -101,7 +101,7 @@ namespace simol
   /// For a FPU potential a,b,c : p1 = b, p2 = c and p3 = fitted stiffness
   void Output::displayFinalChainLagrangeMultiplier(double parameter1, double parameter2, double parameter3)
   {
-    cout << "outFinalFlow_ : " <<  std::left << setw(10) << finalTime()
+    cout << "outFinalChainLagrangeMultiplier_ : " <<  std::left << setw(10) << finalTime()
                      << " " << setw(5) << timeStep()
                      << " " << setw(6) << nbOfParticles()
                      << " " << setw(6) << constTemperature_
@@ -115,7 +115,7 @@ namespace simol
 
     //cout << "displayFinalFlow(double temperature, double delta_temperature, double tau)";
     if (doFinalFlow_)
-    {      
+    {
       outFinalLagrangeMultiplier() << std::left << setw(10) << finalTime()
                      << " " << setw(5) << timeStep()
                      << " " << setw(6) << nbOfParticles()
