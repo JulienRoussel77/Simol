@@ -31,6 +31,7 @@ namespace simol
     constNbOfPModes_(input.nbOfPModes()),
     constDrift_(input.drift()),
     constBulkDriving_(input.bulkDriving()),
+    constFlux_(input.flux()),
     totalEnergy_(0),
     totalVirial_(0),
     temperature_(0),

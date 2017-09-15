@@ -98,20 +98,20 @@ namespace simol
     }
   }
   
+  /// For a FPU potential a,b,c : p1 = b, p2 = c and p3 = fitted stiffness
   void Output::displayFinalChainLagrangeMultiplier(double parameter1, double parameter2, double parameter3)
   {
     cout << "outFinalFlow_ : " <<  std::left << setw(10) << finalTime()
                      << " " << setw(5) << timeStep()
                      << " " << setw(6) << nbOfParticles()
                      << " " << setw(6) << constTemperature_
-                     << " " << setw(6) << constDeltaTemperature_
-                     << " " << setw(6) << constBulkDriving_
+                     << " " << setw(6) << constFlux_
                      << " " << setw(6) << parameter1
                      << " " << setw(6) << parameter2
                      << " " << setw(6) << parameter3
-                     << " " << setw(12);
-    obsLagrangeMultiplier().displayFinalValues(outFinalLagrangeMultiplier());  
-    obsMidFlow().displayFinalValues(outFinalLagrangeMultiplier());
+                     << " " << setw(12) << obsLagrangeMultiplier().mean()
+                     << " " << setw(12) << obsLagrangeMultiplier().variance()
+                     << " " << setw(12) << obsLagrangeMultiplier().varOfVar();
 
     //cout << "displayFinalFlow(double temperature, double delta_temperature, double tau)";
     if (doFinalFlow_)
@@ -120,14 +120,13 @@ namespace simol
                      << " " << setw(5) << timeStep()
                      << " " << setw(6) << nbOfParticles()
                      << " " << setw(4) << constTemperature_
-                     << " " << setw(4) << constDeltaTemperature_
-                     << " " << setw(6) << constBulkDriving_
+                     << " " << setw(4) << constFlux_
                      << " " << setw(6) << parameter1
                      << " " << setw(6) << parameter2
                      << " " << setw(6) << parameter3
                      << " " << setw(12);
       obsLagrangeMultiplier().displayFinalValues(outFinalLagrangeMultiplier());  
-      obsMidFlow().displayFinalValues(outFinalLagrangeMultiplier());             
+      //obsMidFlow().displayFinalValues(outFinalLagrangeMultiplier());             
     }
   }
 

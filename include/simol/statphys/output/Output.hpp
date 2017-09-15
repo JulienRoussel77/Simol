@@ -234,6 +234,7 @@ namespace simol
     int constNbOfPModes_;
     double constDrift_;
     double const constBulkDriving_;
+    double const constFlux_;
     
   protected:
 
