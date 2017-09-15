@@ -78,7 +78,6 @@ namespace simol
     bool doFinalLength() const {return doFinalLength_;}
     bool doFinalVelocity() const {return doFinalVelocity_;}
     bool doFinalLagrangeMultiplier() const {return doFinalLagrangeMultiplier_;}
-    bool doFinalChainLagrangeMultiplier() const {return doFinalChainLagrangeMultiplier_;}
     bool doFinalFlow() const {return doFinalFlow_;}
     
     //-- fields to output --
@@ -252,7 +251,7 @@ namespace simol
     int decorrelationNbOfSteps_, shortDecorrelationNbOfSteps_;
     
     int nbOfAutocoPts_, nbOfShortAutocoPts_;
-    bool doFinalFlow_, doFinalLength_, doFinalVelocity_, doFinalLagrangeMultiplier_, doFinalChainLagrangeMultiplier_, doDPDE_, doXMakeMol_;
+    bool doFinalFlow_, doFinalLength_, doFinalVelocity_, doFinalLagrangeMultiplier_, doDPDE_, doXMakeMol_;
     bool fitModifFlow_;
     
   public:
