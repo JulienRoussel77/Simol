@@ -39,6 +39,7 @@ namespace simol
     shortDecorrelationNbOfSteps_(input.shortDecorrelationNbOfSteps()),
     nbOfAutocoPts_(input.nbOfAutocoPts()),
     nbOfShortAutocoPts_(input.nbOfShortAutocoPts()),
+    doOutChain_(input.doOutChain()),
     doFinalFlow_(input.doFinalFlow()),
     doFinalLength_(input.doFinalLength()),
     doFinalVelocity_(input.doFinalVelocity()),
@@ -615,7 +616,7 @@ namespace simol
     double finalMeanLM = obsLagrangeMultiplier().mean();
     double unbiasedDrift = ((nbOfParticles() - 1) * constDrift_ + finalMeanLM / constGamma_ ) / nbOfParticles();
     
-    cout << outFinalLagrangeMultiplier_ << std::left << setw(10) << finalTime()
+    cout << "outFinalLagrangeMultiplier_" << std::left << setw(10) << finalTime()
                     << " " << setw(5) << timeStep()
                     << " " << setw(6) << nbOfParticles()
                     << " " << setw(4) << constTemperature_

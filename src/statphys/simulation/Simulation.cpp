@@ -225,7 +225,7 @@ namespace simol
       if (output.doOutChain())
         output.displayFinalChainLagrangeMultiplier(syst.potParameter1(), syst.potParameter2());
       else
-        output.displayFinalLagrangeMultiplier();
+        output.displayFinalLagrangeMultiplier();        
     }
   }
   
