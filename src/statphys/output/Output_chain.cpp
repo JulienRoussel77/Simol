@@ -116,7 +116,7 @@ namespace simol
     //cout << "displayFinalFlow(double temperature, double delta_temperature, double tau)";
     if (doFinalFlow_)
     {      
-      outFinalFlow() << std::left << setw(10) << finalTime()
+      outFinalLagrangeMultiplier() << std::left << setw(10) << finalTime()
                      << " " << setw(5) << timeStep()
                      << " " << setw(6) << nbOfParticles()
                      << " " << setw(4) << constTemperature_
