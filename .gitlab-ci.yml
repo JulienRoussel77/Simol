@@ -1,7 +1,7 @@
 stages:
 - build
 
-build_job:
+osx10_clang_job:
     stage: build
     tags: 
     - simol-osx10-clang
@@ -9,6 +9,16 @@ build_job:
     - mv cmake/config/config-ci.cmake cmake/config/config.cmake
     - mkdir -p build
     - cd build
-    - cmake ..
+    - cmake -D CMAKE_CXX_COMPILER=clang ..
     - make
 
+ubuntu16_gcc_job:
+    stage: build
+    tags: 
+    - simol-ubuntu16-gcc
+    script:
+     mv cmake/config/config-ci.cmake cmake/config/config.cmake
+    - mkdir -p build
+    - cd build
+    - cmake -D CMAKE_CXX_COMPILER=gcc ..
+    - make
