@@ -9,7 +9,7 @@ osx10_clang_job:
     - mv cmake/config/config-ci.cmake cmake/config/config.cmake
     - mkdir -p build
     - cd build
-    - cmake -D CMAKE_CXX_COMPILER=clang ..
+    - cmake ..
     - make
     
 ubuntu16_gcc_job:
@@ -17,8 +17,8 @@ ubuntu16_gcc_job:
     tags:
     - simol-ubuntu16-gcc
     script:
-    - mv cmake/config/config-ci.cmake cmake/config/config/cmake
+    - mv cmake/config/config-ci.cmake cmake/config/config.cmake
     - mkdir -p build
     - cd build
-    - cmake -D CMAKE_CXX_COMPILER=gcc ..
+    - cmake ..
     - make
