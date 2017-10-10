@@ -11,13 +11,13 @@ osx10_clang_job:
     - cd build
     - cmake -D CMAKE_CXX_COMPILER=clang ..
     - make
-
+    
 ubuntu16_gcc_job:
     stage: build
-    tags: 
+    tags:
     - simol-ubuntu16-gcc
     script:
-     mv cmake/config/config-ci.cmake cmake/config/config.cmake
+    - mv cmake/config/config-ci.cmake cmake/config/config/cmake
     - mkdir -p build
     - cd build
     - cmake -D CMAKE_CXX_COMPILER=gcc ..
