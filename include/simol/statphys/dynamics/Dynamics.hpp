@@ -13,6 +13,7 @@
 
 #include "simol/statphys/system/System.hpp"
 #include "simol/statphys/dynamics/DynamicsParameters.hpp"
+#include "simol/statphys/controlVariate/Operator.hpp"
 
 namespace simol
 {
@@ -79,8 +80,6 @@ namespace simol
       //shared_ptr<CVBasis> cvBasis();
       //return CVBasis(dynamic_cast<TensorBasis*>(&basis_), make_shared<DVec>(CVcoeffsVec()));
       
-      virtual void computeGeneratorOnBasis(shared_ptr<CVBasis>, System const&) const {};
-      
       
       virtual double& lagrangeMultiplier() {throw runtime_error("resetConstraint not implemented for this system !");}
       virtual const double& lagrangeMultiplier() const {throw runtime_error("resetConstraint not implemented for this system !");}
@@ -98,8 +97,8 @@ namespace simol
       DynamicsParameters parameters_;
       double timeStep_;
       long int nbOfSteps_, thermalizationNbOfSteps_, burninNbOfSteps_;
-      double beta_;
-      double temperature_;
+      //double beta_;
+      //double temperature_;
       std::shared_ptr<RNG> rng_;
   };
 

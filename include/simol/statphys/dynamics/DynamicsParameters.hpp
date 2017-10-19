@@ -19,7 +19,10 @@ namespace simol
       gamma_(input.gamma()),
       tauBending_(input.tauBending()),
       interactionRatio_(input.interactionRatio()),
-      bulkDriving_(input.bulkDriving())
+      bulkDriving_(input.bulkDriving()),
+      mass_(input.mass()),
+      nonEqAmplitude_(input.nonEqAmplitude()),
+      xi_(input.xi())
     {}
     const double& temperature() const {return temperature_;}
     const double& temperatureLeft() const {return temperatureLeft_;}
@@ -32,7 +35,13 @@ namespace simol
     const double& tauBending() const {return tauBending_;}
     const double& interactionRatio() const {return interactionRatio_;}
     const double& bulkDriving() const {return bulkDriving_;}
-
+    const double& mass() const {return mass_;}
+    const double& nonEqAmplitude() const {return nonEqAmplitude_;}
+    const int& nbOfQModes() const {return nbOfQModes_;}
+    const int& nbOfPModes() const {return nbOfPModes_;}
+    const double& drift() const {return drift_;}
+    const double& flux() const {return flux_;}
+    const double& xi() const {return xi_;}
   private:
     double beta_;
     double temperature_;
@@ -45,7 +54,12 @@ namespace simol
     double tauBending_;
     double interactionRatio_;
     double bulkDriving_;
-
+    double mass_;
+    double nonEqAmplitude_;
+    int nbOfQModes_, nbOfPModes_;
+    double drift_;
+    double flux_;
+    double xi_;
   };
 
 }

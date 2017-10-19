@@ -178,7 +178,9 @@ namespace simol
     bool doGalerkinNonequilibrium() const;
     bool doComputeRef() const;
     bool fitModiFlow() const;
+    string CVOperator() const;
     double omegaHermite() const;
+    double meshStep() const;
     double integrationStep() const;
     double integrationQMin() const;
     double integrationLength() const;

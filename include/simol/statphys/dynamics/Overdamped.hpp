@@ -14,7 +14,6 @@ namespace simol
       virtual void updatePosition(Particle& particle);
       virtual void getThermo(Output& output) const;
       virtual void getPressure(Output& output) const;
-      virtual void computeGeneratorOnBasis(shared_ptr<CVBasis> cvBasis, System const& syst) const;
   };
 
 }

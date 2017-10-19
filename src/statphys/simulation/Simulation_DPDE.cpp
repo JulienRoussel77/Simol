@@ -67,7 +67,7 @@ namespace simol
     else if (syst.name() == "NBody")
       {
 	//-- fluctuation/dissipation --
-	if (dyna.gamma() > 0)
+	if (dyna.parameters().gamma() > 0)
 	  dyna.fluctuationDissipation(syst);
 	//-- thermal conduction --
 	if (dyna.kappa() > 0)

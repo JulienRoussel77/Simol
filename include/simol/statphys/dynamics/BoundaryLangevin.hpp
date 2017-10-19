@@ -27,12 +27,12 @@ namespace simol
       virtual void computeProfileBiChain(Output& output, System const& syst, long int iOfStep) const;
       virtual void computeProfileTriChain(Output& output, System const& syst, long int iOfStep) const;
     protected:
-      double deltaTemperature_;
+      /*double deltaTemperature_;
       double temperatureLeft_;
       double temperatureRight_;
       double betaLeft_;
       double betaRight_;
-      double tauBending_;
+      double tauBending_;*/
   };
   
   
@@ -42,12 +42,11 @@ namespace simol
       ConstrainedBoundaryLangevin(Input const& input);
       virtual double& lagrangeMultiplier() {return lagrangeMultiplier_;}
       virtual const double& lagrangeMultiplier() const {return lagrangeMultiplier_;}
-      virtual double& flux() {return flux_;}
-      virtual const double& flux() const {return flux_;}
+      virtual const double& flux() const {return parameters_.flux();}
       virtual string dynamicsName() const {return "ConstrainedBoundaryLangevin";}
     protected:
       double lagrangeMultiplier_;
-      double flux_;
+      //double flux_;
   };
 
 }

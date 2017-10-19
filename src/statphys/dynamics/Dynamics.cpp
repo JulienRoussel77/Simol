@@ -1,5 +1,5 @@
-#ifndef SIMOL_DYNAMICS_IPP
-#define SIMOL_DYNAMICS_IPP
+//#ifndef SIMOL_DYNAMICS_IPP
+//#define SIMOL_DYNAMICS_IPP
 
 #include "simol/statphys/dynamics/Dynamics.hpp"
 
@@ -18,9 +18,9 @@ namespace simol
     timeStep_(input.timeStep()),
     nbOfSteps_(input.nbOfSteps()),
     thermalizationNbOfSteps_(input.thermalizationNbOfSteps()),
-    burninNbOfSteps_(input.burninNbOfSteps()),
-    beta_(input.beta()),
-    temperature_(1 / beta_)
+    burninNbOfSteps_(input.burninNbOfSteps())
+    //beta_(input.beta()),
+    //temperature_(1 / beta_)
   {}
 
 
@@ -60,13 +60,13 @@ namespace simol
 
   ///
   ///Returns the temperature
-  double const& Dynamics::temperature() const {return temperature_;}
+  double const& Dynamics::temperature() const {return parameters_.temperature();}
   ///
   ///Read-only access for the temperature
-  double const& Dynamics::temperatureLeft() const {return temperature_;}
+  double const& Dynamics::temperatureLeft() const {return parameters_.temperatureLeft();}
   ///
   ///Read-only access for the temperature
-  double const& Dynamics::temperatureRight() const {return temperature_;}
+  double const& Dynamics::temperatureRight() const {return parameters_.temperatureRight();}
   ///Returns the difference between the mean temperature and the one at the left end
   ///This is equal to {eta}
   double Dynamics::deltaTemperature() const
@@ -75,13 +75,13 @@ namespace simol
   }
   ///
   ///Read-only access for the inverse temperature
-  double const& Dynamics::beta() const {return beta_;}
+  double const& Dynamics::beta() const {return parameters_.beta();}
   ///
   ///Read-only access for the inverse temperature
-  double const& Dynamics::betaLeft() const {return beta_;}
+  double const& Dynamics::betaLeft() const {return parameters_.betaLeft();}
   ///
   ///Read-only access for the inverse temperature
-  double const& Dynamics::betaRight() const {return beta_;}
+  double const& Dynamics::betaRight() const {return parameters_.betaRight();}
 
 
   /*shared_ptr<CVBasis> Dynamics::cvBasis() 
@@ -172,4 +172,4 @@ namespace simol
 
 
 }
-#endif
+//#endif

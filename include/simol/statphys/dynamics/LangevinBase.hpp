@@ -12,7 +12,6 @@ namespace simol
       
       virtual const double& gamma() const;
       virtual const double& xi() const;
-      virtual double& xi();
       int xiNbOfSteps();
       virtual bool doMomentaExchange() const;
       virtual void initializeCountdown(Particle& particle);
@@ -22,8 +21,8 @@ namespace simol
       virtual void getPressure(Output& output) const;
     protected:
       LangevinBase(Input const& input);
-      double gamma_;
-      double xi_;
+      //double gamma_;
+      //double xi_;
   };
 
 

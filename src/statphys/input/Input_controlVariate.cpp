@@ -129,6 +129,15 @@ namespace simol
     return false;
   }
   
+  string Input::CVOperator() const
+  {
+    if (data["ControlVariate"])
+      if (data["ControlVariate"]["Operator"])
+        return data["ControlVariate"]["Operator"].as<string>();
+
+    return dynamicsName();
+  }
+  
   double Input::omegaHermite() const
   {
     if (data["Basis"])
@@ -136,6 +145,16 @@ namespace simol
         return data["Basis"]["Omega"].as<double>();
 
     return 1;
+    //throw std::invalid_argument("Number of Fourier modes missing");
+  }
+  
+  double Input::meshStep() const
+  {
+    if (data["Basis"])
+      if (data["Basis"]["MeshStep"])
+        return data["Basis"]["MeshStep"].as<double>();
+
+    return 0;
     //throw std::invalid_argument("Number of Fourier modes missing");
   }
   

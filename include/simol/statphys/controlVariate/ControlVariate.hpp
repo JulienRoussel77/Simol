@@ -102,7 +102,7 @@ namespace simol
       void appendToB1(double value);
       void appendToB2(double value, long int iOfStep);
       void appendToD();
-      void appendToBetter(double value, long int iOfStep);
+      virtual void appendToBetter(double value, long int iOfStep);
 
       virtual void append(double value, long int iOfStep);
 
@@ -173,23 +173,13 @@ namespace simol
       virtual void displayGradPMap(ofstream& out) const;*/
   };
   
-  /*class HermiteHermiteControlVariate : public BasisControlVariate
+  class UnderdampedControlVariate : public ControlVariate
   {
     public:
-      HermiteHermiteControlVariate(const Input& input, int idObs, shared_ptr<CVBasis> cvBasis0);
+      UnderdampedControlVariate(const Input& input, int idObs, shared_ptr<CVBasis> cvBasis0);
+      void appendToBetter(double observable, long int iOfStep);
+      double value(System const& syst) const;
   };
-  
-  class ExpHermiteHermiteControlVariate : public BasisControlVariate
-  {
-    public:
-      ExpHermiteHermiteControlVariate(const Input& input, int idObs, shared_ptr<CVBasis> cvBasis0);
-  };
-    
-  class QuadraticHermiteControlVariate : public BasisControlVariate
-  {
-    public:
-      QuadraticHermiteControlVariate(const Input& input, int idObs, shared_ptr<CVBasis> cvBasis0);
-  };*/
 }
 
 #endif

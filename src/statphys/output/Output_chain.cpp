@@ -56,9 +56,9 @@ namespace simol
     cout << "outFinalFlow_ : " <<  std::left << setw(10) << finalTime()
                      << " " << setw(5) << timeStep()
                      << " " << setw(6) << nbOfParticles()
-                     << " " << setw(6) << constTemperature_
-                     << " " << setw(6) << constDeltaTemperature_
-                     << " " << setw(6) << constBulkDriving_
+                     << " " << setw(6) << parameters_.temperature()
+                     << " " << setw(6) << parameters_.deltaTemperature()
+                     << " " << setw(6) << parameters_.bulkDriving()
                      << " " << setw(6) << parameter1
                      << " " << setw(6) << parameter2
                      << " " << setw(6) << parameter3
@@ -79,9 +79,9 @@ namespace simol
       outFinalFlow() << std::left << setw(10) << finalTime()
                      << " " << setw(5) << timeStep()
                      << " " << setw(6) << nbOfParticles()
-                     << " " << setw(4) << constTemperature_
-                     << " " << setw(4) << constDeltaTemperature_
-                     << " " << setw(6) << constBulkDriving_
+                     << " " << setw(4) << parameters_.temperature()
+                     << " " << setw(4) << parameters_.deltaTemperature()
+                     << " " << setw(6) << parameters_.bulkDriving()
                      << " " << setw(6) << parameter1
                      << " " << setw(6) << parameter2
                      << " " << setw(6) << parameter3
@@ -104,8 +104,8 @@ namespace simol
     cout << "outFinalChainLagrangeMultiplier_ : " <<  std::left << setw(10) << finalTime()
                      << " " << setw(5) << timeStep()
                      << " " << setw(6) << nbOfParticles()
-                     << " " << setw(6) << constTemperature_
-                     << " " << setw(6) << constFlux_
+                     << " " << setw(6) << parameters_.temperature()
+                     << " " << setw(6) << parameters_.flux()
                      << " " << setw(6) << parameter1
                      << " " << setw(6) << parameter2
                      << " " << setw(6) << parameter3
@@ -119,8 +119,8 @@ namespace simol
       outFinalLagrangeMultiplier() << std::left << setw(10) << finalTime()
                      << " " << setw(5) << timeStep()
                      << " " << setw(6) << nbOfParticles()
-                     << " " << setw(4) << constTemperature_
-                     << " " << setw(4) << constFlux_
+                     << " " << setw(4) << parameters_.temperature()
+                     << " " << setw(4) << parameters_.flux()
                      << " " << setw(6) << parameter1
                      << " " << setw(6) << parameter2
                      << " " << setw(6) << parameter3

@@ -903,7 +903,7 @@ namespace simol
   
   QuadraticBasis::QuadraticBasis(Input const& input, Potential* potential0):
     QBasis(input, potential0),
-    meshStep_(0.001),
+    meshStep_(input.meshStep()),
     xmin_(0),
     nbOfNodes_(1),
     basisVal_(DVec::Zero(nbOfNodes_)),     // defined in x_n = n*dx
@@ -941,12 +941,6 @@ namespace simol
     //cout << "-----" << endl;
     int iOfNode = indexOfNode(variable);
     double deltaVariable = variable - (xmin_ + iOfNode * meshStep_);
-    /*cout << variable << endl;
-    cout << iOfNode << endl;
-    cout << deltaVariable << endl;
-    cout << basisVal_[iOfNode] << endl;
-    cout << gradVal_[iOfNode] << endl;
-    cout << laplaVal_[iOfNode] << endl;*/
     return basisVal_[iOfNode] + deltaVariable * gradVal_[iOfNode] + pow(deltaVariable, 2)/2 * laplaVal_[iOfNode];
   }
   
@@ -954,7 +948,7 @@ namespace simol
   {
     int iOfNode = indexOfNode(variable);
     double deltaVariable = variable - (xmin_ + iOfNode * meshStep_);
-    return DVec::Constant(1, 1, gradVal_[iOfNode] + deltaVariable * laplaVal_[iOfNode]);    
+    return DVec::Constant(1, 1, gradVal_[iOfNode] + deltaVariable * laplaVal_[iOfNode]);
   }
   
   double QuadraticBasis::laplacian(double variable, int) const

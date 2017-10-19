@@ -97,12 +97,12 @@ namespace simol
   //-- for 1D systems --
   double DPDE::gamma_DPDE(double intEnergy)
   {
-    return gamma_ * heatCapacity() * temperature() / intEnergy;
+    return parameters_.gamma() * heatCapacity() * parameters_.temperature() / intEnergy;
   }
 
   double DPDE::sigma() const
   {
-    return sqrt(2 * gamma_ * temperature());
+    return sqrt(2 * parameters_.gamma() * parameters_.temperature());
   }
 
   //-- for Metropolis procedures --
@@ -157,8 +157,8 @@ namespace simol
   {
     double effectiveTimeStep = MTSfrequency_*timeStep_;
     // Ornstein-Uhlenbeck process on the momenta
-    double alpha = exp(- gamma_ / particle.mass() * effectiveTimeStep);
-    particle.momentum() = alpha * particle.momentum() + sqrt((1 - pow(alpha, 2)) / beta_ * particle.mass()) * rng_->gaussian();
+    double alpha = exp(- parameters_.gamma() / particle.mass() * effectiveTimeStep);
+    particle.momentum() = alpha * particle.momentum() + sqrt((1 - pow(alpha, 2)) / parameters_.beta() * particle.mass()) * rng_->gaussian();
     //---- update of the internal energies; requires metropolization; also use timestep "adapted" to cv. rate of the dynamics; 
     //     and with possibly different temperature than Hamiltonian d.o.f. in order to perform equilibration ---- 
     effectiveTimeStep *= heatCapacity();
@@ -188,7 +188,7 @@ namespace simol
     double local_gamma_DPDE = gamma_DPDE(particle.internalEnergy());
     double alpha = exp(- local_gamma_DPDE / particle.mass() * timeStep_);
     particle.momentum() = alpha * particle.momentum() 
-      + sqrt((1 - pow(alpha, 2)) * particle.mass() * temperature() * gamma() / local_gamma_DPDE) * rng_->gaussian();
+      + sqrt((1 - pow(alpha, 2)) * particle.mass() * parameters_.temperature() * parameters_.gamma() / local_gamma_DPDE) * rng_->gaussian();
     double new_kin_energy = particle.kineticEnergy();
     particle.internalEnergy() += old_kin_energy - new_kin_energy;
   }
@@ -214,7 +214,7 @@ namespace simol
     // SSA like scheme: should be better
     double gamma_n = gamma_DPDE(E0-old_kin_energy);
     double alpha = exp(-gamma_n / particle.mass() * timeStep_);
-    double sigma_n = sqrt((1 - pow(alpha, 2)) * particle.mass() * temperature() * gamma() / gamma_n);
+    double sigma_n = sqrt((1 - pow(alpha, 2)) * particle.mass() * parameters_.temperature() * parameters_.gamma() / gamma_n);
     particle.momentum() = alpha * old_momentum + sigma_n * G;
     //-- compute the Metropolis rate --
     double new_kin_energy = particle.kineticEnergy();
@@ -224,7 +224,7 @@ namespace simol
 	rate = heatCapacity()*(log(E0-new_kin_energy)-log(E0-old_kin_energy)) + 0.5*pow(G.norm(), 2); 
     	double gamma_reverse = gamma_DPDE(E0-new_kin_energy);
     	double alpha_reverse = exp(-gamma_reverse / particle.mass() * timeStep_);
-    	double sigma2_reverse = (1 - pow(alpha_reverse,2)) * particle.mass() * temperature() * gamma() / gamma_reverse; 
+    	double sigma2_reverse = (1 - pow(alpha_reverse,2)) * particle.mass() * parameters_.temperature() * parameters_.gamma() / gamma_reverse; 
     	DVec GG = old_momentum - alpha_reverse*particle.momentum();
 	rate -= 0.5*pow(GG.norm(), 2)/sigma2_reverse;
     	rate = exp(rate)*sigma_n/sqrt(sigma2_reverse);
@@ -262,10 +262,10 @@ namespace simol
       {
 	double effectiveTimeStep = MTSfrequency_*timeStep_;
 	double chi_n = chi(dist);
-	double gamma_n = 0.5 * gamma() * temperature() * (entropy_derivative(internalEnergy1) + entropy_derivative(internalEnergy2));
+	double gamma_n = 0.5 * parameters_.gamma() * parameters_.temperature() * (entropy_derivative(internalEnergy1) + entropy_derivative(internalEnergy2));
 	double alpha_n = exp(- gamma_n * pow(chi_n,2)/reduced_mass * effectiveTimeStep);
 	double G = rng_->scalarGaussian();
-	double sigma_n = sqrt((1 - pow(alpha_n, 2)) * temperature() * gamma() / (gamma_n * reduced_mass ) );
+	double sigma_n = sqrt((1 - pow(alpha_n, 2)) * parameters_.temperature() * parameters_.gamma() / (gamma_n * reduced_mass ) );
 	double new_v12 = alpha_n * v12 +  sigma_n * G;
 	// update the rate for accept/reject correction
 	rejectionRate() = 0.5*pow(G, 2) + log(sigma_n);
@@ -288,9 +288,9 @@ namespace simol
 	double E2 = internalEnergy2 - Delta_v2;
 	rejectionRate() += entropy(E1) + entropy(E2) - entropy(internalEnergy1) - entropy(internalEnergy2); 
 	double chi_n = chi(dist);
-	double gamma_reverse = 0.5 * gamma() * temperature() * (entropy_derivative(E1) + entropy_derivative(E2));
+	double gamma_reverse = 0.5 * parameters_.gamma() * parameters_.temperature() * (entropy_derivative(E1) + entropy_derivative(E2));
 	double alpha_reverse = exp(- gamma_reverse * pow(chi_n,2)/reduced_mass * effectiveTimeStep);
-	double sigma_reverse = sqrt((1 - pow(alpha_reverse, 2)) * temperature() * gamma() / (gamma_reverse*reduced_mass) );
+	double sigma_reverse = sqrt((1 - pow(alpha_reverse, 2)) * parameters_.temperature() * parameters_.gamma() / (gamma_reverse*reduced_mass) );
 	double GG = (alpha_reverse*v12_current - v12_init)/sigma_reverse;
 	rejectionRate() -= 0.5*pow(GG, 2) + log(sigma_reverse);
 	rejectionRate() = exp(rejectionRate());

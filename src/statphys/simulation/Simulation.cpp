@@ -167,7 +167,7 @@ namespace simol
     if (output.obsLagrangeMultiplier_) output.lagrangeMultiplier() = dyna.lagrangeMultiplier();
     dyna.getThermo(output);
     
-    if (output.hasControlVariate()) computeControlVariate(dyna, syst, output);
+    if (output.hasControlVariate()) computeControlVariate(syst, output);
     
     //cout << "sumFlow = " << output.obsSumFlow().currentValue() << endl;
     
@@ -178,10 +178,11 @@ namespace simol
     dyna.specificComputeOutput(output);
   }
   
-  void computeControlVariate(Dynamics const& dyna, System const& syst, Output& output)
+  void computeControlVariate(System const& syst, Output& output)
   {
     output.cvBasis_->computeValueBasis(syst);
-    dyna.computeGeneratorOnBasis(output.cvBasis_, syst);
+    output.cvBasis_->computeValueGeneratorOnBasis(syst);
+    //output.cvBasis_->generator_->value(output.cvBasis_, syst, dyna.parameters());
   }
   
   //------------------- writeOutput and its specifications by dynamics ---------------------------

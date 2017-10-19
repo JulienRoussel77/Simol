@@ -10,6 +10,7 @@
 #include "simol/statphys/controlVariate/Galerkin.hpp"
 #include "simol/statphys/output/Observable.hpp"
 #include "simol/statphys/controlVariate/CVBasis.hpp"
+#include "simol/statphys/dynamics/DynamicsParameters.hpp"
 
 namespace simol
 {
@@ -220,7 +221,7 @@ namespace simol
     double latticeParameter_;
     
   public:
-    double constTemperature_;
+    /*double constTemperature_;
     double constTemperatureLeft_;
     double constTemperatureRight_;
     double constDeltaTemperature_;
@@ -233,7 +234,8 @@ namespace simol
     int constNbOfPModes_;
     double constDrift_;
     double const constBulkDriving_;
-    double const constFlux_;
+    double const constFlux_;*/
+    DynamicsParameters parameters_;
     
   protected:
 

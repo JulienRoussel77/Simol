@@ -65,7 +65,7 @@ namespace simol
   void simulate(DPDE& dyna               , System& syst);
   
   void computeOutput(Dynamics const& dyna, System const& syst, Output& output, long int iOfStep);
-  void computeControlVariate(Dynamics const& dyna, System const& syst, Output& output);
+  void computeControlVariate(System const& syst, Output& output);
   void writeOutput(Dynamics const& dyna, System const& syst , Output& output, long int iOfStep);
   void writeFinalOutput(System const& syst, Output& output);
   
@@ -79,6 +79,7 @@ namespace simol
     system_(createSystem(input)),
     dynamics_(input),
     cvBasis_(createCVBasis(input)),
+    //cvBasis_(input, make_shared<DynamicsParameters>(dynamics_.parameters())),
     galerkin_(createGalerkin(input, cvBasis_)),
     output_(input, cvBasis_)
   {

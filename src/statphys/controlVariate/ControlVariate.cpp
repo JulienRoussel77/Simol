@@ -20,15 +20,7 @@ namespace simol
       return new BasisControlVariate(input, idObs, cvBasis0);
     else
       throw runtime_error(input.controlVariateName() + " is not a valid control variate !");
-    return 0; 
-    
-      /*ExpFourierHermiteControlVariate(input, idObs, cvBasis0);
-    else if(input.controlVariateName() == "HermiteHermite")
-      return new HermiteHermiteControlVariate(input, idObs, cvBasis0);
-    else if(input.controlVariateName() == "ExpHermiteHermite")
-      return new ExpHermiteHermiteControlVariate(input, idObs, cvBasis0);
-    else if(input.controlVariateName() == "QuadraticHermite")
-      return new QuadraticHermiteControlVariate(input, idObs, cvBasis0);*/
+    return 0;
 
   }
 
@@ -252,9 +244,7 @@ namespace simol
     else
     {
       if (!cvBasis().cvCoeffs_) throw std::runtime_error("cvCoeffs is supposed to be initialized here !");
-      //cout << "---------> " << observable << " + " << dot(*cvBasis().cvCoeffs_, generatorOnBasisValues()) << endl;
-      //cout << "---------> " << *cvBasis().cvCoeffs_ << " X " << generatorOnBasisValues() << endl;
-      //cout << "ControlVariate::appendToBetter : " << observable + dot(*cvBasis().cvCoeffs_, generatorOnBasisValues()) << endl;
+      //DVec generatorOnBasisValues = generator_->value()
       autocoStatsBetter_.append(observable + dot(*cvBasis().cvCoeffs_, generatorOnBasisValues()), iOfStep);
     }
 
@@ -320,7 +310,6 @@ namespace simol
 
   ///
   ///Feed a new value to the Observable
-  /// /!\ an update*** method must be called beforehand
   void ControlVariate::append(double observable, long int iOfStep)
   {
     if (doEstimateCvCoeffs())
@@ -410,15 +399,6 @@ namespace simol
                        << " " << unbiasedCorrelationBetterAtSpan(iOfSpan)
                        << " " << sqrt(varCorrelationBetterAtSpan(iOfSpan) / (iOfStep * timeStep())) << endl;
     }
-    
-    /*for (int iOfSpan = nbOfAutocoPts(); iOfSpan < nbOfAutocoPts(); iOfSpan++)
-    {
-      outFluxCorrelation() << iOfSpan * autocoPtsPeriod()
-                       << " " << unbiasedCorrelationAtSpan(iOfSpan)
-                       << " " << sqrt(varCorrelationAtSpan(iOfSpan) / (iOfStep * timeStep()))
-                       << " " << 0
-                       << " " << 0 << endl;
-    }*/
   }
 
 
@@ -435,41 +415,12 @@ namespace simol
     return sin(2 * M_PI * q);
   }
 
-  /*DVec SinusControlVariate::gradientQ(System const& syst, int iOfParticle, int iOfFunction) const
-  {
-    double q = syst(0).position(0);
-    DVec grad(dimension_);
-    grad(0) = 2 * M_PI * cos(2 * M_PI * q);
-    return grad;
-  }
-
-  double SinusControlVariate::laplacianQ(System const& syst, int iOfParticle, int iOfFunction) const
-  {
-    double q = syst(0).position(0);
-    return - pow (2 * M_PI, 2) * sin(2 * M_PI * q);
-  }
-
-
-  double SinusControlVariate::laplacianP(System const&, int iOfParticle, int iOfFunction) const
-  {
-    return 0;
-  }
-
-  DVec SinusControlVariate::gradientP(System const&, int iOfParticle, int iOfFunction) const
-  {
-    return DVec(dimension_);
-  }*/
-
 
   //#####BasisControlVariate#####
 
   BasisControlVariate::BasisControlVariate(Input const& input, int idObs, shared_ptr<CVBasis> cvBasis0):
     ControlVariate(input, idObs, cvBasis0, 1)
-  {
-
-    //cout << "coeffsVec_ : " << endl;
-    //cout << coeffsVec_ << endl;
-  }
+  {}
   
   DVec const& BasisControlVariate::cvCoeffs() const
   {
@@ -497,7 +448,6 @@ namespace simol
 
   double BasisControlVariate::value(System const&) const
   {
-    //cout << "BasisControlVariate::value : " << dot(cvCoeffs(), basisValues()) << endl;
     return dot(cvCoeffs(), basisValues());
   }
   
@@ -516,49 +466,6 @@ namespace simol
         << endl;
   }
 
-  /*DMat BasisControlVariate::gradientQ(System const& syst, int iOfParticle, int iOfFunction) const
-  {
-    //cout << "BasisControlVariate::gradientQ" << endl;
-    DMat result = DMat::Zero(syst.dimension(), syst.nbOfParticles());
-    
-    for (int iOfFunction=0; iOfFunction < (int)cvCoeffs().size(); iOfFunction++)
-      result += cvCoeffs(iOfFunction) * cvBasis().basis_->gradientQ(syst, iOfFunction);
-      
-    return result;
-  }
-
-  double BasisControlVariate::laplacianQ(System const& syst, int iOfFunction) const
-  {
-    double result = 0;
-
-    for (int iOfFunction=0; iOfFunction < (int)cvCoeffs().size(); iOfFunction++)
-      result += cvCoeffs(iOfFunction) * cvBasis().laplacianQ(syst, iOfFunction);
-
-    return result;
-  }
-
-  DVec BasisControlVariate::gradientP(System const& syst, int iOfFunction) const
-  {
-    DVec result(1, 0);
-    
-    for (int i=0; i < (int)cvCoeffs().size(); i++)
-      result += cvCoeffs(i) * cvBasis().basis_->gradientP(syst, iOfParticle, i);
-    //cout << endl;
-    //cout << "gradientP = " << result << endl;
-    return result;
-  }
-
-  double BasisControlVariate::laplacianP(System const& syst, int iOfParticle, int iOfFunction) const
-  {
-    double result = 0;
-
-    for (int i=0; i < (int)cvCoeffs().size(); i++)
-      result += cvCoeffs(i) * cvBasis().basis_->laplacianP(syst, iOfParticle, i);
-    //cout << "laplacianP = " << result << endl;
-    return result;
-  }*/
-
-
 
   ExpFourierHermiteControlVariate::ExpFourierHermiteControlVariate(Input const& input, int idObs, shared_ptr<CVBasis> cvBasis0):
     BasisControlVariate(input, idObs, cvBasis0)
@@ -576,41 +483,8 @@ namespace simol
 
   int ExpFourierHermiteControlVariate::nbOfHermite() const
   {return cvBasis().tensorBasis_->nbOfElts(1);}
-
-  /*void ExpFourierHermiteControlVariate::displayMap(ofstream& out) const
-  {
-    cout << "displayMap" << endl;
-    vector<Particle*> conf(1, new Particle(0, 0, 0));
-    //conf[0] = Particle(0,0,0);
-    out << nbP_ + 1 << " ";
-    for (double p = -pMax_; p < pMax_; p += deltaP_)
-      out << p << " ";
-    out << endl;
-    for (double q = -M_PI; q < M_PI; q += deltaQ_)
-    {
-      out << q << " ";
-      for (double p = -pMax_; p < pMax_; p += deltaP_)
-      {
-        conf[0]->position() = DVec::Constant(1, q);
-        conf[0]->momentum() = DVec::Constant(1, p);
-        out << basisFunction(conf, 0) << " ";
-      }
-      out << endl;
-    }
-    cout << "end displayMap" << endl;
-  }*/
   
-  /*HermiteHermiteControlVariate::HermiteHermiteControlVariate(Input const& input, int idObs, shared_ptr<CVBasis> cvBasis0):
-    BasisControlVariate(input, idObs, cvBasis0)
-  {}
   
-  ExpHermiteHermiteControlVariate::ExpHermiteHermiteControlVariate(Input const& input, int idObs, shared_ptr<CVBasis> cvBasis0):
-    BasisControlVariate(input, idObs, cvBasis0)
-  {}
-  
-  QuadraticHermiteControlVariate::QuadraticHermiteControlVariate(Input const& input, int idObs, shared_ptr<CVBasis> cvBasis0):
-    BasisControlVariate(input, idObs, cvBasis0)
-  {}*/
 
 }
 

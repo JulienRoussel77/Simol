@@ -7,43 +7,37 @@ namespace simol
   ///
   ///Constructor for Langevin dynamics on chains, where there is a thermostat at each end
   BoundaryLangevin::BoundaryLangevin(Input const& input):
-    LangevinBase(input),
-    deltaTemperature_(input.deltaTemperature()),
-    temperatureLeft_(input.temperature() + deltaTemperature_),
-    temperatureRight_(input.temperature() - deltaTemperature_),
-    betaLeft_(1 / temperatureLeft_),
-    betaRight_(1 / temperatureRight_),
-    tauBending_(input.tauBending())
+    LangevinBase(input)
   {}
 
   ///
   ///Read-only access for the inverse temperature at the left end
-  const double& BoundaryLangevin::betaLeft() const {return betaLeft_;}
+  const double& BoundaryLangevin::betaLeft() const {return parameters_.betaLeft();}
   ///
   ///Read-only access for the inverse temperature at the right end
-  const double& BoundaryLangevin::betaRight() const {return betaRight_;}
+  const double& BoundaryLangevin::betaRight() const {return parameters_.betaRight();}
   ///
   ///Read-only access for the temperature at the left end
-  const double& BoundaryLangevin::temperatureLeft() const {return temperatureLeft_;}
+  const double& BoundaryLangevin::temperatureLeft() const {return parameters_.temperatureLeft();}
   ///
   ///Read-only access for the temperature at the right end
-  const double& BoundaryLangevin::temperatureRight() const {return temperatureRight_;}
+  const double& BoundaryLangevin::temperatureRight() const {return parameters_.temperatureRight();}
 
   ///
   ///Returns the amplitude of the brownian motion at the left end
   double BoundaryLangevin::sigmaLeft() const
   {
-    return sqrt(2 * gamma_ / betaLeft_);
+    return sqrt(2 * gamma() / parameters_.betaLeft());
   }
   ///
   ///Returns the amplitude of the brownian motion at the right end
   double BoundaryLangevin::sigmaRight() const
   {
-    return sqrt(2 * gamma_ / betaRight_);
+    return sqrt(2 * gamma() / parameters_.betaRight());
   }
   ///
   ///Returns the bending constrain that is added on the right end of the chain
-  const double& BoundaryLangevin::tauBending() const {return tauBending_;}
+  const double& BoundaryLangevin::tauBending() const {return parameters_.tauBending();}
   ///
   ///Integrates the bending constraint on the (last) particle pair
   void BoundaryLangevin::bending(Particle& particle1, Particle& particle2) const
@@ -74,17 +68,17 @@ namespace simol
 void BoundaryLangevin::computeProfileBiChain(Output& output, System const& syst, long int iOfStep) const
   {    
     double harOmega = syst.pairPotential().harmonicFrequency();
-    double nu = syst(0).mass() * harOmega / output.constGamma_;
+    double nu = syst(0).mass() * harOmega / gamma();
     
     //double alpha2 = pow(pairPotential().harmonicFrequency() / output.constGamma_, 2);
     
     static bool outbool = true;
     if (outbool)
-      cout << "refFlux = " << nu * output.constDeltaTemperature_ * harOmega / (1 + pow(nu, 2)) << endl;
+      cout << "refFlux = " << nu * deltaTemperature() * harOmega / (1 + pow(nu, 2)) << endl;
     outbool = false;
     
     output.obsSumFlow().currentValue() = 0;
-    output.obsModiFlow().currentValue() = nu * output.constDeltaTemperature_ * harOmega / (1 + pow(nu, 2));
+    output.obsModiFlow().currentValue() = nu * deltaTemperature()* harOmega / (1 + pow(nu, 2));
     //cout << nu << " " << output.constGamma_ << " " << output.constDeltaTemperature_ << " " << harOmega << endl;
     int midNb = (syst.nbOfParticles() - 1) / 2;
     output.obsMidFlow().currentValue() = syst.heatFlow(midNb);
@@ -200,10 +194,7 @@ void BoundaryLangevin::computeProfileBiChain(Output& output, System const& syst,
   
   ///Constructor for the Constrained Langevin Dynamics with thermostats everywhere
   ConstrainedBoundaryLangevin::ConstrainedBoundaryLangevin(Input const& input):
-    BoundaryLangevin(input),
-    flux_(input.flux())
-  {
-    cout << "flux_ = " << flux_ << endl;
-  }
+    BoundaryLangevin(input)
+  {}
 
 }

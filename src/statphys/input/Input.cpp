@@ -33,7 +33,6 @@ namespace simol
 
   DVec scanTensor(const string path, vector<int>& dimensions)
   {
-    cout << "scanTensor" << endl;
     ifstream inTensor(path);
     if (!inTensor.is_open())
       throw runtime_error("scanTensor couldn't read from " + path + "!");
@@ -41,10 +40,10 @@ namespace simol
     int dim;
       
     inTensor >> str >> str >> dim;
-    cout << "First dim is " << dim << endl;
+    //cout << "First dim is " << dim << endl;
     dimensions.push_back(dim);
     inTensor >> dim;
-    cout << "Second dim is " << dim << endl;
+    //cout << "Second dim is " << dim << endl;
     dimensions.push_back(dim);
     
     int nbOfValues = dimensions[0]*dimensions[1];
@@ -53,7 +52,6 @@ namespace simol
     int iOfVal = 0;
     while (inTensor >> value)
     {
-      //cout << "value : " << value << endl;
       tensor[iOfVal] = value;
       iOfVal++;
     }

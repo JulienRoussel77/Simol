@@ -5,9 +5,12 @@
 #include "simol/statphys/Tools.hpp"
 #include "simol/statphys/input/Input.hpp"
 #include "simol/statphys/system/System.hpp"
+#include "simol/statphys/controlVariate/Operator.hpp"
   
 namespace simol
 {
+  //class Operator;
+  
   class CVBasis;
   shared_ptr<CVBasis> createCVBasis(Input const& input);
   
@@ -21,11 +24,8 @@ namespace simol
     CVBasis(Input const& input);
     ~CVBasis();
     int const& totalNbOfElts() const;
-    virtual DMat qVariable(const System& syst) const;
-    virtual DMat pVariable(const System& syst) const;
-    virtual DMat forces(const System& syst) const;
-    virtual DVec basisVariables(const System& syst) const = 0;
     virtual void computeValueBasis(const System& syst);
+    virtual void computeValueGeneratorOnBasis(System const& syst);
     virtual DMat gradientQ(const System& syst, int iOfFunction);
     virtual DMat gradientP(const System& syst, int iOfFunction);
     virtual double laplacianQ(const System& syst, int iOfFunction);
@@ -38,39 +38,34 @@ namespace simol
     
     DVec basisValues_;
     DVec generatorOnBasisValues_;
+    
+    Operator* generator_;
   };
   
-  /// CVBasis adapted to the case of a colloid, builds the N dimensional gradient from the derivatives of the basis
-  /// Assuming that the considered DOF is the distance between the two first particles
-  class IsolatedCVBasis : public CVBasis
-  {
-  public:
-    IsolatedCVBasis(const Input& input);
-    virtual DVec basisVariables(const System& syst) const;
-  };
   
-  /// CVBasis adapted to the case of a colloid, builds the N dimensional gradient from the derivatives of the basis
-  /// Assuming that the considered DOF is the distance between the two first particles
-  class ColloidCVBasis : public CVBasis
-  {
-  public:
-    ColloidCVBasis(const Input& input);
-    virtual DMat qVariable(const System& syst) const;
-    virtual DMat pVariable(const System& syst) const;
-    virtual DMat forces(const System& syst) const;
-    virtual DVec basisVariables(const System& syst) const;   
-    /*virtual DMat gradientQ(const System& syst, int iOfFunction);
-    virtual DMat gradientP(const System& syst, int iOfFunction);
-    virtual double laplacianQ(const System& syst, int iOfFunction);
-    virtual double laplacianP(const System& syst, int iOfFunction);*/
-  };
-  
-  /*class ExactColloidCVBasis : public ColloidCVBasis
-  {
-  public:
-    double meshStep;
-    double xmin;
-    DVec 
-  };*/
+//   class IsolatedCVBasis : public CVBasis
+//   {
+//   public:
+//     IsolatedCVBasis(const Input& input, shared_ptr<DynamicsParameters> dynaPara);
+//   };
+//   
+//   
+//   class UnderdampedCVBasis : public CVBasis
+//   {
+//   public:
+//     UnderdampedCVBasis(const Input& input, shared_ptr<DynamicsParameters> dynaPara);
+//   };
+//   
+//   /// CVBasis adapted to the case of a colloid, builds the N dimensional gradient from the derivatives of the basis
+//   /// Assuming that the considered DOF is the distance between the two first particles
+//   class ColloidCVBasis : public CVBasis
+//   {
+//   public:
+//     ColloidCVBasis(const Input& input, shared_ptr<DynamicsParameters> dynaPara);
+//     /*virtual DMat gradientQ(const System& syst, int iOfFunction);
+//     virtual DMat gradientP(const System& syst, int iOfFunction);
+//     virtual double laplacianQ(const System& syst, int iOfFunction);
+//     virtual double laplacianP(const System& syst, int iOfFunction);*/
+//   };
 }
 #endif

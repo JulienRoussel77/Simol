@@ -4,28 +4,23 @@ namespace simol
 {
   ///Constructs a purely virtual Dynamics for Dynamics using RNGs
   LangevinBase::LangevinBase(Input const& input):
-    Dynamics(input),
-    gamma_(input.gamma()),
-    xi_(input.xi())
+    Dynamics(input)
   {}
 
   ///
   ///Read-only accessor of the intensity of the O-U process
-  const double& LangevinBase::gamma() const {return gamma_;}
+  const double& LangevinBase::gamma() const {return parameters_.gamma();}
 
   ///Read-only accessor for xi
-  const double& LangevinBase::xi() const {return xi_;}
-
-  ///Read-write accessor for xi
-  double& LangevinBase::xi() {return xi_;}
+  const double& LangevinBase::xi() const {return parameters_.xi();}
   ///
   ///Returns the mean number of steps between 2 random events
   int LangevinBase::xiNbOfSteps()
-  {return 1 / (xi_ * timeStep_);}
+  {return 1 / (xi() * timeStep_);}
   ///
   ///Returns true if the dynamics involves a Poisson process (momenta exchange)
   bool LangevinBase::doMomentaExchange() const
-  {return xi_ > 0;}
+  {return xi() > 0;}
   ///
   ///If the momenta exchange is activated, the times of future events are drawn
   void LangevinBase::initializeCountdown(Particle& particle)
@@ -54,7 +49,7 @@ namespace simol
   ///Analytical integration of an Orstein-Uhlenbeck process of inverse T "localBeta"
   void LangevinBase::updateOrsteinUhlenbeck(Particle& particle, double localBeta, double localTimeStep)
   {
-    double alpha = exp(- gamma() / particle.mass() * localTimeStep);
+    double alpha = exp(- parameters_.gamma() / particle.mass() * localTimeStep);
     particle.momentum() = alpha * particle.momentum() + sqrt((1 - pow(alpha, 2)) / localBeta * particle.mass()) * rng_->gaussian();
   }
   

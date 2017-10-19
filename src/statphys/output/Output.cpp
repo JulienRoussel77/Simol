@@ -18,20 +18,7 @@ namespace simol
     nbOfParticles_(input.nbOfParticles()),
     nbOfSteps_(input.nbOfSteps()),
     latticeParameter_(input.latticeParameter()),
-    constTemperature_(input.temperature()),
-    constTemperatureLeft_(input.temperature() + input.deltaTemperature()),
-    constTemperatureRight_(input.temperature() - input.deltaTemperature()),    
-    constDeltaTemperature_(input.deltaTemperature()),
-    constGamma_(input.gamma()),
-    constXi_(input.xi()),
-    constTauBending_(input.tauBending()),
-    constNonEqAmplitude_(input.nonEqAmplitude()),
-    constInteractionRatio_(input.interactionRatio()),
-    constNbOfQModes_(input.nbOfQModes()),
-    constNbOfPModes_(input.nbOfPModes()),
-    constDrift_(input.drift()),
-    constBulkDriving_(input.bulkDriving()),
-    constFlux_(input.flux()),
+    parameters_(input),
     totalEnergy_(0),
     totalVirial_(0),
     temperature_(0),
@@ -577,11 +564,11 @@ namespace simol
     outFinalLength() << std::left << setw(10) << finalTime()
                         << " " << setw(5) << timeStep()
                         << " " << setw(6) << nbOfParticles()
-                        << " " << setw(4) << constTemperature_
-                        << " " << setw(6) << constNonEqAmplitude_
-                        << " " << setw(6) << constInteractionRatio_
-                        << " " << setw(3) << constNbOfQModes_
-                        << " " << setw(3) << constNbOfPModes_
+                        << " " << setw(4) << parameters_.temperature()
+                        << " " << setw(6) << parameters_.nonEqAmplitude()
+                        << " " << setw(6) << parameters_.interactionRatio()
+                        << " " << setw(3) << parameters_.nbOfQModes()
+                        << " " << setw(3) << parameters_.nbOfPModes()
                         << " " << setw(12);
     
     obsLength().displayFinalValues(outFinalLength());                 
@@ -596,10 +583,11 @@ namespace simol
     outFinalVelocity() << std::left << setw(10) << finalTime()
                         << " " << setw(5) << timeStep()
                         << " " << setw(6) << nbOfParticles()
-                        << " " << setw(4) << constTemperature_
-                        << " " << setw(6) << constNonEqAmplitude_
-                        << " " << setw(3) << constNbOfQModes_
-                        << " " << setw(3) << constNbOfPModes_
+                        << " " << setw(4) << parameters_.temperature()
+                        << " " << setw(6) << parameters_.gamma()
+                        << " " << setw(6) << parameters_.nonEqAmplitude()
+                        << " " << setw(3) << parameters_.nbOfQModes()
+                        << " " << setw(3) << parameters_.nbOfPModes()
                         << " " << setw(12);    
     obsVelocity().displayFinalValues(outFinalVelocity());  
     
@@ -614,13 +602,13 @@ namespace simol
   void Output::displayFinalLagrangeMultiplier()
   {              
     double finalMeanLM = obsLagrangeMultiplier().mean();
-    double unbiasedDrift = ((nbOfParticles() - 1) * constDrift_ + finalMeanLM / constGamma_ ) / nbOfParticles();
+    double unbiasedDrift = ((nbOfParticles() - 1) * parameters_.drift() + finalMeanLM / parameters_.gamma() ) / nbOfParticles();
     
     cout << "outFinalLagrangeMultiplier_" << std::left << setw(10) << finalTime()
                     << " " << setw(5) << timeStep()
                     << " " << setw(6) << nbOfParticles()
-                    << " " << setw(4) << constTemperature_
-                    << " " << setw(6) << constDrift_
+                    << " " << setw(4) << parameters_.temperature()
+                    << " " << setw(6) << parameters_.drift()
                     << " " << setw(9) << unbiasedDrift
                     << " " << setw(12) << obsLagrangeMultiplier().mean()
                     << " " << setw(12) << obsLagrangeMultiplier().variance()
@@ -629,8 +617,8 @@ namespace simol
     outFinalLagrangeMultiplier() << std::left << setw(10) << finalTime()
                         << " " << setw(5) << timeStep()
                         << " " << setw(6) << nbOfParticles()
-                        << " " << setw(4) << constTemperature_
-                        << " " << setw(6) << constDrift_
+                        << " " << setw(4) << parameters_.temperature()
+                        << " " << setw(6) << parameters_.drift()
                         << " " << setw(9) << unbiasedDrift
                         << " " << setw(12);    
     obsLagrangeMultiplier().displayFinalValues(outFinalLagrangeMultiplier());  
