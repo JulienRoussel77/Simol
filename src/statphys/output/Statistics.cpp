@@ -5,19 +5,46 @@ using std::max;
 
 namespace simol
 {
+  //##### CircularBuffer #####
+  
+  CircularBuffer::CircularBuffer(int size0):
+    size_(size0),
+    data_(DVec::Zero(size_)),
+    index_(0),
+    sum_(0),
+    nbOfValues_(0)
+    {}
+    
+    void CircularBuffer::append(double value)
+    {
+      if (nbOfValues_++ % (100 * size_) == 0)
+      {
+        //cout << "sum : " << sum() << " delta = " << sum() - data_.sum() << endl;
+        data_(index_) = value;
+        sum_ = data_.sum();
+      }
+      else
+      {
+        sum_ = sum_ + value - data_(index_);
+        data_(index_) = value;
+      }
+      index_ = (index_+1)%size_;
+      //if (value > 5)
+      //  cout << data_.transpose() << endl;
+    }
   
   //###### Statistics ######
   
   Statistics::Statistics(int nbRows, int nbCols):
-    sumValues_(nbRows, nbCols),
-    lastValue_(nbRows, nbCols),
-    nbValues_(nbRows, nbCols),
-    iidVar_(nbRows, nbCols)
+    sumValues_(DMat::Zero(nbRows, nbCols)),
+    lastValue_(DMat::Zero(nbRows, nbCols)),
+    nbValues_(DMatInt::Zero(nbRows, nbCols))
+    //iidVar_(nbRows, nbCols)
   {
-    sumValues_.fill(0);
-    lastValue_.fill(0);
-    nbValues_.fill(0);
-    iidVar_.fill(0);
+    //sumValues_.fill(0);
+    //lastValue_.fill(0);
+    //nbValues_.fill(0);
+    //iidVar_.fill(0);
   };
   
   int Statistics::nbOfRows() const
@@ -95,10 +122,8 @@ namespace simol
   
   IIDStats::IIDStats(int nbRows, int nbCols):
     Statistics(nbRows, nbCols),
-    sumVar_(nbRows, nbCols)
-  {
-    sumVar_.fill(0);
-  };
+    sumVar_(DMat::Zero(nbRows, nbCols))
+  {}
   
   void IIDStats::append(double value, int i, int j)
   {
@@ -106,13 +131,7 @@ namespace simol
     nbValues_(i, j)++;
     double prevMean = mean();
     sumValues_(i, j) += value;
-    sumVar_(i,j) = sumVar_(i,j) + (value - prevMean) * (value - mean());    
-    
-    /*lastValue_(i, j) = value;
-    double tempTerm = iidVar_(i,j) + pow(mean(), 2);
-    nbValues_(i, j)++;
-    sumValues_(i, j) += value;
-    iidVar_(i,j) = tempTerm - pow(mean(), 2) + (pow(value, 2) - tempTerm) / nbValues_(i, j);*/
+    sumVar_(i,j) = sumVar_(i,j) + (value - prevMean) * (value - mean());
   }
   
   double IIDStats::variance(int i, int j) const
@@ -136,19 +155,18 @@ namespace simol
 
 
   CorrelationStats::CorrelationStats():
-    decorrelationNbOfSteps_(0),
+    CorrelationStats(0,0,0,0)
+    /*decorrelationNbOfSteps_(0),
     timeStep_(0),
     nbOfAutocoPts_(0),
     nbOfObservables_(0),
-    //timeStep_(timeStep),
     statsValues_(0),
     statsRefValues_(0),
     statsIntegratedCorrelation_(0),
-    //statsIntegratedCorrelationTemp_(),
     statsCorrelation_(0, 0),
-    indexRef_(0)
+    indexRef_(0),
+    bufferValues_(decorrelationNbOfSteps_)*/
   {
-    //cout << "CorrelationStats()" << endl;
   }
 
 
@@ -157,14 +175,14 @@ namespace simol
     timeStep_(timeStep0),
     nbOfAutocoPts_(nbOfAutocoPts0),
     nbOfObservables_(nbOfObservables),
-    //timeStep_(timeStep),
-    statsValues_(nbOfObservables),
-    statsRefValues_(nbOfObservables),
+    statsValuesA_(nbOfObservables),
+    statsValuesB_(nbOfObservables),
     statsIntegratedCorrelation_(nbOfObservables),
-    //statsIntegratedCorrelationTemp_(),
     statsCorrelation_(nbOfAutocoPts_, nbOfObservables),
     indexRef_(0),
-    currentCorrelationIntegral_(0)
+    refValueB_(DVec::Zero(nbOfObservables)),
+    currentCorrelationIntegral_(0),
+    bufferValues_(decorrelationNbOfSteps_)
   {
     //cout << "CorrelationStats(int decorrelation : nbObs = " << decorrelationTime << endl;
   }
@@ -184,66 +202,69 @@ namespace simol
     return timeStep_;
   }
   
-  void CorrelationStats::append(const double& newValue, long int iOfStep, int iOfObservable, const double& newRefValue)
+  void CorrelationStats::append(const double& newValueA, long int iOfStep, int iOfObservable, const double& newValueB)
   {
     //-- update the average --
-    statsValues_.append(newValue, iOfObservable);
+    statsValuesA_.append(newValueA, iOfObservable);
+    statsValuesB_.append(newValueB, iOfObservable);
     //-- update the autocorrelations --
     if (decorrelationNbOfSteps_ != 0)
     {
       if (iOfStep % decorrelationNbOfSteps_ == 0)
       {
-        statsRefValues_.append(newRefValue, iOfObservable);
+        refValueB_(iOfObservable) = newValueB;
         indexRef_ = iOfStep;
         //cout << newValue << endl;
       }
       //-- update the correlation function --
       // decorrelationNbOfSteps_ / nbOfAutocoPts_ is the time intervale between two correlation estimations: can be bigger than the time step
-      statsCorrelation_.append(statsRefValues_.lastValue(iOfObservable) * newValue, ((iOfStep - indexRef_)*nbOfAutocoPts_) / decorrelationNbOfSteps_, iOfObservable);
-      //-- integration of the correlation function with a trapezoidal rule --
-      // /!\ When the integral is small due the cancellation, this half factor can change the result up to 30% ! In this case dt is too big...
+      statsCorrelation_.append(refValueB_(iOfObservable) * newValueA, ((iOfStep - indexRef_)*nbOfAutocoPts_) / decorrelationNbOfSteps_, iOfObservable);
+      
+      //############################## OLD ESTIMATOR ##################
+      /*//-- integration of the correlation function with a trapezoidal rule --
+      // /!\ When the integral is small due the cancellation, this half factor can change the result up to 30% ! In this case dt is too large...
       //currentCorrelationIntegral_ += ((indexRef_ == iOfStep) ? .5 : 1) * statsRefValues_.lastValue(iOfObservable) * newValue;
       currentCorrelationIntegral_ += statsRefValues_.lastValue(iOfObservable) * newValue;
-      //cout << currentCorrelationIntegral_ << endl;
-
       if ((iOfStep+1) % decorrelationNbOfSteps_ == 0)    
       {
         statsIntegratedCorrelation_.append(timeStep() * currentCorrelationIntegral_, iOfObservable);
         currentCorrelationIntegral_ = 0;
-      }
+      }*/
+      
+      //############################## NEW ESTIMATOR ##################
+      bufferValues_.append(newValueA);
+      if (bufferValues_.isReady())
+        statsIntegratedCorrelation_.append(newValueB * 2 * bufferValues_.sumTrapeze() * timeStep());      // the factor 2 comes from the fact that we compute the integral on [-tdeco, tdeco]
+        
+      //cout << newValueB << " x " << bufferValues_.sumTrapeze() << endl;
     }
   }
 
-  /*double CorrelationStats::operator()(long int iOfStep, int iOfObservable) const
-  {
-    return statsCorrelation_.mean(iOfStep, iOfObservable);
-  }*/
-  
   double CorrelationStats::correlationAtSpan(long int iOfSpan, int iOfObservable) const
   {
     return statsCorrelation_.mean(iOfSpan, iOfObservable);
   }
   
-  double CorrelationStats::unbiasedCorrelationAtSpan(long int iOfSpan, int iOfObservable) const
+  double CorrelationStats::centeredCorrelationAtSpan(long int iOfSpan, int iOfObservable) const
   {
-    return statsCorrelation_.mean(iOfSpan, iOfObservable) - mean(iOfObservable) * statsRefValues_.mean(iOfObservable);
+    return statsCorrelation_.mean(iOfSpan, iOfObservable) - meanA(iOfObservable) * statsValuesB_.mean(iOfObservable);
   }
 
 
-  const double& CorrelationStats::lastValue(int iOfObservable) const
+  const double& CorrelationStats::lastValueA(int iOfObservable) const
   {
-    return statsValues_.lastValue(iOfObservable);
+    return statsValuesA_.lastValue(iOfObservable);
   }
 
 
-  double CorrelationStats::mean(int iOfObservable) const
+  double CorrelationStats::meanA(int iOfObservable) const
   {
-    return statsValues_.mean(iOfObservable);
+    return statsValuesA_.mean(iOfObservable);
   }
   
   const long int& CorrelationStats::nbValues(int i, int j) const
   {
-    return statsValues_.nbValues(i,j);
+    return statsValuesA_.nbValues(i,j);
   }
 
 
@@ -252,25 +273,31 @@ namespace simol
     return statsIntegratedCorrelation_.nbValues(iOfObservable);
   }
 
-
+  // This is the correlation integrated from -tdeco to tdeco
   double CorrelationStats::integratedCorrelation(int iOfObservable) const
   {
+    //return statsIntegratedCorrelation_.mean(iOfObservable);
     return statsIntegratedCorrelation_.mean(iOfObservable);
   }
 
+  // This is the correlation integrated from -tdeco to tdeco
   DVec CorrelationStats::integratedCorrelationVec() const
   {
     return statsIntegratedCorrelation_.meanMat().col(0);
   }
 
-  double CorrelationStats::integratedCorrelationUnbiased(int iOfObservable) const
+  // In the autocorrelation case this is the asymptotic variance
+  double CorrelationStats::integratedCorrelationCentered(int iOfObservable) const
   {
-    return integratedCorrelation(iOfObservable) - mean(iOfObservable) * statsRefValues_.mean(iOfObservable) * decorrelationTime();
+    //cout << integratedCorrelation(iOfObservable) << " - " << 2 * meanA(iOfObservable) * statsValuesB_.mean(iOfObservable) * decorrelationTime() << endl;
+    return integratedCorrelation(iOfObservable) - meanA(iOfObservable) * statsValuesB_.mean(iOfObservable) * (2*decorrelationTime() - timeStep());
   }
   
-  double CorrelationStats::varIntegratedCorrelation(int iOfObservable) const
+  // Returns the asymptotic variance of the estimator of the integrated correlation
+  // See http://www.stat.unc.edu/faculty/cji/Sokal.pdf for a justification
+  double CorrelationStats::asyvarIntegratedCorrelationCentered(int iOfObservable) const
   {
-    return statsIntegratedCorrelation_.variance(iOfObservable);
+    return 4 * decorrelationTime() * pow(integratedCorrelationCentered(iOfObservable) , 2);
   }
   
   ///
@@ -289,11 +316,6 @@ namespace simol
     return sqrt(varCorrelationAtSpan(iOfSpan, iOfObservable));
   }
   
-  /*double CorrelationStats::stdErrorCorrelationAtSpan(int iOfSpan, int iOfObservable) const
-  {
-    return stdDevCorrelationAtSpan(iOfSpan, iOfObservable) / sqrt(statsCorrelation_.nbValues(iOfObservable));
-  }*/
-  
   //###### AutocorrelationStats ######
   
   AutocorrelationStats::AutocorrelationStats():
@@ -308,59 +330,46 @@ namespace simol
   void AutocorrelationStats::append(double const& newValue, long int iOfStep, int iOfObservable)
   {
     CorrelationStats::append(newValue, iOfStep, iOfObservable, newValue);
-      if ((iOfStep+1) % decorrelationNbOfSteps_ == 0)    
-      {        
-        /*cout << "c0 = " << correlationAtSpan(0)<< endl;
-        double test = 0;
-        for (int i=0; i < nbOfAutocoPts_; i++)
-        {
-          test += (i==0?.5:1)*unbiasedCorrelationAtSpan(i) * timeStep() * decorrelationNbOfSteps() / nbOfAutocoPts_;
-          //cout << "+= " << 2 * unbiasedCorrelationAtSpan(i) * timeStep() * decorrelationNbOfSteps() / nbOfAutocoPts_ << endl;
-        }
-        cout << "---->" << integratedCorrelationUnbiased() << " <-> " << test - .5  * unbiasedCorrelationAtSpan(0)* timeStep() * decorrelationNbOfSteps() / nbOfAutocoPts_ << " = " << test << " - " << .5 * unbiasedCorrelationAtSpan(0)* timeStep() * decorrelationNbOfSteps() / nbOfAutocoPts_ <<  endl;
-        //cout << "---->" << variance() << " <-> " << test - .5 * 2 * unbiasedCorrelationAtSpan(0)* timeStep() * decorrelationNbOfSteps() / nbOfAutocoPts_ << " = " << test << " - " << .5 * 2 * unbiasedCorrelationAtSpan(0, 0)* timeStep() * decorrelationNbOfSteps() / nbOfAutocoPts_ <<  endl;
-      */
-      }
   }
   
-  double AutocorrelationStats::unbiasedCorrelationAtSpan(long int iOfSpan, int iOfObservable) const
+  double AutocorrelationStats::centeredCorrelationAtSpan(long int iOfSpan, int iOfObservable) const
   {
     if (iOfSpan < statsCorrelation_.nbOfRows())
-      return statsCorrelation_.mean(iOfSpan, iOfObservable) - pow(mean(iOfObservable), 2);
+      return statsCorrelation_.mean(iOfSpan, iOfObservable) - pow(meanA(iOfObservable), 2);
     else
       return std::numeric_limits<double>::quiet_NaN();
       //return 0;
   }
   
-  double AutocorrelationStats::integratedCorrelationUnbiased(int iOfObservable) const
+  /*double AutocorrelationStats::integratedCorrelationCentered(int iOfObservable) const
   {
-    return integratedCorrelation(iOfObservable) - pow(mean(iOfObservable),2) * decorrelationTime();
+    cout << "AutocorrelationStats::integratedCorrelationCentered -> " << integratedCorrelation(iOfObservable) - 2 * pow(mean(iOfObservable),2) * decorrelationTime() << endl;
+    return integratedCorrelation(iOfObservable) - 2 * pow(mean(iOfObservable),2) * decorrelationTime();
+  }*/
+
+  double AutocorrelationStats::asymptoticVariance(int iOfObservable) const
+  {
+    return integratedCorrelationCentered(iOfObservable);
   }
 
-  double AutocorrelationStats::variance(int iOfObservable) const
-  {
-    //return 2 * max(0., integratedCorrelationUnbiased(iOfObservable));
-    return 2 * integratedCorrelationUnbiased(iOfObservable);
-  }
-
-  double AutocorrelationStats::stdDev(int iOfObservable) const
+  /*double AutocorrelationStats::stdDev(int iOfObservable) const
   {
     return sqrt(variance(iOfObservable));
-  }
+  }*/
   
   ///
   ///Returns the variance of the estimator of the variance
-  double AutocorrelationStats::varOfVar(int iOfObservable) const
+  double AutocorrelationStats::asyvarOfAsyvar(int iOfObservable) const
   {
-    return 4 * varIntegratedCorrelation(iOfObservable) * decorrelationTime();
+    return asyvarIntegratedCorrelationCentered(iOfObservable);// * decorrelationTime();
   }
   
-  ///
+  /*///
   ///Returns the variance of the estimator of the variance
   double AutocorrelationStats::stdDevOfVar(int iOfObservable) const
   {
     return sqrt(varOfVar(iOfObservable));
-  }
+  }*/
   
   /*///
   ///Returns the variance of the estimator of the variance

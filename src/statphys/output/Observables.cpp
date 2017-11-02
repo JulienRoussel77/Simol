@@ -105,37 +105,25 @@ namespace simol
     return autocoStats_.mean();
   }
   
-  double Observable::variance() const
+  double Observable::asymptoticVariance() const
   {
-    return autocoStats_.variance();
-  }
-
-  double Observable::stdDev() const
-  {
-    return autocoStats_.stdDev();
+    return autocoStats_.asymptoticVariance();
   }
   
-  double Observable::varOfVar() const
+  double Observable::asyvarOfAsyvar() const
   {
-    return autocoStats_.varOfVar();
-  }
-  
-  double Observable::stdDevOfVar() const
-  {
-    return autocoStats_.stdDevOfVar();
-  }
-  
-  
+    return autocoStats_.asyvarOfAsyvar();
+  }  
 
   double Observable::correlationAtSpan(int iOfSpan) const
   {
     return autocoStats_.correlationAtSpan(iOfSpan);
   }
   
-  double Observable::unbiasedCorrelationAtSpan(int iOfSpan) const
+  double Observable::centeredCorrelationAtSpan(int iOfSpan) const
   {
     //return autocoStats_(iOfSpan) - pow(meanObservable(), 2);
-    return autocoStats_.unbiasedCorrelationAtSpan(iOfSpan);
+    return autocoStats_.centeredCorrelationAtSpan(iOfSpan);
   }
   
   double Observable::varCorrelationAtSpan(int iOfSpan) const
@@ -174,34 +162,36 @@ namespace simol
 
   void Observable::display(long int iOfStep)
   {
+    //cout << "10play !" << endl;
     outFlux() << iOfStep * timeStep() 
              << " " << lastValue()
              << " " << mean()
-             << " " << variance()
-             << " " << varOfVar() << endl;
+             << " " << asymptoticVariance()
+             << " " << asyvarOfAsyvar() 
+             << " " << autocoStats_.integratedCorrelation()<< endl;
   }
   
   void Observable::displayFinalValues(ofstream& out)
   {
     out << mean()
-        << " " << variance()
-        << " " << varOfVar() << endl;
+        << " " << asymptoticVariance()
+        << " " << asyvarOfAsyvar() << endl;
   }
   
   void Observable::displayCorrelations(long int iOfStep)
   {
-    //cout << "Velocity : The correlation in 0 is " << floor((2 * obsVelocity().unbiasedCorrelationAtSpan(0) * decorrelationTime() / nbOfAutocoPts()) / obsVelocity().variance() * 10000)/100 << "% of the variance" << endl;
-    //cout << "SumFlow : The correlation in 0 is " << floor((2 * obsSumFlow().unbiasedCorrelationAtSpan(0) * decorrelationTime() / nbOfAutocoPts()) / obsSumFlow().variance() * 10000)/100 << "% of the variance" << endl;
-    //cout << "ModiFlow : The correlation in 0 is " << floor((2 * obsModiFlow().unbiasedCorrelationAtSpan(0) * decorrelationTime() / nbOfAutocoPts()) / obsModiFlow().variance() * 10000)/100 << "% of the variance" << endl;
+    //cout << "Velocity : The correlation in 0 is " << floor((2 * obsVelocity().centeredCorrelationAtSpan(0) * decorrelationTime() / nbOfAutocoPts()) / obsVelocity().asymptoticVariance() * 10000)/100 << "% of the variance" << endl;
+    //cout << "SumFlow : The correlation in 0 is " << floor((2 * obsSumFlow().centeredCorrelationAtSpan(0) * decorrelationTime() / nbOfAutocoPts()) / obsSumFlow().asymptoticVariance() * 10000)/100 << "% of the variance" << endl;
+    //cout << "ModiFlow : The correlation in 0 is " << floor((2 * obsModiFlow().centeredCorrelationAtSpan(0) * decorrelationTime() / nbOfAutocoPts()) / obsModiFlow().asymptoticVariance() * 10000)/100 << "% of the variance" << endl;
        
-    //cout << "Velocity : The correlation in 0 is " << floor((2 * obsVelocity().unbiasedCorrelationAtSpan(0) * decorrelationTime() / nbOfAutocoPts()) / obsVelocity().variance() * 10000)/100 << "% of the variance" << endl;
-    outFluxCorrelation() << "# The correlation in iOfSpan = 0 is " << floor((2 * unbiasedCorrelationAtSpan(0) * decorrelationTime() / nbOfAutocoPts()) / variance() * 10000)/100 << "% of the variance" << endl;
+    //cout << "Velocity : The correlation in 0 is " << floor((2 * obsVelocity().centeredCorrelationAtSpan(0) * decorrelationTime() / nbOfAutocoPts()) / obsVelocity().asymptoticVariance() * 10000)/100 << "% of the variance" << endl;
+    outFluxCorrelation() << "# The correlation in iOfSpan = 0 is " << floor((2 * centeredCorrelationAtSpan(0) * decorrelationTime() / nbOfAutocoPts()) / asymptoticVariance() * 10000)/100 << "% of the variance" << endl;
     
     for (int iOfSpan = 0; iOfSpan < nbOfAutocoPts(); iOfSpan++)
     {
       //cout << sqrt(varCorrelationAtSpan(iOfSpan)) << " / " << sqrt(iOfStep * timeStep()) << " = " << sqrt(varCorrelationAtSpan(iOfSpan) / (iOfStep * timeStep())) << endl;
       outFluxCorrelation() << iOfSpan * autocoPtsPeriod()
-                       << " " << unbiasedCorrelationAtSpan(iOfSpan)
+                       << " " << centeredCorrelationAtSpan(iOfSpan)
                        << " " << sqrt(varCorrelationAtSpan(iOfSpan) / (iOfStep * timeStep())) << endl;
     }
   }

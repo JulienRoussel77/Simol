@@ -56,23 +56,18 @@ namespace simol
       virtual double& currentValue();
       virtual double lastValue() const;
       virtual double mean() const;
-      virtual double variance() const;
-      virtual double stdDev() const;
-      virtual double varOfVar() const;
-      virtual double stdDevOfVar() const;
+      virtual double asymptoticVariance() const;
+      //virtual double stdDev() const;
+      virtual double asyvarOfAsyvar() const;
+      //virtual double stdDevOfVar() const;
 
       virtual double correlationAtSpan(int iOfSpan) const;
-      virtual double unbiasedCorrelationAtSpan(int iOfSpan) const;
+      virtual double centeredCorrelationAtSpan(int iOfSpan) const;
       virtual double varCorrelationAtSpan(int iOfSpan) const;
       virtual double stdDevCorrelationAtSpan(int iOfSpan) const;
 
       virtual void append(double value, long int iOfStep);
       virtual void appendCurrent(long int iOfStep);
-      
-      /*void computeGeneratorHamiltonian(){};
-      void computeGeneratorOverdamped(System const& syst, double beta){};
-      void computeGeneratorLangevin(System const& syst, double beta, double gamma){};
-      void computeGeneratorBoundarylangevin(System const& syst, double betaLeft, double betaRight, double gamma){};*/
   
       virtual void updateHamiltonian(System const&){};
       virtual void updateOverdamped(System const&, double /*beta*/){};

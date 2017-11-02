@@ -71,9 +71,9 @@ namespace simol
       
       virtual double lastValueBetter() const;
       virtual double meanBetter() const;
-      virtual double varBetter() const;
-      virtual double stdDevBetter() const;
-      virtual double varOfVarBetter() const;
+      virtual double asyvarBetter() const;
+      //virtual double stdDevBetter() const;
+      virtual double asyvarOfAsyvarBetter() const;
  
       virtual DVec lastGeneratorOnBasis() const;
       virtual DVec meanGeneratorOnBasis() const;
@@ -87,9 +87,9 @@ namespace simol
       virtual double correlationB2(int iOfFunction) const;
       
       virtual double correlationBetterAtSpan(int iOfSpan) const;
-      virtual double unbiasedCorrelationBetterAtSpan(int iOfSpan) const;
+      virtual double centeredCorrelationBetterAtSpan(int iOfSpan) const;
       virtual double varCorrelationBetterAtSpan(int iOfSpan) const;
-      virtual double stdDevCorrelationBetterAtSpan(int iOfSpan) const;
+      //virtual double stdDevCorrelationBetterAtSpan(int iOfSpan) const;
       
       const double& basisValue(int iOfFunction) const;
       const DVec& basisValues() const;

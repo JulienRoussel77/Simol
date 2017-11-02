@@ -5,6 +5,8 @@ namespace simol
 {
   shared_ptr<CVBasis> createCVBasis(Input const& input)
   {
+    if (input.basisElts() == "None")
+      return nullptr;
     return shared_ptr<CVBasis>(new CVBasis(input));
     
 //     if (input.basisElts() == "None")

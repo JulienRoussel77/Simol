@@ -573,8 +573,8 @@ namespace simol
     
     obsLength().displayFinalValues(outFinalLength());                 
                         /*<< " " << setw(12) << obsLength().mean()
-                        << " " << setw(12) << obsLength().variance()
-                        << " " << setw(12) << obsLength().varOfVar()
+                        << " " << setw(12) << obsLength().asymptoticVariance()
+                        << " " << setw(12) << obsLength().asyvarOfAsyvar()
                         << std::endl;*/
   }
   
@@ -592,8 +592,8 @@ namespace simol
     obsVelocity().displayFinalValues(outFinalVelocity());  
     
                         /*<< " " << setw(12) << obsVelocity().mean()
-                        << " " << setw(12) << obsVelocity().variance()
-                        << " " << setw(12) << obsVelocity().varOfVar()
+                        << " " << setw(12) << obsVelocity().asymptoticVariance()
+                        << " " << setw(12) << obsVelocity().asyvarOfAsyvar()
                         << std::endl;*/
   }
   
@@ -611,8 +611,8 @@ namespace simol
                     << " " << setw(6) << parameters_.drift()
                     << " " << setw(9) << unbiasedDrift
                     << " " << setw(12) << obsLagrangeMultiplier().mean()
-                    << " " << setw(12) << obsLagrangeMultiplier().variance()
-                    << " " << setw(12) << obsLagrangeMultiplier().varOfVar();
+                    << " " << setw(12) << obsLagrangeMultiplier().asymptoticVariance()
+                    << " " << setw(12) << obsLagrangeMultiplier().asyvarOfAsyvar();
     
     outFinalLagrangeMultiplier() << std::left << setw(10) << finalTime()
                         << " " << setw(5) << timeStep()
@@ -624,16 +624,16 @@ namespace simol
     obsLagrangeMultiplier().displayFinalValues(outFinalLagrangeMultiplier());  
     
                         /*<< " " << setw(12) << obsVelocity().mean()
-                        << " " << setw(12) << obsVelocity().variance()
-                        << " " << setw(12) << obsVelocity().varOfVar()
+                        << " " << setw(12) << obsVelocity().asymptoticVariance()
+                        << " " << setw(12) << obsVelocity().asyvarOfAsyvar()
                         << std::endl;*/
   }
 
   void Output::finalDisplayCorrelations()
   {
-    //cout << "Velocity : The correlation in 0 is " << floor((2 * obsVelocity().unbiasedCorrelationAtSpan(0) * decorrelationTime() / nbOfAutocoPts()) / obsVelocity().variance() * 10000)/100 << "% of the variance" << endl;
-    //cout << "SumFlow : The correlation in 0 is " << floor((2 * obsSumFlow().unbiasedCorrelationAtSpan(0) * decorrelationTime() / nbOfAutocoPts()) / obsSumFlow().variance() * 10000)/100 << "% of the variance" << endl;
-    //cout << "ModiFlow : The correlation in 0 is " << floor((2 * obsModiFlow().unbiasedCorrelationAtSpan(0) * decorrelationTime() / nbOfAutocoPts()) / obsModiFlow().variance() * 10000)/100 << "% of the variance" << endl;
+    //cout << "Velocity : The correlation in 0 is " << floor((2 * obsVelocity().unbiasedCorrelationAtSpan(0) * decorrelationTime() / nbOfAutocoPts()) / obsVelocity().asymptoticVariance() * 10000)/100 << "% of the variance" << endl;
+    //cout << "SumFlow : The correlation in 0 is " << floor((2 * obsSumFlow().unbiasedCorrelationAtSpan(0) * decorrelationTime() / nbOfAutocoPts()) / obsSumFlow().asymptoticVariance() * 10000)/100 << "% of the variance" << endl;
+    //cout << "ModiFlow : The correlation in 0 is " << floor((2 * obsModiFlow().unbiasedCorrelationAtSpan(0) * decorrelationTime() / nbOfAutocoPts()) / obsModiFlow().asymptoticVariance() * 10000)/100 << "% of the variance" << endl;
         
     for (int iOfObservable=0; iOfObservable < nbOfObservables(); iOfObservable++)
       observables(iOfObservable)->displayCorrelations(nbOfSteps());

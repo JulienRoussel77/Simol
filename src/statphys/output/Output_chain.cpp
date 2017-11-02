@@ -37,11 +37,11 @@ namespace simol
       out_ << iOfStep * timeStep() << " "
            << iOfParticle << " "
            << bendistProfile_.mean(iOfParticle) << " "
-           << bendistProfile_.variance(iOfParticle) / sqrt(iOfStep * timeStep()) << " "
+           << bendistProfile_.asymptoticVariance(iOfParticle) / sqrt(iOfStep * timeStep()) << " "
            << flowProfile_.mean(iOfParticle) << " "
-           << flowProfile_.variance(iOfParticle) / sqrt(iOfStep * timeStep()) << " "
+           << flowProfile_.asymptoticVariance(iOfParticle) / sqrt(iOfStep * timeStep()) << " "
            << kinTempProfile_.mean(iOfParticle) << " "
-           << kinTempProfile_.variance(iOfParticle) / sqrt(iOfStep * timeStep()) << " "
+           << kinTempProfile_.asymptoticVariance(iOfParticle) / sqrt(iOfStep * timeStep()) << " "
            << potTempTopProfile_.mean(iOfParticle) / potTempBotProfile_.mean(iOfParticle) << " "
            << endl;
   }
@@ -63,14 +63,14 @@ namespace simol
                      << " " << setw(6) << parameter2
                      << " " << setw(6) << parameter3
                      << " " << setw(12) << obsMidFlow_->mean()
-                     << " " << setw(12) << obsMidFlow_->variance()
-                     << " " << setw(12) << obsMidFlow_->varOfVar()
+                     << " " << setw(12) << obsMidFlow_->asymptoticVariance()
+                     << " " << setw(12) << obsMidFlow_->asyvarOfAsyvar()
                      << " " << setw(12) << obsSumFlow_->mean()
-                     << " " << setw(12) << obsSumFlow_->variance()     //#12
-                     << " " << setw(12) << obsSumFlow_->varOfVar()
+                     << " " << setw(12) << obsSumFlow_->asymptoticVariance()     //#12
+                     << " " << setw(12) << obsSumFlow_->asyvarOfAsyvar()
                      << " " << setw(12) << obsModiFlow_->mean()
-                     << " " << setw(12) << obsModiFlow_->variance()
-                     << " " << setw(12) << obsModiFlow_->varOfVar()
+                     << " " << setw(12) << obsModiFlow_->asymptoticVariance()
+                     << " " << setw(12) << obsModiFlow_->asyvarOfAsyvar()
          << std::endl;
 
     //cout << "displayFinalFlow(double temperature, double delta_temperature, double tau)";
@@ -86,14 +86,14 @@ namespace simol
                      << " " << setw(6) << parameter2
                      << " " << setw(6) << parameter3
                      << " " << setw(12) << obsMidFlow_->mean()
-                     << " " << setw(12) << obsMidFlow_->variance()
-                     << " " << setw(12) << obsMidFlow_->varOfVar()
+                     << " " << setw(12) << obsMidFlow_->asymptoticVariance()
+                     << " " << setw(12) << obsMidFlow_->asyvarOfAsyvar()
                      << " " << setw(12) << obsSumFlow_->mean()
-                     << " " << setw(12) << obsSumFlow_->variance()     //#12
-                     << " " << setw(12) << obsSumFlow_->varOfVar()
+                     << " " << setw(12) << obsSumFlow_->asymptoticVariance()     //#12
+                     << " " << setw(12) << obsSumFlow_->asyvarOfAsyvar()
                      << " " << setw(12) << obsModiFlow_->mean()
-                     << " " << setw(12) << obsModiFlow_->variance()
-                     << " " << setw(12) << obsModiFlow_->varOfVar()
+                     << " " << setw(12) << obsModiFlow_->asymptoticVariance()
+                     << " " << setw(12) << obsModiFlow_->asyvarOfAsyvar()
                      << std::endl;
     }
   }
@@ -110,8 +110,8 @@ namespace simol
                      << " " << setw(6) << parameter2
                      << " " << setw(6) << parameter3
                      << " " << setw(12) << obsLagrangeMultiplier().mean()
-                     << " " << setw(12) << obsLagrangeMultiplier().variance()
-                     << " " << setw(12) << obsLagrangeMultiplier().varOfVar();
+                     << " " << setw(12) << obsLagrangeMultiplier().asymptoticVariance()
+                     << " " << setw(12) << obsLagrangeMultiplier().asyvarOfAsyvar();
 
     //cout << "displayFinalFlow(double temperature, double delta_temperature, double tau)";
     if (doFinalFlow_)
