@@ -194,7 +194,11 @@ namespace simol
   
   double UnderdampedGenerator::uVariable(System const& syst) const
   {
-    return syst(0).energy();
+    DVec projPosition = DVec::Zero(2);
+    projPosition(0) = syst(0).position(0);
+    //cout << "uVar = " << syst.externalPotential().value(projPosition) << " + " << pow(syst(0).momentum(0), 2)/2 << endl;
+    //return syst(0).energy();
+    return syst.externalPotential().value(projPosition) + pow(syst(0).momentum(0), 2)/2;
   }
   
   DVec UnderdampedGenerator::basisVariables(System const& syst) const

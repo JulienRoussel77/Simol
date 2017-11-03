@@ -22,8 +22,10 @@ namespace simol
       return new Rotor(input);
     else if (potName == "FPU")
       return new FPU(input);
-    else if (potName == "SpaceSinus")
-      return new SpaceSinus(input);
+    else if (potName == "SpaceSine")
+      return new SpaceSine(input);
+    else if (potName == "Shearing")
+      return new Shearing(input);
     else if (potName == "LennardJones")
       return new LennardJones(input);
     else if (potName == "WCA")

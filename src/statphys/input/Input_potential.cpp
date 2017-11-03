@@ -12,6 +12,7 @@ const double defaultSigmaLJ = 1.;
 const double defaultSplineRatio = 0.8;
 const double defaultCutOffRatio = 2.5;
 const double defaultPotentialCenter = 0;
+const double defaultCoupling = 0;
 
 namespace simol
 {
@@ -72,6 +73,16 @@ namespace simol
       return data["Potential"]["Amplitude"].as<double>();
     else
       return defaultPotentialCoeff;
+  }
+  
+  //--- SpaceSine ---
+  
+  double Input::coupling() const
+  {
+    if (data["Potential"]["Coupling"])
+      return data["Potential"]["Coupling"].as<double>();
+    else
+      return defaultCoupling;
   }
 
   //--- Lennard Jones ---

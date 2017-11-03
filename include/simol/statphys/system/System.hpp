@@ -30,25 +30,16 @@ namespace simol
     int& iOfCell1() {return iOfCell1_;}
     Particle const& particle1() const {return **it1_;}
     Particle& particle1() {return **it1_;}
-    /*Cell const& cell1() const;
-    Cell& cell1();*/
     int const& iOfNeighbor2() const {return iOfNeighbor2_;}
     int& iOfNeighbor2() {return iOfNeighbor2_;}
-    /*int const& iOfCell2() const;
-    int& iOfCell2();*/
     Particle const& particle2() const {return **it2_;}
     Particle& particle2() {return **it2_;}
-    /*Cell const& cell2() const;
-    Cell& cell2();*/
     vector<Particle*>::iterator const& endIt2() const {return endIt2_;}
     vector<Particle*>::iterator& endIt2() {return endIt2_;}
     
-    //System* syst_;
     vector<Particle*>::iterator it1_;
-    //int iOfParticle1_;
     //absolute index of the cell containing particle1
     int iOfCell1_;
-    //int iOfParticle2_;
     vector<Particle*>::iterator it2_;
     //contains the neighbor index of the cell containing particle2 relatively to cell1
     int iOfNeighbor2_;

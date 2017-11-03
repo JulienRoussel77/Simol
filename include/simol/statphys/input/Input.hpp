@@ -74,6 +74,8 @@ namespace simol
     double interactionRatio() const;
     //Sinus
     double amplitude() const;
+    //SpaceSine
+    double coupling() const;
     //DoubleWell
     double height() const;
     double interWell() const;

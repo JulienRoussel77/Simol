@@ -5,12 +5,10 @@
 
 namespace simol
 {
-
-  class SpaceSinus : public Potential
+  class SpaceSine : public Potential
   {
     public:
-      SpaceSinus(Input const& input);
-      DVec totalForce(DVec const& position) const;
+      SpaceSine(Input const& input);
       double operator()(DVec const& position) const;
       DVec gradient(DVec const& position) const;
       double laplacian(DVec const& position) const;
@@ -18,6 +16,7 @@ namespace simol
     private:
       double amplitude_;
       double pulsation_;
+      double coupling_;
   };
 
 }

@@ -22,6 +22,10 @@ namespace simol
       bulkDriving_(input.bulkDriving()),
       mass_(input.mass()),
       nonEqAmplitude_(input.nonEqAmplitude()),
+      nbOfQModes_(input.nbOfQModes()),
+      nbOfPModes_(input.nbOfPModes()),
+      drift_(input.drift()),
+      flux_(input.flux()),
       xi_(input.xi())
     {}
     const double& temperature() const {return temperature_;}

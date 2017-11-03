@@ -941,6 +941,8 @@ namespace simol
     //cout << "-----" << endl;
     int iOfNode = indexOfNode(variable);
     double deltaVariable = variable - (xmin_ + iOfNode * meshStep_);
+    //cout << iOfNode << " " << deltaVariable << endl;
+    //cout << "----" << endl;
     return basisVal_[iOfNode] + deltaVariable * gradVal_[iOfNode] + pow(deltaVariable, 2)/2 * laplaVal_[iOfNode];
   }
   
@@ -1222,6 +1224,9 @@ namespace simol
 
   double QPBasis::value(DVec const& variables, vector<int>& vecIndex) const
   {
+    //cout << "QPBasis::value(DVec const& variables, vector<int>& vecIndex)" << endl;
+    //cout << variables(0) << " " << vecIndex[0] << " "  << endl;
+    //cout << variables(1) << " " << vecIndex[1] << " "  << endl;
     //cout << variables(0) << " " << bases_[0]->value(variables(0), vecIndex[0]) << " " << bases_[1]->value(variables(1), vecIndex[1]) << endl;
     return bases_[0]->value(variables(0), vecIndex[0]) * bases_[1]->value(variables(1), vecIndex[1]);
   }
