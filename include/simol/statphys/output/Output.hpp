@@ -23,11 +23,8 @@ namespace simol
     Output(Input const& input, shared_ptr<CVBasis> cvBasis0);
     virtual ~Output();
       
-    //Observable* addObservable(const Input& input, const string& outPath);
     Observable*& getObservablePtr(int idObs);
     void addObservable(const Input& input, int idObs, int decorrelationNbOfSteps0, int nbOfAutocoPts0);
-    //Observable* addControlVariate(const Input& input, const string& outPath, Galerkin* galerkin);
-    //void setControlVariates(Input& input, Potential& potential, Galerkin* galerkin);
     
 
     ofstream & outThermo() {return *outThermo_;}
@@ -221,20 +218,6 @@ namespace simol
     double latticeParameter_;
     
   public:
-    /*double constTemperature_;
-    double constTemperatureLeft_;
-    double constTemperatureRight_;
-    double constDeltaTemperature_;
-    double constGamma_;
-    double constXi_;
-    double constTauBending_;
-    double constNonEqAmplitude_;
-    double constInteractionRatio_;
-    int constNbOfQModes_;
-    int constNbOfPModes_;
-    double constDrift_;
-    double const constBulkDriving_;
-    double const constFlux_;*/
     DynamicsParameters parameters_;
     
   protected:

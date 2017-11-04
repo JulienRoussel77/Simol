@@ -586,6 +586,7 @@ namespace simol
                         << " " << setw(4) << parameters_.temperature()
                         << " " << setw(6) << parameters_.gamma()
                         << " " << setw(6) << parameters_.nonEqAmplitude()
+                        << " " << setw(6) << parameters_.coupling()
                         << " " << setw(3) << parameters_.nbOfQModes()
                         << " " << setw(3) << parameters_.nbOfPModes()
                         << " " << setw(12);    

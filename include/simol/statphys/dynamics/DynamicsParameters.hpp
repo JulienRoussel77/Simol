@@ -26,7 +26,8 @@ namespace simol
       nbOfPModes_(input.nbOfPModes()),
       drift_(input.drift()),
       flux_(input.flux()),
-      xi_(input.xi())
+      xi_(input.xi()),
+      coupling_(input.coupling())
     {}
     const double& temperature() const {return temperature_;}
     const double& temperatureLeft() const {return temperatureLeft_;}
@@ -46,6 +47,7 @@ namespace simol
     const double& drift() const {return drift_;}
     const double& flux() const {return flux_;}
     const double& xi() const {return xi_;}
+    const double& coupling() const {return coupling_;}
   private:
     double beta_;
     double temperature_;
@@ -64,6 +66,7 @@ namespace simol
     double drift_;
     double flux_;
     double xi_;
+    double coupling_;
   };
 
 }
