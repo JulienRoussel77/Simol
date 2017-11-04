@@ -47,6 +47,7 @@ namespace simol
   public:
     OverdampedGenerator(Input const& input);
     //void value(shared_ptr<CVBasis> cvBasis, System const& syst, shared_ptr<DynamicsParameters> dynaPara) const;
+    virtual DMat pVariable(const System& syst) const;
     DVec value(TensorBasis* basis, System const& syst) const;
   };
   

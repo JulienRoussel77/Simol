@@ -428,7 +428,6 @@ namespace simol
   {    
     if (length_ == 0)
       throw runtime_error("The integration length is set to zero !");
-    cout << "HermiteQBasis::HermiteQBasis" << endl;
     polyCoeffs_(0, 0) = 1;
     polyCoeffs_(1, 1) = sqrt(omega_);
     for (int iOfElt = 2; iOfElt < (int)nbOfElts_; iOfElt++)
@@ -911,6 +910,8 @@ namespace simol
     laplaVal_(DVec::Zero(nbOfNodes_-1)),   // defined in x_n = (n+1/2)*dx
     dataPath_(input.outputFolderName()+ input.controlVariateCoeffsPath())
   {
+    if (meshStep_ <= 0)
+      throw runtime_error("The MeshStep used by QuadraticBasis is not valid ! value = "+ std::to_string(meshStep_));
     vector<int> dimensions;
     gradVal_ = scanTensor(dataPath_, dimensions);
     cout << dimensions[0] << " x " << dimensions[1] << endl;
@@ -971,12 +972,9 @@ namespace simol
     : Basis(input.nbOfPModes(), input.beta()),
       polyCoeffs_(DMat::Zero(nbOfElts_, nbOfElts_))
   {
-    cout << "nbOfElts = " << nbOfElts_ << endl;
     polyCoeffs_(0, 0) = 1;
-    cout << "nbOfElts = " << nbOfElts_ << endl;
     if (nbOfElts_ > 1)
       polyCoeffs_(1, 1) = sqrt(beta_);
-    cout << "nbOfElts = " << nbOfElts_ << endl;
     for (int iOfElt = 2; iOfElt < (int)nbOfElts_; iOfElt++)
       for (int iOfCoeff = 0; iOfCoeff <= iOfElt; iOfCoeff++)
         polyCoeffs_(iOfElt, iOfCoeff) = (iOfCoeff ? (sqrt(beta_ / iOfElt) * polyCoeffs_(iOfElt - 1, iOfCoeff - 1)) : 0) - sqrt((iOfElt - 1) / (double)iOfElt) * polyCoeffs_(iOfElt - 2, iOfCoeff);
@@ -1224,10 +1222,6 @@ namespace simol
 
   double QPBasis::value(DVec const& variables, vector<int>& vecIndex) const
   {
-    //cout << "QPBasis::value(DVec const& variables, vector<int>& vecIndex)" << endl;
-    //cout << variables(0) << " " << vecIndex[0] << " "  << endl;
-    //cout << variables(1) << " " << vecIndex[1] << " "  << endl;
-    //cout << variables(0) << " " << bases_[0]->value(variables(0), vecIndex[0]) << " " << bases_[1]->value(variables(1), vecIndex[1]) << endl;
     return bases_[0]->value(variables(0), vecIndex[0]) * bases_[1]->value(variables(1), vecIndex[1]);
   }
 
@@ -1288,7 +1282,6 @@ namespace simol
   
   DVec QPBasis::getPartialElement(int iOfVariable, int iOfElt) const
   {
-    cout << "getPartialElement" << endl;
     DVec vect = DVec::Zero(totalNbOfElts());
     if (iOfVariable == 0)
       for (int iOfElt2 = 0; iOfElt2 < nbOfElts(1); iOfElt2++)
@@ -1296,8 +1289,6 @@ namespace simol
     else
       for (int iOfElt2 = 0; iOfElt2 < nbOfElts(0); iOfElt2++)
         vect(iTens(iOfElt2, iOfElt)) = basisMean(0, iOfElt2);
-    cout << "end of getPartialElement" << endl;
-    cout << vect << endl;
     return vect;
   }
 
@@ -1306,7 +1297,6 @@ namespace simol
   ExpFourierHermiteBasis::ExpFourierHermiteBasis(Input const& input, Potential* potential):
     QPBasis()
   {
-    cout << "ExpFourierHermiteBasis for " << potential->classname() << endl;
     bases_[0] = new ExpFourierBasis(input, potential);
     bases_[1] = new HermiteBasis(input);
   }

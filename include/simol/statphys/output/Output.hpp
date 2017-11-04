@@ -67,12 +67,6 @@ namespace simol
     bool doOutBackUp() const {return (bool)outBackUp_;}
     bool doOutChain() const {return (bool)doOutChain_;}
     
-    /*bool doFinalLength() const {return (bool)outFinalLength_;}
-    bool doFinalVelocity() const {return (bool)outFinalVelocity_;}
-    bool doFinalLagrangeMultiplier() const {return (bool)outFinalLagrangeMultiplier_;}
-    bool doFinalChainLagrangeMultiplier() const {return (bool)outFinalChainLagrangeMultiplier_ && ;}
-    bool doFinalFlow() const {return (bool)outFinalFlow_;}*/
-    
     bool doFinalLength() const {return doFinalLength_;}
     bool doFinalVelocity() const {return doFinalVelocity_;}
     bool doFinalLagrangeMultiplier() const {return doFinalLagrangeMultiplier_;}

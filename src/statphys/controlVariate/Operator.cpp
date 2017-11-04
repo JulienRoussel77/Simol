@@ -55,8 +55,8 @@ namespace simol
   DVec Operator::basisVariables(System const& syst) const
   {
     DVec variables = DVec::Zero(2);
-    variables(0) = syst(0).position(0);
-    variables(1) = syst(0).momentum(0);
+    variables(0) = qVariable(syst)(0,0);
+    variables(1) = pVariable(syst)(0,0);
     return variables;
   }
   
@@ -87,6 +87,11 @@ namespace simol
     Operator(input)
   {}
   
+  DMat OverdampedGenerator::pVariable(System const& /*syst*/) const
+  {
+    return DVec::Zero(1);
+  }
+  
   DVec OverdampedGenerator::value(TensorBasis* basis, System const& syst) const
   {
     DVec generatorOnBasisValues = DVec::Zero(basis->totalNbOfElts());
@@ -110,9 +115,7 @@ namespace simol
     DVec r01 = syst(1).position() - syst(0).position();
     //DVec r01 = syst.periodicDistance(r01np);
     double d01 = r01.norm();
-    DVec p01 = syst(1).momentum() - syst(0).momentum();
     variables(0) = d01;
-    variables(1) = dot(p01, r01)/d01;
     if (!std::isfinite(d01))
       throw runtime_error("The colloid distance is not valid : d = " + std::to_string(d01) + " !");
     return variables;
@@ -127,13 +130,13 @@ namespace simol
     return distanceMat;
   }
   
-  DMat OvdColloidGenerator::pVariable(System const& syst) const
+  DMat OvdColloidGenerator::pVariable(System const& /*syst*/) const
   {
     DMat momentumMat = DVec::Zero(1);
-    DVec r01 = syst(1).position() - syst(0).position();
+    /*DVec r01 = syst(1).position() - syst(0).position();
     //DVec r01 = syst.periodicDistance(r01np);
     double d01 = r01.norm();
-    momentumMat(0,0) = dot(syst(1).momentum() - syst(0).momentum(), r01) / d01;
+    momentumMat(0,0) = dot(syst(1).momentum() - syst(0).momentum(), r01) / d01;*/
     return momentumMat;
   }
   
@@ -144,13 +147,6 @@ namespace simol
     //DVec r01 = syst.periodicDistance(r01np);
     double d01 = r01.norm();
     forcesMat(0,0) = dot(syst(1).force() - syst(0).force(), r01) / (2*d01) + (syst.dimension()-1) / d01;
-    //cout << r01.adjoint() << " -> "  << (syst(1).force() - syst(0).force()).adjoint() << endl;
-    //cout  << d01 << " -> " << (syst(1).force() - syst(0).force()).norm() << endl;
-    
-    //ofstream test("test", std::ofstream::app);
-    //test << d01 << " " << dot(syst(1).force() - syst(0).force(), r01) / (2*d01) << " " << (syst.dimension()-1) / d01 << " " << dot(syst(1).force(), r01) / (2*d01) << " " << dot(-syst(0).force(), r01) / (2*d01) << endl;
-    
-    //cout << "CVB force : " << d01 << " " << dot(syst(1).force() - syst(0).force(), r01) / (2*d01) << endl;
     return forcesMat;
   }
     
@@ -196,8 +192,6 @@ namespace simol
   {
     DVec projPosition = DVec::Zero(2);
     projPosition(0) = syst(0).position(0);
-    //cout << "uVar = " << syst.externalPotential().value(projPosition) << " + " << pow(syst(0).momentum(0), 2)/2 << endl;
-    //return syst(0).energy();
     return syst.externalPotential().value(projPosition) + pow(syst(0).momentum(0), 2)/2;
   }
   

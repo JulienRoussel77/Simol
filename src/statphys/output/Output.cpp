@@ -521,8 +521,7 @@ namespace simol
   }
 
   void Output::displayParticles(System const& syst, long int iOfStep)
-  {                     
-    //for (ParticleIterator it = syst.begin(); !syst.finished(it); ++it)
+  {
     for (int iOfParticle = 0; iOfParticle < nbOfParticles_; iOfParticle++)
       outParticles() << iOfStep * timeStep()
                      << " " << iOfParticle
@@ -533,10 +532,7 @@ namespace simol
                      << " " << syst(iOfParticle).energy()
                      << " " << syst(iOfParticle).force().transpose()
                      << " " << syst(iOfParticle).type()
-                     << endl; 
-                     
-    //ofstream test("distance", std::ofstream::app);
-    //test << (syst(1).position() - syst(0).position()).norm() << endl;                 
+                     << endl;             
   }
   
   ///
@@ -571,11 +567,7 @@ namespace simol
                         << " " << setw(3) << parameters_.nbOfPModes()
                         << " " << setw(12);
     
-    obsLength().displayFinalValues(outFinalLength());                 
-                        /*<< " " << setw(12) << obsLength().mean()
-                        << " " << setw(12) << obsLength().asymptoticVariance()
-                        << " " << setw(12) << obsLength().asyvarOfAsyvar()
-                        << std::endl;*/
+    obsLength().displayFinalValues(outFinalLength());
   }
   
   void Output::displayFinalVelocity()
@@ -589,13 +581,9 @@ namespace simol
                         << " " << setw(6) << parameters_.coupling()
                         << " " << setw(3) << parameters_.nbOfQModes()
                         << " " << setw(3) << parameters_.nbOfPModes()
-                        << " " << setw(12);    
-    obsVelocity().displayFinalValues(outFinalVelocity());  
-    
-                        /*<< " " << setw(12) << obsVelocity().mean()
-                        << " " << setw(12) << obsVelocity().asymptoticVariance()
-                        << " " << setw(12) << obsVelocity().asyvarOfAsyvar()
-                        << std::endl;*/
+                        << " " << setw(12);
+                        
+    obsVelocity().displayFinalValues(outFinalVelocity());
   }
   
   ///

@@ -56,7 +56,7 @@ namespace simol
   ///
   ///Evaluates each function of the basis at "configuration" and updates the attribute
   void CVBasis::computeValueBasis(System const& syst)
-  {
+  {  
     DVec variables = generator_->basisVariables(syst);
     for (int iOfElt = 0; iOfElt < totalNbOfElts(); iOfElt++)
       basisValues_(iOfElt) = tensorBasis_->value(variables, iOfElt);
