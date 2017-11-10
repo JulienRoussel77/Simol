@@ -8,7 +8,7 @@ using std::string;
 const double defaultPotentialCoeff = 1;
 const double defaultInteractionRatio = 1;
 const double defaultEpsLJ = 1.;
-const double defaultSigmaLJ = 1.;
+const double defaultSigma = 1.;
 const double defaultSplineRatio = 0.8;
 const double defaultCutOffRatio = 2.5;
 const double defaultPotentialCenter = 0;
@@ -94,12 +94,14 @@ namespace simol
       return defaultEpsLJ;
   }
 
+  ///
+  /// Represents the equilibrium distance of the potential
   double Input::potentialSigma() const
   {
     if (data["Potential"]["Sigma"])
       return data["Potential"]["Sigma"].as<double>();
     else
-      return defaultSigmaLJ;
+      return defaultSigma;
   }
 
   double Input::cutOffRatio() const

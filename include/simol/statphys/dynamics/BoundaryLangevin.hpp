@@ -18,8 +18,10 @@ namespace simol
       double sigmaLeft() const;
       double sigmaRight() const;
       const double& tauBending() const;
+      
+      virtual void simulate (System& syst) const;
 
-      void initializeMomenta(vector<Particle>& configuration);
+      void initializeMomenta(vector<Particle>& configuration) const;
       virtual void bending(Particle& particle1, Particle& particle2) const;
       
       virtual void computeGeneratorOnBasis(shared_ptr<CVBasis> cvBasis, System const& syst) const;
@@ -40,12 +42,13 @@ namespace simol
   {
     public:
       ConstrainedBoundaryLangevin(Input const& input);
-      virtual double& lagrangeMultiplier() {return lagrangeMultiplier_;}
-      virtual const double& lagrangeMultiplier() const {return lagrangeMultiplier_;}
+      virtual void simulate (System& syst) const;
+      //virtual double& lagrangeMultiplier() const {return lagrangeMultiplier_;}
+      //virtual const double& lagrangeMultiplier() const {return lagrangeMultiplier_;}
       virtual const double& flux() const {return parameters_.flux();}
       virtual string dynamicsName() const {return "ConstrainedBoundaryLangevin";}
     protected:
-      double lagrangeMultiplier_;
+      
       //double flux_;
   };
 

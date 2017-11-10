@@ -104,6 +104,70 @@ namespace simol
   {
     return sqrt(2 * parameters_.gamma() * parameters_.temperature());
   }
+  
+  void DPDE::simulate(System& syst)
+  {
+    //--- compute energy at the beginning of the step ---
+    double old_energy = 0;
+    double new_mech_energy = 0;
+    double new_int_energy = 0;
+    if (doProjectionDPDE())
+    {
+      for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
+        old_energy += syst(iOfParticle).potentialEnergy() + syst(iOfParticle).kineticEnergy() + syst(iOfParticle).internalEnergy() ;
+      //cout << "old = " << old_energy << endl;
+    }
+    
+    //-- first do a certain number of steps of Hamiltonian part, prescribed by "MTS frequency" in the input file
+    //   !! works only for NBody systems... !!
+    //cout << "time step is in fact... " << timeStep() << endl;
+    for (int k = 0; k < MTSfrequency(); k++)
+    {
+      for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
+        verletFirstPart(syst(iOfParticle));
+      syst.computeAllForces();
+      for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
+        verletSecondPart(syst(iOfParticle));
+    }
+    
+    //---------- Isolated systems -------------
+    if (syst.name() == "Isolated")
+    {
+      //-- fluctuation/dissipation --
+      for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
+        //energyReinjection(syst(iOfParticle));  // integration of p at fixed gamma + energy reinjection
+        metropolizedEnergyReinjection(syst(iOfParticle));  // Metropolis correction of effective dynamics on p 
+    }
+    //-- then integrate once the fluctuation terms, with effective timestep MTSfrequency()*timeStep_ --
+    //------------- NBody --------------------
+    else if (syst.name() == "NBody")
+    {
+      //-- fluctuation/dissipation --
+      if (parameters().gamma() > 0)
+        fluctuationDissipation(syst);
+      //-- thermal conduction --
+      if (kappa() > 0)
+        thermalConduction(syst);
+  
+    }
+    else 
+      throw std::runtime_error("The system is not implemented for DPDE dynamics!");
+    
+  
+    //--- adjust energy at the end of the step by rescaling the internal energies ---
+    if (doProjectionDPDE())
+    {
+      for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
+      {
+        new_mech_energy += syst(iOfParticle).potentialEnergy() + syst(iOfParticle).kineticEnergy();
+        new_int_energy += syst(iOfParticle).internalEnergy();
+      }
+      //cout << "new = " << new_mech_energy + new_int_energy << endl;
+      double rescaling_factor = (old_energy-new_mech_energy)/new_int_energy;
+      for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
+        syst(iOfParticle).internalEnergy() *= rescaling_factor;
+    }
+  }
 
   //-- for Metropolis procedures --
   const double& DPDE::rejectionRate() const {return rejectionRate_;}
@@ -516,7 +580,7 @@ namespace simol
   void DPDE::getThermo(Output& output) const
   {
     output.temperature() = 2 * output.kineticEnergy() / (output.dimension() * output.nbOfParticles());
-    output.totalEnergy() = output.kineticEnergy() + output.potentialEnergy() + output.internalEnergy();
+    output.obsTotalEnergy().currentValue() = output.kineticEnergy() + output.potentialEnergy() + output.internalEnergy();
   }
   
   void DPDE::specificComputeOutput(Output& output) const

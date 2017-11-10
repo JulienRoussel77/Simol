@@ -144,6 +144,9 @@ namespace simol
     virtual double length() const;
     virtual double velocity() const;
     virtual double force() const;
+    
+    virtual double& lagrangeMultiplier() {return lagrangeMultiplier_;}
+    virtual const double& lagrangeMultiplier() const {return lagrangeMultiplier_;}
   protected:
   //public:
     int dimension_;
@@ -157,6 +160,8 @@ namespace simol
     bool doSetting_;
     double domainSize_;
     string systemSubtype_;
+    
+    double lagrangeMultiplier_;
   };
 
 

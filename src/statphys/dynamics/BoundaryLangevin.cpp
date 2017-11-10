@@ -46,6 +46,24 @@ namespace simol
     particle2.force(0) += tauBending();
   }
   
+  void BoundaryLangevin::simulate(System& syst) const
+  {
+    for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
+      verletFirstPart(syst(iOfParticle));
+
+    syst.computeAllForces();
+
+    for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
+      verletSecondPart(syst(iOfParticle));
+
+    updateOrsteinUhlenbeck(syst.getParticle(0), betaLeft(), timeStep());
+    updateOrsteinUhlenbeck(syst.getParticle(syst.nbOfParticles() - 1), betaRight(), timeStep());
+
+    if (doMomentaExchange())
+      for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles() - 1; iOfParticle++)
+        updateMomentaExchange(syst(iOfParticle), syst(iOfParticle + 1));
+  }
+  
   ///Applies the generator of this dynamics to the basis functions of the CV
   ///Evaluate at the current state of "conifguration"
   void BoundaryLangevin::computeGeneratorOnBasis(shared_ptr<CVBasis> /*cvBasis*/, System const& /*syst*/) const
@@ -196,5 +214,46 @@ void BoundaryLangevin::computeProfileBiChain(Output& output, System const& syst,
   ConstrainedBoundaryLangevin::ConstrainedBoundaryLangevin(Input const& input):
     BoundaryLangevin(input)
   {}
+  
+  void ConstrainedBoundaryLangevin::simulate(System& syst) const
+  {
+    syst.lagrangeMultiplier() = 0;
+    updateOrsteinUhlenbeck(syst.getParticle(0), betaLeft(), timeStep()/2);
+    updateOrsteinUhlenbeck(syst.getParticle(syst.nbOfParticles() - 1), betaRight(), timeStep()/2);
+    
+    //double flux = syst.leftHeatFlow();
+    
+    
+    // Becareful here we assume that all the particles share the same mass !
+    // We analiticaly determine the non-martingale part of the Lagrange multiplier
+    //double alpha = exp(- gamma() / syst(0).mass() * timeStep()/2);
+    //syst.lagrangeMultiplier() += (1-alpha) * drift();
+    //double trash=0;
+    //syst.enforceConstraint(trash, drift());
+    syst.enforceConstraint(syst.lagrangeMultiplier(), flux(), parameters());
+    
+    for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
+      updateMomentum(syst(iOfParticle));
+    syst.enforceConstraint(syst.lagrangeMultiplier(), flux(), parameters());
+    
+    for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
+      updatePosition(syst(iOfParticle));
+    syst.computeAllForces();
+
+    for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
+      verletSecondPart(syst(iOfParticle));
+    syst.enforceConstraint(syst.lagrangeMultiplier(), flux(), parameters());
+    
+    updateOrsteinUhlenbeck(syst.getParticle(0), betaLeft(), timeStep()/2);
+    updateOrsteinUhlenbeck(syst.getParticle(syst.nbOfParticles() - 1), betaRight(), timeStep()/2);
+    
+    // Becareful here we assume that all the particles share the same mass !
+    // We analiticaly retermine the non-martingale part of the Lagrange multiplier
+    //syst.lagrangeMultiplier() += (1-alpha) * drift();
+    //syst.enforceConstraint(trash, drift());
+    syst.enforceConstraint(syst.lagrangeMultiplier(), flux(), parameters());
+    
+    syst.lagrangeMultiplier() /= timeStep();
+  }
 
 }

@@ -10,8 +10,9 @@ namespace simol
     public:
       Overdamped(Input const& input);
       virtual string dynamicsName() const {return "Overdamped";}
+      virtual void simulate (System& syst) const;
       //virtual void updateBefore(Particle& particle);
-      virtual void updatePosition(Particle& particle);
+      virtual void updatePosition(Particle& particle) const;
       virtual void getThermo(Output& output) const;
       virtual void getPressure(Output& output) const;
   };

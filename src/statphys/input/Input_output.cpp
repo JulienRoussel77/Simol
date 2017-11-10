@@ -185,7 +185,7 @@ namespace simol
     double periodTime;
     if (data["Output"]["PrintPeriod"]) periodTime = data["Output"]["PrintPeriod"].as<double>();
     else periodTime = defaultPrintPeriod;
-    int periodNb = (int)( periodTime / timeStep());
+    int periodNb = ceil( periodTime / timeStep());
     double periodTrunc = periodNb * timeStep();
     if (!warningGiven && (periodTime != periodTrunc))
     {
@@ -210,7 +210,7 @@ namespace simol
     double periodTime;
     if (data["Output"]["PrintLongPeriod"]) periodTime = data["Output"]["PrintLongPeriod"].as<double>();
     else periodTime = defaultPrintLongPeriod;
-    int periodNb = (int)( periodTime / timeStep());
+    int periodNb = ceil( periodTime / timeStep());
     double periodTrunc = periodNb * timeStep();
     if (!warningGiven && (periodTime != periodTrunc))
     {
@@ -268,6 +268,7 @@ namespace simol
     {
       case idKineticEnergy : return "kineticEnergy";
       case idPotentialEnergy : return "potentialEnergy";
+      case idTotalEnergy : return "totalEnergy";
       case idPressure : return "pressure";
       case idInternalEnergy : return "internalEnergy";
       case idInternalTemperature : return "internalTemperature";
@@ -288,6 +289,7 @@ namespace simol
     {
       case idKineticEnergy : return doKineticEnergy();
       case idPotentialEnergy : return doPotentialEnergy();
+      case idTotalEnergy : return doTotalEnergy();
       case idPressure : return doPressure();
       case idInternalEnergy : return doInternalEnergy();
       case idInternalTemperature : return doInternalTemperature();
@@ -306,6 +308,9 @@ namespace simol
   {return dynamicsName() != "Overdamped";}
   
   bool Input::doPotentialEnergy() const
+  {return true;}
+  
+  bool Input::doTotalEnergy() const
   {return true;}
   
   bool Input::doPressure() const

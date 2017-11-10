@@ -15,7 +15,7 @@ namespace simol
   const double& LangevinBase::xi() const {return parameters_.xi();}
   ///
   ///Returns the mean number of steps between 2 random events
-  int LangevinBase::xiNbOfSteps()
+  int LangevinBase::xiNbOfSteps() const
   {return 1 / (xi() * timeStep_);}
   ///
   ///Returns true if the dynamics involves a Poisson process (momenta exchange)
@@ -23,7 +23,7 @@ namespace simol
   {return xi() > 0;}
   ///
   ///If the momenta exchange is activated, the times of future events are drawn
-  void LangevinBase::initializeCountdown(Particle& particle)
+  void LangevinBase::initializeCountdown(Particle& particle) const
   {
     if (doMomentaExchange())
       particle.countdown() = rng_->scalarExponential() * xiNbOfSteps(); // / (xi() * timestep());
@@ -32,7 +32,7 @@ namespace simol
   }
   ///
   ///Exchanges the momenta of the 2 particles if the time has come
-  void LangevinBase::updateMomentaExchange(Particle& particle1, Particle& particle2)
+  void LangevinBase::updateMomentaExchange(Particle& particle1, Particle& particle2) const
   {
     if (particle2.countdown() == 0)
     {
@@ -47,26 +47,24 @@ namespace simol
 
   ///
   ///Analytical integration of an Orstein-Uhlenbeck process of inverse T "localBeta"
-  void LangevinBase::updateOrsteinUhlenbeck(Particle& particle, double localBeta, double localTimeStep)
+  void LangevinBase::updateOrsteinUhlenbeck(Particle& particle, double localBeta, double localTimeStep) const
   {
     double alpha = exp(- parameters_.gamma() / particle.mass() * localTimeStep);
     particle.momentum() = alpha * particle.momentum() + sqrt((1 - pow(alpha, 2)) / localBeta * particle.mass()) * rng_->gaussian();
   }
   
-  
-  
-  void LangevinBase::getThermo(Output& output) const
+  void LangevinBase::simulate(System& syst) const
   {
-    output.temperature() = 2 * output.kineticEnergy() / (output.dimension() * output.nbOfParticles());
-    output.totalEnergy() = output.kineticEnergy() + output.potentialEnergy();
+    //for (ParticleIterator it = syst.begin(); !syst.finished(it); ++it)
+    for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
+      verletFirstPart(syst(iOfParticle));
+    syst.computeAllForces();
+    //for (ParticleIterator it = syst.begin(); !syst.finished(it); ++it)
+    for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
+      verletSecondPart(syst(iOfParticle));
   }
   
-  ///
-  ///Computes the pressure from the kineticEnergy and the totalVirial, these fields must be updated
-  void LangevinBase::getPressure(Output& output) const
-  {
-    output.pressure() = (2 * output.kineticEnergy() + output.totalVirial()) / (output.dimension() * output.nbOfParticles() * pow(output.latticeParameter(), output.dimension()));
-  }
+
 
 
 }

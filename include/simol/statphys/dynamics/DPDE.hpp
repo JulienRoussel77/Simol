@@ -50,6 +50,8 @@ namespace simol
     int& MTSfrequency();
     const bool& doProjectionDPDE() const;
     bool& doProjectionDPDE();
+    
+    virtual void simulate (System& syst);
 
     //-- microscopic EOS --
     virtual double gamma_DPDE(double intEnergy);  

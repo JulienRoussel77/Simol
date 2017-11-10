@@ -89,7 +89,10 @@ namespace simol
     initialMomenta_(nbOfParticles(), DVec(dimension())),
     initialInternalEnergies_(nbOfParticles(), 0)
   {
-    assert(data.IsDefined());
+    if (!inputFlux().is_open())
+      throw runtime_error("Input constructor couldn't read from " + inputPath() + "!");
+    //if(!data.IsDefined())
+    //  throw runtime_error("Input constructor couldn't construct from  the YAML::Data object!");
     if (doRestart())
     {
       cout << " -- reading from restart file " << restartFileName() << endl;

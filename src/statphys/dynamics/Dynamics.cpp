@@ -84,14 +84,151 @@ namespace simol
   double const& Dynamics::betaRight() const {return parameters_.betaRight();}
 
 
-  /*shared_ptr<CVBasis> Dynamics::cvBasis() 
+  
+
+  //----------- Ouputs ------------------
+  
+  void Dynamics::computeOutput(System const& syst, Output& output, long int iOfStep) const
   {
-    if (galerkin_)
-      return galerkin_->makeCvBasis();
-      //return make_shared<CVBasis>(dynamic_cast<TensorBasis*>(galerkin_->tensorBasis()), make_shared<DVec>(galerkin_->CVcoeffsVec()));
-    else
-      return nullptr;  
-  }*/
+    // #### faire un output.obsMidFlow().updateBoundaryLangevin(syst, betaLeft(), betaRight(), gamma()); ####
+    if (output.obsKineticEnergy_) computeKineticEnergy(output, syst);
+    if (output.obsPotentialEnergy_) computePotentialEnergy(output, syst);
+    if (syst.isBiChain()) computeProfileBiChain(output, syst, iOfStep);
+    else if (syst.isTriChain()) computeProfileBiChain(output, syst, iOfStep);
+    if (output.obsPressure_) computePressure(output, syst);
+    if (output.obsInternalEnergy_) computeInternalEnergy(output, syst);
+    if (output.obsInternalTemperature_) computeInternalTemperature(output, syst);
+    if (output.obsLength_) output.length() = syst.length();
+    if (output.obsVelocity_) output.velocity() = syst.velocity();
+    if (output.obsForce_) output.force() = syst.force();
+    if (output.obsLagrangeMultiplier_) output.lagrangeMultiplier() = syst.lagrangeMultiplier();
+    getThermo(output);
+    
+    if (output.hasControlVariate()) computeControlVariate(syst, output);
+    
+    //cout << "sumFlow = " << output.obsSumFlow().currentValue() << endl;
+    
+    for (auto&& observable : output.observables())
+      observable->appendCurrent(iOfStep);
+    
+    //compute specific outputs, e.g. rejection rate, negative energies in DPDE, etc
+    specificComputeOutput(output);
+  }
+  
+  void Dynamics::computeControlVariate(System const& syst, Output& output) const
+  {
+    output.cvBasis_->computeValueBasis(syst);
+    output.cvBasis_->computeValueGeneratorOnBasis(syst);
+    //output.cvBasis_->generator_->value(output.cvBasis_, syst, parameters());
+  }
+  
+  //------------------- writeOutput and its specifications by dynamics ---------------------------
+
+  void Dynamics::writeOutput(System const& syst, Output& output, long int iOfStep) const
+  {
+    //throw std::invalid_argument("writeOutput not defined in the general case");
+    if (output.doOutput(iOfStep))
+    {
+      for (int iOfObservable=0; iOfObservable < output.nbOfObservables(); iOfObservable++)
+        output.observables(iOfObservable)->display(iOfStep);
+      output.displayThermoVariables(iOfStep);
+      if (output.doOutChain())
+      {
+        output.displayChainPositions(syst, iOfStep);
+        output.displayChainMomenta(syst, iOfStep);
+      }
+    }
+    
+    if (output.doLongPeriodOutput(iOfStep))
+    {
+      if (output.doOutParticles()) output.displayParticles(syst, iOfStep);
+      if (output.doXMakeMol()) output.displayXMakeMol(syst, iOfStep);   
+      if (output.doOutBackUp()) output.displayBackUp(syst, iOfStep);
+      if (output.doOutChain()) output.displayProfile(iOfStep);
+    }
+  }
+
+
+  //--------------------------- final output ------------------------------------
+
+  void Dynamics::writeFinalOutput(System const& syst, Output& output) const
+  {
+    output.finalDisplayCorrelations();    
+    if (output.doOutChain()) output.finalChainDisplay();
+    if (output.doFinalFlow()) output.displayFinalFlow(syst.potParameter1(), syst.potParameter2(), syst.pairPotential().harmonicFrequency());
+    if (output.doFinalLength()) output.displayFinalLength();
+    if (output.doFinalVelocity()) output.displayFinalVelocity();
+    if (output.doFinalLagrangeMultiplier())
+    {
+      if (output.doOutChain())
+        output.displayFinalChainLagrangeMultiplier(syst.potParameter1(), syst.potParameter2());
+      else
+        output.displayFinalLagrangeMultiplier();        
+    }
+  }
+  
+  
+  void Dynamics::thermalize(System& syst) const
+  {
+    simulate(syst);
+  }
+  
+  void Dynamics::sampleSystem(System& syst) const
+  {
+    cout << " Initialization of the system..." << endl;
+    cout << "sampleSystem : " << syst(0).position().adjoint() << endl;
+
+    if (!syst.doSetting())
+    {
+      syst.sampleMomenta(parameters());
+      syst.samplePositions(parameters());
+      sampleInternalEnergies(syst);
+    }
+    
+    for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
+      syst(iOfParticle).oldGaussian() = syst.rng()->gaussian();
+
+    cout << " - Thermalization (" << thermalizationNbOfSteps() << " steps)..." << endl;
+
+    for (long int iOfStep  = 0; iOfStep < thermalizationNbOfSteps(); ++iOfStep)
+      thermalize(syst);
+
+    cout << " - Burn-in (" << burninNbOfSteps() << " steps)..." << endl;
+
+    for (long int iOfStep  = 0; iOfStep < burninNbOfSteps(); ++iOfStep)
+      simulate(syst);
+    
+    cout << " Starting production mode" << endl;
+    cout << endl;
+
+    syst.computeAllForces();
+    cout << "sampleSystem : " << syst(0).position().adjoint() << endl;
+  }
+  
+  ///
+  /// Main function
+  void Dynamics::launch(System& syst, Output& output)
+  {    
+    //---- initialization (including burn-in) -----
+    sampleSystem(syst);
+    //---- actual steps -----
+    for (long int iOfStep  = 0; iOfStep < nbOfSteps(); ++iOfStep)
+    {
+      //--- display progress every time 10% of simulation elapsed ---
+      if ((10 * iOfStep) % nbOfSteps() == 0)
+        cout << "---- Run " << (100 * iOfStep) / nbOfSteps() << " % completed ----" << endl;
+
+      //--- write outputs if required ----
+      computeOutput(syst, output, iOfStep);
+      writeOutput(syst, output, iOfStep);
+      //---- update the system_ by the numerical integration ---
+      simulate(syst);
+      //if (output_.hasControlVariate()) system_->computeAllForces();
+    }
+
+    //--- write final outputs ----
+    writeFinalOutput(syst, output);
+  }
 
   ///
   ///Standard first part of the numerical integration : half upadate on "p" and update on "q"
@@ -169,7 +306,18 @@ namespace simol
     output.obsInternalTemperature().currentValue() /= syst.nbOfParticles();
   }
   
-
+  void Dynamics::getThermo(Output& output) const
+  {
+    output.temperature() = 2 * output.kineticEnergy() / (output.dimension() * output.nbOfParticles());
+    output.obsTotalEnergy().currentValue() = output.kineticEnergy() + output.potentialEnergy();
+  }
+  
+  ///
+  ///Computes the pressure from the kineticEnergy and the totalVirial, these fields must be updated
+  void Dynamics::getPressure(Output& output) const
+  {
+    output.pressure() = (2 * output.kineticEnergy() + output.totalVirial()) / (output.dimension() * output.nbOfParticles() * pow(output.latticeParameter(), output.dimension()));
+  }
 
 }
 //#endif

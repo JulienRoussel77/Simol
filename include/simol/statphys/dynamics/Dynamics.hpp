@@ -52,9 +52,16 @@ namespace simol
       virtual const double& betaLeft() const;
       virtual const double& betaRight() const;
       
-      //--for output --
-      virtual void getThermo(Output& output) const = 0;
-      virtual void getPressure(Output& output) const = 0;
+      virtual void sampleInternalEnergies(System&) const {};
+      virtual void computeOutput(System const& syst, Output& output, long int iOfStep) const;
+      virtual void computeControlVariate(System const& syst, Output& output) const;
+      virtual void writeOutput(System const& syst, Output& output, long int iOfStep) const;
+      virtual void writeFinalOutput(System const& syst, Output& output) const;
+      virtual void thermalize(System& syst) const;
+      virtual void sampleSystem(System& syst) const;
+      virtual void launch(System& syst, Output& output);
+      
+      virtual void simulate(System& /*syst*/) const {cout << "simulate(System&)" << endl;};
        
       //-- for DPDE --
       virtual double internalTemperature(double /*intEnergy*/) const {return 0;}
@@ -74,15 +81,10 @@ namespace simol
       virtual void updateMomentaExchange(Particle& /*particle1*/, Particle& /*particle2*/) {assert(false);};
       virtual void bending(Particle& /*particle1*/, Particle& /*particle2*/) const {};
       
-      //-- control variates --
-      //Galerkin* galerkin();
-      //shared_ptr<CVBasis> createCvBasis(Input const& input);
-      //shared_ptr<CVBasis> cvBasis();
-      //return CVBasis(dynamic_cast<TensorBasis*>(&basis_), make_shared<DVec>(CVcoeffsVec()));
       
       
-      virtual double& lagrangeMultiplier() {throw runtime_error("resetConstraint not implemented for this system !");}
-      virtual const double& lagrangeMultiplier() const {throw runtime_error("resetConstraint not implemented for this system !");}
+      /*virtual double& lagrangeMultiplier() {throw runtime_error("resetConstraint not implemented for this system !");}
+      virtual const double& lagrangeMultiplier() const {throw runtime_error("resetConstraint not implemented for this system !");}*/
       
       //-- output functions --
       virtual void computeKineticEnergy(Output& output, System const& syst) const;
@@ -93,6 +95,10 @@ namespace simol
       
       virtual void computeProfileBiChain(Output&, System const&, long int) const {}
       virtual void computeProfileTriChain(Output&, System const&, long int) const {}
+            
+      //--for output --
+      virtual void getThermo(Output& output) const;
+      virtual void getPressure(Output& output) const;
     protected:
       DynamicsParameters parameters_;
       double timeStep_;

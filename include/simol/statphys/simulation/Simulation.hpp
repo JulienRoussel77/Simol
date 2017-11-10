@@ -27,7 +27,7 @@ namespace simol
       Simulation(Input& input);
       void launch();
 
-    protected:
+    public:
       int dimension_;
       std::shared_ptr<RNG> rng_;
       // /!\ System is stored as a System* so in all the library: printName(*system_) will return "System" but system_->printName() will return "DaughterSystem"
@@ -45,7 +45,7 @@ namespace simol
   
   System* createSystem(Input const& input);
 
-  //-- fundamental functions --
+  /*//-- fundamental functions --
   void sampleSystem(Dynamics& dyna, System& syst);
   
   void sampleInternalEnergies(Dynamics const& dyna, System& syst);
@@ -55,19 +55,10 @@ namespace simol
   void thermalize(BoundaryLangevin& dyna, System& syst);
   void thermalize(DPDE& dyna, System& syst);
   
-  void simulate(Dynamics& dyna           , System& syst);
-  void simulate(Overdamped& dyna         , System& syst);
-  void simulate(LangevinBase& dyna       , System& syst);
-  void simulate(Langevin& dyna           , System& syst);
-  void simulate(ConstrainedLangevin& dyna, System& syst);
-  void simulate(BoundaryLangevin& dyna   , System& syst);
-  void simulate(ConstrainedBoundaryLangevin& dyna, System& syst);
-  void simulate(DPDE& dyna               , System& syst);
-  
   void computeOutput(Dynamics const& dyna, System const& syst, Output& output, long int iOfStep);
   void computeControlVariate(System const& syst, Output& output);
   void writeOutput(Dynamics const& dyna, System const& syst , Output& output, long int iOfStep);
-  void writeFinalOutput(System const& syst, Output& output);
+  void writeFinalOutput(System const& syst, Output& output);*/
   
   
   // -------------------- Template implementation --------------------
@@ -95,66 +86,9 @@ namespace simol
     //output_.setControlVariates(input, system_->potential(), dynamics_.galerkin());
   }
 
-  ///
-  /// Main function
-  template<class D>
-  void Simulation<D>::launch()
-  {    
-    //---- initialization (including burn-in) -----
-    sampleSystem(dynamics_, *system_);
-    //---- actual steps -----
-    for (long int iOfStep  = 0; iOfStep < dynamics_.nbOfSteps(); ++iOfStep)
-    {
-      //--- display progress every time 10% of simulation elapsed ---
-      if ((10 * iOfStep) % dynamics_.nbOfSteps() == 0)
-        cout << "---- Run " << (100 * iOfStep) / dynamics_.nbOfSteps() << " % completed ----" << endl;
-
-      //--- write outputs if required ----
-      computeOutput(dynamics_, *system_, output_, iOfStep);
-      writeOutput(dynamics_, *system_, output_, iOfStep);
-      //---- update the system_ by the numerical integration ---
-      simulate(dynamics_, *system_);
-      //if (output_.hasControlVariate()) system_->computeAllForces();
-    }
-
-    //--- write final outputs ----
-    writeFinalOutput(*system_, output_);
-  }
   
   
   
-  template <class D, class S>
-  void sampleSystem(D& dyna, S& syst)
-  {
-    cout << " Initialization of the system..." << endl;
-    cout << "sampleSystem : " << syst(0).position().adjoint() << endl;
-
-    if (!syst.doSetting())
-    {
-      syst.sampleMomenta(dyna.parameters());
-      syst.samplePositions(dyna.parameters());
-      sampleInternalEnergies(dyna, syst);
-    }
-    
-    for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
-      syst(iOfParticle).oldGaussian() = syst.rng()->gaussian();
-
-    cout << " - Thermalization (" << dyna.thermalizationNbOfSteps() << " steps)..." << endl;
-
-    for (long int iOfStep  = 0; iOfStep < dyna.thermalizationNbOfSteps(); ++iOfStep)
-      thermalize(dyna, syst);
-
-    cout << " - Burn-in (" << dyna.burninNbOfSteps() << " steps)..." << endl;
-
-    for (long int iOfStep  = 0; iOfStep < dyna.burninNbOfSteps(); ++iOfStep)
-      simulate(dyna, syst);
-    
-    cout << " Starting production mode" << endl;
-    cout << endl;
-
-    syst.computeAllForces();
-    cout << "sampleSystem : " << syst(0).position().adjoint() << endl;
-  }
   
 
 }

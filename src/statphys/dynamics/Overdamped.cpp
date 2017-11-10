@@ -13,7 +13,7 @@ namespace simol
 
   // /!\ a changer dans le cas N != 1
   ///Proceeds to an Euler-Maruyama scheme (in comment the second order is available)
-  void Overdamped::updatePosition(Particle& particle)
+  void Overdamped::updatePosition(Particle& particle) const
   {
     //particle.position() += timeStep_ * particle.force() + sqrt(2 * timeStep_ / beta_) * rng_->gaussian();
     DVec newGaussian = rng_->gaussian();
@@ -21,12 +21,24 @@ namespace simol
     particle.oldGaussian() = newGaussian;
   }
   
+  void Overdamped::simulate(System& syst) const
+  {
+    //cout << "Overdamped::simulate( System& syst)" << endl;
+    for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
+    {
+      //cout << iOfParticle << " " << syst(iOfParticle).position().adjoint() << " " << syst(iOfParticle).momentum().adjoint() << " " << syst(iOfParticle).force().adjoint() << endl;
+      updatePosition(syst(iOfParticle));
+      //cout << iOfParticle << " " << syst(iOfParticle).position().adjoint() << " " << syst(iOfParticle).momentum().adjoint() << " " << syst(iOfParticle).force().adjoint() << endl;
+    }
+    syst.computeAllForces();
+  }
+  
   void Overdamped::getThermo(Output& output) const
   {    
     double kineticEnergy = output.dimension() * output.nbOfParticles() / (2 * parameters_.beta());
     
     output.temperature() = 1 / parameters_.beta();
-    output.totalEnergy() = kineticEnergy + output.potentialEnergy();
+    output.obsTotalEnergy().currentValue() = kineticEnergy + output.potentialEnergy();
   }
   
   ///

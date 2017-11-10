@@ -141,6 +141,7 @@ namespace simol
     bool doObservable(int idObs) const;
     bool doKineticEnergy() const;
     bool doPotentialEnergy() const;
+    bool doTotalEnergy() const;
     bool doPressure() const;
     bool doDPDE() const;
     bool doInternalEnergy() const;

@@ -7,11 +7,14 @@ namespace simol
   Coulomb::Coulomb(Input const & input):
     Potential(input),
     epsilon_(input.potentialEpsilon()),
+    sigma_(input.potentialSigma()),
     cutOffRadius_(input.cutOffRatio()),
-    coeff_(epsilon_/(1. - 2./sqrt(cutOffRadius_) + 1./cutOffRadius_))
+    coeff_(epsilon_/pow(1./sqrt(sigma_) - 1./sqrt(cutOffRadius_), 2))
   {
-    //cout << "epsilon_ = " << epsilon_ << endl;
-    //cout << "coeff_ = " << coeff_ << endl;
+    /*cout << "epsilon_ = " << epsilon_ << endl;
+    cout << "sigma_ = " << sigma_<< endl;
+    cout << "cutOffRadius_ = " << cutOffRadius_<< endl;
+    cout << "coeff_ = " << coeff_ << endl;*/
   }
 
   /// -- distinguish the domains --
@@ -26,9 +29,10 @@ namespace simol
 
   double Coulomb::scalarGradient(double dist) const
   {
+    //cout << dist << " -> " << -coeff_ / pow(dist, 2) * (1. - sqrt(dist / cutOffRadius_)) << endl;
     if (dist < cutOffRadius_)
       //return -coeff_ * (pow(dist, 2) - 1./sqrt(pow(dist, 3) * cutOffRadius_));
-      return -coeff_/2 * pow(dist, -1.5) * (1./sqrt(dist) - 1./sqrt(cutOffRadius_));
+      return -coeff_ / pow(dist, 2) * (1. - sqrt(dist / cutOffRadius_));
     else return 0;
   }
 

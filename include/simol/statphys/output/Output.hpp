@@ -155,6 +155,8 @@ namespace simol
     Observable const& obsKineticEnergy() const;
     Observable& obsPotentialEnergy();
     Observable const& obsPotentialEnergy() const;
+    Observable& obsTotalEnergy();
+    Observable const& obsTotalEnergy() const;
     Observable& obsPressure();
     Observable const& obsPressure() const;
     Observable& obsInternalEnergy();
@@ -217,7 +219,7 @@ namespace simol
   protected:
 
     //-- fields to output --
-    double totalEnergy_;
+    //double totalEnergy_;
     double totalVirial_;
     double temperature_;
     // rejection rates (DPDE)
@@ -240,6 +242,7 @@ namespace simol
     vector<Observable*> allObservables_;
     Observable* obsKineticEnergy_;
     Observable* obsPotentialEnergy_;
+    Observable* obsTotalEnergy_;
     Observable* obsPressure_;
     Observable* obsInternalEnergy_;
     Observable* obsInternalTemperature_;

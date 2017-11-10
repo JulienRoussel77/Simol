@@ -19,7 +19,7 @@ namespace simol
     nbOfSteps_(input.nbOfSteps()),
     latticeParameter_(input.latticeParameter()),
     parameters_(input),
-    totalEnergy_(0),
+    //totalEnergy_(0),
     totalVirial_(0),
     temperature_(0),
     decorrelationNbOfSteps_(input.decorrelationNbOfSteps()),
@@ -37,6 +37,7 @@ namespace simol
     fitModifFlow_(input.fitModiFlow()),
     obsKineticEnergy_(nullptr),
     obsPotentialEnergy_(nullptr),
+    obsTotalEnergy_(nullptr),
     obsPressure_(nullptr),
     obsInternalEnergy_(nullptr),
     obsInternalTemperature_(nullptr),
@@ -196,6 +197,7 @@ namespace simol
     {
       case idKineticEnergy : return obsKineticEnergy_;
       case idPotentialEnergy : return obsPotentialEnergy_;
+      case idTotalEnergy : return obsTotalEnergy_;
       case idPressure : return obsPressure_;
       case idInternalEnergy : return obsInternalEnergy_;
       case idInternalTemperature : return obsInternalTemperature_;
@@ -298,6 +300,12 @@ namespace simol
   double& Output::potentialEnergy()
   {return obsPotentialEnergy().currentValue();}
 
+  const double& Output::totalEnergy() const
+  {return obsTotalEnergy().currentValue();}
+
+  double& Output::totalEnergy()
+  {return obsTotalEnergy().currentValue();}
+  
   const double& Output::pressure() const
   {return obsPressure().currentValue();}
   
@@ -334,11 +342,11 @@ namespace simol
   double& Output::lagrangeMultiplier()
   {return obsLagrangeMultiplier().currentValue();}
   
-  const double& Output::totalEnergy() const
+  /*const double& Output::totalEnergy() const
   {return totalEnergy_;}
   
   double& Output::totalEnergy()
-  {return totalEnergy_;}
+  {return totalEnergy_;}*/
   
   const double& Output::temperature() const
   {return temperature_;}
@@ -355,6 +363,10 @@ namespace simol
   {return *obsPotentialEnergy_;}
   Observable const& Output::obsPotentialEnergy() const
   {return *obsPotentialEnergy_;}
+  Observable& Output::obsTotalEnergy()
+  {return *obsTotalEnergy_;}
+  Observable const& Output::obsTotalEnergy() const
+  {return *obsTotalEnergy_;}
   Observable& Output::obsPressure()
   {return *obsPressure_;}
   Observable const& Output::obsPressure() const
