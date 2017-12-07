@@ -586,11 +586,11 @@ namespace simol
   {
     outFinalVelocity() << std::left << setw(10) << finalTime()
                         << " " << setw(5) << timeStep()
-                        << " " << setw(6) << nbOfParticles()
+                        << " " << setw(4) << nbOfParticles()
                         << " " << setw(4) << parameters_.temperature()
-                        << " " << setw(6) << parameters_.gamma()
-                        << " " << setw(6) << parameters_.nonEqAmplitude()
-                        << " " << setw(6) << parameters_.coupling()
+                        << " " << setw(8) << parameters_.gamma()
+                        << " " << setw(8) << parameters_.nonEqAmplitude()
+                        << " " << setw(8) << parameters_.coupling()
                         << " " << setw(3) << parameters_.nbOfQModes()
                         << " " << setw(3) << parameters_.nbOfPModes()
                         << " " << setw(12);

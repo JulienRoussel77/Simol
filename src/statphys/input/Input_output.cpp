@@ -32,7 +32,7 @@ namespace simol
         && sameLetters(data["Output"]["SimuTypeName"].as<string>(), "yes"))
       name += dynamicsName() + "/" + systemName() + "/";
     if (potentialName() == "TwoTypes")
-      name += firstPotentialName() + "/";
+      name += secondPotentialName() + "/" + firstPotentialName() + "/";
     else
       name += potentialName() + "/";
     
