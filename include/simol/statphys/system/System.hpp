@@ -72,7 +72,8 @@ namespace simol
     //virtual Particle& getMember(const int& iOfCell, const int& iOfMember) {return getParticle(iOfMember);}
     //virtual Particle const& getMember(const int& iOfCell, const int& iOfMember) const {return getParticle(iOfMember);}
     const int& dimension() const;
-    int const& nbOfParticles() const;
+    const int& nbOfParticles() const;
+    const double& domainSize() const;
     string const& systemSubtype() const;
     
     virtual bool doCells() const {return false;}

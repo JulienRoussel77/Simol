@@ -78,6 +78,11 @@ namespace simol
     return nbOfParticles_;
   }
   
+  const double& System::domainSize() const
+  {
+    return domainSize_;
+  }
+  
   const string& System::systemSubtype() const
   {
     return systemSubtype_;

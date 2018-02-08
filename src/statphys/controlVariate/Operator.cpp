@@ -115,9 +115,11 @@ namespace simol
     DVec r01 = syst(1).position() - syst(0).position();
     //DVec r01 = syst.periodicDistance(r01np);
     double d01 = r01.norm();
+    //cout << "d01 = " << d01 << endl;
     variables(0) = d01;
-    if (!std::isfinite(d01))
-      throw runtime_error("The colloid distance is not valid : d = " + std::to_string(d01) + " !");
+    //if (!std::isfinite(d01))
+    if (!std::isfinite(d01) || d01 > sqrt(syst.dimension()) * syst.domainSize())
+      throw runtime_error("The colloid distance is not valid : d = " + std::to_string(d01) + " when the domain size is "+ std::to_string(syst.domainSize()) + "^"+std::to_string(syst.dimension())+" !");
     return variables;
   }
   
