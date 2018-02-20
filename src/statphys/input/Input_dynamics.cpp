@@ -160,7 +160,7 @@ namespace simol
     if (data["Dynamics"]["BulkDriving"])
       return data["Dynamics"]["BulkDriving"].as<double>();
     else 
-      return nu() / (2 * (nbOfParticles()-2);
+      return nu() / (2 * (nbOfParticles()-2));
     //else return defaultBulkDriving;
   }
   
