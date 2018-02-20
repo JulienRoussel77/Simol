@@ -13,7 +13,8 @@ const double defaultKappa = 0;
 const int    defaultMTSfrequency = 1;
 const double defaultNonEqAmplitude = 0;
 const double defaultDrift= 0;
-const double defaultBulkDriving = 0;
+//const double defaultBulkDriving = 0;
+const double defaultNu = 0;
 const double defaultFlux = 0;
 
 namespace simol
@@ -156,7 +157,16 @@ namespace simol
   {
     if (data["Dynamics"]["BulkDriving"])
       return data["Dynamics"]["BulkDriving"].as<double>();
-    else return defaultBulkDriving;
+    else 
+      return nu() / (2 * (nbOfParticles()-2);
+    //else return defaultBulkDriving;
+  }
+  
+  double Input::nu() const
+  {
+    if (data["Dynamics"]["Nu"])
+      return data["Dynamics"]["Nu"].as<double>();
+    else return defaultNu;
   }
   
   double Input::flux() const

@@ -94,6 +94,7 @@ namespace simol
         else if (vecParameters[iOfVec] == "DT")  name += doubleToString(deltaTemperature());
         else if (vecParameters[iOfVec] == "flux")  name += doubleToString(flux());
         else if (vecParameters[iOfVec] == "delta")  name += doubleToString(coupling());
+        else if (vecParameters[iOfVec] == "nu")  name += doubleToString(nu());
         else throw std::runtime_error(vecParameters[iOfVec] + " is not a parameter name !");
       }
       name += "/";

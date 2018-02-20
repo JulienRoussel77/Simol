@@ -111,6 +111,7 @@ namespace simol
     int seed() const;
     double eta() const;
     double bulkDriving() const;
+    double nu() const;
     double flux() const;
     double heatCapacity() const;          // used for DPDE dynamics
     double heatCapacityEinstein() const;  // used for DPDE dynamics
