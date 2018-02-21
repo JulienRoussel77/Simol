@@ -140,11 +140,6 @@ namespace simol
   
   double BiChain::heatFlow(int iOfLink) const
   {
-    /*if (iOfLink == -1)
-      return dynaPara.gamma() / getParticle(iOfLink).mass() * (dynaPara.temperatureLeft() - pow(getParticle(iOfLink).momentum(0), 2) / getParticle(iOfLink).mass());
-    else if (iOfLink == nbOfParticles()-1)
-      return dynaPara.gamma() / getParticle(iOfLink).mass() * ( - pow(getParticle(iOfLink).momentum(0), 2) / getParticle(iOfLink).mass() - dynaPara.temperatureRight());
-    else*/
     return (leftHeatFlow(iOfLink) + rightHeatFlow(iOfLink))/2;
   }
   

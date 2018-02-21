@@ -57,8 +57,8 @@ namespace simol
                      << " " << setw(5) << timeStep()
                      << " " << setw(6) << nbOfParticles()
                      << " " << setw(6) << parameters_.temperature()
-                     << " " << setw(6) << parameters_.deltaTemperature()
-                     << " " << setw(6) << parameters_.bulkDriving()
+                     << " " << setw(6) << parameters_.eta()
+                     << " " << setw(6) << parameters_.nu()
                      << " " << setw(6) << parameter1
                      << " " << setw(6) << parameter2
                      << " " << setw(6) << parameter3
@@ -80,8 +80,8 @@ namespace simol
                      << " " << setw(5) << timeStep()
                      << " " << setw(6) << nbOfParticles()
                      << " " << setw(4) << parameters_.temperature()
-                     << " " << setw(4) << parameters_.deltaTemperature()
-                     << " " << setw(6) << parameters_.bulkDriving()
+                     << " " << setw(4) << parameters_.eta()
+                     << " " << setw(6) << parameters_.nu()
                      << " " << setw(6) << parameter1
                      << " " << setw(6) << parameter2
                      << " " << setw(6) << parameter3

@@ -137,13 +137,12 @@ void BoundaryLangevin::computeProfileBiChain(Output& output, System const& syst,
         //cout << output.obsModiFlow().currentValue() << " + " << modiFlow << " = " << output.obsModiFlow().currentValue() + modiFlow << endl;
         output.obsModiFlow().currentValue() += modiFlow;
       }
-
       output.appendBendistProfile(dist , iOfStep, iOfParticle);
       output.appendPotTempTopProfile(potTempTop, iOfStep, iOfParticle);
       output.appendPotTempBotProfile(potTempBot, iOfStep, iOfParticle);
-      output.appendKinTempProfile(2 * syst(iOfParticle).kineticEnergy(), iOfStep, iOfParticle);
       output.appendFlowProfile(flow, iOfStep, iOfParticle);
       output.appendModiFlowProfile(modiFlow, iOfStep, iOfParticle);
+      output.appendKinTempProfile(2 * syst(iOfParticle).kineticEnergy(), iOfStep, iOfParticle);      
     }
     output.obsSumFlow().currentValue() /= (syst.nbOfParticles() - 1.);
     

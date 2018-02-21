@@ -13,7 +13,7 @@ const double defaultKappa = 0;
 const int    defaultMTSfrequency = 1;
 const double defaultNonEqAmplitude = 0;
 const double defaultDrift= 0;
-//const double defaultBulkDriving = 0;
+const double defaultBulkDriving = 0;
 const double defaultNu = 0;
 const double defaultFlux = 0;
 
@@ -99,9 +99,10 @@ namespace simol
 
   double Input::deltaTemperature() const
   {
-    if (data["Dynamics"]["DeltaTemperature"])
+    return eta() / (2*beta());
+    /*if (data["Dynamics"]["DeltaTemperature"])
       return data["Dynamics"]["DeltaTemperature"].as<double>();
-    else return defaultDeltaTemperature;
+    else return defaultDeltaTemperature;*/
   }
 
   double Input::tauBending() const
@@ -143,7 +144,12 @@ namespace simol
     if (data["Dynamics"]["Eta"])
       return data["Dynamics"]["Eta"].as<double>();
     else if (sameLetters(dynamicsName(), "BoundaryLangevin"))
-      return 2*beta() * deltaTemperature();
+    {
+      if (data["Dynamics"]["DeltaTemperature"])
+        return 2*beta() * data["Dynamics"]["DeltaTemperature"].as<double>();
+      else
+        2*beta() * defaultDeltaTemperature;
+    }
     else
       return nonEqAmplitude();
   }
@@ -157,10 +163,11 @@ namespace simol
   
   double Input::bulkDriving() const
   {
-    if (data["Dynamics"]["BulkDriving"])
+    return nu() / (2 * (nbOfParticles()-2));
+    /*if (data["Dynamics"]["BulkDriving"])
       return data["Dynamics"]["BulkDriving"].as<double>();
     else 
-      return nu() / (2 * (nbOfParticles()-2));
+      return nu() / (2 * (nbOfParticles()-2));*/
     //else return defaultBulkDriving;
   }
   
@@ -168,7 +175,15 @@ namespace simol
   {
     if (data["Dynamics"]["Nu"])
       return data["Dynamics"]["Nu"].as<double>();
-    else return defaultNu;
+    else if (sameLetters(dynamicsName(), "BoundaryLangevin"))
+    {
+      if (data["Dynamics"]["BulkDriving"])
+        return (2 * (nbOfParticles()-2)) * data["Dynamics"]["BulkDriving"].as<double>();
+      else
+        return (2 * (nbOfParticles()-2)) * defaultBulkDriving;
+    }
+    else 
+      return defaultNu;
   }
   
   double Input::flux() const
