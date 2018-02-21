@@ -92,7 +92,7 @@ namespace simol
 
       refPosition += localDist;
       getParticle(iOfParticle).position(0) = refPosition;
-      getParticle(iOfParticle).bulkDriving() = dynaPara.bulkDriving();      
+      getParticle(iOfParticle).bulkDriving() = dynaPara.bulkDriving();
     }
     getParticle(0).bulkDriving() = 0;
     getParticle(nbOfParticles()-1).bulkDriving() = 0;

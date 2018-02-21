@@ -176,7 +176,7 @@ namespace simol
   void Dynamics::sampleSystem(System& syst) const
   {
     cout << " Initialization of the system..." << endl;
-    cout << "sampleSystem : " << syst(0).position().adjoint() << endl;
+    cout << "sampleSystem before : " << syst(0).position().adjoint() << endl;
 
     if (!syst.doSetting())
     {
@@ -188,6 +188,8 @@ namespace simol
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
       syst(iOfParticle).oldGaussian() = syst.rng()->gaussian();
 
+    
+    syst.computeAllForces();
     cout << " - Thermalization (" << thermalizationNbOfSteps() << " steps)..." << endl;
 
     for (long int iOfStep  = 0; iOfStep < thermalizationNbOfSteps(); ++iOfStep)
@@ -200,9 +202,7 @@ namespace simol
     
     cout << " Starting production mode" << endl;
     cout << endl;
-
-    syst.computeAllForces();
-    cout << "sampleSystem : " << syst(0).position().adjoint() << endl;
+    cout << "sampleSystem after : " << syst(0).position().adjoint() << endl;
   }
   
   ///

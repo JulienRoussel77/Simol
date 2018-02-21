@@ -148,7 +148,7 @@ namespace simol
       if (data["Dynamics"]["DeltaTemperature"])
         return 2*beta() * data["Dynamics"]["DeltaTemperature"].as<double>();
       else
-        2*beta() * defaultDeltaTemperature;
+        return 2*beta() * defaultDeltaTemperature;
     }
     else
       return nonEqAmplitude();
