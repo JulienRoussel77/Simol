@@ -31,7 +31,7 @@ namespace simol
     ofstream & outParticles() {return *outParticles_;}
     ofstream & outXMakeMol() {return *outXMakeMol_;}
     ofstream & outBackUp() {return *outBackUp_;}
-    ofstream & outFinalFlow() {return *outFinalFlow_;}
+    ofstream & outFinalFlux() {return *outFinalFlux_;}
     ofstream & outFinalLength() {return *outFinalLength_;}
     ofstream & outFinalVelocity() {return *outFinalVelocity_;}
     ofstream & outFinalLagrangeMultiplier() {return *outFinalLagrangeMultiplier_;}
@@ -70,7 +70,7 @@ namespace simol
     bool doFinalLength() const {return doFinalLength_;}
     bool doFinalVelocity() const {return doFinalVelocity_;}
     bool doFinalLagrangeMultiplier() const {return doFinalLagrangeMultiplier_;}
-    bool doFinalFlow() const {return doFinalFlow_;}
+    bool doFinalFlux() const {return doFinalFlux_;}
     
     //-- fields to output --
     const double& kineticEnergy() const;
@@ -135,14 +135,14 @@ namespace simol
     void appendPotTempTopProfile(double value, long int iOfStep, int iOfParticle);
     void appendPotTempBotProfile(double value, long int iOfStep, int iOfParticle);
     void appendBendistProfile(double value, long int iOfStep, int iOfParticle);
-    void appendFlowProfile(double value, long int iOfStep, int iOfParticle);
-    void appendModiFlowProfile(double value, long int iOfStep, int iOfParticle);
+    void appendFluxProfile(double value, long int iOfStep, int iOfParticle);
+    void appendModiFluxProfile(double value, long int iOfStep, int iOfParticle);
     void writeProfile(ofstream & out_, long int iOfStep);
     void displayChainMomenta(System const& syst, long int iOfStep);
     void displayChainPositions(System const& syst, long int iOfStep);
     void displayProfile(long int iOfStep);
     void finalChainDisplay();
-    void displayFinalFlow(double parameter1=0, double parameter2=0, double parameter3=0);
+    void displayFinalFlux(double parameter1=0, double parameter2=0, double parameter3=0);
     void displayFinalChainLagrangeMultiplier(double parameter1=0, double parameter2=0, double parameter3=0);
     
     //-------------- ConstrainedLangevin ----------------
@@ -169,12 +169,12 @@ namespace simol
     Observable const& obsForce() const;
     Observable& obsLength();
     Observable const& obsLength() const;
-    Observable& obsMidFlow();
-    Observable const& obsMidFlow() const;
-    Observable& obsSumFlow();
-    Observable const& obsSumFlow() const;
-    Observable& obsModiFlow();
-    Observable const& obsModiFlow() const;
+    Observable& obsMidFlux();
+    Observable const& obsMidFlux() const;
+    Observable& obsSumFlux();
+    Observable const& obsSumFlux() const;
+    Observable& obsModiFlux();
+    Observable const& obsModiFlux() const;
     Observable& obsLagrangeMultiplier();
     Observable const& obsLagrangeMultiplier() const;
 
@@ -199,7 +199,7 @@ namespace simol
     std::shared_ptr<ofstream> outVelocitiesGenerator_;
 
     //-- for chains --
-    std::shared_ptr<ofstream> outFinalFlow_;
+    std::shared_ptr<ofstream> outFinalFlux_;
     std::shared_ptr<ofstream> outBeam_;  
     std::shared_ptr<ofstream> outChainVelocities_;
     std::shared_ptr<ofstream> outProfile_;
@@ -232,8 +232,8 @@ namespace simol
     int decorrelationNbOfSteps_, shortDecorrelationNbOfSteps_;
     
     int nbOfAutocoPts_, nbOfShortAutocoPts_;
-    bool doOutChain_, doFinalFlow_, doFinalLength_, doFinalVelocity_, doFinalLagrangeMultiplier_, doDPDE_, doXMakeMol_;
-    bool fitModifFlow_;
+    bool doOutChain_, doFinalFlux_, doFinalLength_, doFinalVelocity_, doFinalLagrangeMultiplier_, doDPDE_, doXMakeMol_;
+    bool fitModifFlux_;
     
   public:
     
@@ -249,9 +249,9 @@ namespace simol
     Observable* obsVelocity_;
     Observable* obsForce_;
     Observable* obsLength_;
-    Observable* obsMidFlow_;
-    Observable* obsSumFlow_;
-    Observable* obsModiFlow_;
+    Observable* obsMidFlux_;
+    Observable* obsSumFlux_;
+    Observable* obsModiFlux_;
     Observable* obsLagrangeMultiplier_;
     
     vector<Observable*> observables_;
@@ -262,8 +262,8 @@ namespace simol
     AutocorrelationStats potTempTopProfile_;
     AutocorrelationStats potTempBotProfile_;
     AutocorrelationStats bendistProfile_;
-    AutocorrelationStats flowProfile_;
-    AutocorrelationStats modiFlowProfile_;
+    AutocorrelationStats fluxProfile_;
+    AutocorrelationStats modiFluxProfile_;
     
     shared_ptr<CVBasis> cvBasis_;
   };

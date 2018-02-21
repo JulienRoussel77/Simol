@@ -384,8 +384,8 @@ namespace simol
   void ControlVariate::displayCorrelations(long int iOfStep)
   {
     //cout << "Velocity : The correlation in 0 is " << floor((2 * obsVelocity().centeredCorrelationAtSpan(0) * decorrelationTime() / nbOfAutocoPts()) / obsVelocity().asymptoticVariance() * 10000)/100 << "% of the variance" << endl;
-    //cout << "SumFlow : The correlation in 0 is " << floor((2 * obsSumFlow().centeredCorrelationAtSpan(0) * decorrelationTime() / nbOfAutocoPts()) / obsSumFlow().asymptoticVariance() * 10000)/100 << "% of the variance" << endl;
-    //cout << "ModiFlow : The correlation in 0 is " << floor((2 * obsModiFlow().centeredCorrelationAtSpan(0) * decorrelationTime() / nbOfAutocoPts()) / obsModiFlow().asymptoticVariance() * 10000)/100 << "% of the variance" << endl;
+    //cout << "SumFlux : The correlation in 0 is " << floor((2 * obsSumFlux().centeredCorrelationAtSpan(0) * decorrelationTime() / nbOfAutocoPts()) / obsSumFlux().asymptoticVariance() * 10000)/100 << "% of the variance" << endl;
+    //cout << "ModiFlux : The correlation in 0 is " << floor((2 * obsModiFlux().centeredCorrelationAtSpan(0) * decorrelationTime() / nbOfAutocoPts()) / obsModiFlux().asymptoticVariance() * 10000)/100 << "% of the variance" << endl;
        
     //cout << "Velocity : The correlation in 0 is " << floor((2 * obsVelocity().centeredCorrelationAtSpan(0) * decorrelationTime() / nbOfAutocoPts()) / obsVelocity().asymptoticVariance() * 10000)/100 << "% of the variance" << endl;
     outFluxCorrelation() << "# The correlation in iOfSpan = 0 is " << floor((2 * centeredCorrelationAtSpan(0) * decorrelationTime() / nbOfAutocoPts()) / asymptoticVariance() * 10000)/100 << "% of the variance" << endl;

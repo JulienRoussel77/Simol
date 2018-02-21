@@ -27,14 +27,14 @@ namespace simol
     nbOfAutocoPts_(input.nbOfAutocoPts()),
     nbOfShortAutocoPts_(input.nbOfShortAutocoPts()),
     doOutChain_(input.doOutChain()),
-    doFinalFlow_(input.doFinalFlow()),
+    doFinalFlux_(input.doFinalFlux()),
     doFinalLength_(input.doFinalLength()),
     doFinalVelocity_(input.doFinalVelocity()),
     doFinalLagrangeMultiplier_(input.doFinalLagrangeMultiplier()),
     //doFinalChainLagrangeMultiplier_(input.doFinalChainLagrangeMultiplier()),
     doDPDE_(input.doDPDE()),
     doXMakeMol_(input.doXMakeMol()),
-    fitModifFlow_(input.fitModiFlow()),
+    fitModifFlux_(input.fitModiFlux()),
     obsKineticEnergy_(nullptr),
     obsPotentialEnergy_(nullptr),
     obsTotalEnergy_(nullptr),
@@ -44,21 +44,21 @@ namespace simol
     obsVelocity_(nullptr),
     obsForce_(nullptr),
     obsLength_(nullptr),
-    obsMidFlow_(nullptr),
-    obsSumFlow_(nullptr),
-    obsModiFlow_(nullptr),
+    obsMidFlux_(nullptr),
+    obsSumFlux_(nullptr),
+    obsModiFlux_(nullptr),
     obsLagrangeMultiplier_(nullptr),
     observables_(),
     kinTempProfile_(shortDecorrelationNbOfSteps(), timeStep(), nbOfShortAutocoPts(), nbOfParticles_),
     potTempTopProfile_(shortDecorrelationNbOfSteps(), timeStep(), nbOfShortAutocoPts(), nbOfParticles_),
     potTempBotProfile_(shortDecorrelationNbOfSteps(), timeStep(), nbOfShortAutocoPts(), nbOfParticles_),
     bendistProfile_(shortDecorrelationNbOfSteps(), timeStep(), nbOfShortAutocoPts(), nbOfParticles_),
-    flowProfile_(shortDecorrelationNbOfSteps(), timeStep(), nbOfShortAutocoPts(), nbOfParticles_),
-    modiFlowProfile_(shortDecorrelationNbOfSteps(), timeStep(), nbOfShortAutocoPts(), nbOfParticles_),
+    fluxProfile_(shortDecorrelationNbOfSteps(), timeStep(), nbOfShortAutocoPts(), nbOfParticles_),
+    modiFluxProfile_(shortDecorrelationNbOfSteps(), timeStep(), nbOfShortAutocoPts(), nbOfParticles_),
     cvBasis_(cvBasis0)
   {    
     for (int idObs = 0; idObs < nbOfIdObs; idObs++)
-      if (idObs == idModiFlow || idObs == idMidFlow)
+      if (idObs == idModiFlux || idObs == idMidFlux)
         addObservable(input, idObs, shortDecorrelationNbOfSteps(), nbOfShortAutocoPts());
       else
         addObservable(input, idObs, decorrelationNbOfSteps(), nbOfAutocoPts());
@@ -95,7 +95,7 @@ namespace simol
     
     if (doFinalLength()) outFinalLength_ = std::make_shared<ofstream>(input.simuTypeName() + "finalLength.txt", std::ofstream::app);
     if (doFinalVelocity()) outFinalVelocity_ = std::make_shared<ofstream>(input.simuTypeName() + "finalVelocity.txt", std::ofstream::app);
-    if (doFinalFlow()) outFinalFlow_         = std::make_shared<ofstream>(input.simuTypeName() + "finalFlow.txt", std::ofstream::app);
+    if (doFinalFlux()) outFinalFlux_         = std::make_shared<ofstream>(input.simuTypeName() + "finalFlux.txt", std::ofstream::app);
     if (doFinalLagrangeMultiplier()) outFinalLagrangeMultiplier_= std::make_shared<ofstream>(input.simuTypeName() + "finalLagrangeMultiplier.txt", std::ofstream::app);
     if (doOutChain()) 
     {
@@ -204,9 +204,9 @@ namespace simol
       case idVelocity : return obsVelocity_;
       case idForce : return obsForce_;
       case idLength : return obsLength_;
-      case idMidFlow : return obsMidFlow_;
-      case idSumFlow : return obsSumFlow_;
-      case idModiFlow : return obsModiFlow_;
+      case idMidFlux : return obsMidFlux_;
+      case idSumFlux : return obsSumFlux_;
+      case idModiFlux : return obsModiFlux_;
       case idLagrangeMultiplier: return obsLagrangeMultiplier_;
       default : throw std::runtime_error("This observable id corresponds to no observable !");
     }
@@ -391,18 +391,18 @@ namespace simol
   {return *obsLength_;}
   Observable const& Output::obsLength() const
   {return *obsLength_;}
-  Observable& Output::obsMidFlow()
-  {return *obsMidFlow_;}
-  Observable const& Output::obsMidFlow() const
-  {return *obsMidFlow_;}
-  Observable& Output::obsSumFlow()
-  {return *obsSumFlow_;}
-  Observable const& Output::obsSumFlow() const
-  {return *obsSumFlow_;}
-  Observable& Output::obsModiFlow()
-  {return *obsModiFlow_;}
-  Observable const& Output::obsModiFlow() const
-  {return *obsModiFlow_;}
+  Observable& Output::obsMidFlux()
+  {return *obsMidFlux_;}
+  Observable const& Output::obsMidFlux() const
+  {return *obsMidFlux_;}
+  Observable& Output::obsSumFlux()
+  {return *obsSumFlux_;}
+  Observable const& Output::obsSumFlux() const
+  {return *obsSumFlux_;}
+  Observable& Output::obsModiFlux()
+  {return *obsModiFlux_;}
+  Observable const& Output::obsModiFlux() const
+  {return *obsModiFlux_;}
   Observable& Output::obsLagrangeMultiplier()
   {return *obsLagrangeMultiplier_;}
   Observable const& Output::obsLagrangeMultiplier() const
@@ -633,8 +633,8 @@ namespace simol
   void Output::finalDisplayCorrelations()
   {
     //cout << "Velocity : The correlation in 0 is " << floor((2 * obsVelocity().unbiasedCorrelationAtSpan(0) * decorrelationTime() / nbOfAutocoPts()) / obsVelocity().asymptoticVariance() * 10000)/100 << "% of the variance" << endl;
-    //cout << "SumFlow : The correlation in 0 is " << floor((2 * obsSumFlow().unbiasedCorrelationAtSpan(0) * decorrelationTime() / nbOfAutocoPts()) / obsSumFlow().asymptoticVariance() * 10000)/100 << "% of the variance" << endl;
-    //cout << "ModiFlow : The correlation in 0 is " << floor((2 * obsModiFlow().unbiasedCorrelationAtSpan(0) * decorrelationTime() / nbOfAutocoPts()) / obsModiFlow().asymptoticVariance() * 10000)/100 << "% of the variance" << endl;
+    //cout << "SumFlux : The correlation in 0 is " << floor((2 * obsSumFlux().unbiasedCorrelationAtSpan(0) * decorrelationTime() / nbOfAutocoPts()) / obsSumFlux().asymptoticVariance() * 10000)/100 << "% of the variance" << endl;
+    //cout << "ModiFlux : The correlation in 0 is " << floor((2 * obsModiFlux().unbiasedCorrelationAtSpan(0) * decorrelationTime() / nbOfAutocoPts()) / obsModiFlux().asymptoticVariance() * 10000)/100 << "% of the variance" << endl;
         
     for (int iOfObservable=0; iOfObservable < nbOfObservables(); iOfObservable++)
       observables(iOfObservable)->displayCorrelations(nbOfSteps());

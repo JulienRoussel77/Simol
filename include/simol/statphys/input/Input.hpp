@@ -150,9 +150,9 @@ namespace simol
     bool doVelocity() const;
     bool doForce() const;
     bool doLength() const;
-    bool doMidFlow() const;
-    bool doSumFlow() const;
-    bool doModiFlow() const;
+    bool doMidFlux() const;
+    bool doSumFlux() const;
+    bool doModiFlux() const;
     bool doLagrangeMultiplier() const;
     
     bool doOutThermo() const;
@@ -163,7 +163,7 @@ namespace simol
     
     bool doFinalLength() const;    
     bool doFinalVelocity() const;
-    bool doFinalFlow() const;
+    bool doFinalFlux() const;
     bool doFinalLagrangeMultiplier() const;
     bool doFinalChainLagrangeMultiplier() const;
     
@@ -181,7 +181,7 @@ namespace simol
     int nbOfPModes() const;
     bool doGalerkinNonequilibrium() const;
     bool doComputeRef() const;
-    bool fitModiFlow() const;
+    bool fitModiFlux() const;
     string CVOperator() const;
     double omegaHermite() const;
     double meshStep() const;

@@ -38,8 +38,8 @@ namespace simol
            << iOfParticle << " "
            << bendistProfile_.mean(iOfParticle) << " "
            << bendistProfile_.asymptoticVariance(iOfParticle) / sqrt(iOfStep * timeStep()) << " "
-           << flowProfile_.mean(iOfParticle) << " "
-           << flowProfile_.asymptoticVariance(iOfParticle) / sqrt(iOfStep * timeStep()) << " "
+           << fluxProfile_.mean(iOfParticle) << " "
+           << fluxProfile_.asymptoticVariance(iOfParticle) / sqrt(iOfStep * timeStep()) << " "
            << kinTempProfile_.mean(iOfParticle) << " "
            << kinTempProfile_.asymptoticVariance(iOfParticle) / sqrt(iOfStep * timeStep()) << " "
            << potTempTopProfile_.mean(iOfParticle) / potTempBotProfile_.mean(iOfParticle) << " "
@@ -51,9 +51,9 @@ namespace simol
     writeProfile(outFinalProfile(), nbOfSteps());
   }
 
-  void Output::displayFinalFlow(double parameter1, double parameter2, double parameter3)
+  void Output::displayFinalFlux(double parameter1, double parameter2, double parameter3)
   {
-    cout << "outFinalFlow_ : " <<  std::left << setw(10) << finalTime()
+    cout << "outFinalFlux_ : " <<  std::left << setw(10) << finalTime()
                      << " " << setw(5) << timeStep()
                      << " " << setw(6) << nbOfParticles()
                      << " " << setw(6) << parameters_.temperature()
@@ -62,21 +62,21 @@ namespace simol
                      << " " << setw(6) << parameter1
                      << " " << setw(6) << parameter2
                      << " " << setw(6) << parameter3
-                     << " " << setw(12) << obsMidFlow_->mean()
-                     << " " << setw(12) << obsMidFlow_->asymptoticVariance()
-                     << " " << setw(12) << obsMidFlow_->asyvarOfAsyvar()
-                     << " " << setw(12) << obsSumFlow_->mean()
-                     << " " << setw(12) << obsSumFlow_->asymptoticVariance()     //#12
-                     << " " << setw(12) << obsSumFlow_->asyvarOfAsyvar()
-                     << " " << setw(12) << obsModiFlow_->mean()
-                     << " " << setw(12) << obsModiFlow_->asymptoticVariance()
-                     << " " << setw(12) << obsModiFlow_->asyvarOfAsyvar()
+                     << " " << setw(12) << obsMidFlux_->mean()
+                     << " " << setw(12) << obsMidFlux_->asymptoticVariance()
+                     << " " << setw(12) << obsMidFlux_->asyvarOfAsyvar()
+                     << " " << setw(12) << obsSumFlux_->mean()
+                     << " " << setw(12) << obsSumFlux_->asymptoticVariance()     //#12
+                     << " " << setw(12) << obsSumFlux_->asyvarOfAsyvar()
+                     << " " << setw(12) << obsModiFlux_->mean()
+                     << " " << setw(12) << obsModiFlux_->asymptoticVariance()
+                     << " " << setw(12) << obsModiFlux_->asyvarOfAsyvar()
          << std::endl;
 
-    //cout << "displayFinalFlow(double temperature, double delta_temperature, double tau)";
-    if (doFinalFlow_)
+    //cout << "displayFinalFlux(double temperature, double delta_temperature, double tau)";
+    if (doFinalFlux_)
     {      
-      outFinalFlow() << std::left << setw(10) << finalTime()
+      outFinalFlux() << std::left << setw(10) << finalTime()
                      << " " << setw(5) << timeStep()
                      << " " << setw(6) << nbOfParticles()
                      << " " << setw(4) << parameters_.temperature()
@@ -85,15 +85,15 @@ namespace simol
                      << " " << setw(6) << parameter1
                      << " " << setw(6) << parameter2
                      << " " << setw(6) << parameter3
-                     << " " << setw(12) << obsMidFlow_->mean()
-                     << " " << setw(12) << obsMidFlow_->asymptoticVariance()
-                     << " " << setw(12) << obsMidFlow_->asyvarOfAsyvar()
-                     << " " << setw(12) << obsSumFlow_->mean()
-                     << " " << setw(12) << obsSumFlow_->asymptoticVariance()     //#12
-                     << " " << setw(12) << obsSumFlow_->asyvarOfAsyvar()
-                     << " " << setw(12) << obsModiFlow_->mean()
-                     << " " << setw(12) << obsModiFlow_->asymptoticVariance()
-                     << " " << setw(12) << obsModiFlow_->asyvarOfAsyvar()
+                     << " " << setw(12) << obsMidFlux_->mean()
+                     << " " << setw(12) << obsMidFlux_->asymptoticVariance()
+                     << " " << setw(12) << obsMidFlux_->asyvarOfAsyvar()
+                     << " " << setw(12) << obsSumFlux_->mean()
+                     << " " << setw(12) << obsSumFlux_->asymptoticVariance()     //#12
+                     << " " << setw(12) << obsSumFlux_->asyvarOfAsyvar()
+                     << " " << setw(12) << obsModiFlux_->mean()
+                     << " " << setw(12) << obsModiFlux_->asymptoticVariance()
+                     << " " << setw(12) << obsModiFlux_->asyvarOfAsyvar()
                      << std::endl;
     }
   }
@@ -113,8 +113,8 @@ namespace simol
                      << " " << setw(12) << obsLagrangeMultiplier().asymptoticVariance()
                      << " " << setw(12) << obsLagrangeMultiplier().asyvarOfAsyvar();
 
-    //cout << "displayFinalFlow(double temperature, double delta_temperature, double tau)";
-    if (doFinalFlow_)
+    //cout << "displayFinalFlux(double temperature, double delta_temperature, double tau)";
+    if (doFinalFlux_)
     {
       outFinalLagrangeMultiplier() << std::left << setw(10) << finalTime()
                      << " " << setw(5) << timeStep()
@@ -126,7 +126,7 @@ namespace simol
                      << " " << setw(6) << parameter3
                      << " " << setw(12);
       obsLagrangeMultiplier().displayFinalValues(outFinalLagrangeMultiplier());  
-      //obsMidFlow().displayFinalValues(outFinalLagrangeMultiplier());             
+      //obsMidFlux().displayFinalValues(outFinalLagrangeMultiplier());             
     }
   }
 
@@ -150,14 +150,14 @@ namespace simol
     bendistProfile_.append(value, iOfStep, iOfParticle);
   }
 
-  void Output::appendFlowProfile(double value, long int iOfStep, int iOfParticle)
+  void Output::appendFluxProfile(double value, long int iOfStep, int iOfParticle)
   {
-    flowProfile_.append(value, iOfStep, iOfParticle);
+    fluxProfile_.append(value, iOfStep, iOfParticle);
   }
   
-  void Output::appendModiFlowProfile(double value, long int iOfStep, int iOfParticle)
+  void Output::appendModiFluxProfile(double value, long int iOfStep, int iOfParticle)
   {
-    modiFlowProfile_.append(value, iOfStep, iOfParticle);
+    modiFluxProfile_.append(value, iOfStep, iOfParticle);
   }
 
 }

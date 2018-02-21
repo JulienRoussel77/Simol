@@ -52,7 +52,7 @@ namespace simol
 //     dyna.updateOrsteinUhlenbeck(syst.getParticle(0), dyna.betaLeft(), dyna.timeStep()/2);
 //     dyna.updateOrsteinUhlenbeck(syst.getParticle(syst.nbOfParticles() - 1), dyna.betaRight(), dyna.timeStep()/2);
 //     
-//     //double flux = syst.leftHeatFlow();
+//     //double flux = syst.leftHeatFlux();
 //     
 //     
 //     // Becareful here we assume that all the particles share the same mass !

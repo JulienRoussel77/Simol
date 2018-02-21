@@ -106,9 +106,9 @@ const int idInternalTemperature = 5;
 const int idVelocity = 6;
 const int idForce = 7;
 const int idLength = 8;
-const int idMidFlow = 9;
-const int idSumFlow = 10;
-const int idModiFlow = 11;
+const int idMidFlux = 9;
+const int idSumFlux = 10;
+const int idModiFlux = 11;
 const int idLagrangeMultiplier = 12;
 const int nbOfIdObs = 13;
 

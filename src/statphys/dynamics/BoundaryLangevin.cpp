@@ -95,12 +95,12 @@ void BoundaryLangevin::computeProfileBiChain(Output& output, System const& syst,
       cout << "refFlux = " << nu * deltaTemperature() * harOmega / (1 + pow(nu, 2)) << endl;
     outbool = false;
     
-    output.obsSumFlow().currentValue() = 0;
-    output.obsModiFlow().currentValue() = nu * deltaTemperature()* harOmega / (1 + pow(nu, 2));
+    output.obsSumFlux().currentValue() = 0;
+    output.obsModiFlux().currentValue() = nu * deltaTemperature()* harOmega / (1 + pow(nu, 2));
     //cout << nu << " " << output.constGamma_ << " " << output.constDeltaTemperature_ << " " << harOmega << endl;
     int midNb = (syst.nbOfParticles() - 1) / 2;
-    output.obsMidFlow().currentValue() = syst.heatFlow(midNb);
-    //cout << "---------obsModiFlow = " << output.obsModiFlow().currentValue() << endl;
+    output.obsMidFlux().currentValue() = syst.heatFlux(midNb);
+    //cout << "---------obsModiFlux = " << output.obsModiFlux().currentValue() << endl;
     
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
     {
@@ -108,14 +108,15 @@ void BoundaryLangevin::computeProfileBiChain(Output& output, System const& syst,
       double potTempBot=1;
       double potTempTop=0;
       
-      double flow = 0;
-      double modiFlow = 0;
+      double flux = 0;
+      double modiFlux = 0;
       double speedLeft, speedRight;
       
       if (iOfParticle != syst.nbOfParticles()-1)
       {
-        flow = syst.heatFlow(iOfParticle);
-        output.obsSumFlow().currentValue() += flow;
+        if (iOfParticle != 0)
+          flux = syst.heatFluxOnAtom(iOfParticle);
+        output.obsSumFlux().currentValue() += flux;
         
         dist = syst(iOfParticle+1).position(0) - syst(iOfParticle).position(0);        // dist is r_iOfParticle
         
@@ -133,31 +134,31 @@ void BoundaryLangevin::computeProfileBiChain(Output& output, System const& syst,
         else
           speedRight = -nu * harOmega * (syst(iOfParticle+2).position(0) - syst(iOfParticle+1).position(0) - syst.pairPotential().harmonicEquilibrium());
         
-        modiFlow = -(speedRight - speedLeft) * (syst(iOfParticle).energyGrad(0) - harmonicForce) / (2 * (1+pow(nu, 2)));
-        //cout << output.obsModiFlow().currentValue() << " + " << modiFlow << " = " << output.obsModiFlow().currentValue() + modiFlow << endl;
-        output.obsModiFlow().currentValue() += modiFlow;
+        modiFlux = -(speedRight - speedLeft) * (syst(iOfParticle).energyGrad(0) - harmonicForce) / (2 * (1+pow(nu, 2)));
+        //cout << output.obsModiFlux().currentValue() << " + " << modiFlux << " = " << output.obsModiFlux().currentValue() + modiFlux << endl;
+        output.obsModiFlux().currentValue() += modiFlux;
       }
       output.appendBendistProfile(dist , iOfStep, iOfParticle);
       output.appendPotTempTopProfile(potTempTop, iOfStep, iOfParticle);
       output.appendPotTempBotProfile(potTempBot, iOfStep, iOfParticle);
-      output.appendFlowProfile(flow, iOfStep, iOfParticle);
-      output.appendModiFlowProfile(modiFlow, iOfStep, iOfParticle);
+      output.appendFluxProfile(flux, iOfStep, iOfParticle);
+      output.appendModiFluxProfile(modiFlux, iOfStep, iOfParticle);
       output.appendKinTempProfile(2 * syst(iOfParticle).kineticEnergy(), iOfStep, iOfParticle);      
     }
-    output.obsSumFlow().currentValue() /= (syst.nbOfParticles() - 1.);
+    output.obsSumFlux().currentValue() /= (syst.nbOfParticles() - 2.);
     
   }
   
   void BoundaryLangevin::computeProfileTriChain(Output& output, System const& syst, long int iOfStep) const
   {
-    output.obsSumFlow().currentValue() = 0;
+    output.obsSumFlux().currentValue() = 0;
     
-    // modiFlow expression is easier for pair nbOfParticles
+    // modiFlux expression is easier for pair nbOfParticles
     
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
     {
       double bending = 0;
-      double flow = 0;
+      double flux = 0;
       double potTempTop = 0;
       double potTempBot = 0;
 
@@ -165,7 +166,7 @@ void BoundaryLangevin::computeProfileBiChain(Output& output, System const& syst,
       if (iOfParticle == 0)
       {
         bending = syst(-1).position(0) - 2 * syst(0).position(0) + syst(1).position(0);
-        flow = gamma() * (parameters().temperatureLeft() - 2 * syst(0).kineticEnergy())
+        flux = gamma() * (parameters().temperatureLeft() - 2 * syst(0).kineticEnergy())
                - syst(-1).energyGrad(0) * syst(0).momentum(0);
         potTempTop = pow(- syst(-1).energyGrad(0) + 2 * syst(0).energyGrad(0) - syst(1).energyGrad(0), 2);
         potTempBot = syst(-1).energyLapla() + 4 * syst(0).energyLapla() + syst(1).energyLapla();
@@ -174,33 +175,33 @@ void BoundaryLangevin::computeProfileBiChain(Output& output, System const& syst,
       {
         // bending is k_iOfParticle
         bending = syst(iOfParticle - 1).position(0) - 2 * syst(iOfParticle).position(0) + syst(iOfParticle + 1).position(0);
-        // flow is j_iOfParticle
-        flow = - syst(iOfParticle - 1).energyGrad(0) * syst(iOfParticle).momentum(0)
+        // flux is j_iOfParticle
+        flux = - syst(iOfParticle - 1).energyGrad(0) * syst(iOfParticle).momentum(0)
                + syst(iOfParticle).energyGrad(0) * syst(iOfParticle - 1).momentum(0);
 
         potTempTop = pow(- syst(iOfParticle - 1).energyGrad(0) + 2 * syst(iOfParticle).energyGrad(0) - syst(iOfParticle + 1).energyGrad(0), 2);
         potTempBot = syst(iOfParticle - 1).energyLapla() + 4 * syst(iOfParticle).energyLapla() + syst(iOfParticle + 1).energyLapla();
-        output.obsSumFlow().currentValue() += flow;
+        output.obsSumFlux().currentValue() += flux;
       }
       else
       {
         bending = nan("");
-        flow = - syst(iOfParticle - 1).energyGrad(0) * syst(iOfParticle).momentum(0);
+        flux = - syst(iOfParticle - 1).energyGrad(0) * syst(iOfParticle).momentum(0);
         potTempTop = pow(- syst(iOfParticle - 1).energyGrad(0), 2);
         potTempBot = syst(iOfParticle - 1).energyLapla();
       }
       int midNb = (syst.nbOfParticles() - 1) / 2;
       if (iOfParticle == midNb)
-        output.obsMidFlow().currentValue() = flow;
+        output.obsMidFlux().currentValue() = flux;
 
       output.appendBendistProfile(bending , iOfStep, iOfParticle);
       output.appendKinTempProfile(2 * syst(iOfParticle).kineticEnergy(), iOfStep, iOfParticle);
       output.appendPotTempTopProfile(potTempTop, iOfStep, iOfParticle);
       output.appendPotTempBotProfile(potTempBot, iOfStep, iOfParticle);
-      output.appendFlowProfile(flow, iOfStep, iOfParticle);
+      output.appendFluxProfile(flux, iOfStep, iOfParticle);
     }
-    output.obsSumFlow().currentValue() /= (syst.nbOfParticles() - 2.);
-    //cout << output.obsSumFlow().currentValue() << endl;
+    output.obsSumFlux().currentValue() /= (syst.nbOfParticles() - 2.);
+    //cout << output.obsSumFlux().currentValue() << endl;
   }
   
   
@@ -220,16 +221,12 @@ void BoundaryLangevin::computeProfileBiChain(Output& output, System const& syst,
     updateOrsteinUhlenbeck(syst.getParticle(0), betaLeft(), timeStep()/2);
     updateOrsteinUhlenbeck(syst.getParticle(syst.nbOfParticles() - 1), betaRight(), timeStep()/2);
     
-    //double flux = syst.leftHeatFlow();
+    //double flux = syst.leftHeatFlux();
     
     
     // Becareful here we assume that all the particles share the same mass !
-    // We analiticaly determine the non-martingale part of the Lagrange multiplier
-    //double alpha = exp(- gamma() / syst(0).mass() * timeStep()/2);
-    //syst.lagrangeMultiplier() += (1-alpha) * drift();
-    //double trash=0;
-    //syst.enforceConstraint(trash, drift());
-    syst.enforceConstraint(syst.lagrangeMultiplier(), flux(), parameters());
+    
+    //syst.enforceConstraint(syst.lagrangeMultiplier(), flux(), parameters());
     
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
       updateMomentum(syst(iOfParticle));
@@ -240,17 +237,15 @@ void BoundaryLangevin::computeProfileBiChain(Output& output, System const& syst,
     syst.computeAllForces();
 
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
-      verletSecondPart(syst(iOfParticle));
+      updateMomentum(syst(iOfParticle));
     syst.enforceConstraint(syst.lagrangeMultiplier(), flux(), parameters());
     
     updateOrsteinUhlenbeck(syst.getParticle(0), betaLeft(), timeStep()/2);
     updateOrsteinUhlenbeck(syst.getParticle(syst.nbOfParticles() - 1), betaRight(), timeStep()/2);
     
     // Becareful here we assume that all the particles share the same mass !
-    // We analiticaly retermine the non-martingale part of the Lagrange multiplier
-    //syst.lagrangeMultiplier() += (1-alpha) * drift();
-    //syst.enforceConstraint(trash, drift());
-    syst.enforceConstraint(syst.lagrangeMultiplier(), flux(), parameters());
+    
+    //syst.enforceConstraint(syst.lagrangeMultiplier(), flux(), parameters());
     
     syst.lagrangeMultiplier() /= timeStep();
   }

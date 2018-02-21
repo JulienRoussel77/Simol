@@ -132,9 +132,10 @@ namespace simol
     // currently specific to chains
     virtual double boundaryPotEnergy() const;
     //double laplacian(DVec const& position, int type = 0) const;
-    virtual double leftHeatFlow(int /*iOfLink*/) const {throw runtime_error("leftHeatFlow not implemented for this system !");};
-    virtual double rightHeatFlow(int /*iOfLink*/) const {throw runtime_error("rightHeatFlow not implemented for this system !");};
-    virtual double heatFlow(int /*iOfLink*/) const {throw runtime_error("heatFlow not implemented for this system !");};
+    virtual double leftHeatFlux(int /*iOfLink*/) const {throw runtime_error("leftHeatFlux not implemented for this system !");};
+    virtual double rightHeatFlux(int /*iOfLink*/) const {throw runtime_error("rightHeatFlux not implemented for this system !");};
+    virtual double heatFlux(int /*iOfLink*/) const {throw runtime_error("heatFlux not implemented for this system !");};
+    virtual double heatFluxOnAtom(int /*iOfParticle*/) const {throw runtime_error("heatFluxOnAtom not implemented for this system !");};
     
     // currently specific to bicolor systems
     virtual void enforceConstraint(double& /*lagrangeMultiplier*/, double /*fixedVelocity*/, DynamicsParameters const& /*dynaPara*/) {throw runtime_error("enforceConstraint not implemented for this system !");}

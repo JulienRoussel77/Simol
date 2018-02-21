@@ -128,45 +128,54 @@ namespace simol
     particle1.energyLapla() = lapla12;    // v"(q_2 - q_1)
   }
   
-  double BiChain::leftHeatFlow(int iOfLink) const
+  double BiChain::leftHeatFlux(int iOfLink) const
   {
     return - getParticle(iOfLink).momentum(0) / getParticle(iOfLink).mass() * getParticle(iOfLink).energyGrad(0);
   }
   
-  double BiChain::rightHeatFlow(int iOfLink) const
+  double BiChain::rightHeatFlux(int iOfLink) const
   {
     return - getParticle(iOfLink+1).momentum(0) / getParticle(iOfLink+1).mass() * getParticle(iOfLink).energyGrad(0);
   }
   
-  double BiChain::heatFlow(int iOfLink) const
+  double BiChain::heatFlux(int iOfLink) const
   {
-    return (leftHeatFlow(iOfLink) + rightHeatFlow(iOfLink))/2;
+    return (leftHeatFlux(iOfLink) + rightHeatFlux(iOfLink))/2;
   }
   
-  double BiChain::computeSumFlow() const
+  double BiChain::heatFluxOnAtom(int iOfParticle) const
+  {
+    return (rightHeatFlux(iOfParticle-1) + leftHeatFlux(iOfParticle))/2;
+  }
+  
+  double BiChain::computeSumFlux() const
   {    
-    double sumFlow = 0;    
-    for (int iOfLink = 0; iOfLink < nbOfParticles()-1; iOfLink++)
-      sumFlow += heatFlow(iOfLink);      
-    return sumFlow / (nbOfParticles() - 1.);
+    double sumFlux = 0;    
+    /*for (int iOfLink = 0; iOfLink < nbOfParticles()-1; iOfLink++)
+      sumFlux += heatFlux(iOfLink);      
+    return sumFlux / (nbOfParticles() - 1.);*/
+    
+    for (int iOfParticle = 1; iOfParticle < nbOfParticles()-1; iOfParticle++)
+      sumFlux += heatFluxOnAtom(iOfParticle);      
+    return sumFlux / (nbOfParticles() - 2.);
   }
   
   
   
-  void BiChain::enforceConstraint(double& lagrangeMultiplier, double flux, DynamicsParameters const& dynaPara)
+  /*void BiChain::enforceConstraint(double& lagrangeMultiplier, double flux, DynamicsParameters const& dynaPara)
   {
     //double blueMeanVelocity = 0;
     //double redMeanVelocity = 0;
     
-    double instantFlux = computeSumFlow();
+    double instantFlux = computeSumFlux();
     //cout << "flux = " << instantFlux << endl;
-    double sensibility = pow(getParticle(0).energyGrad(0), 2) + pow(getParticle(nbOfParticles()-2).energyGrad(0), 2);
+    double sensitivity = pow(getParticle(0).energyGrad(0), 2) + pow(getParticle(nbOfParticles()-2).energyGrad(0), 2);
     for (int iOfParticle = 1; iOfParticle < nbOfParticles()-1; iOfParticle++)
-      sensibility += pow(getParticle(iOfParticle-1).energyGrad(0) + getParticle(iOfParticle).energyGrad(0), 2);
+      sensitivity += pow(getParticle(iOfParticle-1).energyGrad(0) + getParticle(iOfParticle).energyGrad(0), 2);
       
     //cout << "flux before = " << flux << " compared to drift = " << drift << endl;
     
-    double localLagrangeMultiplier = -(nbOfParticles()-1)*getParticle(0).mass()*dynaPara.temperature() * (instantFlux - flux) / sensibility;
+    double localLagrangeMultiplier = -(nbOfParticles()-1)*getParticle(0).mass()*dynaPara.temperature() * (instantFlux - flux) / sensitivity;
 
     getParticle(0).momentum(0) -= localLagrangeMultiplier * getParticle(0).energyGrad(0);
     getParticle(nbOfParticles()-1).momentum(0) -= localLagrangeMultiplier * getParticle(nbOfParticles()-2).energyGrad(0);
@@ -175,7 +184,33 @@ namespace simol
     
     lagrangeMultiplier += localLagrangeMultiplier;
     
-    //cout << computeSumFlow() << "=?=" << flux << endl;
+    //cout << computeSumFlux() << "=?=" << flux << endl;
+  }*/
+  
+  /// Here we compute the sensitivity G(r,p) and project on the right hyperplan
+  void BiChain::enforceConstraint(double& lagrangeMultiplier, double flux, DynamicsParameters const& /*dynaPara*/)
+  {
+    //double blueMeanVelocity = 0;
+    //double redMeanVelocity = 0;
+    
+    double instantFlux = computeSumFlux();
+    //cout << "flux = " << instantFlux << endl;
+    double sensitivity = 0;
+    for (int iOfParticle = 1; iOfParticle < nbOfParticles()-1; iOfParticle++)
+      sensitivity += pow(getParticle(iOfParticle-1).energyGrad(0) + getParticle(iOfParticle).energyGrad(0), 2);
+    
+    sensitivity /= pow(2*(nbOfParticles()-2), 2)*getParticle(0).mass();
+      
+    //cout << "flux before = " << flux << " compared to drift = " << drift << endl;
+    
+    double localLagrangeMultiplier = -(instantFlux - flux) / sensitivity;
+
+    for (int iOfParticle = 1; iOfParticle < nbOfParticles()-1; iOfParticle++)
+      getParticle(iOfParticle).momentum(0) -= localLagrangeMultiplier / (2*(nbOfParticles()-2)) * (getParticle(iOfParticle-1).energyGrad(0) + getParticle(iOfParticle).energyGrad(0));
+    
+    lagrangeMultiplier += localLagrangeMultiplier;
+    
+    //cout << computeSumFlux() << "=?=" << flux << endl;
   }
 
   //###### TriChain ######

@@ -120,11 +120,11 @@ namespace simol
     //throw std::invalid_argument("Number of Hermite modes missing");
   }
   
-  bool Input::fitModiFlow() const
+  bool Input::fitModiFlux() const
   {
     if (data["ControlVariate"])
-      if (data["ControlVariate"]["fitModiFlow"])
-        if (isYes(data["Galerkin"]["fitModiFlow"].as<string>()))
+      if (data["ControlVariate"]["fitModiFlux"])
+        if (isYes(data["Galerkin"]["fitModiFlux"].as<string>()))
           return true;
     return false;
   }

@@ -39,11 +39,12 @@ namespace simol
       virtual void samplePositions(DynamicsParameters const& dynaPara);
       void computeAllForces();
       void interaction(Particle& particle1, Particle& particle2) const;
-      double leftHeatFlow(int iOfParticle) const;
-      double rightHeatFlow(int iOfParticle) const;
-      double heatFlow(int iOfParticle) const;
+      double leftHeatFlux(int iOfParticle) const;
+      double rightHeatFlux(int iOfParticle) const;
+      double heatFlux(int iOfParticle) const;
+      double heatFluxOnAtom(int iOfParticle) const;            
             
-      double computeSumFlow() const;
+      double computeSumFlux() const;
       void enforceConstraint(double& lagrangeMultiplier, double flux, DynamicsParameters const& dynaPara);
     protected:
   };

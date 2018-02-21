@@ -276,9 +276,9 @@ namespace simol
       case idVelocity : return "velocity";
       case idForce : return "force";
       case idLength : return "length";
-      case idMidFlow : return "midFlow";
-      case idSumFlow : return "sumFlow";
-      case idModiFlow : return "modiFlow";
+      case idMidFlux : return "midFlux";
+      case idSumFlux : return "sumFlux";
+      case idModiFlux : return "modiFlux";
       case idLagrangeMultiplier: return "lagrangeMultiplier";
       default : throw std::runtime_error("This observable id corresponds to no observable !");
     }
@@ -297,9 +297,9 @@ namespace simol
       case idVelocity : return doVelocity();
       case idForce : return doForce();
       case idLength : return doLength();
-      case idMidFlow : return doMidFlow();
-      case idSumFlow : return doSumFlow();
-      case idModiFlow : return doModiFlow();
+      case idMidFlux : return doMidFlux();
+      case idSumFlux : return doSumFlux();
+      case idModiFlux : return doModiFlux();
       case idLagrangeMultiplier: return doLagrangeMultiplier();
       default : throw std::runtime_error("doObs not defined for this observable id !");
     }
@@ -335,13 +335,13 @@ namespace simol
   bool Input::doLength() const
   {return (systemName() == "Isolated") || (systemName() == "Chain") || (systemName() == "Colloid");}
   
-  bool Input::doMidFlow() const
+  bool Input::doMidFlux() const
   {return dynamicsName() == "BoundaryLangevin" || dynamicsName() == "ConstrainedBoundaryLangevin";}
   
-  bool Input::doSumFlow() const
+  bool Input::doSumFlux() const
   {return dynamicsName() == "BoundaryLangevin" || dynamicsName() == "ConstrainedBoundaryLangevin";}
   
-  bool Input::doModiFlow() const
+  bool Input::doModiFlux() const
   {return dynamicsName() == "BoundaryLangevin" || dynamicsName() == "ConstrainedBoundaryLangevin";}
   
   bool Input::doLagrangeMultiplier() const
@@ -384,10 +384,10 @@ namespace simol
     return doVelocity();
   }  
   
-  bool Input::doFinalFlow() const
+  bool Input::doFinalFlux() const
   {
-    /*if (data["Output"]["DoFinalFlow"])
-      if (sameLetters(data["Output"]["DoFinalFlow"].as<string>(), "yes"))
+    /*if (data["Output"]["DoFinalFlux"])
+      if (sameLetters(data["Output"]["DoFinalFlux"].as<string>(), "yes"))
         return true;
     return false;*/
     return dynamicsName() == "BoundaryLangevin" || dynamicsName() == "ConstrainedBoundaryLangevin";; 
