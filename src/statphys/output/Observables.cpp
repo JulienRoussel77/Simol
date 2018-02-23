@@ -167,8 +167,8 @@ namespace simol
              << " " << lastValue()
              << " " << mean()
              << " " << asymptoticVariance()
-             << " " << asyvarOfAsyvar() 
-             << " " << autocoStats_.integratedCorrelation()<< endl;
+             << " " << asyvarOfAsyvar() << endl;
+             //<< " " << autocoStats_.integratedCorrelation()<< endl;
   }
   
   void Observable::displayFinalValues(ofstream& out)

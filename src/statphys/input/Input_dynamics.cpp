@@ -21,6 +21,13 @@ namespace simol
 {
 
   string Input::dynamicsName() const {return data["Dynamics"]["Name"].as<string>();}
+  
+  bool Input::isConstrained() const
+  {
+    if (data["Dynamics"]["IsConstrained"])
+      return isYes(data["Dynamics"]["IsConstrained"].as<string>());
+    return false;
+  }
 
   double Input::gamma() const
   {

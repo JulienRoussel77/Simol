@@ -46,7 +46,7 @@ namespace simol
       //virtual double& lagrangeMultiplier() const {return lagrangeMultiplier_;}
       //virtual const double& lagrangeMultiplier() const {return lagrangeMultiplier_;}
       virtual const double& flux() const {return parameters_.flux();}
-      virtual string dynamicsName() const {return "ConstrainedBoundaryLangevin";}
+      //virtual string dynamicsName() const {return "ConstrainedBoundaryLangevin";}
     protected:
       
       //double flux_;

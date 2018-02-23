@@ -99,32 +99,8 @@ namespace simol
       }
       name += "/";
     }
-
-    /*if (data["Output"]["ParametersName"]
-        && data["Output"]["ParametersName"].as<string>() == "yes")
-    {
-      if (dynamicsName() == "BoundaryLangevin")
-        name += "N" + to_string(nbOfParticles()) + "_";
-
-      name += "dt" + doubleToString(timeStep()) + "_eta" + doubleToString(eta());
-
-      if (dynamicsName() == "BoundaryLangevin")
-        name += "_xi" + doubleToString(xi());
-
-      name += "/";
-    }*/
     return name;
   }
-
-  /*string Input::outputFolderName() const
-  {
-    string name = parametersName();
-
-    if (data["Output"]["FolderName"])
-      name += data["Output"]["FolderName"].as<string>() + "/";
-
-    return name;
-  }*/
 
   ///
   ///Returns the a number of steps
@@ -336,16 +312,16 @@ namespace simol
   {return (systemName() == "Isolated") || (systemName() == "Chain") || (systemName() == "Colloid");}
   
   bool Input::doMidFlux() const
-  {return dynamicsName() == "BoundaryLangevin" || dynamicsName() == "ConstrainedBoundaryLangevin";}
+  {return dynamicsName() == "BoundaryLangevin";}
   
   bool Input::doSumFlux() const
-  {return dynamicsName() == "BoundaryLangevin" || dynamicsName() == "ConstrainedBoundaryLangevin";}
+  {return dynamicsName() == "BoundaryLangevin";}
   
   bool Input::doModiFlux() const
-  {return dynamicsName() == "BoundaryLangevin" || dynamicsName() == "ConstrainedBoundaryLangevin";}
+  {return dynamicsName() == "BoundaryLangevin";}
   
   bool Input::doLagrangeMultiplier() const
-  {return dynamicsName() == "ConstrainedLangevin" || dynamicsName() == "ConstrainedBoundaryLangevin";}
+  {return isConstrained();}
   
   bool Input::doOutThermo() const
   {return true;}  
@@ -360,27 +336,15 @@ namespace simol
   {return true;}
   
   bool Input::doOutChain() const
-  {return dynamicsName() == "BoundaryLangevin" || dynamicsName() == "ConstrainedBoundaryLangevin";;}
+  {return dynamicsName() == "BoundaryLangevin";}
   
   bool Input::doFinalLength() const
   {
-    /*if (data["Output"]["DoFinalVelocity"])
-      if (sameLetters(data["Output"]["DoFinalVelocity"].as<string>(), "yes"))
-        return true;
-    return false;*/
-    
-    //return (systemName() == "Isolated" || systemName() == "Colloid");
     return doLength();
   }  
   
   bool Input::doFinalVelocity() const
   {
-    /*if (data["Output"]["DoFinalVelocity"])
-      if (sameLetters(data["Output"]["DoFinalVelocity"].as<string>(), "yes"))
-        return true;
-    return false;*/
-    
-    //return (dynamicsName() != "Overdamped" && (systemName() == "Isolated" || systemName() == "Bicolor"));
     return doVelocity();
   }  
   
@@ -390,18 +354,13 @@ namespace simol
       if (sameLetters(data["Output"]["DoFinalFlux"].as<string>(), "yes"))
         return true;
     return false;*/
-    return dynamicsName() == "BoundaryLangevin" || dynamicsName() == "ConstrainedBoundaryLangevin";; 
+    return dynamicsName() == "BoundaryLangevin"; 
   }  
   
   bool Input::doFinalLagrangeMultiplier() const
   {
-    return dynamicsName() == "ConstrainedLangevin" || dynamicsName() == "ConstrainedBoundaryLangevin"; 
+    return isConstrained(); 
   }  
-  
-  /*bool Input::doFinalChainLagrangeMultiplier() const
-  {
-    return dynamicsName() == "ConstrainedBoundaryLangevin"; 
-  }*/
   
   bool Input::doOutVelocitiesGenerator() const
   {return controlVariateName() != "None";}

@@ -27,7 +27,7 @@ namespace simol
       virtual const double& lagrangeMultiplier() const {return lagrangeMultiplier_;}*/
       //virtual double& drift() {return drift_;}
       virtual const double& drift() const {return parameters_.drift();}
-      virtual string dynamicsName() const {return "ConstrainedLangevin";}
+      //virtual string dynamicsName() const {return "ConstrainedLangevin";}
     protected:
       //double lagrangeMultiplier_;
       //double drift_;

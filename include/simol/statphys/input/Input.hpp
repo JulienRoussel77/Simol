@@ -93,6 +93,7 @@ namespace simol
 
     //-- Dynamics --
     string dynamicsName() const;
+    bool isConstrained() const;
     double gamma() const;
     double temperature() const;
     bool doMetropolis() const;
