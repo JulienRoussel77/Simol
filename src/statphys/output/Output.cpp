@@ -58,7 +58,7 @@ namespace simol
     cvBasis_(cvBasis0)
   {    
     for (int idObs = 0; idObs < nbOfIdObs; idObs++)
-      if (idObs == idModiFlux || idObs == idMidFlux)
+      if (idObs == idModiFlux || idObs == idMidFlux || idObs == idLagrangeMultiplier)
         addObservable(input, idObs, shortDecorrelationNbOfSteps(), nbOfShortAutocoPts());
       else
         addObservable(input, idObs, decorrelationNbOfSteps(), nbOfAutocoPts());
