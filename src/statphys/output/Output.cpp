@@ -605,15 +605,15 @@ namespace simol
   /// This output is such that the mobility can be estimated as the unbiased drift divided by the mean Lagrange multiplier
   void Output::displayFinalLagrangeMultiplier()
   {              
-    double finalMeanLM = obsLagrangeMultiplier().mean();
-    double unbiasedDrift = ((nbOfParticles() - 1) * parameters_.drift() + finalMeanLM / parameters_.gamma() ) / nbOfParticles();
+    //double finalMeanLM = obsLagrangeMultiplier().mean();
+    //double unbiasedDrift = ((nbOfParticles() - 1) * parameters_.drift() + finalMeanLM / parameters_.gamma() ) / nbOfParticles();
     
     cout << "outFinalLagrangeMultiplier_" << std::left << " " << setw(10) << finalTime()
                     << " " << setw(5) << timeStep()
                     << " " << setw(6) << nbOfParticles()
                     << " " << setw(4) << parameters_.temperature()
                     << " " << setw(6) << parameters_.drift()
-                    << " " << setw(9) << unbiasedDrift
+                    //<< " " << setw(9) << unbiasedDrift
                     << " " << setw(12) << obsLagrangeMultiplier().mean()
                     << " " << setw(12) << obsLagrangeMultiplier().asymptoticVariance()
                     << " " << setw(12) << obsLagrangeMultiplier().asyvarOfAsyvar();
@@ -623,7 +623,7 @@ namespace simol
                         << " " << setw(6) << nbOfParticles()
                         << " " << setw(4) << parameters_.temperature()
                         << " " << setw(6) << parameters_.drift()
-                        << " " << setw(9) << unbiasedDrift
+                        //<< " " << setw(9) << unbiasedDrift
                         << " " << setw(12);    
     obsLagrangeMultiplier().displayFinalValues(outFinalLagrangeMultiplier());  
     
