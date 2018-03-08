@@ -2,32 +2,54 @@
 
 namespace simol
 {
-  void Output::displayChainPositions(System const& syst, long int iOfStep)
-  {
-    outBeam() << iOfStep * timeStep()
-              << " " << syst(0).position() - 2 * syst(1).position() + syst(2).position()
-              //<< " " << syst(0).position() - 2*syst(1).position() + syst(2).position()
-              << " " << syst((nbOfParticles_ - 2) / 4).position() - 2 * syst((nbOfParticles_ - 2) / 4 + 1).position() + syst((nbOfParticles_ - 2) / 4 + 2).position()
-              << " " << syst((nbOfParticles_ - 2) / 2).position() - 2 * syst((nbOfParticles_ - 2) / 2 + 1).position() + syst((nbOfParticles_ - 2) / 2 + 2).position()
-              << " " << syst(3 * (nbOfParticles_ - 2) / 4).position() - 2 * syst(3 * (nbOfParticles_ - 2) / 4 + 1).position() + syst(3 * (nbOfParticles_ - 2) / 4 + 2).position()
-              << " " << syst(nbOfParticles_ - 3).position() - 2 * syst(nbOfParticles_ - 2).position() + syst(nbOfParticles_ - 1).position()
-              << endl;
-  }
+//   void Output::displayChainPositions(System const& syst, long int iOfStep)
+//   {
+//     outBeam() << iOfStep * timeStep()
+//               << " " << syst(0).position() - 2 * syst(1).position() + syst(2).position()
+//               //<< " " << syst(0).position() - 2*syst(1).position() + syst(2).position()
+//               << " " << syst((nbOfParticles_ - 2) / 4).position() - 2 * syst((nbOfParticles_ - 2) / 4 + 1).position() + syst((nbOfParticles_ - 2) / 4 + 2).position()
+//               << " " << syst((nbOfParticles_ - 2) / 2).position() - 2 * syst((nbOfParticles_ - 2) / 2 + 1).position() + syst((nbOfParticles_ - 2) / 2 + 2).position()
+//               << " " << syst(3 * (nbOfParticles_ - 2) / 4).position() - 2 * syst(3 * (nbOfParticles_ - 2) / 4 + 1).position() + syst(3 * (nbOfParticles_ - 2) / 4 + 2).position()
+//               << " " << syst(nbOfParticles_ - 3).position() - 2 * syst(nbOfParticles_ - 2).position() + syst(nbOfParticles_ - 1).position()
+//               << endl;
+//   }
+// 
+//   void Output::displayChainMomenta(System const& syst, long int iOfStep)
+//   {
+//     outChainVelocities() << iOfStep * timeStep()
+//                          << " " << syst(0).momentum()
+//                          << " " << syst(nbOfParticles_ / 4).momentum()
+//                          << " " << syst(nbOfParticles_ / 2).momentum()
+//                          << " " << syst(3 * nbOfParticles_ / 4).momentum()
+//                          << " " << syst(nbOfParticles_ - 1).momentum()
+//                          << endl;
+//   }
+  
 
-  void Output::displayChainMomenta(System const& syst, long int iOfStep)
-  {
-    outChainVelocities() << iOfStep * timeStep()
-                         << " " << syst(0).momentum()
-                         << " " << syst(nbOfParticles_ / 4).momentum()
-                         << " " << syst(nbOfParticles_ / 2).momentum()
-                         << " " << syst(3 * nbOfParticles_ / 4).momentum()
-                         << " " << syst(nbOfParticles_ - 1).momentum()
-                         << endl;
-  }
 
+  void Output::displayInstantProfile(System const& syst, long int iOfStep)
+  {
+    writeInstantProfile(syst, outInstantProfile(), iOfStep);
+  }
+  
   void Output::displayProfile(long int iOfStep)
   {
     writeProfile(outProfile(), iOfStep);
+  }
+  
+  void Output::writeInstantProfile(System const& syst, ofstream & out_, long int iOfStep)
+  {
+    assert(out_ && out_.is_open());
+    for (int i = 0; i < 6; i ++)
+    {
+      int iOfParticle = 1 + (i * (nbOfParticles()-2))/6;
+      out_ << iOfStep * timeStep() << " "
+           << iOfParticle << " "
+           << bendistProfile_.lastValue(iOfParticle) << " "
+           << syst(iOfParticle).momentum(0) << " "
+           << fluxProfile_.lastValue(iOfParticle) << " "
+           << endl;
+    }
   }
 
   void Output::writeProfile(ofstream & out_, long int iOfStep)
@@ -43,6 +65,8 @@ namespace simol
            << kinTempProfile_.mean(iOfParticle) << " "
            << kinTempProfile_.asymptoticVariance(iOfParticle) / sqrt(iOfStep * timeStep()) << " "
            << potTempTopProfile_.mean(iOfParticle) / potTempBotProfile_.mean(iOfParticle) << " "
+           << extFluxProfile_.mean(iOfParticle) << " "
+           << extFluxProfile_.asymptoticVariance(iOfParticle) / sqrt(iOfStep * timeStep()) << " "
            << endl;
   }
 
@@ -158,6 +182,11 @@ namespace simol
   void Output::appendModiFluxProfile(double value, long int iOfStep, int iOfParticle)
   {
     modiFluxProfile_.append(value, iOfStep, iOfParticle);
+  }
+  
+  void Output::appendExtFluxProfile(double value, long int iOfStep, int iOfParticle)
+  {
+    extFluxProfile_.append(value, iOfStep, iOfParticle);
   }
 
 }

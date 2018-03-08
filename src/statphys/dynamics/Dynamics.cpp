@@ -134,8 +134,9 @@ namespace simol
       output.displayThermoVariables(iOfStep);
       if (output.doOutChain())
       {
-        output.displayChainPositions(syst, iOfStep);
-        output.displayChainMomenta(syst, iOfStep);
+        //output.displayChainPositions(syst, iOfStep);
+        //output.displayChainMomenta(syst, iOfStep);
+        output.displayInstantProfile(syst, iOfStep);
       }
     }
     

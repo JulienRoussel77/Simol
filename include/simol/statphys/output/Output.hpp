@@ -36,9 +36,10 @@ namespace simol
     ofstream & outFinalVelocity() {return *outFinalVelocity_;}
     ofstream & outFinalLagrangeMultiplier() {return *outFinalLagrangeMultiplier_;}
     ofstream & outMeanThermo() {return *outMeanThermo_;}
-    ofstream & outChainVelocities() {return *outChainVelocities_;}
-    ofstream & outBeam() {return *outBeam_;}
+    //ofstream & outChainVelocities() {return *outChainVelocities_;}
+    //ofstream & outBeam() {return *outBeam_;}
     ofstream & outVelocitiesGenerator() {return *outVelocitiesGenerator_;}
+    ofstream & outInstantProfile() {return *outInstantProfile_;}
     ofstream & outProfile() {return *outProfile_;}
     ofstream & outFinalProfile() {return *outFinalProfile_;}
 
@@ -137,9 +138,13 @@ namespace simol
     void appendBendistProfile(double value, long int iOfStep, int iOfParticle);
     void appendFluxProfile(double value, long int iOfStep, int iOfParticle);
     void appendModiFluxProfile(double value, long int iOfStep, int iOfParticle);
+    void appendExtFluxProfile(double value, long int iOfStep, int iOfParticle);
+    
+    void writeInstantProfile(System const& syst, ofstream & out_, long int iOfStep);
     void writeProfile(ofstream & out_, long int iOfStep);
-    void displayChainMomenta(System const& syst, long int iOfStep);
-    void displayChainPositions(System const& syst, long int iOfStep);
+    //void displayChainMomenta(System const& syst, long int iOfStep);
+    //void displayChainPositions(System const& syst, long int iOfStep);
+    void displayInstantProfile(System const& syst, long int iOfStep);
     void displayProfile(long int iOfStep);
     void finalChainDisplay();
     void displayFinalFlux(double parameter1=0, double parameter2=0, double parameter3=0);
@@ -200,8 +205,9 @@ namespace simol
 
     //-- for chains --
     std::shared_ptr<ofstream> outFinalFlux_;
-    std::shared_ptr<ofstream> outBeam_;  
-    std::shared_ptr<ofstream> outChainVelocities_;
+    //std::shared_ptr<ofstream> outBeam_;  
+    //std::shared_ptr<ofstream> outChainVelocities_;
+    std::shared_ptr<ofstream> outInstantProfile_;
     std::shared_ptr<ofstream> outProfile_;
     std::shared_ptr<ofstream> outFinalProfile_;
 
@@ -264,6 +270,7 @@ namespace simol
     AutocorrelationStats bendistProfile_;
     AutocorrelationStats fluxProfile_;
     AutocorrelationStats modiFluxProfile_;
+    AutocorrelationStats extFluxProfile_;
     
     shared_ptr<CVBasis> cvBasis_;
   };

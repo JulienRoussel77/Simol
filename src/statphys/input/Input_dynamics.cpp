@@ -11,7 +11,7 @@ const double defaultDeltaTemperature = 0;
 const double defaultTauBending = 0;
 const double defaultKappa = 0; 
 const int    defaultMTSfrequency = 1;
-const double defaultNonEqAmplitude = 0;
+const double defaultEta = 0;
 const double defaultDrift= 0;
 const double defaultBulkDriving = 0;
 const double defaultNu = 0;
@@ -143,7 +143,10 @@ namespace simol
     if (data["Dynamics"]["NonEqForce"]) throw runtime_error("Change NonEqForce to NonEqAmplitude !");
     if (data["Dynamics"]["NonEqAmplitude"])
       return data["Dynamics"]["NonEqAmplitude"].as<double>();
-    else return defaultNonEqAmplitude;
+    //else if (sameLetters(systemName(), "Bicolor"))
+    //  return eta();
+    
+    return eta();
   }
 
   double Input::eta() const
@@ -158,7 +161,7 @@ namespace simol
         return 2*beta() * defaultDeltaTemperature;
     }
     else
-      return nonEqAmplitude();
+      return defaultEta;
   }
   
   double Input::drift() const

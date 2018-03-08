@@ -20,13 +20,13 @@ namespace simol
     domainSize_(std::numeric_limits<double>::infinity()),
     dimension_(input.dimension())
   {
-    // /!\ Here the amplitude of the drift scales with N !
-    if (input.systemSubtype() == "TwoDrifts")
-      nonEqForce_(0) = nonEqAmplitude() / sqrt(2.);
-    else if (input.systemSubtype() == "ColorDrift")
-      nonEqForce_(0) = nonEqAmplitude() / sqrt((double) input.nbOfParticles());
-    else
+    nonEqForce_(0) = nonEqAmplitude();
+    /*if (input.systemSubtype() == "TwoDrift")
       nonEqForce_(0) = nonEqAmplitude();
+    else if (input.systemSubtype() == "ColorDrift")
+      nonEqForce_(0) = nonEqAmplitude();
+    else
+      nonEqForce_(0) = nonEqAmplitude();*/
     
   }
   
@@ -255,7 +255,7 @@ namespace simol
     }
     partitionFunction *= step;
     double randVal = rng->scalarUniform();
-    cout << "Inverse transform method : U = " << randVal << endl;
+    //cout << "Inverse transform method : U = " << randVal << endl;
     double objective = randVal * partitionFunction / step;
     double cumulant = 0;
     for (int iOfNode = 0; iOfNode < nbOfNodes; iOfNode++)

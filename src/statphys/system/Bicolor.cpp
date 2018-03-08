@@ -14,10 +14,10 @@ namespace simol
     if (systemSubtype() == "None")
       for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
         getParticle(iOfParticle).type() = 0; 
-    else if (systemSubtype() == "OneDrift")
+    else if (systemSubtype() == "OneDrift" || systemSubtype() == "NortonOneDrift")
       for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
         getParticle(iOfParticle).type() = (iOfParticle == 0); 
-    else if (systemSubtype() == "TwoDrifts")
+    else if (systemSubtype() == "TwoDrift")
       for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
         getParticle(iOfParticle).type() = (iOfParticle < 2); 
     else if (systemSubtype() == "ColorDrift" || systemSubtype() == "NortonColorDrift")
@@ -65,48 +65,42 @@ namespace simol
   
   void Bicolor::enforceConstraint(double& lagrangeMultiplier, double drift, DynamicsParameters const& /*dynaPara*/)
   {
-    //double blueMeanVelocity = 0;
-    //double redMeanVelocity = 0;
     
-    double relativeDrift = 0;
+    /*double relativeDrift = 0;
     for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
       relativeDrift += getParticle(iOfParticle).type() * getParticle(iOfParticle).velocity(0);
-    relativeDrift /= sqrt((double) nbOfParticles());
+    relativeDrift /= sqrt((double) nbOfParticles());*/
+    double relativeDrift = velocity();
     
     //cout << "relativeDrift before = " << relativeDrift << " compared to drift = " << drift << endl;
     
-    double localLagrangeMultiplier = drift - relativeDrift;
+    double localLagrangeMultiplier = getParticle(0).mass() * (drift - relativeDrift);
 
     for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
-      getParticle(iOfParticle).momentum(0) += localLagrangeMultiplier / sqrt((double) nbOfParticles()) * getParticle(iOfParticle).mass() * getParticle(iOfParticle).type();
+      getParticle(iOfParticle).momentum(0) += localLagrangeMultiplier * getParticle(iOfParticle).type();
     
     lagrangeMultiplier += localLagrangeMultiplier;
-    
-    /*relativeDrift = 0;
-    for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
-      relativeDrift += getParticle(iOfParticle).type() * getParticle(iOfParticle).velocity(0);
-    relativeDrift /= sqrt((double) nbOfParticles());
-    cout << "relativeDrift after = " << relativeDrift << " compared to drift = " << drift << endl;*/
   }
 
   
   ///
-  ///Computes the instant value of the observable (averaged) velocity F^\top p/m
-  /// TODO : prendre la masse et gamma en compte ici
+  ///Computes the instant value of the observable (averaged) velocity F^\top p/(m*n_F)
   double Bicolor::velocity() const
   {
     if (systemSubtype() == "OneDrift" || systemSubtype() == "None")
       return getParticle(0).velocity(0);
-    else if (systemSubtype() == "TwoDrifts")
-      return (getParticle(0).velocity(0) + getParticle(1).velocity(0))/sqrt(2.);
+    else if (systemSubtype() == "TwoDrift")
+      return (getParticle(0).velocity(0) + getParticle(1).velocity(0))/2.;
     else if (systemSubtype() == "ColorDrift" || systemSubtype() == "NortonColorDrift")
     {
       double sumVelocity = 0;
       for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
         sumVelocity += getParticle(iOfParticle).type() * getParticle(iOfParticle).velocity(0);
       //return sumVelocity;
-      sumVelocity /= sqrt((double) nbOfParticles());
-      return (sumVelocity + externalPotential_->nonEqAmplitude() /(nbOfParticles()-1.)) * (nbOfParticles()-1.) / nbOfParticles();
+      sumVelocity /= (double) nbOfParticles();
+      //return (sumVelocity + externalPotential_->nonEqAmplitude() /(nbOfParticles()-1.)) * (nbOfParticles()-1.) / nbOfParticles();
+      //return (sumVelocity + externalPotential_->nonEqAmplitude() /(dynaPara.gamma() * nbOfParticles()-1.)) * (nbOfParticles()-1.) / nbOfParticles();
+      return sumVelocity;
     }
     else
       throw runtime_error(systemSubtype() + " is not a valid system subtype in Bicolor::velocity() !");
@@ -118,14 +112,13 @@ namespace simol
   {
     if (systemSubtype() == "OneDrift" || systemSubtype() == "None")
       return getParticle(0).force(0);
-    else if (systemSubtype() == "TwoDrifts")
-      return (getParticle(0).force(0) + getParticle(1).force(0))/sqrt(2.);
+    else if (systemSubtype() == "TwoDrift")
+      return getParticle(0).force(0) + getParticle(1).force(0);
     else if (systemSubtype() == "ColorDrift" || systemSubtype() == "NortonColorDrift")
     {
       double sumForces = 0;
       for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
         sumForces += getParticle(iOfParticle).type() * getParticle(iOfParticle).force(0);
-      sumForces /= sqrt((double) nbOfParticles());
       return sumForces;
     }
     else

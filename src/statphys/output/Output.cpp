@@ -55,6 +55,7 @@ namespace simol
     bendistProfile_(shortDecorrelationNbOfSteps(), timeStep(), nbOfShortAutocoPts(), nbOfParticles_),
     fluxProfile_(shortDecorrelationNbOfSteps(), timeStep(), nbOfShortAutocoPts(), nbOfParticles_),
     modiFluxProfile_(shortDecorrelationNbOfSteps(), timeStep(), nbOfShortAutocoPts(), nbOfParticles_),
+    extFluxProfile_(shortDecorrelationNbOfSteps(), timeStep(), nbOfShortAutocoPts(), nbOfParticles_),
     cvBasis_(cvBasis0)
   {    
     for (int idObs = 0; idObs < nbOfIdObs; idObs++)
@@ -100,9 +101,11 @@ namespace simol
     if (doOutChain()) 
     {
       outFinalProfile_      = std::make_shared<ofstream>(input.outputFolderName() + "finalProfile.txt");
-      outBeam_              = std::make_shared<ofstream>(input.outputFolderName() + "beamChain.txt");
-      outChainVelocities_   = std::make_shared<ofstream>(input.outputFolderName() + "velocitiesChain.txt");
-      outChainVelocities() << "# time i=0 i=N/4 i=N/2 i=3N/4 i=N-1" << endl;      
+      //outBeam_              = std::make_shared<ofstream>(input.outputFolderName() + "beamChain.txt");
+      //outChainVelocities_   = std::make_shared<ofstream>(input.outputFolderName() + "velocitiesChain.txt");
+      //outChainVelocities() << "# time i=0 i=N/4 i=N/2 i=3N/4 i=N-1" << endl;      
+      outInstantProfile_           = std::make_shared<ofstream>(input.outputFolderName() + "instantProfile.txt");
+      outInstantProfile() << "# time i=1 i=N/4 i=N/2 i=3N/4 i=N-2" << endl;  
       outProfile_           = std::make_shared<ofstream>(input.outputFolderName() + "profile.txt");
     }
     
@@ -117,7 +120,7 @@ namespace simol
       throw std::runtime_error("The output file does not exist! Please add it manually.");
 
     //-- copy read input into file --
-    std::ofstream outInput(input.outputFolderName() + "inputFile.txt");
+    std::ofstream outInput(input.outputFolderName() + "inputFile.yaml");
     outInput << input.inputFlux().rdbuf();
 
     //------------------ screen output for control --------------------------
@@ -573,7 +576,7 @@ namespace simol
                         << " " << setw(5) << timeStep()
                         << " " << setw(6) << nbOfParticles()
                         << " " << setw(4) << parameters_.temperature()
-                        << " " << setw(6) << parameters_.nonEqAmplitude()
+                        << " " << setw(6) << parameters_.eta()
                         << " " << setw(6) << parameters_.interactionRatio()
                         << " " << setw(3) << parameters_.nbOfQModes()
                         << " " << setw(3) << parameters_.nbOfPModes()
@@ -589,7 +592,7 @@ namespace simol
                         << " " << setw(4) << nbOfParticles()
                         << " " << setw(4) << parameters_.temperature()
                         << " " << setw(8) << parameters_.gamma()
-                        << " " << setw(8) << parameters_.nonEqAmplitude()
+                        << " " << setw(8) << parameters_.eta()
                         << " " << setw(8) << parameters_.coupling()
                         << " " << setw(3) << parameters_.nbOfQModes()
                         << " " << setw(3) << parameters_.nbOfPModes()
@@ -605,7 +608,7 @@ namespace simol
     double finalMeanLM = obsLagrangeMultiplier().mean();
     double unbiasedDrift = ((nbOfParticles() - 1) * parameters_.drift() + finalMeanLM / parameters_.gamma() ) / nbOfParticles();
     
-    cout << "outFinalLagrangeMultiplier_" << std::left << setw(10) << finalTime()
+    cout << "outFinalLagrangeMultiplier_" << std::left << " " << setw(10) << finalTime()
                     << " " << setw(5) << timeStep()
                     << " " << setw(6) << nbOfParticles()
                     << " " << setw(4) << parameters_.temperature()
