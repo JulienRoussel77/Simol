@@ -117,7 +117,7 @@ namespace simol
     std::cout << "Final output written in " << input.simuTypeName() << std::endl;
 
     if (outParticles_ && !outParticles_->is_open())
-      throw std::runtime_error("The output file does not exist! Please add it manually.");
+      throw std::runtime_error("The output file does not exist! Please add it manually. ("+input.outputFolderName()+")");
 
     //-- copy read input into file --
     std::ofstream outInput(input.outputFolderName() + "inputFile.yaml");
