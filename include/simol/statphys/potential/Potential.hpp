@@ -27,6 +27,7 @@ namespace simol
       virtual const double& domainSize() const;
       virtual double& domainSize();
       virtual int const& dimension() const;
+      virtual bool const& flag() const;
       
       virtual double operator()(DVec const & position) const;
       virtual double operator()(double position) const;
@@ -78,6 +79,7 @@ namespace simol
       double center_;
       double domainSize_;
       int dimension_;
+      bool flag_;
   };
 
 }

@@ -138,7 +138,7 @@ namespace simol
     virtual double heatFluxOnAtom(int /*iOfParticle*/) const {throw runtime_error("heatFluxOnAtom not implemented for this system !");};
     
     // currently specific to bicolor systems
-    virtual void enforceConstraint(double& /*lagrangeMultiplier*/, double /*fixedVelocity*/, DynamicsParameters const& /*dynaPara*/) {throw runtime_error("enforceConstraint not implemented for this system !");}
+    virtual void enforceConstraint(double /*fixedVelocity*/, DynamicsParameters const& /*dynaPara*/, bool /*updateLagrangeMultiplier*/) {throw runtime_error("enforceConstraint not implemented for this system !");}
     
     virtual void samplePositions(DynamicsParameters const& dynaPara);
     virtual void sampleMomenta(DynamicsParameters const& dynaPara);

@@ -217,7 +217,7 @@ void BoundaryLangevin::computeProfileBiChain(Output& output, System const& syst,
     
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
       updateMomentum(syst(iOfParticle));
-    syst.enforceConstraint(syst.lagrangeMultiplier(), flux(), parameters());
+    syst.enforceConstraint(flux(), parameters(), true);
     
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
       updatePosition(syst(iOfParticle));
@@ -225,7 +225,7 @@ void BoundaryLangevin::computeProfileBiChain(Output& output, System const& syst,
 
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
       updateMomentum(syst(iOfParticle));
-    syst.enforceConstraint(syst.lagrangeMultiplier(), flux(), parameters());
+    syst.enforceConstraint(flux(), parameters(), true);
     
     updateOrsteinUhlenbeck(syst.getParticle(0), betaLeft(), timeStep()/2);
     updateOrsteinUhlenbeck(syst.getParticle(syst.nbOfParticles() - 1), betaRight(), timeStep()/2);

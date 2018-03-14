@@ -56,14 +56,17 @@ namespace simol
           interaction(getParticle(i), getParticle(j));
     }
     
+    if (pairPotential().flag())
+    {
+      
+      getParticle(0).force() = DVec::Zero(dimension());
+      getParticle(0).potentialEnergy() = 0;
+    }
     
-    //for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
-    //  cout << "3 : i " << iOfParticle << ", p " << getParticle(iOfParticle).position().adjoint() << ", e " << getParticle(iOfParticle).potentialEnergy() << ", f " << getParticle(iOfParticle).force().adjoint() << endl;
-
     
   }
   
-  void Bicolor::enforceConstraint(double& lagrangeMultiplier, double drift, DynamicsParameters const& /*dynaPara*/)
+  void Bicolor::enforceConstraint(double drift, DynamicsParameters const& /*dynaPara*/, bool updateLagrangeMultiplier)
   {
     
     /*double relativeDrift = 0;
@@ -79,7 +82,8 @@ namespace simol
     for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
       getParticle(iOfParticle).momentum(0) += localLagrangeMultiplier * getParticle(iOfParticle).type();
     
-    lagrangeMultiplier += localLagrangeMultiplier;
+    if (updateLagrangeMultiplier)
+      lagrangeMultiplier() += localLagrangeMultiplier;
   }
 
   

@@ -188,7 +188,7 @@ namespace simol
   }*/
   
   /// Here we compute the sensitivity G(r,p) and project on the right hyperplan
-  void BiChain::enforceConstraint(double& lagrangeMultiplier, double flux, DynamicsParameters const& /*dynaPara*/)
+  void BiChain::enforceConstraint(double flux, DynamicsParameters const& /*dynaPara*/, bool updateLagrangeMultiplier)
   {
     //double blueMeanVelocity = 0;
     //double redMeanVelocity = 0;
@@ -208,7 +208,8 @@ namespace simol
     for (int iOfParticle = 1; iOfParticle < nbOfParticles()-1; iOfParticle++)
       getParticle(iOfParticle).momentum(0) -= localLagrangeMultiplier / (2*(nbOfParticles()-2)) * (getParticle(iOfParticle-1).energyGrad(0) + getParticle(iOfParticle).energyGrad(0));
     
-    lagrangeMultiplier += localLagrangeMultiplier;
+    if (updateLagrangeMultiplier)
+      lagrangeMultiplier() += localLagrangeMultiplier;
     
     //cout << computeSumFlux() << "=?=" << flux << endl;
   }

@@ -14,7 +14,7 @@ namespace simol
     virtual void computeAllForces();
     virtual double velocity() const;
     virtual double force() const;
-    virtual void enforceConstraint(double& lagrangeMultiplier, double fixedVelocity, DynamicsParameters const& /*dynaPara*/);
+    virtual void enforceConstraint(double fixedVelocity, DynamicsParameters const& /*dynaPara*/, bool updateLagrangeMultiplier);
   };
   
 }

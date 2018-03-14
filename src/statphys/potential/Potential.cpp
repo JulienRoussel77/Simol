@@ -18,7 +18,8 @@ namespace simol
     nonEqForce_(DVec::Zero(input.dimension())),
     center_(input.potentialCenter()),
     domainSize_(std::numeric_limits<double>::infinity()),
-    dimension_(input.dimension())
+    dimension_(input.dimension()),
+    flag_(input.flag())
   {
     nonEqForce_(0) = nonEqAmplitude();
     /*if (input.systemSubtype() == "TwoDrift")
@@ -81,7 +82,9 @@ namespace simol
   const int& Potential::dimension() const
   {return dimension_;}   
       
-
+  const bool& Potential::flag() const
+  {return flag_;}   
+  
   double Potential::operator()(DVec const& position) const
   {
     //throw runtime_error("Potential::operator()(DVec const& position) not implemented for "<< classname() << " !");

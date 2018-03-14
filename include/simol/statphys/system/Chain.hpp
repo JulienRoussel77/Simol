@@ -45,7 +45,7 @@ namespace simol
       double heatFluxOnAtom(int iOfParticle) const;            
             
       double computeSumFlux() const;
-      void enforceConstraint(double& lagrangeMultiplier, double flux, DynamicsParameters const& dynaPara);
+      void enforceConstraint(double flux, DynamicsParameters const& dynaPara, bool updateLagrangeMultiplier);
     protected:
   };
   

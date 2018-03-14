@@ -65,6 +65,13 @@ namespace simol
     else return defaultInteractionRatio;
   }
   
+  bool Input::flag() const
+  {
+    if (data["Potential"]["Flag"])
+      return isYes(data["Potential"]["Flag"].as<string>());
+    else return false;
+  }
+  
 
   //--- Sinusoidal ---
   double Input::amplitude() const

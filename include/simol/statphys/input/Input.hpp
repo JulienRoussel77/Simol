@@ -72,6 +72,7 @@ namespace simol
     string secondPotentialName() const;
     string galerkinPotentialName() const;
     double interactionRatio() const;
+    bool flag() const;
     //Sinus
     double amplitude() const;
     //SpaceSine

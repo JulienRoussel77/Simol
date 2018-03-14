@@ -64,13 +64,13 @@ namespace simol
     // We analiticaly retermine the non-martingale part of the Lagrange multiplier
     double alpha = exp(- gamma() / syst(0).mass() * timeStep()/2);
     syst.lagrangeMultiplier() += (1-alpha) * drift();
-    double trash=0;
-    syst.enforceConstraint(trash, drift(), parameters());
+    //double trash=0;
+    syst.enforceConstraint(drift(), parameters(), false);
     //syst.enforceConstraint(syst.lagrangeMultiplier(), drift());
     
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
       updateMomentum(syst(iOfParticle));
-    syst.enforceConstraint(syst.lagrangeMultiplier(), drift(), parameters());
+    syst.enforceConstraint(drift(), parameters(), true);
     
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
       updatePosition(syst(iOfParticle));
@@ -78,7 +78,7 @@ namespace simol
 
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
       verletSecondPart(syst(iOfParticle));
-    syst.enforceConstraint(syst.lagrangeMultiplier(), drift(), parameters());
+    syst.enforceConstraint(drift(), parameters(), true);
     
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
       updateOrsteinUhlenbeck(syst(iOfParticle), beta(), timeStep()/2);
@@ -86,7 +86,7 @@ namespace simol
     // Becareful here we assume that all the particles share the same mass !
     // We analiticaly retermine the non-martingale part of the Lagrange multiplier
     syst.lagrangeMultiplier() += (1-alpha) * drift();
-    syst.enforceConstraint(trash, drift(), parameters());
+    syst.enforceConstraint(drift(), parameters(), false);
     //syst.enforceConstraint(syst.lagrangeMultiplier(), drift());
     
     syst.lagrangeMultiplier() /= timeStep();

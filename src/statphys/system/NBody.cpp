@@ -166,6 +166,8 @@ namespace simol
       nbOfCells_ = pow(nbOfCellsPerDimension_, dimension_);
       cells_ = vector<Cell>(nbOfCells_, Cell());
       // number of neighboring cells: depends on the dimension
+      if (dimension_ == 1)
+        nbOfNeighbors_ = 1+1;
       if (dimension_ == 2)
         nbOfNeighbors_ = 4+1;
       if (dimension_ == 3)
@@ -197,17 +199,19 @@ namespace simol
   int NBody::findIndex(DVec const& pos) const
   {
     DVec perPos = periodicImage(pos);
-    int i1 = floor(perPos(0) / cellSize_);
+    int i1 = floor(perPos(0) / cellSize_);    
+    if (dimension_ == 1)
+      return returnIndexCell(i1);
+    
     int i2 = floor(perPos(1) / cellSize_);
     if (dimension_ == 2)
       return returnIndexCell(i1, i2);
-    else if (dimension_ == 3)
-    {
-      int i3 = floor(perPos(2) / cellSize_);
+    
+    int i3 = floor(perPos(2) / cellSize_);
+    if (dimension_ == 3)
       return returnIndexCell(i1, i2, i3);
-    }
-    else
-      throw std::invalid_argument("NBody::findIndex -- dimension incorrect");
+
+    throw std::invalid_argument("NBody::findIndex -- dimension incorrect");
     return 0;
   }
   
@@ -215,7 +219,7 @@ namespace simol
   /// determine the index of a cell from the vector of integers characterizing the cell
   int NBody::returnIndexCell(int i1, int i2, int i3) const
   {
-              int indexCell  = intModulo(i1, nbOfCellsPerDimension_);
+    int indexCell  = intModulo(i1, nbOfCellsPerDimension_);
     if (i2 != -1) indexCell = indexCell * nbOfCellsPerDimension_ + intModulo(i2, nbOfCellsPerDimension_);
     if (i3 != -1) indexCell = indexCell * nbOfCellsPerDimension_ + intModulo(i3, nbOfCellsPerDimension_);
     return indexCell;
@@ -230,6 +234,15 @@ namespace simol
     for (int j = 0; j < nbOfCells_; j++)
       cells_[j].indexNeighbors() = vector<int>(nbOfNeighbors_, 0);
     //-- find the neighboring cells --
+    if (dimension_ == 1)
+    {
+      for (int i1 = 0; i1 < nbOfCellsPerDimension_; i1++)
+      {
+        int currentCellIndex = returnIndexCell(i1);
+        cells_[currentCellIndex].indexNeighbors(0) = returnIndexCell(i1    );
+        cells_[currentCellIndex].indexNeighbors(1) = returnIndexCell(i1 + 1);
+      }
+    }
     if (dimension_ == 2)
     {
       for (int i1 = 0; i1 < nbOfCellsPerDimension_; i1++)
@@ -298,7 +311,6 @@ namespace simol
   void NBody::samplePositions(DynamicsParameters const& dynaPara)
   {
     cout << " - Sampling the positions..." << endl;
-    int Dim = dimension();
     int NbPartDim = nbOfParticlesPerDimension();
     double latticeSize = latticeParameter();
 
@@ -308,7 +320,11 @@ namespace simol
       getParticle(i).countdown() = i;
     }
     //-- initialization on a cubic lattice --
-    if (Dim == 2)
+    if (dimension() == 1)
+      for (int i = 0; i < NbPartDim; i++)
+        getParticle(i).position(0) = (i+.5) * latticeSize;
+
+    else if (dimension() == 2)
     {
       for (int i = 0; i < NbPartDim; i++)
         for (int j = 0; j < NbPartDim; j++)
@@ -317,7 +333,7 @@ namespace simol
           getParticle(i * NbPartDim + j).position(1) = (j+.5) * latticeSize;
         }
     }
-    else if (Dim == 3)
+    else if (dimension() == 3)
     {
       int NbPartDim2 = NbPartDim * NbPartDim;
       for (int i = 0; i < NbPartDim; i++)
@@ -331,7 +347,7 @@ namespace simol
     }
     else
     {
-      throw std::invalid_argument("sampleSystem: Bad dimension, should be 2 or 3");
+      throw std::invalid_argument("sampleSystem: Bad dimension, should be 1, 2 or 3");
     }
   }
   
