@@ -149,6 +149,8 @@ namespace simol
     Rcut_(input.cutOffRatio()*input.potentialSigma())
   {
     domainSize_ = input.latticeParameter()*input.nbOfParticlesPerDimension();
+    if (domainSize() < 2*pairPotential().cutOffRadius())
+      throw runtime_error("The size of the domain must be at least twice the cut-off radius of the pair potential!");
     
     //-- initialise the configuration by initializing the particles, intial__ reads the restart file if it exists --
     assert(configuration_.size() > 1);
@@ -384,6 +386,7 @@ namespace simol
     /*cout << "####################" << endl;
     cout << particle1.position().adjoint() << " <-> " << particle2.position().adjoint() << endl;*/
     DVec r12 = periodicDistance(particle2.position() - particle1.position());
+    
     //cout << r12.adjoint() << endl;
     double distance = r12.norm();
     /*cout << distance << endl;
@@ -396,6 +399,16 @@ namespace simol
     particle2.potentialEnergy() += energy12 / 2;
     // compute forces (positive -> repulsive / negative -> attractive)
     double force12 = pairPotential().scalarPotentialForce(distance);
+    if (particle1.type() == 1 || particle2.type() == 1)
+      force12 *= pairPotential_->interactionRatio();
+      
+    //if (particle1.countdown() + particle2.countdown() == 1)
+    //  cout << "r = " << r12 << " f = " << force12 << endl;  
+    
+    /*ofstream pairs("pairs.txt", std::ofstream::app);
+    if (particle1.countdown() + particle2.countdown() == 1)
+      pairs << r12 << " " << force12 << " " << distance << endl;*/
+      
     r12 /= distance;
     particle1.force() -= force12 * r12;
     particle2.force() += force12 * r12;
@@ -404,8 +417,9 @@ namespace simol
     particle2.virial() += 0.5 * force12 * distance;
     //cout << distance << " -> " << force12 << " " << energy12 << endl;
 
-    //ofstream pairs("pairs.txt", std::ofstream::app);
-    //pairs << distance << endl;
+    
+    
+
     
   }
 

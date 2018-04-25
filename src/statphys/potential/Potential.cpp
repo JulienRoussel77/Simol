@@ -19,7 +19,9 @@ namespace simol
     center_(input.potentialCenter()),
     domainSize_(std::numeric_limits<double>::infinity()),
     dimension_(input.dimension()),
-    flag_(input.flag())
+    flag_(input.flag()),
+    interactionRatio_(input.interactionRatio()),
+    cutOffRadius_(input.cutOffRadius())
   {
     nonEqForce_(0) = nonEqAmplitude();
     /*if (input.systemSubtype() == "TwoDrift")
@@ -29,6 +31,7 @@ namespace simol
     else
       nonEqForce_(0) = nonEqAmplitude();*/
     
+    cout << "interactionRatio_ : " << interactionRatio_ << endl;
   }
   
   ///
@@ -83,7 +86,13 @@ namespace simol
   {return dimension_;}   
       
   const bool& Potential::flag() const
-  {return flag_;}   
+  {return flag_;}
+  
+  const double& Potential::interactionRatio() const
+  {return interactionRatio_;}   
+  
+  const double& Potential::cutOffRadius() const
+  {return cutOffRadius_;}  
   
   double Potential::operator()(DVec const& position) const
   {

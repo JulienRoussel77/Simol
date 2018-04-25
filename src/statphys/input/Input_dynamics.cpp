@@ -28,6 +28,13 @@ namespace simol
       return isYes(data["Dynamics"]["IsConstrained"].as<string>());
     return false;
   }
+  
+//   bool Input::isMollified() const
+//   {
+//     if (data["Dynamics"]["IsMollified"])
+//       return isYes(data["Dynamics"]["IsMollified"].as<string>());
+//     return false;
+//   }
 
   double Input::gamma() const
   {
@@ -50,20 +57,6 @@ namespace simol
     else throw std::runtime_error("No given temperature!");
   }
 
-  /*double Input::temperatureLeft() const
-  {
-    if (data["Dynamics"]["TemperatureLeft"])
-      return data["Dynamics"]["TemperatureLeft"].as<double>();
-    else throw std::runtime_error("No TemperatureLeft in the input file !");
-  }
-
-  double Input::temperatureRight() const
-  {
-    if (data["Dynamics"]["TemperatureRight"])
-      return data["Dynamics"]["TemperatureRight"].as<double>();
-    else throw std::runtime_error("No TemperatureRight in the input file !");
-  }*/
-
   double Input::beta() const
   {
     return 1 / temperature();
@@ -84,25 +77,6 @@ namespace simol
     else
       return false;
   }
-
-
-  /*double Input::betaLeft() const
-  {
-    if (data["Dynamics"]["BetaLeft"])
-      return data["Dynamics"]["BetaLeft"].as<double>();
-    else if (data["Dynamics"]["TemperatureLeft"])
-      return 1 / data["Dynamics"]["TemperatureLeft"].as<double>();
-    else throw std::runtime_error("No BetaLeft in the input file !");
-  }
-
-  double Input::betaRight() const
-  {
-    if (data["Dynamics"]["BetaRight"])
-      return data["Dynamics"]["BetaRight"].as<double>();
-    else if (data["Dynamics"]["TemperatureRight"])
-      return 1 / data["Dynamics"]["TemperatureRight"].as<double>();
-    else throw std::runtime_error("No BetaRight in the input file !");
-  }*/
 
   double Input::deltaTemperature() const
   {

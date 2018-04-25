@@ -54,15 +54,11 @@ namespace simol
       for (int i = 0; i < nbOfParticles(); i++)
         for (int j = i + 1; j < nbOfParticles(); j++)
           interaction(getParticle(i), getParticle(j));
-    }
+    }    
     
-    if (pairPotential().flag())
-    {
-      
-      getParticle(0).force() = DVec::Zero(dimension());
-      getParticle(0).potentialEnergy() = 0;
-    }
-    
+    double alpha3=pairPotential().interactionRatio();
+    lagrangeMultiplier() = - getParticle(0).force(0) / alpha3;
+    getParticle(0).force(0) *= (2-alpha3)/alpha3;      
     
   }
   

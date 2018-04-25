@@ -83,7 +83,7 @@ namespace simol
   ///Read-only access for the inverse temperature
   double const& Dynamics::betaRight() const {return parameters_.betaRight();}
 
-
+  //bool const& Dynamics::isMollified() const {return parameters_.isMollified();}
   
 
   //----------- Ouputs ------------------

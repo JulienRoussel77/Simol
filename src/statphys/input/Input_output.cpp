@@ -306,7 +306,7 @@ namespace simol
   {return (dynamicsName() != "Overdamped" && (systemName() == "Isolated" || systemName() == "Bicolor"));}
   
   bool Input::doForce() const
-  {return (dynamicsName() == "Overdamped");}
+  {return (dynamicsName() == "Overdamped" || systemName() == "Bicolor");}
   
   bool Input::doLength() const
   {return (systemName() == "Isolated") || (systemName() == "Chain") || (systemName() == "Colloid");}

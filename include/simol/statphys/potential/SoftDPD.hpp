@@ -15,7 +15,7 @@ namespace simol
   private:
     
     double epsilon_;
-    double cutOffRadius_;
+    //double cutOffRadius_;
   };
 
 }

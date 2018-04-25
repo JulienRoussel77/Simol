@@ -28,6 +28,8 @@ namespace simol
       virtual double& domainSize();
       virtual int const& dimension() const;
       virtual bool const& flag() const;
+      virtual double const& interactionRatio() const;
+      virtual double const& cutOffRadius() const;
       
       virtual double operator()(DVec const & position) const;
       virtual double operator()(double position) const;
@@ -80,6 +82,8 @@ namespace simol
       double domainSize_;
       int dimension_;
       bool flag_;
+      double interactionRatio_;
+      double cutOffRadius_;
   };
 
 }

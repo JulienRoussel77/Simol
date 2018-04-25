@@ -13,8 +13,8 @@ namespace simol
       virtual void simulate (System& syst) const;
       
       double sigma() const;
+      virtual const double& drift() const {return parameters_.drift();}
     protected:
-      //double sigma_;
   };
   
   
@@ -22,15 +22,8 @@ namespace simol
   {
     public:
       ConstrainedLangevin(Input const& input);
-      virtual void simulate (System& syst) const;
-      /*virtual double& lagrangeMultiplier() {return lagrangeMultiplier_;}
-      virtual const double& lagrangeMultiplier() const {return lagrangeMultiplier_;}*/
-      //virtual double& drift() {return drift_;}
-      virtual const double& drift() const {return parameters_.drift();}
-      //virtual string dynamicsName() const {return "ConstrainedLangevin";}
+      virtual void simulate (System& syst) const;      
     protected:
-      //double lagrangeMultiplier_;
-      //double drift_;
   };
 
 }

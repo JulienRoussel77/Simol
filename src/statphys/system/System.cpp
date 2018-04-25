@@ -24,7 +24,8 @@ namespace simol
     configuration_(nbOfParticles_, nullptr),
     doSetting_(input.doSetting()),
     domainSize_(std::numeric_limits<double>::infinity()),
-    systemSubtype_(input.systemSubtype())
+    systemSubtype_(input.systemSubtype()),
+    lagrangeMultiplier_(0)
   {
     externalPotential_ = createPotential(input, input.externalPotentialName());
     pairPotential_ = createPotential(input, input.pairPotentialName());

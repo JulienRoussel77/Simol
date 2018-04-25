@@ -90,11 +90,13 @@ namespace simol
     double potentialEpsilon() const;
     double potentialSigma() const;
     double cutOffRatio() const;
+    double cutOffRadius() const;
     double splineRatio() const;
 
     //-- Dynamics --
     string dynamicsName() const;
     bool isConstrained() const;
+    //bool isMollified() const;
     double gamma() const;
     double temperature() const;
     bool doMetropolis() const;

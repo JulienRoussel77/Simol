@@ -30,7 +30,7 @@ namespace simol
       DynamicsParameters const& parameters() const {return parameters_;}
       //-- time step and numbers of steps --
       double& timeStep();
-      const double& timeStep() const;
+      double const& timeStep() const;
       long int& nbOfSteps();
       long int const& nbOfSteps() const;
       double finalTime() const;
@@ -44,13 +44,14 @@ namespace simol
       std::shared_ptr<RNG>& rng();
 
       //-- (inverse) temperatures --
-      virtual const double&  temperature() const;
-      virtual const double& temperatureLeft() const;
-      virtual const double& temperatureRight() const;
+      virtual double const&  temperature() const;
+      virtual double const& temperatureLeft() const;
+      virtual double const& temperatureRight() const;
       virtual double deltaTemperature() const;
-      virtual const double& beta() const;
-      virtual const double& betaLeft() const;
-      virtual const double& betaRight() const;
+      virtual double const& beta() const;
+      virtual double const& betaLeft() const;
+      virtual double const& betaRight() const;
+      //virtual bool const& isMollified() const;
       
       virtual void sampleInternalEnergies(System&) const {};
       virtual void computeOutput(System const& syst, Output& output, long int iOfStep) const;
@@ -84,7 +85,7 @@ namespace simol
       
       
       /*virtual double& lagrangeMultiplier() {throw runtime_error("resetConstraint not implemented for this system !");}
-      virtual const double& lagrangeMultiplier() const {throw runtime_error("resetConstraint not implemented for this system !");}*/
+      virtual double const& lagrangeMultiplier() const {throw runtime_error("resetConstraint not implemented for this system !");}*/
       
       //-- output functions --
       virtual void computeKineticEnergy(Output& output, System const& syst) const;

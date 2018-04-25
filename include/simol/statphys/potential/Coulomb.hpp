@@ -16,7 +16,7 @@ namespace simol
     
     double epsilon_;
     double sigma_;
-    double cutOffRadius_;
+    //double cutOffRadius_;
     double coeff_;
   };
 

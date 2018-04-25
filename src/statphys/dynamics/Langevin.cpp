@@ -26,9 +26,19 @@ namespace simol
   
   void Langevin::simulate(System& syst) const
   {
+    
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
       verletFirstPart(syst(iOfParticle));
     syst.computeAllForces();
+    
+    
+    ofstream test("test.txt", std::ofstream::app);
+    test << syst.periodicDistance(syst(1).position() - syst(0).position()) << " "
+         << syst.periodicDistance(syst(2).position() - syst(1).position()) << " "
+         << syst.periodicDistance(syst(0).position() - syst(2).position()) << " "
+         << syst(0).force(0) << " "
+         << syst(1).force(0) << " "
+         << syst(2).force(0) << endl;
 
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
       verletSecondPart(syst(iOfParticle));
@@ -41,55 +51,43 @@ namespace simol
   ConstrainedLangevin::ConstrainedLangevin(Input const& input):
     Langevin(input)
   {}
-  
-  /*void ConstrainedLangevin::halfUpdateOrsteinUhlenbeck(System& syst) const
-  {
-    // Becareful here we assume that all the particles share the same mass !
-    double alpha = exp(- gamma() / syst(0).mass() * timeStep()/2);
-    double localLagrangeMultiplier = 0;
-    for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
-    {
-      localLagrangeMultiplier += 
-      syst(iOfParticle).momentum() = alpha * particle.momentum() + sqrt((1 - pow(alpha, 2)) / localBeta * particle.mass()) * rng_->gaussian();
-  }*/
-  
-  void ConstrainedLangevin::simulate(System& syst) const
-  {
-    syst.lagrangeMultiplier() = 0;
-    
-    for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
-      updateOrsteinUhlenbeck(syst(iOfParticle), beta(), timeStep()/2);
-    
-    // Becareful here we assume that all the particles share the same mass !
-    // We analiticaly retermine the non-martingale part of the Lagrange multiplier
-    double alpha = exp(- gamma() / syst(0).mass() * timeStep()/2);
-    syst.lagrangeMultiplier() += (1-alpha) * drift();
-    //double trash=0;
-    syst.enforceConstraint(drift(), parameters(), false);
-    //syst.enforceConstraint(syst.lagrangeMultiplier(), drift());
-    
-    for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
-      updateMomentum(syst(iOfParticle));
-    syst.enforceConstraint(drift(), parameters(), true);
-    
-    for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
-      updatePosition(syst(iOfParticle));
-    syst.computeAllForces();
 
-    for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
-      verletSecondPart(syst(iOfParticle));
-    syst.enforceConstraint(drift(), parameters(), true);
-    
-    for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
-      updateOrsteinUhlenbeck(syst(iOfParticle), beta(), timeStep()/2);
-    
-    // Becareful here we assume that all the particles share the same mass !
-    // We analiticaly retermine the non-martingale part of the Lagrange multiplier
-    syst.lagrangeMultiplier() += (1-alpha) * drift();
-    syst.enforceConstraint(drift(), parameters(), false);
-    //syst.enforceConstraint(syst.lagrangeMultiplier(), drift());
-    
-    syst.lagrangeMultiplier() /= timeStep();
-  }
+void ConstrainedLangevin::simulate(System& syst) const
+{
+  double alpha = exp(- gamma() / syst(0).mass() * timeStep()/2);
+  syst.lagrangeMultiplier() = 2 * (1-alpha) * drift();
+  
+  for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
+    updateOrsteinUhlenbeck(syst(iOfParticle), beta(), timeStep()/2);
+  
+  // Becareful here we assume that all the particles share the same mass !
+  // We analiticaly retermine the non-martingale part of the Lagrange multiplier
+  
+  //syst.lagrangeMultiplier() += (1-alpha) * drift();
+  
+  syst.enforceConstraint(drift(), parameters(), false);
+  //syst.enforceConstraint(syst.lagrangeMultiplier(), drift());
+  
+  for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
+    updateMomentum(syst(iOfParticle));
+  syst.enforceConstraint(drift(), parameters(), true);
+  
+  for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
+    updatePosition(syst(iOfParticle));
+  syst.computeAllForces();
+
+  for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
+    verletSecondPart(syst(iOfParticle));
+  syst.enforceConstraint(drift(), parameters(), true);
+  
+  for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
+    updateOrsteinUhlenbeck(syst(iOfParticle), beta(), timeStep()/2);
+  
+  //syst.lagrangeMultiplier() += (1-alpha) * drift();
+  syst.enforceConstraint(drift(), parameters(), false);
+  //syst.enforceConstraint(syst.lagrangeMultiplier(), drift());
+  
+  syst.lagrangeMultiplier() /= timeStep();
+}
 
 }

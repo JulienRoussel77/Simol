@@ -8,7 +8,7 @@ namespace simol
     Potential(input),
     epsilon_(input.potentialEpsilon()),
     sigma_(input.potentialSigma()),
-    cutOffRadius_(input.cutOffRatio()),
+    //cutOffRadius_(input.cutOffRatio()),
     coeff_(epsilon_/pow(1./sqrt(sigma_) - 1./sqrt(cutOffRadius_), 2))
   {
     /*cout << "epsilon_ = " << epsilon_ << endl;

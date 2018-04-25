@@ -6,8 +6,8 @@ namespace simol
   
   SoftDPD::SoftDPD(Input const & input):
     Potential(input),
-    epsilon_(input.potentialEpsilon()),
-    cutOffRadius_(input.cutOffRatio())
+    epsilon_(input.potentialEpsilon())
+    //cutOffRadius_(input.cutOffRatio())
   {}
 
   /// -- distinguish the domains --

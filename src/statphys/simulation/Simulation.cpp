@@ -20,10 +20,6 @@ namespace simol
       throw std::runtime_error(input.systemName() + " is not a valid system name !");
   }
   
-  /*void thermalize(Dynamics& model, System& syst)
-  {
-    simulate(model, syst);
-  }*/
    
   
   

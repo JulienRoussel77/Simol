@@ -110,13 +110,21 @@ namespace simol
     else
       return defaultSigma;
   }
-
+  
   double Input::cutOffRatio() const
   {
     if (data["Potential"]["CutOffRatio"])
       return data["Potential"]["CutOffRatio"].as<double>();
     else
       return defaultCutOffRatio;
+  }
+
+  double Input::cutOffRadius() const
+  {
+    if (data["Potential"]["CutOffRadius"])
+      return data["Potential"]["CutOffRadius"].as<double>();
+    else
+      return cutOffRatio() * potentialSigma();
   }
 
   double Input::splineRatio() const

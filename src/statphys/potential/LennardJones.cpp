@@ -14,7 +14,7 @@ namespace simol
     Potential(input),
     epsilon_(input.potentialEpsilon()),
     sigma_(input.potentialSigma()),
-    cutOffRadius_(input.cutOffRatio()*sigma_),
+    //cutOffRadius_(input.cutOffRatio()*sigma_),
     splineRatio_(input.splineRatio()),
     splineRadius_(input.splineRatio()*cutOffRadius_),
     A_spline_(untruncated(splineRadius_)),

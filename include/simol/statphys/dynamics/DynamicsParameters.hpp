@@ -30,7 +30,9 @@ namespace simol
       coupling_(input.coupling()),
       eta_(input.eta()),
       nu_(input.nu())
+      //isMollified_(input.isMollified())
     {}
+    
     const double& temperature() const {return temperature_;}
     const double& temperatureLeft() const {return temperatureLeft_;}
     const double& temperatureRight() const {return temperatureRight_;}
@@ -52,6 +54,7 @@ namespace simol
     const double& coupling() const {return coupling_;}
     const double& eta() const {return eta_;}
     const double& nu() const {return nu_;}
+    const bool& isMollified() const {return isMollified_;}
   private:
     double beta_;
     double temperature_;
@@ -73,6 +76,7 @@ namespace simol
     double coupling_;
     double eta_;
     double nu_;
+    bool isMollified_;
   };
 
 }
