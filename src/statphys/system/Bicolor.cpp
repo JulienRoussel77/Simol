@@ -56,9 +56,9 @@ namespace simol
           interaction(getParticle(i), getParticle(j));
     }    
     
-    double alpha3=pairPotential().interactionRatio();
+    /*double alpha3=pairPotential().interactionRatio();
     lagrangeMultiplier() = - getParticle(0).force(0) / alpha3;
-    getParticle(0).force(0) *= (2-alpha3)/alpha3;      
+    getParticle(0).force(0) *= (2-alpha3)/alpha3;      */
     
   }
   

@@ -61,7 +61,7 @@ void ConstrainedLangevin::simulate(System& syst) const
     updateOrsteinUhlenbeck(syst(iOfParticle), beta(), timeStep()/2);
   
   // Becareful here we assume that all the particles share the same mass !
-  // We analiticaly retermine the non-martingale part of the Lagrange multiplier
+  // We analiticaly determine the non-martingale part of the Lagrange multiplier for the O-U process
   
   //syst.lagrangeMultiplier() += (1-alpha) * drift();
   
