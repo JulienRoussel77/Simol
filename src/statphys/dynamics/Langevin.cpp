@@ -30,15 +30,6 @@ namespace simol
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
       verletFirstPart(syst(iOfParticle));
     syst.computeAllForces();
-    
-    
-    ofstream test("test.txt", std::ofstream::app);
-    test << syst.periodicDistance(syst(1).position() - syst(0).position()) << " "
-         << syst.periodicDistance(syst(2).position() - syst(1).position()) << " "
-         << syst.periodicDistance(syst(0).position() - syst(2).position()) << " "
-         << syst(0).force(0) << " "
-         << syst(1).force(0) << " "
-         << syst(2).force(0) << endl;
 
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
       verletSecondPart(syst(iOfParticle));
