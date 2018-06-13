@@ -906,8 +906,8 @@ namespace simol
     xmin_(0),
     nbOfNodes_(1),
     basisVal_(DVec::Zero(nbOfNodes_)),     // defined in x_n = n*dx
-    gradVal_(DVec::Zero(nbOfNodes_)),      // defined in x_n = n*dx
-    laplaVal_(DVec::Zero(nbOfNodes_-1)),   // defined in x_n = (n+1/2)*dx
+    gradVal_(DVec::Zero(nbOfNodes_)),      // defined in x_n = (n+1/2)*dx
+    laplaVal_(DVec::Zero(nbOfNodes_-1)),   // defined in x_n = (n+1)*dx
     dataPath_(input.outputFolderName()+ input.controlVariateCoeffsPath())
   {
     if (meshStep_ <= 0)
@@ -919,7 +919,7 @@ namespace simol
     nbOfNodes_ = nbOfValues;
     basisVal_ = DVec::Zero(nbOfNodes_);
     laplaVal_ = DVec::Zero(nbOfNodes_-1);
-    //laplaVal_[0] = 0;
+    
     for (int iOfNode = 0; iOfNode < nbOfNodes_-1; iOfNode++)
       laplaVal_[iOfNode] = (gradVal_[iOfNode+1] - gradVal_[iOfNode]) / meshStep_;
     
