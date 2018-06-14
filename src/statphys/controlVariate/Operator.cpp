@@ -186,6 +186,8 @@ namespace simol
     return generatorOnBasisValues;
   }
   
+  
+  
   UnderdampedGenerator::UnderdampedGenerator(Input const& input):
     Operator(input)
   {}
@@ -213,8 +215,12 @@ namespace simol
     DVec variables = basisVariables(syst);
     double pVar = pVariable(syst)(0,0);
     for (int iOfFunction = 0; iOfFunction < basis->totalNbOfElts(); iOfFunction++)
+    {
       generatorOnBasisValues(iOfFunction) += (pVar > 0? 1:-1)*( (1./parameters_.beta() - pow(pVar, 2) + pVar * parameters_.eta()/parameters_.gamma()) * basis->gradientQ(variables, iOfFunction)(0,0)
                                               + 1./parameters_.beta() * pow(pVar, 2) * basis->laplacianQ(variables, iOfFunction));
+      if (syst.dimension() != 1)
+        generatorOnBasisValues(iOfFunction) += (pVar > 0? 1:-1)*(- pVar/parameters_.gamma()) * syst.externalPotential().gradientCoupling(syst(0).position()) * basis->gradientQ(variables, iOfFunction)(0,0);
+    }
     //ofstream test("test.txt", std::ofstream::app);
     //test << variables(0) << " " << variables(1) << " " << generatorOnBasisValues(0) << endl;
     return generatorOnBasisValues;

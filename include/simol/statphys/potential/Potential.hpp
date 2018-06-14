@@ -74,6 +74,9 @@ namespace simol
       virtual DVec polyDCoeffs() const;
       virtual DVec polyDDCoeffs() const;
       virtual double inverseCoeff() const;
+      
+      virtual double marginalWithoutCoupling(DVec const& position) const;
+      virtual double gradientCoupling(DVec const& position) const;
     protected:
       Potential();
       double nonEqAmplitude_;

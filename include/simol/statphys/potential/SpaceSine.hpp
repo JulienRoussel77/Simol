@@ -12,6 +12,9 @@ namespace simol
       double operator()(DVec const& position) const;
       DVec gradient(DVec const& position) const;
       double laplacian(DVec const& position) const;
+      
+      double marginalWithoutCoupling(DVec const& position) const;
+      double gradientCoupling(DVec const& position) const;
 
     private:
       double amplitude_;

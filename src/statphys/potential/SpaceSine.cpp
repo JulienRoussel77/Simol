@@ -41,5 +41,19 @@ namespace simol
     return pow(pulsation_, 2) * (amplitude_ * (cos(pulsation_ * position(0)) + cos(pulsation_ * position(1)))
       + 2 * coupling_ * (pow(cos(pulsation_ * (position(0)+position(1))), 2) - sin(pulsation_ * (position(0)+position(1)))) * exp(sin(pulsation_ * (position(0)+position(1)))));
   }
+  
+  double SpaceSine::marginalWithoutCoupling(DVec const& position) const
+  {
+    //return amplitude_ * (2 - cos(pulsation_ * position(0)) - cos(pulsation_ * position(1))) + coupling_ * (1-cos(2*pulsation_ * position(0))) * (1-cos(pulsation_*position(1)));
+    return amplitude_ * (1 - cos(pulsation_ * position(0)));
+  }
+
+  double SpaceSine::gradientCoupling(DVec const& position) const
+  {
+    //grad(0) = amplitude_ * pulsation_ * sin(pulsation_ * position(0)) + 2*coupling_ * pulsation_ * sin(2*pulsation_ * position(0)) * (1-cos(pulsation_*position(1)));
+    //grad(1) = amplitude_ * pulsation_ * sin(pulsation_ * position(1)) + coupling_ * pulsation_ * (1-cos(2*pulsation_ * position(0))) * sin(pulsation_*position(1));
+    
+    return coupling_ * pulsation_ * cos(pulsation_ * (position(0)+position(1))) * exp(sin(pulsation_ * (position(0)+position(1))));
+  }
 
 }
