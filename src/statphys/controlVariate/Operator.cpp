@@ -196,7 +196,7 @@ namespace simol
   {
     DVec projPosition = DVec::Zero(2);
     projPosition(0) = syst(0).position(0);
-    return syst.externalPotential().value(projPosition) + pow(syst(0).momentum(0), 2)/2;
+    return syst.externalPotential().marginalWithoutCoupling(projPosition) + pow(syst(0).momentum(0), 2)/2;
   }
   
   DVec UnderdampedGenerator::basisVariables(System const& syst) const
