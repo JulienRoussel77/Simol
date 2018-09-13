@@ -18,7 +18,6 @@ namespace simol
   {
     cout << " - Sampling the positions..." << endl;
     getParticle(0).position(0) = drawPotLaw(dynaPara.beta());
-    cout << "--> q = " << getParticle(0).position(0) << endl;
   }
 
   void Isolated::computeAllForces()

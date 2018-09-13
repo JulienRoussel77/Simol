@@ -19,6 +19,7 @@ namespace simol
       double sigmaRight() const;
       const double& tauBending() const;
       
+      virtual void thermalize(System& syst) const;
       virtual void simulate (System& syst) const;
 
       void initializeMomenta(vector<Particle>& configuration) const;

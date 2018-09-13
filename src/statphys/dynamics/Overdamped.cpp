@@ -23,13 +23,8 @@ namespace simol
   
   void Overdamped::simulate(System& syst) const
   {
-    //cout << "Overdamped::simulate( System& syst)" << endl;
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
-    {
-      //cout << iOfParticle << " " << syst(iOfParticle).position().adjoint() << " " << syst(iOfParticle).momentum().adjoint() << " " << syst(iOfParticle).force().adjoint() << endl;
       updatePosition(syst(iOfParticle));
-      //cout << iOfParticle << " " << syst(iOfParticle).position().adjoint() << " " << syst(iOfParticle).momentum().adjoint() << " " << syst(iOfParticle).force().adjoint() << endl;
-    }
     syst.computeAllForces();
   }
   
@@ -42,7 +37,7 @@ namespace simol
   }
   
   ///
-  ///Computes the pressure from the kineticEnergy and the totalVirial, these fields must be updated
+  ///Computes the pressure from the kineticEnergy and the totalVirial, these fields must have been updated
   void Overdamped::getPressure(Output& output) const
   {
     double kineticEnergy = output.dimension() * output.nbOfParticles() / (2 * parameters_.beta());

@@ -7,7 +7,8 @@ namespace simol
     Potential(input)
   {}
 
-
+  /// This is not a potential force but an exernal drift force, so their is not potential value
+  /// The name of the class should probably be changed
   double Drift::operator()(const DVec& /*position*/) const
   {
     return 0;
@@ -23,10 +24,10 @@ namespace simol
     return 0;
   }
 
+  ///
+  /// the sense of the drift depends on the type of particle (-1, 0 or 1)
   DVec Drift::totalForce(const DVec& /*position*/, int type) const
   {
-    //cout << "Potential::totalForce" << endl;
-    //cout << nonEqForce_ << " - " << gradient(position) << " = " << nonEqForce_ - gradient(position) << endl;
     return nonEqForce_ * type;
   }
 

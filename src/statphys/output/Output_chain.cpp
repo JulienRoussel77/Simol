@@ -2,29 +2,6 @@
 
 namespace simol
 {
-//   void Output::displayChainPositions(System const& syst, long int iOfStep)
-//   {
-//     outBeam() << iOfStep * timeStep()
-//               << " " << syst(0).position() - 2 * syst(1).position() + syst(2).position()
-//               //<< " " << syst(0).position() - 2*syst(1).position() + syst(2).position()
-//               << " " << syst((nbOfParticles_ - 2) / 4).position() - 2 * syst((nbOfParticles_ - 2) / 4 + 1).position() + syst((nbOfParticles_ - 2) / 4 + 2).position()
-//               << " " << syst((nbOfParticles_ - 2) / 2).position() - 2 * syst((nbOfParticles_ - 2) / 2 + 1).position() + syst((nbOfParticles_ - 2) / 2 + 2).position()
-//               << " " << syst(3 * (nbOfParticles_ - 2) / 4).position() - 2 * syst(3 * (nbOfParticles_ - 2) / 4 + 1).position() + syst(3 * (nbOfParticles_ - 2) / 4 + 2).position()
-//               << " " << syst(nbOfParticles_ - 3).position() - 2 * syst(nbOfParticles_ - 2).position() + syst(nbOfParticles_ - 1).position()
-//               << endl;
-//   }
-// 
-//   void Output::displayChainMomenta(System const& syst, long int iOfStep)
-//   {
-//     outChainVelocities() << iOfStep * timeStep()
-//                          << " " << syst(0).momentum()
-//                          << " " << syst(nbOfParticles_ / 4).momentum()
-//                          << " " << syst(nbOfParticles_ / 2).momentum()
-//                          << " " << syst(3 * nbOfParticles_ / 4).momentum()
-//                          << " " << syst(nbOfParticles_ - 1).momentum()
-//                          << endl;
-//   }
-  
 
 
   void Output::displayInstantProfile(System const& syst, long int iOfStep)

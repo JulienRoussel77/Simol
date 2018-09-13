@@ -46,6 +46,23 @@ namespace simol
     particle2.force(0) += tauBending();
   }
   
+  void BoundaryLangevin::thermalize(System& syst) const
+  {
+    for (int i = 0; i < syst.nbOfParticles(); i++)
+      verletFirstPart(syst(i));
+
+    syst.computeAllForces();
+
+    for (int i = 0; i < syst.nbOfParticles(); i++)
+      verletSecondPart(syst(i));
+
+    for (int i = 0; i < syst.nbOfParticles(); i++)
+    {
+      double localTemperature = temperatureLeft() + i * deltaTemperature() / syst.nbOfParticles();
+      updateOrsteinUhlenbeck(syst(0), 1 / localTemperature, timeStep());
+    }
+  }
+  
   void BoundaryLangevin::simulate(System& syst) const
   {
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
@@ -74,20 +91,12 @@ void BoundaryLangevin::computeProfileBiChain(Output& output, System const& syst,
     double harOmega = syst.pairPotential().harmonicFrequency();
     double nu = syst(0).mass() * harOmega / gamma();
     
-    //double alpha2 = pow(pairPotential().harmonicFrequency() / output.constGamma_, 2);
-    
-    static bool outbool = true;
-    if (outbool)
-      cout << "refFlux = " << nu * deltaTemperature() * harOmega / (1 + pow(nu, 2)) << endl;
-    outbool = false;
-    
     output.obsSumFlux().currentValue() = 0;
     output.obsModiFlux().currentValue() = nu * deltaTemperature()* harOmega / (1 + pow(nu, 2));
-    //cout << nu << " " << output.constGamma_ << " " << output.constDeltaTemperature_ << " " << harOmega << endl;
+    
     int midNb = (syst.nbOfParticles() - 1) / 2;
     output.obsMidFlux().currentValue() = syst.heatFlux(midNb);
-    //cout << "---------obsModiFlux = " << output.obsModiFlux().currentValue() << endl;
-    
+        
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
     {
       double dist = 0;
@@ -98,6 +107,7 @@ void BoundaryLangevin::computeProfileBiChain(Output& output, System const& syst,
       double modiFlux = 0;
       double speedLeft, speedRight;
       
+      // computes the different fluxes, plus the configurational temperature
       if (iOfParticle != syst.nbOfParticles()-1)
       {
         if (iOfParticle != 0)
@@ -121,9 +131,11 @@ void BoundaryLangevin::computeProfileBiChain(Output& output, System const& syst,
           speedRight = -nu * harOmega * (syst(iOfParticle+2).position(0) - syst(iOfParticle+1).position(0) - syst.pairPotential().harmonicEquilibrium());
         
         modiFlux = -(speedRight - speedLeft) * (syst(iOfParticle).energyGrad(0) - harmonicForce) / (2 * (1+pow(nu, 2)));
-        //cout << output.obsModiFlux().currentValue() << " + " << modiFlux << " = " << output.obsModiFlux().currentValue() + modiFlux << endl;
+        
         output.obsModiFlux().currentValue() += modiFlux;
       }
+      
+      // updates the statstics on the the profile of some quantities along the chain
       output.appendBendistProfile(dist , iOfStep, iOfParticle);
       output.appendPotTempTopProfile(potTempTop, iOfStep, iOfParticle);
       output.appendPotTempBotProfile(potTempBot, iOfStep, iOfParticle);
@@ -207,12 +219,10 @@ void BoundaryLangevin::computeProfileBiChain(Output& output, System const& syst,
     syst.lagrangeMultiplier() = 0;
     updateOrsteinUhlenbeck(syst.getParticle(0), betaLeft(), timeStep()/2);
     updateOrsteinUhlenbeck(syst.getParticle(syst.nbOfParticles() - 1), betaRight(), timeStep()/2);
-    
-    //double flux = syst.leftHeatFlux();
-    
-    
+        
     // Becareful here we assume that all the particles share the same mass !
     
+    // The flux does not depend on p_1 and p_N so we don't reproject
     //syst.enforceConstraint(syst.lagrangeMultiplier(), flux(), parameters());
     
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)

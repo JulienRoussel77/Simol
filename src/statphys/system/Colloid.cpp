@@ -30,7 +30,7 @@ namespace simol
     
     // take closest periodic image
     DVec r12 = periodicDistance(particle2.position() - particle1.position());
-    //DVec r12 = particle2.position() - particle1.position();
+    
     double distance = r12.norm();
     r12 /= distance;
     // compute energy
@@ -41,16 +41,8 @@ namespace simol
     // compute forces (positive -> repulsive / negative -> attractive)
     double force12 = pairPotential().scalarPotentialForce(distance, interactionType);
 
-    //ofstream test("test", std::ofstream::app);
-    //test << distance << " " << energy12 << " " << force12 << endl;
-
     particle1.force() -= force12 * r12;
     particle2.force() += force12 * r12;
-    
-    //cout << "inter : " << distance << " " << energy12 << " " << force12 << endl;
-    //cout << "--> " << particle1.position().adjoint() << " v " << particle2.position().adjoint() << " -> distance = " << distance << endl;
-    
-    //cout << particle1.type() << " x " << particle2.type() << " : " << distance << " " << force12 << endl;
   }
   
   ///Computes the force and the energy associated to this pair interaction, and updates these 2 fields
@@ -60,7 +52,6 @@ namespace simol
   {
     int interactionType = particle1.type() + particle2.type();
     
-    //DVec r12 = periodicDistance(particle2.position() - particle1.position());
     DVec r12 = particle2.position() - particle1.position();
     double distance = r12.norm();
     r12 /= distance;
@@ -79,7 +70,7 @@ namespace simol
   {
     NBody::samplePositions(dynaPara);
     
-    //!\ Can put the system in an unstable configuration...
+    //!\ Can put the system in an unstable configuration if an end of the dimer starts too close to a particle of solvent
     if (dynaPara.interactionRatio() == 0)
     {
       DVec q0 = getParticle(0).position();
@@ -88,7 +79,6 @@ namespace simol
       r10 /= r10.norm();
       DVec qMid = (q0+q1)/2;
       double dist = pairPotential_->drawLaw(dynaPara.beta(), rng_, 1);
-      cout << "  -> colloid length : " << dist << endl;
       getParticle(0).position() = qMid - dist/2 * r10;
       getParticle(1).position() = qMid + dist/2 * r10;
     }
@@ -98,16 +88,9 @@ namespace simol
   
   void Colloid::computeAllForces()
   {
-    //cout << endl << "------------------computeAllForces----------------------" << endl;
-    //for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
-    //  cout << "1 : i " << iOfParticle << " " << getParticle(iOfParticle).type() << endl;
-
     for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
       getParticle(iOfParticle).resetForce(externalPotential());
-    
-    //for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
-    //  cout << "2 : i " << iOfParticle << ", p " << getParticle(iOfParticle).position().adjoint() << ", e " << getParticle(iOfParticle).potentialEnergy() << ", f " << getParticle(iOfParticle).force().adjoint() << endl;
-    
+     
     if (doCells_)
     {
       //-- reinitialize cells before looping on the pair interactions --
@@ -115,17 +98,8 @@ namespace simol
       for (ParticlePairIterator it = pairBegin(); !pairFinished(it); incrementePairIterator(it))
         interaction(it.particle1(), it.particle2());
       
+      // we make the two ends of the colloid interact even if they are not in the same box, and we don't periodize their positions
       nonPerInteraction(getParticle(0), getParticle(1));
-      
-      // When the two dimer particles are not in neighboring cells we make them interact
-      /*int iOfCell0 = findIndex(getParticle(0).position());
-      vector<int>* indexNeigh0 = &cell(iOfCell0).indexNeighbors();
-      int iOfCell1 = findIndex(getParticle(1).position());
-      vector<int>* indexNeigh1 = &cell(iOfCell1).indexNeighbors();
-      if (iOfCell0 != iOfCell1 
-        && std::find(indexNeigh0->begin(), indexNeigh0->end(), iOfCell1) == indexNeigh0->end()
-        && std::find(indexNeigh1->begin(), indexNeigh1->end(), iOfCell0) == indexNeigh1->end())
-        interaction(getParticle(0), getParticle(1));*/
     }
     else
     {
@@ -143,9 +117,7 @@ namespace simol
   ///This length is not periodized!
   double Colloid::length() const
   {
-    //DVec r01 = periodicDistance(getParticle(1).position() - getParticle(0).position());
     DVec r01 = getParticle(1).position() - getParticle(0).position();
-    //cout << periodicImage(getParticle(0).position()).adjoint() << " <-> " << periodicImage(getParticle(1).position()).adjoint() << " = " << r12.norm() << endl;
     return r01.norm();
   }
   
@@ -154,10 +126,9 @@ namespace simol
   /// positive -> repulsion / negative -> attraction
   double Colloid::force() const
   {
-    //DVec r01 = periodicDistance(getParticle(1).position() - getParticle(0).position());
     DVec r01 = getParticle(1).position() - getParticle(0).position();
     double d01 = r01.norm();
-    //cout << "Out force : " << d01 << " " << dot(getParticle(1).force() - getParticle(0).force(), r01) / (2*d01) << endl;
+   
     return dot(getParticle(1).force() - getParticle(0).force(), r01) / (2*d01);
   }
   

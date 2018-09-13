@@ -38,7 +38,6 @@ namespace simol
       virtual DVec gradient(DVec const & position) const;
       virtual double scalarGradient(double position) const;
       virtual DVec totalForce(DVec const & position) const;
-      //virtual DVec totalForce(double position) const;
       virtual DVec potentialForce(DVec const & position) const;
       virtual double scalarPotentialForce(double position) const;
       virtual double laplacian(DVec const & position) const;
@@ -79,13 +78,21 @@ namespace simol
       virtual double gradientCoupling(DVec const& position) const;
     protected:
       Potential();
+      // amplitude eta of the driving force
       double nonEqAmplitude_;
+      // direction of the driving force
       DVec nonEqForce_;
+      // center of the potential, allows to shift the system (useful for the colloid interaction)
       double center_;
+      // useful for example for the cosine 1D potential
       double domainSize_;
+      // dimension of the phase space
       int dimension_;
+      // what is this ?
       bool flag_;
+      // allows to switch off a part of the potential (eg for the colloid)
       double interactionRatio_;
+      // maximum range of the pair interaction
       double cutOffRadius_;
   };
 

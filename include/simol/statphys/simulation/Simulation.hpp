@@ -29,12 +29,15 @@ namespace simol
 
     public:
       int dimension_;
+      // pseudo-random number generator (Mersenne-Twister)
       std::shared_ptr<RNG> rng_;
       // /!\ System is stored as a System* so in all the library: printName(*system_) will return "System" but system_->printName() will return "DaughterSystem"
       System* system_;
+      // Dynamics of the system (Hamiltonian, Langevin, Overdamped, ...)
       D dynamics_;
       shared_ptr<CVBasis> cvBasis_;
       Galerkin* galerkin_;
+      // object managing the processing of the data and the ouput of relevent information
       Output output_;
       
   };
@@ -44,21 +47,6 @@ namespace simol
   // --------------- Declaration and implementation of external functions -------------------
   
   System* createSystem(Input const& input);
-
-  /*//-- fundamental functions --
-  void sampleSystem(Dynamics& dyna, System& syst);
-  
-  void sampleInternalEnergies(Dynamics const& dyna, System& syst);
-  void sampleInternalEnergies(DPDE const& dyna, System& syst);
-  
-  void thermalize(Dynamics& dyna, System& syst);
-  void thermalize(BoundaryLangevin& dyna, System& syst);
-  void thermalize(DPDE& dyna, System& syst);
-  
-  void computeOutput(Dynamics const& dyna, System const& syst, Output& output, long int iOfStep);
-  void computeControlVariate(System const& syst, Output& output);
-  void writeOutput(Dynamics const& dyna, System const& syst , Output& output, long int iOfStep);
-  void writeFinalOutput(System const& syst, Output& output);*/
   
   
   // -------------------- Template implementation --------------------

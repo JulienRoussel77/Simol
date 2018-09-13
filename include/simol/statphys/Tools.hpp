@@ -87,7 +87,6 @@ double modulo(double variable, double mini, double maxi);
 int intModulo(int variable, int maxi);
 void displayTime(double time);
 int getNbOfLines(ifstream& file);
-//bool hasSmallerNorm(const cplx& a, const cplx& b);
 bool hasSmallerNorm(cplx a, cplx b);
 
 double dot(DVec const& u, DVec const& v);
@@ -95,8 +94,8 @@ DMat reshape(DVec const& u, int nbOfRows, int nbOfCols);
 DVec rint(DVec const& u);
 DVec polynomialDerivative(DVec const& P);
 DVec polynomialProduct(DVec const& P, DVec const& Q);
-//double extendedLog(double value);
 
+// integer identifiers of the different observables, 
 const int idKineticEnergy = 0;
 const int idPotentialEnergy = 1;
 const int idTotalEnergy = 2;

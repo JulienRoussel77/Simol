@@ -5,7 +5,8 @@ namespace simol
   
   //--------------- particle pair iterators ------------
   
-  
+  ///
+  /// Set the iterator to the first pair of particles for the order given by Verlet boxes
   ParticlePairIterator NBody::pairBegin()
   {
     if (nbOfParticles() < 2) throw runtime_error("Cannot initialize a Particle Pair Iterator if the system has 0 or 1 particle!");
@@ -27,11 +28,15 @@ namespace simol
     return iter;
   }
   
+  ///
+  /// Returns true if the iterator points to the last pair of particles
   bool NBody::pairFinished(ParticlePairIterator const& it) const
   {
     return (it.iOfCell1() == nbOfCells());
   }
   
+  ///
+  /// Increments the iterator to the next pair of particles
   void NBody::incrementePairIterator(ParticlePairIterator& it)
   {
     it.it2_++;
@@ -308,11 +313,10 @@ namespace simol
     }
   }
   
-  
-  
+  /// The particles are initialized on a regular cubic lattice
+  /// The momenta are initialized using Gaussian laws
   void NBody::samplePositions(DynamicsParameters const& dynaPara)
   {
-    cout << " - Sampling the positions..." << endl;
     int NbPartDim = nbOfParticlesPerDimension();
     double latticeSize = latticeParameter();
 
@@ -383,15 +387,10 @@ namespace simol
   void NBody::interaction(Particle& particle1, Particle& particle2) const
   {
     // take closest periodic image
-    /*cout << "####################" << endl;
-    cout << particle1.position().adjoint() << " <-> " << particle2.position().adjoint() << endl;*/
     DVec r12 = periodicDistance(particle2.position() - particle1.position());
     
     //cout << r12.adjoint() << endl;
     double distance = r12.norm();
-    /*cout << distance << endl;
-    cout << particle1.force().adjoint() << endl;
-    cout << "####################" << endl;*/
 
     // compute energy
     double energy12 = pairPotential()(distance);
@@ -402,12 +401,6 @@ namespace simol
     if (particle1.type() == 1 || particle2.type() == 1)
       force12 *= pairPotential_->interactionRatio();
       
-    //if (particle1.countdown() + particle2.countdown() == 1)
-    //  cout << "r = " << r12 << " f = " << force12 << endl;  
-    
-    /*ofstream pairs("pairs.txt", std::ofstream::app);
-    if (particle1.countdown() + particle2.countdown() == 1)
-      pairs << r12 << " " << force12 << " " << distance << endl;*/
       
     r12 /= distance;
     particle1.force() -= force12 * r12;
@@ -415,7 +408,6 @@ namespace simol
     // compute pressure, based on the Virial formula for the potential part: P_pot = -\sum_{i < j} r_ij v'(r_ij) / d|Vol|; will divide by d|Vol| at the end
     particle1.virial() += 0.5 * force12 * distance;
     particle2.virial() += 0.5 * force12 * distance;
-    //cout << distance << " -> " << force12 << " " << energy12 << endl;
 
     
     

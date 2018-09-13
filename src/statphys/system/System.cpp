@@ -10,17 +10,13 @@ namespace simol
   ///
   /// Assumes that there are 2 particles in the first box ! Can be improved...
   ParticlePairIterator::ParticlePairIterator():
-    //syst_(&syst0),
-    //it1_(syst0.cell(0).members().begin()),
     iOfCell1_(0),
-    //it2_(std::next(it1_, 1)),
     iOfNeighbor2_(0)
   {} 
   
   System::System(Input const& input):
     dimension_(input.dimension()),
     nbOfParticles_(input.nbOfParticles()),
-    //configuration_(input.nbOfParticles(), new Particle(dimension_)),
     configuration_(nbOfParticles_, nullptr),
     doSetting_(input.doSetting()),
     domainSize_(std::numeric_limits<double>::infinity()),
@@ -31,9 +27,9 @@ namespace simol
     pairPotential_ = createPotential(input, input.pairPotentialName());
     if (externalPotential_) domainSize_ = externalPotential_->domainSize();
     
-    cout << "System::System" << endl;
-    cout << "externalPotential_ : " << externalPotential_->classname() << endl;
-    cout << "pairPotential_ : " << pairPotential_->classname() << endl;
+    // the potential is composed of two parts, an external potential (rather a force) and a pair potential
+    //cout << "externalPotential_ : " << externalPotential_->classname() << endl;
+    //cout << "pairPotential_ : " << pairPotential_->classname() << endl;
   }
 
   ///
@@ -88,16 +84,6 @@ namespace simol
   {
     return systemSubtype_;
   }
-  
-  /*Potential* System::pairPotential()
-  {
-    return pairPotential_;
-  }
-  
-    Potential* System::externalPotential()
-  {
-    return externalPotential_;
-  }*/
   
   ///
   /// return position x in the interval [0,domainSize_)
@@ -229,6 +215,13 @@ namespace simol
     for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
       getParticle(iOfParticle).momentum() = drawMomentum(dynaPara.beta(), getParticle(iOfParticle).mass());
   }
+  
+  void System::sampleInternalEnergies()
+  {
+    cout << " - Sampling internal energies..." << endl;
+    for (int i = 0; i < nbOfParticles(); i++)
+      getParticle(i).internalEnergy() = 1;
+  }
 
   void System::computeAllForces()
   {throw std::invalid_argument("compteAllForces not defined");}
@@ -236,6 +229,8 @@ namespace simol
 
   //--------------- move into chain -----------------
 
+  ///
+  /// Depending on the boundary condition, a contribution to the energy should be added
   double System::boundaryPotEnergy() const
   {return 0;}
 
@@ -279,7 +274,6 @@ namespace simol
   ///Computes the instant value of the observable length
   double System::length() const
   {
-    //return periodicImage(getParticle(0).position())(0);
     return getParticle(0).position(0);
   }
   

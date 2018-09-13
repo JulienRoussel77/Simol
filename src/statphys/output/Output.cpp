@@ -19,7 +19,6 @@ namespace simol
     nbOfSteps_(input.nbOfSteps()),
     latticeParameter_(input.latticeParameter()),
     parameters_(input),
-    //totalEnergy_(0),
     totalVirial_(0),
     temperature_(0),
     decorrelationNbOfSteps_(input.decorrelationNbOfSteps()),
@@ -31,7 +30,6 @@ namespace simol
     doFinalLength_(input.doFinalLength()),
     doFinalVelocity_(input.doFinalVelocity()),
     doFinalLagrangeMultiplier_(input.doFinalLagrangeMultiplier()),
-    //doFinalChainLagrangeMultiplier_(input.doFinalChainLagrangeMultiplier()),
     doDPDE_(input.doDPDE()),
     doXMakeMol_(input.doXMakeMol()),
     fitModifFlux_(input.fitModiFlux()),
@@ -58,13 +56,16 @@ namespace simol
     extFluxProfile_(shortDecorrelationNbOfSteps(), timeStep(), nbOfShortAutocoPts(), nbOfParticles_),
     cvBasis_(cvBasis0)
   {    
+    // creates the observables whch are needed, depending on the type of dynamics, system, ...
+    // the observable are created with a decorrelation time which is either standard or short 
+    // the correlation time is used in the estimation of the asymptotic variance of the observable
     for (int idObs = 0; idObs < nbOfIdObs; idObs++)
       if (idObs == idModiFlux || idObs == idMidFlux || idObs == idLagrangeMultiplier)
         addObservable(input, idObs, shortDecorrelationNbOfSteps(), nbOfShortAutocoPts());
       else
         addObservable(input, idObs, decorrelationNbOfSteps(), nbOfAutocoPts());
     
-    
+    // prepares the output file for thermodynamic quantities
     if (input.doOutThermo())
       {
         //-- instantaneous values --
@@ -101,15 +102,10 @@ namespace simol
     if (doOutChain()) 
     {
       outFinalProfile_      = std::make_shared<ofstream>(input.outputFolderName() + "finalProfile.txt");
-      //outBeam_              = std::make_shared<ofstream>(input.outputFolderName() + "beamChain.txt");
-      //outChainVelocities_   = std::make_shared<ofstream>(input.outputFolderName() + "velocitiesChain.txt");
-      //outChainVelocities() << "# time i=0 i=N/4 i=N/2 i=3N/4 i=N-1" << endl;      
       outInstantProfile_           = std::make_shared<ofstream>(input.outputFolderName() + "instantProfile.txt");
       outInstantProfile() << "# time i=1 i=N/4 i=N/2 i=3N/4 i=N-2" << endl;  
       outProfile_           = std::make_shared<ofstream>(input.outputFolderName() + "profile.txt");
     }
-    
-    //if (input.CVObservable() != "None") makeCVObservables(input);
     
     //--------- announce where input/outputs are ----------------------------
     std::cout << endl;
@@ -188,12 +184,16 @@ namespace simol
     cout << endl << endl;
   }
   
+  ///
+  /// memory addresses corresponding to the created observables are made free at the end of the simulation
   Output::~Output()
   {
     for (int iOfObservable = 0; iOfObservable < nbOfObservables(); iOfObservable++)
       delete observables(iOfObservable);
   }
   
+  /// Returns the pointer to the observable corresponding to the identifier "idObs"
+  /// See Tools.hpp for the definition of these identifiers
   Observable*& Output::getObservablePtr(int idObs)
   {
     switch (idObs)
@@ -215,18 +215,10 @@ namespace simol
     }
   }
   
-  /*Observable* Output::addObservable(const Input& input, const string& outPath)
-  {
-    Observable* obsPtr = new Observable(input, outPath);
-    observables_.push_back(obsPtr);
-    return obsPtr;
-  }*/
-  
+  /// Creation of an observable
+  /// idObs gives the observable under consideration (see Tools.hpp and getObservablePtr)
   void Output::addObservable(const Input& input, int idObs, int decorrelationNbOfSteps0, int nbOfAutocoPts0)
   {
-    /*Observable* obsPtr = new Observable(input, outPath);
-    observables_.push_back(obsPtr);
-    return obsPtr;*/
     Observable* obsPtr = nullptr;
     if (input.doObservable(idObs))
     {
@@ -236,20 +228,7 @@ namespace simol
       observables_.push_back(obsPtr);
     }
   }
-  
-  /*Observable* Output::addKineticEnergy(const Input& input, Galerkin* galerkin)
-  {
-    Observable* obsPtr = nullptr;
-    if (input.doKineticEnergy())
-    {
-      if (input.CVObservable() != "kineticEnergy") obsPtr = new Observable(input, "kineticEnergy.txt");
-      else obsPtr = new Observable(input, "kineticEnergy.txt", galerkin);
-      observables_.push_back(obsPtr);
-    }
-    return obsPtr;
-  }*/
-  
-  
+    
 
   //----- various assessors --------
 
@@ -344,12 +323,6 @@ namespace simol
   
   double& Output::lagrangeMultiplier()
   {return obsLagrangeMultiplier().currentValue();}
-  
-  /*const double& Output::totalEnergy() const
-  {return totalEnergy_;}
-  
-  double& Output::totalEnergy()
-  {return totalEnergy_;}*/
   
   const double& Output::temperature() const
   {return temperature_;}
@@ -498,6 +471,8 @@ namespace simol
   
   //----------------- display functions --------------------------
 
+  ///
+  /// writes some relevent thermodynamic quantities in the output file "thermo.txt"
   void Output::displayThermoVariables(long int iOfStep)
   {
     //---- instantaneous values ----
@@ -535,6 +510,8 @@ namespace simol
     
   }
 
+  ///
+  /// writes one line of output per particle into the ouput file "particle.txt"
   void Output::displayParticles(System const& syst, long int iOfStep)
   {
     for (int iOfParticle = 0; iOfParticle < nbOfParticles_; iOfParticle++)
@@ -570,7 +547,9 @@ namespace simol
   
   // ------------ final outputs ----------------
   
-    void Output::displayFinalLength()
+  ///
+  /// Rarely used, writes statistics relative to a relevent length (or position) in the ouput file "length.txt"
+  void Output::displayFinalLength()
   {
     outFinalLength() << std::left << setw(10) << finalTime()
                         << " " << setw(5) << timeStep()
@@ -585,6 +564,8 @@ namespace simol
     obsLength().displayFinalValues(outFinalLength());
   }
   
+  /// Called at the end of the simulation
+  /// Writes a single line with the parameters of the dynamics and estimated statstics of the velocity (or a relevent velocity)
   void Output::displayFinalVelocity()
   {
     outFinalVelocity() << std::left << setw(10) << finalTime()
@@ -601,13 +582,11 @@ namespace simol
     obsVelocity().displayFinalValues(outFinalVelocity());
   }
   
-  ///
+  /// Called at the end of the simulation
+  /// Writes a single line with the parameters of the dynamics and estimated statstics of the Lagrange multiplier
   /// This output is such that the mobility can be estimated as the unbiased drift divided by the mean Lagrange multiplier
   void Output::displayFinalLagrangeMultiplier()
-  {              
-    //double finalMeanLM = obsLagrangeMultiplier().mean();
-    //double unbiasedDrift = ((nbOfParticles() - 1) * parameters_.drift() + finalMeanLM / parameters_.gamma() ) / nbOfParticles();
-    
+  {    
     cout << "outFinalLagrangeMultiplier_" << std::left << " " << setw(10) << finalTime()
                     << " " << setw(5) << timeStep()
                     << " " << setw(6) << nbOfParticles()
@@ -626,19 +605,12 @@ namespace simol
                         //<< " " << setw(9) << unbiasedDrift
                         << " " << setw(12);    
     obsLagrangeMultiplier().displayFinalValues(outFinalLagrangeMultiplier());  
-    
-                        /*<< " " << setw(12) << obsVelocity().mean()
-                        << " " << setw(12) << obsVelocity().asymptoticVariance()
-                        << " " << setw(12) << obsVelocity().asyvarOfAsyvar()
-                        << std::endl;*/
   }
 
+  ///
+  /// Writes all the correlation profiles which have been estimated in their respective output files "correlation....txt"
   void Output::finalDisplayCorrelations()
-  {
-    //cout << "Velocity : The correlation in 0 is " << floor((2 * obsVelocity().unbiasedCorrelationAtSpan(0) * decorrelationTime() / nbOfAutocoPts()) / obsVelocity().asymptoticVariance() * 10000)/100 << "% of the variance" << endl;
-    //cout << "SumFlux : The correlation in 0 is " << floor((2 * obsSumFlux().unbiasedCorrelationAtSpan(0) * decorrelationTime() / nbOfAutocoPts()) / obsSumFlux().asymptoticVariance() * 10000)/100 << "% of the variance" << endl;
-    //cout << "ModiFlux : The correlation in 0 is " << floor((2 * obsModiFlux().unbiasedCorrelationAtSpan(0) * decorrelationTime() / nbOfAutocoPts()) / obsModiFlux().asymptoticVariance() * 10000)/100 << "% of the variance" << endl;
-        
+  {   
     for (int iOfObservable=0; iOfObservable < nbOfObservables(); iOfObservable++)
       observables(iOfObservable)->displayCorrelations(nbOfSteps());
   }

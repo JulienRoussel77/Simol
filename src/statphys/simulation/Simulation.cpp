@@ -2,6 +2,7 @@
 
 namespace simol
 {
+  /// Returns a pointer to a System of the class provided in the input file
   System* createSystem(Input const& input)
   {
     if (input.systemName() == "Isolated")

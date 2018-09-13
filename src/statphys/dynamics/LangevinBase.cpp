@@ -55,11 +55,9 @@ namespace simol
   
   void LangevinBase::simulate(System& syst) const
   {
-    //for (ParticleIterator it = syst.begin(); !syst.finished(it); ++it)
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
       verletFirstPart(syst(iOfParticle));
     syst.computeAllForces();
-    //for (ParticleIterator it = syst.begin(); !syst.finished(it); ++it)
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
       verletSecondPart(syst(iOfParticle));
   }

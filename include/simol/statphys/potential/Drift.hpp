@@ -6,6 +6,8 @@
 namespace simol
 {
 
+  /// Represents an externa drift force, which does not derive from a potential
+  /// Only used in Bicolor for fluid with several particles, and not for 1D cosine potentials
   class Drift : public Potential
   {
     public:

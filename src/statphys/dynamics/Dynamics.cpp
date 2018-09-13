@@ -19,8 +19,6 @@ namespace simol
     nbOfSteps_(input.nbOfSteps()),
     thermalizationNbOfSteps_(input.thermalizationNbOfSteps()),
     burninNbOfSteps_(input.burninNbOfSteps())
-    //beta_(input.beta()),
-    //temperature_(1 / beta_)
   {}
 
 
@@ -88,9 +86,11 @@ namespace simol
 
   //----------- Ouputs ------------------
   
+  ///
+  /// Compute observables such as energies, thermodynamic quantities and linear combinations of velocities
+  /// Is followed by writeOutput
   void Dynamics::computeOutput(System const& syst, Output& output, long int iOfStep) const
   {
-    // #### faire un output.obsMidFlux().updateBoundaryLangevin(syst, betaLeft(), betaRight(), gamma()); ####
     if (output.obsKineticEnergy_) computeKineticEnergy(output, syst);
     if (output.obsPotentialEnergy_) computePotentialEnergy(output, syst);
     if (syst.isBiChain()) computeProfileBiChain(output, syst, iOfStep);
@@ -105,9 +105,7 @@ namespace simol
     getThermo(output);
     
     if (output.hasControlVariate()) computeControlVariate(syst, output);
-    
-    //cout << "sumFlux = " << output.obsSumFlux().currentValue() << endl;
-    
+       
     for (auto&& observable : output.observables())
       observable->appendCurrent(iOfStep);
     
@@ -119,27 +117,26 @@ namespace simol
   {
     output.cvBasis_->computeValueBasis(syst);
     output.cvBasis_->computeValueGeneratorOnBasis(syst);
-    //output.cvBasis_->generator_->value(output.cvBasis_, syst, parameters());
   }
   
   //------------------- writeOutput and its specifications by dynamics ---------------------------
-
+  
+  ///
+  /// Write outputs in the output files for relevent observables, some of these computed in computeOutput
   void Dynamics::writeOutput(System const& syst, Output& output, long int iOfStep) const
   {
-    //throw std::invalid_argument("writeOutput not defined in the general case");
+    // Test if the iteration index is a multiple of the input parameter "PrintPeriod"
     if (output.doOutput(iOfStep))
     {
       for (int iOfObservable=0; iOfObservable < output.nbOfObservables(); iOfObservable++)
         output.observables(iOfObservable)->display(iOfStep);
       output.displayThermoVariables(iOfStep);
       if (output.doOutChain())
-      {
-        //output.displayChainPositions(syst, iOfStep);
-        //output.displayChainMomenta(syst, iOfStep);
         output.displayInstantProfile(syst, iOfStep);
-      }
     }
     
+    // Test if the iteration index is a multiple of the input parameter "PrintLongPeriod"
+    // These outut are more time and memory consuming so they are written less often
     if (output.doLongPeriodOutput(iOfStep))
     {
       if (output.doOutParticles()) output.displayParticles(syst, iOfStep);
@@ -152,6 +149,8 @@ namespace simol
 
   //--------------------------- final output ------------------------------------
 
+  ///
+  /// Similar to writeOutput but called at the end of the simulation for one-line summaries
   void Dynamics::writeFinalOutput(System const& syst, Output& output) const
   {
     output.finalDisplayCorrelations();    
@@ -168,17 +167,20 @@ namespace simol
     }
   }
   
-  
+  /// The simulation starts with a "ThermalizationTime" where an iteration is described by this function
+  /// By default this is a standard iteration but can be replaced by a smarter dynamics, with a shorter transitory regime
   void Dynamics::thermalize(System& syst) const
   {
     simulate(syst);
   }
   
+  /// Initializes the system, either using a configuration file prescribing all initial variables or a distribution law
+  /// Ideally the inital state is sampled according to the invariant probability measure of the synamics
   void Dynamics::sampleSystem(System& syst) const
   {
     cout << " Initialization of the system..." << endl;
-    cout << "sampleSystem before : " << syst(0).position().adjoint() << endl;
 
+    // Test if a configuration file has been provided, if not we use distribution law
     if (!syst.doSetting())
     {
       syst.sampleMomenta(parameters());
@@ -203,7 +205,6 @@ namespace simol
     
     cout << " Starting production mode" << endl;
     cout << endl;
-    cout << "sampleSystem after : " << syst(0).position().adjoint() << endl;
   }
   
   ///
@@ -219,12 +220,11 @@ namespace simol
       if ((10 * iOfStep) % nbOfSteps() == 0)
         cout << "---- Run " << (100 * iOfStep) / nbOfSteps() << " % completed ----" << endl;
 
-      //--- write outputs if required ----
+      //--- compute and write outputs if required ----
       computeOutput(syst, output, iOfStep);
       writeOutput(syst, output, iOfStep);
       //---- update the system_ by the numerical integration ---
       simulate(syst);
-      //if (output_.hasControlVariate()) system_->computeAllForces();
     }
 
     //--- write final outputs ----
@@ -246,17 +246,21 @@ namespace simol
     particle.momentum() += timeStep_ * particle.force() / 2;
   }
   
+  ///
+  /// Integrates dp = f(q) dt over half a timestep for one particle
   void Dynamics::updateMomentum(Particle& particle) const
   {
     particle.momentum() += timeStep_ * particle.force() / 2;
   }
   
+  ///
+  /// Integrates dq = p/m dt over half a timestep for one particle
   void Dynamics::updatePosition(Particle& particle) const
   {
     particle.position() += timeStep_ * particle.momentum() / particle.mass();
   }
   
-  
+  // --- computes thermodynamic quantities and stock the result in observable objects ---
   
   void Dynamics::computeKineticEnergy(Output& output, System const& syst) const
   {
@@ -279,13 +283,8 @@ namespace simol
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
       output.totalVirial() += syst(iOfParticle).virial();
     
-    //output.obsPressure().currentValue() = 2*output.kineticEnergy() + output.totalVirial()/(output.dimension()*nbOfParticles()*pow(output.latticeParameter(), output.dimension()));
-    
     //Computes the instantaneous pressure, knowing the total virial
     getPressure(output);
-    
-    //Computes the instantaneous pressure, knowing the total virial
-    //output.obsPressure().currentValue() = output.pressure();
   }
   
   void Dynamics::computeInternalEnergy(Output& output, System const& syst) const
@@ -321,4 +320,3 @@ namespace simol
   }
 
 }
-//#endif

@@ -23,15 +23,8 @@ namespace simol
     interactionRatio_(input.interactionRatio()),
     cutOffRadius_(input.cutOffRadius())
   {
+    // We only consider external forcing in the first direction (e_x)
     nonEqForce_(0) = nonEqAmplitude();
-    /*if (input.systemSubtype() == "TwoDrift")
-      nonEqForce_(0) = nonEqAmplitude();
-    else if (input.systemSubtype() == "ColorDrift")
-      nonEqForce_(0) = nonEqAmplitude();
-    else
-      nonEqForce_(0) = nonEqAmplitude();*/
-    
-    cout << "interactionRatio_ : " << interactionRatio_ << endl;
   }
   
   ///
@@ -94,30 +87,27 @@ namespace simol
   const double& Potential::cutOffRadius() const
   {return cutOffRadius_;}  
   
+  /// Returns the energy associated to either a distance or a position
+  /// Depending on the potential, the energy is defined either for a real number or a vector
   double Potential::operator()(DVec const& position) const
   {
-    //throw runtime_error("Potential::operator()(DVec const& position) not implemented for "<< classname() << " !");
-    //cout << "Potential::operator()(DVec const& position) for " << classname() << endl;
     return operator()(position(0));
   }
 
+  ///
+  /// Returns the energy associated to either a distance or a position
   double Potential::operator()(double position) const
   {
-    //throw runtime_error("Potential::operator()(double position) not implemented for "<< classname() << " !");
-    //cout << "Potential::operator()(double position) for " << classname() << endl;
     return operator()(DVec::Constant(dimension(), position));
-    //return operator()(DVec::Constant(1,1, position));
   }
 
   double Potential::value(DVec const& position) const
   {
-    //cout << "Potential::value(DVec const& position) for " << classname() << endl;
     return operator()(position);
   }
 
   double Potential::value(double position) const
   {
-    //cout << "Potential::value(double position) for " << classname() << endl;
     return operator()(position);
   }
   
@@ -133,39 +123,28 @@ namespace simol
 
   DVec Potential::gradient(DVec const& position) const
   {
-    //throw runtime_error("Potential::gradient(DVec const& position) not implemented !");
-    //cout << "Potential::gradient(DVec const& position)" << endl;
     return DVec::Constant(1, 1, scalarGradient(position(0)));
   }
 
+  ///
+  /// Returns some relevent derivative of the energy
   double Potential::scalarGradient(double /*position*/) const
   {
     throw runtime_error("Potential::scalarGradient(double position) not implemented !");
-    //cout << "Potential::gradient(double position)" << endl;
-    //return gradient(DVec::Constant(dimension(), position));
   }
 
+  /// The total "external" force is sum of a constant drift a potential force
+  /// This method is called for the 1D cosine potential
+  /// When the drift is color dependent we call the totalForce version of the class Drift
   DVec Potential::totalForce(DVec const& position) const
   {
-    //cout << "Potential::totalForce" << endl;
-    //cout << nonEqForce_ << " - " << gradient(position) << " = " << nonEqForce_ - gradient(position) << endl;
     return nonEqForce_ - gradient(position);
   }
-
-  /*double Potential::scalarTotalForce(double position) const
-  {
-    return nonEqForce_ - gradient(position);
-  }*/
 
   DVec Potential::potentialForce(DVec const& position) const
   {
     return - gradient(position);
   }
-
-  /*DVec Potential::potentialForce(double position) const
-  {
-    return - gradient(position);
-  }*/
   
   double Potential::scalarPotentialForce(double position) const
   {
@@ -229,30 +208,8 @@ namespace simol
     return shiftToHarmonic();
   }
   
-  /*///
-  ///sampling using the rejection method
-  double Potential::drawLaw(double localBeta, std::shared_ptr<RNG>& rng, int type) const
-  {
-    double ratio = shiftToHarmonic(type);
-    bool reject = true;
-    double xdraw, udraw;
-    cout << "Rejection method with a gaussian centered on " << center_ << " with std dev of 1 and ratio " << ratio << endl;
-    while (reject)
-    {
-      xdraw = center_ + rng->scalarGaussian() / sqrt(localBeta);
-      cout << "xdraw : " << xdraw << endl;
-      
-      udraw = rng->scalarUniform();
-
-      reject = (udraw > exp(- localBeta * (value(xdraw, type) - pow(xdraw-center_, 2) / 2 + ratio)));
-      cout << udraw << " compared to " << exp(- localBeta * (value(xdraw, type) - pow(xdraw-center_, 2) / 2 + ratio)) << endl;
-      assert(exp(-localBeta * (pow(xdraw-center_, 2) / 2 - ratio)) >= exp(- localBeta * value(xdraw)));
-    }
-    return xdraw;
-  }*/
-  
   ///
-  ///sampling using the inverse tranform method
+  /// Sampling using the inverse tranform method
   double Potential::drawLaw(double localBeta, std::shared_ptr<RNG>& rng, int type) const
   {
     double step = 1e-4;
@@ -263,11 +220,9 @@ namespace simol
     {
       double q = qMin + iOfNode * step;
       partitionFunction += exp(-localBeta * value(q, type));
-      //cout << iOfNode << " " << q << " " << exp(-localBeta * value(q, type)) << " " << partitionFunction << endl;
     }
     partitionFunction *= step;
     double randVal = rng->scalarUniform();
-    //cout << "Inverse transform method : U = " << randVal << endl;
     double objective = randVal * partitionFunction / step;
     double cumulant = 0;
     for (int iOfNode = 0; iOfNode < nbOfNodes; iOfNode++)

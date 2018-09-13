@@ -105,6 +105,23 @@ namespace simol
     return sqrt(2 * parameters_.gamma() * parameters_.temperature());
   }
   
+    //--- DPDE dynamics ---
+  void DPDE::thermalize(System& syst)
+  {
+    //-- Verlet part: possibly MTS here as well, as in the function "simulate"--
+    for (int k = 0; k < MTSfrequency(); k++)
+    {
+      for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
+        verletFirstPart(syst(iOfParticle));
+      syst.computeAllForces();
+      for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
+        verletSecondPart(syst(iOfParticle));
+    }
+    //-- for the FD part, the timestep is renormalized as the effective timestep MTSfrequency()*timeStep_, as in the function "simulate" --
+    for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
+      Thermalization(syst(iOfParticle));
+    }
+  
   void DPDE::simulate(System& syst)
   {
     //--- compute energy at the beginning of the step ---

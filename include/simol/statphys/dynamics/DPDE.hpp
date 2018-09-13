@@ -51,6 +51,7 @@ namespace simol
     const bool& doProjectionDPDE() const;
     bool& doProjectionDPDE();
     
+    virtual void thermalize(System& syst);
     virtual void simulate (System& syst);
 
     //-- microscopic EOS --

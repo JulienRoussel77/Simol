@@ -27,9 +27,13 @@ namespace simol
 
   class Input
   {
+    // YAML object managing the fields of the input file
     YAML::Node data;
+    // memory address of the input file
     string inputPath_;
+    // input flux from the input file
     ifstream inputFlux_;
+    // in the case when the system is initialized from a given configuration, this configuration is stored in these vectors
     vector<DVec> initialPositions_, initialMomenta_;
     vector<double> initialInternalEnergies_;
   public:

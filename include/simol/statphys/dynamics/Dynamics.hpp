@@ -101,11 +101,17 @@ namespace simol
       virtual void getThermo(Output& output) const;
       virtual void getPressure(Output& output) const;
     protected:
+      // contains all the parameters of the dynamics
       DynamicsParameters parameters_;
+      // timestep of the integrator
       double timeStep_;
-      long int nbOfSteps_, thermalizationNbOfSteps_, burninNbOfSteps_;
-      //double beta_;
-      //double temperature_;
+      // number of steps of integration with output
+      long int nbOfSteps_;
+      // number of steps of thermalization (see method thermalize)
+      long int thermalizationNbOfSteps_;
+      // number of steps of integration without output
+      long int burninNbOfSteps_;
+      // random number generator
       std::shared_ptr<RNG> rng_;
   };
 

@@ -20,6 +20,7 @@ namespace simol
     else if (systemSubtype() == "TwoDrift")
       for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
         getParticle(iOfParticle).type() = (iOfParticle < 2); 
+    // Beware, ColorDrift only works for an even number of particles
     else if (systemSubtype() == "ColorDrift" || systemSubtype() == "NortonColorDrift")
       for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
         getParticle(iOfParticle).type() = 2*((2*iOfParticle) < nbOfParticles()) - 1;    
@@ -29,16 +30,8 @@ namespace simol
   
   void Bicolor::computeAllForces()
   {
-    //cout << endl << "------------------computeAllForces----------------------" << endl;
-    //for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
-    //  cout << "1 : i " << iOfParticle << " " << getParticle(iOfParticle).type() << endl;
-
     for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
       getParticle(iOfParticle).resetForce(externalPotential());
-    
-    //for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
-    //  cout << "2 : i " << iOfParticle << ", p " << getParticle(iOfParticle).position().adjoint() << ", e " << getParticle(iOfParticle).potentialEnergy() << ", f " << getParticle(iOfParticle).force().adjoint() << endl;
-    
     
     if (doCells_)
     {
@@ -54,24 +47,15 @@ namespace simol
       for (int i = 0; i < nbOfParticles(); i++)
         for (int j = i + 1; j < nbOfParticles(); j++)
           interaction(getParticle(i), getParticle(j));
-    }    
-    
-    /*double alpha3=pairPotential().interactionRatio();
-    lagrangeMultiplier() = - getParticle(0).force(0) / alpha3;
-    getParticle(0).force(0) *= (2-alpha3)/alpha3;      */
-    
+    }        
   }
   
+  ///
+  /// Projects the momenta according to the Norton algorithm so that velocity() == drift
   void Bicolor::enforceConstraint(double drift, DynamicsParameters const& /*dynaPara*/, bool updateLagrangeMultiplier)
   {
-    
-    /*double relativeDrift = 0;
-    for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
-      relativeDrift += getParticle(iOfParticle).type() * getParticle(iOfParticle).velocity(0);
-    relativeDrift /= sqrt((double) nbOfParticles());*/
+    // we call velocity() which returns the linear combination of velocities which is constrained
     double relativeDrift = velocity();
-    
-    //cout << "relativeDrift before = " << relativeDrift << " compared to drift = " << drift << endl;
     
     double localLagrangeMultiplier = getParticle(0).mass() * (drift - relativeDrift);
 
@@ -96,10 +80,9 @@ namespace simol
       double sumVelocity = 0;
       for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
         sumVelocity += getParticle(iOfParticle).type() * getParticle(iOfParticle).velocity(0);
-      //return sumVelocity;
+      
       sumVelocity /= (double) nbOfParticles();
-      //return (sumVelocity + externalPotential_->nonEqAmplitude() /(nbOfParticles()-1.)) * (nbOfParticles()-1.) / nbOfParticles();
-      //return (sumVelocity + externalPotential_->nonEqAmplitude() /(dynaPara.gamma() * nbOfParticles()-1.)) * (nbOfParticles()-1.) / nbOfParticles();
+      
       return sumVelocity;
     }
     else

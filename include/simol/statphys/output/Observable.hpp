@@ -10,22 +10,29 @@ using std::setw;
 
 namespace simol
 {
-  
+ /// Represents an observable such as the energy or a flux
+ /// Statistics such as the mean or the asymptotic variance are estimated on the fly
+ /// Manages the ouputs corresponding to this observable
  class Observable
   {
-  //friend Observable* createObservable(const Input& input);
   public:
+      // number of steps of the autocorrelation profile used to compute the asymptotic variance
       int decorrelationNbOfSteps_;
+      // timestep of the integrator of the dynamics
       double timeStep_;
+      // number of steps between two outputs of this observable
       int printPeriodNbOfSteps_;
+      // number of nodes in the final plot of the autocorrelation profile (too many nodes can require a very large memory, especially for the chains)
       int nbOfAutocoPts_;
-
-      //Contains the value that is being computed, set to zero at each iteration
+      // Contains the value which is being computed, set to zero at each iteration
       double currentValue_;
+      // object used to do statistics on the processed values of the observable
       AutocorrelationStats autocoStats_;
-      
+      // memory path to the output file corresponding to this observable 
       string outPath_;
+      // output stream for this observable
       ofstream outFlux_;      
+      // output stream for the autocorrelation profile of this observable
       shared_ptr<ofstream> outFluxCorrelation_;
     public:
       Observable(Input const& input, int idObs, int decorrelationNbOfSteps0, int nbOfAutocoPts0);

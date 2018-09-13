@@ -26,15 +26,12 @@ namespace simol
   
   void Chain::incrementePairIterator(ParticlePairIterator& it)
   {
-    //it.iOfParticle1()++;
-    //it.iOfParticle2()++;
     it.it1_++;
     it.it2_++;
   }
 
   bool Chain::pairFinished(ParticlePairIterator const& it) const
   {
-    //return it.iOfParticle1() == nbOfParticles() - 1;
     return it.it2_ == configuration().end();
   }
   
@@ -77,8 +74,8 @@ namespace simol
     Chain(input, 0)
   {}
 
-
-
+  /// The initial positions are sampled by drawing r_i ~ exp(-v(r_i)/T_i)
+  /// The temperature T_i at the site i is approximated by a linear profile in the nonequilibrium case
   void BiChain::samplePositions(DynamicsParameters const& dynaPara)
   {
     cout << " - Sampling the positions..." << endl;
@@ -101,10 +98,7 @@ namespace simol
 
 
   void BiChain::computeAllForces()
-  {    
-    //for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
-    //  getParticle(iOfParticle).resetForce(pairPotential());
-    
+  {        
     getParticle(-nbOfWallParticles_).force(0) = 0; // Only reset the first particle to gain time
     
     for (ParticlePairIterator it = pairBegin(); !pairFinished(it); incrementePairIterator(it))
@@ -150,59 +144,24 @@ namespace simol
   
   double BiChain::computeSumFlux() const
   {    
-    double sumFlux = 0;    
-    /*for (int iOfLink = 0; iOfLink < nbOfParticles()-1; iOfLink++)
-      sumFlux += heatFlux(iOfLink);      
-    return sumFlux / (nbOfParticles() - 1.);*/
+    double sumFlux = 0;  
     
     for (int iOfParticle = 1; iOfParticle < nbOfParticles()-1; iOfParticle++)
       sumFlux += heatFluxOnAtom(iOfParticle);      
     return sumFlux / (nbOfParticles() - 2.);
   }
   
-  
-  
-  /*void BiChain::enforceConstraint(double& lagrangeMultiplier, double flux, DynamicsParameters const& dynaPara)
-  {
-    //double blueMeanVelocity = 0;
-    //double redMeanVelocity = 0;
-    
-    double instantFlux = computeSumFlux();
-    //cout << "flux = " << instantFlux << endl;
-    double sensitivity = pow(getParticle(0).energyGrad(0), 2) + pow(getParticle(nbOfParticles()-2).energyGrad(0), 2);
-    for (int iOfParticle = 1; iOfParticle < nbOfParticles()-1; iOfParticle++)
-      sensitivity += pow(getParticle(iOfParticle-1).energyGrad(0) + getParticle(iOfParticle).energyGrad(0), 2);
-      
-    //cout << "flux before = " << flux << " compared to drift = " << drift << endl;
-    
-    double localLagrangeMultiplier = -(nbOfParticles()-1)*getParticle(0).mass()*dynaPara.temperature() * (instantFlux - flux) / sensitivity;
-
-    getParticle(0).momentum(0) -= localLagrangeMultiplier * getParticle(0).energyGrad(0);
-    getParticle(nbOfParticles()-1).momentum(0) -= localLagrangeMultiplier * getParticle(nbOfParticles()-2).energyGrad(0);
-    for (int iOfParticle = 1; iOfParticle < nbOfParticles()-1; iOfParticle++)
-      getParticle(iOfParticle).momentum(0) -= localLagrangeMultiplier * (getParticle(iOfParticle-1).energyGrad(0) + getParticle(iOfParticle).energyGrad(0));
-    
-    lagrangeMultiplier += localLagrangeMultiplier;
-    
-    //cout << computeSumFlux() << "=?=" << flux << endl;
-  }*/
-  
   /// Here we compute the sensitivity G(r,p) and project on the right hyperplan
   void BiChain::enforceConstraint(double flux, DynamicsParameters const& /*dynaPara*/, bool updateLagrangeMultiplier)
-  {
-    //double blueMeanVelocity = 0;
-    //double redMeanVelocity = 0;
-    
+  {    
     double instantFlux = computeSumFlux();
-    //cout << "flux = " << instantFlux << endl;
+   
     double sensitivity = 0;
     for (int iOfParticle = 1; iOfParticle < nbOfParticles()-1; iOfParticle++)
       sensitivity += pow(getParticle(iOfParticle-1).energyGrad(0) + getParticle(iOfParticle).energyGrad(0), 2);
     
     sensitivity /= pow(2*(nbOfParticles()-2), 2)*getParticle(0).mass();
-      
-    //cout << "flux before = " << flux << " compared to drift = " << drift << endl;
-    
+         
     double localLagrangeMultiplier = -(instantFlux - flux) / sensitivity;
 
     for (int iOfParticle = 1; iOfParticle < nbOfParticles()-1; iOfParticle++)
@@ -210,8 +169,6 @@ namespace simol
     
     if (updateLagrangeMultiplier)
       lagrangeMultiplier() += localLagrangeMultiplier;
-    
-    //cout << computeSumFlux() << "=?=" << flux << endl;
   }
 
   //###### TriChain ######
@@ -278,13 +235,12 @@ namespace simol
     //std::cout << "TriChain::computeAllForces" << std::endl;
     for (int iOfParticle = 0; iOfParticle < nbOfParticles(); iOfParticle++)
       getParticle(iOfParticle).resetForce(pairPotential());
-    //for (auto&& particle : configuration_)
-    //  dyna.computeForce(particle);
+    
     triInteraction(getParticle(-2), getParticle(-1), getParticle(0));
     triInteraction(getParticle(-1), getParticle(0), getParticle(1));
     for (int iOfParticle = 0; iOfParticle < nbOfParticles() - 2; iOfParticle++)
       triInteraction(getParticle(iOfParticle), getParticle(iOfParticle + 1), getParticle(iOfParticle + 2));
-    //dyna.bending(configuration_[nbOfParticles() - 2], configuration_[nbOfParticles() - 1]);
+    
     if (isOfFixedVolum_)
       triInteraction(getParticle(nbOfParticles() - 1), getParticle(-2), getParticle(-1));
   }

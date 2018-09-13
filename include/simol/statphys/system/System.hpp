@@ -4,8 +4,6 @@
 #include "simol/statphys/Tools.hpp"
 #include <vector>
 #include "simol/statphys/system/Particle.hpp"
-//#include "simol/statphys/dynamics/Dynamics.hpp"
-//#include "simol/statphys/output/Output.hpp"
 
 #include "simol/statphys/potential/AllPotentials.hpp"
 #include "simol/statphys/dynamics/DynamicsParameters.hpp"
@@ -46,12 +44,9 @@ namespace simol
     vector<Particle*>::iterator endIt2_;
   };
   
-  //class System;
-  //System* createSystem(Input const& input);
 
   class System
   {
-  //friend System* createSystem(Input const& input);
   public:
     System(Input const& input);
     virtual ~System();
@@ -69,8 +64,6 @@ namespace simol
     virtual Particle& operator()(int iOfParticle = 0) {return *(configuration_[iOfParticle]);};
     const Particle& getParticle(int iOfParticle = 0) const;
     Particle& getParticle(int iOfParticle = 0);
-    //virtual Particle& getMember(const int& iOfCell, const int& iOfMember) {return getParticle(iOfMember);}
-    //virtual Particle const& getMember(const int& iOfCell, const int& iOfMember) const {return getParticle(iOfMember);}
     const int& dimension() const;
     const int& nbOfParticles() const;
     const double& domainSize() const;
@@ -108,14 +101,8 @@ namespace simol
     virtual void interaction(Particle& particle1, Particle& particle2) const;
     double externalPotential(DVec const& position, int type = 0) const;
     double externalPotential(const double& position, int type = 0) const;
-    /*DVec totalForce(DVec const& position, int type = 0) const;
-    DVec totalForce(double position, int type = 0) const;*/
     DVec externalForce(DVec const & position, int type = 0) const;
     DVec externalForce(double position, int type = 0) const;
-    //DVec& externalForce() ;
-    //DVec const& externalForce() const;
-    //double& externalForce(const int& i);
-    //double const& externalForce(const int& i) const;
     double const& potParameter1() const;
     double const& potParameter2() const;
     
@@ -131,7 +118,6 @@ namespace simol
 
     // currently specific to chains
     virtual double boundaryPotEnergy() const;
-    //double laplacian(DVec const& position, int type = 0) const;
     virtual double leftHeatFlux(int /*iOfLink*/) const {throw runtime_error("leftHeatFlux not implemented for this system !");};
     virtual double rightHeatFlux(int /*iOfLink*/) const {throw runtime_error("rightHeatFlux not implemented for this system !");};
     virtual double heatFlux(int /*iOfLink*/) const {throw runtime_error("heatFlux not implemented for this system !");};
@@ -142,6 +128,7 @@ namespace simol
     
     virtual void samplePositions(DynamicsParameters const& dynaPara);
     virtual void sampleMomenta(DynamicsParameters const& dynaPara);
+    virtual void sampleInternalEnergies();
     
     virtual double length() const;
     virtual double velocity() const;
@@ -150,19 +137,27 @@ namespace simol
     virtual double& lagrangeMultiplier() {return lagrangeMultiplier_;}
     virtual const double& lagrangeMultiplier() const {return lagrangeMultiplier_;}
   protected:
-  //public:
     int dimension_;
+    // nomber of particles
     int nbOfParticles_;
+    // vector containing pointers to each particle
     std::vector<Particle*> configuration_;
-    //list<Particle> configuration_;
+    //  ugly: contains a path to the address of the file giving the inital configuration (if it exists)
     string settingsPath_;
+    // pointer to the random number generator
     std::shared_ptr<RNG> rng_;
+    // part of the potential which is not an interaction potential
+    // eg a confining potential or an external drift force
     Potential* externalPotential_;
+    // pair interaction potential (eg LJ)
     Potential* pairPotential_;
+    // Is true if the system is initialized using a file
     bool doSetting_;
+    // size of the domain, can be infinity
     double domainSize_;
+    // used for the Bicolor system and indicates the type of drift (OneDrift, TwoDrift or ColorDrift)
     string systemSubtype_;
-    
+    // for constrained systems, instantaneous value of the Lagrange multiplier
     double lagrangeMultiplier_;
   };
 

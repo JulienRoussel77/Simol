@@ -2,6 +2,8 @@
 
 namespace simol
 {
+  
+  // --- Langevin class ---
   ///Constructor for the Langevin Dynamics with thermostats everywhere
   Langevin::Langevin(Input const& input):
     LangevinBase(input)
@@ -14,15 +16,6 @@ namespace simol
   {
     return sqrt(2 * parameters_.gamma() / parameters_.beta());
   }
-
-  /*///After refers to the fact that this step comes after updating the forces
-  ///Proceeds to the second half of the Verlet scheme, then integrate the O-U analytically
-  void Langevin::updateAfter(Particle& particle)
-  {
-    particle.momentum() += timeStep_ * particle.force() / 2;
-    double alpha = exp(- gamma_ / particle.mass() * timeStep_);
-    particle.momentum() = alpha * particle.momentum() + sqrt((1 - pow(alpha, 2)) / beta_ * particle.mass()) * rng_->gaussian();
-  }*/
   
   void Langevin::simulate(System& syst) const
   {
@@ -37,6 +30,11 @@ namespace simol
     for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
       updateOrsteinUhlenbeck(syst(iOfParticle), beta(), timeStep());
   }
+  
+  
+  // --- ConstrainedLangevin class for the Norton dynamics---
+  
+  
   
   ///Constructor for the Constrained Langevin Dynamics with thermostats everywhere
   ConstrainedLangevin::ConstrainedLangevin(Input const& input):
@@ -53,12 +51,9 @@ void ConstrainedLangevin::simulate(System& syst) const
   
   // Becareful here we assume that all the particles share the same mass !
   // We analiticaly determine the non-martingale part of the Lagrange multiplier for the O-U process
-  
-  //syst.lagrangeMultiplier() += (1-alpha) * drift();
-  
+    
   syst.enforceConstraint(drift(), parameters(), false);
-  //syst.enforceConstraint(syst.lagrangeMultiplier(), drift());
-  
+    
   for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
     updateMomentum(syst(iOfParticle));
   syst.enforceConstraint(drift(), parameters(), true);
@@ -74,9 +69,7 @@ void ConstrainedLangevin::simulate(System& syst) const
   for (int iOfParticle = 0; iOfParticle < syst.nbOfParticles(); iOfParticle++)
     updateOrsteinUhlenbeck(syst(iOfParticle), beta(), timeStep()/2);
   
-  //syst.lagrangeMultiplier() += (1-alpha) * drift();
   syst.enforceConstraint(drift(), parameters(), false);
-  //syst.enforceConstraint(syst.lagrangeMultiplier(), drift());
   
   syst.lagrangeMultiplier() /= timeStep();
 }

@@ -8,7 +8,8 @@ using std::endl;
 
 namespace simol
 {
-
+  ///
+  /// Contains the data of a single particle
   Particle::Particle(double const& mass, DVec const& position0, DVec const& momentum0, double internalEnergy0):
     mass_(mass),
     position_(position0),
@@ -40,15 +41,14 @@ namespace simol
   double const & Particle::mass() const
   { return mass_; }
 
+  /// Called at the beginning of an iteration
+  /// The external part of the potential is called here
+  /// This includes drift or shearing forces, every force but the interactions
   void Particle::resetForce(Potential const& externalPot)
   {
-    //cout << position().adjoint() << " force : " << force().adjoint() << endl;
     potentialEnergy_ = externalPot.value(position());
-    //force_ = pot.nonEqForce();
-    //cout << "externalPot = " << externalPot.classname() << endl;
     force_ = externalPot.totalForce(position(), type());
     virial_ = 0;
-    //cout << position().adjoint() << " force : " << force().adjoint() << endl;
   }
 
   //--- primary variables ----

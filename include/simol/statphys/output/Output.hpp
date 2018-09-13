@@ -186,6 +186,8 @@ namespace simol
     bool hasControlVariate() const;
   protected:
     string outputFolderName_;
+    
+    // output fluxes
     std::shared_ptr<ofstream> outThermo_;
     std::shared_ptr<ofstream> outMeanThermo_;
     std::shared_ptr<ofstream> outParticles_;
@@ -205,27 +207,31 @@ namespace simol
 
     //-- for chains --
     std::shared_ptr<ofstream> outFinalFlux_;
-    //std::shared_ptr<ofstream> outBeam_;  
-    //std::shared_ptr<ofstream> outChainVelocities_;
     std::shared_ptr<ofstream> outInstantProfile_;
     std::shared_ptr<ofstream> outProfile_;
     std::shared_ptr<ofstream> outFinalProfile_;
 
-    //-- input parameters useful for output --
+    // number of steps between two outputs
+    // heavy outputs are printed less often than lighter ones
     int printPeriodNbOfSteps_, printLongPeriodNbOfSteps_;
+    // time step of the integrator of the dynamics
     double timeStep_;
+    // dimension of the system (usually 1, 2 or 3)
     int dimension_;
+    // number of particles
     int nbOfParticles_;
+    // number of integration iterations
     long int nbOfSteps_;
+    // for systems initialized on a lattice, this is the size of one cell
     double latticeParameter_;
     
   public:
+    // contains the parameters of the dynamics
     DynamicsParameters parameters_;
     
   protected:
 
     //-- fields to output --
-    //double totalEnergy_;
     double totalVirial_;
     double temperature_;
     // rejection rates (DPDE)
@@ -234,18 +240,24 @@ namespace simol
     double rejectionCountThermal_;
     double negativeEnergiesCountThermal_;
 
-    //-- parametrization of outputs --
+    // number of time steps corresponding to the autocorrelatio profile of an observable
+    // in practice it should be an upper bound of the decorrelation time in order to get a good estimation of the asymptotic variance
+    // some observables have faster decorrelation and they require a shorter profile
     int decorrelationNbOfSteps_, shortDecorrelationNbOfSteps_;
-    
+    // number of nodes in the final plot of the correlation profile (number of bins)
     int nbOfAutocoPts_, nbOfShortAutocoPts_;
+    // Is true if the corresponding output should be printed
     bool doOutChain_, doFinalFlux_, doFinalLength_, doFinalVelocity_, doFinalLagrangeMultiplier_, doDPDE_, doXMakeMol_;
+    // For a thermal chain: is true if the harmonic potential fitting the interaction potential should be fitted numerically (used for control variates, cf paper SIAM:MMS)
     bool fitModifFlux_;
     
   public:
-    
-    std::shared_ptr<ofstream> outTest_;   // for debug purpose only
-    
-    vector<Observable*> allObservables_;
+    // for debug purpose only
+    std::shared_ptr<ofstream> outTest_;
+    // redundent pointers to the observables which are used
+    // if all goes well "observables_[idOfObs] == getObservable(idObs)"
+    // the observables which are not relevent are not created and remain nullptr
+    //vector<Observable*> allObservables_;
     Observable* obsKineticEnergy_;
     Observable* obsPotentialEnergy_;
     Observable* obsTotalEnergy_;
@@ -263,7 +275,8 @@ namespace simol
     vector<Observable*> observables_;
 
     //----------- for autocorrelations -------------
-    //-- chains --
+    // objects making statistics on the values gathered for the observable profile in a chain
+    // allows for example to plot the profile of mean fluxes with an error bar for each site
     AutocorrelationStats kinTempProfile_;
     AutocorrelationStats potTempTopProfile_;
     AutocorrelationStats potTempBotProfile_;

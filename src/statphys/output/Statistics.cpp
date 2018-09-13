@@ -5,8 +5,8 @@ using std::max;
 
 namespace simol
 {
-  //##### CircularBuffer #####
-  
+  /// Data structure with a circular index
+  /// Keeps in memory the last "size_" given values and their sum  
   CircularBuffer::CircularBuffer(int size0):
     size_(size0),
     data_(DVec::Zero(size_)),
@@ -17,9 +17,9 @@ namespace simol
     
     void CircularBuffer::append(double value)
     {
+      // Every 100 new values, recompute the sum from scratch for numerical stability
       if (nbOfValues_++ % (100 * size_) == 0)
       {
-        //cout << "sum : " << sum() << " delta = " << sum() - data_.sum() << endl;
         data_(index_) = value;
         sum_ = data_.sum();
       }
@@ -29,22 +29,15 @@ namespace simol
         data_(index_) = value;
       }
       index_ = (index_+1)%size_;
-      //if (value > 5)
-      //  cout << data_.transpose() << endl;
     }
   
-  //###### Statistics ######
-  
+  /// Statistics of nbRows X nbCols data samples, independently
+  /// For each sample, computes the sum on the fly
   Statistics::Statistics(int nbRows, int nbCols):
     sumValues_(DMat::Zero(nbRows, nbCols)),
     lastValue_(DMat::Zero(nbRows, nbCols)),
     nbValues_(DMatInt::Zero(nbRows, nbCols))
-    //iidVar_(nbRows, nbCols)
   {
-    //sumValues_.fill(0);
-    //lastValue_.fill(0);
-    //nbValues_.fill(0);
-    //iidVar_.fill(0);
   };
   
   int Statistics::nbOfRows() const
@@ -57,43 +50,43 @@ namespace simol
     return sumValues_.cols();
   }
 
-  void Statistics::append(double value, int i, int j)
+  void Statistics::append(double value, int iOfRow, int iOfCol)
   {
-    lastValue_(i, j) = value;
-    sumValues_(i, j) += value;
-    nbValues_(i, j)++;
+    lastValue_(iOfRow, iOfCol) = value;
+    sumValues_(iOfRow, iOfCol) += value;
+    nbValues_(iOfRow, iOfCol)++;
   }
 
 
-  double Statistics::mean(int i, int j) const
+  double Statistics::mean(int iOfRow, int iOfCol) const
   {
-    if (nbValues_(i, j) == 0)
+    if (nbValues_(iOfRow, iOfCol) == 0)
       return 0;
     else
-      return sumValues_(i, j) / nbValues(i, j);
+      return sumValues_(iOfRow, iOfCol) / nbValues(iOfRow, iOfCol);
   }
 
-  DVec Statistics::meanVec(int i) const
+  /// Returns the vector of the means of the column i
+  DVec Statistics::meanVec(int iOfCol) const
   {
-    //return piecewiseDivision(sumValues_.col(i), nbValues_.col(i));
-    return sumValues_.col(i).array() / nbValues_.cast<double>().col(i).array();
+    return sumValues_.col(iOfCol).array() / nbValues_.cast<double>().col(iOfCol).array();
   }
 
+  /// Returns the matrix of the means
   DMat Statistics::meanMat() const
   {
-    //return piecewiseDivision(sumValues_, nbValues_);
     return sumValues_.array() / nbValues_.cast<double>().array();
   }
 
 
-  const long int& Statistics::nbValues(int i, int j) const
+  const long int& Statistics::nbValues(int iOfRow, int iOfCol) const
   {
-    return nbValues_(i, j);
+    return nbValues_(iOfRow, iOfCol);
   }
 
-  const DVecInt Statistics::nbValuesVec(int i) const
+  const DVecInt Statistics::nbValuesVec(int iOfCol) const
   {
-    return nbValues_.col(i);
+    return nbValues_.col(iOfCol);
   }
 
   const DMatInt& Statistics::nbValuesMat() const
@@ -102,14 +95,14 @@ namespace simol
   }
 
 
-  const double& Statistics::lastValue(int i, int j) const
+  const double& Statistics::lastValue(int iOfRow, int iOfCol) const
   {
-    return lastValue_(i, j);
+    return lastValue_(iOfRow, iOfCol);
   }
 
-  const DVec Statistics::lastValueVec(int i) const
+  const DVec Statistics::lastValueVec(int iOfCol) const
   {
-    return lastValue_.col(i);
+    return lastValue_.col(iOfCol);
   }
 
   const DMat& Statistics::lastValueMat() const
@@ -118,54 +111,40 @@ namespace simol
   }  
   
   
-  //###### IIDStats ######
-  
+  /// Inherits from Statistics
+  /// Computes the variance of each data sample on the fly, assuming they are IID  
   IIDStats::IIDStats(int nbRows, int nbCols):
     Statistics(nbRows, nbCols),
     sumVar_(DMat::Zero(nbRows, nbCols))
   {}
   
-  void IIDStats::append(double value, int i, int j)
+  void IIDStats::append(double value, int iOfRow, int iOfCol)
   {
-    lastValue_(i, j) = value;
-    nbValues_(i, j)++;
+    lastValue_(iOfRow, iOfCol) = value;
+    nbValues_(iOfRow, iOfCol)++;
     double prevMean = mean();
-    sumValues_(i, j) += value;
-    sumVar_(i,j) = sumVar_(i,j) + (value - prevMean) * (value - mean());
+    sumValues_(iOfRow, iOfCol) += value;
+    sumVar_(iOfRow, iOfCol) = sumVar_(iOfRow, iOfCol) + (value - prevMean) * (value - mean());
   }
   
-  double IIDStats::variance(int i, int j) const
+  double IIDStats::variance(int iOfRow, int iOfCol) const
   {
-    if (nbValues_(i, j) == 1)
+    if (nbValues_(iOfRow, iOfCol) == 1)
       return 0;
     else
-    {
-      //cout << sumVar_(i, j) << " / " << nbValues_(i, j)-1 << " = " << sumVar_(i, j) / (nbValues_(i, j)-1) << endl;
-      return sumVar_(i, j) / (nbValues_(i, j)-1.);
-    }
+      return sumVar_(iOfRow, iOfCol) / (nbValues_(iOfRow, iOfCol)-1.);
   }
   
-  double IIDStats::stdDev(int i, int j) const
+  double IIDStats::stdDev(int iOfRow, int iOfCol) const
   {
-    return sqrt(variance(i,j));
+    return sqrt(variance(iOfRow, iOfCol));
   }
   
   
-  //###### CorrelationStats ######
-
-
+  /// This class deals with two temporal series (A_n, B_n) of the form (phi(X_n), psi(X_n)) 
+  /// Computes the correlation profile and its integrale
   CorrelationStats::CorrelationStats():
     CorrelationStats(0,0,0,0)
-    /*decorrelationNbOfSteps_(0),
-    timeStep_(0),
-    nbOfAutocoPts_(0),
-    nbOfObservables_(0),
-    statsValues_(0),
-    statsRefValues_(0),
-    statsIntegratedCorrelation_(0),
-    statsCorrelation_(0, 0),
-    indexRef_(0),
-    bufferValues_(decorrelationNbOfSteps_)*/
   {
   }
 
@@ -184,7 +163,6 @@ namespace simol
     currentCorrelationIntegral_(0),
     bufferValues_(decorrelationNbOfSteps_)
   {
-    //cout << "CorrelationStats(int decorrelation : nbObs = " << decorrelationTime << endl;
   }
   
   const int& CorrelationStats::decorrelationNbOfSteps() const
@@ -192,6 +170,7 @@ namespace simol
     return decorrelationNbOfSteps_;
   }
   
+  /// Expected upper bound on the time tau such that A_t and B_{t+tau} are independent
   double CorrelationStats::decorrelationTime() const
   {
     return decorrelationNbOfSteps() * timeStep();
@@ -214,7 +193,6 @@ namespace simol
       {
         refValueB_(iOfObservable) = newValueB;
         indexRef_ = iOfStep;
-        //cout << newValue << endl;
       }
       //-- update the correlation function --
       // decorrelationNbOfSteps_ / nbOfAutocoPts_ is the time intervale between two correlation estimations: can be bigger than the time step
@@ -236,7 +214,6 @@ namespace simol
       if (bufferValues_.isReady())
         statsIntegratedCorrelation_.append(newValueB * 2 * bufferValues_.sumTrapeze() * timeStep());      // the factor 2 comes from the fact that we compute the integral on [-tdeco, tdeco]
         
-      //cout << newValueB << " x " << bufferValues_.sumTrapeze() << endl;
     }
   }
 
@@ -262,9 +239,9 @@ namespace simol
     return statsValuesA_.mean(iOfObservable);
   }
   
-  const long int& CorrelationStats::nbValues(int i, int j) const
+  const long int& CorrelationStats::nbValues(int iOfSpan, int iOfObservable) const
   {
-    return statsValuesA_.nbValues(i,j);
+    return statsValuesA_.nbValues(iOfSpan, iOfObservable);
   }
 
 
@@ -316,8 +293,8 @@ namespace simol
     return sqrt(varCorrelationAtSpan(iOfSpan, iOfObservable));
   }
   
-  //###### AutocorrelationStats ######
-  
+  /// Specialization of CorrelationStats in the case when A = B
+  //m Computes the autocorrelation profile and its integrale, which is the asymptotic variance
   AutocorrelationStats::AutocorrelationStats():
     CorrelationStats()
   {}
@@ -340,22 +317,11 @@ namespace simol
       return std::numeric_limits<double>::quiet_NaN();
       //return 0;
   }
-  
-  /*double AutocorrelationStats::integratedCorrelationCentered(int iOfObservable) const
-  {
-    cout << "AutocorrelationStats::integratedCorrelationCentered -> " << integratedCorrelation(iOfObservable) - 2 * pow(mean(iOfObservable),2) * decorrelationTime() << endl;
-    return integratedCorrelation(iOfObservable) - 2 * pow(mean(iOfObservable),2) * decorrelationTime();
-  }*/
 
   double AutocorrelationStats::asymptoticVariance(int iOfObservable) const
   {
     return integratedCorrelationCentered(iOfObservable);
   }
-
-  /*double AutocorrelationStats::stdDev(int iOfObservable) const
-  {
-    return sqrt(variance(iOfObservable));
-  }*/
   
   ///
   ///Returns the variance of the estimator of the variance
@@ -363,19 +329,5 @@ namespace simol
   {
     return asyvarIntegratedCorrelationCentered(iOfObservable);// * decorrelationTime();
   }
-  
-  /*///
-  ///Returns the variance of the estimator of the variance
-  double AutocorrelationStats::stdDevOfVar(int iOfObservable) const
-  {
-    return sqrt(varOfVar(iOfObservable));
-  }*/
-  
-  /*///
-  ///Returns the variance of the estimator of the variance
-  double AutocorrelationStats::stdErrorOfVariance(int iOfObservable) const
-  {
-    return stdDevOfVariance(iOfObservable) / sqrt(statsCorrelation_.nbValues(iOfObservable));
-  }*/
   
 }
