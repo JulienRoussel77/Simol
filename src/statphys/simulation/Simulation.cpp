@@ -7,10 +7,8 @@ namespace simol
   {
     if (input.systemName() == "Isolated")
       return new Isolated(input);
-    else if (input.systemName() == "BiChain")
-      return new BiChain(input);
-    else if (input.systemName() == "TriChain")
-      return new TriChain(input);
+    else if (input.systemName() == "Chain")
+      return new Chain(input);
     else if (input.systemName() == "NBody")
       return new NBody(input);
     else if (input.systemName() == "Colloid")
