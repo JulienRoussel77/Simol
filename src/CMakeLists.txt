@@ -1,9 +1,25 @@
+#====================================================
+# Store all cpp filenames into cpp-filenames variable
+#====================================================
+FILE(GLOB_RECURSE cpp-filenames *.cpp */*.cpp */*/*.cpp)
 
-# including src/core is useful when one wants to include linalg/Vector.hpp instead of core/linalg/Vector.hpp
-#include_directories(core)
+INCLUDE_DIRECTORIES(. input output dynamics system potential simulation)
 
-ADD_SUBDIRECTORY(core)
-ADD_SUBDIRECTORY(quantchem)
-ADD_SUBDIRECTORY(statphys)
+#==============================
+# Define simol-statphys library
+#==============================
+ADD_LIBRARY(simol-statphys ${cpp-filenames})
 
+#===================================================
+# Force simol-core to be built before simol-statphys
+#===================================================
+#ADD_DEPENDENCIES(simol-statphys)
+
+#===========================================
+# Libraries to be linked with simol-statphys
+#===========================================
+TARGET_LINK_LIBRARIES(simol-statphys)
+TARGET_LINK_LIBRARIES(simol-statphys ${YAMLCPP_INSTALL_DIR}/lib/libyaml-cpp.a)
+
+INSTALL(TARGETS simol-statphys ARCHIVE DESTINATION lib)
 

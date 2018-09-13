@@ -1,12 +1,12 @@
 #include <cstdlib>
 #include <iostream>
 
-#include "simol/statphys/simulation/Simulation.hpp"
-#include "simol/statphys/system/System.hpp"
-#include "simol/statphys/dynamics/Dynamics.hpp"
+#include "simol/simulation/Simulation.hpp"
+#include "simol/system/System.hpp"
+#include "simol/dynamics/Dynamics.hpp"
 #include "simol/core/linalg/Vector.hpp"
-#include "simol/statphys/input/Input.hpp"
-#include "simol/statphys/Tools.hpp"
+#include "simol/input/Input.hpp"
+#include "simol/Tools.hpp"
 
 #include <cmath>
 

@@ -2,12 +2,12 @@
 #include <cstdlib>
 #include <iostream>
 
-#include "simol/statphys/system/System.hpp"
-#include "simol/statphys/system/System.hpp"
-#include "simol/statphys/dynamics/Dynamics.hpp"
+#include "simol/system/System.hpp"
+#include "simol/system/System.hpp"
+#include "simol/dynamics/Dynamics.hpp"
 #include "simol/core/linalg/Vector.hpp"
-#include "simol/statphys/input/Input.hpp"
-#include "simol/statphys/controlVariate/Galerkin.hpp"
+#include "simol/input/Input.hpp"
+#include "simol/controlVariate/Galerkin.hpp"
 
 #include <cmath>
 

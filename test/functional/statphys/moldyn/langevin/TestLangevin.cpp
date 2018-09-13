@@ -1,9 +1,9 @@
 #include <cstdlib>
 #include <iostream>
 
-#include "simol/statphys/simulation/Simulation.hpp"
+#include "simol/simulation/Simulation.hpp"
 #include "simol/core/linalg/Vector.hpp"
-#include "simol/statphys/input/Input.hpp"
+#include "simol/input/Input.hpp"
 
 #include <cmath>
 
