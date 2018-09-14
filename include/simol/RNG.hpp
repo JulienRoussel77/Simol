@@ -2,7 +2,6 @@
 #define SIMOL_GAUSSIAN_HPP
 
 #include <random>
-//#include "simol/core/linalg/Vector.hpp"
 
 
 typedef Eigen::SparseMatrix<double> SMat;

@@ -3,8 +3,6 @@
 
 #include "simol/Tools.hpp"
 #include "simol/potential/Potential.hpp"
-//#include "simol/core/linalg/Vector.hpp"
-#include "simol/core/random/RNG.hpp"
 
 namespace simol
 {

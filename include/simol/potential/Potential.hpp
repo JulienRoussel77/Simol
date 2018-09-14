@@ -2,9 +2,7 @@
 #define SIMOL_POTENTIAL_HPP
 
 #include "simol/Tools.hpp"
-//#include "simol/core/linalg/Vector.hpp"
 #include "simol/input/Input.hpp"
-#include "simol/core/random/RNG.hpp"
 
 
 namespace simol

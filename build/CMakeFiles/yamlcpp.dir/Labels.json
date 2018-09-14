@@ -1,0 +1,43 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/home/jurousse/Travail/simol/build/CMakeFiles/yamlcpp"
+		},
+		{
+			"file" : "/home/jurousse/Travail/simol/build/CMakeFiles/yamlcpp.rule"
+		},
+		{
+			"file" : "/home/jurousse/Travail/simol/build/CMakeFiles/yamlcpp-complete.rule"
+		},
+		{
+			"file" : "/home/jurousse/Logiciels/yamlcpp/stamp/yamlcpp-install.rule"
+		},
+		{
+			"file" : "/home/jurousse/Logiciels/yamlcpp/stamp/yamlcpp-mkdir.rule"
+		},
+		{
+			"file" : "/home/jurousse/Logiciels/yamlcpp/stamp/yamlcpp-download.rule"
+		},
+		{
+			"file" : "/home/jurousse/Logiciels/yamlcpp/stamp/yamlcpp-update.rule"
+		},
+		{
+			"file" : "/home/jurousse/Logiciels/yamlcpp/stamp/yamlcpp-patch.rule"
+		},
+		{
+			"file" : "/home/jurousse/Logiciels/yamlcpp/stamp/yamlcpp-configure.rule"
+		},
+		{
+			"file" : "/home/jurousse/Logiciels/yamlcpp/stamp/yamlcpp-build.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"yamlcpp"
+		],
+		"name" : "yamlcpp"
+	}
+}

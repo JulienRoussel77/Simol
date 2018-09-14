@@ -260,12 +260,12 @@ namespace simol
     throw std::invalid_argument("Potential::polynomialCoeffs: Function undefined");
   }
   
-  double Potential::marginalWithoutCoupling(DVec const& position) const
+  double Potential::marginalWithoutCoupling(DVec const& /*position*/) const
   {
     throw std::invalid_argument("Potential::marginalWithoutCoupling: Function undefined");
   }
   
-  double Potential::gradientCoupling(DVec const& position) const
+  double Potential::gradientCoupling(DVec const& /*position*/) const
   {
     throw std::invalid_argument("Potential::gradientCoupling: Function undefined");
   }

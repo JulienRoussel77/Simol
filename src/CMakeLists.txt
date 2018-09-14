@@ -18,8 +18,9 @@ ADD_LIBRARY(simol-statphys ${cpp-filenames})
 #===========================================
 # Libraries to be linked with simol-statphys
 #===========================================
-TARGET_LINK_LIBRARIES(simol-statphys)
+
 TARGET_LINK_LIBRARIES(simol-statphys ${YAMLCPP_INSTALL_DIR}/lib/libyaml-cpp.a)
+MESSAGE(STATUS "YAMLCPP_INSTALLL_DIR=${YAMLCPP_INSTALL_DIR}")
 
 INSTALL(TARGETS simol-statphys ARCHIVE DESTINATION lib)
 
