@@ -21,4 +21,6 @@ output/*
 config.cmake
 simol.kdev4
 
+build
+
 launcher_cluster_*
